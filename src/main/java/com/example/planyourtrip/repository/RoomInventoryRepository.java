@@ -25,4 +25,14 @@ public interface RoomInventoryRepository extends JpaRepository<RoomInventory, Lo
                                           @Param("to") LocalDate to);
 
     long countByHotelRoomId(Long roomId);
+
+    @Query("SELECT count(ri) FROM RoomInventory ri " +
+           "WHERE ri.hotelRoom.id = :roomId " +
+           "AND ri.inventoryDate >= :checkIn " +
+           "AND ri.inventoryDate < :checkOut " +
+           "AND ri.availableInventory > 0 " +
+           "AND ri.stopSell = false")
+    long countAvailableNights(@Param("roomId") Long roomId,
+                               @Param("checkIn") LocalDate checkIn,
+                               @Param("checkOut") LocalDate checkOut);
 }

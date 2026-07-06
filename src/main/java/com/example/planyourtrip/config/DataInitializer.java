@@ -39,6 +39,7 @@ public class DataInitializer implements ApplicationRunner {
     private final HotelFacilityRepository hotelFacilityRepo;
     private final HotelServiceRepository hotelServiceRepo;
     private final RoomInventoryRepository roomInventoryRepo;
+    private final RatePlanRepository ratePlanRepo;
 
     public DataInitializer(UserRepository users, PasswordEncoder encoder,
                            AdministrativeUnitRepository locations,
@@ -55,7 +56,8 @@ public class DataInitializer implements ApplicationRunner {
                            RoomAmenityRepository roomAmenityRepo,
                            HotelFacilityRepository hotelFacilityRepo,
                            HotelServiceRepository hotelServiceRepo,
-                           RoomInventoryRepository roomInventoryRepo) {
+                           RoomInventoryRepository roomInventoryRepo,
+                           RatePlanRepository ratePlanRepo) {
         this.users      = users;
         this.encoder    = encoder;
         this.locations  = locations;
@@ -73,6 +75,7 @@ public class DataInitializer implements ApplicationRunner {
         this.hotelFacilityRepo    = hotelFacilityRepo;
         this.hotelServiceRepo     = hotelServiceRepo;
         this.roomInventoryRepo    = roomInventoryRepo;
+        this.ratePlanRepo         = ratePlanRepo;
     }
 
     @Override
@@ -89,6 +92,7 @@ public class DataInitializer implements ApplicationRunner {
         seedHotelRooms();
         seedHotelExperience();
         seedRoomInventory();
+        seedRatePlans();
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -900,6 +904,43 @@ public class DataInitializer implements ApplicationRunner {
         s.setIcon(icon);
         s.setAvailable(available);
         hotelServiceRepo.save(s);
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // RATE PLANS — promotional pricing for demo hotel rooms
+    // ─────────────────────────────────────────────────────────────
+
+    private void seedRatePlans() {
+        Place place = placeRepo.findBySlug("grand-palace-hotel-vung-tau").orElse(null);
+        if (place == null) return;
+        HotelDetail detail = hotelDetailRepo.findByPlaceId(place.getId()).orElse(null);
+        if (detail == null) return;
+
+        java.time.LocalDate today = java.time.LocalDate.now();
+        ratePlanFor(detail, "STD-TWIN", "Summer Deal",
+            RatePlanType.PROMOTIONAL, new BigDecimal("800000.00"), today, today.plusDays(30));
+        ratePlanFor(detail, "SUITE-KNG", "Ocean Suite Offer",
+            RatePlanType.PROMOTIONAL, new BigDecimal("2800000.00"), today, today.plusDays(14));
+    }
+
+    private void ratePlanFor(HotelDetail detail, String roomCode, String rateName,
+                              RatePlanType rateType, BigDecimal price,
+                              java.time.LocalDate start, java.time.LocalDate end) {
+        HotelRoom room = hotelRoomRepo.findAllByHotelDetailId(detail.getId())
+            .stream()
+            .filter(r -> roomCode.equals(r.getRoomCode()))
+            .findFirst()
+            .orElse(null);
+        if (room == null) return;
+        if (!ratePlanRepo.findByHotelRoomIdOrderByStartDateAsc(room.getId()).isEmpty()) return;
+        RatePlan plan = new RatePlan();
+        plan.setHotelRoom(room);
+        plan.setRateName(rateName);
+        plan.setRateType(rateType);
+        plan.setPricePerNight(price);
+        plan.setStartDate(start);
+        plan.setEndDate(end);
+        ratePlanRepo.save(plan);
     }
 
     private void roomFor(HotelDetail detail, String code,
