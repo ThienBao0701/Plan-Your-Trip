@@ -88,6 +88,19 @@ public class Booking {
 
     private Instant cancelledAt;
 
+    private Instant actualCheckInAt;
+
+    private Instant actualCheckOutAt;
+
+    private Instant completedAt;
+
+    private Instant archivedAt;
+
+    private Instant lastStatusChangedAt;
+
+    @Column(columnDefinition = "TEXT")
+    private String cancelReason;
+
     @PrePersist
     void onCreate() { createdAt = updatedAt = Instant.now(); }
 

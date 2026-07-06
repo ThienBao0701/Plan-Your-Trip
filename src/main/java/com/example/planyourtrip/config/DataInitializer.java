@@ -45,6 +45,7 @@ public class DataInitializer implements ApplicationRunner {
     private final RatePlanRepository ratePlanRepo;
     private final PromotionRepository promotionRepo;
     private final BookingRepository bookingRepo;
+    private final PaymentRepository paymentRepo;
 
     public DataInitializer(UserRepository users, PasswordEncoder encoder,
                            AdministrativeUnitRepository locations,
@@ -64,7 +65,8 @@ public class DataInitializer implements ApplicationRunner {
                            RoomInventoryRepository roomInventoryRepo,
                            RatePlanRepository ratePlanRepo,
                            PromotionRepository promotionRepo,
-                           BookingRepository bookingRepo) {
+                           BookingRepository bookingRepo,
+                           PaymentRepository paymentRepo) {
         this.users      = users;
         this.encoder    = encoder;
         this.locations  = locations;
@@ -85,6 +87,7 @@ public class DataInitializer implements ApplicationRunner {
         this.ratePlanRepo         = ratePlanRepo;
         this.promotionRepo        = promotionRepo;
         this.bookingRepo          = bookingRepo;
+        this.paymentRepo          = paymentRepo;
     }
 
     @Override
@@ -104,6 +107,7 @@ public class DataInitializer implements ApplicationRunner {
         seedRatePlans();
         seedPromotions();
         seedBookings();
+        seedPayments();
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -1128,5 +1132,38 @@ public class DataInitializer implements ApplicationRunner {
 
     private String bookingCode(Long id, java.time.LocalDate date) {
         return "PYT-" + date.format(DateTimeFormatter.BASIC_ISO_DATE) + "-" + String.format("%06d", id);
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // PAYMENTS — one PAID payment for the seeded CONFIRMED booking
+    // ─────────────────────────────────────────────────────────────
+
+    private void seedPayments() {
+        if (paymentRepo.count() > 0) return;
+
+        User demo = users.findByEmail("demo@planyourtrip.com").orElse(null);
+        if (demo == null) return;
+
+        Booking confirmed = bookingRepo.findByUserIdOrderByCreatedAtDesc(demo.getId())
+            .stream()
+            .filter(b -> b.getStatus() == BookingStatus.CONFIRMED)
+            .findFirst().orElse(null);
+        if (confirmed == null) return;
+
+        java.time.LocalDate today = java.time.LocalDate.now();
+
+        Payment p = new Payment();
+        p.setBooking(confirmed);
+        p.setAmount(confirmed.getFinalPrice());
+        p.setCurrency(confirmed.getCurrency());
+        p.setPaymentMethod(PaymentMethod.MOCK);
+        p.setStatus(PaymentStatus.PAID);
+        p.setProvider(PaymentProvider.MOCK);
+        p.setProviderTransactionId("MOCK-TXN-SEED-" + confirmed.getId());
+        p.setPaidAt(java.time.Instant.now());
+        p = paymentRepo.save(p);
+        p.setPaymentCode("PAY-" + today.format(DateTimeFormatter.BASIC_ISO_DATE)
+            + "-" + String.format("%06d", p.getId()));
+        paymentRepo.save(p);
     }
 }

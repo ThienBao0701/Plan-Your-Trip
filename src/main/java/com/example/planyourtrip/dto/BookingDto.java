@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 
 public class BookingDto {
 
@@ -39,7 +40,13 @@ public class BookingDto {
         Instant createdAt,
         Instant updatedAt,
         Instant confirmedAt,
-        Instant cancelledAt
+        Instant cancelledAt,
+        Instant actualCheckInAt,
+        Instant actualCheckOutAt,
+        Instant completedAt,
+        Instant archivedAt,
+        Instant lastStatusChangedAt,
+        String cancelReason
     ) {}
 
     public record BookingSummaryResponse(
@@ -57,5 +64,43 @@ public class BookingDto {
 
     public record BookingStatusRequest(
         @NotNull BookingStatus status
+    ) {}
+
+    public record CancelRequest(String cancelReason) {}
+
+    public record TimelineEvent(String event, Instant occurredAt, String description) {}
+
+    public record BookingTimelineResponse(
+        Long bookingId,
+        String bookingCode,
+        List<TimelineEvent> events
+    ) {}
+
+    public record UpcomingBookingResponse(
+        Long id,
+        String bookingCode,
+        String hotelName,
+        String roomName,
+        LocalDate checkIn,
+        LocalDate checkOut,
+        int nights,
+        String status,
+        BigDecimal finalPrice,
+        String currency
+    ) {}
+
+    public record BookingHistoryResponse(
+        Long id,
+        String bookingCode,
+        String hotelName,
+        String roomName,
+        LocalDate checkIn,
+        LocalDate checkOut,
+        int nights,
+        String status,
+        BigDecimal finalPrice,
+        String currency,
+        Instant createdAt,
+        Instant confirmedAt
     ) {}
 }

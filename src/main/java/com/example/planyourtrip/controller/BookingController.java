@@ -33,15 +33,41 @@ public class BookingController {
         return service.getById(uid, id);
     }
 
+    @GetMapping("/api/bookings/{id}/timeline")
+    @Operation(summary = "Get booking timeline (owner or admin)")
+    public BookingTimelineResponse getTimeline(@AuthUser Long uid, @PathVariable Long id) {
+        return service.getTimeline(uid, id);
+    }
+
     @GetMapping("/api/me/bookings")
     @Operation(summary = "List current user's bookings")
     public List<BookingSummaryResponse> getMyBookings(@AuthUser Long uid) {
         return service.getMyBookings(uid);
     }
 
+    @GetMapping("/api/me/bookings/upcoming")
+    @Operation(summary = "Upcoming bookings (PENDING / CONFIRMED / CHECK_IN_READY)")
+    public List<UpcomingBookingResponse> getUpcoming(@AuthUser Long uid) {
+        return service.getUpcomingBookings(uid);
+    }
+
+    @GetMapping("/api/me/bookings/history")
+    @Operation(summary = "Booking history (completed / cancelled / archived)")
+    public List<BookingHistoryResponse> getHistory(@AuthUser Long uid) {
+        return service.getBookingHistory(uid);
+    }
+
+    @GetMapping("/api/me/bookings/active")
+    @Operation(summary = "Active bookings (currently checked in)")
+    public List<BookingSummaryResponse> getActive(@AuthUser Long uid) {
+        return service.getActiveBookings(uid);
+    }
+
     @PatchMapping("/api/bookings/{id}/cancel")
     @Operation(summary = "Cancel a booking (owner only)")
-    public BookingResponse cancel(@AuthUser Long uid, @PathVariable Long id) {
-        return service.cancel(uid, id);
+    public BookingResponse cancel(@AuthUser Long uid,
+                                   @PathVariable Long id,
+                                   @RequestBody(required = false) CancelRequest req) {
+        return service.cancel(uid, id, req != null ? req.cancelReason() : null);
     }
 }
