@@ -3,6 +3,9 @@ package com.example.planyourtrip.config;
 import com.example.planyourtrip.model.*;
 import com.example.planyourtrip.repository.*;
 
+import java.math.RoundingMode;
+import java.time.format.DateTimeFormatter;
+
 import java.math.BigDecimal;
 import com.example.planyourtrip.util.SlugUtils;
 import org.springframework.boot.ApplicationArguments;
@@ -40,6 +43,8 @@ public class DataInitializer implements ApplicationRunner {
     private final HotelServiceRepository hotelServiceRepo;
     private final RoomInventoryRepository roomInventoryRepo;
     private final RatePlanRepository ratePlanRepo;
+    private final PromotionRepository promotionRepo;
+    private final BookingRepository bookingRepo;
 
     public DataInitializer(UserRepository users, PasswordEncoder encoder,
                            AdministrativeUnitRepository locations,
@@ -57,7 +62,9 @@ public class DataInitializer implements ApplicationRunner {
                            HotelFacilityRepository hotelFacilityRepo,
                            HotelServiceRepository hotelServiceRepo,
                            RoomInventoryRepository roomInventoryRepo,
-                           RatePlanRepository ratePlanRepo) {
+                           RatePlanRepository ratePlanRepo,
+                           PromotionRepository promotionRepo,
+                           BookingRepository bookingRepo) {
         this.users      = users;
         this.encoder    = encoder;
         this.locations  = locations;
@@ -76,6 +83,8 @@ public class DataInitializer implements ApplicationRunner {
         this.hotelServiceRepo     = hotelServiceRepo;
         this.roomInventoryRepo    = roomInventoryRepo;
         this.ratePlanRepo         = ratePlanRepo;
+        this.promotionRepo        = promotionRepo;
+        this.bookingRepo          = bookingRepo;
     }
 
     @Override
@@ -93,6 +102,8 @@ public class DataInitializer implements ApplicationRunner {
         seedHotelExperience();
         seedRoomInventory();
         seedRatePlans();
+        seedPromotions();
+        seedBookings();
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -907,6 +918,56 @@ public class DataInitializer implements ApplicationRunner {
     }
 
     // ─────────────────────────────────────────────────────────────
+    // PROMOTIONS — discount campaigns
+    // ─────────────────────────────────────────────────────────────
+
+    private void seedPromotions() {
+        if (promotionRepo.count() > 0) return;
+        java.time.LocalDate today = java.time.LocalDate.now();
+
+        promo("Summer Sale",       null,          PromotionType.GENERAL,     DiscountType.PERCENTAGE,
+              new BigDecimal("10"), null,          null, null,  false, 10,
+              today, today.plusDays(90));
+
+        promo("Weekend Special",   null,          PromotionType.WEEKEND,     DiscountType.PERCENTAGE,
+              new BigDecimal("15"), null,          null, null,  false, 20,
+              today, today.plusDays(90));
+
+        promo("Member Discount",   "MEMBER5",     PromotionType.MEMBER,      DiscountType.PERCENTAGE,
+              new BigDecimal("5"),  null,          null, null,  true,  5,
+              today, today.plusDays(365));
+
+        promo("Early Bird",        "EARLYBIRD20", PromotionType.EARLY_BIRD,  DiscountType.PERCENTAGE,
+              new BigDecimal("20"), null,          3,    null,  false, 30,
+              today.plusDays(30), today.plusDays(180));
+
+        promo("Last Minute",       "LASTMIN8",    PromotionType.LAST_MINUTE, DiscountType.PERCENTAGE,
+              new BigDecimal("8"),  null,          null, null,  false, 15,
+              today, today.plusDays(7));
+    }
+
+    private void promo(String name, String code, PromotionType type, DiscountType discountType,
+                       BigDecimal value, BigDecimal maxDiscount, Integer minStay,
+                       BigDecimal minSpend, boolean stackable, int priority,
+                       java.time.LocalDate start, java.time.LocalDate end) {
+        Promotion p = new Promotion();
+        p.setName(name);
+        p.setCode(code);
+        p.setPromotionType(type);
+        p.setDiscountType(discountType);
+        p.setDiscountValue(value);
+        p.setMaxDiscountAmount(maxDiscount);
+        p.setMinimumStay(minStay);
+        p.setMinimumSpend(minSpend);
+        p.setStackable(stackable);
+        p.setPriority(priority);
+        p.setStartDate(start);
+        p.setEndDate(end);
+        p.setTargetType(PromotionTargetType.ALL);
+        promotionRepo.save(p);
+    }
+
+    // ─────────────────────────────────────────────────────────────
     // RATE PLANS — promotional pricing for demo hotel rooms
     // ─────────────────────────────────────────────────────────────
 
@@ -988,5 +1049,84 @@ public class DataInitializer implements ApplicationRunner {
                 roomInventoryRepo.save(inv);
             }
         }
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // BOOKINGS — 2 sample bookings for demo user
+    // ─────────────────────────────────────────────────────────────
+
+    private void seedBookings() {
+        if (bookingRepo.count() > 0) return;
+
+        User demo = users.findByEmail("demo@planyourtrip.com").orElse(null);
+        if (demo == null) return;
+
+        Place hotel = placeRepo.findBySlug("grand-palace-hotel-vung-tau").orElse(null);
+        if (hotel == null) return;
+
+        HotelDetail detail = hotelDetailRepo.findByPlaceId(hotel.getId()).orElse(null);
+        if (detail == null) return;
+
+        List<HotelRoom> rooms = hotelRoomRepo.findAllByHotelDetailId(detail.getId());
+        if (rooms.isEmpty()) return;
+
+        HotelRoom stdTwin = rooms.stream()
+            .filter(r -> "STD-TWIN".equals(r.getRoomCode())).findFirst().orElse(null);
+        HotelRoom dlxKing = rooms.stream()
+            .filter(r -> "DLX-KING".equals(r.getRoomCode())).findFirst().orElse(null);
+        if (stdTwin == null || dlxKing == null) return;
+
+        java.time.LocalDate today = java.time.LocalDate.now();
+
+        // Booking 1: CONFIRMED — STD-TWIN, 2 nights, today+60
+        java.time.LocalDate ci1 = today.plusDays(60);
+        java.time.LocalDate co1 = ci1.plusDays(2);
+        BigDecimal price1 = stdTwin.getPriceFrom()
+            .multiply(BigDecimal.valueOf(2)).setScale(2, RoundingMode.HALF_UP);
+        Booking b1 = buildBooking(demo, hotel, stdTwin, ci1, co1, 2, 0, 1,
+            BookingStatus.CONFIRMED, price1, "Vui lòng chuẩn bị phòng hướng biển");
+        b1 = bookingRepo.save(b1);
+        b1.setBookingCode(bookingCode(b1.getId(), today));
+        b1.setConfirmedAt(java.time.Instant.now());
+        bookingRepo.save(b1);
+        roomInventoryRepo.decrementInventory(stdTwin.getId(), ci1, co1, 1);
+
+        // Booking 2: CANCELLED — DLX-KING, 3 nights, today+50
+        java.time.LocalDate ci2 = today.plusDays(50);
+        java.time.LocalDate co2 = ci2.plusDays(3);
+        BigDecimal price2 = dlxKing.getPriceFrom()
+            .multiply(BigDecimal.valueOf(3)).setScale(2, RoundingMode.HALF_UP);
+        Booking b2 = buildBooking(demo, hotel, dlxKing, ci2, co2, 2, 1, 1,
+            BookingStatus.CANCELLED, price2, null);
+        b2 = bookingRepo.save(b2);
+        b2.setBookingCode(bookingCode(b2.getId(), today));
+        b2.setCancelledAt(java.time.Instant.now());
+        bookingRepo.save(b2);
+    }
+
+    private Booking buildBooking(User user, Place hotel, HotelRoom room,
+                                  java.time.LocalDate checkIn, java.time.LocalDate checkOut,
+                                  int adults, int children, int numRooms,
+                                  BookingStatus status, BigDecimal finalPrice, String specialRequest) {
+        Booking b = new Booking();
+        b.setUser(user);
+        b.setHotel(hotel);
+        b.setRoom(room);
+        b.setCheckInDate(checkIn);
+        b.setCheckOutDate(checkOut);
+        b.setAdults(adults);
+        b.setChildren(children);
+        b.setNumberOfRooms(numRooms);
+        b.setStatus(status);
+        b.setCurrency("VND");
+        b.setBasePrice(finalPrice);
+        b.setDiscountAmount(BigDecimal.ZERO.setScale(2));
+        b.setFinalPrice(finalPrice);
+        b.setSpecialRequest(specialRequest);
+        return b;
+    }
+
+    private String bookingCode(Long id, java.time.LocalDate date) {
+        return "PYT-" + date.format(DateTimeFormatter.BASIC_ISO_DATE) + "-" + String.format("%06d", id);
     }
 }

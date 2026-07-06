@@ -49,7 +49,8 @@ public class SecurityConfig {
                     "/api/categories/**",
                     "/api/amenities/**",
                     "/api/places",
-                    "/api/places/**"
+                    "/api/places/**",
+                    "/api/rooms/*/pricing"
                 ).permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/partner/**").hasAnyRole("PARTNER", "ADMIN")
