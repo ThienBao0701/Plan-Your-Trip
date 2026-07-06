@@ -6,5 +6,6 @@ public enum RelatedEntityType {
     HOTEL,
     ROOM,
     PROMOTION,
-    SYSTEM
+    SYSTEM,
+    PARTNER
 }

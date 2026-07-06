@@ -49,6 +49,7 @@ public class DataInitializer implements ApplicationRunner {
     private final NotificationRepository notificationRepo;
     private final InvoiceRepository invoiceRepo;
     private final ReviewRepository reviewRepo;
+    private final PartnerProfileRepository partnerProfileRepo;
 
     public DataInitializer(UserRepository users, PasswordEncoder encoder,
                            AdministrativeUnitRepository locations,
@@ -72,7 +73,8 @@ public class DataInitializer implements ApplicationRunner {
                            PaymentRepository paymentRepo,
                            NotificationRepository notificationRepo,
                            InvoiceRepository invoiceRepo,
-                           ReviewRepository reviewRepo) {
+                           ReviewRepository reviewRepo,
+                           PartnerProfileRepository partnerProfileRepo) {
         this.users      = users;
         this.encoder    = encoder;
         this.locations  = locations;
@@ -97,6 +99,7 @@ public class DataInitializer implements ApplicationRunner {
         this.notificationRepo     = notificationRepo;
         this.invoiceRepo          = invoiceRepo;
         this.reviewRepo           = reviewRepo;
+        this.partnerProfileRepo   = partnerProfileRepo;
     }
 
     @Override
@@ -120,6 +123,7 @@ public class DataInitializer implements ApplicationRunner {
         seedInvoices();
         seedReviews();
         seedNotifications();
+        seedPartnerProfiles();
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -1332,5 +1336,33 @@ public class DataInitializer implements ApplicationRunner {
             n.setReadAt(java.time.Instant.now());
         }
         notificationRepo.save(n);
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // PARTNER PROFILES — approved profile for the seeded partner user
+    // ─────────────────────────────────────────────────────────────
+
+    private void seedPartnerProfiles() {
+        User partner = users.findByEmail("partner@planyourtrip.com").orElse(null);
+        if (partner == null) return;
+        if (partnerProfileRepo.existsByUserId(partner.getId())) return;
+
+        User admin = users.findByEmail("admin@planyourtrip.com").orElse(null);
+
+        PartnerProfile p = new PartnerProfile();
+        p.setUser(partner);
+        p.setBusinessName("Grand Palace Hospitality Co., Ltd.");
+        p.setBusinessType(BusinessType.HOTEL);
+        p.setRepresentativeName(partner.getFullName());
+        p.setPhone("0909123456");
+        p.setEmail(partner.getEmail());
+        p.setAddress("48 Quang Trung, Bãi Trước, TP. Vũng Tàu");
+        p.setTaxCode("0312345678");
+        java.time.Instant now = java.time.Instant.now();
+        p.setVerificationStatus(PartnerVerificationStatus.APPROVED);
+        p.setSubmittedAt(now);
+        p.setApprovedAt(now);
+        p.setApprovedBy(admin);
+        partnerProfileRepo.save(p);
     }
 }

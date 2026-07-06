@@ -3,7 +3,8 @@
     "allow": [
       "Bash(mvn test *)",
       "Bash(grep -v \"^\\\\.$\")",
-      "Bash(grep -v \"/\\\\.\")"
+      "Bash(grep -v \"/\\\\.\")",
+      "Bash(find 'D:/Plan Your Trip/planyourtrip-backend/planyourtrip-backend/src/test/java/com/example/planyourtrip' -iname *review* -o -iname *invoice*)"
     ]
   }
 }
