@@ -38,6 +38,7 @@ public class DataInitializer implements ApplicationRunner {
     private final RoomAmenityRepository roomAmenityRepo;
     private final HotelFacilityRepository hotelFacilityRepo;
     private final HotelServiceRepository hotelServiceRepo;
+    private final RoomInventoryRepository roomInventoryRepo;
 
     public DataInitializer(UserRepository users, PasswordEncoder encoder,
                            AdministrativeUnitRepository locations,
@@ -53,7 +54,8 @@ public class DataInitializer implements ApplicationRunner {
                            HotelRoomRepository hotelRoomRepo,
                            RoomAmenityRepository roomAmenityRepo,
                            HotelFacilityRepository hotelFacilityRepo,
-                           HotelServiceRepository hotelServiceRepo) {
+                           HotelServiceRepository hotelServiceRepo,
+                           RoomInventoryRepository roomInventoryRepo) {
         this.users      = users;
         this.encoder    = encoder;
         this.locations  = locations;
@@ -70,6 +72,7 @@ public class DataInitializer implements ApplicationRunner {
         this.roomAmenityRepo      = roomAmenityRepo;
         this.hotelFacilityRepo    = hotelFacilityRepo;
         this.hotelServiceRepo     = hotelServiceRepo;
+        this.roomInventoryRepo    = roomInventoryRepo;
     }
 
     @Override
@@ -85,6 +88,7 @@ public class DataInitializer implements ApplicationRunner {
         seedHotelDetails();
         seedHotelRooms();
         seedHotelExperience();
+        seedRoomInventory();
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -913,6 +917,35 @@ public class DataInitializer implements ApplicationRunner {
                 ra.setAmenity(amenity);
                 roomAmenityRepo.save(ra);
             });
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // ROOM INVENTORY — 90 days for all demo rooms
+    // ─────────────────────────────────────────────────────────────
+
+    private void seedRoomInventory() {
+        Place place = placeRepo.findBySlug("grand-palace-hotel-vung-tau").orElse(null);
+        if (place == null) return;
+        HotelDetail detail = hotelDetailRepo.findByPlaceId(place.getId()).orElse(null);
+        if (detail == null) return;
+
+        java.time.LocalDate today = java.time.LocalDate.now();
+        List<HotelRoom> rooms = hotelRoomRepo.findAllByHotelDetailId(detail.getId());
+
+        for (HotelRoom room : rooms) {
+            if (roomInventoryRepo.existsByHotelRoomIdAndInventoryDate(room.getId(), today)) continue;
+            for (int i = 0; i < 90; i++) {
+                RoomInventory inv = new RoomInventory();
+                inv.setHotelRoom(room);
+                inv.setInventoryDate(today.plusDays(i));
+                inv.setTotalInventory(20);
+                inv.setAvailableInventory(18);
+                inv.setBlockedInventory(1);
+                inv.setSoldInventory(0);
+                inv.setMaintenanceInventory(1);
+                roomInventoryRepo.save(inv);
+            }
         }
     }
 }
