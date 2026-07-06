@@ -48,6 +48,7 @@ public class DataInitializer implements ApplicationRunner {
     private final PaymentRepository paymentRepo;
     private final NotificationRepository notificationRepo;
     private final InvoiceRepository invoiceRepo;
+    private final ReviewRepository reviewRepo;
 
     public DataInitializer(UserRepository users, PasswordEncoder encoder,
                            AdministrativeUnitRepository locations,
@@ -70,7 +71,8 @@ public class DataInitializer implements ApplicationRunner {
                            BookingRepository bookingRepo,
                            PaymentRepository paymentRepo,
                            NotificationRepository notificationRepo,
-                           InvoiceRepository invoiceRepo) {
+                           InvoiceRepository invoiceRepo,
+                           ReviewRepository reviewRepo) {
         this.users      = users;
         this.encoder    = encoder;
         this.locations  = locations;
@@ -94,6 +96,7 @@ public class DataInitializer implements ApplicationRunner {
         this.paymentRepo          = paymentRepo;
         this.notificationRepo     = notificationRepo;
         this.invoiceRepo          = invoiceRepo;
+        this.reviewRepo           = reviewRepo;
     }
 
     @Override
@@ -115,6 +118,7 @@ public class DataInitializer implements ApplicationRunner {
         seedBookings();
         seedPayments();
         seedInvoices();
+        seedReviews();
         seedNotifications();
     }
 
@@ -1086,6 +1090,8 @@ public class DataInitializer implements ApplicationRunner {
             .filter(r -> "STD-TWIN".equals(r.getRoomCode())).findFirst().orElse(null);
         HotelRoom dlxKing = rooms.stream()
             .filter(r -> "DLX-KING".equals(r.getRoomCode())).findFirst().orElse(null);
+        HotelRoom famDbl = rooms.stream()
+            .filter(r -> "FAM-DBL".equals(r.getRoomCode())).findFirst().orElse(null);
         if (stdTwin == null || dlxKing == null) return;
 
         java.time.LocalDate today = java.time.LocalDate.now();
@@ -1114,6 +1120,25 @@ public class DataInitializer implements ApplicationRunner {
         b2.setBookingCode(bookingCode(b2.getId(), today));
         b2.setCancelledAt(java.time.Instant.now());
         bookingRepo.save(b2);
+
+        // Booking 3: COMPLETED — FAM-DBL, 2 nights, in the past (for review seeding)
+        if (famDbl != null) {
+            java.time.LocalDate ci3 = today.minusDays(10);
+            java.time.LocalDate co3 = ci3.plusDays(2);
+            BigDecimal price3 = famDbl.getPriceFrom()
+                .multiply(BigDecimal.valueOf(2)).setScale(2, RoundingMode.HALF_UP);
+            Booking b3 = buildBooking(demo, hotel, famDbl, ci3, co3, 2, 0, 1,
+                BookingStatus.COMPLETED, price3, null);
+            java.time.Instant past = java.time.Instant.now().minusSeconds(9L * 24 * 3600);
+            b3.setConfirmedAt(past);
+            b3.setActualCheckInAt(past);
+            b3.setActualCheckOutAt(past);
+            b3.setCompletedAt(past);
+            b3.setLastStatusChangedAt(past);
+            b3 = bookingRepo.save(b3);
+            b3.setBookingCode(bookingCode(b3.getId(), today));
+            bookingRepo.save(b3);
+        }
     }
 
     private Booking buildBooking(User user, Place hotel, HotelRoom room,
@@ -1209,6 +1234,41 @@ public class DataInitializer implements ApplicationRunner {
         inv.setInvoiceNumber("INV-" + java.time.LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE)
             + "-" + String.format("%06d", inv.getId()));
         invoiceRepo.save(inv);
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // REVIEWS — one approved review for the seeded COMPLETED booking, if any
+    // ─────────────────────────────────────────────────────────────
+
+    private void seedReviews() {
+        if (reviewRepo.count() > 0) return;
+
+        Booking completed = bookingRepo.findAllByOrderByCreatedAtDesc().stream()
+            .filter(b -> b.getStatus() == BookingStatus.COMPLETED)
+            .findFirst().orElse(null);
+        if (completed == null) return;
+
+        Place hotel = completed.getHotel();
+
+        Review review = new Review();
+        review.setBooking(completed);
+        review.setUser(completed.getUser());
+        review.setPlace(hotel);
+        review.setRatingOverall(5);
+        review.setRatingCleanliness(5);
+        review.setRatingService(4);
+        review.setRatingLocation(5);
+        review.setRatingValue(4);
+        review.setRatingFacilities(5);
+        review.setTitle("Wonderful stay");
+        review.setContent("Great sea view, friendly staff, and spotless rooms. Would book again.");
+        review.setStatus(ReviewStatus.APPROVED);
+        review.setApprovedAt(java.time.Instant.now());
+        reviewRepo.save(review);
+
+        hotel.setRatingAvg(5.0);
+        hotel.setReviewCount(1);
+        placeRepo.save(hotel);
     }
 
     // ─────────────────────────────────────────────────────────────
