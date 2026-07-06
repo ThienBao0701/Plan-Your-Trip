@@ -47,6 +47,7 @@ public class DataInitializer implements ApplicationRunner {
     private final BookingRepository bookingRepo;
     private final PaymentRepository paymentRepo;
     private final NotificationRepository notificationRepo;
+    private final InvoiceRepository invoiceRepo;
 
     public DataInitializer(UserRepository users, PasswordEncoder encoder,
                            AdministrativeUnitRepository locations,
@@ -68,7 +69,8 @@ public class DataInitializer implements ApplicationRunner {
                            PromotionRepository promotionRepo,
                            BookingRepository bookingRepo,
                            PaymentRepository paymentRepo,
-                           NotificationRepository notificationRepo) {
+                           NotificationRepository notificationRepo,
+                           InvoiceRepository invoiceRepo) {
         this.users      = users;
         this.encoder    = encoder;
         this.locations  = locations;
@@ -91,6 +93,7 @@ public class DataInitializer implements ApplicationRunner {
         this.bookingRepo          = bookingRepo;
         this.paymentRepo          = paymentRepo;
         this.notificationRepo     = notificationRepo;
+        this.invoiceRepo          = invoiceRepo;
     }
 
     @Override
@@ -111,6 +114,7 @@ public class DataInitializer implements ApplicationRunner {
         seedPromotions();
         seedBookings();
         seedPayments();
+        seedInvoices();
         seedNotifications();
     }
 
@@ -1169,6 +1173,42 @@ public class DataInitializer implements ApplicationRunner {
         p.setPaymentCode("PAY-" + today.format(DateTimeFormatter.BASIC_ISO_DATE)
             + "-" + String.format("%06d", p.getId()));
         paymentRepo.save(p);
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // INVOICES — one invoice for the seeded PAID payment
+    // ─────────────────────────────────────────────────────────────
+
+    private void seedInvoices() {
+        if (invoiceRepo.count() > 0) return;
+
+        Payment paid = paymentRepo.findAllByOrderByCreatedAtDesc().stream()
+            .filter(p -> p.getStatus() == PaymentStatus.PAID)
+            .findFirst().orElse(null);
+        if (paid == null) return;
+
+        Booking booking = paid.getBooking();
+        User user = booking.getUser();
+
+        Invoice inv = new Invoice();
+        inv.setBooking(booking);
+        inv.setPayment(paid);
+        inv.setUser(user);
+        inv.setHotel(booking.getHotel());
+        inv.setStatus(InvoiceStatus.ISSUED);
+        inv.setCurrency(booking.getCurrency());
+        inv.setSubtotal(booking.getBasePrice());
+        inv.setDiscountAmount(booking.getDiscountAmount());
+        inv.setTaxAmount(BigDecimal.ZERO.setScale(2));
+        inv.setTotalAmount(paid.getAmount());
+        inv.setIssuedAt(java.time.Instant.now());
+        inv.setPaidAt(paid.getPaidAt());
+        inv.setBillingName(user.getFullName());
+        inv.setBillingEmail(user.getEmail());
+        inv = invoiceRepo.save(inv);
+        inv.setInvoiceNumber("INV-" + java.time.LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE)
+            + "-" + String.format("%06d", inv.getId()));
+        invoiceRepo.save(inv);
     }
 
     // ─────────────────────────────────────────────────────────────
