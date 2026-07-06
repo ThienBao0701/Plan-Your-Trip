@@ -1,0 +1,9 @@
+package com.example.planyourtrip.service;
+import com.example.planyourtrip.dto.TripDto; import com.example.planyourtrip.exception.ApiException; import com.example.planyourtrip.model.Trip; import com.example.planyourtrip.repository.*; import org.springframework.http.HttpStatus; import org.springframework.stereotype.Service; import org.springframework.transaction.annotation.Transactional; import java.util.*;
+@Service public class TripService { private final TripRepository trips; private final UserRepository users; public TripService(TripRepository trips,UserRepository users){this.trips=trips;this.users=users;} public List<TripDto> list(Long uid){return trips.findByOwnerId(uid).stream().map(this::toDto).toList();} public TripDto get(Long uid,Long id){return toDto(ownerTrip(uid,id));}
+ @Transactional public TripDto create(Long uid,TripDto d){validateDates(d); Trip t=new Trip(); t.setOwner(users.findById(uid).orElseThrow()); apply(t,d); return toDto(trips.save(t));}
+ @Transactional public TripDto update(Long uid,Long id,TripDto d){validateDates(d); Trip t=ownerTrip(uid,id); apply(t,d); return toDto(t);} @Transactional public void delete(Long uid,Long id){trips.delete(ownerTrip(uid,id));}
+ public Trip ownerTrip(Long uid,Long id){return trips.findByIdAndOwnerId(id,uid).orElseThrow(()->new ApiException(HttpStatus.NOT_FOUND,"Trip not found"));}
+ private void validateDates(TripDto d){ if(d.startDate().isAfter(d.endDate())) throw new ApiException(HttpStatus.BAD_REQUEST,"startDate must be before or equal to endDate"); }
+ private void apply(Trip t,TripDto d){t.setTitle(d.title());t.setDestination(d.destination());t.setImageUrl(d.imageUrl());t.setStartDate(d.startDate());t.setEndDate(d.endDate());t.setTravelers(d.travelers());t.setBudget(d.budget());}
+ private TripDto toDto(Trip t){return new TripDto(t.getId(),t.getTitle(),t.getDestination(),t.getImageUrl(),t.getStartDate(),t.getEndDate(),t.getTravelers(),t.getBudget());}}

@@ -1,0 +1,3 @@
+package com.example.planyourtrip.controller;
+import com.example.planyourtrip.dto.AuthDtos.*; import com.example.planyourtrip.service.AuthService; import jakarta.validation.Valid; import org.springframework.http.*; import org.springframework.web.bind.annotation.*;
+@RestController @RequestMapping("/api/auth") public class AuthController { private final AuthService auth; public AuthController(AuthService auth){this.auth=auth;} @PostMapping("/register") ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest r){return ResponseEntity.status(201).body(auth.register(r));} @PostMapping("/login") AuthResponse login(@Valid @RequestBody LoginRequest r){return auth.login(r);} }
