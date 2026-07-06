@@ -46,6 +46,7 @@ public class DataInitializer implements ApplicationRunner {
     private final PromotionRepository promotionRepo;
     private final BookingRepository bookingRepo;
     private final PaymentRepository paymentRepo;
+    private final NotificationRepository notificationRepo;
 
     public DataInitializer(UserRepository users, PasswordEncoder encoder,
                            AdministrativeUnitRepository locations,
@@ -66,7 +67,8 @@ public class DataInitializer implements ApplicationRunner {
                            RatePlanRepository ratePlanRepo,
                            PromotionRepository promotionRepo,
                            BookingRepository bookingRepo,
-                           PaymentRepository paymentRepo) {
+                           PaymentRepository paymentRepo,
+                           NotificationRepository notificationRepo) {
         this.users      = users;
         this.encoder    = encoder;
         this.locations  = locations;
@@ -88,6 +90,7 @@ public class DataInitializer implements ApplicationRunner {
         this.promotionRepo        = promotionRepo;
         this.bookingRepo          = bookingRepo;
         this.paymentRepo          = paymentRepo;
+        this.notificationRepo     = notificationRepo;
     }
 
     @Override
@@ -108,6 +111,7 @@ public class DataInitializer implements ApplicationRunner {
         seedPromotions();
         seedBookings();
         seedPayments();
+        seedNotifications();
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -1165,5 +1169,68 @@ public class DataInitializer implements ApplicationRunner {
         p.setPaymentCode("PAY-" + today.format(DateTimeFormatter.BASIC_ISO_DATE)
             + "-" + String.format("%06d", p.getId()));
         paymentRepo.save(p);
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // NOTIFICATIONS — sample in-app notifications for demo users
+    // ─────────────────────────────────────────────────────────────
+
+    private void seedNotifications() {
+        if (notificationRepo.count() > 0) return;
+
+        User demo = users.findByEmail("demo@planyourtrip.com").orElse(null);
+        if (demo == null) return;
+
+        Booking confirmed = bookingRepo.findByUserIdOrderByCreatedAtDesc(demo.getId())
+            .stream().filter(b -> b.getStatus() == BookingStatus.CONFIRMED).findFirst().orElse(null);
+
+        if (confirmed != null) {
+            notification(demo, "Booking confirmed",
+                "Your booking " + confirmed.getBookingCode() + " has been confirmed.",
+                NotificationType.BOOKING, Priority.NORMAL,
+                RelatedEntityType.BOOKING, confirmed.getId(), true);
+
+            Payment paid = paymentRepo.findByBookingIdOrderByCreatedAtDesc(confirmed.getId())
+                .stream().filter(p -> p.getStatus() == PaymentStatus.PAID).findFirst().orElse(null);
+            if (paid != null) {
+                notification(demo, "Payment successful",
+                    "Your payment for booking " + confirmed.getBookingCode() + " was successful.",
+                    NotificationType.PAYMENT, Priority.HIGH,
+                    RelatedEntityType.PAYMENT, paid.getId(), false);
+            }
+        }
+
+        notification(demo, "Welcome to Plan Your Trip",
+            "Thanks for joining! Explore hotels, cafes, and attractions across Vietnam.",
+            NotificationType.SYSTEM, Priority.LOW, null, null, false);
+
+        notification(demo, "Summer Sale is live",
+            "Enjoy up to 10% off selected stays this summer.",
+            NotificationType.PROMOTION, Priority.NORMAL, null, null, false);
+
+        User partner = users.findByEmail("partner@planyourtrip.com").orElse(null);
+        if (partner != null) {
+            notification(partner, "New booking received",
+                "You have a new booking request awaiting confirmation.",
+                NotificationType.PARTNER, Priority.NORMAL, null, null, false);
+        }
+    }
+
+    private void notification(User recipient, String title, String message,
+                               NotificationType type, Priority priority,
+                               RelatedEntityType relatedEntityType, Long relatedEntityId, boolean read) {
+        Notification n = new Notification();
+        n.setRecipientUser(recipient);
+        n.setTitle(title);
+        n.setMessage(message);
+        n.setNotificationType(type);
+        n.setPriority(priority);
+        n.setRelatedEntityType(relatedEntityType);
+        n.setRelatedEntityId(relatedEntityId);
+        if (read) {
+            n.setRead(true);
+            n.setReadAt(java.time.Instant.now());
+        }
+        notificationRepo.save(n);
     }
 }

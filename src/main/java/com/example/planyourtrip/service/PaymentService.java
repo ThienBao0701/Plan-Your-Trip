@@ -19,13 +19,16 @@ public class PaymentService {
     private final PaymentRepository paymentRepo;
     private final BookingRepository bookingRepo;
     private final UserRepository userRepo;
+    private final NotificationService notificationService;
 
     public PaymentService(PaymentRepository paymentRepo,
                           BookingRepository bookingRepo,
-                          UserRepository userRepo) {
+                          UserRepository userRepo,
+                          NotificationService notificationService) {
         this.paymentRepo = paymentRepo;
         this.bookingRepo = bookingRepo;
         this.userRepo    = userRepo;
+        this.notificationService = notificationService;
     }
 
     @Transactional
@@ -107,7 +110,18 @@ public class PaymentService {
             booking.setConfirmedAt(Instant.now());
         bookingRepo.save(booking);
 
-        return toResponse(paymentRepo.save(payment));
+        Payment saved = paymentRepo.save(payment);
+
+        notificationService.create(booking.getUser().getId(), NotificationType.PAYMENT, Priority.HIGH,
+            "Payment successful",
+            "Your payment for booking " + booking.getBookingCode() + " was successful.",
+            RelatedEntityType.PAYMENT, saved.getId());
+        notificationService.create(booking.getUser().getId(), NotificationType.BOOKING, Priority.NORMAL,
+            "Booking confirmed",
+            "Your booking " + booking.getBookingCode() + " has been confirmed.",
+            RelatedEntityType.BOOKING, booking.getId());
+
+        return toResponse(saved);
     }
 
     @Transactional
@@ -127,7 +141,14 @@ public class PaymentService {
             payment.setFailureReason(req.failureReason());
 
         // Booking remains PENDING
-        return toResponse(paymentRepo.save(payment));
+        Payment saved = paymentRepo.save(payment);
+
+        notificationService.create(payment.getBooking().getUser().getId(), NotificationType.PAYMENT, Priority.HIGH,
+            "Payment failed",
+            "Your payment for booking " + payment.getBooking().getBookingCode() + " failed.",
+            RelatedEntityType.PAYMENT, saved.getId());
+
+        return toResponse(saved);
     }
 
     @Transactional

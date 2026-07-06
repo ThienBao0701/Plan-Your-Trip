@@ -1,9 +1,13 @@
 package com.example.planyourtrip.service;
 
+import com.example.planyourtrip.dto.NotificationDto.BroadcastRequest;
 import com.example.planyourtrip.dto.PromotionDto.*;
 import com.example.planyourtrip.exception.ApiException;
+import com.example.planyourtrip.model.NotificationType;
+import com.example.planyourtrip.model.Priority;
 import com.example.planyourtrip.model.Promotion;
 import com.example.planyourtrip.model.PromotionTargetType;
+import com.example.planyourtrip.model.RelatedEntityType;
 import com.example.planyourtrip.repository.PromotionRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -16,9 +20,11 @@ import java.util.List;
 public class PromotionService {
 
     private final PromotionRepository promotionRepo;
+    private final NotificationService notificationService;
 
-    public PromotionService(PromotionRepository promotionRepo) {
+    public PromotionService(PromotionRepository promotionRepo, NotificationService notificationService) {
         this.promotionRepo = promotionRepo;
+        this.notificationService = notificationService;
     }
 
     public List<PromotionResponse> getAll() {
@@ -39,7 +45,15 @@ public class PromotionService {
         }
         Promotion p = new Promotion();
         fill(p, req);
-        return toResponse(promotionRepo.save(p));
+        Promotion saved = promotionRepo.save(p);
+
+        notificationService.adminBroadcast(new BroadcastRequest(
+            "New promotion: " + saved.getName(),
+            "Check out our new promotion: " + saved.getName() + "!",
+            NotificationType.PROMOTION, Priority.LOW,
+            RelatedEntityType.PROMOTION, saved.getId()));
+
+        return toResponse(saved);
     }
 
     @Transactional

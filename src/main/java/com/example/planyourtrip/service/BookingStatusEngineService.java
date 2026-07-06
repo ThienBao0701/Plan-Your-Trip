@@ -3,6 +3,9 @@ package com.example.planyourtrip.service;
 import com.example.planyourtrip.exception.ApiException;
 import com.example.planyourtrip.model.Booking;
 import com.example.planyourtrip.model.BookingStatus;
+import com.example.planyourtrip.model.NotificationType;
+import com.example.planyourtrip.model.Priority;
+import com.example.planyourtrip.model.RelatedEntityType;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +19,12 @@ import static com.example.planyourtrip.model.BookingStatus.*;
 
 @Service
 public class BookingStatusEngineService {
+
+    private final NotificationService notificationService;
+
+    public BookingStatusEngineService(NotificationService notificationService) {
+        this.notificationService = notificationService;
+    }
 
     private static final Map<BookingStatus, Set<BookingStatus>> ALLOWED = new HashMap<>();
 
@@ -54,6 +63,21 @@ public class BookingStatusEngineService {
             case ARCHIVED     -> booking.setArchivedAt(now);
             case CANCELLED    -> { if (booking.getCancelledAt() == null) booking.setCancelledAt(now); }
             default           -> {}
+        }
+        notifyIfApplicable(booking, target);
+    }
+
+    private void notifyIfApplicable(Booking booking, BookingStatus target) {
+        switch (target) {
+            case CHECKED_IN -> notificationService.create(booking.getUser().getId(),
+                NotificationType.BOOKING, Priority.NORMAL, "Booking checked in",
+                "You have checked in for booking " + booking.getBookingCode() + ".",
+                RelatedEntityType.BOOKING, booking.getId());
+            case CHECKED_OUT -> notificationService.create(booking.getUser().getId(),
+                NotificationType.BOOKING, Priority.NORMAL, "Booking checked out",
+                "You have checked out for booking " + booking.getBookingCode() + ".",
+                RelatedEntityType.BOOKING, booking.getId());
+            default -> {}
         }
     }
 }

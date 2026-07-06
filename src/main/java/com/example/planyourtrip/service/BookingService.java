@@ -29,6 +29,7 @@ public class BookingService {
     private final PricingEngineService pricingEngine;
     private final BookingStatusEngineService statusEngine;
     private final PaymentRepository paymentRepo;
+    private final NotificationService notificationService;
 
     private static final Set<BookingStatus> UPCOMING_STATUSES =
         EnumSet.of(BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.CHECK_IN_READY);
@@ -47,7 +48,8 @@ public class BookingService {
                           UserRepository userRepo,
                           PricingEngineService pricingEngine,
                           BookingStatusEngineService statusEngine,
-                          PaymentRepository paymentRepo) {
+                          PaymentRepository paymentRepo,
+                          NotificationService notificationService) {
         this.bookingRepo   = bookingRepo;
         this.roomRepo      = roomRepo;
         this.inventoryRepo = inventoryRepo;
@@ -55,6 +57,7 @@ public class BookingService {
         this.pricingEngine = pricingEngine;
         this.statusEngine  = statusEngine;
         this.paymentRepo   = paymentRepo;
+        this.notificationService = notificationService;
     }
 
     // ── Create ────────────────────────────────────────────────────────────────
@@ -204,7 +207,14 @@ public class BookingService {
         inventoryRepo.restoreInventory(booking.getRoom().getId(),
             booking.getCheckInDate(), booking.getCheckOutDate(), booking.getNumberOfRooms());
 
-        return toResponse(bookingRepo.save(booking));
+        Booking saved = bookingRepo.save(booking);
+
+        notificationService.create(userId, NotificationType.BOOKING, Priority.NORMAL,
+            "Booking cancelled",
+            "Your booking " + saved.getBookingCode() + " has been cancelled.",
+            RelatedEntityType.BOOKING, saved.getId());
+
+        return toResponse(saved);
     }
 
     // ── Admin: list / get ─────────────────────────────────────────────────────
