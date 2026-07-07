@@ -5,6 +5,8 @@ import com.example.planyourtrip.model.BookingStatus;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.List;
 
 public final class BookingSpecification {
 
@@ -45,5 +47,34 @@ public final class BookingSpecification {
         if (code == null || code.isBlank()) return Specification.where(null);
         return (root, query, cb) ->
             cb.equal(cb.upper(root.get("bookingCode")), code.toUpperCase());
+    }
+
+    public static Specification<Booking> withHotelIdIn(List<Long> hotelIds) {
+        if (hotelIds == null || hotelIds.isEmpty()) return (root, query, cb) -> cb.disjunction();
+        return (root, query, cb) -> root.get("hotel").get("id").in(hotelIds);
+    }
+
+    public static Specification<Booking> withRoomId(Long roomId) {
+        if (roomId == null) return Specification.where(null);
+        return (root, query, cb) -> cb.equal(root.get("room").get("id"), roomId);
+    }
+
+    public static Specification<Booking> withCheckOutDate(LocalDate date) {
+        if (date == null) return Specification.where(null);
+        return (root, query, cb) -> cb.equal(root.get("checkOutDate"), date);
+    }
+
+    public static Specification<Booking> withCheckInDateRange(LocalDate from, LocalDate to) {
+        if (from == null && to == null) return Specification.where(null);
+        return (root, query, cb) -> {
+            if (from != null && to != null) return cb.between(root.get("checkInDate"), from, to);
+            if (from != null) return cb.greaterThanOrEqualTo(root.get("checkInDate"), from);
+            return cb.lessThanOrEqualTo(root.get("checkInDate"), to);
+        };
+    }
+
+    public static Specification<Booking> withStatusIn(Collection<BookingStatus> statuses) {
+        if (statuses == null || statuses.isEmpty()) return Specification.where(null);
+        return (root, query, cb) -> root.get("status").in(statuses);
     }
 }

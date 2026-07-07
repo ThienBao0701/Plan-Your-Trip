@@ -157,7 +157,7 @@ public class InvoiceService {
             + "-" + String.format("%06d", id);
     }
 
-    private InvoiceResponse toResponse(Invoice i) {
+    InvoiceResponse toResponse(Invoice i) {
         return new InvoiceResponse(
             i.getId(),
             i.getInvoiceNumber(),
@@ -176,7 +176,7 @@ public class InvoiceService {
         );
     }
 
-    private InvoiceSummaryResponse toSummary(Invoice i) {
+    InvoiceSummaryResponse toSummary(Invoice i) {
         return new InvoiceSummaryResponse(
             i.getId(), i.getInvoiceNumber(),
             i.getBooking().getId(), i.getBooking().getBookingCode(),

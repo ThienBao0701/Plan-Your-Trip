@@ -208,7 +208,7 @@ public class PaymentService {
             + "-" + String.format("%06d", id);
     }
 
-    private PaymentResponse toResponse(Payment p) {
+    PaymentResponse toResponse(Payment p) {
         return new PaymentResponse(
             p.getId(),
             p.getPaymentCode(),

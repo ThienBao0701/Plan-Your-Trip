@@ -353,7 +353,7 @@ public class BookingService {
             + "-" + String.format("%06d", id);
     }
 
-    private BookingResponse toResponse(Booking b) {
+    BookingResponse toResponse(Booking b) {
         int nights = (int) ChronoUnit.DAYS.between(b.getCheckInDate(), b.getCheckOutDate());
         return new BookingResponse(
             b.getId(),
@@ -376,7 +376,7 @@ public class BookingService {
         );
     }
 
-    private BookingSummaryResponse toSummary(Booking b) {
+    BookingSummaryResponse toSummary(Booking b) {
         int nights = (int) ChronoUnit.DAYS.between(b.getCheckInDate(), b.getCheckOutDate());
         return new BookingSummaryResponse(
             b.getId(),

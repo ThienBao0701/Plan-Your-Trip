@@ -30,8 +30,8 @@ public class BookingStatusEngineService {
 
     static {
         ALLOWED.put(PENDING,        EnumSet.of(CONFIRMED, CHECK_IN_READY, CANCELLED));
-        ALLOWED.put(CONFIRMED,      EnumSet.of(CHECK_IN_READY, CHECKED_IN, CANCELLED));
-        ALLOWED.put(CHECK_IN_READY, EnumSet.of(CHECKED_IN, CANCELLED));
+        ALLOWED.put(CONFIRMED,      EnumSet.of(CHECK_IN_READY, CHECKED_IN, CANCELLED, NO_SHOW));
+        ALLOWED.put(CHECK_IN_READY, EnumSet.of(CHECKED_IN, CANCELLED, NO_SHOW));
         ALLOWED.put(CHECKED_IN,     EnumSet.of(CHECKED_OUT));
         ALLOWED.put(CHECKED_OUT,    EnumSet.of(COMPLETED));
         ALLOWED.put(COMPLETED,      EnumSet.of(ARCHIVED));
