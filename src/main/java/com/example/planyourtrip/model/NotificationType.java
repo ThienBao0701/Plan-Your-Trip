@@ -8,5 +8,6 @@ public enum NotificationType {
     PROMOTION,
     REVIEW,
     PARTNER,
-    ADMIN
+    ADMIN,
+    MESSAGE
 }

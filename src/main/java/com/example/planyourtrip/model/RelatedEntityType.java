@@ -7,5 +7,6 @@ public enum RelatedEntityType {
     ROOM,
     PROMOTION,
     SYSTEM,
-    PARTNER
+    PARTNER,
+    MESSAGE
 }
