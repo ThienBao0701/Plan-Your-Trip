@@ -96,6 +96,13 @@ public class HotelRoomService {
         roomRepo.save(room);
     }
 
+    @Transactional
+    public void activate(Long id) {
+        HotelRoom room = roomOrThrow(id);
+        room.setActive(true);
+        roomRepo.save(room);
+    }
+
     HotelRoomResponse toResponse(HotelRoom room) {
         List<AmenityRef> amenities = roomAmenityRepo.findAllByRoomId(room.getId())
             .stream()

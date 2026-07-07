@@ -156,7 +156,7 @@ class PartnerPropertyTest {
         OwnedHotel h = setupOwnedHotel("LocationUpdate");
 
         String req = """
-                {"latitude":10.5,"longitude":107.1,"address":"999 New Address, Vung Tau"}
+                {"latitude":10.5,"longitude":107.1,"address":"999 New Address, Test City"}
                 """;
 
         String body = mvc.perform(put("/api/partner/hotels/" + h.hotelId() + "/location")
@@ -169,7 +169,7 @@ class PartnerPropertyTest {
         JsonNode res = mapper.readTree(body);
         assertEquals(10.5, res.get("latitude").asDouble());
         assertEquals(107.1, res.get("longitude").asDouble());
-        assertEquals("999 New Address, Vung Tau", res.get("address").asText());
+        assertEquals("999 New Address, Test City", res.get("address").asText());
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -416,7 +416,7 @@ class PartnerPropertyTest {
                   "categoryId": %d,
                   "subcategoryId": %d,
                   "administrativeUnitId": %d,
-                  "address": "123 Test Street, Vung Tau",
+                  "address": "123 Test Street, Test City",
                   "priceLevel": 2,
                   "featured": false,
                   "verified": false,
