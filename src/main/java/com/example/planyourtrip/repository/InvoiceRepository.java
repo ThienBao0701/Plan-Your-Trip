@@ -15,4 +15,6 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     List<Invoice> findByUserIdOrderByCreatedAtDesc(Long userId);
 
     List<Invoice> findAllByOrderByCreatedAtDesc();
+
+    List<Invoice> findByBookingIdIn(List<Long> bookingIds);
 }
