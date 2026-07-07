@@ -4,8 +4,11 @@ import com.example.planyourtrip.dto.HotelDetailDto.HotelDetailRequest;
 import com.example.planyourtrip.dto.HotelDetailDto.HotelDetailResponse;
 import com.example.planyourtrip.dto.HotelExperienceDto.ExperienceRequest;
 import com.example.planyourtrip.dto.HotelExperienceDto.ExperienceResponse;
+import com.example.planyourtrip.dto.PartnerHotelDto.AssignOwnerRequest;
+import com.example.planyourtrip.dto.PartnerHotelDto.PartnerHotelResponse;
 import com.example.planyourtrip.service.HotelDetailService;
 import com.example.planyourtrip.service.HotelExperienceService;
+import com.example.planyourtrip.service.PartnerPropertyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,11 +24,14 @@ public class AdminHotelController {
 
     private final HotelDetailService service;
     private final HotelExperienceService experienceService;
+    private final PartnerPropertyService partnerPropertyService;
 
     public AdminHotelController(HotelDetailService service,
-                                 HotelExperienceService experienceService) {
-        this.service           = service;
-        this.experienceService = experienceService;
+                                 HotelExperienceService experienceService,
+                                 PartnerPropertyService partnerPropertyService) {
+        this.service                = service;
+        this.experienceService      = experienceService;
+        this.partnerPropertyService = partnerPropertyService;
     }
 
     @GetMapping("/{placeId}")
@@ -61,5 +67,13 @@ public class AdminHotelController {
             @PathVariable Long placeId,
             @RequestBody ExperienceRequest req) {
         return experienceService.updateExperience(placeId, req);
+    }
+
+    @PostMapping("/{hotelId}/assign-owner")
+    @Operation(summary = "Assign a hotel to a partner profile")
+    public PartnerHotelResponse assignOwner(
+            @PathVariable Long hotelId,
+            @Valid @RequestBody AssignOwnerRequest req) {
+        return partnerPropertyService.assignOwner(hotelId, req);
     }
 }

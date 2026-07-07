@@ -84,6 +84,10 @@ public class Place {
     private User ownerUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_partner_profile_id")
+    private PartnerProfile owner;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by_id", nullable = false)
     private User createdBy;
 
@@ -96,6 +100,15 @@ public class Place {
     private boolean featured;
 
     private boolean verified;
+
+    private String phone;
+    private String email;
+    private String website;
+    private String facebook;
+    private String instagram;
+
+    @Column(nullable = false)
+    private boolean active = true;
 
     @Column(updatable = false)
     private Instant createdAt;

@@ -124,6 +124,7 @@ public class DataInitializer implements ApplicationRunner {
         seedReviews();
         seedNotifications();
         seedPartnerProfiles();
+        seedPartnerHotelOwnership();
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -1364,5 +1365,23 @@ public class DataInitializer implements ApplicationRunner {
         p.setApprovedAt(now);
         p.setApprovedBy(admin);
         partnerProfileRepo.save(p);
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // PARTNER HOTEL OWNERSHIP — Grand Palace Hotel belongs to the seeded partner
+    // ─────────────────────────────────────────────────────────────
+
+    private void seedPartnerHotelOwnership() {
+        Place hotel = placeRepo.findBySlug("grand-palace-hotel-vung-tau").orElse(null);
+        if (hotel == null || hotel.getOwner() != null) return;
+
+        User partner = users.findByEmail("partner@planyourtrip.com").orElse(null);
+        if (partner == null) return;
+
+        PartnerProfile profile = partnerProfileRepo.findByUserId(partner.getId()).orElse(null);
+        if (profile == null) return;
+
+        hotel.setOwner(profile);
+        placeRepo.save(hotel);
     }
 }

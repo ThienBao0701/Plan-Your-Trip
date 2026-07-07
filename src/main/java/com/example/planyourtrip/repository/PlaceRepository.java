@@ -44,4 +44,10 @@ public interface PlaceRepository extends JpaRepository<Place, Long>, JpaSpecific
     List<Place> findByCategoryId(Long categoryId);
 
     List<Place> findByAdministrativeUnitId(Long administrativeUnitId);
+
+    List<Place> findAllByOwnerId(Long ownerId);
+
+    Optional<Place> findByIdAndOwnerId(Long id, Long ownerId);
+
+    long countByOwnerId(Long ownerId);
 }
