@@ -26,6 +26,7 @@ public class PartnerPromotionService {
     private final PromotionRepository promotionRepo;
     private final PromotionService promotionService;
     private final NotificationService notificationService;
+    private final PartnerActivityLogService activityLogService;
 
     public PartnerPromotionService(PartnerProfileRepository partnerProfiles,
                                     PlaceRepository places,
@@ -33,7 +34,8 @@ public class PartnerPromotionService {
                                     HotelRoomRepository rooms,
                                     PromotionRepository promotionRepo,
                                     PromotionService promotionService,
-                                    NotificationService notificationService) {
+                                    NotificationService notificationService,
+                                    PartnerActivityLogService activityLogService) {
         this.partnerProfiles = partnerProfiles;
         this.places = places;
         this.hotelDetails = hotelDetails;
@@ -41,6 +43,7 @@ public class PartnerPromotionService {
         this.promotionRepo = promotionRepo;
         this.promotionService = promotionService;
         this.notificationService = notificationService;
+        this.activityLogService = activityLogService;
     }
 
     @Transactional(readOnly = true)
@@ -79,6 +82,8 @@ public class PartnerPromotionService {
         validateTargetOwnership(req.targetType(), req.targetId(), profile.getId());
         PromotionResponse res = promotionService.update(id, req);
         notifyPromotionUpdated(profile, res.id(), res.name());
+        activityLogService.log(profile.getId(), userId, "PROMOTION_UPDATED", "PROMOTION", res.id(),
+            "Updated promotion " + res.name());
         return res;
     }
 

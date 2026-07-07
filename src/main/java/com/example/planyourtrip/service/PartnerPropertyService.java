@@ -20,15 +20,18 @@ public class PartnerPropertyService {
     private final PartnerProfileRepository partnerProfiles;
     private final HotelDetailRepository hotelDetails;
     private final NotificationService notificationService;
+    private final PartnerActivityLogService activityLogService;
 
     public PartnerPropertyService(PlaceRepository places,
                                    PartnerProfileRepository partnerProfiles,
                                    HotelDetailRepository hotelDetails,
-                                   NotificationService notificationService) {
+                                   NotificationService notificationService,
+                                   PartnerActivityLogService activityLogService) {
         this.places = places;
         this.partnerProfiles = partnerProfiles;
         this.hotelDetails = hotelDetails;
         this.notificationService = notificationService;
+        this.activityLogService = activityLogService;
     }
 
     @Transactional(readOnly = true)
@@ -59,6 +62,8 @@ public class PartnerPropertyService {
 
         Place saved = places.save(place);
         notifyPropertyUpdated(saved);
+        activityLogService.log(profile.getId(), userId, "PROPERTY_UPDATED", "HOTEL", saved.getId(),
+            "Updated basic information for " + saved.getName());
         return toResponse(saved);
     }
 

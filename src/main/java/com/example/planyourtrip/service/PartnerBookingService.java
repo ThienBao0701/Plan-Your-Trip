@@ -43,6 +43,7 @@ public class PartnerBookingService {
     private final InvoiceService invoiceService;
     private final BookingStatusEngineService statusEngine;
     private final NotificationService notificationService;
+    private final PartnerActivityLogService activityLogService;
 
     private static final Set<BookingStatus> UPCOMING_STATUSES =
         EnumSet.of(BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.CHECK_IN_READY);
@@ -63,7 +64,8 @@ public class PartnerBookingService {
                                   PaymentService paymentService,
                                   InvoiceService invoiceService,
                                   BookingStatusEngineService statusEngine,
-                                  NotificationService notificationService) {
+                                  NotificationService notificationService,
+                                  PartnerActivityLogService activityLogService) {
         this.partnerProfiles = partnerProfiles;
         this.places = places;
         this.hotelDetails = hotelDetails;
@@ -77,6 +79,7 @@ public class PartnerBookingService {
         this.invoiceService = invoiceService;
         this.statusEngine = statusEngine;
         this.notificationService = notificationService;
+        this.activityLogService = activityLogService;
     }
 
     // ── List / search ────────────────────────────────────────────────────────
@@ -143,7 +146,9 @@ public class PartnerBookingService {
         PartnerProfile profile = myApprovedProfileOrThrow(userId);
         Booking booking = ownedBookingOrThrow(bookingId, profile.getId());
         statusEngine.transition(booking, BookingStatus.CHECKED_IN);
-        return bookingService.toResponse(bookingRepo.save(booking));
+        Booking saved = bookingRepo.save(booking);
+        logStatusChange(profile.getId(), userId, saved);
+        return bookingService.toResponse(saved);
     }
 
     @Transactional
@@ -151,7 +156,9 @@ public class PartnerBookingService {
         PartnerProfile profile = myApprovedProfileOrThrow(userId);
         Booking booking = ownedBookingOrThrow(bookingId, profile.getId());
         statusEngine.transition(booking, BookingStatus.CHECKED_OUT);
-        return bookingService.toResponse(bookingRepo.save(booking));
+        Booking saved = bookingRepo.save(booking);
+        logStatusChange(profile.getId(), userId, saved);
+        return bookingService.toResponse(saved);
     }
 
     @Transactional
@@ -161,6 +168,7 @@ public class PartnerBookingService {
         statusEngine.transition(booking, BookingStatus.NO_SHOW);
         Booking saved = bookingRepo.save(booking);
         notifyAdminsNoShow(saved);
+        logStatusChange(profile.getId(), userId, saved);
         return bookingService.toResponse(saved);
     }
 
@@ -169,7 +177,14 @@ public class PartnerBookingService {
         PartnerProfile profile = myApprovedProfileOrThrow(userId);
         Booking booking = ownedBookingOrThrow(bookingId, profile.getId());
         statusEngine.transition(booking, BookingStatus.COMPLETED);
-        return bookingService.toResponse(bookingRepo.save(booking));
+        Booking saved = bookingRepo.save(booking);
+        logStatusChange(profile.getId(), userId, saved);
+        return bookingService.toResponse(saved);
+    }
+
+    private void logStatusChange(Long partnerProfileId, Long userId, Booking booking) {
+        activityLogService.log(partnerProfileId, userId, "BOOKING_STATUS_CHANGED", "BOOKING", booking.getId(),
+            "Booking " + booking.getBookingCode() + " status changed to " + booking.getStatus());
     }
 
     // ── Dashboard ────────────────────────────────────────────────────────────

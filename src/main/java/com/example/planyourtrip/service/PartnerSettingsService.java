@@ -40,19 +40,22 @@ public class PartnerSettingsService {
     private final PartnerTeamMemberRepository teamMemberRepo;
     private final UserRepository userRepo;
     private final NotificationService notificationService;
+    private final PartnerActivityLogService activityLogService;
 
     public PartnerSettingsService(PartnerProfileRepository partnerProfileRepo,
                                    PartnerSettingsRepository settingsRepo,
                                    PartnerPayoutAccountRepository payoutAccountRepo,
                                    PartnerTeamMemberRepository teamMemberRepo,
                                    UserRepository userRepo,
-                                   NotificationService notificationService) {
+                                   NotificationService notificationService,
+                                   PartnerActivityLogService activityLogService) {
         this.partnerProfileRepo = partnerProfileRepo;
         this.settingsRepo = settingsRepo;
         this.payoutAccountRepo = payoutAccountRepo;
         this.teamMemberRepo = teamMemberRepo;
         this.userRepo = userRepo;
         this.notificationService = notificationService;
+        this.activityLogService = activityLogService;
     }
 
     // ── Settings ─────────────────────────────────────────────────────────────
@@ -92,6 +95,22 @@ public class PartnerSettingsService {
         return toPayoutResponse(account);
     }
 
+    /**
+     * Same as {@link #getPayoutAccount} but returns null instead of throwing when no
+     * payout account is configured yet — for callers (like account-summary
+     * aggregation) that need to tolerate "not configured" without relying on
+     * exception-based control flow across a transactional boundary (catching an
+     * exception thrown by a nested {@code @Transactional} call does not clear Spring's
+     * rollback-only flag on the shared transaction and would surface as an
+     * {@code UnexpectedRollbackException} instead).
+     */
+    @Transactional(readOnly = true)
+    public PartnerPayoutAccountResponse getPayoutAccountOrNull(Long userId) {
+        PartnerAccess access = resolveAccess(userId);
+        return payoutAccountRepo.findByPartnerProfileId(access.profile().getId())
+            .map(this::toPayoutResponse).orElse(null);
+    }
+
     @Transactional
     public PartnerPayoutAccountResponse updatePayoutAccount(Long userId, PartnerPayoutAccountRequest req) {
         PartnerAccess access = resolveAccess(userId);
@@ -112,6 +131,8 @@ public class PartnerSettingsService {
 
         PartnerPayoutAccount saved = payoutAccountRepo.save(account);
         notifyPayoutUpdated(access.profile());
+        activityLogService.log(access.profile().getId(), userId, "PAYOUT_ACCOUNT_UPDATED",
+            "PAYOUT_ACCOUNT", saved.getId(), "Payout account updated");
         return toPayoutResponse(saved);
     }
 
@@ -164,6 +185,9 @@ public class PartnerSettingsService {
             "You were added to " + access.profile().getBusinessName() + "'s team as " + req.role().name() + ".",
             RelatedEntityType.PARTNER, access.profile().getId());
 
+        activityLogService.log(access.profile().getId(), userId, "TEAM_MEMBER_ADDED",
+            "TEAM_MEMBER", saved.getId(), "Added " + target.getEmail() + " as " + req.role().name());
+
         return toTeamResponse(saved);
     }
 
@@ -186,6 +210,21 @@ public class PartnerSettingsService {
 
         PartnerTeamMember member = ownedTeamMemberOrThrow(teamMemberId, access.profile().getId());
         teamMemberRepo.delete(member);
+    }
+
+    // ── Admin (unrestricted, no role/ownership checks) ──────────────────────────
+
+    @Transactional(readOnly = true)
+    public PartnerSettingsResponse adminGetSettings(Long partnerProfileId) {
+        PartnerProfile profile = partnerProfileRepo.findById(partnerProfileId)
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Partner profile not found: " + partnerProfileId));
+        return toSettingsResponse(getOrCreateSettings(profile));
+    }
+
+    @Transactional(readOnly = true)
+    public List<PartnerTeamMemberResponse> adminGetTeamMembers(Long partnerProfileId) {
+        return teamMemberRepo.findByPartnerProfileIdOrderByCreatedAtAsc(partnerProfileId)
+            .stream().map(this::toTeamResponse).toList();
     }
 
     // ── Access resolution ────────────────────────────────────────────────────

@@ -30,19 +30,22 @@ public class PartnerPricingService {
     private final RatePlanService ratePlanService;
     private final PricingEngineService pricingEngineService;
     private final NotificationService notificationService;
+    private final PartnerActivityLogService activityLogService;
 
     public PartnerPricingService(PartnerProfileRepository partnerProfiles,
                                   HotelRoomRepository rooms,
                                   RatePlanRepository ratePlanRepo,
                                   RatePlanService ratePlanService,
                                   PricingEngineService pricingEngineService,
-                                  NotificationService notificationService) {
+                                  NotificationService notificationService,
+                                  PartnerActivityLogService activityLogService) {
         this.partnerProfiles = partnerProfiles;
         this.rooms = rooms;
         this.ratePlanRepo = ratePlanRepo;
         this.ratePlanService = ratePlanService;
         this.pricingEngineService = pricingEngineService;
         this.notificationService = notificationService;
+        this.activityLogService = activityLogService;
     }
 
     @Transactional(readOnly = true)
@@ -67,6 +70,8 @@ public class PartnerPricingService {
         RatePlan plan = ownedRatePlanOrThrow(ratePlanId, profile.getId());
         RatePlanResponse res = ratePlanService.update(ratePlanId, req);
         notifyRatePlanUpdated(plan.getHotelRoom());
+        activityLogService.log(profile.getId(), userId, "RATE_PLAN_UPDATED", "RATE_PLAN", ratePlanId,
+            "Updated rate plan " + res.rateName() + " for " + plan.getHotelRoom().getRoomName());
         return res;
     }
 

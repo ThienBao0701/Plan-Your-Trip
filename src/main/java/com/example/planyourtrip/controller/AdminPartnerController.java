@@ -1,8 +1,15 @@
 package com.example.planyourtrip.controller;
 
+import com.example.planyourtrip.dto.PartnerExtranetDto.AdminPartnerDetailResponse;
+import com.example.planyourtrip.dto.PartnerExtranetDto.PartnerActivityLogResponse;
 import com.example.planyourtrip.dto.PartnerProfileDto.*;
+import com.example.planyourtrip.dto.PartnerSettingsDto.PartnerSettingsResponse;
+import com.example.planyourtrip.dto.PartnerSettingsDto.PartnerTeamMemberResponse;
 import com.example.planyourtrip.security.AuthUser;
+import com.example.planyourtrip.service.PartnerActivityLogService;
+import com.example.planyourtrip.service.PartnerExtranetService;
 import com.example.planyourtrip.service.PartnerProfileService;
+import com.example.planyourtrip.service.PartnerSettingsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -16,8 +23,19 @@ import java.util.List;
 public class AdminPartnerController {
 
     private final PartnerProfileService service;
+    private final PartnerExtranetService extranetService;
+    private final PartnerSettingsService settingsService;
+    private final PartnerActivityLogService activityLogService;
 
-    public AdminPartnerController(PartnerProfileService service) { this.service = service; }
+    public AdminPartnerController(PartnerProfileService service,
+                                   PartnerExtranetService extranetService,
+                                   PartnerSettingsService settingsService,
+                                   PartnerActivityLogService activityLogService) {
+        this.service = service;
+        this.extranetService = extranetService;
+        this.settingsService = settingsService;
+        this.activityLogService = activityLogService;
+    }
 
     @GetMapping
     @Operation(summary = "List all partner profiles")
@@ -48,5 +66,29 @@ public class AdminPartnerController {
     public PartnerProfileResponse suspend(@PathVariable Long id,
                                            @RequestBody(required = false) PartnerStatusRequest req) {
         return service.adminSuspend(id, req);
+    }
+
+    @GetMapping("/{id}/detail")
+    @Operation(summary = "Aggregated partner detail: hotel/team counts, payout status")
+    public AdminPartnerDetailResponse detail(@PathVariable Long id) {
+        return extranetService.adminGetDetail(id);
+    }
+
+    @GetMapping("/{id}/team")
+    @Operation(summary = "List a partner's team members")
+    public List<PartnerTeamMemberResponse> team(@PathVariable Long id) {
+        return settingsService.adminGetTeamMembers(id);
+    }
+
+    @GetMapping("/{id}/settings")
+    @Operation(summary = "Get a partner's business/notification settings")
+    public PartnerSettingsResponse settings(@PathVariable Long id) {
+        return settingsService.adminGetSettings(id);
+    }
+
+    @GetMapping("/{id}/activity-logs")
+    @Operation(summary = "List a partner's activity log")
+    public List<PartnerActivityLogResponse> activityLogs(@PathVariable Long id) {
+        return activityLogService.adminListByPartner(id);
     }
 }

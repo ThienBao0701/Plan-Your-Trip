@@ -157,8 +157,16 @@ class PartnerSettingsTest {
 
         JsonNode arr = mapper.readTree(body);
         assertTrue(arr.isArray());
-        assertEquals(1, arr.size());
-        assertEquals("MANAGER", arr.get(0).get("role").asText());
+        // Approval now auto-creates an OWNER team member (Phase 6.10), so the list
+        // contains that plus the MANAGER just added.
+        assertEquals(2, arr.size());
+        boolean hasManager = false, hasOwner = false;
+        for (JsonNode n : arr) {
+            if ("MANAGER".equals(n.get("role").asText())) hasManager = true;
+            if ("OWNER".equals(n.get("role").asText())) hasOwner = true;
+        }
+        assertTrue(hasManager);
+        assertTrue(hasOwner);
     }
 
     @Test
@@ -228,7 +236,11 @@ class PartnerSettingsTest {
                 .header("Authorization", "Bearer " + partner.token()))
             .andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
-        assertEquals(0, mapper.readTree(body).size());
+        // Approval now auto-creates an OWNER team member (Phase 6.10) which was never
+        // removed here — only the explicitly-added-and-deleted VIEWER should be gone.
+        JsonNode remaining = mapper.readTree(body);
+        assertEquals(1, remaining.size());
+        assertEquals("OWNER", remaining.get(0).get("role").asText());
     }
 
     // ═══════════════════════════════════════════════════════════════════════════

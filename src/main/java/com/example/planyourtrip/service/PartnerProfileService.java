@@ -4,6 +4,7 @@ import com.example.planyourtrip.dto.PartnerProfileDto.*;
 import com.example.planyourtrip.exception.ApiException;
 import com.example.planyourtrip.model.*;
 import com.example.planyourtrip.repository.PartnerProfileRepository;
+import com.example.planyourtrip.repository.PartnerTeamMemberRepository;
 import com.example.planyourtrip.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,13 +19,16 @@ public class PartnerProfileService {
     private final PartnerProfileRepository partnerProfileRepo;
     private final UserRepository userRepo;
     private final NotificationService notificationService;
+    private final PartnerTeamMemberRepository partnerTeamMemberRepo;
 
     public PartnerProfileService(PartnerProfileRepository partnerProfileRepo,
                                   UserRepository userRepo,
-                                  NotificationService notificationService) {
+                                  NotificationService notificationService,
+                                  PartnerTeamMemberRepository partnerTeamMemberRepo) {
         this.partnerProfileRepo = partnerProfileRepo;
         this.userRepo = userRepo;
         this.notificationService = notificationService;
+        this.partnerTeamMemberRepo = partnerTeamMemberRepo;
     }
 
     @Transactional
@@ -117,11 +121,32 @@ public class PartnerProfileService {
             userRepo.save(owner);
         }
 
+        ensureOwnerTeamMember(profile, owner);
+
         notificationService.create(owner.getId(), NotificationType.PARTNER, Priority.NORMAL,
             "Your partner profile has been approved", "Your partner profile has been approved.",
             RelatedEntityType.PARTNER, profile.getId());
 
         return toResponse(profile);
+    }
+
+    /**
+     * Every approved partner should have an OWNER {@link PartnerTeamMember} row for
+     * its own user (Phase 6.9 introduced the team model after some profiles had
+     * already been approved, so this is created lazily here rather than assumed).
+     */
+    private void ensureOwnerTeamMember(PartnerProfile profile, User owner) {
+        if (partnerTeamMemberRepo.existsByPartnerProfileIdAndUserId(profile.getId(), owner.getId())) return;
+
+        PartnerTeamMember member = new PartnerTeamMember();
+        member.setPartnerProfile(profile);
+        member.setUser(owner);
+        member.setRole(PartnerTeamRole.OWNER);
+        member.setActive(true);
+        Instant now = Instant.now();
+        member.setInvitedAt(now);
+        member.setJoinedAt(now);
+        partnerTeamMemberRepo.save(member);
     }
 
     @Transactional
