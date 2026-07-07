@@ -77,4 +77,13 @@ public final class BookingSpecification {
         if (statuses == null || statuses.isEmpty()) return Specification.where(null);
         return (root, query, cb) -> root.get("status").in(statuses);
     }
+
+    public static Specification<Booking> withCheckOutDateRange(LocalDate from, LocalDate to) {
+        if (from == null && to == null) return Specification.where(null);
+        return (root, query, cb) -> {
+            if (from != null && to != null) return cb.between(root.get("checkOutDate"), from, to);
+            if (from != null) return cb.greaterThanOrEqualTo(root.get("checkOutDate"), from);
+            return cb.lessThanOrEqualTo(root.get("checkOutDate"), to);
+        };
+    }
 }

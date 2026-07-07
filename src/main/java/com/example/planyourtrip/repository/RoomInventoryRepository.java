@@ -27,6 +27,12 @@ public interface RoomInventoryRepository extends JpaRepository<RoomInventory, Lo
 
     long countByHotelRoomId(Long roomId);
 
+    @Query("SELECT ri FROM RoomInventory ri WHERE ri.hotelRoom.id IN :roomIds " +
+           "AND ri.inventoryDate BETWEEN :from AND :to")
+    List<RoomInventory> findByHotelRoomIdInAndInventoryDateBetween(@Param("roomIds") List<Long> roomIds,
+                                                                    @Param("from") LocalDate from,
+                                                                    @Param("to") LocalDate to);
+
     @Query("SELECT count(ri) FROM RoomInventory ri " +
            "WHERE ri.hotelRoom.id = :roomId " +
            "AND ri.inventoryDate >= :checkIn " +
