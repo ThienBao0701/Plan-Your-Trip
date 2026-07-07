@@ -1,6 +1,7 @@
 package com.example.planyourtrip.repository;
 
 import com.example.planyourtrip.model.Promotion;
+import com.example.planyourtrip.model.PromotionTargetType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,4 +22,12 @@ public interface PromotionRepository extends JpaRepository<Promotion, Long> {
            "ORDER BY p.priority DESC")
     List<Promotion> findActiveForDateRange(@Param("checkIn") LocalDate checkIn,
                                             @Param("lastNight") LocalDate lastNight);
+
+    @Query("SELECT p FROM Promotion p WHERE " +
+           "(p.targetType = :hotelType AND p.targetId IN :hotelDetailIds) OR " +
+           "(p.targetType = :roomType AND p.targetId IN :roomIds)")
+    List<Promotion> findByOwnedTargets(@Param("hotelType") PromotionTargetType hotelType,
+                                        @Param("hotelDetailIds") List<Long> hotelDetailIds,
+                                        @Param("roomType") PromotionTargetType roomType,
+                                        @Param("roomIds") List<Long> roomIds);
 }
