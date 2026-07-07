@@ -50,6 +50,9 @@ public class DataInitializer implements ApplicationRunner {
     private final InvoiceRepository invoiceRepo;
     private final ReviewRepository reviewRepo;
     private final PartnerProfileRepository partnerProfileRepo;
+    private final PartnerSettingsRepository partnerSettingsRepo;
+    private final PartnerPayoutAccountRepository partnerPayoutAccountRepo;
+    private final PartnerTeamMemberRepository partnerTeamMemberRepo;
 
     public DataInitializer(UserRepository users, PasswordEncoder encoder,
                            AdministrativeUnitRepository locations,
@@ -74,7 +77,10 @@ public class DataInitializer implements ApplicationRunner {
                            NotificationRepository notificationRepo,
                            InvoiceRepository invoiceRepo,
                            ReviewRepository reviewRepo,
-                           PartnerProfileRepository partnerProfileRepo) {
+                           PartnerProfileRepository partnerProfileRepo,
+                           PartnerSettingsRepository partnerSettingsRepo,
+                           PartnerPayoutAccountRepository partnerPayoutAccountRepo,
+                           PartnerTeamMemberRepository partnerTeamMemberRepo) {
         this.users      = users;
         this.encoder    = encoder;
         this.locations  = locations;
@@ -100,6 +106,9 @@ public class DataInitializer implements ApplicationRunner {
         this.invoiceRepo          = invoiceRepo;
         this.reviewRepo           = reviewRepo;
         this.partnerProfileRepo   = partnerProfileRepo;
+        this.partnerSettingsRepo       = partnerSettingsRepo;
+        this.partnerPayoutAccountRepo  = partnerPayoutAccountRepo;
+        this.partnerTeamMemberRepo     = partnerTeamMemberRepo;
     }
 
     @Override
@@ -125,6 +134,7 @@ public class DataInitializer implements ApplicationRunner {
         seedNotifications();
         seedPartnerProfiles();
         seedPartnerHotelOwnership();
+        seedPartnerSettings();
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -1383,5 +1393,46 @@ public class DataInitializer implements ApplicationRunner {
 
         hotel.setOwner(profile);
         placeRepo.save(hotel);
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // PARTNER SETTINGS — defaults, owner team membership, sample payout account
+    // ─────────────────────────────────────────────────────────────
+
+    private void seedPartnerSettings() {
+        User partner = users.findByEmail("partner@planyourtrip.com").orElse(null);
+        if (partner == null) return;
+
+        PartnerProfile profile = partnerProfileRepo.findByUserId(partner.getId()).orElse(null);
+        if (profile == null) return;
+
+        if (!partnerSettingsRepo.existsByPartnerProfileId(profile.getId())) {
+            PartnerSettings settings = new PartnerSettings();
+            settings.setPartnerProfile(profile);
+            partnerSettingsRepo.save(settings);
+        }
+
+        if (!partnerTeamMemberRepo.existsByPartnerProfileIdAndUserId(profile.getId(), partner.getId())) {
+            PartnerTeamMember owner = new PartnerTeamMember();
+            owner.setPartnerProfile(profile);
+            owner.setUser(partner);
+            owner.setRole(PartnerTeamRole.OWNER);
+            owner.setActive(true);
+            java.time.Instant now = java.time.Instant.now();
+            owner.setInvitedAt(now);
+            owner.setJoinedAt(now);
+            partnerTeamMemberRepo.save(owner);
+        }
+
+        if (!partnerPayoutAccountRepo.existsByPartnerProfileId(profile.getId())) {
+            PartnerPayoutAccount payout = new PartnerPayoutAccount();
+            payout.setPartnerProfile(profile);
+            payout.setAccountHolderName(partner.getFullName());
+            payout.setBankName("Vietcombank");
+            payout.setBankAccountLast4("6789");
+            payout.setPayoutMethod(PayoutMethod.BANK_TRANSFER);
+            payout.setStatus(PayoutAccountStatus.VERIFIED);
+            partnerPayoutAccountRepo.save(payout);
+        }
     }
 }
