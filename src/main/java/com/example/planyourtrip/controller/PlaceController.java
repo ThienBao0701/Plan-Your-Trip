@@ -3,10 +3,14 @@ package com.example.planyourtrip.controller;
 import com.example.planyourtrip.dto.PageResponse;
 import com.example.planyourtrip.dto.PlaceDetailResponse;
 import com.example.planyourtrip.dto.PlaceDto.PlaceSummaryResponse;
+import com.example.planyourtrip.security.UserPrincipal;
 import com.example.planyourtrip.service.PlaceService;
+import com.example.planyourtrip.service.RecentlyViewedService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,9 +23,11 @@ import java.util.List;
 public class PlaceController {
 
     private final PlaceService service;
+    private final RecentlyViewedService recentlyViewedService;
 
-    public PlaceController(PlaceService service) {
+    public PlaceController(PlaceService service, RecentlyViewedService recentlyViewedService) {
         this.service = service;
+        this.recentlyViewedService = recentlyViewedService;
     }
 
     @GetMapping
@@ -55,7 +61,9 @@ public class PlaceController {
         description = "Returns full place detail including cover image, gallery, opening hours, openNow status, and similar places. Only PUBLISHED places are returned."
     )
     public PlaceDetailResponse getBySlug(@PathVariable String slug) {
-        return service.getDetailBySlug(slug);
+        PlaceDetailResponse detail = service.getDetailBySlug(slug);
+        recordViewIfAuthenticated(detail.id());
+        return detail;
     }
 
     @GetMapping("/{id}")
@@ -64,6 +72,23 @@ public class PlaceController {
         description = "Returns full place detail including cover image, gallery, opening hours, openNow status, and similar places. Returns 404 if not found or not PUBLISHED."
     )
     public PlaceDetailResponse get(@PathVariable Long id) {
-        return service.getDetail(id);
+        PlaceDetailResponse detail = service.getDetail(id);
+        recordViewIfAuthenticated(detail.id());
+        return detail;
+    }
+
+    /**
+     * Best-effort view tracking for logged-in customers. Anonymous public detail
+     * access must never be affected: no user, or any failure while recording the
+     * view, is silently ignored so it can never break the detail response itself.
+     */
+    private void recordViewIfAuthenticated(Long placeId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !(auth.getPrincipal() instanceof UserPrincipal principal)) return;
+        try {
+            recentlyViewedService.recordView(principal.id(), placeId);
+        } catch (RuntimeException ignored) {
+            // Never let view-tracking failures break the public detail response.
+        }
     }
 }
