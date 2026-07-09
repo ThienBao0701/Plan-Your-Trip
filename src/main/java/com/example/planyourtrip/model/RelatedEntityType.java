@@ -8,5 +8,6 @@ public enum RelatedEntityType {
     PROMOTION,
     SYSTEM,
     PARTNER,
-    MESSAGE
+    MESSAGE,
+    TRIP
 }

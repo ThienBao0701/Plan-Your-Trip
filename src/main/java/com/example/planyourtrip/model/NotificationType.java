@@ -9,5 +9,6 @@ public enum NotificationType {
     REVIEW,
     PARTNER,
     ADMIN,
-    MESSAGE
+    MESSAGE,
+    TRIP
 }

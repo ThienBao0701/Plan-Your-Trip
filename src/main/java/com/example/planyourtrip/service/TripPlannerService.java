@@ -4,6 +4,7 @@ import com.example.planyourtrip.dto.TripPlanDto.*;
 import com.example.planyourtrip.exception.ApiException;
 import com.example.planyourtrip.model.*;
 import com.example.planyourtrip.repository.PlaceRepository;
+import com.example.planyourtrip.repository.TripPlanCollaboratorRepository;
 import com.example.planyourtrip.repository.TripPlanDayRepository;
 import com.example.planyourtrip.repository.TripPlanItemRepository;
 import com.example.planyourtrip.repository.TripPlanRepository;
@@ -20,10 +21,14 @@ import java.util.stream.Collectors;
 
 /**
  * Core itinerary planner: {@link TripPlan} → {@link TripPlanDay} → {@link TripPlanItem}.
- * Every mutating operation resolves ownership through the trip's {@code user},
- * mirroring the {@code myXOrThrow}/{@code ownedXOrThrow} convention used across the
- * partner and customer modules — a day/item lookup by bare id always re-verifies
- * that its parent trip belongs to the caller before any read or write.
+ *
+ * <p>Three tiers of access (Phase 7.5): the trip owner always has full access;
+ * an active {@link TripCollaboratorRole#EDITOR} collaborator can view and modify
+ * days/items but not trip metadata, deletion, duplication, or collaborator
+ * management (those stay strictly owner-only via {@link #myTripOrThrow}); an active
+ * {@link TripCollaboratorRole#VIEWER} collaborator can only view. A day/item lookup
+ * by bare id always re-resolves its parent trip and re-checks permission against
+ * it before any read or write — never trusts the id alone.
  *
  * <p>Deliberately built with no controller-facing state beyond its constructor
  * dependencies so it can be reused as-is by a future AI itinerary generator
@@ -37,17 +42,20 @@ public class TripPlannerService {
     private final TripPlanItemRepository itemRepo;
     private final PlaceRepository placeRepo;
     private final UserRepository userRepo;
+    private final TripPlanCollaboratorRepository collaboratorRepo;
 
     public TripPlannerService(TripPlanRepository tripRepo,
                                TripPlanDayRepository dayRepo,
                                TripPlanItemRepository itemRepo,
                                PlaceRepository placeRepo,
-                               UserRepository userRepo) {
+                               UserRepository userRepo,
+                               TripPlanCollaboratorRepository collaboratorRepo) {
         this.tripRepo = tripRepo;
         this.dayRepo = dayRepo;
         this.itemRepo = itemRepo;
         this.placeRepo = placeRepo;
         this.userRepo = userRepo;
+        this.collaboratorRepo = collaboratorRepo;
     }
 
     // ── Trip ──────────────────────────────────────────────────────────────────
@@ -79,6 +87,7 @@ public class TripPlannerService {
             .stream().map(TripPlanDay::getId).toList();
         if (!dayIds.isEmpty()) itemRepo.deleteByTripPlanDayIdIn(dayIds);
         dayRepo.deleteByTripPlanId(tripId);
+        collaboratorRepo.deleteByTripPlanId(tripId);
         tripRepo.delete(trip);
     }
 
@@ -89,7 +98,7 @@ public class TripPlannerService {
 
     @Transactional(readOnly = true)
     public TripResponse getById(Long userId, Long tripId) {
-        return toResponse(myTripOrThrow(userId, tripId));
+        return toResponse(viewableTripOrThrow(userId, tripId));
     }
 
     @Transactional
@@ -141,7 +150,7 @@ public class TripPlannerService {
 
     @Transactional
     public TripDayResponse addDay(Long userId, Long tripId, TripDayRequest req) {
-        TripPlan trip = myTripOrThrow(userId, tripId);
+        TripPlan trip = editableTripOrThrow(userId, tripId);
         if (dayRepo.existsByTripPlanIdAndDayNumber(trip.getId(), req.dayNumber()))
             throw new ApiException(HttpStatus.CONFLICT, "Day number already exists: " + req.dayNumber());
 
@@ -153,7 +162,7 @@ public class TripPlannerService {
 
     @Transactional
     public TripDayResponse updateDay(Long userId, Long dayId, TripDayRequest req) {
-        TripPlanDay day = dayInMyTripOrThrow(userId, dayId);
+        TripPlanDay day = editableDayOrThrow(userId, dayId);
         if (req.dayNumber() != day.getDayNumber()
                 && dayRepo.existsByTripPlanIdAndDayNumber(day.getTripPlan().getId(), req.dayNumber()))
             throw new ApiException(HttpStatus.CONFLICT, "Day number already exists: " + req.dayNumber());
@@ -164,7 +173,7 @@ public class TripPlannerService {
 
     @Transactional
     public void deleteDay(Long userId, Long dayId) {
-        TripPlanDay day = dayInMyTripOrThrow(userId, dayId);
+        TripPlanDay day = editableDayOrThrow(userId, dayId);
         itemRepo.deleteByTripPlanDayId(day.getId());
         dayRepo.delete(day);
     }
@@ -173,7 +182,7 @@ public class TripPlannerService {
 
     @Transactional
     public TripItemResponse addItem(Long userId, Long dayId, TripItemRequest req) {
-        TripPlanDay day = dayInMyTripOrThrow(userId, dayId);
+        TripPlanDay day = editableDayOrThrow(userId, dayId);
         Place place = resolvePublishedPlaceOrNull(req.placeId());
         validateItemContent(req);
 
@@ -187,7 +196,7 @@ public class TripPlannerService {
 
     @Transactional
     public TripItemResponse updateItem(Long userId, Long itemId, TripItemRequest req) {
-        TripPlanItem item = itemInMyTripOrThrow(userId, itemId);
+        TripPlanItem item = editableItemOrThrow(userId, itemId);
         Place place = resolvePublishedPlaceOrNull(req.placeId());
         validateItemContent(req);
 
@@ -198,7 +207,7 @@ public class TripPlannerService {
 
     @Transactional
     public void deleteItem(Long userId, Long itemId) {
-        TripPlanItem item = itemInMyTripOrThrow(userId, itemId);
+        TripPlanItem item = editableItemOrThrow(userId, itemId);
         Long dayId = item.getTripPlanDay().getId();
         itemRepo.delete(item);
         resequence(dayId);
@@ -206,9 +215,10 @@ public class TripPlannerService {
 
     @Transactional
     public TripItemResponse moveItem(Long userId, Long itemId, MoveTripItemRequest req) {
-        TripPlanItem item = itemInMyTripOrThrow(userId, itemId);
+        TripPlanItem item = editableItemOrThrow(userId, itemId);
         TripPlanDay sourceDay = item.getTripPlanDay();
-        TripPlanDay targetDay = dayInMyTripOrThrow(userId, req.targetDayId());
+        TripPlanDay targetDay = dayRepo.findById(req.targetDayId())
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Trip day not found: " + req.targetDayId()));
 
         if (!targetDay.getTripPlan().getId().equals(sourceDay.getTripPlan().getId()))
             throw new ApiException(HttpStatus.BAD_REQUEST, "Cannot move an item to a day in a different trip");
@@ -233,7 +243,7 @@ public class TripPlannerService {
 
     @Transactional
     public TripDayResponse reorderDay(Long userId, Long dayId, ReorderTripDayRequest req) {
-        TripPlanDay day = dayInMyTripOrThrow(userId, dayId);
+        TripPlanDay day = editableDayOrThrow(userId, dayId);
         List<TripPlanItem> items = itemRepo.findByTripPlanDayIdOrderBySortOrderAsc(day.getId());
         Map<Long, TripPlanItem> byId = items.stream().collect(Collectors.toMap(TripPlanItem::getId, Function.identity()));
 
@@ -247,27 +257,73 @@ public class TripPlannerService {
         return toDayResponse(day);
     }
 
-    // ── Ownership helpers ────────────────────────────────────────────────────
+    // ── Ownership / collaborator permission helpers ─────────────────────────
 
+    /**
+     * Strictly owner-only: trip metadata update, delete, duplicate. A collaborator
+     * (who can already see the trip exists) gets 403 here, not 404 — 404 is
+     * reserved for callers with no relationship to the trip at all.
+     */
     private TripPlan myTripOrThrow(Long userId, Long tripId) {
-        return tripRepo.findByIdAndUserId(tripId, userId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Trip not found: " + tripId));
+        TripPlan trip = viewableTripOrThrow(userId, tripId);
+        if (!isOwner(trip, userId))
+            throw new ApiException(HttpStatus.FORBIDDEN, "Only the trip owner can perform this action");
+        return trip;
     }
 
-    private TripPlanDay dayInMyTripOrThrow(Long userId, Long dayId) {
+    /** Owner or any active collaborator (VIEWER or EDITOR) may view. */
+    private TripPlan viewableTripOrThrow(Long userId, Long tripId) {
+        TripPlan trip = tripRepo.findById(tripId)
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Trip not found: " + tripId));
+        if (!canView(trip, userId))
+            throw new ApiException(HttpStatus.NOT_FOUND, "Trip not found: " + tripId);
+        return trip;
+    }
+
+    /** Owner or an active EDITOR collaborator may add/update/delete days and items. */
+    private TripPlan editableTripOrThrow(Long userId, Long tripId) {
+        TripPlan trip = viewableTripOrThrow(userId, tripId);
+        if (!canEdit(trip, userId))
+            throw new ApiException(HttpStatus.FORBIDDEN, "You do not have permission to edit this trip");
+        return trip;
+    }
+
+    private TripPlanDay editableDayOrThrow(Long userId, Long dayId) {
         TripPlanDay day = dayRepo.findById(dayId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Trip day not found: " + dayId));
-        if (!day.getTripPlan().getUser().getId().equals(userId))
-            throw new ApiException(HttpStatus.NOT_FOUND, "Trip day not found: " + dayId);
+        checkEditable(userId, day.getTripPlan(), "Trip day not found: " + dayId);
         return day;
     }
 
-    private TripPlanItem itemInMyTripOrThrow(Long userId, Long itemId) {
+    private TripPlanItem editableItemOrThrow(Long userId, Long itemId) {
         TripPlanItem item = itemRepo.findById(itemId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Trip item not found: " + itemId));
-        if (!item.getTripPlanDay().getTripPlan().getUser().getId().equals(userId))
-            throw new ApiException(HttpStatus.NOT_FOUND, "Trip item not found: " + itemId);
+        checkEditable(userId, item.getTripPlanDay().getTripPlan(), "Trip item not found: " + itemId);
         return item;
+    }
+
+    private void checkEditable(Long userId, TripPlan trip, String notFoundMessage) {
+        if (!canView(trip, userId)) throw new ApiException(HttpStatus.NOT_FOUND, notFoundMessage);
+        if (!canEdit(trip, userId))
+            throw new ApiException(HttpStatus.FORBIDDEN, "You do not have permission to edit this trip");
+    }
+
+    private boolean isOwner(TripPlan trip, Long userId) {
+        return trip.getUser().getId().equals(userId);
+    }
+
+    private boolean canView(TripPlan trip, Long userId) {
+        if (isOwner(trip, userId)) return true;
+        return collaboratorRepo.findByTripPlanIdAndUserId(trip.getId(), userId)
+            .map(TripPlanCollaborator::isActive).orElse(false);
+    }
+
+    private boolean canEdit(TripPlan trip, Long userId) {
+        if (isOwner(trip, userId)) return true;
+        return collaboratorRepo.findByTripPlanIdAndUserId(trip.getId(), userId)
+            .filter(TripPlanCollaborator::isActive)
+            .map(c -> c.getRole() == TripCollaboratorRole.EDITOR)
+            .orElse(false);
     }
 
     // ── Validation / mutation helpers ───────────────────────────────────────
@@ -337,7 +393,8 @@ public class TripPlannerService {
 
     // ── Response mapping ─────────────────────────────────────────────────────
 
-    private TripResponse toResponse(TripPlan trip) {
+    /** Package-private so {@link TripCollaborationService} can reuse the same nested mapping. */
+    TripResponse toResponse(TripPlan trip) {
         List<TripDayResponse> days = dayRepo.findByTripPlanIdOrderByDayNumberAsc(trip.getId())
             .stream().map(this::toDayResponse).toList();
         return new TripResponse(

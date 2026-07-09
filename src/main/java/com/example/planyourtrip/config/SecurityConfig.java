@@ -50,7 +50,8 @@ public class SecurityConfig {
                     "/api/amenities/**",
                     "/api/places",
                     "/api/places/**",
-                    "/api/rooms/*/pricing"
+                    "/api/rooms/*/pricing",
+                    "/api/trips/public/**"
                 ).permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/partner/profile/**").authenticated()
