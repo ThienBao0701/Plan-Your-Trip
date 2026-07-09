@@ -9,6 +9,7 @@ import com.example.planyourtrip.repository.TripPlanCollaboratorRepository;
 import com.example.planyourtrip.repository.TripPlanDayRepository;
 import com.example.planyourtrip.repository.TripPlanExpenseRepository;
 import com.example.planyourtrip.repository.TripPlanItemRepository;
+import com.example.planyourtrip.repository.TripPlanDocumentRepository;
 import com.example.planyourtrip.repository.TripPlanNoteRepository;
 import com.example.planyourtrip.repository.TripPlanPackingItemRepository;
 import com.example.planyourtrip.repository.TripPlanRepository;
@@ -51,6 +52,7 @@ public class TripPlannerService {
     private final TripPlanExpenseRepository expenseRepo;
     private final TripPlanPackingItemRepository packingRepo;
     private final TripPlanNoteRepository noteRepo;
+    private final TripPlanDocumentRepository documentRepo;
 
     public TripPlannerService(TripPlanRepository tripRepo,
                                TripPlanDayRepository dayRepo,
@@ -61,7 +63,8 @@ public class TripPlannerService {
                                TripPlanBudgetRepository budgetRepo,
                                TripPlanExpenseRepository expenseRepo,
                                TripPlanPackingItemRepository packingRepo,
-                               TripPlanNoteRepository noteRepo) {
+                               TripPlanNoteRepository noteRepo,
+                               TripPlanDocumentRepository documentRepo) {
         this.tripRepo = tripRepo;
         this.dayRepo = dayRepo;
         this.itemRepo = itemRepo;
@@ -72,6 +75,7 @@ public class TripPlannerService {
         this.expenseRepo = expenseRepo;
         this.packingRepo = packingRepo;
         this.noteRepo = noteRepo;
+        this.documentRepo = documentRepo;
     }
 
     // ── Trip ──────────────────────────────────────────────────────────────────
@@ -108,6 +112,7 @@ public class TripPlannerService {
         budgetRepo.deleteByTripPlanId(tripId);
         packingRepo.deleteByTripPlanId(tripId);
         noteRepo.deleteByTripPlanId(tripId);
+        documentRepo.deleteByTripPlanId(tripId);
         tripRepo.delete(trip);
     }
 
