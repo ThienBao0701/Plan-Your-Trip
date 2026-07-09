@@ -4,8 +4,10 @@ import com.example.planyourtrip.dto.TripPlanDto.*;
 import com.example.planyourtrip.exception.ApiException;
 import com.example.planyourtrip.model.*;
 import com.example.planyourtrip.repository.PlaceRepository;
+import com.example.planyourtrip.repository.TripPlanBudgetRepository;
 import com.example.planyourtrip.repository.TripPlanCollaboratorRepository;
 import com.example.planyourtrip.repository.TripPlanDayRepository;
+import com.example.planyourtrip.repository.TripPlanExpenseRepository;
 import com.example.planyourtrip.repository.TripPlanItemRepository;
 import com.example.planyourtrip.repository.TripPlanRepository;
 import com.example.planyourtrip.repository.UserRepository;
@@ -43,19 +45,25 @@ public class TripPlannerService {
     private final PlaceRepository placeRepo;
     private final UserRepository userRepo;
     private final TripPlanCollaboratorRepository collaboratorRepo;
+    private final TripPlanBudgetRepository budgetRepo;
+    private final TripPlanExpenseRepository expenseRepo;
 
     public TripPlannerService(TripPlanRepository tripRepo,
                                TripPlanDayRepository dayRepo,
                                TripPlanItemRepository itemRepo,
                                PlaceRepository placeRepo,
                                UserRepository userRepo,
-                               TripPlanCollaboratorRepository collaboratorRepo) {
+                               TripPlanCollaboratorRepository collaboratorRepo,
+                               TripPlanBudgetRepository budgetRepo,
+                               TripPlanExpenseRepository expenseRepo) {
         this.tripRepo = tripRepo;
         this.dayRepo = dayRepo;
         this.itemRepo = itemRepo;
         this.placeRepo = placeRepo;
         this.userRepo = userRepo;
         this.collaboratorRepo = collaboratorRepo;
+        this.budgetRepo = budgetRepo;
+        this.expenseRepo = expenseRepo;
     }
 
     // ── Trip ──────────────────────────────────────────────────────────────────
@@ -88,6 +96,8 @@ public class TripPlannerService {
         if (!dayIds.isEmpty()) itemRepo.deleteByTripPlanDayIdIn(dayIds);
         dayRepo.deleteByTripPlanId(tripId);
         collaboratorRepo.deleteByTripPlanId(tripId);
+        expenseRepo.deleteByTripPlanId(tripId);
+        budgetRepo.deleteByTripPlanId(tripId);
         tripRepo.delete(trip);
     }
 
