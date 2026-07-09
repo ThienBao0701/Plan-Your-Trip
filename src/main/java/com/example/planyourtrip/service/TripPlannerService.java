@@ -12,6 +12,7 @@ import com.example.planyourtrip.repository.TripPlanItemRepository;
 import com.example.planyourtrip.repository.TripPlanDocumentRepository;
 import com.example.planyourtrip.repository.TripPlanNoteRepository;
 import com.example.planyourtrip.repository.TripPlanPackingItemRepository;
+import com.example.planyourtrip.repository.TripPlanReminderRepository;
 import com.example.planyourtrip.repository.TripPlanRepository;
 import com.example.planyourtrip.repository.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -53,6 +54,7 @@ public class TripPlannerService {
     private final TripPlanPackingItemRepository packingRepo;
     private final TripPlanNoteRepository noteRepo;
     private final TripPlanDocumentRepository documentRepo;
+    private final TripPlanReminderRepository reminderRepo;
 
     public TripPlannerService(TripPlanRepository tripRepo,
                                TripPlanDayRepository dayRepo,
@@ -64,7 +66,8 @@ public class TripPlannerService {
                                TripPlanExpenseRepository expenseRepo,
                                TripPlanPackingItemRepository packingRepo,
                                TripPlanNoteRepository noteRepo,
-                               TripPlanDocumentRepository documentRepo) {
+                               TripPlanDocumentRepository documentRepo,
+                               TripPlanReminderRepository reminderRepo) {
         this.tripRepo = tripRepo;
         this.dayRepo = dayRepo;
         this.itemRepo = itemRepo;
@@ -76,6 +79,7 @@ public class TripPlannerService {
         this.packingRepo = packingRepo;
         this.noteRepo = noteRepo;
         this.documentRepo = documentRepo;
+        this.reminderRepo = reminderRepo;
     }
 
     // ── Trip ──────────────────────────────────────────────────────────────────
@@ -105,14 +109,19 @@ public class TripPlannerService {
         TripPlan trip = myTripOrThrow(userId, tripId);
         List<Long> dayIds = dayRepo.findByTripPlanIdOrderByDayNumberAsc(tripId)
             .stream().map(TripPlanDay::getId).toList();
-        if (!dayIds.isEmpty()) itemRepo.deleteByTripPlanDayIdIn(dayIds);
-        dayRepo.deleteByTripPlanId(tripId);
-        collaboratorRepo.deleteByTripPlanId(tripId);
+
+        // Order matters: anything that can reference a day/item (via a nullable FK)
+        // must be deleted before the days/items themselves, or the FK constraint
+        // on that still-referencing row would reject the day/item delete.
+        reminderRepo.deleteByTripPlanId(tripId);
         expenseRepo.deleteByTripPlanId(tripId);
-        budgetRepo.deleteByTripPlanId(tripId);
-        packingRepo.deleteByTripPlanId(tripId);
         noteRepo.deleteByTripPlanId(tripId);
         documentRepo.deleteByTripPlanId(tripId);
+        if (!dayIds.isEmpty()) itemRepo.deleteByTripPlanDayIdIn(dayIds);
+        dayRepo.deleteByTripPlanId(tripId);
+        packingRepo.deleteByTripPlanId(tripId);
+        budgetRepo.deleteByTripPlanId(tripId);
+        collaboratorRepo.deleteByTripPlanId(tripId);
         tripRepo.delete(trip);
     }
 
