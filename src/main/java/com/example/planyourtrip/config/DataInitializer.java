@@ -53,6 +53,8 @@ public class DataInitializer implements ApplicationRunner {
     private final PartnerSettingsRepository partnerSettingsRepo;
     private final PartnerPayoutAccountRepository partnerPayoutAccountRepo;
     private final PartnerTeamMemberRepository partnerTeamMemberRepo;
+    private final CouponDefinitionRepository couponDefinitionRepo;
+    private final com.example.planyourtrip.service.TravelCreditService travelCreditService;
 
     public DataInitializer(UserRepository users, PasswordEncoder encoder,
                            AdministrativeUnitRepository locations,
@@ -80,7 +82,9 @@ public class DataInitializer implements ApplicationRunner {
                            PartnerProfileRepository partnerProfileRepo,
                            PartnerSettingsRepository partnerSettingsRepo,
                            PartnerPayoutAccountRepository partnerPayoutAccountRepo,
-                           PartnerTeamMemberRepository partnerTeamMemberRepo) {
+                           PartnerTeamMemberRepository partnerTeamMemberRepo,
+                           CouponDefinitionRepository couponDefinitionRepo,
+                           com.example.planyourtrip.service.TravelCreditService travelCreditService) {
         this.users      = users;
         this.encoder    = encoder;
         this.locations  = locations;
@@ -109,6 +113,8 @@ public class DataInitializer implements ApplicationRunner {
         this.partnerSettingsRepo       = partnerSettingsRepo;
         this.partnerPayoutAccountRepo  = partnerPayoutAccountRepo;
         this.partnerTeamMemberRepo     = partnerTeamMemberRepo;
+        this.couponDefinitionRepo      = couponDefinitionRepo;
+        this.travelCreditService       = travelCreditService;
     }
 
     @Override
@@ -135,6 +141,49 @@ public class DataInitializer implements ApplicationRunner {
         seedPartnerProfiles();
         seedPartnerHotelOwnership();
         seedPartnerSettings();
+        seedCouponDefinitions();
+        seedDemoTravelCredits();
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // COUPONS & TRAVEL CREDITS — Phase 7.14 (idempotent)
+    // ─────────────────────────────────────────────────────────────
+
+    /** Idempotent by code — checked case-insensitively before insert, so restarts never duplicate WELCOME10. */
+    private void seedCouponDefinitions() {
+        if (couponDefinitionRepo.existsByCodeIgnoreCase("WELCOME10")) return;
+        java.time.LocalDate today = java.time.LocalDate.now();
+
+        CouponDefinition welcome = new CouponDefinition();
+        welcome.setCode("WELCOME10");
+        welcome.setName("Welcome 10% Off");
+        welcome.setDescription("10% off your first order of 500,000 VND or more (up to 300,000 VND off).");
+        welcome.setDiscountType(DiscountType.PERCENTAGE);
+        welcome.setDiscountValue(new BigDecimal("10"));
+        welcome.setMaxDiscountAmount(new BigDecimal("300000"));
+        welcome.setMinimumSpend(new BigDecimal("500000"));
+        welcome.setValidFrom(today.minusMonths(1));
+        welcome.setValidUntil(today.plusYears(1));
+        welcome.setActive(true);
+        welcome.setUsageLimitPerUser(1);
+        couponDefinitionRepo.save(welcome);
+    }
+
+    /**
+     * Small promotional starter balance for the demo user. Idempotent via the
+     * fixed idempotencyKey — TravelCreditService returns the original ledger
+     * row on replay, so restarts never double-grant.
+     */
+    private void seedDemoTravelCredits() {
+        User demo = users.findByEmail("demo@planyourtrip.com").orElse(null);
+        if (demo == null) return;
+        travelCreditService.grant(demo.getId(),
+            new com.example.planyourtrip.dto.TravelCreditDto.TravelCreditAdjustmentRequest(
+                new BigDecimal("100000"), "VND",
+                "Seeded demo promotional travel credit",
+                TravelCreditReferenceType.SYSTEM, null,
+                "seed-demo-welcome-credit", null,
+                TravelCreditTransactionType.PROMOTION));
     }
 
     // ─────────────────────────────────────────────────────────────
