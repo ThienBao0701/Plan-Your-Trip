@@ -65,6 +65,17 @@ public class TripPlanReminder {
 
     private Instant completedAt;
 
+    // ── Delivery tracking (Phase 7.11 — Reminder Delivery Foundation) ─────────
+
+    /** Set once a Notification has been successfully created for this reminder; null until then. */
+    private Instant deliveredAt;
+
+    @Column(nullable = false)
+    private int deliveryAttempts = 0;
+
+    @Column(columnDefinition = "TEXT")
+    private String lastDeliveryError;
+
     @PrePersist
     void onCreate() { createdAt = updatedAt = Instant.now(); }
 
