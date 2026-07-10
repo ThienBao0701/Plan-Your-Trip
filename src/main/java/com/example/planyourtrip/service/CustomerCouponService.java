@@ -149,6 +149,89 @@ public class CustomerCouponService {
         return new CouponPreviewResponse(orderAmount, discount, orderAmount.subtract(discount), true, null);
     }
 
+    // ── Phase 7.15 — checkout integration (called by BookingService) ─────────
+
+    /** A validated coupon + its computed discount, ready to be consumed by a booking. */
+    public record CheckoutCouponResult(CustomerCoupon coupon, BigDecimal discountAmount) {}
+
+    /**
+     * Phase 7.15 — validates a claimed coupon for checkout and computes its
+     * discount against {@code orderAmount} (the booking total AFTER any
+     * promotion discount) using the exact same eligibility rules and formula as
+     * {@link #preview}. Read-only: never marks the coupon used — that happens in
+     * {@link #markUsedForBooking} after the booking row exists, all inside the
+     * booking-creation transaction.
+     *
+     * <p>Status choices (documented judgment calls, consistent with 7.14):
+     * no claim of this code owned by the caller → 404 (covers unknown codes and
+     * other users' claims without leaking existence); claimed but no AVAILABLE
+     * instance (USED / EXPIRED / REVOKED) → 409 state conflict; definition
+     * inactive / not yet valid / minimumSpend not met → 400.
+     */
+    @Transactional
+    public CheckoutCouponResult validateForCheckout(Long userId, String rawCode, BigDecimal orderAmount) {
+        String code = CouponDefinitionService.normalizeCode(rawCode);
+        List<CustomerCoupon> claims =
+            customerCouponRepo.findByUserIdAndCouponDefinitionCodeOrderByClaimedAtAsc(userId, code);
+        if (claims.isEmpty())
+            throw new ApiException(HttpStatus.NOT_FOUND, "Coupon not found: " + code);
+
+        CustomerCoupon coupon = claims.stream()
+            .filter(c -> effectiveStatus(c) == CustomerCouponStatus.AVAILABLE)
+            .findFirst()
+            .orElseThrow(() -> new ApiException(HttpStatus.CONFLICT,
+                "Coupon is not available (already used, expired or revoked): " + code));
+
+        CouponDefinition def = coupon.getCouponDefinition();
+        if (!def.isActive())
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Coupon is no longer active: " + code);
+        if (LocalDate.now().isBefore(def.getValidFrom()))
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Coupon is not valid yet: " + code);
+        if (def.getMinimumSpend() != null && orderAmount.compareTo(def.getMinimumSpend()) < 0)
+            throw new ApiException(HttpStatus.BAD_REQUEST,
+                "Minimum spend of " + def.getMinimumSpend().toPlainString()
+                    + " not met for coupon: " + code);
+
+        return new CheckoutCouponResult(coupon, computeDiscount(def, orderAmount));
+    }
+
+    /**
+     * Phase 7.15 — atomically consumes a validated coupon: USED + usedAt +
+     * booking link, in the same transaction as the booking insert, so a failed
+     * booking never burns the coupon.
+     */
+    @Transactional
+    public void markUsedForBooking(CustomerCoupon coupon, Booking booking) {
+        coupon.setStatus(CustomerCouponStatus.USED);
+        coupon.setUsedAt(Instant.now());
+        coupon.setBooking(booking);
+        customerCouponRepo.save(coupon);
+    }
+
+    /**
+     * Phase 7.15 — cancellation hook. Releases the booking's coupon back to
+     * AVAILABLE (clearing usedAt + booking) IF it is still redeemable — i.e. its
+     * effective expiry has not passed and the definition is still active;
+     * otherwise it stays USED (documented judgment call: a coupon that could no
+     * longer be used anyway is not resurrected). Safe to call for bookings that
+     * never used a coupon (no-op), and naturally idempotent — once released the
+     * coupon no longer references the booking.
+     */
+    @Transactional
+    public void releaseForCancelledBooking(Long bookingId) {
+        customerCouponRepo.findByBookingId(bookingId).ifPresent(coupon -> {
+            if (coupon.getStatus() != CustomerCouponStatus.USED) return;
+            LocalDate expiry = effectiveExpiry(coupon);
+            boolean stillRedeemable = coupon.getCouponDefinition().isActive()
+                && (expiry == null || !expiry.isBefore(LocalDate.now()));
+            if (!stillRedeemable) return;
+            coupon.setStatus(CustomerCouponStatus.AVAILABLE);
+            coupon.setUsedAt(null);
+            coupon.setBooking(null);
+            customerCouponRepo.save(coupon);
+        });
+    }
+
     /**
      * Mirrors {@code PricingEngineService#computeDiscount} — see class javadoc
      * for why the formula is duplicated rather than reused.

@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -30,6 +32,8 @@ public class BookingService {
     private final BookingStatusEngineService statusEngine;
     private final PaymentRepository paymentRepo;
     private final NotificationService notificationService;
+    private final CustomerCouponService customerCouponService;
+    private final TravelCreditService travelCreditService;
 
     private static final Set<BookingStatus> UPCOMING_STATUSES =
         EnumSet.of(BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.CHECK_IN_READY);
@@ -49,7 +53,9 @@ public class BookingService {
                           PricingEngineService pricingEngine,
                           BookingStatusEngineService statusEngine,
                           PaymentRepository paymentRepo,
-                          NotificationService notificationService) {
+                          NotificationService notificationService,
+                          CustomerCouponService customerCouponService,
+                          TravelCreditService travelCreditService) {
         this.bookingRepo   = bookingRepo;
         this.roomRepo      = roomRepo;
         this.inventoryRepo = inventoryRepo;
@@ -58,6 +64,8 @@ public class BookingService {
         this.statusEngine  = statusEngine;
         this.paymentRepo   = paymentRepo;
         this.notificationService = notificationService;
+        this.customerCouponService = customerCouponService;
+        this.travelCreditService = travelCreditService;
     }
 
     // ── Create ────────────────────────────────────────────────────────────────
@@ -103,6 +111,32 @@ public class BookingService {
         User user = userRepo.findById(userId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
 
+        // ── Phase 7.15: coupon + travel credits at checkout ──────────────────
+        // Stacking order (documented judgment call): promotion/pricing-engine
+        // discount first (already inside pricing.finalPrice()), then the coupon
+        // on that amount, then credits against the remainder. Promotions and a
+        // coupon stack; at most one coupon per booking (single couponCode field).
+        BigDecimal orderAmount = pricing.finalPrice();
+        CustomerCouponService.CheckoutCouponResult couponResult = null;
+        if (req.couponCode() != null && !req.couponCode().isBlank()) {
+            couponResult = customerCouponService.validateForCheckout(userId, req.couponCode(), orderAmount);
+        }
+        BigDecimal couponDiscount = couponResult != null ? couponResult.discountAmount() : BigDecimal.ZERO;
+        BigDecimal remainingAfterCoupon = orderAmount.subtract(couponDiscount);
+
+        BigDecimal creditAmount = null;
+        if (req.creditAmount() != null) {
+            creditAmount = req.creditAmount().setScale(2, RoundingMode.HALF_UP);
+            if (creditAmount.signum() <= 0)
+                throw new ApiException(HttpStatus.BAD_REQUEST, "creditAmount must be greater than zero");
+            // Rejected (not clamped): the customer asked for an explicit amount,
+            // silently redeeming less would be surprising.
+            if (creditAmount.compareTo(remainingAfterCoupon) > 0)
+                throw new ApiException(HttpStatus.BAD_REQUEST,
+                    "creditAmount exceeds the amount payable after discounts ("
+                        + remainingAfterCoupon.toPlainString() + ")");
+        }
+
         Booking booking = new Booking();
         booking.setUser(user);
         booking.setHotel(hotel);
@@ -117,7 +151,15 @@ public class BookingService {
         booking.setBasePrice(pricing.basePrice());
         booking.setRatePlanPrice(pricing.ratePlanPrice());
         booking.setDiscountAmount(pricing.promotionDiscount());
-        booking.setFinalPrice(pricing.finalPrice());
+        if (couponResult != null) {
+            booking.setCouponCode(couponResult.coupon().getCouponDefinition().getCode());
+            booking.setCouponDiscountAmount(couponDiscount);
+        }
+        if (creditAmount != null) booking.setCreditAmountUsed(creditAmount);
+        booking.setFinalPrice(remainingAfterCoupon
+            .subtract(creditAmount != null ? creditAmount : BigDecimal.ZERO)
+            .max(BigDecimal.ZERO)
+            .setScale(2, RoundingMode.HALF_UP));
         booking.setSpecialRequest(req.specialRequest());
 
         booking = bookingRepo.save(booking);
@@ -125,6 +167,16 @@ public class BookingService {
         booking = bookingRepo.save(booking);
 
         inventoryRepo.decrementInventory(req.roomId(), req.checkIn(), req.checkOut(), numRooms);
+
+        // Consume coupon + redeem credits INSIDE this transaction (the booking id
+        // now exists for the FK / ledger reference) — any failure from here on
+        // (e.g. insufficient credit balance → 409 under the account's pessimistic
+        // lock) rolls the whole booking back, so a failed booking never burns a
+        // coupon or credits.
+        if (couponResult != null)
+            customerCouponService.markUsedForBooking(couponResult.coupon(), booking);
+        if (creditAmount != null)
+            travelCreditService.redeemForBooking(userId, creditAmount, booking.getCurrency(), booking.getId());
 
         return toResponse(booking);
     }
@@ -207,6 +259,8 @@ public class BookingService {
         inventoryRepo.restoreInventory(booking.getRoom().getId(),
             booking.getCheckInDate(), booking.getCheckOutDate(), booking.getNumberOfRooms());
 
+        releaseCheckoutBenefits(booking);
+
         Booking saved = bookingRepo.save(booking);
 
         notificationService.create(userId, NotificationType.BOOKING, Priority.NORMAL,
@@ -272,6 +326,7 @@ public class BookingService {
             booking.setCancelledAt(now);
             inventoryRepo.restoreInventory(booking.getRoom().getId(),
                 booking.getCheckInDate(), booking.getCheckOutDate(), booking.getNumberOfRooms());
+            releaseCheckoutBenefits(booking);
         }
 
         return toResponse(bookingRepo.save(booking));
@@ -321,6 +376,22 @@ public class BookingService {
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
+
+    /**
+     * Phase 7.15 — cancellation reversal for both the customer cancel path and
+     * the admin force-CANCELLED path. Credits redeemed by the booking come back
+     * as a REVERSAL ledger row (idempotencyKey {@code booking-<id>-reversal}, so
+     * repeated cancellation can never double-restore); the coupon is released
+     * back to AVAILABLE only while still redeemable — see
+     * {@link CustomerCouponService#releaseForCancelledBooking}. Ledger-only:
+     * refund/payment money flows are untouched.
+     */
+    private void releaseCheckoutBenefits(Booking booking) {
+        if (booking.getCreditAmountUsed() != null && booking.getCreditAmountUsed().signum() > 0)
+            travelCreditService.reverseForBooking(booking.getUser().getId(),
+                booking.getCreditAmountUsed(), booking.getCurrency(), booking.getId());
+        customerCouponService.releaseForCancelledBooking(booking.getId());
+    }
 
     private BookingTimelineResponse buildTimeline(Booking b) {
         List<TimelineEvent> events = new ArrayList<>();
@@ -372,7 +443,8 @@ public class BookingService {
             b.getConfirmedAt(), b.getCancelledAt(),
             b.getActualCheckInAt(), b.getActualCheckOutAt(),
             b.getCompletedAt(), b.getArchivedAt(),
-            b.getLastStatusChangedAt(), b.getCancelReason()
+            b.getLastStatusChangedAt(), b.getCancelReason(),
+            b.getCouponCode(), b.getCouponDiscountAmount(), b.getCreditAmountUsed()
         );
     }
 

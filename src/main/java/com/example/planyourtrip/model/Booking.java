@@ -73,6 +73,22 @@ public class Booking {
     @Column(precision = 15, scale = 2, nullable = false)
     private BigDecimal finalPrice;
 
+    // ── Phase 7.15 — Coupon & Travel Credit checkout integration ─────────────
+    // All three are nullable and null for every booking made without a coupon /
+    // credits, so pre-7.15 bookings and the plain checkout flow are unchanged.
+
+    /** Snapshot of the applied coupon's normalized code (the linked CustomerCoupon row carries the FK back). */
+    @Column(name = "coupon_code", length = 60)
+    private String couponCode;
+
+    /** Discount granted by the coupon, applied AFTER the promotion discount ({@link #discountAmount}). */
+    @Column(name = "coupon_discount_amount", precision = 15, scale = 2)
+    private BigDecimal couponDiscountAmount;
+
+    /** Promotional travel credits redeemed against this booking (already subtracted from {@link #finalPrice}). */
+    @Column(name = "credit_amount_used", precision = 15, scale = 2)
+    private BigDecimal creditAmountUsed;
+
     @Column(columnDefinition = "TEXT")
     private String specialRequest;
 

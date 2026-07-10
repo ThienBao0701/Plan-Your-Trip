@@ -139,6 +139,48 @@ public class TravelCreditService {
         return mutate(targetUserId, req, false);
     }
 
+    // ── Phase 7.15 — checkout integration (called by BookingService) ─────────
+
+    /**
+     * Phase 7.15 — redeems promotional credits against a booking. Runs through
+     * the exact same locked, idempotent {@link #mutate} machinery as the admin
+     * paths: pessimistic write lock on the account row, balance-never-negative
+     * (409 when the amount exceeds the balance), currency match against the
+     * booking currency (400 on mismatch), REDEMPTION ledger row with
+     * referenceType=BOOKING and a deterministic idempotencyKey
+     * {@code booking-<id>-redemption}. Joins the caller's booking-creation
+     * transaction, so a failed booking rolls the redemption back.
+     */
+    @Transactional
+    public TravelCreditTransactionResponse redeemForBooking(Long userId, BigDecimal amount,
+                                                             String bookingCurrency, Long bookingId) {
+        return mutate(userId, new TravelCreditAdjustmentRequest(
+            amount, bookingCurrency,
+            "Redeemed against booking #" + bookingId,
+            TravelCreditReferenceType.BOOKING, bookingId,
+            "booking-" + bookingId + "-redemption",
+            null, TravelCreditTransactionType.REDEMPTION), false);
+    }
+
+    /**
+     * Phase 7.15 — restores credits redeemed by a booking when it is cancelled.
+     * A REVERSAL ledger row (referenceType=BOOKING — the reversal points back at
+     * the booking whose redemption it undoes, not at a payment refund) with the
+     * deterministic idempotencyKey {@code booking-<id>-reversal}, so a repeated
+     * cancellation can never double-restore. Ledger-only: no payment/refund
+     * money flow is touched.
+     */
+    @Transactional
+    public TravelCreditTransactionResponse reverseForBooking(Long userId, BigDecimal amount,
+                                                              String bookingCurrency, Long bookingId) {
+        return mutate(userId, new TravelCreditAdjustmentRequest(
+            amount, bookingCurrency,
+            "Reversal for cancelled booking #" + bookingId,
+            TravelCreditReferenceType.BOOKING, bookingId,
+            "booking-" + bookingId + "-reversal",
+            null, TravelCreditTransactionType.REVERSAL), true);
+    }
+
     private TravelCreditTransactionResponse mutate(Long targetUserId, TravelCreditAdjustmentRequest req,
                                                     boolean increase) {
         User user = userOrThrow(targetUserId);

@@ -15,4 +15,14 @@ public interface CustomerCouponRepository extends JpaRepository<CustomerCoupon, 
 
     /** Per-user claim count against {@code CouponDefinition#usageLimitPerUser}. */
     long countByUserIdAndCouponDefinitionId(Long userId, Long couponDefinitionId);
+
+    /**
+     * Phase 7.15 checkout — all of a user's claims of a given (normalized,
+     * upper-case) code, oldest claim first so the earliest AVAILABLE claim is
+     * consumed first when {@code usageLimitPerUser > 1}.
+     */
+    List<CustomerCoupon> findByUserIdAndCouponDefinitionCodeOrderByClaimedAtAsc(Long userId, String code);
+
+    /** Phase 7.15 cancellation — the coupon consumed by a booking (at most one per booking). */
+    Optional<CustomerCoupon> findByBookingId(Long bookingId);
 }

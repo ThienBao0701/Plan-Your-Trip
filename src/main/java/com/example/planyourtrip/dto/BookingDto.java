@@ -1,6 +1,7 @@
 package com.example.planyourtrip.dto;
 
 import com.example.planyourtrip.model.BookingStatus;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
@@ -11,6 +12,15 @@ import java.util.List;
 
 public class BookingDto {
 
+    /**
+     * Phase 7.15 additions — both optional and ignored when absent, so the
+     * pre-7.15 payload behaves exactly as before:
+     * {@code couponCode} — a coupon code the customer has CLAIMED (matched
+     * case-insensitively; code chosen over couponId as the friendlier contract);
+     * {@code creditAmount} — an explicit positive amount of promotional travel
+     * credits to redeem (explicit amount chosen over a use-all boolean for
+     * customer control). Coupon applies first, credits against the remainder.
+     */
     public record BookingRequest(
         @NotNull Long roomId,
         @NotNull LocalDate checkIn,
@@ -18,7 +28,9 @@ public class BookingDto {
         @NotNull @Min(1) Integer adults,
         Integer children,
         Integer numberOfRooms,
-        String specialRequest
+        String specialRequest,
+        String couponCode,
+        @DecimalMin(value = "0.0", inclusive = false) BigDecimal creditAmount
     ) {}
 
     public record BookingResponse(
@@ -46,7 +58,11 @@ public class BookingDto {
         Instant completedAt,
         Instant archivedAt,
         Instant lastStatusChangedAt,
-        String cancelReason
+        String cancelReason,
+        // Phase 7.15 — additive only; all three are null when no coupon/credits were used.
+        String couponCode,
+        BigDecimal couponDiscountAmount,
+        BigDecimal creditAmountUsed
     ) {}
 
     public record BookingSummaryResponse(
