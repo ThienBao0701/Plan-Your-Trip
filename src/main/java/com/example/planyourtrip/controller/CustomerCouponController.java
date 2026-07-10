@@ -55,4 +55,14 @@ public class CustomerCouponController {
                                           @Valid @RequestBody CouponPreviewRequest req) {
         return service.preview(uid, id, req);
     }
+
+    @PostMapping("/{id}/eligibility")
+    @Operation(summary = "Full Phase 7.17 eligibility breakdown for this coupon against a hypothetical booking",
+        description = "Strictly read-only — never marks the coupon used. Reports target-type, minimum-stay, "
+            + "booking-date-window, customer-segment and promotion/credit-stacking satisfaction individually, "
+            + "plus the overall eligible/reason verdict.")
+    public CouponEligibilityResponse eligibility(@AuthUser Long uid, @PathVariable Long id,
+                                                  @Valid @RequestBody CouponEligibilityRequest req) {
+        return service.checkEligibility(uid, id, req);
+    }
 }

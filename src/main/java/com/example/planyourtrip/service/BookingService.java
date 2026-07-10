@@ -117,9 +117,21 @@ public class BookingService {
         // on that amount, then credits against the remainder. Promotions and a
         // coupon stack; at most one coupon per booking (single couponCode field).
         BigDecimal orderAmount = pricing.finalPrice();
+        // Phase 7.17 — thread the full checkout context (target hotel/room,
+        // stay dates, whether a promotion discount is already baked into
+        // orderAmount, and the raw requested credit amount) through to the
+        // SAME centralized evaluator used by claim/preview/eligibility, so
+        // targeting/stay/date/segment/stacking rules are enforced here too —
+        // before any coupon/credit mutation, so a failed booking still burns
+        // neither (unchanged 7.15 atomicity guarantee).
+        boolean promotionDiscountApplied = pricing.promotionDiscount() != null
+            && pricing.promotionDiscount().signum() > 0;
         CustomerCouponService.CheckoutCouponResult couponResult = null;
         if (req.couponCode() != null && !req.couponCode().isBlank()) {
-            couponResult = customerCouponService.validateForCheckout(userId, req.couponCode(), orderAmount);
+            CustomerCouponService.EligibilityContext ctx = new CustomerCouponService.EligibilityContext(
+                hotel.getId(), room.getId(), req.checkIn(), req.checkOut(),
+                orderAmount, req.creditAmount(), promotionDiscountApplied);
+            couponResult = customerCouponService.validateForCheckout(userId, req.couponCode(), ctx);
         }
         BigDecimal couponDiscount = couponResult != null ? couponResult.discountAmount() : BigDecimal.ZERO;
         BigDecimal remainingAfterCoupon = orderAmount.subtract(couponDiscount);

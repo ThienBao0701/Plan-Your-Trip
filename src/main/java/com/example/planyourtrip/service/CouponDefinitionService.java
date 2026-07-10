@@ -4,7 +4,11 @@ import com.example.planyourtrip.dto.CouponDto.CouponDefinitionRequest;
 import com.example.planyourtrip.dto.CouponDto.CouponDefinitionResponse;
 import com.example.planyourtrip.exception.ApiException;
 import com.example.planyourtrip.model.CouponDefinition;
+import com.example.planyourtrip.model.CouponTargetType;
+import com.example.planyourtrip.model.CustomerSegment;
 import com.example.planyourtrip.repository.CouponDefinitionRepository;
+import com.example.planyourtrip.repository.HotelRoomRepository;
+import com.example.planyourtrip.repository.PlaceRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,15 +26,32 @@ import java.util.Locale;
  * <p>Note one deliberate deviation from {@code PromotionService#validateDates}
  * (which requires end strictly after start): the 7.14 spec allows a single-day
  * coupon, so {@code validFrom == validUntil} is accepted here.
+ *
+ * <p>Phase 7.17 — Coupon Targeting &amp; Advanced Eligibility: admin create/update
+ * now also validates the target configuration ({@link CouponTargetType}) and the
+ * new stay/date-window fields. Deliberate deviation from {@code Promotion}'s
+ * HOTEL targeting (which resolves {@code targetId} against a {@code HotelDetail}
+ * id via {@code room.getHotelDetail().getId()} in {@code PricingEngineService}):
+ * here HOTEL {@code targetId} resolves against a {@code Place} id instead,
+ * matching the "hotelId" convention used everywhere else in this codebase
+ * (e.g. {@code PartnerAnalyticsService#resolveHotelScope}, admin hotel
+ * endpoints) and matching what a {@code Booking} actually carries
+ * ({@code Booking#hotel} is a {@code Place} FK, not a {@code HotelDetail} FK).
  */
 @Service
 @Transactional(readOnly = true)
 public class CouponDefinitionService {
 
     private final CouponDefinitionRepository couponRepo;
+    private final PlaceRepository placeRepo;
+    private final HotelRoomRepository hotelRoomRepo;
 
-    public CouponDefinitionService(CouponDefinitionRepository couponRepo) {
+    public CouponDefinitionService(CouponDefinitionRepository couponRepo,
+                                    PlaceRepository placeRepo,
+                                    HotelRoomRepository hotelRoomRepo) {
         this.couponRepo = couponRepo;
+        this.placeRepo = placeRepo;
+        this.hotelRoomRepo = hotelRoomRepo;
     }
 
     public List<CouponDefinitionResponse> getAll() {
@@ -95,9 +116,37 @@ public class CouponDefinitionService {
     private void validate(CouponDefinitionRequest req) {
         // Bean validation on the DTO already covers: code/name required,
         // discountValue > 0, maxDiscountAmount/minimumSpend >= 0 when present,
-        // totalUsageLimit/usageLimitPerUser >= 1 when present, dates required.
+        // totalUsageLimit/usageLimitPerUser >= 1 when present, dates required,
+        // minimumStayNights >= 1 when present.
         if (req.validUntil().isBefore(req.validFrom()))
             throw new ApiException(HttpStatus.BAD_REQUEST, "validFrom must be on or before validUntil");
+        if (req.bookingDateFrom() != null && req.bookingDateTo() != null
+                && req.bookingDateFrom().isAfter(req.bookingDateTo()))
+            throw new ApiException(HttpStatus.BAD_REQUEST, "bookingDateFrom must be on or before bookingDateTo");
+
+        CouponTargetType targetType = req.targetType() != null ? req.targetType() : CouponTargetType.ALL;
+        switch (targetType) {
+            case HOTEL -> {
+                if (req.targetId() == null)
+                    throw new ApiException(HttpStatus.BAD_REQUEST,
+                        "targetId is required when targetType is HOTEL");
+                if (!placeRepo.existsById(req.targetId()))
+                    throw new ApiException(HttpStatus.NOT_FOUND, "Hotel not found: " + req.targetId());
+            }
+            case ROOM -> {
+                if (req.targetId() == null)
+                    throw new ApiException(HttpStatus.BAD_REQUEST,
+                        "targetId is required when targetType is ROOM");
+                if (!hotelRoomRepo.existsById(req.targetId()))
+                    throw new ApiException(HttpStatus.NOT_FOUND, "Room not found: " + req.targetId());
+            }
+            case PLACE_TYPE -> {
+                if (req.placeType() == null || req.placeType().isBlank())
+                    throw new ApiException(HttpStatus.BAD_REQUEST,
+                        "placeType is required when targetType is PLACE_TYPE");
+            }
+            default -> { /* ALL — no target required */ }
+        }
     }
 
     private void fill(CouponDefinition def, CouponDefinitionRequest req, String normalizedCode) {
@@ -114,6 +163,19 @@ public class CouponDefinitionService {
         def.setUsageLimitPerUser(req.usageLimitPerUser() != null ? req.usageLimitPerUser() : 1);
         if (req.active() != null) def.setActive(req.active());
         // currentUsageCount is never client-settable.
+
+        // ── Phase 7.17 — targeting & advanced eligibility ──────────────────
+        def.setTargetType(req.targetType() != null ? req.targetType() : CouponTargetType.ALL);
+        def.setTargetId(req.targetId());
+        def.setPlaceType(req.placeType());
+        def.setMinimumStayNights(req.minimumStayNights());
+        def.setBookingDateFrom(req.bookingDateFrom());
+        def.setBookingDateTo(req.bookingDateTo());
+        def.setCustomerSegment(req.customerSegment() != null ? req.customerSegment() : CustomerSegment.ALL_USERS);
+        if (req.firstBookingOnly() != null) def.setFirstBookingOnly(req.firstBookingOnly());
+        if (req.combinableWithPromotions() != null) def.setCombinableWithPromotions(req.combinableWithPromotions());
+        if (req.combinableWithTravelCredits() != null)
+            def.setCombinableWithTravelCredits(req.combinableWithTravelCredits());
     }
 
     /** Package-private — reused as-is by {@code CustomerCouponService} so both map the exact same shape. */
@@ -123,6 +185,10 @@ public class CouponDefinitionService {
             d.getDiscountType(), d.getDiscountValue(), d.getMaxDiscountAmount(), d.getMinimumSpend(),
             d.getValidFrom(), d.getValidUntil(), d.isActive(),
             d.getTotalUsageLimit(), d.getUsageLimitPerUser(), d.getCurrentUsageCount(),
+            d.getTargetType(), d.getTargetId(), d.getPlaceType(),
+            d.getMinimumStayNights(), d.getBookingDateFrom(), d.getBookingDateTo(),
+            d.getCustomerSegment(), d.isFirstBookingOnly(),
+            d.isCombinableWithPromotions(), d.isCombinableWithTravelCredits(),
             d.getCreatedAt(), d.getUpdatedAt()
         );
     }

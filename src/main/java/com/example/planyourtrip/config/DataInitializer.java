@@ -149,24 +149,65 @@ public class DataInitializer implements ApplicationRunner {
     // COUPONS & TRAVEL CREDITS — Phase 7.14 (idempotent)
     // ─────────────────────────────────────────────────────────────
 
-    /** Idempotent by code — checked case-insensitively before insert, so restarts never duplicate WELCOME10. */
+    /**
+     * Idempotent by code — checked case-insensitively before insert, so restarts
+     * never duplicate WELCOME10 or GRANDPALACE15.
+     *
+     * <p>Phase 7.17 — WELCOME10 now sets its targeting/eligibility fields
+     * explicitly (targetType=ALL, customerSegment=ALL_USERS,
+     * combinableWithPromotions=true, combinableWithTravelCredits=true) — the
+     * same values the entity already defaults to, made explicit here so the
+     * seed is self-documenting and regression-safe. GRANDPALACE15 is the new
+     * HOTEL-targeted demo coupon, targeting the seeded "Grand Palace Hotel
+     * Vũng Tàu" ({@code targetId} = its Place id — see class javadoc on
+     * {@code CouponDefinitionService} for why HOTEL targets a Place id here).
+     */
     private void seedCouponDefinitions() {
-        if (couponDefinitionRepo.existsByCodeIgnoreCase("WELCOME10")) return;
         java.time.LocalDate today = java.time.LocalDate.now();
 
-        CouponDefinition welcome = new CouponDefinition();
-        welcome.setCode("WELCOME10");
-        welcome.setName("Welcome 10% Off");
-        welcome.setDescription("10% off your first order of 500,000 VND or more (up to 300,000 VND off).");
-        welcome.setDiscountType(DiscountType.PERCENTAGE);
-        welcome.setDiscountValue(new BigDecimal("10"));
-        welcome.setMaxDiscountAmount(new BigDecimal("300000"));
-        welcome.setMinimumSpend(new BigDecimal("500000"));
-        welcome.setValidFrom(today.minusMonths(1));
-        welcome.setValidUntil(today.plusYears(1));
-        welcome.setActive(true);
-        welcome.setUsageLimitPerUser(1);
-        couponDefinitionRepo.save(welcome);
+        if (!couponDefinitionRepo.existsByCodeIgnoreCase("WELCOME10")) {
+            CouponDefinition welcome = new CouponDefinition();
+            welcome.setCode("WELCOME10");
+            welcome.setName("Welcome 10% Off");
+            welcome.setDescription("10% off your first order of 500,000 VND or more (up to 300,000 VND off).");
+            welcome.setDiscountType(DiscountType.PERCENTAGE);
+            welcome.setDiscountValue(new BigDecimal("10"));
+            welcome.setMaxDiscountAmount(new BigDecimal("300000"));
+            welcome.setMinimumSpend(new BigDecimal("500000"));
+            welcome.setValidFrom(today.minusMonths(1));
+            welcome.setValidUntil(today.plusYears(1));
+            welcome.setActive(true);
+            welcome.setUsageLimitPerUser(1);
+            welcome.setTargetType(CouponTargetType.ALL);
+            welcome.setCustomerSegment(CustomerSegment.ALL_USERS);
+            welcome.setCombinableWithPromotions(true);
+            welcome.setCombinableWithTravelCredits(true);
+            couponDefinitionRepo.save(welcome);
+        }
+
+        if (!couponDefinitionRepo.existsByCodeIgnoreCase("GRANDPALACE15")) {
+            Place grandPalace = placeRepo.findBySlug("grand-palace-hotel-vung-tau").orElse(null);
+            if (grandPalace != null) {
+                CouponDefinition grandPalace15 = new CouponDefinition();
+                grandPalace15.setCode("GRANDPALACE15");
+                grandPalace15.setName("Grand Palace Hotel 15% Off");
+                grandPalace15.setDescription(
+                    "15% off stays of 2 nights or more at Grand Palace Hotel Vũng Tàu.");
+                grandPalace15.setDiscountType(DiscountType.PERCENTAGE);
+                grandPalace15.setDiscountValue(new BigDecimal("15"));
+                grandPalace15.setValidFrom(today.minusDays(1));
+                grandPalace15.setValidUntil(today.plusYears(1));
+                grandPalace15.setActive(true);
+                grandPalace15.setUsageLimitPerUser(1);
+                grandPalace15.setTargetType(CouponTargetType.HOTEL);
+                grandPalace15.setTargetId(grandPalace.getId());
+                grandPalace15.setMinimumStayNights(2);
+                grandPalace15.setCustomerSegment(CustomerSegment.ALL_USERS);
+                grandPalace15.setCombinableWithPromotions(true);
+                grandPalace15.setCombinableWithTravelCredits(true);
+                couponDefinitionRepo.save(grandPalace15);
+            }
+        }
     }
 
     /**

@@ -88,6 +88,44 @@ public class CouponDefinition {
     @Column(nullable = false)
     private int currentUsageCount = 0;
 
+    // ── Phase 7.17 — Coupon Targeting & Advanced Eligibility ─────────────────
+    // All additive/nullable/defaulted so every existing row (WELCOME10) remains
+    // valid as ALL/ALL_USERS/combinable=true with no data migration needed.
+
+    /** Mirrors {@link Promotion}'s targetType+targetId pattern — see {@link CouponTargetType}. */
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private CouponTargetType targetType = CouponTargetType.ALL;
+
+    /** HOTEL → a {@code Place} id (the "hotelId" convention used app-wide); ROOM → a {@code HotelRoom} id. */
+    private Long targetId;
+
+    /** PLACE_TYPE target — matched against {@code Category#type} (a plain String, e.g. "ACCOMMODATION"). */
+    @Column(length = 100)
+    private String placeType;
+
+    @Min(1)
+    private Integer minimumStayNights;
+
+    private LocalDate bookingDateFrom;
+
+    private LocalDate bookingDateTo;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private CustomerSegment customerSegment = CustomerSegment.ALL_USERS;
+
+    @Column(nullable = false)
+    private boolean firstBookingOnly = false;
+
+    @Column(nullable = false)
+    private boolean combinableWithPromotions = true;
+
+    @Column(nullable = false)
+    private boolean combinableWithTravelCredits = true;
+
     @Column(updatable = false)
     private Instant createdAt;
 

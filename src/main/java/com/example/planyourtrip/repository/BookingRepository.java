@@ -24,4 +24,15 @@ public interface BookingRepository extends JpaRepository<Booking, Long>,
 
     List<Booking> findByUserIdAndStatusInOrderByCreatedAtDesc(
             Long userId, Collection<BookingStatus> statuses);
+
+    // ── Phase 7.17 — customer-segment eligibility (own booking history only) ──
+
+    /** NEW_USER / firstBookingOnly: true when the user has any "qualifying" (non-cancelled, non-refunded) booking. */
+    boolean existsByUserIdAndStatusNotIn(Long userId, Collection<BookingStatus> statuses);
+
+    /** RETURNING_USER: true when the user has at least one confirmed-or-later booking. */
+    boolean existsByUserIdAndStatusIn(Long userId, Collection<BookingStatus> statuses);
+
+    /** HIGH_VALUE: count of the user's bookings in a given status (COMPLETED), compared against a threshold. */
+    long countByUserIdAndStatus(Long userId, BookingStatus status);
 }

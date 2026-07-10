@@ -1,5 +1,7 @@
 package com.example.planyourtrip.dto;
 
+import com.example.planyourtrip.model.CouponTargetType;
+import com.example.planyourtrip.model.CustomerSegment;
 import com.example.planyourtrip.model.DiscountType;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
@@ -23,6 +25,15 @@ public class CouponDto {
      * leaves the existing value unchanged. {@code usageLimitPerUser} null
      * defaults to 1. {@code currentUsageCount} is never client-settable.
      */
+    /**
+     * Phase 7.17 additions (all additive/optional — see {@code CouponDefinition}
+     * class javadoc for the backward-compat guarantee): {@code targetType} null
+     * defaults to ALL; {@code customerSegment} null defaults to ALL_USERS;
+     * {@code firstBookingOnly}/{@code combinableWithPromotions}/
+     * {@code combinableWithTravelCredits} null on create default to
+     * false/true/true respectively and null on update leaves the existing value
+     * unchanged (same convention as {@code active}).
+     */
     public record CouponDefinitionRequest(
         @NotBlank String code,
         @NotBlank String name,
@@ -35,7 +46,17 @@ public class CouponDto {
         @NotNull LocalDate validUntil,
         Boolean active,
         @Min(1) Integer totalUsageLimit,
-        @Min(1) Integer usageLimitPerUser
+        @Min(1) Integer usageLimitPerUser,
+        CouponTargetType targetType,
+        Long targetId,
+        String placeType,
+        @Min(1) Integer minimumStayNights,
+        LocalDate bookingDateFrom,
+        LocalDate bookingDateTo,
+        CustomerSegment customerSegment,
+        Boolean firstBookingOnly,
+        Boolean combinableWithPromotions,
+        Boolean combinableWithTravelCredits
     ) {}
 
     public record CouponDefinitionResponse(
@@ -53,6 +74,16 @@ public class CouponDto {
         Integer totalUsageLimit,
         int usageLimitPerUser,
         int currentUsageCount,
+        CouponTargetType targetType,
+        Long targetId,
+        String placeType,
+        Integer minimumStayNights,
+        LocalDate bookingDateFrom,
+        LocalDate bookingDateTo,
+        CustomerSegment customerSegment,
+        boolean firstBookingOnly,
+        boolean combinableWithPromotions,
+        boolean combinableWithTravelCredits,
         Instant createdAt,
         Instant updatedAt
     ) {}
@@ -84,14 +115,26 @@ public class CouponDto {
     ) {}
 
     /**
-     * {@code hotelId}/{@code roomId} are accepted for forward compatibility with
-     * Phase 7.15 checkout integration but are not used by the foundation
-     * calculation — eligibility here is amount/date/status based only.
+     * Phase 7.17 — {@code hotelId}/{@code roomId} (present since 7.14 for
+     * forward compatibility) are now actually used for target-type eligibility,
+     * alongside the new optional {@code checkIn}/{@code checkOut} (minimum-stay
+     * and booking-date-window eligibility), {@code travelCreditAmount} (credit
+     * stacking) and {@code promotionDiscountApplied} (promotion stacking —
+     * null lets the service best-effort detect it via the pricing engine when
+     * {@code roomId}/{@code checkIn}/{@code checkOut} are all present).
+     * Every new field is optional: a caller that only ever sent
+     * {@code orderAmount} keeps getting exactly the pre-7.17 result, since a
+     * missing targeting/date/stacking context is treated as "not violated"
+     * rather than failed — see {@code CustomerCouponService} class javadoc.
      */
     public record CouponPreviewRequest(
         @NotNull @DecimalMin(value = "0.0", inclusive = false) BigDecimal orderAmount,
         Long hotelId,
-        Long roomId
+        Long roomId,
+        LocalDate checkIn,
+        LocalDate checkOut,
+        BigDecimal travelCreditAmount,
+        Boolean promotionDiscountApplied
     ) {}
 
     /** Preview is strictly read-only — it never marks the coupon used. */
@@ -101,5 +144,34 @@ public class CouponDto {
         BigDecimal finalAmount,
         boolean eligible,
         String reason
+    ) {}
+
+    /**
+     * Phase 7.17 — request shape shared by both the customer
+     * ({@code POST /api/me/coupons/{id}/eligibility}) and admin
+     * ({@code GET /api/admin/coupon-definitions/{id}/eligibility-preview})
+     * eligibility endpoints. Strictly read-only, same guarantee as
+     * {@link CouponPreviewRequest} — never marks a coupon used.
+     */
+    public record CouponEligibilityRequest(
+        Long hotelId,
+        Long roomId,
+        LocalDate checkIn,
+        LocalDate checkOut,
+        @NotNull @DecimalMin(value = "0.0", inclusive = false) BigDecimal orderAmount,
+        BigDecimal travelCreditAmount
+    ) {}
+
+    /** Full eligibility breakdown — one flag per Phase 7.17 rule category, plus the overall verdict. */
+    public record CouponEligibilityResponse(
+        boolean eligible,
+        String reason,
+        CouponTargetType matchedTargetType,
+        boolean minimumStaySatisfied,
+        boolean dateWindowSatisfied,
+        boolean customerSegmentSatisfied,
+        boolean promotionStackingAllowed,
+        boolean creditStackingAllowed,
+        BigDecimal previewDiscount
     ) {}
 }
