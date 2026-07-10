@@ -215,7 +215,9 @@ public class TripPlanDocumentService {
 
     // ── Response mapping ─────────────────────────────────────────────────────
 
-    private TripPlanDocumentResponse toResponse(TripPlanDocument d) {
+    // Package-private (not private) so TravelWalletService (Phase 7.12) can reuse
+    // this mapper verbatim instead of duplicating document/media response mapping.
+    TripPlanDocumentResponse toResponse(TripPlanDocument d) {
         return new TripPlanDocumentResponse(
             d.getId(), d.getTripPlan().getId(),
             d.getTripDay() != null ? d.getTripDay().getId() : null,
