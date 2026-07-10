@@ -21,8 +21,21 @@ public class TripPlanReminder {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "trip_plan_id", nullable = false)
+    /**
+     * Phase 7.13 — relaxed from {@code optional = false}/{@code nullable = false}
+     * to support wallet-expiry reminders generated for a {@code TravelWalletItem}
+     * that has no linked {@code TripPlan} (a standalone/metadata-only wallet
+     * item). Every reminder created by {@code TripPlanReminderService} still
+     * always sets this (it is only ever reached via a {@code /trips/{tripId}/...}
+     * route), so existing trip-scoped reminder behavior is unaffected. Only
+     * {@code WalletExpiryReminderService} may create a row with this null, and
+     * only when the source wallet item itself has no {@code tripPlan}; such rows
+     * are still owned/delivered via {@link #user} (see
+     * {@code TripReminderDeliveryService}, which already scopes "due reminders"
+     * by {@code userId}, not {@code tripPlanId}).
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "trip_plan_id")
     private TripPlan tripPlan;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -75,6 +88,31 @@ public class TripPlanReminder {
 
     @Column(columnDefinition = "TEXT")
     private String lastDeliveryError;
+
+    // ── Idempotent-source tracking (Phase 7.13 — Wallet Expiry Alerts) ────────
+
+    /**
+     * Nullable discriminator for reminders created by an automated generator
+     * rather than a direct user CRUD call (e.g. {@code "WALLET_EXPIRY"} for
+     * {@code WalletExpiryReminderService}). Null for ordinary user-created
+     * reminders (Phase 7.10 CRUD path).
+     */
+    private String sourceType;
+
+    /** Nullable id of the source row (e.g. the {@code TravelWalletItem} id) when {@link #sourceType} is set. */
+    private Long sourceId;
+
+    /**
+     * Nullable, unique-where-non-null deterministic idempotency key, e.g.
+     * {@code "WALLET_EXPIRY:" + walletItemId + ":" + windowDays}. Repeated
+     * generation runs must check for an existing row with this key before
+     * inserting — see {@code WalletExpiryReminderService#generateForItem}.
+     * Enforced at the DB level via {@code @Column(unique = true)} below (H2/
+     * PostgreSQL both allow multiple NULLs alongside a unique constraint, so
+     * ordinary non-source reminders are unaffected).
+     */
+    @Column(unique = true)
+    private String sourceKey;
 
     @PrePersist
     void onCreate() { createdAt = updatedAt = Instant.now(); }

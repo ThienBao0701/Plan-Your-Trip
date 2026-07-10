@@ -18,6 +18,8 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Phase 7.12 — Travel Wallet Foundation. Aggregates existing
@@ -81,6 +83,49 @@ public class TravelWalletService {
             .toList();
     }
 
+    /**
+     * Phase 7.13 — filtered/sorted/paginated variant of {@link #list(Long)}.
+     * Every parameter is optional (null = "no filter"); called with all-null
+     * filters and null page/size/sort this returns exactly what {@link #list(Long)}
+     * returns, in the same order — backward compatible with the pre-7.13
+     * {@code GET /api/me/travel-wallet} contract. {@code status} filters on the
+     * computed effective status (never the raw persisted one). {@code archived}
+     * here is an explicit opt-in/opt-out filter, not the "exclude archived by
+     * default" rule used by the Smart Organizer endpoints — omitted, archived
+     * items remain visible in this list exactly like before 7.13.
+     */
+    @Transactional(readOnly = true)
+    public List<TravelWalletSummaryResponse> list(Long userId, TravelWalletItemType type, TravelWalletItemStatus status,
+                                                    Long tripId, Boolean favorite, Boolean archived,
+                                                    Integer expiringWithinDays, Integer page, Integer size, String sort) {
+        Stream<TravelWalletItem> stream = walletRepo.findByUserIdOrderByCreatedAtDesc(userId).stream();
+
+        if (type != null) stream = stream.filter(i -> i.getWalletItemType() == type);
+        if (status != null) stream = stream.filter(i -> effectiveStatus(i) == status);
+        if (tripId != null) stream = stream.filter(i -> i.getTripPlan() != null && i.getTripPlan().getId().equals(tripId));
+        if (favorite != null) stream = stream.filter(i -> i.isFavorite() == favorite);
+        if (archived != null) stream = stream.filter(i -> i.isArchived() == archived);
+        if (expiringWithinDays != null) {
+            LocalDate today = LocalDate.now();
+            LocalDate cutoff = today.plusDays(expiringWithinDays);
+            stream = stream.filter(i -> i.getValidUntil() != null
+                && !i.getValidUntil().isBefore(today) && !i.getValidUntil().isAfter(cutoff));
+        }
+
+        List<TravelWalletItem> filtered = stream.collect(Collectors.toCollection(java.util.ArrayList::new));
+        filtered.sort(resolveSort(sort));
+
+        if (page != null || size != null) {
+            int sz = size != null ? Math.max(size, 0) : filtered.size();
+            int p = page != null ? Math.max(page, 0) : 0;
+            int from = Math.min(p * sz, filtered.size());
+            int to = Math.min(from + sz, filtered.size());
+            filtered = filtered.subList(from, to);
+        }
+
+        return filtered.stream().map(this::toSummary).toList();
+    }
+
     @Transactional(readOnly = true)
     public TravelWalletItemResponse getMine(Long userId, Long id) {
         return toResponse(ownedItemOrThrow(userId, id));
@@ -131,6 +176,7 @@ public class TravelWalletService {
         item.setStatus(req.status() != null ? req.status() : TravelWalletItemStatus.ACTIVE);
         item.setFavorite(false);
         item.setArchived(false);
+        item.setExpiryReminderEnabled(req.expiryReminderEnabled() == null || req.expiryReminderEnabled());
 
         return toResponse(walletRepo.save(item));
     }
@@ -153,6 +199,7 @@ public class TravelWalletService {
         item.setValidFrom(req.validFrom());
         item.setValidUntil(req.validUntil());
         if (req.status() != null) item.setStatus(req.status());
+        if (req.expiryReminderEnabled() != null) item.setExpiryReminderEnabled(req.expiryReminderEnabled());
 
         return toResponse(walletRepo.save(item));
     }
@@ -315,7 +362,8 @@ public class TravelWalletService {
         return invoice;
     }
 
-    private TravelWalletItem ownedItemOrThrow(Long userId, Long id) {
+    /** Package-private (not private) — reused as-is by {@code WalletExpiryReminderService} for single-item ownership checks (Phase 7.13). */
+    TravelWalletItem ownedItemOrThrow(Long userId, Long id) {
         return walletRepo.findByIdAndUserId(id, userId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Wallet item not found: " + id));
     }
@@ -386,7 +434,8 @@ public class TravelWalletService {
 
     // ── Effective status computation (read-time only, never persisted) ──────
 
-    private TravelWalletItemStatus effectiveStatus(TravelWalletItem item) {
+    /** Package-private (not private) — reused as-is by {@code TravelWalletOrganizerService} (Phase 7.13) to avoid a second implementation. */
+    TravelWalletItemStatus effectiveStatus(TravelWalletItem item) {
         if (item.isArchived()) return TravelWalletItemStatus.ARCHIVED;
         if (item.getStatus() == TravelWalletItemStatus.CANCELLED) return TravelWalletItemStatus.CANCELLED;
         LocalDate today = LocalDate.now();
@@ -395,8 +444,21 @@ public class TravelWalletService {
         return item.getStatus();
     }
 
-    private boolean isExpired(TravelWalletItem item) {
+    boolean isExpired(TravelWalletItem item) {
         return item.getValidUntil() != null && item.getValidUntil().isBefore(LocalDate.now());
+    }
+
+    /** Phase 7.13 — "expiring soon" per the phase spec: validUntil within the next 30 days inclusive, and not already expired. */
+    boolean isExpiringSoon(TravelWalletItem item) {
+        if (item.getValidUntil() == null || isExpired(item)) return false;
+        LocalDate today = LocalDate.now();
+        return !item.getValidUntil().isAfter(today.plusDays(30));
+    }
+
+    /** Phase 7.13 — "unlinked" per the phase spec: no tripPlanDocument/booking/invoice AND no tripPlan (metadata-only). */
+    boolean isUnlinked(TravelWalletItem item) {
+        return item.getTripPlanDocument() == null && item.getBooking() == null
+            && item.getInvoice() == null && item.getTripPlan() == null;
     }
 
     private int statusPriority(TravelWalletItemStatus effective) {
@@ -420,7 +482,8 @@ public class TravelWalletService {
 
     // ── Response mapping ─────────────────────────────────────────────────────
 
-    private TravelWalletItemResponse toResponse(TravelWalletItem i) {
+    /** Package-private (not private) — reused as-is by {@code TravelWalletOrganizerService} (Phase 7.13) so every group embeds the exact same shape, never remapped. */
+    TravelWalletItemResponse toResponse(TravelWalletItem i) {
         TravelWalletTripSummary tripSummary = i.getTripPlan() != null
             ? new TravelWalletTripSummary(i.getTripPlan().getId(), i.getTripPlan().getTitle(),
                 i.getTripPlan().getDestination(), i.getTripPlan().getStartDate(), i.getTripPlan().getEndDate())
@@ -433,7 +496,9 @@ public class TravelWalletService {
             i.getInvoice() != null ? invoiceService.toSummary(i.getInvoice()) : null,
             i.getWalletItemType().name(), i.getDisplayTitle(), i.getIssuer(), i.getReferenceNumberMasked(),
             i.getValidFrom(), i.getValidUntil(), i.getStatus().name(), effectiveStatus(i).name(), isExpired(i),
-            i.isFavorite(), i.isArchived(), i.getCreatedAt(), i.getUpdatedAt()
+            i.isFavorite(), i.isArchived(), i.isExpiryReminderEnabled(),
+            WalletOrganizerCategory.forItemType(i.getWalletItemType()).name(),
+            i.getCreatedAt(), i.getUpdatedAt()
         );
     }
 
@@ -444,7 +509,29 @@ public class TravelWalletService {
             i.getTripPlan() != null ? i.getTripPlan().getTitle() : null,
             i.getWalletItemType().name(), i.getDisplayTitle(), i.getIssuer(), i.getReferenceNumberMasked(),
             i.getValidFrom(), i.getValidUntil(), i.getStatus().name(), effectiveStatus(i).name(), isExpired(i),
-            i.isFavorite(), i.isArchived(), i.getCreatedAt(), i.getUpdatedAt()
+            i.isFavorite(), i.isArchived(), i.isExpiryReminderEnabled(),
+            WalletOrganizerCategory.forItemType(i.getWalletItemType()).name(),
+            i.getCreatedAt(), i.getUpdatedAt()
         );
+    }
+
+    // ── Sort resolution (Phase 7.13 — enhanced list filtering) ──────────────
+
+    /** Falls back to {@link #sortComparator()} (the pre-7.13 default order) for a null/blank/unrecognized sort param. */
+    private Comparator<TravelWalletItem> resolveSort(String sort) {
+        if (sort == null || sort.isBlank()) return sortComparator();
+        String[] parts = sort.split(",", 2);
+        String field = parts[0].trim();
+        boolean desc = parts.length > 1 && "desc".equalsIgnoreCase(parts[1].trim());
+
+        Comparator<TravelWalletItem> cmp = switch (field) {
+            case "validUntil" -> Comparator.comparing(i -> i.getValidUntil() == null ? LocalDate.MAX : i.getValidUntil());
+            case "validFrom" -> Comparator.comparing(i -> i.getValidFrom() == null ? LocalDate.MAX : i.getValidFrom());
+            case "displayTitle" -> Comparator.comparing(TravelWalletItem::getDisplayTitle, String.CASE_INSENSITIVE_ORDER);
+            case "createdAt" -> Comparator.comparing(TravelWalletItem::getCreatedAt);
+            default -> null;
+        };
+        if (cmp == null) return sortComparator();
+        return desc ? cmp.reversed() : cmp;
     }
 }

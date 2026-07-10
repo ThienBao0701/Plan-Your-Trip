@@ -35,7 +35,9 @@ public class TravelWalletDto {
         String referenceNumber,
         LocalDate validFrom,
         LocalDate validUntil,
-        TravelWalletItemStatus status
+        TravelWalletItemStatus status,
+        /** Phase 7.13. Null on create defaults to {@code true}; null on update leaves the existing value unchanged. */
+        Boolean expiryReminderEnabled
     ) {}
 
     public record TravelWalletTripSummary(
@@ -70,6 +72,10 @@ public class TravelWalletDto {
         boolean expired,
         boolean favorite,
         boolean archived,
+        /** Phase 7.13 — whether {@code WalletExpiryReminderService} will generate expiry reminders for this item. */
+        boolean expiryReminderEnabled,
+        /** Phase 7.13 — computed from {@code walletItemType} via {@code WalletOrganizerCategory#forItemType}, never persisted. */
+        String organizerCategory,
         Instant createdAt,
         Instant updatedAt
     ) {}
@@ -90,6 +96,8 @@ public class TravelWalletDto {
         boolean expired,
         boolean favorite,
         boolean archived,
+        boolean expiryReminderEnabled,
+        String organizerCategory,
         Instant createdAt,
         Instant updatedAt
     ) {}

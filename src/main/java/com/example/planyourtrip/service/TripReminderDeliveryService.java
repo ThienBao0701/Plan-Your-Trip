@@ -94,14 +94,17 @@ public class TripReminderDeliveryService {
         r.setDeliveryAttempts(r.getDeliveryAttempts() + 1);
         try {
             String message = r.getMessage() != null && !r.getMessage().isBlank() ? r.getMessage() : r.getTitle();
+            // Phase 7.13: a wallet-expiry reminder for a wallet item with no linked trip has a
+            // null tripPlan (see TripPlanReminder#tripPlan) — fall back to no related entity
+            // rather than NPE-ing on getTripPlan().getId().
             notificationService.create(
                 r.getUser().getId(),
                 NotificationType.TRIP,
                 Priority.NORMAL,
                 r.getTitle(),
                 message,
-                RelatedEntityType.TRIP,
-                r.getTripPlan().getId()
+                r.getTripPlan() != null ? RelatedEntityType.TRIP : null,
+                r.getTripPlan() != null ? r.getTripPlan().getId() : null
             );
             r.setDeliveredAt(Instant.now());
             r.setLastDeliveryError(null);
@@ -118,7 +121,7 @@ public class TripReminderDeliveryService {
 
     private DueReminderResponse toDueResponse(TripPlanReminder r) {
         return new DueReminderResponse(
-            r.getId(), r.getTripPlan().getId(), r.getUser().getId(),
+            r.getId(), r.getTripPlan() != null ? r.getTripPlan().getId() : null, r.getUser().getId(),
             r.getReminderType().name(), r.getTitle(), r.getMessage(), r.getReminderAt(),
             r.getStatus().name(), r.getDeliveryAttempts(), r.getLastDeliveryError()
         );

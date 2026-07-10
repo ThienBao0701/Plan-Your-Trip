@@ -79,6 +79,16 @@ public class TravelWalletItem {
     @Column(nullable = false)
     private boolean archived = false;
 
+    /**
+     * Phase 7.13 — Wallet Expiry Alerts &amp; Smart Organizer. When {@code true}
+     * (the default) and {@link #validUntil} is set, {@code WalletExpiryReminderService}
+     * will create the 30/7/1-day-before {@code TripPlanReminder} rows for this
+     * item. Setting this to {@code false} opts the item out of expiry-reminder
+     * generation entirely (existing reminders already created are untouched).
+     */
+    @Column(nullable = false)
+    private boolean expiryReminderEnabled = true;
+
     @Column(updatable = false)
     private Instant createdAt;
 

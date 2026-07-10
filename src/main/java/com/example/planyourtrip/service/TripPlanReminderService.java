@@ -131,6 +131,14 @@ public class TripPlanReminderService {
         TripPlanReminder reminder = reminderRepo.findById(reminderId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Reminder not found: " + reminderId));
         TripPlan trip = reminder.getTripPlan();
+        if (trip == null) {
+            // Phase 7.13: a WalletExpiryReminderService-generated reminder for a wallet item with
+            // no linked trip has a null tripPlan — no collaborator concept applies, so it is
+            // strictly owner-only here (mirrors TravelWalletService's own wallet-item ownership rule).
+            if (!reminder.getUser().getId().equals(userId))
+                throw new ApiException(HttpStatus.NOT_FOUND, "Reminder not found: " + reminderId);
+            return reminder;
+        }
         if (!canView(trip, userId))
             throw new ApiException(HttpStatus.NOT_FOUND, "Reminder not found: " + reminderId);
         if (!canEdit(trip, userId))
@@ -196,7 +204,7 @@ public class TripPlanReminderService {
 
     private TripPlanReminderResponse toResponse(TripPlanReminder r) {
         return new TripPlanReminderResponse(
-            r.getId(), r.getTripPlan().getId(),
+            r.getId(), r.getTripPlan() != null ? r.getTripPlan().getId() : null,
             r.getTripDay() != null ? r.getTripDay().getId() : null,
             r.getTripItem() != null ? r.getTripItem().getId() : null,
             r.getDocument() != null ? r.getDocument().getId() : null,
