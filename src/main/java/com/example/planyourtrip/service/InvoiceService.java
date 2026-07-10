@@ -63,6 +63,12 @@ public class InvoiceService {
         invoice.setCurrency(booking.getCurrency());
         invoice.setSubtotal(booking.getBasePrice());
         invoice.setDiscountAmount(booking.getDiscountAmount());
+        // Phase 7.16 — snapshot the coupon/credit lines from the booking (same
+        // snapshot-at-issue convention as subtotal/discountAmount above); null
+        // when the booking used no coupon / credits.
+        invoice.setCouponCode(booking.getCouponCode());
+        invoice.setCouponDiscountAmount(booking.getCouponDiscountAmount());
+        invoice.setCreditAmountUsed(booking.getCreditAmountUsed());
         invoice.setTaxAmount(BigDecimal.ZERO.setScale(2));
         invoice.setTotalAmount(payment.getAmount());
         invoice.setIssuedAt(Instant.now());
@@ -168,7 +174,9 @@ public class InvoiceService {
             i.getHotel().getId(), i.getHotel().getName(),
             i.getStatus().name(),
             i.getCurrency(),
-            i.getSubtotal(), i.getDiscountAmount(), i.getTaxAmount(), i.getTotalAmount(),
+            i.getSubtotal(), i.getDiscountAmount(),
+            i.getCouponCode(), i.getCouponDiscountAmount(), i.getCreditAmountUsed(),
+            i.getTaxAmount(), i.getTotalAmount(),
             i.getIssuedAt(), i.getPaidAt(), i.getCancelledAt(),
             i.getBillingName(), i.getBillingEmail(), i.getBillingPhone(), i.getBillingAddress(),
             i.getTaxCode(), i.getNotes(),

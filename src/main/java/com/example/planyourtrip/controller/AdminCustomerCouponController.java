@@ -11,14 +11,15 @@ import java.util.List;
 
 /**
  * Phase 7.14 — Customer Coupons &amp; Travel Credits Foundation.
- * Read-only admin support view of a user's claimed coupons — mirrors
+ * Admin support view of a user's claimed coupons — mirrors
  * {@code AdminTravelWalletController}'s {@code /api/admin/users/{userId}/...}
- * shape. Access restricted to ROLE_ADMIN by SecurityConfig's blanket
+ * shape. Phase 7.16 adds the revocation tooling (the only admin mutation of a
+ * claimed coupon). Access restricted to ROLE_ADMIN by SecurityConfig's blanket
  * {@code /api/admin/**} rule.
  */
 @RestController
 @RequestMapping("/api/admin/users")
-@Tag(name = "Admin - Customer Coupons", description = "Read-only admin visibility into a user's claimed coupons")
+@Tag(name = "Admin - Customer Coupons", description = "Admin visibility into a user's claimed coupons, plus revocation")
 @SecurityRequirement(name = "bearerAuth")
 public class AdminCustomerCouponController {
 
@@ -30,5 +31,12 @@ public class AdminCustomerCouponController {
     @Operation(summary = "List a user's claimed coupons (read-only support view)")
     public List<CustomerCouponResponse> list(@PathVariable Long userId) {
         return service.adminListForUser(userId);
+    }
+
+    @PostMapping("/{userId}/coupons/{couponId}/revoke")
+    @Operation(summary = "Revoke an AVAILABLE claimed coupon (terminal; frees the total-usage slot; "
+        + "409 when already used or revoked)")
+    public CustomerCouponResponse revoke(@PathVariable Long userId, @PathVariable Long couponId) {
+        return service.adminRevoke(userId, couponId);
     }
 }

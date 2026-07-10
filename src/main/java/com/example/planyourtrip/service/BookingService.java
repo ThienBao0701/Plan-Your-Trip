@@ -366,6 +366,80 @@ public class BookingService {
         return toResponse(bookingRepo.save(booking));
     }
 
+    // ── Phase 7.16 — Admin: refund a cancelled booking's payment as credits ──
+
+    /**
+     * Phase 7.16 — refund-to-credits: the money actually paid for a booking
+     * that was subsequently cancelled comes back to the customer as
+     * promotional travel credits (NO real-money custody or gateway refund —
+     * ledger only). Admin-triggered, mirroring the manual-trigger convention.
+     *
+     * <p>Rules (documented judgment calls):
+     * <ul>
+     *   <li>booking must be CANCELLED — refunding an active booking makes no
+     *       sense (422); an already-REFUNDED booking gets its own 422 so the
+     *       trigger is safely non-repeatable at the state level, with the
+     *       ledger's deterministic idempotencyKey
+     *       {@code booking-<id>-refund-credit} as the race-proof backstop;</li>
+     *   <li>exactly the PAID payment's amount is refunded (that is the money
+     *       that actually changed hands — coupon/credit discounts were never
+     *       paid, and credits redeemed at checkout were already restored by the
+     *       cancellation REVERSAL, so nothing double-counts);</li>
+     *   <li>a payment already cash-refunded via
+     *       {@code POST /api/admin/payments/{id}/refund} is no longer PAID, so
+     *       refund-to-credits rejects it (422) — one refund path per payment;</li>
+     *   <li>everything (ledger row, payment → REFUNDED, booking → REFUNDED)
+     *       happens in one transaction: any failure (e.g. account currency
+     *       mismatch → 400) leaves no partial state.</li>
+     * </ul>
+     */
+    @Transactional
+    public BookingResponse adminRefundToCredits(Long bookingId) {
+        Booking booking = bookingRepo.findById(bookingId)
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found: " + bookingId));
+
+        if (booking.getStatus() == BookingStatus.REFUNDED)
+            throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,
+                "Booking has already been refunded");
+        if (booking.getStatus() != BookingStatus.CANCELLED)
+            throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,
+                "Only a CANCELLED booking can be refunded to credits. Current status: "
+                    + booking.getStatus());
+
+        Payment paidPayment = paymentRepo.findByBookingIdOrderByCreatedAtDesc(bookingId).stream()
+            .filter(p -> p.getStatus() == PaymentStatus.PAID)
+            .findFirst()
+            .orElseThrow(() -> new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,
+                "No PAID payment exists for this booking — nothing to refund"));
+        if (paidPayment.getAmount() == null || paidPayment.getAmount().signum() <= 0)
+            throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,
+                "Payment amount is zero — nothing to refund");
+
+        // Ledger first: the locked, idempotent REFUND_CREDIT grant. Any
+        // ApiException from here (e.g. currency mismatch) aborts the whole
+        // transaction before/along with the status flips below.
+        travelCreditService.refundForBooking(booking.getUser().getId(),
+            paidPayment.getAmount(), paidPayment.getCurrency(), bookingId, paidPayment.getId());
+
+        Instant now = Instant.now();
+        paidPayment.setStatus(PaymentStatus.REFUNDED);
+        paidPayment.setRefundedAt(now);
+        paymentRepo.save(paidPayment);
+
+        booking.setStatus(BookingStatus.REFUNDED);
+        booking.setLastStatusChangedAt(now);
+        Booking saved = bookingRepo.save(booking);
+
+        notificationService.create(saved.getUser().getId(), NotificationType.BOOKING, Priority.NORMAL,
+            "Booking refunded",
+            "Your booking " + saved.getBookingCode() + " has been refunded as "
+                + paidPayment.getAmount().toPlainString() + " " + paidPayment.getCurrency()
+                + " in promotional travel credits.",
+            RelatedEntityType.BOOKING, saved.getId());
+
+        return toResponse(saved);
+    }
+
     // ── Admin: timeline ───────────────────────────────────────────────────────
 
     @Transactional(readOnly = true)

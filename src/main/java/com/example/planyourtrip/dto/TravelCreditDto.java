@@ -76,4 +76,18 @@ public class TravelCreditDto {
         TravelCreditAccountResponse account,
         List<TravelCreditTransactionResponse> recentTransactions
     ) {}
+
+    /**
+     * Phase 7.16 — result of an admin-triggered expiration sweep
+     * ({@code POST /api/admin/travel-credits/process-expirations}).
+     * {@code expirations} lists every EXPIRATION ledger row inserted by THIS
+     * run (already-processed grants replay to nothing and are not listed) —
+     * shape mirrors {@code WalletExpiryReminderResultResponse} (Phase 7.13).
+     */
+    public record CreditExpirationRunResponse(
+        int accountsAffected,
+        int transactionsExpired,
+        BigDecimal totalAmountExpired,
+        List<TravelCreditTransactionResponse> expirations
+    ) {}
 }

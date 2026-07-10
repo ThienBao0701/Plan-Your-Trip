@@ -16,8 +16,11 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -179,6 +182,132 @@ public class TravelCreditService {
             TravelCreditReferenceType.BOOKING, bookingId,
             "booking-" + bookingId + "-reversal",
             null, TravelCreditTransactionType.REVERSAL), true);
+    }
+
+    // ── Phase 7.16 — refund-to-credits (called by BookingService) ────────────
+
+    /**
+     * Phase 7.16 — refunds the money paid for a cancelled booking as
+     * promotional travel credits. Same locked, idempotent {@link #mutate}
+     * machinery as every other ledger op: REFUND_CREDIT increase with the
+     * deterministic idempotencyKey {@code booking-<id>-refund-credit}, so a
+     * repeated trigger (or a race) can never double-credit.
+     * {@code referenceType=REFUND} pointing at the refunded payment id
+     * (judgment call: the refund row references the money source, while
+     * REDEMPTION/REVERSAL reference the booking — the booking id remains in
+     * the key and the description). Joins the caller's transaction, so any
+     * failure rolls the payment/booking status flips back with it.
+     */
+    @Transactional
+    public TravelCreditTransactionResponse refundForBooking(Long userId, BigDecimal amount,
+                                                             String currency, Long bookingId, Long paymentId) {
+        return mutate(userId, new TravelCreditAdjustmentRequest(
+            amount, currency,
+            "Refund-to-credits for cancelled booking #" + bookingId + " (payment #" + paymentId + ")",
+            TravelCreditReferenceType.REFUND, paymentId,
+            "booking-" + bookingId + "-refund-credit",
+            null, TravelCreditTransactionType.REFUND_CREDIT), true);
+    }
+
+    // ── Phase 7.16 — credit expiration processing (admin manual trigger) ─────
+
+    /**
+     * Phase 7.16 — expires unspent credits whose grant carried an
+     * {@code expiresAt} that has passed (a grant is valid THROUGH its expiry
+     * date). No scheduler — admin-triggered only, mirroring the Phase 7.11/7.13
+     * manual-trigger pattern.
+     *
+     * <p>How much of an expired grant is still unspent is derived purely from
+     * the immutable ledger under a FIFO assumption (credits are consumed
+     * oldest-first): for a grant G,
+     * {@code unconsumed(G) = clamp(min(G.amount, sumOfIncreasesThroughG − sumOfAllDecreases), 0…)}.
+     * This never exceeds the current balance (so the balance-never-negative
+     * invariant cannot trip) and never touches credits granted after G — a
+     * fully-consumed expired grant deterministically expires nothing, on this
+     * run and every future run.
+     *
+     * <p>Each expiration is one immutable EXPIRATION ledger row inserted via the
+     * same locked {@link #mutate} machinery, with the deterministic
+     * idempotencyKey {@code credit-tx-<grantTxId>-expiration} (pre-checked here
+     * AND backstopped by the DB unique constraint), {@code referenceType=SYSTEM}
+     * and {@code referenceId} = the expired grant's transaction id. The account
+     * row is locked BEFORE the ledger is read so the computation cannot race a
+     * concurrent redemption. One notification per affected account (not per
+     * row), sent only when something actually expired.
+     */
+    @Transactional
+    public CreditExpirationRunResponse processExpirations() {
+        LocalDate today = LocalDate.now();
+
+        Map<Long, List<TravelCreditTransaction>> candidatesByAccount = new LinkedHashMap<>();
+        transactionRepo.findByExpiresAtBeforeOrderByIdAsc(today).stream()
+            .filter(t -> INCREASE_TYPES.contains(t.getTransactionType()))
+            .forEach(t -> candidatesByAccount
+                .computeIfAbsent(t.getAccount().getId(), k -> new ArrayList<>()).add(t));
+
+        List<TravelCreditTransactionResponse> expirations = new ArrayList<>();
+        int accountsAffected = 0;
+        BigDecimal totalExpired = BigDecimal.ZERO.setScale(2, RoundingMode.UNNECESSARY);
+
+        for (List<TravelCreditTransaction> grants : candidatesByAccount.values()) {
+            Long userId = grants.get(0).getAccount().getUser().getId();
+
+            // Lock first — the FIFO computation below must not race a concurrent
+            // redemption between reading the ledger and inserting the EXPIRATION.
+            TravelCreditAccount account = accountRepo.findByUserIdForUpdate(userId).orElseThrow();
+
+            // Full ledger in insert order (id ascending).
+            List<TravelCreditTransaction> ledger = new ArrayList<>(
+                transactionRepo.findByAccountIdOrderByCreatedAtDescIdDesc(account.getId()));
+            ledger.sort((a, b) -> Long.compare(a.getId(), b.getId()));
+
+            BigDecimal totalDecreases = ledger.stream()
+                .filter(t -> DECREASE_TYPES.contains(t.getTransactionType()))
+                .map(TravelCreditTransaction::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            BigDecimal accountExpired = BigDecimal.ZERO;
+            for (TravelCreditTransaction grant : grants) {
+                String key = "credit-tx-" + grant.getId() + "-expiration";
+                if (transactionRepo.findByIdempotencyKey(key).isPresent()) continue; // already processed
+
+                BigDecimal increasesThroughGrant = ledger.stream()
+                    .filter(t -> t.getId() <= grant.getId())
+                    .filter(t -> INCREASE_TYPES.contains(t.getTransactionType()))
+                    .map(TravelCreditTransaction::getAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                BigDecimal unconsumed = grant.getAmount()
+                    .min(increasesThroughGrant.subtract(totalDecreases))
+                    .max(BigDecimal.ZERO)
+                    .setScale(2, RoundingMode.HALF_UP);
+                if (unconsumed.signum() <= 0) continue; // fully consumed — nothing to expire, ever
+
+                expirations.add(mutate(userId, new TravelCreditAdjustmentRequest(
+                    unconsumed, account.getCurrency(),
+                    "Expired credits from transaction #" + grant.getId()
+                        + " (expired " + grant.getExpiresAt() + ")",
+                    TravelCreditReferenceType.SYSTEM, grant.getId(),
+                    key, null, TravelCreditTransactionType.EXPIRATION), false));
+
+                totalDecreases = totalDecreases.add(unconsumed); // this expiration is itself a decrease
+                accountExpired = accountExpired.add(unconsumed);
+            }
+
+            if (accountExpired.signum() > 0) {
+                accountsAffected++;
+                totalExpired = totalExpired.add(accountExpired);
+                notificationService.create(userId, NotificationType.PAYMENT, Priority.NORMAL,
+                    "Travel credits expired",
+                    accountExpired.setScale(2, RoundingMode.HALF_UP).toPlainString() + " "
+                        + account.getCurrency()
+                        + " in promotional travel credits has expired and been removed from your account.",
+                    RelatedEntityType.SYSTEM, account.getId());
+            }
+        }
+
+        return new CreditExpirationRunResponse(accountsAffected, expirations.size(),
+            totalExpired.setScale(2, RoundingMode.HALF_UP), expirations);
     }
 
     private TravelCreditTransactionResponse mutate(Long targetUserId, TravelCreditAdjustmentRequest req,

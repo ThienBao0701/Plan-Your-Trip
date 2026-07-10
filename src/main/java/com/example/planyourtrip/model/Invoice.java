@@ -53,6 +53,23 @@ public class Invoice {
     @Column(precision = 15, scale = 2, nullable = false)
     private BigDecimal discountAmount;
 
+    // ── Phase 7.16 — itemized coupon/credit lines (snapshotted from the booking
+    // at issue time, like subtotal/discountAmount; all nullable so invoices
+    // issued before 7.16 — or for bookings without a coupon/credits — are
+    // untouched) ──────────────────────────────────────────────────────────────
+
+    /** Coupon code consumed by the booking, when one was applied. */
+    @Column(length = 60)
+    private String couponCode;
+
+    /** Coupon discount applied at checkout (Phase 7.15), when one was applied. */
+    @Column(precision = 15, scale = 2)
+    private BigDecimal couponDiscountAmount;
+
+    /** Promotional travel credits redeemed at checkout (Phase 7.15), when any. */
+    @Column(precision = 15, scale = 2)
+    private BigDecimal creditAmountUsed;
+
     @Column(precision = 15, scale = 2, nullable = false)
     private BigDecimal taxAmount;
 

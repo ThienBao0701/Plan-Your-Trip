@@ -77,4 +77,11 @@ public class AdminBookingController {
     public BookingResponse archive(@PathVariable Long id) {
         return service.adminArchive(id);
     }
+
+    @PostMapping("/{id}/refund-to-credits")
+    @Operation(summary = "Refund a CANCELLED booking's PAID payment as promotional travel credits "
+        + "(booking and payment become REFUNDED; idempotent REFUND_CREDIT ledger row)")
+    public BookingResponse refundToCredits(@PathVariable Long id) {
+        return service.adminRefundToCredits(id);
+    }
 }

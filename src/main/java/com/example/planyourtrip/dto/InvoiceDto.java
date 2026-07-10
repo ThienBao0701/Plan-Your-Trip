@@ -33,6 +33,11 @@ public class InvoiceDto {
         String currency,
         BigDecimal subtotal,
         BigDecimal discountAmount,
+        // Phase 7.16 — itemized coupon/credit lines (null on invoices issued
+        // before 7.16 or when the booking used no coupon / credits).
+        String couponCode,
+        BigDecimal couponDiscountAmount,
+        BigDecimal creditAmountUsed,
         BigDecimal taxAmount,
         BigDecimal totalAmount,
         Instant issuedAt,

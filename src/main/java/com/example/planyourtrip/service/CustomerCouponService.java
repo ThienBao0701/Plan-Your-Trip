@@ -126,6 +126,62 @@ public class CustomerCouponService {
             .stream().map(this::toResponse).toList();
     }
 
+    // ── Phase 7.16 — admin revocation ────────────────────────────────────────
+
+    /**
+     * Phase 7.16 — admin revokes a claimed coupon. REVOKED is terminal (it
+     * always wins in {@link #effectiveStatus}), so a revoked claim is rejected
+     * at checkout (409) and reported ineligible by the preview from the moment
+     * this commits.
+     *
+     * <p>Documented judgment calls:
+     * <ul>
+     *   <li>only a stored-AVAILABLE claim can be revoked — a USED coupon is
+     *       history attached to a booking (409), an already-REVOKED one is a
+     *       repeat (409). A stored-AVAILABLE claim whose effective expiry has
+     *       passed may still be revoked (harmless bookkeeping);</li>
+     *   <li>{@code CouponDefinition#currentUsageCount} counts LIVE claims
+     *       against {@code totalUsageLimit}, so revocation decrements it
+     *       (floored at 0) and frees the slot for other customers. The per-user
+     *       claim count deliberately still includes the revoked row — revocation
+     *       is punitive/corrective, and the target user must not be able to
+     *       simply re-claim the code;</li>
+     *   <li>lookup is ownership-scoped under the path's userId: a coupon id
+     *       that exists but belongs to a different user is a 404, never a 403,
+     *       per the established convention.</li>
+     * </ul>
+     */
+    @Transactional
+    public CustomerCouponResponse adminRevoke(Long targetUserId, Long couponId) {
+        userRepo.findById(targetUserId)
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found: " + targetUserId));
+        CustomerCoupon coupon = customerCouponRepo.findByIdAndUserId(couponId, targetUserId)
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Coupon not found: " + couponId));
+
+        if (coupon.getStatus() == CustomerCouponStatus.USED)
+            throw new ApiException(HttpStatus.CONFLICT,
+                "Cannot revoke a coupon that has already been used");
+        if (coupon.getStatus() == CustomerCouponStatus.REVOKED)
+            throw new ApiException(HttpStatus.CONFLICT, "Coupon is already revoked");
+
+        coupon.setStatus(CustomerCouponStatus.REVOKED);
+        CustomerCoupon saved = customerCouponRepo.save(coupon);
+
+        CouponDefinition def = coupon.getCouponDefinition();
+        if (def.getCurrentUsageCount() > 0) {
+            def.setCurrentUsageCount(def.getCurrentUsageCount() - 1);
+            couponDefinitionRepo.save(def);
+        }
+
+        notificationService.create(targetUserId, NotificationType.PROMOTION, Priority.NORMAL,
+            "Coupon revoked",
+            "Coupon " + def.getCode() + " (" + def.getName()
+                + ") has been revoked and can no longer be used.",
+            RelatedEntityType.PROMOTION, def.getId());
+
+        return toResponse(saved);
+    }
+
     // ── Preview (strictly read-only — never marks the coupon used) ──────────
 
     @Transactional(readOnly = true)
