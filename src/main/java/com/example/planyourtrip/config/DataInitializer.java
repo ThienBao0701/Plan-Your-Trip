@@ -61,6 +61,7 @@ public class DataInitializer implements ApplicationRunner {
     private final com.example.planyourtrip.service.CustomerMembershipService customerMembershipService;
     private final com.example.planyourtrip.repository.LoyaltyRedemptionPolicyRepository loyaltyRedemptionPolicyRepo;
     private final com.example.planyourtrip.repository.ReferralCampaignRepository referralCampaignRepo;
+    private final com.example.planyourtrip.repository.PersonalizationRuleRepository personalizationRuleRepo;
 
     public DataInitializer(UserRepository users, PasswordEncoder encoder,
                            AdministrativeUnitRepository locations,
@@ -96,7 +97,8 @@ public class DataInitializer implements ApplicationRunner {
                            MembershipBenefitDefinitionRepository membershipBenefitDefinitionRepo,
                            com.example.planyourtrip.service.CustomerMembershipService customerMembershipService,
                            com.example.planyourtrip.repository.LoyaltyRedemptionPolicyRepository loyaltyRedemptionPolicyRepo,
-                           com.example.planyourtrip.repository.ReferralCampaignRepository referralCampaignRepo) {
+                           com.example.planyourtrip.repository.ReferralCampaignRepository referralCampaignRepo,
+                           com.example.planyourtrip.repository.PersonalizationRuleRepository personalizationRuleRepo) {
         this.users      = users;
         this.encoder    = encoder;
         this.locations  = locations;
@@ -133,6 +135,7 @@ public class DataInitializer implements ApplicationRunner {
         this.customerMembershipService  = customerMembershipService;
         this.loyaltyRedemptionPolicyRepo = loyaltyRedemptionPolicyRepo;
         this.referralCampaignRepo = referralCampaignRepo;
+        this.personalizationRuleRepo = personalizationRuleRepo;
     }
 
     @Override
@@ -167,6 +170,51 @@ public class DataInitializer implements ApplicationRunner {
         seedDemoMembership();
         seedDefaultRedemptionPolicy();
         seedDefaultReferralCampaign();
+        seedPersonalizationRules();
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // PERSONALIZATION RULES — Phase 7.23 (idempotent)
+    // ─────────────────────────────────────────────────────────────
+
+    /**
+     * Seeds the four starter personalization rules from the Phase 7.23 spec so
+     * the rule-based recommender is usable out of the box. Idempotent by ruleCode
+     * (checked case-insensitively before insert; the DB unique constraint on
+     * {@code rule_code} is the backstop) — restarts never duplicate a row, and an
+     * admin-customized rule is never overwritten. Deliberately does NOT generate
+     * any customer recommendations at startup (generation is explicit, per spec).
+     */
+    private void seedPersonalizationRules() {
+        personalizationRule("WISHLIST_AFFINITY_DEFAULT", "Wishlist affinity",
+            "Recommend places similar to the customer's saved wishlist.",
+            com.example.planyourtrip.model.PersonalizationRuleType.WISHLIST_AFFINITY, 100, null);
+        personalizationRule("RECENTLY_VIEWED_DEFAULT", "Recently viewed affinity",
+            "Recommend places similar to what the customer recently viewed.",
+            com.example.planyourtrip.model.PersonalizationRuleType.RECENTLY_VIEWED, 90, null);
+        personalizationRule("MEMBERSHIP_TIER_DEFAULT", "Membership-exclusive offers",
+            "Surface tier-exclusive coupons to eligible members.",
+            com.example.planyourtrip.model.PersonalizationRuleType.MEMBERSHIP_TIER, 80,
+            com.example.planyourtrip.model.MembershipTier.SILVER);
+        personalizationRule("REENGAGEMENT_DEFAULT", "Re-engagement offers",
+            "Surface active promotions and coupons to returning customers.",
+            com.example.planyourtrip.model.PersonalizationRuleType.REENGAGEMENT, 70, null);
+    }
+
+    private void personalizationRule(String code, String name, String description,
+                                     com.example.planyourtrip.model.PersonalizationRuleType type,
+                                     int priority, com.example.planyourtrip.model.MembershipTier minTier) {
+        if (personalizationRuleRepo.existsByRuleCodeIgnoreCase(code)) return;
+        com.example.planyourtrip.model.PersonalizationRule r =
+            new com.example.planyourtrip.model.PersonalizationRule();
+        r.setRuleCode(code);
+        r.setName(name);
+        r.setDescription(description);
+        r.setRuleType(type);
+        r.setPriority(priority);
+        r.setActive(true);
+        r.setMinimumMembershipTier(minTier);
+        personalizationRuleRepo.save(r);
     }
 
     // ─────────────────────────────────────────────────────────────
