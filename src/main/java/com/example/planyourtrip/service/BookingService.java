@@ -36,6 +36,7 @@ public class BookingService {
     private final TravelCreditService travelCreditService;
     private final LoyaltyService loyaltyService;
     private final LoyaltyRedemptionService loyaltyRedemptionService;
+    private final ReferralService referralService;
 
     private static final Set<BookingStatus> UPCOMING_STATUSES =
         EnumSet.of(BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.CHECK_IN_READY);
@@ -59,7 +60,8 @@ public class BookingService {
                           CustomerCouponService customerCouponService,
                           TravelCreditService travelCreditService,
                           LoyaltyService loyaltyService,
-                          LoyaltyRedemptionService loyaltyRedemptionService) {
+                          LoyaltyRedemptionService loyaltyRedemptionService,
+                          ReferralService referralService) {
         this.bookingRepo   = bookingRepo;
         this.roomRepo      = roomRepo;
         this.inventoryRepo = inventoryRepo;
@@ -72,6 +74,7 @@ public class BookingService {
         this.travelCreditService = travelCreditService;
         this.loyaltyService = loyaltyService;
         this.loyaltyRedemptionService = loyaltyRedemptionService;
+        this.referralService = referralService;
     }
 
     // ── Create ────────────────────────────────────────────────────────────────
@@ -352,8 +355,14 @@ public class BookingService {
         // "booking-<id>-loyalty-earn" key, so this can never double-award even if
         // adminComplete (engine-validated path, below) also reaches COMPLETED for
         // the same booking.
-        if (newStatus == BookingStatus.COMPLETED)
+        if (newStatus == BookingStatus.COMPLETED) {
             loyaltyService.awardBookingPoints(saved.getUser().getId(), saved.getId(), saved.getFinalPrice());
+            // Phase 7.22 — same completion hook, one additional call: referral
+            // qualification. No-op unless the booking owner is an invitee still
+            // awaiting their qualifying first booking; idempotent via the reward's
+            // one-way USED→REWARDED gate, so a repeated COMPLETED never re-rewards.
+            referralService.qualifyBookingForReferral(saved.getUser().getId(), saved.getId(), saved.getFinalPrice());
+        }
         return toResponse(saved);
     }
 
@@ -383,6 +392,8 @@ public class BookingService {
         Booking saved = bookingRepo.save(booking);
         // Phase 7.18 — same idempotent loyalty-points hook as adminUpdateStatus above.
         loyaltyService.awardBookingPoints(saved.getUser().getId(), saved.getId(), saved.getFinalPrice());
+        // Phase 7.22 — referral qualification, same completion hook (see adminUpdateStatus).
+        referralService.qualifyBookingForReferral(saved.getUser().getId(), saved.getId(), saved.getFinalPrice());
         return toResponse(saved);
     }
 

@@ -158,6 +158,47 @@ public class CustomerCouponService {
         User user = userRepo.findById(userId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
 
+        return toResponse(issueCoupon(user, def));
+    }
+
+    // ── Phase 7.22 — direct system issuance (referral rewards) ───────────────
+
+    /**
+     * Phase 7.22 — issues a specific {@link CouponDefinition} directly to a
+     * specific user WITHOUT a code and WITHOUT the customer-facing claim
+     * eligibility gates (active/date-window/usage-limit/segment/first-booking/
+     * tier). Used by {@code ReferralService} to grant a configured referral
+     * reward coupon: the reward campaign — not the customer — decides who
+     * receives it, so the self-service claim preconditions do not apply.
+     *
+     * <p>This is an ADDITIVE extension, not a duplicate reward engine: it reuses
+     * the exact same row-creation + usage-increment + "Coupon added" notification
+     * internals as {@link #claim} via the shared private {@link #issueCoupon}
+     * helper (extracted from claim's tail — not copy-pasted), so a
+     * referral-granted coupon is physically identical to a claimed one and flows
+     * through the same {@code CustomerCoupon} lifecycle. Reward-once/idempotency
+     * for the referral path is guaranteed by {@code ReferralService}'s one-way
+     * {@code USED → REWARDED} status gate (this method is only ever called once,
+     * inside the single reward-granting transaction).
+     */
+    @Transactional
+    public CustomerCouponResponse issueDirectly(Long userId, Long couponDefinitionId) {
+        CouponDefinition def = couponDefinitionRepo.findById(couponDefinitionId)
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND,
+                "Coupon definition not found: " + couponDefinitionId));
+        User user = userRepo.findById(userId)
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found: " + userId));
+        return toResponse(issueCoupon(user, def));
+    }
+
+    /**
+     * Shared coupon-issuance internal, extracted from {@link #claim}'s tail and
+     * reused by {@link #issueDirectly} (Phase 7.22): create the AVAILABLE
+     * {@link CustomerCoupon} row, increment the definition's usage count and send
+     * the standard "Coupon added" notification. Callers own their own
+     * precondition checks before invoking this.
+     */
+    private CustomerCoupon issueCoupon(User user, CouponDefinition def) {
         CustomerCoupon coupon = new CustomerCoupon();
         coupon.setUser(user);
         coupon.setCouponDefinition(def);
@@ -168,12 +209,12 @@ public class CustomerCouponService {
         def.setCurrentUsageCount(def.getCurrentUsageCount() + 1);
         couponDefinitionRepo.save(def);
 
-        notificationService.create(userId, NotificationType.PROMOTION, Priority.NORMAL,
+        notificationService.create(user.getId(), NotificationType.PROMOTION, Priority.NORMAL,
             "Coupon added",
             "Coupon " + def.getCode() + " (" + def.getName() + ") has been added to your account.",
             RelatedEntityType.PROMOTION, def.getId());
 
-        return toResponse(saved);
+        return saved;
     }
 
     // ── Read ─────────────────────────────────────────────────────────────────

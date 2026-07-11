@@ -60,6 +60,7 @@ public class DataInitializer implements ApplicationRunner {
     private final MembershipBenefitDefinitionRepository membershipBenefitDefinitionRepo;
     private final com.example.planyourtrip.service.CustomerMembershipService customerMembershipService;
     private final com.example.planyourtrip.repository.LoyaltyRedemptionPolicyRepository loyaltyRedemptionPolicyRepo;
+    private final com.example.planyourtrip.repository.ReferralCampaignRepository referralCampaignRepo;
 
     public DataInitializer(UserRepository users, PasswordEncoder encoder,
                            AdministrativeUnitRepository locations,
@@ -94,7 +95,8 @@ public class DataInitializer implements ApplicationRunner {
                            MembershipTierDefinitionRepository membershipTierDefinitionRepo,
                            MembershipBenefitDefinitionRepository membershipBenefitDefinitionRepo,
                            com.example.planyourtrip.service.CustomerMembershipService customerMembershipService,
-                           com.example.planyourtrip.repository.LoyaltyRedemptionPolicyRepository loyaltyRedemptionPolicyRepo) {
+                           com.example.planyourtrip.repository.LoyaltyRedemptionPolicyRepository loyaltyRedemptionPolicyRepo,
+                           com.example.planyourtrip.repository.ReferralCampaignRepository referralCampaignRepo) {
         this.users      = users;
         this.encoder    = encoder;
         this.locations  = locations;
@@ -130,6 +132,7 @@ public class DataInitializer implements ApplicationRunner {
         this.membershipBenefitDefinitionRepo = membershipBenefitDefinitionRepo;
         this.customerMembershipService  = customerMembershipService;
         this.loyaltyRedemptionPolicyRepo = loyaltyRedemptionPolicyRepo;
+        this.referralCampaignRepo = referralCampaignRepo;
     }
 
     @Override
@@ -163,6 +166,37 @@ public class DataInitializer implements ApplicationRunner {
         seedMembershipBenefits();
         seedDemoMembership();
         seedDefaultRedemptionPolicy();
+        seedDefaultReferralCampaign();
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // REFERRAL CAMPAIGN — Phase 7.22 (idempotent)
+    // ─────────────────────────────────────────────────────────────
+
+    /**
+     * Seeds the single active default referral campaign so the referral
+     * programme is usable out of the box, mirroring
+     * {@link #seedDefaultRedemptionPolicy}'s single-active-default discipline.
+     * Points-only rewards (200 to the inviter, 100 to the invitee) with no
+     * minimum qualifying amount — coupon/credit reward slots are left for an
+     * admin to configure. Idempotent by code (checked before insert; the DB
+     * unique constraint on {@code code} is the backstop); never overwrites an
+     * admin-customized campaign.
+     */
+    private void seedDefaultReferralCampaign() {
+        String code = "DEFAULT_REFERRAL";
+        if (referralCampaignRepo.findByCodeIgnoreCase(code).isPresent()) return;
+        com.example.planyourtrip.model.ReferralCampaign c =
+            new com.example.planyourtrip.model.ReferralCampaign();
+        c.setCode(code);
+        c.setName("Default referral programme");
+        c.setMinimumQualifyingBookingAmount(null);
+        c.setInviterRewardPoints(200L);
+        c.setInviteeRewardPoints(100L);
+        c.setActive(true);
+        c.setEffectiveFrom(java.time.Instant.now());
+        c.setEffectiveUntil(null);
+        referralCampaignRepo.save(c);
     }
 
     // ─────────────────────────────────────────────────────────────
