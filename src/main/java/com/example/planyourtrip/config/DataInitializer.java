@@ -62,6 +62,8 @@ public class DataInitializer implements ApplicationRunner {
     private final com.example.planyourtrip.repository.LoyaltyRedemptionPolicyRepository loyaltyRedemptionPolicyRepo;
     private final com.example.planyourtrip.repository.ReferralCampaignRepository referralCampaignRepo;
     private final com.example.planyourtrip.repository.PersonalizationRuleRepository personalizationRuleRepo;
+    private final com.example.planyourtrip.service.GiftCardProductService giftCardProductService;
+    private final com.example.planyourtrip.service.GiftCardService giftCardService;
 
     public DataInitializer(UserRepository users, PasswordEncoder encoder,
                            AdministrativeUnitRepository locations,
@@ -98,7 +100,9 @@ public class DataInitializer implements ApplicationRunner {
                            com.example.planyourtrip.service.CustomerMembershipService customerMembershipService,
                            com.example.planyourtrip.repository.LoyaltyRedemptionPolicyRepository loyaltyRedemptionPolicyRepo,
                            com.example.planyourtrip.repository.ReferralCampaignRepository referralCampaignRepo,
-                           com.example.planyourtrip.repository.PersonalizationRuleRepository personalizationRuleRepo) {
+                           com.example.planyourtrip.repository.PersonalizationRuleRepository personalizationRuleRepo,
+                           com.example.planyourtrip.service.GiftCardProductService giftCardProductService,
+                           com.example.planyourtrip.service.GiftCardService giftCardService) {
         this.users      = users;
         this.encoder    = encoder;
         this.locations  = locations;
@@ -136,6 +140,8 @@ public class DataInitializer implements ApplicationRunner {
         this.loyaltyRedemptionPolicyRepo = loyaltyRedemptionPolicyRepo;
         this.referralCampaignRepo = referralCampaignRepo;
         this.personalizationRuleRepo = personalizationRuleRepo;
+        this.giftCardProductService = giftCardProductService;
+        this.giftCardService = giftCardService;
     }
 
     @Override
@@ -171,6 +177,50 @@ public class DataInitializer implements ApplicationRunner {
         seedDefaultRedemptionPolicy();
         seedDefaultReferralCampaign();
         seedPersonalizationRules();
+        seedGiftCardProduct();
+        seedDemoGiftCard();
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // GIFT CARDS — Phase 7.24 (idempotent)
+    // ─────────────────────────────────────────────────────────────
+
+    /**
+     * Seeds the single standard gift-card product from the Phase 7.24 spec.
+     * Idempotent by productCode — checked case-insensitively before insert (the
+     * DB unique constraint on {@code product_code} is the backstop); never
+     * overwrites an admin-customized existing product.
+     */
+    private void seedGiftCardProduct() {
+        String code = "PYT_STANDARD_GIFT";
+        if (giftCardProductService.existsByCode(code)) return;
+        com.example.planyourtrip.dto.GiftCardDto.GiftCardProductRequest req =
+            new com.example.planyourtrip.dto.GiftCardDto.GiftCardProductRequest(
+                code, "Plan Your Trip Gift Card",
+                "Prepaid promotional gift card redeemable within Plan Your Trip.",
+                "VND", null, new BigDecimal("100000"), new BigDecimal("10000000"),
+                true, 365, true, null, null);
+        giftCardProductService.create(req);
+    }
+
+    /**
+     * Seeds one ACTIVE demo gift card for the demo user via a deterministic
+     * issuance idempotency key, mirroring {@link #seedDemoTravelCredits()} /
+     * {@link #seedDemoLoyaltyAccount()}'s replay-safe pattern —
+     * {@code GiftCardService} returns the original card untouched on replay, so
+     * restarts never issue a second one. Activated immediately so the demo
+     * account has something usable out of the box.
+     */
+    private void seedDemoGiftCard() {
+        User demo = users.findByEmail("demo@planyourtrip.com").orElse(null);
+        if (demo == null) return;
+        com.example.planyourtrip.dto.GiftCardDto.GiftCardIssueRequest req =
+            new com.example.planyourtrip.dto.GiftCardDto.GiftCardIssueRequest(
+                "PYT_STANDARD_GIFT", new BigDecimal("200000"), null, null,
+                "Welcome gift from Plan Your Trip!", "seed-demo-gift-card-issue");
+        com.example.planyourtrip.dto.GiftCardDto.GiftCardResponse card =
+            giftCardService.issueForCustomer(demo.getId(), req);
+        giftCardService.activate(demo.getId(), card.id());
     }
 
     // ─────────────────────────────────────────────────────────────
