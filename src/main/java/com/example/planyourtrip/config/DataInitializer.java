@@ -55,6 +55,10 @@ public class DataInitializer implements ApplicationRunner {
     private final PartnerTeamMemberRepository partnerTeamMemberRepo;
     private final CouponDefinitionRepository couponDefinitionRepo;
     private final com.example.planyourtrip.service.TravelCreditService travelCreditService;
+    private final com.example.planyourtrip.service.LoyaltyService loyaltyService;
+    private final MembershipTierDefinitionRepository membershipTierDefinitionRepo;
+    private final MembershipBenefitDefinitionRepository membershipBenefitDefinitionRepo;
+    private final com.example.planyourtrip.service.CustomerMembershipService customerMembershipService;
 
     public DataInitializer(UserRepository users, PasswordEncoder encoder,
                            AdministrativeUnitRepository locations,
@@ -84,7 +88,11 @@ public class DataInitializer implements ApplicationRunner {
                            PartnerPayoutAccountRepository partnerPayoutAccountRepo,
                            PartnerTeamMemberRepository partnerTeamMemberRepo,
                            CouponDefinitionRepository couponDefinitionRepo,
-                           com.example.planyourtrip.service.TravelCreditService travelCreditService) {
+                           com.example.planyourtrip.service.TravelCreditService travelCreditService,
+                           com.example.planyourtrip.service.LoyaltyService loyaltyService,
+                           MembershipTierDefinitionRepository membershipTierDefinitionRepo,
+                           MembershipBenefitDefinitionRepository membershipBenefitDefinitionRepo,
+                           com.example.planyourtrip.service.CustomerMembershipService customerMembershipService) {
         this.users      = users;
         this.encoder    = encoder;
         this.locations  = locations;
@@ -115,6 +123,10 @@ public class DataInitializer implements ApplicationRunner {
         this.partnerTeamMemberRepo     = partnerTeamMemberRepo;
         this.couponDefinitionRepo      = couponDefinitionRepo;
         this.travelCreditService       = travelCreditService;
+        this.loyaltyService            = loyaltyService;
+        this.membershipTierDefinitionRepo   = membershipTierDefinitionRepo;
+        this.membershipBenefitDefinitionRepo = membershipBenefitDefinitionRepo;
+        this.customerMembershipService  = customerMembershipService;
     }
 
     @Override
@@ -143,6 +155,10 @@ public class DataInitializer implements ApplicationRunner {
         seedPartnerSettings();
         seedCouponDefinitions();
         seedDemoTravelCredits();
+        seedDemoLoyaltyAccount();
+        seedMembershipTierDefinitions();
+        seedMembershipBenefits();
+        seedDemoMembership();
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -225,6 +241,112 @@ public class DataInitializer implements ApplicationRunner {
                 TravelCreditReferenceType.SYSTEM, null,
                 "seed-demo-welcome-credit", null,
                 TravelCreditTransactionType.PROMOTION));
+    }
+
+    /**
+     * Phase 7.18 — Loyalty Points Foundation. Small, realistic starter grant
+     * for the demo user (Phase 7.19's own demo-membership seeding builds on
+     * top of whatever this account ends up holding — deliberately kept
+     * modest, not an unrealistic point pile). Idempotent via the fixed
+     * idempotencyKey — {@code LoyaltyService} returns the original ledger row
+     * on replay, so restarts never double-grant.
+     */
+    private void seedDemoLoyaltyAccount() {
+        User demo = users.findByEmail("demo@planyourtrip.com").orElse(null);
+        if (demo == null) return;
+        loyaltyService.adminGrant(demo.getId(),
+            new com.example.planyourtrip.dto.LoyaltyDto.LoyaltyGrantRequest(
+                50L, "Seeded demo loyalty points",
+                LoyaltyReferenceType.SYSTEM, null,
+                "seed-demo-loyalty-grant"));
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // MEMBERSHIP TIERS — Phase 7.19 (idempotent)
+    // ─────────────────────────────────────────────────────────────
+
+    /**
+     * Recommended default qualification thresholds + points multiplier from
+     * the Phase 7.19 spec. Idempotent by tier — {@link MembershipTierDefinitionRepository#findByTier}
+     * is checked before insert, so restarts never duplicate a row (the entity
+     * also carries a DB unique constraint on {@code tier} as a backstop).
+     */
+    private void seedMembershipTierDefinitions() {
+        tierDef(MembershipTier.BRONZE, "Bronze", "Entry-level membership tier — every enrolled member starts here.",
+            0L, 0, new BigDecimal("1.00"), 1);
+        tierDef(MembershipTier.SILVER, "Silver", "Reached after 1,000 lifetime points and 2 completed bookings.",
+            1000L, 2, new BigDecimal("1.10"), 2);
+        tierDef(MembershipTier.GOLD, "Gold", "Reached after 5,000 lifetime points and 5 completed bookings.",
+            5000L, 5, new BigDecimal("1.25"), 3);
+        tierDef(MembershipTier.PLATINUM, "Platinum", "Reached after 15,000 lifetime points and 10 completed bookings.",
+            15000L, 10, new BigDecimal("1.50"), 4);
+        tierDef(MembershipTier.DIAMOND, "Diamond", "Reached after 40,000 lifetime points and 20 completed bookings.",
+            40000L, 20, new BigDecimal("2.00"), 5);
+    }
+
+    private void tierDef(MembershipTier tier, String displayName, String description,
+                          long minPoints, int minBookings, BigDecimal multiplier, int sortOrder) {
+        if (membershipTierDefinitionRepo.findByTier(tier).isPresent()) return;
+        MembershipTierDefinition d = new MembershipTierDefinition();
+        d.setTier(tier);
+        d.setDisplayName(displayName);
+        d.setDescription(description);
+        d.setMinimumLifetimePoints(minPoints);
+        d.setMinimumCompletedBookings(minBookings);
+        d.setPointsMultiplier(multiplier);
+        d.setActive(true);
+        d.setSortOrder(sortOrder);
+        membershipTierDefinitionRepo.save(d);
+    }
+
+    /**
+     * Example benefit METADATA only — nothing here is operationally executed
+     * in this phase (no real room upgrade, breakfast fulfillment, priority
+     * support routing, or coupon issuance). Idempotent by (tier, name).
+     */
+    private void seedMembershipBenefits() {
+        benefit(MembershipTier.BRONZE, MembershipBenefitType.MEMBER_ONLY_COUPONS,
+            "Member-only coupons", "Eligible for coupons targeted at the MEMBER customer segment.", null, null, 1);
+        benefit(MembershipTier.SILVER, MembershipBenefitType.EARLY_ACCESS,
+            "Early access to promotions", "See new promotions before the general public.", null, null, 1);
+        benefit(MembershipTier.GOLD, MembershipBenefitType.PRIORITY_SUPPORT,
+            "Priority support", "Faster support queue placement (metadata only — no routing implemented yet).", null, null, 1);
+        benefit(MembershipTier.PLATINUM, MembershipBenefitType.LATE_CHECKOUT,
+            "Late checkout", "Up to 2 hours late checkout, subject to availability (metadata only).",
+            new BigDecimal("2"), "hours", 1);
+        benefit(MembershipTier.DIAMOND, MembershipBenefitType.ROOM_UPGRADE,
+            "Complimentary room upgrade", "Subject to availability at check-in (metadata only — no operational execution).",
+            null, null, 1);
+    }
+
+    private void benefit(MembershipTier tier, MembershipBenefitType type, String name, String description,
+                          BigDecimal numericValue, String textValue, int sortOrder) {
+        boolean exists = membershipBenefitDefinitionRepo.findByTierAndActiveTrueOrderBySortOrderAsc(tier).stream()
+            .anyMatch(b -> b.getName().equals(name));
+        if (exists) return;
+        MembershipBenefitDefinition b = new MembershipBenefitDefinition();
+        b.setTier(tier);
+        b.setBenefitType(type);
+        b.setName(name);
+        b.setDescription(description);
+        b.setNumericValue(numericValue);
+        b.setTextValue(textValue);
+        b.setActive(true);
+        b.setSortOrder(sortOrder);
+        membershipBenefitDefinitionRepo.save(b);
+    }
+
+    /**
+     * Enrolls the demo user idempotently ({@code CustomerMembershipService#enroll}
+     * already no-ops on replay) — tier is DERIVED from whatever
+     * {@link #seedDemoLoyaltyAccount()} left the demo {@code LoyaltyAccount}
+     * holding (50 points as of this phase), so this lands on BRONZE, not an
+     * unrealistic forced high tier.
+     */
+    private void seedDemoMembership() {
+        User demo = users.findByEmail("demo@planyourtrip.com").orElse(null);
+        if (demo == null) return;
+        customerMembershipService.enroll(demo.getId());
     }
 
     // ─────────────────────────────────────────────────────────────

@@ -10,6 +10,7 @@ import com.example.planyourtrip.model.*;
 import com.example.planyourtrip.repository.BookingRepository;
 import com.example.planyourtrip.repository.CouponDefinitionRepository;
 import com.example.planyourtrip.repository.CustomerCouponRepository;
+import com.example.planyourtrip.repository.CustomerMembershipRepository;
 import com.example.planyourtrip.repository.PlaceRepository;
 import com.example.planyourtrip.repository.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -81,6 +82,7 @@ public class CustomerCouponService {
     private final CouponDefinitionService couponDefinitionService;
     private final PricingEngineService pricingEngineService;
     private final NotificationService notificationService;
+    private final CustomerMembershipRepository customerMembershipRepo;
 
     /** RETURNING_USER / customer-level threshold constants — see {@link #evaluateSegment}. */
     private static final Set<BookingStatus> NOT_QUALIFYING_STATUSES =
@@ -98,7 +100,8 @@ public class CustomerCouponService {
                                   PlaceRepository placeRepo,
                                   CouponDefinitionService couponDefinitionService,
                                   PricingEngineService pricingEngineService,
-                                  NotificationService notificationService) {
+                                  NotificationService notificationService,
+                                  CustomerMembershipRepository customerMembershipRepo) {
         this.customerCouponRepo = customerCouponRepo;
         this.couponDefinitionRepo = couponDefinitionRepo;
         this.userRepo = userRepo;
@@ -107,6 +110,7 @@ public class CustomerCouponService {
         this.couponDefinitionService = couponDefinitionService;
         this.pricingEngineService = pricingEngineService;
         this.notificationService = notificationService;
+        this.customerMembershipRepo = customerMembershipRepo;
     }
 
     // ── Claim ────────────────────────────────────────────────────────────────
@@ -581,12 +585,18 @@ public class CustomerCouponService {
      *       (see {@link #RETURNING_USER_STATUSES}: CONFIRMED, CHECKED_IN,
      *       CHECKED_OUT, COMPLETED, ARCHIVED — i.e. a real, honored booking,
      *       not merely a still-pending one);</li>
-     *   <li>{@code MEMBER} — always false. {@code CustomerProfile} carries no
-     *       membership/loyalty field in the current schema (checked before
-     *       writing this — see Phase 7.18 "Loyalty Points Foundation"), so
-     *       this segment is deliberately left unsupported rather than
-     *       inventing a fake signal; every MEMBER-segment coupon is reported
-     *       ineligible with a clear reason until that phase adds one;</li>
+     *   <li>{@code MEMBER} — Phase 7.19 "Membership Tier &amp; Loyalty
+     *       Qualification" refinement: true when the user has an ACTIVE,
+     *       NON-EXPIRED {@code CustomerMembership} row (BRONZE and above all
+     *       count — the tier value itself doesn't gate MEMBER, only having a
+     *       currently-valid membership does). Superseded from the Phase 7.18
+     *       version, which only required bare {@code LoyaltyAccount}
+     *       existence — a {@code LoyaltyAccount} with no {@code CustomerMembership}
+     *       enrollment no longer satisfies MEMBER. This check is strictly
+     *       read-only — it never creates (or enrolls) a membership during
+     *       eligibility evaluation, mirroring the "do not create membership
+     *       during eligibility" convention already established for the other
+     *       checks in this method;</li>
      *   <li>{@code HIGH_VALUE} — true when the user has at least
      *       {@link #HIGH_VALUE_COMPLETED_BOOKING_THRESHOLD} (5) COMPLETED
      *       bookings;</li>
@@ -602,7 +612,9 @@ public class CustomerCouponService {
             case ALL_USERS, MANUAL -> true;
             case NEW_USER -> !hasQualifyingBooking(userId);
             case RETURNING_USER -> bookingRepo.existsByUserIdAndStatusIn(userId, RETURNING_USER_STATUSES);
-            case MEMBER -> false;
+            case MEMBER -> customerMembershipRepo.findByUserIdAndActiveTrue(userId)
+                .map(m -> m.getValidUntil() == null || !Instant.now().isAfter(m.getValidUntil()))
+                .orElse(false);
             case HIGH_VALUE -> bookingRepo.countByUserIdAndStatus(userId, BookingStatus.COMPLETED)
                 >= HIGH_VALUE_COMPLETED_BOOKING_THRESHOLD;
         };

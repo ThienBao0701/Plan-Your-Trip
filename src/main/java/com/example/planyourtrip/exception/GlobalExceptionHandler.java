@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.*;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -46,6 +47,21 @@ public class GlobalExceptionHandler {
             .orElse("Validation failed");
         return ResponseEntity.badRequest().body(new ErrorBody(
             Instant.now().toString(), 400, "Bad Request", msg, req.getRequestURI()));
+    }
+
+    /**
+     * Phase 7.19 — {@code CustomerMembership} uses optimistic locking
+     * ({@code @Version}), deliberately unlike {@code LoyaltyAccount}/
+     * {@code TravelCreditAccount}'s pessimistic {@code SELECT ... FOR UPDATE}
+     * (see {@code CustomerMembershipService} class javadoc for the rationale).
+     * A lost-update race surfaces here as 409 — the caller can safely retry
+     * the same mutation; no automatic retry loop is implemented in this phase.
+     */
+    @ExceptionHandler(OptimisticLockingFailureException.class)
+    ResponseEntity<ErrorBody> optimisticLock(OptimisticLockingFailureException ex, HttpServletRequest req) {
+        return ResponseEntity.status(409).body(new ErrorBody(
+            Instant.now().toString(), 409, "Conflict",
+            "The resource was modified concurrently; please retry", req.getRequestURI()));
     }
 
     @ExceptionHandler(AccessDeniedException.class)
