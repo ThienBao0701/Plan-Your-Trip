@@ -3,6 +3,7 @@ package com.example.planyourtrip.dto;
 import com.example.planyourtrip.model.CouponTargetType;
 import com.example.planyourtrip.model.CustomerSegment;
 import com.example.planyourtrip.model.DiscountType;
+import com.example.planyourtrip.model.MembershipTier;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -56,7 +57,9 @@ public class CouponDto {
         CustomerSegment customerSegment,
         Boolean firstBookingOnly,
         Boolean combinableWithPromotions,
-        Boolean combinableWithTravelCredits
+        Boolean combinableWithTravelCredits,
+        /** Phase 7.21 (additive) — null means no membership-tier requirement. See {@code CouponDefinition} class javadoc. */
+        MembershipTier minimumTier
     ) {}
 
     public record CouponDefinitionResponse(
@@ -84,6 +87,8 @@ public class CouponDto {
         boolean firstBookingOnly,
         boolean combinableWithPromotions,
         boolean combinableWithTravelCredits,
+        /** Phase 7.21 (additive) — null means no membership-tier requirement. */
+        MembershipTier minimumTier,
         Instant createdAt,
         Instant updatedAt
     ) {}

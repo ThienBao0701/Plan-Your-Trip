@@ -57,6 +57,24 @@ import java.util.Optional;
  * {@code finalPrice + creditAmountUsed}). The loyalty discount then further
  * reduces the payable amount, which may never fall below the policy's minimum
  * final payable.
+ *
+ * <p><b>Phase 7.21 (additive) — tier-aware discount multiplier.</b> The single
+ * shared money-conversion primitive {@link #pointsToMoney} now takes the
+ * redeeming customer's {@code redemptionDiscountMultiplier} (resolved via
+ * {@code CustomerMembershipService#resolveRedemptionMultiplierForUser} — 1.00
+ * baseline when the user has no membership, so every pre-7.21 caller/test is
+ * completely unaffected): {@code finalDiscount = baseDiscount(points) ×
+ * multiplier}, both stages rounded DOWN to scale 2 (matching this class's
+ * existing money-rounding convention). Applied identically at
+ * {@link #preview} and {@link #reserve} — the only two places a discount is
+ * computed fresh from a points count — so both surfaces always agree.
+ * Deliberately NOT folded into the 20%-cap / minimum-payable-floor point math
+ * ({@link #maxPointsByMoney}): the number of points a customer may spend
+ * stays governed by the policy's base (unmultiplied) rate, and the tier
+ * multiplier is a pure bonus layered on top of the resulting money value —
+ * the same "bonus stacks on top of the base calculation" pattern already
+ * used by {@code MembershipTierDefinition#pointsMultiplier} for booking-award
+ * points.
  */
 @Service
 public class LoyaltyRedemptionService {
@@ -71,6 +89,7 @@ public class LoyaltyRedemptionService {
     private final BookingRepository bookingRepo;
     private final UserRepository userRepo;
     private final NotificationService notificationService;
+    private final CustomerMembershipService customerMembershipService;
 
     public LoyaltyRedemptionService(LoyaltyAccountRepository accountRepo,
                                     LoyaltyPointsTransactionRepository transactionRepo,
@@ -78,7 +97,8 @@ public class LoyaltyRedemptionService {
                                     LoyaltyRedemptionPolicyService policyService,
                                     BookingRepository bookingRepo,
                                     UserRepository userRepo,
-                                    NotificationService notificationService) {
+                                    NotificationService notificationService,
+                                    CustomerMembershipService customerMembershipService) {
         this.accountRepo = accountRepo;
         this.transactionRepo = transactionRepo;
         this.redemptionRepo = redemptionRepo;
@@ -86,6 +106,7 @@ public class LoyaltyRedemptionService {
         this.bookingRepo = bookingRepo;
         this.userRepo = userRepo;
         this.notificationService = notificationService;
+        this.customerMembershipService = customerMembershipService;
     }
 
     public record ReserveOutcome(RedemptionResponse response, boolean created) {}
@@ -115,7 +136,8 @@ public class LoyaltyRedemptionService {
         }
 
         long balance = accountRepo.findByUserId(userId).map(LoyaltyAccount::getCurrentBalance).orElse(0L);
-        Calc calc = compute(policy, eligibleBase, payableBefore, req.requestedPoints(), balance);
+        BigDecimal multiplier = customerMembershipService.resolveRedemptionMultiplierForUser(userId);
+        Calc calc = compute(policy, eligibleBase, payableBefore, req.requestedPoints(), balance, multiplier);
 
         return new RedemptionPreviewResponse(
             req.requestedPoints(), calc.acceptedPoints(), calc.discount(),
@@ -167,7 +189,8 @@ public class LoyaltyRedemptionService {
         BigDecimal eligibleBase = eligibleBaseFor(booking);
         BigDecimal payableBefore = booking.getFinalPrice();
         validateStrict(policy, eligibleBase, payableBefore, points, account.getCurrentBalance());
-        BigDecimal discount = pointsToMoney(policy, points);
+        BigDecimal multiplier = customerMembershipService.resolveRedemptionMultiplierForUser(userId);
+        BigDecimal discount = pointsToMoney(policy, points, multiplier);
 
         // Persist the redemption first so its id/reference anchor the ledger row.
         LoyaltyPointsRedemption redemption = new LoyaltyPointsRedemption();
@@ -427,7 +450,7 @@ public class LoyaltyRedemptionService {
                         List<String> messages) {}
 
     private Calc compute(LoyaltyRedemptionPolicy policy, BigDecimal eligibleBase, BigDecimal payableBefore,
-                         long requested, long balance) {
+                         long requested, long balance, BigDecimal multiplier) {
         long inc = policy.getRedemptionIncrementPoints();
         long min = policy.getMinimumRedemptionPoints();
 
@@ -439,7 +462,7 @@ public class LoyaltyRedemptionService {
         long candidate = Math.min(reqFloored, maxPoints);
         long accepted = candidate >= min ? candidate : 0L;
 
-        BigDecimal discount = pointsToMoney(policy, accepted);
+        BigDecimal discount = pointsToMoney(policy, accepted, multiplier);
         BigDecimal finalPayable = payableBefore.subtract(discount).max(BigDecimal.ZERO)
             .setScale(2, RoundingMode.HALF_UP);
 
@@ -490,10 +513,19 @@ public class LoyaltyRedemptionService {
         return floorToIncrement(points, policy.getRedemptionIncrementPoints());
     }
 
-    private BigDecimal pointsToMoney(LoyaltyRedemptionPolicy policy, long points) {
-        return policy.getValuePerUnit()
+    /**
+     * Phase 7.21 (additive) — {@code multiplier} is the redeeming customer's
+     * tier {@code redemptionDiscountMultiplier} (1.00 baseline when the user
+     * has no membership — see class javadoc). {@code baseDiscount} is rounded
+     * DOWN to scale 2 first (the pre-7.21 formula, unchanged), then the
+     * multiplier is applied and the result is rounded DOWN to scale 2 again —
+     * same conservative rounding convention used throughout this class.
+     */
+    private BigDecimal pointsToMoney(LoyaltyRedemptionPolicy policy, long points, BigDecimal multiplier) {
+        BigDecimal baseDiscount = policy.getValuePerUnit()
             .multiply(BigDecimal.valueOf(points))
             .divide(BigDecimal.valueOf(policy.getPointsPerUnit()), 2, RoundingMode.DOWN);
+        return baseDiscount.multiply(multiplier).setScale(2, RoundingMode.DOWN);
     }
 
     private long moneyToPoints(LoyaltyRedemptionPolicy policy, BigDecimal money) {

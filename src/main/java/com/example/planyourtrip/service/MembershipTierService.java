@@ -111,6 +111,18 @@ public class MembershipTierService {
             .orElse(BigDecimal.ONE);
     }
 
+    /**
+     * Phase 7.21 (additive) — used by {@code CustomerMembershipService#resolveRedemptionMultiplierForUser}
+     * (in turn consumed by {@code LoyaltyRedemptionService}). Falls back to
+     * 1.00 (no boost) when the tier's definition is missing or inactive,
+     * exactly mirroring {@link #resolveMultiplier}.
+     */
+    public BigDecimal resolveRedemptionMultiplier(MembershipTier tier) {
+        return tierDefRepo.findByTierAndActiveTrue(tier)
+            .map(MembershipTierDefinition::getRedemptionDiscountMultiplier)
+            .orElse(BigDecimal.ONE);
+    }
+
     String displayName(MembershipTier tier) {
         return tierDefRepo.findByTierAndActiveTrue(tier)
             .map(MembershipTierDefinition::getDisplayName)
@@ -129,13 +141,15 @@ public class MembershipTierService {
         def.setMinimumCompletedBookings(req.minimumCompletedBookings());
         def.setPointsMultiplier(req.pointsMultiplier());
         def.setSortOrder(req.sortOrder());
+        // Phase 7.21 — null on create leaves the entity's own 1.00 default; null on update leaves it unchanged.
+        if (req.redemptionDiscountMultiplier() != null) def.setRedemptionDiscountMultiplier(req.redemptionDiscountMultiplier());
     }
 
     private MembershipTierDefinitionResponse toResponse(MembershipTierDefinition d) {
         return new MembershipTierDefinitionResponse(
             d.getId(), d.getTier(), d.getDisplayName(), d.getDescription(),
             d.getMinimumLifetimePoints(), d.getMinimumCompletedBookings(), d.getPointsMultiplier(),
-            d.isActive(), d.getSortOrder(), d.getCreatedAt(), d.getUpdatedAt()
+            d.isActive(), d.getSortOrder(), d.getRedemptionDiscountMultiplier(), d.getCreatedAt(), d.getUpdatedAt()
         );
     }
 

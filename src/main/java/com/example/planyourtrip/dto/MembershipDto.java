@@ -28,7 +28,13 @@ public class MembershipDto {
         @NotNull @Min(0) Integer minimumCompletedBookings,
         @NotNull @DecimalMin(value = "1.00", message = "pointsMultiplier must be >= 1.00") BigDecimal pointsMultiplier,
         Boolean active,
-        @NotNull @Min(0) Integer sortOrder
+        @NotNull @Min(0) Integer sortOrder,
+        /**
+         * Phase 7.21 (additive) — nullable: null on create defaults to 1.00
+         * (the entity's own default); null on update leaves the existing value
+         * unchanged, matching {@code active}'s convention.
+         */
+        @DecimalMin(value = "1.00", message = "redemptionDiscountMultiplier must be >= 1.00") BigDecimal redemptionDiscountMultiplier
     ) {}
 
     public record MembershipTierDefinitionResponse(
@@ -41,6 +47,7 @@ public class MembershipDto {
         BigDecimal pointsMultiplier,
         boolean active,
         int sortOrder,
+        BigDecimal redemptionDiscountMultiplier,
         Instant createdAt,
         Instant updatedAt
     ) {}

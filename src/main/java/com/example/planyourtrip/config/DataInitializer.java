@@ -302,25 +302,35 @@ public class DataInitializer implements ApplicationRunner {
 
     /**
      * Recommended default qualification thresholds + points multiplier from
-     * the Phase 7.19 spec. Idempotent by tier — {@link MembershipTierDefinitionRepository#findByTier}
+     * the Phase 7.19 spec, plus Phase 7.21's additive {@code redemptionDiscountMultiplier}
+     * (modest, monotonically increasing, consistent in spirit with the
+     * pointsMultiplier progression above without inventing wildly different
+     * numbers: BRONZE 1.00 / SILVER 1.05 / GOLD 1.10 / PLATINUM 1.15 / DIAMOND 1.25).
+     * Idempotent by tier — {@link MembershipTierDefinitionRepository#findByTier}
      * is checked before insert, so restarts never duplicate a row (the entity
-     * also carries a DB unique constraint on {@code tier} as a backstop).
+     * also carries a DB unique constraint on {@code tier} as a backstop). Pre-existing
+     * rows are left untouched by this idempotency check — as with {@code LoyaltyAccount#status}
+     * (Phase 7.20), the new column carries a plain Java field default
+     * ({@code new BigDecimal("1.00")}) rather than a separate backfill step,
+     * since this app's {@code ddl-auto=update} H2 dev/test database never
+     * carries persisted historical rows across the schema change.
      */
     private void seedMembershipTierDefinitions() {
         tierDef(MembershipTier.BRONZE, "Bronze", "Entry-level membership tier — every enrolled member starts here.",
-            0L, 0, new BigDecimal("1.00"), 1);
+            0L, 0, new BigDecimal("1.00"), 1, new BigDecimal("1.00"));
         tierDef(MembershipTier.SILVER, "Silver", "Reached after 1,000 lifetime points and 2 completed bookings.",
-            1000L, 2, new BigDecimal("1.10"), 2);
+            1000L, 2, new BigDecimal("1.10"), 2, new BigDecimal("1.05"));
         tierDef(MembershipTier.GOLD, "Gold", "Reached after 5,000 lifetime points and 5 completed bookings.",
-            5000L, 5, new BigDecimal("1.25"), 3);
+            5000L, 5, new BigDecimal("1.25"), 3, new BigDecimal("1.10"));
         tierDef(MembershipTier.PLATINUM, "Platinum", "Reached after 15,000 lifetime points and 10 completed bookings.",
-            15000L, 10, new BigDecimal("1.50"), 4);
+            15000L, 10, new BigDecimal("1.50"), 4, new BigDecimal("1.15"));
         tierDef(MembershipTier.DIAMOND, "Diamond", "Reached after 40,000 lifetime points and 20 completed bookings.",
-            40000L, 20, new BigDecimal("2.00"), 5);
+            40000L, 20, new BigDecimal("2.00"), 5, new BigDecimal("1.25"));
     }
 
     private void tierDef(MembershipTier tier, String displayName, String description,
-                          long minPoints, int minBookings, BigDecimal multiplier, int sortOrder) {
+                          long minPoints, int minBookings, BigDecimal multiplier, int sortOrder,
+                          BigDecimal redemptionDiscountMultiplier) {
         if (membershipTierDefinitionRepo.findByTier(tier).isPresent()) return;
         MembershipTierDefinition d = new MembershipTierDefinition();
         d.setTier(tier);
@@ -331,6 +341,7 @@ public class DataInitializer implements ApplicationRunner {
         d.setPointsMultiplier(multiplier);
         d.setActive(true);
         d.setSortOrder(sortOrder);
+        d.setRedemptionDiscountMultiplier(redemptionDiscountMultiplier);
         membershipTierDefinitionRepo.save(d);
     }
 

@@ -48,6 +48,20 @@ public class MembershipTierDefinition {
     @Column(nullable = false, precision = 5, scale = 2)
     private BigDecimal pointsMultiplier = BigDecimal.ONE;
 
+    /**
+     * Phase 7.21 (additive) — applied to the discount amount computed by
+     * {@code LoyaltyRedemptionService} when the redeeming customer's current
+     * effective tier is this one. Plain Java field default (1.00), the same
+     * in-place-column-addition pattern already used by
+     * {@code LoyaltyAccount#status} (Phase 7.20) — every pre-7.21 row simply
+     * gets the default, no separate migration needed. Falls back to 1.00 (no
+     * boost) via {@code MembershipTierService#resolveRedemptionMultiplier}
+     * when the tier's definition row is missing or inactive, exactly
+     * mirroring {@link #pointsMultiplier}'s fallback.
+     */
+    @Column(nullable = false, precision = 5, scale = 2)
+    private BigDecimal redemptionDiscountMultiplier = new BigDecimal("1.00");
+
     @Column(nullable = false)
     private boolean active = true;
 

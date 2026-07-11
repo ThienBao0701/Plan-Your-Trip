@@ -176,6 +176,10 @@ public class CouponDefinitionService {
         if (req.combinableWithPromotions() != null) def.setCombinableWithPromotions(req.combinableWithPromotions());
         if (req.combinableWithTravelCredits() != null)
             def.setCombinableWithTravelCredits(req.combinableWithTravelCredits());
+
+        // ── Phase 7.21 — minimumTier gating (additive, always a plain pass-through:
+        // null means "no requirement", same convention as targetId/placeType/minimumStayNights) ──
+        def.setMinimumTier(req.minimumTier());
     }
 
     /** Package-private — reused as-is by {@code CustomerCouponService} so both map the exact same shape. */
@@ -189,6 +193,7 @@ public class CouponDefinitionService {
             d.getMinimumStayNights(), d.getBookingDateFrom(), d.getBookingDateTo(),
             d.getCustomerSegment(), d.isFirstBookingOnly(),
             d.isCombinableWithPromotions(), d.isCombinableWithTravelCredits(),
+            d.getMinimumTier(),
             d.getCreatedAt(), d.getUpdatedAt()
         );
     }

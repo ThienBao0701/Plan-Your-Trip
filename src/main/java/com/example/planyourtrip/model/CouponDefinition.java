@@ -126,6 +126,22 @@ public class CouponDefinition {
     @Column(nullable = false)
     private boolean combinableWithTravelCredits = true;
 
+    /**
+     * Phase 7.21 (additive) — nullable "membership gate": null means no tier
+     * requirement (every pre-7.21 coupon, including the seeded WELCOME10/
+     * GRANDPALACE15, stays valid as-is). When set, only a customer whose
+     * CURRENT EFFECTIVE membership tier (see
+     * {@code CustomerMembershipService#effectiveTierForUser}) is at or above
+     * this tier (compared by {@link MembershipTier}'s ordinal) may claim/use
+     * the coupon — evaluated by {@code CustomerCouponService}'s centralized
+     * eligibility evaluator, the same place the pre-existing MEMBER customer
+     * segment is evaluated. A user with no membership at all is treated as
+     * below BRONZE (ineligible).
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private MembershipTier minimumTier;
+
     @Column(updatable = false)
     private Instant createdAt;
 

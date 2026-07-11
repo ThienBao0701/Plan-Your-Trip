@@ -277,6 +277,35 @@ public class CustomerMembershipService {
             .orElse(false);
     }
 
+    /**
+     * Phase 7.21 (additive) — read-only effective-tier lookup for other
+     * services to reuse rather than recompute (e.g. {@code CustomerCouponService}'s
+     * {@code minimumTier} coupon gate). Empty when the user has never enrolled
+     * or their membership row is inactive — callers must treat that as "below
+     * BRONZE", not as BRONZE itself (see {@link #getMyBenefits}, which
+     * deliberately defaults to BRONZE for display purposes; that default is
+     * NOT appropriate for a tier-gated eligibility check). Never creates a
+     * membership.
+     */
+    @Transactional(readOnly = true)
+    public Optional<MembershipTier> effectiveTierForUser(Long userId) {
+        return membershipRepo.findByUserIdAndActiveTrue(userId).map(this::effectiveTier);
+    }
+
+    /**
+     * Phase 7.21 (additive) — used by {@code LoyaltyRedemptionService} to boost
+     * a redemption's discount amount. 1.00 (baseline, unchanged behavior) when
+     * the user has no membership row, exactly mirroring
+     * {@link #resolveMultiplierForUser}'s fallback for the (separate)
+     * booking-award points multiplier.
+     */
+    @Transactional(readOnly = true)
+    public java.math.BigDecimal resolveRedemptionMultiplierForUser(Long userId) {
+        return membershipRepo.findByUserIdAndActiveTrue(userId)
+            .map(m -> tierService.resolveRedemptionMultiplier(effectiveTier(m)))
+            .orElse(java.math.BigDecimal.ONE);
+    }
+
     // ── Admin ─────────────────────────────────────────────────────────────────
 
     @Transactional(readOnly = true)

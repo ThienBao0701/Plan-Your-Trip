@@ -83,6 +83,7 @@ public class CustomerCouponService {
     private final PricingEngineService pricingEngineService;
     private final NotificationService notificationService;
     private final CustomerMembershipRepository customerMembershipRepo;
+    private final CustomerMembershipService customerMembershipService;
 
     /** RETURNING_USER / customer-level threshold constants — see {@link #evaluateSegment}. */
     private static final Set<BookingStatus> NOT_QUALIFYING_STATUSES =
@@ -101,7 +102,8 @@ public class CustomerCouponService {
                                   CouponDefinitionService couponDefinitionService,
                                   PricingEngineService pricingEngineService,
                                   NotificationService notificationService,
-                                  CustomerMembershipRepository customerMembershipRepo) {
+                                  CustomerMembershipRepository customerMembershipRepo,
+                                  CustomerMembershipService customerMembershipService) {
         this.customerCouponRepo = customerCouponRepo;
         this.couponDefinitionRepo = couponDefinitionRepo;
         this.userRepo = userRepo;
@@ -111,6 +113,7 @@ public class CustomerCouponService {
         this.pricingEngineService = pricingEngineService;
         this.notificationService = notificationService;
         this.customerMembershipRepo = customerMembershipRepo;
+        this.customerMembershipService = customerMembershipService;
     }
 
     // ── Claim ────────────────────────────────────────────────────────────────
@@ -137,9 +140,10 @@ public class CustomerCouponService {
             throw new ApiException(HttpStatus.CONFLICT,
                 "Coupon has reached its total usage limit: " + code);
 
-        // Phase 7.17 — the two eligibility rules that never need booking context
-        // (customer segment, first-booking-only) are enforced right at claim
-        // time, via the same helper the full evaluator uses.
+        // Phase 7.17 — the eligibility rules that never need booking context
+        // (customer segment, first-booking-only, and — Phase 7.21 — the
+        // minimum-membership-tier gate) are enforced right at claim time, via
+        // the same helper the full evaluator uses.
         CustomerLevelEligibility customerLevel = evaluateCustomerLevel(def, userId);
         if (!customerLevel.segmentSatisfied())
             throw new ApiException(HttpStatus.BAD_REQUEST,
@@ -147,6 +151,9 @@ public class CustomerCouponService {
         if (!customerLevel.firstBookingSatisfied())
             throw new ApiException(HttpStatus.BAD_REQUEST,
                 "Coupon is limited to first-time bookings: " + code);
+        if (!customerLevel.tierSatisfied())
+            throw new ApiException(HttpStatus.BAD_REQUEST,
+                "Coupon requires a minimum membership tier of " + def.getMinimumTier() + ": " + code);
 
         User user = userRepo.findById(userId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
@@ -483,6 +490,8 @@ public class CustomerCouponService {
             reason = "Coupon is not available for your customer segment (" + def.getCustomerSegment() + ")";
         else if (!customerLevel.firstBookingSatisfied())
             reason = "Coupon is limited to your first booking";
+        else if (!customerLevel.tierSatisfied())
+            reason = "Coupon requires a minimum membership tier of " + def.getMinimumTier();
         else if (!promoStackOk)
             reason = "Coupon cannot be combined with an already-applied promotion discount";
         else if (!creditStackOk)
@@ -558,14 +567,37 @@ public class CustomerCouponService {
         return true;
     }
 
-    /** Result of the two eligibility rules that never need booking context — see class javadoc. */
-    private record CustomerLevelEligibility(boolean segmentSatisfied, boolean firstBookingSatisfied) {}
+    /**
+     * Result of the eligibility rules that never need booking context — see
+     * class javadoc. {@code tierSatisfied} is Phase 7.21's additive
+     * minimum-membership-tier gate.
+     */
+    private record CustomerLevelEligibility(boolean segmentSatisfied, boolean firstBookingSatisfied,
+                                             boolean tierSatisfied) {}
 
     private CustomerLevelEligibility evaluateCustomerLevel(CouponDefinition def, Long userId) {
-        if (userId == null) return new CustomerLevelEligibility(true, true);
+        if (userId == null) return new CustomerLevelEligibility(true, true, true);
         boolean segmentOk = evaluateSegment(def.getCustomerSegment(), userId);
         boolean firstOk = !def.isFirstBookingOnly() || !hasQualifyingBooking(userId);
-        return new CustomerLevelEligibility(segmentOk, firstOk);
+        boolean tierOk = tierRequirementSatisfied(def, userId);
+        return new CustomerLevelEligibility(segmentOk, firstOk, tierOk);
+    }
+
+    /**
+     * Phase 7.21 — additive minimum-membership-tier gate. Null
+     * {@code minimumTier} means no requirement (satisfied). Otherwise the
+     * user's CURRENT EFFECTIVE tier (reused from {@code CustomerMembershipService},
+     * never recomputed here) must be at or above the required tier by enum
+     * ordinal; a user with no membership at all is treated as below BRONZE
+     * (ineligible). Strictly read-only — never enrolls/creates a membership as
+     * a side effect of checking eligibility, mirroring the MEMBER segment
+     * check's "do not create membership during eligibility" convention.
+     */
+    private boolean tierRequirementSatisfied(CouponDefinition def, Long userId) {
+        if (def.getMinimumTier() == null) return true;
+        return customerMembershipService.effectiveTierForUser(userId)
+            .map(tier -> tier.ordinal() >= def.getMinimumTier().ordinal())
+            .orElse(false);
     }
 
     /**
