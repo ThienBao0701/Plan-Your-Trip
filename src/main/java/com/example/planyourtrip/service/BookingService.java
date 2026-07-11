@@ -35,6 +35,7 @@ public class BookingService {
     private final CustomerCouponService customerCouponService;
     private final TravelCreditService travelCreditService;
     private final LoyaltyService loyaltyService;
+    private final LoyaltyRedemptionService loyaltyRedemptionService;
 
     private static final Set<BookingStatus> UPCOMING_STATUSES =
         EnumSet.of(BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.CHECK_IN_READY);
@@ -57,7 +58,8 @@ public class BookingService {
                           NotificationService notificationService,
                           CustomerCouponService customerCouponService,
                           TravelCreditService travelCreditService,
-                          LoyaltyService loyaltyService) {
+                          LoyaltyService loyaltyService,
+                          LoyaltyRedemptionService loyaltyRedemptionService) {
         this.bookingRepo   = bookingRepo;
         this.roomRepo      = roomRepo;
         this.inventoryRepo = inventoryRepo;
@@ -69,6 +71,7 @@ public class BookingService {
         this.customerCouponService = customerCouponService;
         this.travelCreditService = travelCreditService;
         this.loyaltyService = loyaltyService;
+        this.loyaltyRedemptionService = loyaltyRedemptionService;
     }
 
     // ── Create ────────────────────────────────────────────────────────────────
@@ -490,6 +493,9 @@ public class BookingService {
             travelCreditService.reverseForBooking(booking.getUser().getId(),
                 booking.getCreditAmountUsed(), booking.getCurrency(), booking.getId());
         customerCouponService.releaseForCancelledBooking(booking.getId());
+        // Phase 7.20 — restore loyalty points for an active redemption on this booking
+        // (RESERVED → RELEASED, APPLIED → REFUNDED). Idempotent; no-op when none exists.
+        loyaltyRedemptionService.onBookingCancelled(booking.getId());
     }
 
     private BookingTimelineResponse buildTimeline(Booking b) {
@@ -543,7 +549,8 @@ public class BookingService {
             b.getActualCheckInAt(), b.getActualCheckOutAt(),
             b.getCompletedAt(), b.getArchivedAt(),
             b.getLastStatusChangedAt(), b.getCancelReason(),
-            b.getCouponCode(), b.getCouponDiscountAmount(), b.getCreditAmountUsed()
+            b.getCouponCode(), b.getCouponDiscountAmount(), b.getCreditAmountUsed(),
+            b.getLoyaltyDiscountAmount(), b.getLoyaltyPointsRedeemed()
         );
     }
 

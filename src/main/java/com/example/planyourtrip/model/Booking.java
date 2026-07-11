@@ -89,6 +89,21 @@ public class Booking {
     @Column(name = "credit_amount_used", precision = 15, scale = 2)
     private BigDecimal creditAmountUsed;
 
+    // ── Phase 7.20 — Loyalty points redemption ───────────────────────────────
+    // Both nullable and null for every booking made without a loyalty
+    // redemption, so pre-7.20 bookings and the plain checkout flow are
+    // byte-for-byte unchanged. Set when a redemption is RESERVED against the
+    // booking (finalPrice reduced by the discount) and cleared if that
+    // reservation is later released/expired/refunded.
+
+    /** Loyalty-points discount reserved/applied against this booking (already subtracted from {@link #finalPrice}). */
+    @Column(name = "loyalty_discount_amount", precision = 15, scale = 2)
+    private BigDecimal loyaltyDiscountAmount;
+
+    /** Number of loyalty points backing {@link #loyaltyDiscountAmount}. */
+    @Column(name = "loyalty_points_redeemed")
+    private Long loyaltyPointsRedeemed;
+
     @Column(columnDefinition = "TEXT")
     private String specialRequest;
 

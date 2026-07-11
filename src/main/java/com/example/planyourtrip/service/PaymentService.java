@@ -20,15 +20,18 @@ public class PaymentService {
     private final BookingRepository bookingRepo;
     private final UserRepository userRepo;
     private final NotificationService notificationService;
+    private final LoyaltyRedemptionService loyaltyRedemptionService;
 
     public PaymentService(PaymentRepository paymentRepo,
                           BookingRepository bookingRepo,
                           UserRepository userRepo,
-                          NotificationService notificationService) {
+                          NotificationService notificationService,
+                          LoyaltyRedemptionService loyaltyRedemptionService) {
         this.paymentRepo = paymentRepo;
         this.bookingRepo = bookingRepo;
         this.userRepo    = userRepo;
         this.notificationService = notificationService;
+        this.loyaltyRedemptionService = loyaltyRedemptionService;
     }
 
     @Transactional
@@ -112,6 +115,10 @@ public class PaymentService {
 
         Payment saved = paymentRepo.save(payment);
 
+        // Phase 7.20 — confirm any RESERVED loyalty redemption now the booking is
+        // paid/confirmed (RESERVED → APPLIED). Idempotent; no-op when none exists.
+        loyaltyRedemptionService.applyForBooking(booking.getId());
+
         notificationService.create(booking.getUser().getId(), NotificationType.PAYMENT, Priority.HIGH,
             "Payment successful",
             "Your payment for booking " + booking.getBookingCode() + " was successful.",
@@ -142,6 +149,11 @@ public class PaymentService {
 
         // Booking remains PENDING
         Payment saved = paymentRepo.save(payment);
+
+        // Phase 7.20 — payment failed before the redemption was applied: release
+        // the RESERVED reservation so the held points return to the customer.
+        // Idempotent; no-op when there is no active reservation.
+        loyaltyRedemptionService.onPaymentFailed(payment.getBooking().getId());
 
         notificationService.create(payment.getBooking().getUser().getId(), NotificationType.PAYMENT, Priority.HIGH,
             "Payment failed",

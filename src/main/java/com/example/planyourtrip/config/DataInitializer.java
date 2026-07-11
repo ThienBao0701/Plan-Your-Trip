@@ -59,6 +59,7 @@ public class DataInitializer implements ApplicationRunner {
     private final MembershipTierDefinitionRepository membershipTierDefinitionRepo;
     private final MembershipBenefitDefinitionRepository membershipBenefitDefinitionRepo;
     private final com.example.planyourtrip.service.CustomerMembershipService customerMembershipService;
+    private final com.example.planyourtrip.repository.LoyaltyRedemptionPolicyRepository loyaltyRedemptionPolicyRepo;
 
     public DataInitializer(UserRepository users, PasswordEncoder encoder,
                            AdministrativeUnitRepository locations,
@@ -92,7 +93,8 @@ public class DataInitializer implements ApplicationRunner {
                            com.example.planyourtrip.service.LoyaltyService loyaltyService,
                            MembershipTierDefinitionRepository membershipTierDefinitionRepo,
                            MembershipBenefitDefinitionRepository membershipBenefitDefinitionRepo,
-                           com.example.planyourtrip.service.CustomerMembershipService customerMembershipService) {
+                           com.example.planyourtrip.service.CustomerMembershipService customerMembershipService,
+                           com.example.planyourtrip.repository.LoyaltyRedemptionPolicyRepository loyaltyRedemptionPolicyRepo) {
         this.users      = users;
         this.encoder    = encoder;
         this.locations  = locations;
@@ -127,6 +129,7 @@ public class DataInitializer implements ApplicationRunner {
         this.membershipTierDefinitionRepo   = membershipTierDefinitionRepo;
         this.membershipBenefitDefinitionRepo = membershipBenefitDefinitionRepo;
         this.customerMembershipService  = customerMembershipService;
+        this.loyaltyRedemptionPolicyRepo = loyaltyRedemptionPolicyRepo;
     }
 
     @Override
@@ -159,6 +162,38 @@ public class DataInitializer implements ApplicationRunner {
         seedMembershipTierDefinitions();
         seedMembershipBenefits();
         seedDemoMembership();
+        seedDefaultRedemptionPolicy();
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // LOYALTY REDEMPTION POLICY — Phase 7.20 (idempotent)
+    // ─────────────────────────────────────────────────────────────
+
+    /**
+     * Seeds the single active default loyalty-redemption policy from the Phase
+     * 7.20 spec (100 points = 1,000 VND → 1 point = 10 VND; min 1,000 points;
+     * 100-point increments; 20% max discount; 1,000 VND minimum payable).
+     * Idempotent by policyCode — checked before insert, so restarts never
+     * duplicate the row (a DB unique constraint on {@code policy_code} is the
+     * backstop). Never overwrites an admin-customized existing policy.
+     */
+    private void seedDefaultRedemptionPolicy() {
+        String code = "DEFAULT_LOYALTY_REDEMPTION";
+        if (loyaltyRedemptionPolicyRepo.findByPolicyCodeIgnoreCase(code).isPresent()) return;
+        com.example.planyourtrip.model.LoyaltyRedemptionPolicy p =
+            new com.example.planyourtrip.model.LoyaltyRedemptionPolicy();
+        p.setPolicyCode(code);
+        p.setDisplayName("Default loyalty redemption");
+        p.setPointsPerUnit(100L);
+        p.setValuePerUnit(new BigDecimal("1000.00"));
+        p.setMinimumRedemptionPoints(1000L);
+        p.setRedemptionIncrementPoints(100L);
+        p.setMaximumDiscountPercentage(20);
+        p.setMinimumFinalPayableAmount(new BigDecimal("1000.00"));
+        p.setActive(true);
+        p.setEffectiveFrom(java.time.Instant.now());
+        p.setEffectiveUntil(null);
+        loyaltyRedemptionPolicyRepo.save(p);
     }
 
     // ─────────────────────────────────────────────────────────────

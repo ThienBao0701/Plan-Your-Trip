@@ -62,7 +62,10 @@ public class BookingDto {
         // Phase 7.15 — additive only; all three are null when no coupon/credits were used.
         String couponCode,
         BigDecimal couponDiscountAmount,
-        BigDecimal creditAmountUsed
+        BigDecimal creditAmountUsed,
+        // Phase 7.20 — additive only; both null when no loyalty redemption was applied.
+        BigDecimal loyaltyDiscountAmount,
+        Long loyaltyPointsRedeemed
     ) {}
 
     public record BookingSummaryResponse(

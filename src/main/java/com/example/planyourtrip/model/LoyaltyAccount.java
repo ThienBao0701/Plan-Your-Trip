@@ -44,9 +44,20 @@ public class LoyaltyAccount {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    /** Spendable balance — see class javadoc. Never negative in this phase (no decrease path exists). */
+    /** Spendable balance — see class javadoc. Never negative (Phase 7.20 redemption debit guards this). */
     @Column(name = "current_balance", nullable = false)
     private long currentBalance = 0L;
+
+    /**
+     * Phase 7.20 — account status gate for redemption. Defaults to ACTIVE, so
+     * every pre-7.20 account and every account created by the earn/grant paths
+     * remains fully usable (earning is never gated by status). Only redemption
+     * ({@code LoyaltyRedemptionService}) checks this: SUSPENDED/CLOSED accounts
+     * cannot reserve points.
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private LoyaltyAccountStatus status = LoyaltyAccountStatus.ACTIVE;
 
     /** MONOTONIC — only ever increases. See class javadoc. */
     @Column(name = "lifetime_points_earned", nullable = false)

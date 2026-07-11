@@ -8,5 +8,7 @@ package com.example.planyourtrip.model;
  * {@code TravelCreditReferenceType}'s pattern.
  */
 public enum LoyaltyReferenceType {
-    BOOKING, REVIEW, ADMIN, SYSTEM
+    BOOKING, REVIEW, ADMIN, SYSTEM,
+    /** Phase 7.20 — a redemption ledger row references the {@code LoyaltyPointsRedemption} it belongs to. */
+    REDEMPTION
 }
