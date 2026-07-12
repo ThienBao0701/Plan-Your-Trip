@@ -1,7 +1,9 @@
 package com.example.planyourtrip.repository;
 
 import com.example.planyourtrip.model.RoomInventory;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,6 +15,25 @@ import java.util.Optional;
 public interface RoomInventoryRepository extends JpaRepository<RoomInventory, Long> {
 
     Optional<RoomInventory> findByHotelRoomIdAndInventoryDate(Long roomId, LocalDate date);
+
+    /**
+     * Phase 7.28 — pessimistic write lock (SELECT ... FOR UPDATE) over the exact inventory
+     * rows a booking is about to check-and-decrement. Acquired in
+     * {@code BookingService.create} BEFORE the {@code countNightsWithSufficientInventory}
+     * availability check so the check + {@code decrementInventory} become atomic against a
+     * concurrent booking for the same room/dates: the loser blocks until the winner commits,
+     * then re-evaluates availability under the lock and is rejected (422) instead of
+     * overselling. Rows are locked in a deterministic {@code inventoryDate} order so
+     * multi-night windows cannot deadlock. {@code ri.hotelRoom.id} resolves to the FK column
+     * (no join to {@code hotel_rooms}), so ONLY {@code room_inventory} rows are locked.
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT ri FROM RoomInventory ri WHERE ri.hotelRoom.id = :roomId " +
+           "AND ri.inventoryDate >= :checkIn AND ri.inventoryDate < :checkOut " +
+           "ORDER BY ri.inventoryDate ASC")
+    List<RoomInventory> lockForUpdate(@Param("roomId") Long roomId,
+                                      @Param("checkIn") LocalDate checkIn,
+                                      @Param("checkOut") LocalDate checkOut);
 
     boolean existsByHotelRoomIdAndInventoryDate(Long roomId, LocalDate date);
 

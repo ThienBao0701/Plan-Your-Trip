@@ -38,6 +38,7 @@ public class BookingService {
     private final LoyaltyRedemptionService loyaltyRedemptionService;
     private final ReferralService referralService;
     private final GiftCardService giftCardService;
+    private final InventoryReservationService inventoryReservationService;
 
     private static final Set<BookingStatus> UPCOMING_STATUSES =
         EnumSet.of(BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.CHECK_IN_READY);
@@ -63,7 +64,8 @@ public class BookingService {
                           LoyaltyService loyaltyService,
                           LoyaltyRedemptionService loyaltyRedemptionService,
                           ReferralService referralService,
-                          GiftCardService giftCardService) {
+                          GiftCardService giftCardService,
+                          InventoryReservationService inventoryReservationService) {
         this.bookingRepo   = bookingRepo;
         this.roomRepo      = roomRepo;
         this.inventoryRepo = inventoryRepo;
@@ -78,6 +80,7 @@ public class BookingService {
         this.loyaltyRedemptionService = loyaltyRedemptionService;
         this.referralService = referralService;
         this.giftCardService = giftCardService;
+        this.inventoryReservationService = inventoryReservationService;
     }
 
     // ── Create ────────────────────────────────────────────────────────────────
@@ -112,6 +115,11 @@ public class BookingService {
                 "Total guests exceed maximum capacity of " + maxGuestsTotal);
 
         long nights = ChronoUnit.DAYS.between(req.checkIn(), req.checkOut());
+        // Phase 7.28 — pessimistically lock the exact inventory rows BEFORE the availability
+        // check so the check + decrement below are atomic against a concurrent booking for the
+        // same room/dates. The loser blocks here until the winner commits, then re-reads
+        // availability under the lock and is rejected below — overselling is impossible.
+        inventoryRepo.lockForUpdate(req.roomId(), req.checkIn(), req.checkOut());
         long availNights = inventoryRepo.countNightsWithSufficientInventory(
             req.roomId(), req.checkIn(), req.checkOut(), numRooms);
         if (availNights < nights)
@@ -191,6 +199,11 @@ public class BookingService {
         booking = bookingRepo.save(booking);
 
         inventoryRepo.decrementInventory(req.roomId(), req.checkIn(), req.checkOut(), numRooms);
+
+        // Phase 7.28 — record the single HELD hold covering the decrement just applied, in
+        // THIS transaction (a rolled-back booking leaves neither decrement nor hold). This is
+        // a tracking row only — it performs NO inventory math of its own.
+        inventoryReservationService.hold(booking);
 
         // Consume coupon + redeem credits INSIDE this transaction (the booking id
         // now exists for the FK / ledger reference) — any failure from here on
@@ -293,6 +306,11 @@ public class BookingService {
         inventoryRepo.restoreInventory(booking.getRoom().getId(),
             booking.getCheckInDate(), booking.getCheckOutDate(), booking.getNumberOfRooms());
 
+        // Phase 7.28 — mark the hold terminally handled (RELEASED) WITHOUT restoring again:
+        // the restoreInventory call above already returned this booking's inventory. Idempotent
+        // no-op if the hold was already released/consumed/expired.
+        inventoryReservationService.releaseForCancelledBooking(booking.getId());
+
         releaseCheckoutBenefits(booking);
 
         Booking saved = bookingRepo.save(booking);
@@ -360,6 +378,9 @@ public class BookingService {
             booking.setCancelledAt(now);
             inventoryRepo.restoreInventory(booking.getRoom().getId(),
                 booking.getCheckInDate(), booking.getCheckOutDate(), booking.getNumberOfRooms());
+            // Phase 7.28 — same additive hook as cancel(): mark the hold RELEASED without a
+            // second restore (the line above already restored). Idempotent.
+            inventoryReservationService.releaseForCancelledBooking(booking.getId());
             releaseCheckoutBenefits(booking);
         }
 

@@ -22,19 +22,22 @@ public class PaymentService {
     private final NotificationService notificationService;
     private final LoyaltyRedemptionService loyaltyRedemptionService;
     private final GiftCardService giftCardService;
+    private final InventoryReservationService inventoryReservationService;
 
     public PaymentService(PaymentRepository paymentRepo,
                           BookingRepository bookingRepo,
                           UserRepository userRepo,
                           NotificationService notificationService,
                           LoyaltyRedemptionService loyaltyRedemptionService,
-                          GiftCardService giftCardService) {
+                          GiftCardService giftCardService,
+                          InventoryReservationService inventoryReservationService) {
         this.paymentRepo = paymentRepo;
         this.bookingRepo = bookingRepo;
         this.userRepo    = userRepo;
         this.notificationService = notificationService;
         this.loyaltyRedemptionService = loyaltyRedemptionService;
         this.giftCardService = giftCardService;
+        this.inventoryReservationService = inventoryReservationService;
     }
 
     @Transactional
@@ -122,6 +125,11 @@ public class PaymentService {
         // paid/confirmed (RESERVED → APPLIED). Idempotent; no-op when none exists.
         loyaltyRedemptionService.applyForBooking(booking.getId());
 
+        // Phase 7.28 — payment succeeded: consume the room hold (HELD → CONSUMED). Pure
+        // status flip — the decrement made at booking creation is now permanent and is NOT
+        // re-applied. Idempotent; no-op when there is no hold or it is already terminal.
+        inventoryReservationService.consumeForBooking(booking.getId());
+
         // Phase 7.25 — gift card: payment success KEEPS the redemption. No callback
         // is needed because a gift card is an immediate debit at booking creation
         // (there is no reserve/apply split like loyalty) — the REDEMPTION already
@@ -167,6 +175,14 @@ public class PaymentService {
         // (restore balance + REFUND ledger row, un-apply the discount on the
         // booking). Idempotent; no-op when nothing was redeemed.
         giftCardService.releaseForBooking(payment.getBooking().getId());
+
+        // Phase 7.28 — payment failed: release the room hold (HELD → RELEASED) and restore
+        // inventory via the EXISTING restoreInventory method. This single hook also covers
+        // session-cancel/session-expiry, because Phase 7.27's PaymentSettlementBridge routes
+        // those through this same mockFail. Booking status is deliberately UNCHANGED (stays
+        // PENDING) — after this phase a PENDING booking can legitimately hold NO inventory
+        // (its hold was released on payment failure/expiry). Idempotent; no double-restore.
+        inventoryReservationService.releaseForBooking(payment.getBooking().getId());
 
         notificationService.create(payment.getBooking().getUser().getId(), NotificationType.PAYMENT, Priority.HIGH,
             "Payment failed",
