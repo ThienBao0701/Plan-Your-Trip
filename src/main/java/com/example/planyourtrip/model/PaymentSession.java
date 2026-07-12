@@ -76,6 +76,17 @@ public class PaymentSession {
     @Column(name = "checkout_url", length = 1000)
     private String checkoutUrl;
 
+    /**
+     * Phase 7.27 — ADDITIVE bridge link to the real {@link Payment} settlement row. Null
+     * until the session reaches a terminal state and {@code PaymentSettlementBridge} routes
+     * it through the EXISTING {@code PaymentService} settlement methods (never populated by
+     * {@code PaymentService} itself — the dependency direction stays one-way: the gateway
+     * layer knows about {@code Payment}, {@code PaymentService} stays session-agnostic).
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_id")
+    private Payment payment;
+
     @Column(updatable = false)
     private Instant createdAt;
 

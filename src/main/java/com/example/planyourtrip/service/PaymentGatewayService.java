@@ -65,6 +65,7 @@ public class PaymentGatewayService {
     private final BookingRepository bookingRepo;
     private final UserRepository userRepo;
     private final NotificationService notificationService;
+    private final PaymentSettlementBridge settlementBridge;
     private final Map<PaymentProvider, PaymentGateway> gateways;
 
     public PaymentGatewayService(PaymentSessionRepository sessionRepo,
@@ -72,12 +73,14 @@ public class PaymentGatewayService {
                                  BookingRepository bookingRepo,
                                  UserRepository userRepo,
                                  NotificationService notificationService,
+                                 PaymentSettlementBridge settlementBridge,
                                  List<PaymentGateway> gatewayBeans) {
         this.sessionRepo = sessionRepo;
         this.eventRepo = eventRepo;
         this.bookingRepo = bookingRepo;
         this.userRepo = userRepo;
         this.notificationService = notificationService;
+        this.settlementBridge = settlementBridge;
         Map<PaymentProvider, PaymentGateway> map = new HashMap<>();
         for (PaymentGateway gw : gatewayBeans) {
             map.put(gw.provider(), gw); // last-wins; in practice one bean per provider
@@ -151,18 +154,70 @@ public class PaymentGatewayService {
             return toResponse(session, true);
 
         return switch (v.outcome()) {
-            case AUTHORIZED -> applyAuthorized(session, v.providerReference());
-            case FAILED -> applyFailed(session, v.providerReference());
+            case AUTHORIZED -> toResponse(applyAuthorized(session, v.providerReference()), true);
+            case FAILED -> toResponse(applyFailed(session, v.providerReference()), true);
         };
     }
 
-    private SessionResponse applyAuthorized(PaymentSession session, String providerReference) {
-        // Idempotent replay: already authorized (non-terminal) → no-op.
+    // ═════════════════════════════════════════════════════════════════════
+    // REAL PROVIDER WEBHOOK (unauthenticated; signature-verified; retry-safe)
+    // ═════════════════════════════════════════════════════════════════════
+
+    /**
+     * Phase 7.27 — process a REAL, unauthenticated provider webhook. Security is the
+     * provider's cryptographic signature over the raw body (verified by the selected
+     * gateway with its shared webhook secret), NOT a JWT and NOT the per-session token.
+     *
+     * <p>End-to-end: select gateway by {@code provider} → verify signature + extract
+     * {@code sessionId}/outcome → load the session under a write lock → confirm the
+     * session belongs to this provider → drive the state machine, reusing the SAME
+     * transition + {@code PaymentSessionEvent} idempotency + settlement-bridge code as the
+     * simulation callback. A duplicate delivery on an already-terminal session is a safe
+     * no-op. A successful webhook drives the session all the way to CAPTURED (real
+     * providers report a completed charge in one shot) and bridges to real settlement.
+     */
+    @Transactional
+    public WebhookAck processWebhook(PaymentProvider provider, String rawBody, String signatureHeader) {
+        PaymentGateway gateway = gatewayOrThrow(provider);
+
+        PaymentGateway.WebhookVerification v;
+        try {
+            v = gateway.verifyWebhook(rawBody, signatureHeader);
+        } catch (UnsupportedOperationException e) {
+            throw new ApiException(HttpStatus.BAD_REQUEST,
+                "Provider " + provider + " does not expose a signed webhook receiver");
+        }
+        if (!v.valid())
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Invalid webhook signature");
+
+        PaymentSession session = sessionRepo.findBySessionIdForUpdate(v.sessionId())
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND,
+                "Payment session not found: " + v.sessionId()));
+
+        // Provider isolation: a payload verified for one provider may only drive a session
+        // that was opened for that same provider.
+        if (session.getProvider() != provider)
+            throw new ApiException(HttpStatus.BAD_REQUEST,
+                "Webhook provider " + provider + " does not match session provider " + session.getProvider());
+
+        if (session.getStatus().isTerminal())
+            return new WebhookAck(session.getSessionId(), session.getStatus(), false,
+                "Session already terminal — ignored");
+
+        PaymentSession result = switch (v.outcome()) {
+            case AUTHORIZED -> doCaptureTransition(applyAuthorized(session, v.providerReference()));
+            case FAILED -> applyFailed(session, v.providerReference());
+        };
+        return new WebhookAck(result.getSessionId(), result.getStatus(), true, "Processed");
+    }
+
+    /** PENDING → AUTHORIZED transition (idempotent). Returns the (possibly unchanged) session. */
+    private PaymentSession applyAuthorized(PaymentSession session, String providerReference) {
         if (session.getStatus() == PaymentSessionStatus.AUTHORIZED)
-            return toResponse(session, true);
+            return session; // idempotent replay
         String key = eventKey(session, "authorized");
         if (eventRepo.findByIdempotencyKey(key).isPresent())
-            return toResponse(session, true);
+            return session;
 
         PaymentSessionStatus from = session.getStatus();
         session.setProviderReference(providerReference);
@@ -174,13 +229,14 @@ public class PaymentGatewayService {
 
         notify(saved, "Payment Authorized",
             "Your payment for booking " + saved.getBooking().getBookingCode() + " was authorized.");
-        return toResponse(saved, true);
+        return saved;
     }
 
-    private SessionResponse applyFailed(PaymentSession session, String providerReference) {
+    /** → FAILED transition + bridge to the real failure settlement. Idempotent. */
+    private PaymentSession applyFailed(PaymentSession session, String providerReference) {
         String key = eventKey(session, "failed");
         if (eventRepo.findByIdempotencyKey(key).isPresent())
-            return toResponse(session, true);
+            return session;
 
         PaymentSessionStatus from = session.getStatus();
         session.setProviderReference(providerReference);
@@ -192,7 +248,34 @@ public class PaymentGatewayService {
 
         notify(saved, "Payment Failed",
             "Your payment for booking " + saved.getBooking().getBookingCode() + " failed.");
-        return toResponse(saved, true);
+
+        // BRIDGE: route the failure through the EXISTING PaymentService.mockFail hook chain.
+        settlementBridge.settleFailure(saved, "Provider declined the payment");
+        return saved;
+    }
+
+    /**
+     * AUTHORIZED → CAPTURED transition + bridge to the real PAID settlement. Shared by the
+     * owner/admin capture endpoint and the real webhook success path. Idempotent.
+     */
+    private PaymentSession doCaptureTransition(PaymentSession session) {
+        if (session.getStatus() == PaymentSessionStatus.CAPTURED)
+            return session; // idempotent
+
+        gatewayOrThrow(session.getProvider()).capture(session);
+
+        session.setStatus(PaymentSessionStatus.CAPTURED);
+        PaymentSession saved = sessionRepo.save(session);
+
+        insertEvent(saved, PaymentSessionEventType.CAPTURED, PaymentSessionStatus.AUTHORIZED,
+            PaymentSessionStatus.CAPTURED, "Authorized funds captured", eventKey(saved, "captured"));
+
+        notify(saved, "Payment Captured",
+            "Your payment for booking " + saved.getBooking().getBookingCode() + " was captured.");
+
+        // BRIDGE: route the success through the EXISTING PaymentService.mockSuccess hook chain.
+        settlementBridge.settleSuccess(saved);
+        return saved;
     }
 
     // ═════════════════════════════════════════════════════════════════════
@@ -211,17 +294,7 @@ public class PaymentGatewayService {
             throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,
                 "Only an AUTHORIZED session can be captured. Current status: " + session.getStatus());
 
-        gatewayOrThrow(session.getProvider()).capture(session);
-
-        session.setStatus(PaymentSessionStatus.CAPTURED);
-        PaymentSession saved = sessionRepo.save(session);
-
-        insertEvent(saved, PaymentSessionEventType.CAPTURED, PaymentSessionStatus.AUTHORIZED,
-            PaymentSessionStatus.CAPTURED, "Authorized funds captured", eventKey(saved, "captured"));
-
-        notify(saved, "Payment Captured",
-            "Your payment for booking " + saved.getBooking().getBookingCode() + " was captured.");
-        return toResponse(saved, true);
+        return toResponse(doCaptureTransition(session), true);
     }
 
     @Transactional
@@ -245,6 +318,10 @@ public class PaymentGatewayService {
         insertEvent(saved, PaymentSessionEventType.CANCELLED, from,
             PaymentSessionStatus.CANCELLED, "Session cancelled", eventKey(saved, "cancelled"));
         // No customer notification for cancel — only Authorized/Failed/Captured are notified.
+
+        // BRIDGE: a cancelled session releases any held loyalty/gift-card via the existing
+        // PaymentService.mockFail hook chain (no-op when nothing was held).
+        settlementBridge.settleFailure(saved, "Payment session cancelled");
         return toResponse(saved, true);
     }
 
@@ -283,6 +360,10 @@ public class PaymentGatewayService {
         PaymentSession saved = sessionRepo.save(session);
         insertEvent(saved, PaymentSessionEventType.EXPIRED, from,
             PaymentSessionStatus.EXPIRED, "Session expired", eventKey(saved, "expired"));
+
+        // BRIDGE: a timed-out session releases any held loyalty/gift-card via the existing
+        // PaymentService.mockFail hook chain (no-op when nothing was held).
+        settlementBridge.settleFailure(saved, "Payment session expired");
         return saved;
     }
 

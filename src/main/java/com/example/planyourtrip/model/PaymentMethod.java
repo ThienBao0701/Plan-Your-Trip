@@ -7,5 +7,7 @@ public enum PaymentMethod {
     BANK_TRANSFER,
     VNPAY,
     MOMO,
-    STRIPE
+    STRIPE,
+    // Phase 7.27 — additive: PayOS gained a real gateway adapter this phase.
+    PAYOS
 }

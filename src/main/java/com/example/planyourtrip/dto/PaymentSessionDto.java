@@ -65,4 +65,17 @@ public class PaymentSessionDto {
     public record ExpirationResultResponse(
         int expiredCount
     ) {}
+
+    /**
+     * Phase 7.27 — acknowledgement returned to a real provider webhook. Deliberately does
+     * NOT echo the {@code callbackToken}: a real webhook caller is the provider, not the
+     * owner. {@code processed} is false for an idempotent no-op (e.g. duplicate delivery on
+     * an already-terminal session).
+     */
+    public record WebhookAck(
+        String sessionId,
+        PaymentSessionStatus status,
+        boolean processed,
+        String detail
+    ) {}
 }

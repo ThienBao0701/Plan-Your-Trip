@@ -223,6 +223,7 @@ public class PaymentService {
             case VNPAY -> PaymentProvider.VNPAY;
             case MOMO  -> PaymentProvider.MOMO;
             case STRIPE -> PaymentProvider.STRIPE;
+            case PAYOS -> PaymentProvider.PAYOS;
             case CASH, CARD, BANK_TRANSFER -> PaymentProvider.MANUAL;
             default -> PaymentProvider.MOCK;
         };

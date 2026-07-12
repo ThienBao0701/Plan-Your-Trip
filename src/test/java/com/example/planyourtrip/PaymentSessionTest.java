@@ -27,33 +27,34 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Phase 7.26 — Payment Gateway Foundation.
  *
  * <p>Exercises the {@code PaymentSession} lifecycle end-to-end through the API. Also
- * registers an in-test-only fake {@link PaymentGateway} for the (previously unwired)
- * {@link PaymentProvider#PAYOS} provider to prove the abstraction accepts a brand-new
+ * registers an in-test-only fake {@link PaymentGateway} for the (still-unwired)
+ * {@link PaymentProvider#GOOGLE_PAY} provider to prove the abstraction accepts a brand-new
  * provider WITHOUT any change to {@code PaymentGatewayService}/{@code BookingService}/
- * {@code PaymentService} source.
+ * {@code PaymentService} source. (Phase 7.27 gave VNPAY/PAYOS/STRIPE/MOMO real gateways, so
+ * this test picks a provider that still has none.)
  */
 @SpringBootTest
 @AutoConfigureMockMvc
 class PaymentSessionTest {
 
-    static final String FAKE_PAYOS_URL_PREFIX = "https://fake-payos.test/pay/";
+    static final String FAKE_FUTURE_URL_PREFIX = "https://fake-future-provider.test/pay/";
 
     /** A trivial second gateway registered ONLY for this test's context (see class javadoc). */
     @TestConfiguration
     static class FakeGatewayConfig {
         @Bean
-        PaymentGateway fakePayosGateway() {
+        PaymentGateway fakeFutureGateway() {
             return new PaymentGateway() {
-                @Override public PaymentProvider provider() { return PaymentProvider.PAYOS; }
+                @Override public PaymentProvider provider() { return PaymentProvider.GOOGLE_PAY; }
                 @Override public String createCheckoutUrl(PaymentSession session) {
-                    return FAKE_PAYOS_URL_PREFIX + session.getSessionId();
+                    return FAKE_FUTURE_URL_PREFIX + session.getSessionId();
                 }
                 @Override public CallbackVerification verifyCallback(PaymentSession session, GatewayCallback cb) {
                     if (cb == null || cb.callbackToken() == null
                             || !session.getCallbackToken().equals(cb.callbackToken()))
                         return new CallbackVerification(false, null, null);
                     return new CallbackVerification(true, cb.outcome(),
-                        cb.providerReference() != null ? cb.providerReference() : "PAYOS-" + session.getSessionId());
+                        cb.providerReference() != null ? cb.providerReference() : "GPAY-" + session.getSessionId());
                 }
                 @Override public void capture(PaymentSession session) { /* no-op fake */ }
                 @Override public void cancel(PaymentSession session) { /* no-op fake */ }
@@ -122,11 +123,12 @@ class PaymentSessionTest {
     @Test
     void session_create_unregisteredProvider_returns400() throws Exception {
         Long bookingId = createBooking(userToken, 7);
-        // VNPAY exists in the enum but has no registered gateway in this phase.
+        // Phase 7.27: VNPAY/PAYOS/STRIPE/MOMO now have real registered gateways, so this
+        // test uses APPLE_PAY — an enum value that still has no registered gateway.
         mvc.perform(post("/api/payment-sessions")
                 .header("Authorization", "Bearer " + userToken)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"bookingId\":" + bookingId + ",\"provider\":\"VNPAY\"}"))
+                .content("{\"bookingId\":" + bookingId + ",\"provider\":\"APPLE_PAY\"}"))
             .andExpect(status().isBadRequest());
     }
 
@@ -303,22 +305,22 @@ class PaymentSessionTest {
     @Test
     void providerAbstraction_selectsCorrectGatewayWithoutBranching() throws Exception {
         Long mockBooking = createBooking(userToken, 31);
-        Long payosBooking = createBooking(userToken, 33);
+        Long futureBooking = createBooking(userToken, 33);
 
         JsonNode mockSession = createSession(userToken, mockBooking, "MOCK");
-        JsonNode payosSession = createSession(userToken, payosBooking, "PAYOS");
+        JsonNode futureSession = createSession(userToken, futureBooking, "GOOGLE_PAY");
 
         // Correct implementation selected purely by provider key — different checkout URLs.
         assertTrue(mockSession.get("checkoutUrl").asText().startsWith("https://mock-gateway"));
-        assertTrue(payosSession.get("checkoutUrl").asText().startsWith(FAKE_PAYOS_URL_PREFIX));
+        assertTrue(futureSession.get("checkoutUrl").asText().startsWith(FAKE_FUTURE_URL_PREFIX));
     }
 
     @Test
     void futureProvider_worksWithoutServiceChange_fullLifecycle() throws Exception {
         Long bookingId = createBooking(userToken, 35);
-        // PAYOS is only wired via the in-test fake gateway — the service source is untouched.
-        JsonNode created = createSession(userToken, bookingId, "PAYOS");
-        assertEquals("PAYOS", created.get("provider").asText());
+        // GOOGLE_PAY is only wired via the in-test fake gateway — the service source is untouched.
+        JsonNode created = createSession(userToken, bookingId, "GOOGLE_PAY");
+        assertEquals("GOOGLE_PAY", created.get("provider").asText());
         assertEquals("PENDING", created.get("status").asText());
 
         JsonNode authorized = callback(created, CallbackOutcome.AUTHORIZED, null);

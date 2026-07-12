@@ -39,6 +39,9 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/api/auth/**",
                     "/api/health",
+                    // Phase 7.27 — real provider webhooks are unauthenticated but
+                    // signature-verified inside PaymentGatewayService.processWebhook.
+                    "/api/webhooks/payments/**",
                     "/swagger-ui/**",
                     "/swagger-ui.html",
                     "/v3/api-docs/**",

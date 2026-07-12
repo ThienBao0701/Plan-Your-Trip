@@ -52,6 +52,37 @@ public interface PaymentGateway {
     void cancel(PaymentSession session);
 
     /**
+     * Phase 7.27 — verify a REAL, unauthenticated provider webhook. Unlike
+     * {@link #verifyCallback} (which authenticates with the per-session
+     * {@code callbackToken}), this validates a cryptographic signature over the raw
+     * request body keyed by the provider's shared webhook secret, and extracts the target
+     * {@code sessionId} + normalized outcome FROM the signed payload itself. Default: not
+     * supported — only the real provider adapters override this (the Phase-7.26 mock/test
+     * gateways drive state through the token-based {@link #verifyCallback} path instead).
+     */
+    default WebhookVerification verifyWebhook(String rawBody, String signatureHeader) {
+        throw new UnsupportedOperationException(
+            "Provider " + provider() + " does not expose a signed webhook receiver");
+    }
+
+    /**
+     * A gateway's verified interpretation of a REAL signed webhook: whether the signature
+     * checked out, which session it targets, and the normalized outcome/reference.
+     */
+    record WebhookVerification(boolean valid, String sessionId,
+                               CallbackOutcome outcome, String providerReference) {
+
+        public static WebhookVerification invalid() {
+            return new WebhookVerification(false, null, null, null);
+        }
+
+        public static WebhookVerification of(String sessionId, CallbackOutcome outcome,
+                                             String providerReference) {
+            return new WebhookVerification(true, sessionId, outcome, providerReference);
+        }
+    }
+
+    /**
      * Normalized inbound callback payload (provider-agnostic shape). A real gateway would
      * receive the provider's own body and headers and normalize onto this before/while
      * verifying; the mock accepts it directly.
