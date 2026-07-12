@@ -509,6 +509,47 @@ class CheckoutCouponCreditTest {
             "payment amount must be the coupon+credit discounted payable total");
     }
 
+    /**
+     * Phase 7.30 — the SELECTED rate plan's resolved price now feeds the authoritative checkout
+     * total, and the customer-discount chain (here a coupon) layers on top of it. STD-TWIN's best
+     * eligible plan is the seeded "Non-refundable" (priority 20 → resolved nightly 900,000), NOT
+     * the cheaper "Summer Deal" (800,000) that the standalone min-price engine still returns — so a
+     * default booking is charged the resolved-plan-based total, and the coupon discounts that total.
+     */
+    @Test
+    void resolvedRatePlanPriceDrivesCheckoutTotalAndCouponStacksOnIt() throws Exception {
+        LocalDate ci = TODAY.plusDays(7), co = ci.plusDays(2); // 2 nights
+        BigDecimal base = baselinePrice(ci, co);
+
+        // The baseline booking must reflect the RESOLVED "Non-refundable" plan (900,000/night),
+        // proving rate-plan pricing is authoritative, not preview-only.
+        JsonNode probe = book(registerUser("chk-rp-probe").get("token").asText(),
+            bookingPayload(stdTwinRoomId, ci, co, null, null), status().isCreated());
+        assertEquals("Non-refundable", probe.get("selectedRatePlanName").asText(),
+            "best-eligible (priority 20) plan drives the booking");
+        assertDecimal(new BigDecimal("900000.00"), probe.get("nightlyRateSnapshot"));
+        // ratePlanPrice = resolved nightly 900,000 × 2 nights = 1,800,000 (NOT Summer Deal 1,600,000).
+        assertDecimal(new BigDecimal("1800000.00"), probe.get("ratePlanPrice"));
+        // finalPrice is built on the resolved rate-plan price minus the promotion discount.
+        BigDecimal probeFinal = new BigDecimal(probe.get("ratePlanPrice").asText())
+            .subtract(new BigDecimal(probe.get("discountAmount").asText()))
+            .setScale(2, RoundingMode.HALF_UP);
+        assertDecimal(probeFinal, probe.get("finalPrice"),
+            "finalPrice = resolved ratePlanPrice − promotion discount");
+
+        // A coupon then stacks on that resolved-plan-based total, exactly as the chain expects.
+        String code = uniqueCode("rp-chain");
+        createCouponDef(code, "PERCENTAGE", "10", null, null);
+        String token = registerUser("chk-rp").get("token").asText();
+        claim(token, code);
+        JsonNode res = book(token, bookingPayload(stdTwinRoomId, ci, co, code, null),
+            status().isCreated());
+        BigDecimal expectedDiscount = pct(base, "10");
+        assertDecimal(expectedDiscount, res.get("couponDiscountAmount"));
+        assertDecimal(base.subtract(expectedDiscount), res.get("finalPrice"),
+            "coupon discounts the resolved-rate-plan-based order total");
+    }
+
     @Test
     void unauthenticatedCheckoutWithCouponOrCreditsRejected() throws Exception {
         LocalDate ci = TODAY.plusDays(83), co = ci.plusDays(1);

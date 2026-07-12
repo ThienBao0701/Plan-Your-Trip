@@ -579,7 +579,65 @@ class AdvancedRatePlanTest {
             .andExpect(status().isForbidden());
     }
 
-    // scenario37 (all previous tests still pass) is verified by the full suite.
+    // ═══════════════════════════════════════════════════════════════════════════
+    // 37–38. Phase 7.30 — resolved rate-plan price reaches booking.finalPrice
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    @Test
+    void scenario37_explicitDerivedRatePlanReflectedInFinalPrice() throws Exception {
+        Long roomId = provisionBookableRoom();
+        Long flexId = createPlanReturnId(roomId, parentPlan("Flexible", "FLEX-INT", 1000000));
+        Long brkId  = createPlanReturnId(roomId,
+            derivedPlan("Breakfast", "BRK-INT", flexId, "FIXED_AMOUNT", 150000));
+
+        String c1 = registerAndLogin("flex-int-" + uniq() + "@test.com");
+        JsonNode flex = book(c1, roomId, today(3), today(5), 2, 0, flexId, 0); // 2 nights
+        String c2 = registerAndLogin("brk-int-" + uniq() + "@test.com");
+        JsonNode brk = book(c2, roomId, today(3), today(5), 2, 0, brkId, 0);
+
+        // Resolved nightly rates: base 1,000,000 vs derived +150,000 = 1,150,000.
+        assertEquals(1000000.0, flex.get("nightlyRateSnapshot").asDouble(), 0.01);
+        assertEquals(1150000.0, brk.get("nightlyRateSnapshot").asDouble(), 0.01);
+        // The derived adjustment flows into the CHARGED rate-plan price (2 nights → +300,000),
+        // proving it is not preview-only.
+        double flexRpp = flex.get("ratePlanPrice").asDouble();
+        double brkRpp  = brk.get("ratePlanPrice").asDouble();
+        assertEquals(2000000.0, flexRpp, 0.01);
+        assertEquals(2300000.0, brkRpp, 0.01);
+        assertEquals(300000.0, brkRpp - flexRpp, 0.01);
+        assertFinalIsRatePlanMinusDiscount(flex);
+        assertFinalIsRatePlanMinusDiscount(brk);
+    }
+
+    @Test
+    void scenario38_occupancyChildAndExtraBedSupplementsReflectedInFinalPrice() throws Exception {
+        Long roomId = provisionBookableRoom();
+        Map<String, Object> p = basePlan("Occ Supplements", "OCC-INT");
+        p.put("pricePerNight", 1000000);
+        p.put("occupancyPricingEnabled", true);
+        p.put("childPricingEnabled", true);
+        p.put("extraBedPrice", 200000);
+        Long planId = createPlanReturnId(roomId, p);
+        addOccupancy(planId, 2, 1, 1100000, 150000L, 200000L);
+
+        String customer = registerAndLogin("occ-int-" + uniq() + "@test.com");
+        // 2 adults + 1 child + 1 extra bed, 2 nights.
+        JsonNode booking = book(customer, roomId, today(3), today(5), 2, 1, planId, 1);
+        // finalNightly = occupancy 1,100,000 + child 150,000 + extra bed 200,000 = 1,450,000.
+        assertEquals(1450000.0, booking.get("nightlyRateSnapshot").asDouble(), 0.01);
+        // 2 nights → 2,900,000 flows into the charged rate-plan price.
+        assertEquals(2900000.0, booking.get("ratePlanPrice").asDouble(), 0.01);
+        assertFinalIsRatePlanMinusDiscount(booking);
+    }
+
+    /** finalPrice must equal the resolved rate-plan price minus the promotion discount. */
+    private void assertFinalIsRatePlanMinusDiscount(JsonNode booking) {
+        double rpp = booking.get("ratePlanPrice").asDouble();
+        double disc = booking.get("discountAmount").asDouble();
+        double finalPrice = booking.get("finalPrice").asDouble();
+        assertEquals(rpp - disc, finalPrice, 0.01,
+            "finalPrice must equal resolved ratePlanPrice minus promotion discount");
+    }
 
     // ═══════════════════════════════════════════════════════════════════════════
     // HELPERS

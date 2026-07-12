@@ -1434,8 +1434,12 @@ public class DataInitializer implements ApplicationRunner {
     // ─────────────────────────────────────────────────────────────
     //
     // Seeded on STD-TWIN. All prices are >= 900,000 so the existing "Summer Deal"
-    // (800,000) remains the cheapest plan — the min-price pick used by the
-    // untouched PricingEngineService/AvailabilityService is therefore unchanged.
+    // (800,000) remains the cheapest plan — the min-price pick used by the untouched
+    // 3-arg PricingEngineService.calculate() and AvailabilityService is therefore unchanged.
+    // NOTE (Phase 7.30): booking CHECKOUT no longer uses that min-price pick — it uses
+    // RatePlanPricingService's priority-desc selection, so a default STD-TWIN booking now
+    // resolves "Non-refundable" (priority 20) and is charged its resolved rate, consistent
+    // with the plan snapshotted onto the booking.
 
     private void seedAdvancedRatePlans() {
         Place place = placeRepo.findBySlug("grand-palace-hotel-vung-tau").orElse(null);

@@ -33,9 +33,45 @@ public class PricingEngineService {
         this.promotionRepo = promotionRepo;
     }
 
+    /**
+     * Standalone pricing: selects the cheapest active rate plan itself (Step 2 min-price pick).
+     * Used by the public {@code GET /api/rooms/{roomId}/pricing} endpoint,
+     * {@code PartnerPricingService} and {@code CustomerCouponService}. Behaviour unchanged.
+     */
     public PricingBreakdownResponse calculate(Long roomId,
                                                LocalDate checkIn,
                                                LocalDate checkOut) {
+        return calculate(roomId, checkIn, checkOut, false, null, null);
+    }
+
+    /**
+     * Phase 7.30 — checkout pricing driven by an EXTERNALLY resolved rate plan.
+     *
+     * <p>Called from {@code BookingService.create()} with the full resolved per-stay subtotal
+     * produced by {@link RatePlanPricingService} (base nightly + derived adjustment + occupancy /
+     * child / extra-bed supplements, already multiplied by nights). This SKIPS the internal
+     * Step-2 min-price selection and uses the supplied value as the rate-plan price, then flows
+     * through the SAME promotion-discount logic (Steps 3–4) as the 3-arg overload — so the amount
+     * charged is consistent with the rate-plan snapshotted onto the booking.
+     *
+     * @param resolvedRatePlanSubtotal the resolved stay subtotal, or {@code null} to fall back to
+     *                                 the base room price (matches the "no eligible plan" case).
+     * @param resolvedRatePlanName     display name of the resolved plan, or {@code null}.
+     */
+    public PricingBreakdownResponse calculate(Long roomId,
+                                               LocalDate checkIn,
+                                               LocalDate checkOut,
+                                               BigDecimal resolvedRatePlanSubtotal,
+                                               String resolvedRatePlanName) {
+        return calculate(roomId, checkIn, checkOut, true, resolvedRatePlanSubtotal, resolvedRatePlanName);
+    }
+
+    private PricingBreakdownResponse calculate(Long roomId,
+                                               LocalDate checkIn,
+                                               LocalDate checkOut,
+                                               boolean useResolvedRatePlan,
+                                               BigDecimal resolvedRatePlanSubtotal,
+                                               String resolvedRatePlanName) {
         if (!checkOut.isAfter(checkIn)) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "checkOut must be after checkIn");
         }
@@ -54,15 +90,23 @@ public class PricingEngineService {
             ? room.getPriceFrom() : BigDecimal.ZERO;
         BigDecimal basePrice = priceFrom.multiply(BigDecimal.valueOf(nights));
 
-        // ── Step 2: Rate plan override ────────────────────────────────────────
-        List<RatePlan> plans = ratePlanRepo.findActiveForStay(roomId, checkIn, lastNight);
-        Optional<RatePlan> bestPlan = plans.stream()
-            .min(Comparator.comparing(RatePlan::getPricePerNight));
+        // ── Step 2: Rate plan price ───────────────────────────────────────────
+        BigDecimal ratePlanPrice;
+        String ratePlanName;
+        if (useResolvedRatePlan) {
+            // Phase 7.30 — trust the externally resolved plan/subtotal; no internal selection.
+            ratePlanPrice = resolvedRatePlanSubtotal;
+            ratePlanName  = resolvedRatePlanName;
+        } else {
+            List<RatePlan> plans = ratePlanRepo.findActiveForStay(roomId, checkIn, lastNight);
+            Optional<RatePlan> bestPlan = plans.stream()
+                .min(Comparator.comparing(RatePlan::getPricePerNight));
 
-        BigDecimal ratePlanNightly = bestPlan.map(RatePlan::getPricePerNight).orElse(null);
-        BigDecimal ratePlanPrice   = ratePlanNightly != null
-            ? ratePlanNightly.multiply(BigDecimal.valueOf(nights)) : null;
-        String ratePlanName = bestPlan.map(RatePlan::getRateName).orElse(null);
+            BigDecimal ratePlanNightly = bestPlan.map(RatePlan::getPricePerNight).orElse(null);
+            ratePlanPrice = ratePlanNightly != null
+                ? ratePlanNightly.multiply(BigDecimal.valueOf(nights)) : null;
+            ratePlanName = bestPlan.map(RatePlan::getRateName).orElse(null);
+        }
 
         BigDecimal workingPrice = ratePlanPrice != null ? ratePlanPrice : basePrice;
 

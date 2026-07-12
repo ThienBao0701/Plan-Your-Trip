@@ -129,18 +129,25 @@ public class BookingService {
             throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,
                 "Insufficient inventory for the selected dates");
 
-        var pricing = pricingEngine.calculate(req.roomId(), req.checkIn(), req.checkOut());
-
-        // Phase 7.29 — resolve the rate plan to SNAPSHOT onto this booking. The authoritative
-        // charged total continues to flow through `pricing` above and the untouched customer-
-        // discount chain below (base→ratePlan→promotion→coupon→loyalty→credit→gift card); this
-        // resolution adds the rate-plan terms snapshot only. When req.ratePlanId() is supplied it
-        // is validated for eligibility here (throws 422 before any inventory mutation); when
-        // omitted the best eligible plan is snapshotted (or none). Inventory is NOT re-checked
-        // (availability already confirmed under the Phase 7.28 lock above).
+        // Phase 7.29/7.30 — resolve the rate plan FIRST, then feed its resolved per-stay subtotal
+        // into the pricing engine so the authoritative charged total is built on the SAME plan that
+        // is snapshotted onto the booking below (no longer the engine's own cheapest-plan pick).
+        // When req.ratePlanId() is supplied it is validated for eligibility here (throws 422 before
+        // any inventory mutation); when omitted the best eligible plan is resolved (or none).
+        // Inventory is NOT re-checked (availability already confirmed under the Phase 7.28 lock).
         int extraBeds = req.extraBeds() != null ? req.extraBeds() : 0;
         var rateResolution = ratePlanPricingService.resolveForBooking(
             room, req.ratePlanId(), req.checkIn(), req.checkOut(), req.adults(), children, extraBeds);
+
+        // Phase 7.30 — the resolved rate-plan stay subtotal (base nightly + derived adjustment +
+        // occupancy/child/extra-bed supplements × nights) becomes the FIRST pricing stage, feeding
+        // the unchanged customer-discount chain (ratePlan→promotion→coupon→loyalty→credit→gift card).
+        // When no plan is eligible the subtotal is null and pricing falls back to the base room price.
+        var pricing = rateResolution
+            .map(r -> pricingEngine.calculate(req.roomId(), req.checkIn(), req.checkOut(),
+                r.staySubtotal(), r.plan().getRateName()))
+            .orElseGet(() -> pricingEngine.calculate(req.roomId(), req.checkIn(), req.checkOut(),
+                null, null));
 
         User user = userRepo.findById(userId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
