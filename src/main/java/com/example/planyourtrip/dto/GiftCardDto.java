@@ -178,6 +178,29 @@ public class GiftCardDto {
         Instant expiresAt
     ) {}
 
+    // ── Phase 7.25 — booking-scoped redemption preview ───────────────────────
+
+    /**
+     * Preview redeeming a gift card against an EXISTING PENDING booking's current
+     * payable ({@code booking.finalPrice}, already reduced by promotion/coupon/
+     * loyalty/travel-credit). {@code POST /api/me/gift-cards/preview-booking}.
+     * Read-only — never mutates a balance or the booking.
+     */
+    public record GiftCardBookingPreviewRequest(
+        @NotBlank String giftCardCode,
+        @NotNull Long bookingId
+    ) {}
+
+    public record GiftCardBookingPreviewResponse(
+        boolean eligible,
+        String reason,
+        BigDecimal giftCardApplied,
+        BigDecimal remainingBalance,
+        BigDecimal remainingPayable,
+        GiftCardStatus effectiveStatus,
+        Instant expiresAt
+    ) {}
+
     // ── Admin adjustment ──────────────────────────────────────────────────────
 
     public record GiftCardAdjustmentRequest(

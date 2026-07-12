@@ -21,17 +21,20 @@ public class PaymentService {
     private final UserRepository userRepo;
     private final NotificationService notificationService;
     private final LoyaltyRedemptionService loyaltyRedemptionService;
+    private final GiftCardService giftCardService;
 
     public PaymentService(PaymentRepository paymentRepo,
                           BookingRepository bookingRepo,
                           UserRepository userRepo,
                           NotificationService notificationService,
-                          LoyaltyRedemptionService loyaltyRedemptionService) {
+                          LoyaltyRedemptionService loyaltyRedemptionService,
+                          GiftCardService giftCardService) {
         this.paymentRepo = paymentRepo;
         this.bookingRepo = bookingRepo;
         this.userRepo    = userRepo;
         this.notificationService = notificationService;
         this.loyaltyRedemptionService = loyaltyRedemptionService;
+        this.giftCardService = giftCardService;
     }
 
     @Transactional
@@ -119,6 +122,11 @@ public class PaymentService {
         // paid/confirmed (RESERVED → APPLIED). Idempotent; no-op when none exists.
         loyaltyRedemptionService.applyForBooking(booking.getId());
 
+        // Phase 7.25 — gift card: payment success KEEPS the redemption. No callback
+        // is needed because a gift card is an immediate debit at booking creation
+        // (there is no reserve/apply split like loyalty) — the REDEMPTION already
+        // stands and is only ever reversed by release (failure) / refund (cancel).
+
         notificationService.create(booking.getUser().getId(), NotificationType.PAYMENT, Priority.HIGH,
             "Payment successful",
             "Your payment for booking " + booking.getBookingCode() + " was successful.",
@@ -154,6 +162,11 @@ public class PaymentService {
         // the RESERVED reservation so the held points return to the customer.
         // Idempotent; no-op when there is no active reservation.
         loyaltyRedemptionService.onPaymentFailed(payment.getBooking().getId());
+
+        // Phase 7.25 — payment failed: release any gift card redeemed at checkout
+        // (restore balance + REFUND ledger row, un-apply the discount on the
+        // booking). Idempotent; no-op when nothing was redeemed.
+        giftCardService.releaseForBooking(payment.getBooking().getId());
 
         notificationService.create(payment.getBooking().getUser().getId(), NotificationType.PAYMENT, Priority.HIGH,
             "Payment failed",

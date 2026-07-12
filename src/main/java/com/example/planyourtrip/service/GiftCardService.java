@@ -4,6 +4,7 @@ import com.example.planyourtrip.dto.GiftCardDto.*;
 import com.example.planyourtrip.dto.PageResponse;
 import com.example.planyourtrip.exception.ApiException;
 import com.example.planyourtrip.model.*;
+import com.example.planyourtrip.repository.BookingRepository;
 import com.example.planyourtrip.repository.GiftCardRepository;
 import com.example.planyourtrip.repository.GiftCardSpecification;
 import com.example.planyourtrip.repository.GiftCardTransactionRepository;
@@ -80,17 +81,20 @@ public class GiftCardService {
     private final GiftCardProductService productService;
     private final UserRepository userRepo;
     private final NotificationService notificationService;
+    private final BookingRepository bookingRepo;
 
     public GiftCardService(GiftCardRepository giftCardRepo,
                             GiftCardTransactionRepository transactionRepo,
                             GiftCardProductService productService,
                             UserRepository userRepo,
-                            NotificationService notificationService) {
+                            NotificationService notificationService,
+                            BookingRepository bookingRepo) {
         this.giftCardRepo = giftCardRepo;
         this.transactionRepo = transactionRepo;
         this.productService = productService;
         this.userRepo = userRepo;
         this.notificationService = notificationService;
+        this.bookingRepo = bookingRepo;
     }
 
     // ═════════════════════════════════════════════════════════════════════
@@ -330,6 +334,222 @@ public class GiftCardService {
         BigDecimal finalPayable = orderAmount.subtract(redeemable).max(BigDecimal.ZERO);
         return new GiftCardPreviewResponse(true, null,
             card.getCurrentBalance(), redeemable, finalPayable, effective, card.getExpiresAt());
+    }
+
+    // ═════════════════════════════════════════════════════════════════════
+    // CHECKOUT INTEGRATION (Phase 7.25)
+    // ═════════════════════════════════════════════════════════════════════
+    //
+    // Checkout pricing order (documented — enforced by BookingService.create's
+    // pipeline, which reduces booking.finalPrice step by step):
+    //     Base → Promotion → Coupon → Loyalty → Travel Credits → GIFT CARD → Payable
+    // Gift cards always apply AFTER travel credits: redemption is computed against
+    // the booking's CURRENT finalPrice at this point in the pipeline.
+    //
+    // Unlike loyalty's reserve/apply split, a gift card is an IMMEDIATE DEBIT at
+    // booking creation (like travel credits): one REDEMPTION ledger row now. The
+    // three-way payment split is then:
+    //     payment SUCCESS  → keep the redemption (no callback — the debit stands)
+    //     payment FAILURE  → releaseForBooking (restore balance, REFUND row)
+    //     booking CANCELLED → refundForBooking (restore balance, REFUND row)
+    // Both release and refund route through the SAME single restore primitive with
+    // ONE deterministic idempotency key ({@code booking-<id>-giftcard-refund}), so a
+    // booking that fails payment and is later cancelled is restored AT MOST ONCE —
+    // additionally guarded by clearing the booking's own gift-card fields on restore
+    // (mirrors LoyaltyRedemptionService.removeDiscountFromBooking / the 7.15 credit
+    // guard). Every balance change reuses the same centralized {@link #insertLedger}
+    // primitive + {@link GiftCardRepository#findByIdForUpdate} pessimistic lock +
+    // {@link #deriveStatusAfterBalanceChange} used by every other operation — never a
+    // second debit/credit code path.
+
+    /**
+     * Booking-scoped redemption preview (read-only) —
+     * {@code POST /api/me/gift-cards/preview-booking}. Ownership-scoped: an unknown
+     * or unrelated card returns a structured ineligible response (never a 404),
+     * mirroring the general {@link #preview}'s soft-fail convention (documented
+     * judgment call — avoids leaking card existence on a read-only endpoint). The
+     * booking must belong to the caller (403 otherwise).
+     */
+    @Transactional(readOnly = true)
+    public GiftCardBookingPreviewResponse previewForBooking(Long userId, GiftCardBookingPreviewRequest req) {
+        Booking booking = bookingRepo.findById(req.bookingId())
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found: " + req.bookingId()));
+        if (!booking.getUser().getId().equals(userId))
+            throw new ApiException(HttpStatus.FORBIDDEN, "Access denied");
+
+        BigDecimal payable = booking.getFinalPrice();
+        Optional<GiftCard> found = giftCardRepo.findByGiftCardCode(normalizeCode(req.giftCardCode()));
+        if (found.isEmpty() || !isPurchaserOrRecipient(userId, found.get()))
+            return new GiftCardBookingPreviewResponse(false, "Gift card not found",
+                BigDecimal.ZERO, BigDecimal.ZERO, payable, null, null);
+
+        GiftCard card = found.get();
+        GiftCardStatus effective = effectiveStatus(card);
+
+        if (!card.getCurrency().equalsIgnoreCase(booking.getCurrency()))
+            return new GiftCardBookingPreviewResponse(false,
+                "Currency mismatch: gift card currency is " + card.getCurrency(),
+                card.getCurrentBalance(), card.getCurrentBalance(), payable, effective, card.getExpiresAt());
+        if (effective != GiftCardStatus.ACTIVE && effective != GiftCardStatus.PARTIALLY_REDEEMED)
+            return new GiftCardBookingPreviewResponse(false,
+                "Gift card is not redeemable (status: " + effective + ")",
+                card.getCurrentBalance(), card.getCurrentBalance(), payable, effective, card.getExpiresAt());
+        if (card.getCurrentBalance().signum() <= 0)
+            return new GiftCardBookingPreviewResponse(false, "Gift card has no remaining balance",
+                card.getCurrentBalance(), card.getCurrentBalance(), payable, effective, card.getExpiresAt());
+
+        BigDecimal applied = card.getCurrentBalance().min(payable).max(BigDecimal.ZERO);
+        BigDecimal remainingPayable = payable.subtract(applied).max(BigDecimal.ZERO);
+        BigDecimal remainingBalance = card.getCurrentBalance().subtract(applied);
+        return new GiftCardBookingPreviewResponse(true, null,
+            applied, remainingBalance, remainingPayable, effective, card.getExpiresAt());
+    }
+
+    /**
+     * Immediate gift-card debit at booking creation — called by
+     * {@code BookingService.create} AFTER travel-credit application. Redeems
+     * {@code min(currentBalance, booking.finalPrice)} (never negative, never more
+     * than the remaining payable), writes ONE REDEMPTION ledger row
+     * (referenceType=BOOKING, referenceId=bookingId, key
+     * {@code booking-<id>-giftcard-redemption}), reduces {@code booking.finalPrice}
+     * and records the masked reference on the booking. Runs inside the caller's
+     * booking-creation transaction under the card's pessimistic lock, so a failed
+     * booking rolls the debit back.
+     *
+     * <p>Security: only the card's purchaser/recipient may redeem it — any other
+     * card is a 404 (never 403), matching the "avoid leaking existence" convention.
+     * Currency must match the booking (400), the card must be redeemable
+     * (ACTIVE/PARTIALLY_REDEEMED — else 409), balance &gt; 0. When the remaining
+     * payable is already 0 the gift card contributes nothing and no ledger row is
+     * written (no-op).
+     */
+    @Transactional
+    public void redeemForBooking(Long userId, String rawCode, Booking booking) {
+        String code = normalizeCode(rawCode);
+        GiftCard viewed = giftCardRepo.findByGiftCardCode(code)
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Gift card not found"));
+        if (!isPurchaserOrRecipient(userId, viewed))
+            throw new ApiException(HttpStatus.NOT_FOUND, "Gift card not found");
+
+        String key = "booking-" + booking.getId() + "-giftcard-redemption";
+        if (transactionRepo.findByIdempotencyKey(key).isPresent()) return; // already redeemed (defensive replay)
+
+        GiftCard card = giftCardRepo.findByIdForUpdate(viewed.getId())
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Gift card not found"));
+
+        GiftCardStatus effective = effectiveStatus(card);
+        if (!card.getCurrency().equalsIgnoreCase(booking.getCurrency()))
+            throw new ApiException(HttpStatus.BAD_REQUEST,
+                "Currency mismatch: gift card currency is " + card.getCurrency());
+        if (effective != GiftCardStatus.ACTIVE && effective != GiftCardStatus.PARTIALLY_REDEEMED)
+            throw new ApiException(HttpStatus.CONFLICT,
+                "Gift card is not redeemable (status: " + effective + ")");
+        if (card.getCurrentBalance().signum() <= 0)
+            throw new ApiException(HttpStatus.CONFLICT, "Gift card has no remaining balance");
+
+        BigDecimal remainingPayable = booking.getFinalPrice();
+        BigDecimal redeem = card.getCurrentBalance().min(remainingPayable)
+            .max(BigDecimal.ZERO).setScale(2, RoundingMode.HALF_UP);
+        if (redeem.signum() <= 0) return; // nothing left to pay — gift card contributes nothing
+
+        BigDecimal before = card.getCurrentBalance();
+        BigDecimal after = before.subtract(redeem);
+        card.setCurrentBalance(after);
+        card.setStatus(deriveStatusAfterBalanceChange(card, after));
+        if (card.getStatus() == GiftCardStatus.FULLY_REDEEMED && card.getFullyRedeemedAt() == null)
+            card.setFullyRedeemedAt(Instant.now());
+        giftCardRepo.save(card);
+
+        insertLedger(card, GiftCardTransactionType.REDEMPTION, redeem, before, after,
+            "Redeemed against booking #" + booking.getId(),
+            GiftCardReferenceType.BOOKING, booking.getId(), key);
+
+        booking.setGiftCardAmountUsed(redeem);
+        booking.setGiftCardReference(maskCode(card.getCodeLast4()));
+        booking.setFinalPrice(booking.getFinalPrice().subtract(redeem)
+            .max(BigDecimal.ZERO).setScale(2, RoundingMode.HALF_UP));
+        bookingRepo.save(booking);
+
+        Long notifyUserId = booking.getUser().getId();
+        notificationService.create(notifyUserId, NotificationType.PROMOTION, Priority.NORMAL,
+            "Gift card used",
+            redeem.toPlainString() + " " + card.getCurrency() + " from your gift card "
+                + maskCode(card.getCodeLast4()) + " was applied to booking " + booking.getBookingCode() + ".",
+            RelatedEntityType.BOOKING, booking.getId());
+    }
+
+    /**
+     * Payment-failure release — {@code PaymentService.mockFail} hook. Restores the
+     * redeemed balance and un-applies the discount from the booking. Idempotent
+     * no-op when there is nothing (still) redeemed for the booking.
+     */
+    @Transactional
+    public void releaseForBooking(Long bookingId) {
+        restoreForBooking(bookingId, "payment failed");
+    }
+
+    /**
+     * Booking-cancellation refund — {@code BookingService} cancel hook. Same restore
+     * primitive as {@link #releaseForBooking} (same REFUND ledger type + same single
+     * deterministic idempotency key), so a booking that failed payment and is later
+     * cancelled is never restored twice. Idempotent no-op when nothing is redeemed.
+     */
+    @Transactional
+    public void refundForBooking(Long bookingId) {
+        restoreForBooking(bookingId, "booking cancelled");
+    }
+
+    /**
+     * Single restore primitive shared by release (payment failure) and refund
+     * (cancellation). Guard #1: the booking's own {@code giftCardAmountUsed} — once
+     * a restore clears it, every later trigger is a no-op (mirrors the 7.15 credit /
+     * loyalty guard). Guard #2: the deterministic REFUND ledger key
+     * {@code booking-<id>-giftcard-refund} (pre-check + DB unique backstop). The
+     * gift card is located via the REDEMPTION ledger row's BOOKING/referenceId
+     * anchor, so no full code is ever stored on the booking.
+     */
+    private void restoreForBooking(Long bookingId, String trigger) {
+        Booking booking = bookingRepo.findById(bookingId).orElse(null);
+        if (booking == null) return;
+        if (booking.getGiftCardAmountUsed() == null || booking.getGiftCardAmountUsed().signum() <= 0)
+            return; // nothing redeemed, or already restored
+
+        String refundKey = "booking-" + bookingId + "-giftcard-refund";
+        if (transactionRepo.findByIdempotencyKey(refundKey).isPresent()) return; // already restored
+
+        Optional<GiftCardTransaction> redemption = transactionRepo
+            .findFirstByReferenceTypeAndReferenceIdAndTransactionType(
+                GiftCardReferenceType.BOOKING, bookingId, GiftCardTransactionType.REDEMPTION);
+        if (redemption.isEmpty()) return; // no debit on record — nothing to give back
+
+        BigDecimal amount = booking.getGiftCardAmountUsed();
+        GiftCard card = giftCardRepo.findByIdForUpdate(redemption.get().getGiftCard().getId())
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Gift card not found"));
+
+        BigDecimal before = card.getCurrentBalance();
+        BigDecimal after = before.add(amount);
+        card.setCurrentBalance(after);
+        card.setStatus(deriveStatusAfterBalanceChange(card, after));
+        if (after.signum() > 0) card.setFullyRedeemedAt(null); // reopened — no longer fully redeemed
+        giftCardRepo.save(card);
+
+        insertLedger(card, GiftCardTransactionType.REFUND, amount, before, after,
+            "Gift card refunded (" + trigger + ") for booking #" + bookingId,
+            GiftCardReferenceType.BOOKING, bookingId, refundKey);
+
+        // Un-apply the discount on the booking and clear the gift-card fields
+        // (mirrors LoyaltyRedemptionService.removeDiscountFromBooking) so the payable
+        // is correct on a retry and any subsequent restore is a no-op.
+        booking.setFinalPrice(booking.getFinalPrice().add(amount).setScale(2, RoundingMode.HALF_UP));
+        booking.setGiftCardAmountUsed(null);
+        booking.setGiftCardReference(null);
+        bookingRepo.save(booking);
+
+        notificationService.create(booking.getUser().getId(), NotificationType.PROMOTION, Priority.NORMAL,
+            "Gift card refunded",
+            amount.toPlainString() + " " + card.getCurrency() + " was refunded to your gift card "
+                + maskCode(card.getCodeLast4()) + " for booking " + booking.getBookingCode() + ".",
+            RelatedEntityType.BOOKING, booking.getId());
     }
 
     // ═════════════════════════════════════════════════════════════════════

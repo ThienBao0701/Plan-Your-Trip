@@ -104,6 +104,22 @@ public class Booking {
     @Column(name = "loyalty_points_redeemed")
     private Long loyaltyPointsRedeemed;
 
+    // ── Phase 7.25 — Gift card checkout integration ──────────────────────────
+    // Both nullable and null for every booking made without a gift card, so
+    // pre-7.25 bookings and the plain checkout flow are byte-for-byte unchanged.
+    // Set when a gift card is redeemed at booking creation (after travel credits;
+    // finalPrice reduced by the redeemed amount) and CLEARED when that redemption
+    // is released (payment failure) or refunded (booking cancellation) — mirroring
+    // the loyalty-redemption fields above.
+
+    /** Gift card value redeemed against this booking (already subtracted from {@link #finalPrice}). */
+    @Column(name = "gift_card_amount_used", precision = 15, scale = 2)
+    private BigDecimal giftCardAmountUsed;
+
+    /** Masked code of the redeemed gift card (support display only — never the full redeemable secret). */
+    @Column(name = "gift_card_reference", length = 32)
+    private String giftCardReference;
+
     @Column(columnDefinition = "TEXT")
     private String specialRequest;
 

@@ -87,4 +87,12 @@ public class GiftCardController {
     public GiftCardPreviewResponse preview(@Valid @RequestBody GiftCardPreviewRequest req) {
         return service.preview(req);
     }
+
+    @PostMapping("/preview-booking")
+    @Operation(summary = "Preview redeeming one of my gift cards against an existing booking's current payable "
+        + "(read-only — never mutates balance or the booking)")
+    public GiftCardBookingPreviewResponse previewBooking(@AuthUser Long uid,
+                                                          @Valid @RequestBody GiftCardBookingPreviewRequest req) {
+        return service.previewForBooking(uid, req);
+    }
 }

@@ -30,7 +30,10 @@ public class BookingDto {
         Integer numberOfRooms,
         String specialRequest,
         String couponCode,
-        @DecimalMin(value = "0.0", inclusive = false) BigDecimal creditAmount
+        @DecimalMin(value = "0.0", inclusive = false) BigDecimal creditAmount,
+        // Phase 7.25 — optional gift-card code redeemed at checkout AFTER travel
+        // credits (auto-clamped to min(balance, remaining payable); ignored when absent).
+        String giftCardCode
     ) {}
 
     public record BookingResponse(
@@ -65,7 +68,11 @@ public class BookingDto {
         BigDecimal creditAmountUsed,
         // Phase 7.20 — additive only; both null when no loyalty redemption was applied.
         BigDecimal loyaltyDiscountAmount,
-        Long loyaltyPointsRedeemed
+        Long loyaltyPointsRedeemed,
+        // Phase 7.25 — additive only; both null when no gift card was redeemed
+        // (or after a redemption is released/refunded).
+        BigDecimal giftCardAmountUsed,
+        String giftCardReference
     ) {}
 
     public record BookingSummaryResponse(

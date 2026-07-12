@@ -37,6 +37,7 @@ public class BookingService {
     private final LoyaltyService loyaltyService;
     private final LoyaltyRedemptionService loyaltyRedemptionService;
     private final ReferralService referralService;
+    private final GiftCardService giftCardService;
 
     private static final Set<BookingStatus> UPCOMING_STATUSES =
         EnumSet.of(BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.CHECK_IN_READY);
@@ -61,7 +62,8 @@ public class BookingService {
                           TravelCreditService travelCreditService,
                           LoyaltyService loyaltyService,
                           LoyaltyRedemptionService loyaltyRedemptionService,
-                          ReferralService referralService) {
+                          ReferralService referralService,
+                          GiftCardService giftCardService) {
         this.bookingRepo   = bookingRepo;
         this.roomRepo      = roomRepo;
         this.inventoryRepo = inventoryRepo;
@@ -75,6 +77,7 @@ public class BookingService {
         this.loyaltyService = loyaltyService;
         this.loyaltyRedemptionService = loyaltyRedemptionService;
         this.referralService = referralService;
+        this.giftCardService = giftCardService;
     }
 
     // ── Create ────────────────────────────────────────────────────────────────
@@ -198,6 +201,16 @@ public class BookingService {
             customerCouponService.markUsedForBooking(couponResult.coupon(), booking);
         if (creditAmount != null)
             travelCreditService.redeemForBooking(userId, creditAmount, booking.getCurrency(), booking.getId());
+
+        // Phase 7.25 — gift card is the LAST discount source, applied against the
+        // payable AFTER travel credits (finalPrice above already reflects promotion,
+        // coupon and credits). redeemForBooking clamps to min(balance, payable),
+        // writes the REDEMPTION ledger row, reduces booking.finalPrice and records
+        // the masked reference — all inside this same transaction, so any failure
+        // here (e.g. wrong currency / non-redeemable card) rolls the whole booking
+        // back and no gift-card balance is burned.
+        if (req.giftCardCode() != null && !req.giftCardCode().isBlank())
+            giftCardService.redeemForBooking(userId, req.giftCardCode(), booking);
 
         return toResponse(booking);
     }
@@ -507,6 +520,10 @@ public class BookingService {
         // Phase 7.20 — restore loyalty points for an active redemption on this booking
         // (RESERVED → RELEASED, APPLIED → REFUNDED). Idempotent; no-op when none exists.
         loyaltyRedemptionService.onBookingCancelled(booking.getId());
+        // Phase 7.25 — refund any gift-card value redeemed on this booking (restore
+        // balance + REFUND ledger row). Idempotent (shares the single refund key with
+        // the payment-failure release path); no-op when nothing is (still) redeemed.
+        giftCardService.refundForBooking(booking.getId());
     }
 
     private BookingTimelineResponse buildTimeline(Booking b) {
@@ -561,7 +578,8 @@ public class BookingService {
             b.getCompletedAt(), b.getArchivedAt(),
             b.getLastStatusChangedAt(), b.getCancelReason(),
             b.getCouponCode(), b.getCouponDiscountAmount(), b.getCreditAmountUsed(),
-            b.getLoyaltyDiscountAmount(), b.getLoyaltyPointsRedeemed()
+            b.getLoyaltyDiscountAmount(), b.getLoyaltyPointsRedeemed(),
+            b.getGiftCardAmountUsed(), b.getGiftCardReference()
         );
     }
 
