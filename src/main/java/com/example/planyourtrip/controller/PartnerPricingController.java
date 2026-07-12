@@ -1,8 +1,7 @@
 package com.example.planyourtrip.controller;
 
 import com.example.planyourtrip.dto.PromotionDto.PricingBreakdownResponse;
-import com.example.planyourtrip.dto.RatePlanDto.RatePlanRequest;
-import com.example.planyourtrip.dto.RatePlanDto.RatePlanResponse;
+import com.example.planyourtrip.dto.RatePlanDto.*;
 import com.example.planyourtrip.security.AuthUser;
 import com.example.planyourtrip.service.PartnerPricingService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -61,5 +60,74 @@ public class PartnerPricingController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkIn,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOut) {
         return service.getPricingPreview(uid, roomId, checkIn, checkOut);
+    }
+
+    // ── Phase 7.29 — advanced rate-plan management ────────────────────────────
+
+    @PostMapping("/api/partner/rate-plans/{id}/activate")
+    @Operation(summary = "Activate a rate plan I own")
+    public RatePlanResponse activate(@AuthUser Long uid, @PathVariable Long id) {
+        return service.activateRatePlan(uid, id, true);
+    }
+
+    @PostMapping("/api/partner/rate-plans/{id}/deactivate")
+    @Operation(summary = "Deactivate a rate plan I own")
+    public RatePlanResponse deactivate(@AuthUser Long uid, @PathVariable Long id) {
+        return service.activateRatePlan(uid, id, false);
+    }
+
+    @PostMapping("/api/partner/rate-plans/{id}/duplicate")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Duplicate a rate plan I own")
+    public RatePlanResponse duplicate(@AuthUser Long uid, @PathVariable Long id,
+                                      @RequestBody(required = false) RatePlanDuplicateRequest req) {
+        return service.duplicateRatePlan(uid, id, req);
+    }
+
+    @GetMapping("/api/partner/rate-plans/{id}/occupancy-prices")
+    @Operation(summary = "List occupancy prices for a rate plan I own")
+    public List<RatePlanOccupancyPriceResponse> listOccupancyPrices(@AuthUser Long uid, @PathVariable Long id) {
+        return service.getOccupancyPrices(uid, id);
+    }
+
+    @PostMapping("/api/partner/rate-plans/{id}/occupancy-prices")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Add an occupancy price to a rate plan I own")
+    public RatePlanOccupancyPriceResponse addOccupancyPrice(@AuthUser Long uid, @PathVariable Long id,
+                                                            @Valid @RequestBody RatePlanOccupancyPriceRequest req) {
+        return service.addOccupancyPrice(uid, id, req);
+    }
+
+    @PutMapping("/api/partner/rate-plan-occupancy-prices/{id}")
+    @Operation(summary = "Update an occupancy price on a rate plan I own")
+    public RatePlanOccupancyPriceResponse updateOccupancyPrice(@AuthUser Long uid, @PathVariable Long id,
+                                                               @Valid @RequestBody RatePlanOccupancyPriceRequest req) {
+        return service.updateOccupancyPrice(uid, id, req);
+    }
+
+    @DeleteMapping("/api/partner/rate-plan-occupancy-prices/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Delete an occupancy price on a rate plan I own")
+    public void deleteOccupancyPrice(@AuthUser Long uid, @PathVariable Long id) {
+        service.deleteOccupancyPrice(uid, id);
+    }
+
+    @GetMapping("/api/partner/rate-plans/{id}/preview")
+    @Operation(summary = "Preview rate-plan pricing/eligibility for a stay")
+    public RatePlanPricingBreakdownResponse ratePlanPreview(
+            @AuthUser Long uid, @PathVariable Long id,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkIn,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOut,
+            @RequestParam(defaultValue = "2") int adults,
+            @RequestParam(defaultValue = "0") int children,
+            @RequestParam(defaultValue = "0") int extraBeds) {
+        return service.previewRatePlan(uid, id, checkIn, checkOut, adults, children, extraBeds);
+    }
+
+    @PostMapping("/api/partner/rate-plans/{id}/validate")
+    @Operation(summary = "Validate rate-plan eligibility for a stay")
+    public RatePlanEligibilityResponse validate(@AuthUser Long uid, @PathVariable Long id,
+                                                @Valid @RequestBody RatePlanEligibilityRequest req) {
+        return service.validateRatePlan(uid, id, req);
     }
 }

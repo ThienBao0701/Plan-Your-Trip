@@ -33,7 +33,13 @@ public class BookingDto {
         @DecimalMin(value = "0.0", inclusive = false) BigDecimal creditAmount,
         // Phase 7.25 — optional gift-card code redeemed at checkout AFTER travel
         // credits (auto-clamped to min(balance, remaining payable); ignored when absent).
-        String giftCardCode
+        String giftCardCode,
+        // Phase 7.29 — optional explicit rate plan selection + extra beds. When
+        // ratePlanId is provided it is validated for eligibility (else 422) and its
+        // terms are snapshotted onto the booking; when omitted the best eligible plan
+        // is snapshotted. Both ignored (null/0) for the pre-7.29 payload.
+        Long ratePlanId,
+        Integer extraBeds
     ) {}
 
     public record BookingResponse(
@@ -72,7 +78,17 @@ public class BookingDto {
         // Phase 7.25 — additive only; both null when no gift card was redeemed
         // (or after a redemption is released/refunded).
         BigDecimal giftCardAmountUsed,
-        String giftCardReference
+        String giftCardReference,
+        // Phase 7.29 — additive only; all null when no rate plan was resolved for the booking.
+        Long selectedRatePlanId,
+        String selectedRatePlanCode,
+        String selectedRatePlanName,
+        String mealPlanType,
+        String cancellationPolicyType,
+        Instant cancellationDeadlineAt,
+        Boolean refundable,
+        BigDecimal nightlyRateSnapshot,
+        BigDecimal ratePlanAdjustmentSnapshot
     ) {}
 
     public record BookingSummaryResponse(

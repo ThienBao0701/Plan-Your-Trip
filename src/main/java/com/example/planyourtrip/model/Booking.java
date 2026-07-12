@@ -120,6 +120,43 @@ public class Booking {
     @Column(name = "gift_card_reference", length = 32)
     private String giftCardReference;
 
+    // ── Phase 7.29 — Rate-plan snapshot ──────────────────────────────────────
+    // All nullable and null for every booking made without a resolvable rate plan,
+    // so pre-7.29 bookings and the plain checkout flow are unchanged. These are a
+    // POINT-IN-TIME SNAPSHOT: later edits to the rate plan never mutate historical
+    // bookings. They are informational terms captured alongside the authoritative
+    // charged total (which continues to flow through the untouched pricing/discount
+    // chain — see BookingService.create).
+
+    @Column(name = "selected_rate_plan_id")
+    private Long selectedRatePlanId;
+
+    @Column(name = "selected_rate_plan_code", length = 60)
+    private String selectedRatePlanCode;
+
+    @Column(name = "selected_rate_plan_name")
+    private String selectedRatePlanName;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "rate_plan_meal_plan_type", length = 20)
+    private MealPlanType mealPlanType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "rate_plan_cancellation_policy_type", length = 30)
+    private CancellationPolicyType cancellationPolicyType;
+
+    @Column(name = "rate_plan_cancellation_deadline_at")
+    private Instant cancellationDeadlineAt;
+
+    @Column(name = "rate_plan_refundable")
+    private Boolean refundable;
+
+    @Column(name = "rate_plan_nightly_rate_snapshot", precision = 15, scale = 2)
+    private BigDecimal nightlyRateSnapshot;
+
+    @Column(name = "rate_plan_adjustment_snapshot", precision = 15, scale = 2)
+    private BigDecimal ratePlanAdjustmentSnapshot;
+
     @Column(columnDefinition = "TEXT")
     private String specialRequest;
 

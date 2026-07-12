@@ -43,6 +43,7 @@ public class DataInitializer implements ApplicationRunner {
     private final HotelServiceRepository hotelServiceRepo;
     private final RoomInventoryRepository roomInventoryRepo;
     private final RatePlanRepository ratePlanRepo;
+    private final com.example.planyourtrip.repository.RatePlanOccupancyPriceRepository ratePlanOccupancyPriceRepo;
     private final PromotionRepository promotionRepo;
     private final BookingRepository bookingRepo;
     private final PaymentRepository paymentRepo;
@@ -82,6 +83,7 @@ public class DataInitializer implements ApplicationRunner {
                            HotelServiceRepository hotelServiceRepo,
                            RoomInventoryRepository roomInventoryRepo,
                            RatePlanRepository ratePlanRepo,
+                           com.example.planyourtrip.repository.RatePlanOccupancyPriceRepository ratePlanOccupancyPriceRepo,
                            PromotionRepository promotionRepo,
                            BookingRepository bookingRepo,
                            PaymentRepository paymentRepo,
@@ -121,6 +123,7 @@ public class DataInitializer implements ApplicationRunner {
         this.hotelServiceRepo     = hotelServiceRepo;
         this.roomInventoryRepo    = roomInventoryRepo;
         this.ratePlanRepo         = ratePlanRepo;
+        this.ratePlanOccupancyPriceRepo = ratePlanOccupancyPriceRepo;
         this.promotionRepo        = promotionRepo;
         this.bookingRepo          = bookingRepo;
         this.paymentRepo          = paymentRepo;
@@ -159,6 +162,7 @@ public class DataInitializer implements ApplicationRunner {
         seedHotelExperience();
         seedRoomInventory();
         seedRatePlans();
+        seedAdvancedRatePlans();
         seedPromotions();
         seedBookings();
         seedPayments();
@@ -1423,6 +1427,110 @@ public class DataInitializer implements ApplicationRunner {
         plan.setStartDate(start);
         plan.setEndDate(end);
         ratePlanRepo.save(plan);
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // ADVANCED RATE PLANS (Phase 7.29) — restart-safe by per-room code
+    // ─────────────────────────────────────────────────────────────
+    //
+    // Seeded on STD-TWIN. All prices are >= 900,000 so the existing "Summer Deal"
+    // (800,000) remains the cheapest plan — the min-price pick used by the
+    // untouched PricingEngineService/AvailabilityService is therefore unchanged.
+
+    private void seedAdvancedRatePlans() {
+        Place place = placeRepo.findBySlug("grand-palace-hotel-vung-tau").orElse(null);
+        if (place == null) return;
+        HotelDetail detail = hotelDetailRepo.findByPlaceId(place.getId()).orElse(null);
+        if (detail == null) return;
+        HotelRoom room = hotelRoomRepo.findAllByHotelDetailId(detail.getId())
+            .stream().filter(r -> "STD-TWIN".equals(r.getRoomCode())).findFirst().orElse(null);
+        if (room == null) return;
+
+        java.time.LocalDate today = java.time.LocalDate.now();
+        java.time.LocalDate end = today.plusDays(180);
+
+        // 1. Flexible Room Only — BASE, free cancellation.
+        RatePlan flexible = advancedPlanByCode(room, "FLEX-RO");
+        if (flexible == null) {
+            flexible = new RatePlan();
+            flexible.setHotelRoom(room);
+            flexible.setCode("FLEX-RO");
+            flexible.setRateName("Flexible Room Only");
+            flexible.setRateType(RatePlanType.STANDARD);
+            flexible.setPricePerNight(new BigDecimal("1000000.00"));
+            flexible.setStartDate(today);
+            flexible.setEndDate(end);
+            flexible.setMealPlanType(com.example.planyourtrip.model.MealPlanType.ROOM_ONLY);
+            flexible.setCancellationPolicyType(com.example.planyourtrip.model.CancellationPolicyType.FREE_CANCELLATION);
+            flexible.setCancellationDeadlineHours(48);
+            flexible.setRefundable(true);
+            flexible.setSourceType(com.example.planyourtrip.model.RateSourceType.BASE);
+            flexible.setPriority(10);
+            flexible.setOccupancyPricingEnabled(true);
+            flexible.setChildPricingEnabled(true);
+            flexible.setExtraBedPrice(new BigDecimal("200000.00"));
+            flexible = ratePlanRepo.save(flexible);
+
+            // 4. Occupancy price for 2 adults + 1 child on the flexible plan.
+            if (!ratePlanOccupancyPriceRepo.existsByRatePlanIdAndAdultsAndChildren(flexible.getId(), 2, 1)) {
+                com.example.planyourtrip.model.RatePlanOccupancyPrice op =
+                    new com.example.planyourtrip.model.RatePlanOccupancyPrice();
+                op.setRatePlan(flexible);
+                op.setAdults(2);
+                op.setChildren(1);
+                op.setPricePerNight(new BigDecimal("1100000.00"));
+                op.setChildSupplement(new BigDecimal("150000.00"));
+                op.setExtraBedSupplement(new BigDecimal("200000.00"));
+                ratePlanOccupancyPriceRepo.save(op);
+            }
+        }
+
+        // 2. Non-refundable -10% — DERIVED from Flexible.
+        if (advancedPlanByCode(room, "NONREF-10") == null) {
+            RatePlan nonref = new RatePlan();
+            nonref.setHotelRoom(room);
+            nonref.setCode("NONREF-10");
+            nonref.setRateName("Non-refundable");
+            nonref.setRateType(RatePlanType.PROMOTIONAL);
+            nonref.setPricePerNight(new BigDecimal("900000.00"));
+            nonref.setStartDate(today);
+            nonref.setEndDate(end);
+            nonref.setMealPlanType(com.example.planyourtrip.model.MealPlanType.ROOM_ONLY);
+            nonref.setCancellationPolicyType(com.example.planyourtrip.model.CancellationPolicyType.NON_REFUNDABLE);
+            nonref.setRefundable(false);
+            nonref.setSourceType(com.example.planyourtrip.model.RateSourceType.DERIVED);
+            nonref.setParentRatePlan(flexible);
+            nonref.setAdjustmentType(com.example.planyourtrip.model.RateAdjustmentType.PERCENTAGE);
+            nonref.setAdjustmentValue(new BigDecimal("-10.00"));
+            nonref.setPriority(20);
+            ratePlanRepo.save(nonref);
+        }
+
+        // 3. Breakfast Included +150,000 — DERIVED from Flexible.
+        if (advancedPlanByCode(room, "BRKFST") == null) {
+            RatePlan breakfast = new RatePlan();
+            breakfast.setHotelRoom(room);
+            breakfast.setCode("BRKFST");
+            breakfast.setRateName("Breakfast Included");
+            breakfast.setRateType(RatePlanType.STANDARD);
+            breakfast.setPricePerNight(new BigDecimal("1150000.00"));
+            breakfast.setStartDate(today);
+            breakfast.setEndDate(end);
+            breakfast.setMealPlanType(com.example.planyourtrip.model.MealPlanType.BREAKFAST);
+            breakfast.setCancellationPolicyType(com.example.planyourtrip.model.CancellationPolicyType.FREE_CANCELLATION);
+            breakfast.setCancellationDeadlineHours(24);
+            breakfast.setRefundable(true);
+            breakfast.setSourceType(com.example.planyourtrip.model.RateSourceType.DERIVED);
+            breakfast.setParentRatePlan(flexible);
+            breakfast.setAdjustmentType(com.example.planyourtrip.model.RateAdjustmentType.FIXED_AMOUNT);
+            breakfast.setAdjustmentValue(new BigDecimal("150000.00"));
+            breakfast.setPriority(15);
+            ratePlanRepo.save(breakfast);
+        }
+    }
+
+    private RatePlan advancedPlanByCode(HotelRoom room, String code) {
+        return ratePlanRepo.findByHotelRoomIdAndCodeIgnoreCase(room.getId(), code).orElse(null);
     }
 
     private void roomFor(HotelDetail detail, String code,

@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface RatePlanRepository extends JpaRepository<RatePlan, Long> {
 
@@ -20,4 +21,20 @@ public interface RatePlanRepository extends JpaRepository<RatePlan, Long> {
     List<RatePlan> findActiveForStay(@Param("roomId") Long roomId,
                                       @Param("checkIn") LocalDate checkIn,
                                       @Param("lastNight") LocalDate lastNight);
+
+    // ── Phase 7.29 ────────────────────────────────────────────────────────────
+
+    List<RatePlan> findByHotelRoomId(Long roomId);
+
+    /** Case-insensitive per-room code lookup for uniqueness enforcement. */
+    @Query("SELECT rp FROM RatePlan rp WHERE rp.hotelRoom.id = :roomId " +
+           "AND LOWER(rp.code) = LOWER(:code)")
+    Optional<RatePlan> findByHotelRoomIdAndCodeIgnoreCase(@Param("roomId") Long roomId,
+                                                          @Param("code") String code);
+
+    /** Derived children referencing a parent — used to gate parent deactivation/deletion. */
+    List<RatePlan> findByParentRatePlanId(Long parentId);
+
+    /** Global admin listing, newest first. */
+    List<RatePlan> findAllByOrderByIdDesc();
 }

@@ -1,8 +1,7 @@
 package com.example.planyourtrip.service;
 
 import com.example.planyourtrip.dto.PromotionDto.PricingBreakdownResponse;
-import com.example.planyourtrip.dto.RatePlanDto.RatePlanRequest;
-import com.example.planyourtrip.dto.RatePlanDto.RatePlanResponse;
+import com.example.planyourtrip.dto.RatePlanDto.*;
 import com.example.planyourtrip.exception.ApiException;
 import com.example.planyourtrip.model.HotelRoom;
 import com.example.planyourtrip.model.NotificationType;
@@ -10,6 +9,7 @@ import com.example.planyourtrip.model.PartnerProfile;
 import com.example.planyourtrip.model.PartnerVerificationStatus;
 import com.example.planyourtrip.model.Priority;
 import com.example.planyourtrip.model.RatePlan;
+import com.example.planyourtrip.model.RatePlanOccupancyPrice;
 import com.example.planyourtrip.model.RelatedEntityType;
 import com.example.planyourtrip.repository.HotelRoomRepository;
 import com.example.planyourtrip.repository.PartnerProfileRepository;
@@ -28,6 +28,7 @@ public class PartnerPricingService {
     private final HotelRoomRepository rooms;
     private final RatePlanRepository ratePlanRepo;
     private final RatePlanService ratePlanService;
+    private final RatePlanPricingService ratePlanPricingService;
     private final PricingEngineService pricingEngineService;
     private final NotificationService notificationService;
     private final PartnerActivityLogService activityLogService;
@@ -36,6 +37,7 @@ public class PartnerPricingService {
                                   HotelRoomRepository rooms,
                                   RatePlanRepository ratePlanRepo,
                                   RatePlanService ratePlanService,
+                                  RatePlanPricingService ratePlanPricingService,
                                   PricingEngineService pricingEngineService,
                                   NotificationService notificationService,
                                   PartnerActivityLogService activityLogService) {
@@ -43,6 +45,7 @@ public class PartnerPricingService {
         this.rooms = rooms;
         this.ratePlanRepo = ratePlanRepo;
         this.ratePlanService = ratePlanService;
+        this.ratePlanPricingService = ratePlanPricingService;
         this.pricingEngineService = pricingEngineService;
         this.notificationService = notificationService;
         this.activityLogService = activityLogService;
@@ -89,6 +92,74 @@ public class PartnerPricingService {
         PartnerProfile profile = myApprovedProfileOrThrow(userId);
         ownedRoomOrThrow(roomId, profile.getId());
         return pricingEngineService.calculate(roomId, checkIn, checkOut);
+    }
+
+    // ── Phase 7.29 — advanced rate-plan management (owner-scoped) ──────────────
+
+    @Transactional
+    public RatePlanResponse activateRatePlan(Long userId, Long ratePlanId, boolean active) {
+        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        RatePlan plan = ownedRatePlanOrThrow(ratePlanId, profile.getId());
+        RatePlanResponse res = ratePlanService.setActive(ratePlanId, active);
+        notifyRatePlanUpdated(plan.getHotelRoom());
+        return res;
+    }
+
+    @Transactional
+    public RatePlanResponse duplicateRatePlan(Long userId, Long ratePlanId, RatePlanDuplicateRequest req) {
+        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        RatePlan plan = ownedRatePlanOrThrow(ratePlanId, profile.getId());
+        RatePlanResponse res = ratePlanService.duplicate(ratePlanId, req);
+        notifyRatePlanUpdated(plan.getHotelRoom());
+        return res;
+    }
+
+    @Transactional(readOnly = true)
+    public List<RatePlanOccupancyPriceResponse> getOccupancyPrices(Long userId, Long ratePlanId) {
+        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        ownedRatePlanOrThrow(ratePlanId, profile.getId());
+        return ratePlanService.getOccupancyPrices(ratePlanId);
+    }
+
+    @Transactional
+    public RatePlanOccupancyPriceResponse addOccupancyPrice(Long userId, Long ratePlanId, RatePlanOccupancyPriceRequest req) {
+        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        ownedRatePlanOrThrow(ratePlanId, profile.getId());
+        return ratePlanService.addOccupancyPrice(ratePlanId, req);
+    }
+
+    @Transactional
+    public RatePlanOccupancyPriceResponse updateOccupancyPrice(Long userId, Long occupancyPriceId, RatePlanOccupancyPriceRequest req) {
+        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        ownedOccupancyPriceOrThrow(occupancyPriceId, profile.getId());
+        return ratePlanService.updateOccupancyPrice(occupancyPriceId, req);
+    }
+
+    @Transactional
+    public void deleteOccupancyPrice(Long userId, Long occupancyPriceId) {
+        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        ownedOccupancyPriceOrThrow(occupancyPriceId, profile.getId());
+        ratePlanService.deleteOccupancyPrice(occupancyPriceId);
+    }
+
+    @Transactional(readOnly = true)
+    public RatePlanPricingBreakdownResponse previewRatePlan(Long userId, Long ratePlanId, LocalDate checkIn,
+                                                            LocalDate checkOut, int adults, int children, int extraBeds) {
+        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        ownedRatePlanOrThrow(ratePlanId, profile.getId());
+        return ratePlanPricingService.previewByPlan(ratePlanId, checkIn, checkOut, adults, children, extraBeds);
+    }
+
+    @Transactional(readOnly = true)
+    public RatePlanEligibilityResponse validateRatePlan(Long userId, Long ratePlanId, RatePlanEligibilityRequest req) {
+        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        ownedRatePlanOrThrow(ratePlanId, profile.getId());
+        return ratePlanPricingService.validate(ratePlanId, req);
+    }
+
+    private RatePlan ownedOccupancyPriceOrThrow(Long occupancyPriceId, Long ownerId) {
+        RatePlanOccupancyPrice op = ratePlanService.occupancyPriceOrThrow(occupancyPriceId);
+        return ownedRatePlanOrThrow(op.getRatePlan().getId(), ownerId);
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

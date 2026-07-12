@@ -54,6 +54,9 @@ public class SecurityConfig {
                     "/api/places",
                     "/api/places/**",
                     "/api/rooms/*/pricing",
+                    // Phase 7.29 — public rate-plan listing / pricing preview / cancellation preview
+                    "/api/rooms/*/rate-plans",
+                    "/api/rooms/*/rate-plans/**",
                     "/api/trips/public/**"
                 ).permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")

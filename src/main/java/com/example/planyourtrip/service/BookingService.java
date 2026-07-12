@@ -39,6 +39,7 @@ public class BookingService {
     private final ReferralService referralService;
     private final GiftCardService giftCardService;
     private final InventoryReservationService inventoryReservationService;
+    private final RatePlanPricingService ratePlanPricingService;
 
     private static final Set<BookingStatus> UPCOMING_STATUSES =
         EnumSet.of(BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.CHECK_IN_READY);
@@ -65,7 +66,8 @@ public class BookingService {
                           LoyaltyRedemptionService loyaltyRedemptionService,
                           ReferralService referralService,
                           GiftCardService giftCardService,
-                          InventoryReservationService inventoryReservationService) {
+                          InventoryReservationService inventoryReservationService,
+                          RatePlanPricingService ratePlanPricingService) {
         this.bookingRepo   = bookingRepo;
         this.roomRepo      = roomRepo;
         this.inventoryRepo = inventoryRepo;
@@ -81,6 +83,7 @@ public class BookingService {
         this.referralService = referralService;
         this.giftCardService = giftCardService;
         this.inventoryReservationService = inventoryReservationService;
+        this.ratePlanPricingService = ratePlanPricingService;
     }
 
     // ── Create ────────────────────────────────────────────────────────────────
@@ -127,6 +130,17 @@ public class BookingService {
                 "Insufficient inventory for the selected dates");
 
         var pricing = pricingEngine.calculate(req.roomId(), req.checkIn(), req.checkOut());
+
+        // Phase 7.29 — resolve the rate plan to SNAPSHOT onto this booking. The authoritative
+        // charged total continues to flow through `pricing` above and the untouched customer-
+        // discount chain below (base→ratePlan→promotion→coupon→loyalty→credit→gift card); this
+        // resolution adds the rate-plan terms snapshot only. When req.ratePlanId() is supplied it
+        // is validated for eligibility here (throws 422 before any inventory mutation); when
+        // omitted the best eligible plan is snapshotted (or none). Inventory is NOT re-checked
+        // (availability already confirmed under the Phase 7.28 lock above).
+        int extraBeds = req.extraBeds() != null ? req.extraBeds() : 0;
+        var rateResolution = ratePlanPricingService.resolveForBooking(
+            room, req.ratePlanId(), req.checkIn(), req.checkOut(), req.adults(), children, extraBeds);
 
         User user = userRepo.findById(userId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
@@ -193,6 +207,22 @@ public class BookingService {
             .max(BigDecimal.ZERO)
             .setScale(2, RoundingMode.HALF_UP));
         booking.setSpecialRequest(req.specialRequest());
+
+        // Phase 7.29 — persist the immutable rate-plan snapshot (point-in-time; later plan
+        // edits never mutate this booking). Left null when no plan was resolved.
+        if (rateResolution.isPresent()) {
+            var r = rateResolution.get();
+            var plan = r.plan();
+            booking.setSelectedRatePlanId(plan.getId());
+            booking.setSelectedRatePlanCode(plan.getCode());
+            booking.setSelectedRatePlanName(plan.getRateName());
+            booking.setMealPlanType(plan.getMealPlanType());
+            booking.setCancellationPolicyType(plan.getCancellationPolicyType());
+            booking.setCancellationDeadlineAt(r.cancellationDeadlineAt());
+            booking.setRefundable(plan.isRefundable());
+            booking.setNightlyRateSnapshot(r.finalNightlyRate());
+            booking.setRatePlanAdjustmentSnapshot(r.ratePlanAdjustment());
+        }
 
         booking = bookingRepo.save(booking);
         booking.setBookingCode(generateCode(booking.getId()));
@@ -600,7 +630,12 @@ public class BookingService {
             b.getLastStatusChangedAt(), b.getCancelReason(),
             b.getCouponCode(), b.getCouponDiscountAmount(), b.getCreditAmountUsed(),
             b.getLoyaltyDiscountAmount(), b.getLoyaltyPointsRedeemed(),
-            b.getGiftCardAmountUsed(), b.getGiftCardReference()
+            b.getGiftCardAmountUsed(), b.getGiftCardReference(),
+            b.getSelectedRatePlanId(), b.getSelectedRatePlanCode(), b.getSelectedRatePlanName(),
+            b.getMealPlanType() != null ? b.getMealPlanType().name() : null,
+            b.getCancellationPolicyType() != null ? b.getCancellationPolicyType().name() : null,
+            b.getCancellationDeadlineAt(), b.getRefundable(),
+            b.getNightlyRateSnapshot(), b.getRatePlanAdjustmentSnapshot()
         );
     }
 
