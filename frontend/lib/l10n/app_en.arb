@@ -1,0 +1,56 @@
+{
+  "@@locale": "en",
+  "appTitle": "Plan Your Trip",
+  "tabExplore": "Explore",
+  "tabTrips": "Trips",
+  "tabPlanner": "Planner",
+  "tabProfile": "Profile",
+  "tabExploreSemantic": "Explore tab",
+  "tabTripsSemantic": "Trips tab",
+  "tabPlannerSemantic": "Planner tab",
+  "tabProfileSemantic": "Profile tab",
+  "bottomNavigationSemantic": "Primary navigation",
+  "loadingTitle": "Loading",
+  "loadingMessage": "Preparing your journey...",
+  "loadingSemanticLabel": "Content is loading",
+  "emptyTitle": "No data yet",
+  "emptyMessage": "Content will appear here when you get started.",
+  "emptyAction": "Explore now",
+  "emptyStateSemanticLabel": "Empty state",
+  "offlineTitle": "You are offline",
+  "offlineMessage": "Check your connection and try again.",
+  "offlineAction": "Try again",
+  "offlineStateSemanticLabel": "Offline state",
+  "errorTitle": "Something went wrong",
+  "errorMessage": "We could not load this content.",
+  "errorAction": "Reload",
+  "errorStateSemanticLabel": "Recoverable error",
+  "sessionExpiredTitle": "Session expired",
+  "sessionExpiredMessage": "Sign in again to continue. Unsaved local changes are kept.",
+  "sessionExpiredLoginAction": "Log in again",
+  "sessionExpiredHomeAction": "Return home",
+  "sessionExpiredSemanticLabel": "Session expired",
+  "searchFieldSemanticLabel": "Search",
+  "plannerTitle": "Planner",
+  "plannerSubtitle": "Open a trip timeline and continue planning.",
+  "plannerEmptyTitle": "No trips to plan yet",
+  "plannerEmptyMessage": "Create a trip before building a timeline.",
+  "plannerCreateTripAction": "Create a trip",
+  "plannerOpenTimelineAction": "Open timeline",
+  "plannerTripMeta": "{destination} · {days, plural, =1{1 day} other{{days} days}} · {travelers, plural, =1{1 traveler} other{{travelers} travelers}}",
+  "@plannerTripMeta": {
+    "placeholders": {
+      "destination": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      },
+      "travelers": {
+        "type": "int"
+      }
+    }
+  },
+  "plannerTripCardSemantic": "Trip planner card",
+  "demoModeLabel": "Demo Mode"
+}

@@ -2,21 +2,29 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
 class AppTypography {
-  static const font = 'Roboto';
+  const AppTypography._();
 
-  static TextTheme textTheme = const TextTheme(
+  static const String? fontFamily = null;
+  static const fontFallback = <String>[
+    'Segoe UI',
+    'Roboto',
+    'Arial',
+    'sans-serif',
+  ];
+
+  static const TextTheme textTheme = TextTheme(
     displaySmall: TextStyle(
         fontSize: 38,
         height: 1.05,
         fontWeight: FontWeight.w900,
         color: AppColors.midnight,
-        letterSpacing: -1.2),
+        letterSpacing: 0),
     headlineMedium: TextStyle(
         fontSize: 28,
         height: 1.12,
         fontWeight: FontWeight.w800,
         color: AppColors.midnight,
-        letterSpacing: -0.8),
+        letterSpacing: 0),
     titleLarge: TextStyle(
         fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.ink),
     titleMedium: TextStyle(

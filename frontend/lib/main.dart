@@ -3,6 +3,7 @@ import 'core/app_state.dart';
 import 'design/app_theme.dart';
 import 'features/auth/onboarding_screen.dart';
 import 'features/home/app_shell.dart';
+import 'l10n/app_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,8 +19,10 @@ class PlanYourTripApp extends StatelessWidget {
     final app = AppScope.of(context);
     return MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Plan Your Trip',
+        onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
         theme: AppTheme.light(),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         home: app.email == null ? const OnboardingScreen() : const AppShell());
   }
 }

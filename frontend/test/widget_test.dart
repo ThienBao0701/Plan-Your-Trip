@@ -8,9 +8,12 @@ import 'package:planyourtrip_frontend/core/app_state.dart';
 import 'package:planyourtrip_frontend/core/mock/app_models.dart';
 import 'package:planyourtrip_frontend/core/mock/mock_data.dart';
 import 'package:planyourtrip_frontend/core/network/api_client.dart';
+import 'package:planyourtrip_frontend/design/app_theme.dart';
 import 'package:planyourtrip_frontend/features/home/app_shell.dart';
+import 'package:planyourtrip_frontend/l10n/app_localizations.dart';
 import 'package:planyourtrip_frontend/main.dart';
 import 'package:planyourtrip_frontend/shared/widgets/add_to_trip_sheet.dart';
+import 'package:planyourtrip_frontend/shared/widgets/glass_widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -27,13 +30,61 @@ void main() {
     addTearDown(() => FlutterError.onError = originalOnError);
   }
 
-  Future<void> pumpTall(WidgetTester tester, Widget widget) async {
+  Future<void> pumpTall(
+    WidgetTester tester,
+    Widget widget, {
+    bool settle = true,
+  }) async {
     tester.view.physicalSize = const Size(900, 1400);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(widget);
+    if (settle) {
+      await tester.pumpAndSettle();
+    } else {
+      await tester.pump();
+    }
+  }
+
+  Future<void> pumpSize(
+    WidgetTester tester,
+    Widget widget,
+    Size size,
+  ) async {
+    tester.view.physicalSize = size;
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(widget);
     await tester.pumpAndSettle();
+  }
+
+  Widget localizedApp({
+    required Widget child,
+    AppState? app,
+    Locale? locale,
+    double textScaleFactor = 1,
+  }) {
+    return AppScope(
+      notifier: app ?? AppState(),
+      child: MaterialApp(
+        theme: AppTheme.light(),
+        locale: locale,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        builder: (context, child) {
+          final media = MediaQuery.of(context);
+          return MediaQuery(
+            data: media.copyWith(
+              textScaler: TextScaler.linear(textScaleFactor),
+            ),
+            child: child!,
+          );
+        },
+        home: child,
+      ),
+    );
   }
 
   testWidgets('Plan Your Trip app starts', (tester) async {
@@ -63,7 +114,10 @@ void main() {
 
     expect(app.demoMode, isTrue);
     expect(app.email, MockData.demoEmail);
-    expect(find.textContaining('Where will you'), findsOneWidget);
+    expect(
+      find.textContaining('Where will you', skipOffstage: false),
+      findsOneWidget,
+    );
   });
 
   test('real login failure does not enable demo mode', () async {
@@ -182,18 +236,253 @@ void main() {
 
     await pumpTall(
       tester,
-      AppScope(
-          notifier: AppState(), child: const MaterialApp(home: AppShell())),
+      localizedApp(child: const AppShell()),
     );
 
-    await tester.enterText(find.byType(TextField).first, 'Ha Noi');
-    await tester.tap(find.text('Places'));
+    final initialField = tester.widget<TextField>(
+      find.byType(TextField, skipOffstage: false).first,
+    );
+    initialField.controller!.text = 'Ha Noi';
+    await tester.pump();
+    await tester.tap(find.text('Trips'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Home'));
+    await tester.tap(find.text('Explore'));
     await tester.pumpAndSettle();
 
-    final field = tester.widget<TextField>(find.byType(TextField).first);
+    final field = tester.widget<TextField>(
+      find.byType(TextField, skipOffstage: false).first,
+    );
     expect(field.controller?.text, 'Ha Noi');
+  });
+
+  testWidgets('four-tab shell renders expected destinations', (tester) async {
+    ignoreNetworkImageErrors();
+
+    await pumpTall(tester, localizedApp(child: const AppShell()));
+
+    expect(
+      find.textContaining('Where will you', skipOffstage: false),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.text('Trips'));
+    await tester.pumpAndSettle();
+    expect(find.text('My trips', skipOffstage: false), findsOneWidget);
+
+    await tester.tap(find.text('Planner'));
+    await tester.pumpAndSettle();
+    expect(
+      find.text(
+        'Open a trip timeline and continue planning.',
+        skipOffstage: false,
+      ),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.text('Profile'));
+    await tester.pumpAndSettle();
+    expect(
+      find.text('Traveler', skipOffstage: false),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('shell does not overflow on a narrow phone viewport',
+      (tester) async {
+    ignoreNetworkImageErrors();
+
+    await pumpSize(
+      tester,
+      localizedApp(child: const AppShell()),
+      const Size(320, 680),
+    );
+
+    expect(find.text('Explore'), findsOneWidget);
+    expect(find.text('Profile'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('shell constrains content on a wide viewport', (tester) async {
+    ignoreNetworkImageErrors();
+
+    await pumpSize(
+      tester,
+      localizedApp(child: const AppShell()),
+      const Size(1280, 820),
+    );
+
+    final firstFieldWidth =
+        tester.getSize(find.byType(TextField, skipOffstage: false).first).width;
+    expect(firstFieldWidth, lessThan(920));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('localized Vietnamese tab labels render', (tester) async {
+    ignoreNetworkImageErrors();
+
+    await pumpTall(
+      tester,
+      localizedApp(
+        child: const AppShell(),
+        locale: const Locale('vi'),
+      ),
+    );
+
+    expect(find.text('Khám phá'), findsOneWidget);
+    expect(find.text('Chuyến đi'), findsOneWidget);
+    expect(find.text('Lịch trình'), findsOneWidget);
+    expect(find.text('Hồ sơ'), findsOneWidget);
+  });
+
+  testWidgets('loading state renders semantic progress indication',
+      (tester) async {
+    final semantics = tester.ensureSemantics();
+    try {
+      await pumpTall(
+        tester,
+        localizedApp(
+          child: const Scaffold(
+            body: Center(
+              child: SizedBox(width: 420, child: OceanLoadingState()),
+            ),
+          ),
+        ),
+        settle: false,
+      );
+
+      expect(
+        find.bySemanticsLabel(RegExp('Content is loading')),
+        findsOneWidget,
+      );
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    } finally {
+      semantics.dispose();
+    }
+  });
+
+  testWidgets('empty state renders and invokes CTA', (tester) async {
+    var tapped = false;
+
+    await pumpTall(
+      tester,
+      localizedApp(
+        child: Scaffold(
+          body: Center(
+            child: SizedBox(
+              width: 420,
+              child: OceanEmptyState(
+                actionLabel: 'Explore now',
+                onAction: () => tapped = true,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('No data yet'), findsOneWidget);
+    await tester.tap(find.text('Explore now'));
+    expect(tapped, isTrue);
+  });
+
+  testWidgets('offline state invokes retry', (tester) async {
+    var retries = 0;
+
+    await pumpTall(
+      tester,
+      localizedApp(
+        child: Scaffold(
+          body: Center(
+            child: SizedBox(
+              width: 420,
+              child: OceanOfflineState(onRetry: () => retries++),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('You are offline'), findsOneWidget);
+    await tester.tap(find.text('Try again'));
+    expect(retries, 1);
+  });
+
+  testWidgets('recoverable error state invokes reload', (tester) async {
+    var reloads = 0;
+
+    await pumpTall(
+      tester,
+      localizedApp(
+        child: Scaffold(
+          body: Center(
+            child: SizedBox(
+              width: 420,
+              child: OceanRecoverableErrorState(onReload: () => reloads++),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('Something went wrong'), findsOneWidget);
+    await tester.tap(find.text('Reload'));
+    expect(reloads, 1);
+  });
+
+  testWidgets('session-expired state invokes login', (tester) async {
+    var logins = 0;
+
+    await pumpTall(
+      tester,
+      localizedApp(
+        child: Scaffold(
+          body: Center(
+            child: SizedBox(
+              width: 420,
+              child: OceanSessionExpiredState(onLogin: () => logins++),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('Session expired'), findsOneWidget);
+    await tester.tap(find.text('Log in again'));
+    expect(logins, 1);
+  });
+
+  testWidgets('shared components support increased text scaling',
+      (tester) async {
+    ignoreNetworkImageErrors();
+
+    await pumpSize(
+      tester,
+      localizedApp(
+        child: const AppShell(),
+        textScaleFactor: 1.8,
+      ),
+      const Size(360, 760),
+    );
+
+    expect(find.text('Explore'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('important shell controls expose semantic labels',
+      (tester) async {
+    ignoreNetworkImageErrors();
+    final semantics = tester.ensureSemantics();
+    try {
+      await pumpTall(tester, localizedApp(child: const AppShell()));
+
+      expect(find.bySemanticsLabel('Primary navigation'), findsOneWidget);
+      expect(find.bySemanticsLabel('Explore tab'), findsOneWidget);
+      expect(find.bySemanticsLabel('Trips tab'), findsOneWidget);
+      expect(find.bySemanticsLabel('Planner tab'), findsOneWidget);
+      expect(find.bySemanticsLabel('Profile tab'), findsOneWidget);
+    } finally {
+      semantics.dispose();
+    }
   });
 
   test('expense cannot be created without a valid trip and amount', () {

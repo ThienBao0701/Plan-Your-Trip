@@ -1,0 +1,56 @@
+{
+  "@@locale": "vi",
+  "appTitle": "Plan Your Trip",
+  "tabExplore": "Khám phá",
+  "tabTrips": "Chuyến đi",
+  "tabPlanner": "Lịch trình",
+  "tabProfile": "Hồ sơ",
+  "tabExploreSemantic": "Tab Khám phá",
+  "tabTripsSemantic": "Tab Chuyến đi",
+  "tabPlannerSemantic": "Tab Lịch trình",
+  "tabProfileSemantic": "Tab Hồ sơ",
+  "bottomNavigationSemantic": "Điều hướng chính",
+  "loadingTitle": "Đang tải",
+  "loadingMessage": "Đang chuẩn bị hành trình của bạn...",
+  "loadingSemanticLabel": "Nội dung đang tải",
+  "emptyTitle": "Chưa có dữ liệu",
+  "emptyMessage": "Nội dung sẽ xuất hiện tại đây khi bạn bắt đầu.",
+  "emptyAction": "Khám phá ngay",
+  "emptyStateSemanticLabel": "Trạng thái chưa có dữ liệu",
+  "offlineTitle": "Bạn đang ngoại tuyến",
+  "offlineMessage": "Kiểm tra kết nối mạng rồi thử lại.",
+  "offlineAction": "Thử lại",
+  "offlineStateSemanticLabel": "Trạng thái ngoại tuyến",
+  "errorTitle": "Đã xảy ra lỗi",
+  "errorMessage": "Chúng tôi chưa thể tải nội dung này.",
+  "errorAction": "Tải lại",
+  "errorStateSemanticLabel": "Lỗi có thể khôi phục",
+  "sessionExpiredTitle": "Phiên đăng nhập đã hết hạn",
+  "sessionExpiredMessage": "Đăng nhập lại để tiếp tục. Dữ liệu cục bộ chưa lưu vẫn được giữ.",
+  "sessionExpiredLoginAction": "Đăng nhập lại",
+  "sessionExpiredHomeAction": "Về trang chủ",
+  "sessionExpiredSemanticLabel": "Phiên đăng nhập đã hết hạn",
+  "searchFieldSemanticLabel": "Tìm kiếm",
+  "plannerTitle": "Lịch trình",
+  "plannerSubtitle": "Mở dòng thời gian chuyến đi và tiếp tục lên kế hoạch.",
+  "plannerEmptyTitle": "Chưa có chuyến đi để lên lịch",
+  "plannerEmptyMessage": "Tạo một chuyến đi trước khi xây dựng lịch trình.",
+  "plannerCreateTripAction": "Tạo chuyến đi",
+  "plannerOpenTimelineAction": "Mở lịch trình",
+  "plannerTripMeta": "{destination} · {days} ngày · {travelers} người",
+  "@plannerTripMeta": {
+    "placeholders": {
+      "destination": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      },
+      "travelers": {
+        "type": "int"
+      }
+    }
+  },
+  "plannerTripCardSemantic": "Thẻ lập lịch chuyến đi",
+  "demoModeLabel": "Chế độ demo"
+}
