@@ -14,4 +14,7 @@ public interface HotelRoomRepository extends JpaRepository<HotelRoom, Long> {
     boolean existsByHotelDetailIdAndRoomCode(Long hotelDetailId, String roomCode);
 
     boolean existsByHotelDetailIdAndRoomCodeAndIdNot(Long hotelDetailId, String roomCode, Long id);
+
+    /** Phase 7.37 — admin platform analytics: platform-wide count of active rooms. */
+    long countByActiveTrue();
 }
