@@ -9,13 +9,22 @@ class AppState extends ChangeNotifier {
   final ApiClient api;
   final SessionStorage storage;
   final PreferenceStorage preferences;
+  final DateTime Function() now;
+  final String Function(int sequence) _bookingCodeGenerator;
+  int _bookingSequence = 0;
+
   AppState({
     ApiClient? api,
     SessionStorage? storage,
     PreferenceStorage? preferences,
+    DateTime Function()? now,
+    String Function(int sequence)? bookingCodeGenerator,
   })  : api = api ?? ApiClient(),
         storage = storage ?? SessionStorage(),
-        preferences = preferences ?? PreferenceStorage();
+        preferences = preferences ?? PreferenceStorage(),
+        now = now ?? DateTime.now,
+        _bookingCodeGenerator = bookingCodeGenerator ??
+            ((sequence) => 'PYT-DEMO-${sequence.toString().padLeft(4, '0')}');
 
   bool demoMode = true;
   String? email;
@@ -29,6 +38,7 @@ class AppState extends ChangeNotifier {
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
+  List<DemoBooking> demoBookings = [];
   List<Category> get categories => MockData.categories;
 
   // ── Session ──────────────────────────────────────────────────────────────
@@ -76,6 +86,7 @@ class AppState extends ChangeNotifier {
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
+    demoBookings = [];
     notifyListeners();
   }
 
@@ -84,11 +95,13 @@ class AppState extends ChangeNotifier {
       trips = List.from(MockData.trips);
       timeline = List.from(MockData.timeline);
       expenses = List.from(MockData.expenses);
+      demoBookings = [];
       return;
     }
     trips = [];
     timeline = [];
     expenses = [];
+    demoBookings = [];
   }
 
   // ── Local preferences ────────────────────────────────────────────────────
@@ -280,6 +293,63 @@ class AppState extends ChangeNotifier {
   void deleteExpense(int id) {
     expenses = expenses.where((e) => e.id != id).toList();
     notifyListeners();
+  }
+
+  // ── Demo bookings ────────────────────────────────────────────────────────
+
+  String nextDemoBookingCode() {
+    _bookingSequence += 1;
+    return _bookingCodeGenerator(_bookingSequence);
+  }
+
+  bool addDemoBooking(DemoBooking booking) {
+    if (!demoMode || demoBookings.any((item) => item.code == booking.code)) {
+      return false;
+    }
+    demoBookings = [...demoBookings, booking];
+    notifyListeners();
+    return true;
+  }
+
+  bool updateDemoBooking(DemoBooking booking) {
+    if (!demoMode || !demoBookings.any((item) => item.code == booking.code)) {
+      return false;
+    }
+    demoBookings = demoBookings
+        .map((item) => item.code == booking.code ? booking : item)
+        .toList();
+    notifyListeners();
+    return true;
+  }
+
+  bool cancelDemoBooking(String code, {String? reason}) {
+    if (!demoMode) return false;
+    final index = demoBookings.indexWhere((item) => item.code == code);
+    if (index < 0 || !demoBookings[index].status.canCancel) return false;
+    final updated = demoBookings[index].copyWith(
+      status: BookingStatus.cancelled,
+      cancellationReason: reason?.trim().isEmpty == true ? null : reason,
+    );
+    demoBookings = [
+      for (var i = 0; i < demoBookings.length; i++)
+        i == index ? updated : demoBookings[i],
+    ];
+    notifyListeners();
+    return true;
+  }
+
+  bool markDemoBookingItineraryAdded(String code) {
+    if (!demoMode) return false;
+    final index = demoBookings.indexWhere((item) => item.code == code);
+    if (index < 0) return false;
+    if (demoBookings[index].itineraryAdded) return true;
+    final updated = demoBookings[index].copyWith(itineraryAdded: true);
+    demoBookings = [
+      for (var i = 0; i < demoBookings.length; i++)
+        i == index ? updated : demoBookings[i],
+    ];
+    notifyListeners();
+    return true;
   }
 
   // ── Unique ID helper ──────────────────────────────────────────────────────

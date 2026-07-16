@@ -822,6 +822,322 @@
   "expenseCategoryVisa": "Visa",
   "expenseCategoryInsurance": "Insurance",
   "expenseCategoryOther": "Other",
+  "hotelsTitle": "Hotels",
+  "hotelsSubtitle": "Search accommodation from public place data, then review one room and one local quote.",
+  "hotelsDestinationLabel": "Destination",
+  "hotelsDestinationHint": "City, hotel, or area",
+  "hotelsCheckInLabel": "Check-in",
+  "hotelsCheckOutLabel": "Check-out",
+  "hotelsAdultsLabel": "Adults",
+  "hotelsChildrenLabel": "Children",
+  "hotelsSearchAction": "Search stays",
+  "hotelsSearchSemantic": "Search hotel stays",
+  "hotelsTripPrefillLabel": "Prefilled from {trip}",
+  "@hotelsTripPrefillLabel": {
+    "placeholders": {
+      "trip": {
+        "type": "String"
+      }
+    }
+  },
+  "hotelsLocalPreviewMessage": "Hotel discovery uses local accommodation place data. Availability, quotes, and bookings are presentation-only in this UI phase.",
+  "hotelsResultCount": "{count, plural, =0{No hotels} =1{1 hotel} other{{count} hotels}}",
+  "@hotelsResultCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hotelsEmptyTitle": "No stays found",
+  "hotelsEmptyMessage": "Try a different destination or guest mix.",
+  "hotelsValidationPastCheckIn": "Check-in cannot be before today.",
+  "hotelsValidationCheckout": "Check-out must be after check-in.",
+  "hotelsValidationAdults": "At least one adult is required.",
+  "hotelsValidationChildren": "Children cannot be negative.",
+  "hotelsValidationExtraBeds": "Extra beds cannot be negative.",
+  "hotelDetailTitle": "Hotel details",
+  "hotelStars": "{stars, plural, =1{1 star} other{{stars} stars}}",
+  "@hotelStars": {
+    "placeholders": {
+      "stars": {
+        "type": "int"
+      }
+    }
+  },
+  "hotelCheckInOutMeta": "Check-in {checkIn} · Check-out {checkOut}",
+  "@hotelCheckInOutMeta": {
+    "placeholders": {
+      "checkIn": {
+        "type": "String"
+      },
+      "checkOut": {
+        "type": "String"
+      }
+    }
+  },
+  "hotelAvailableRooms": "{count, plural, =0{No matching rooms} =1{1 matching room} other{{count} matching rooms}}",
+  "@hotelAvailableRooms": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hotelBreakfastIncluded": "Breakfast",
+  "hotelAirportShuttle": "Airport shuttle",
+  "hotelDistanceBeach": "{meters} m to beach",
+  "@hotelDistanceBeach": {
+    "placeholders": {
+      "meters": {
+        "type": "int"
+      }
+    }
+  },
+  "hotelDistanceCenter": "{meters} m to city center",
+  "@hotelDistanceCenter": {
+    "placeholders": {
+      "meters": {
+        "type": "int"
+      }
+    }
+  },
+  "hotelLanguages": "Languages: {languages}",
+  "@hotelLanguages": {
+    "placeholders": {
+      "languages": {
+        "type": "String"
+      }
+    }
+  },
+  "hotelPaymentMethods": "Payment methods: {methods}",
+  "@hotelPaymentMethods": {
+    "placeholders": {
+      "methods": {
+        "type": "String"
+      }
+    }
+  },
+  "hotelFacilitiesTitle": "Facilities",
+  "hotelServicesTitle": "Services",
+  "hotelRoomPreviewTitle": "Room preview",
+  "hotelCheckAvailabilityAction": "Check availability",
+  "hotelCheckAvailabilitySemantic": "Check availability for {hotel}",
+  "@hotelCheckAvailabilitySemantic": {
+    "placeholders": {
+      "hotel": {
+        "type": "String"
+      }
+    }
+  },
+  "hotelViewRoomsAction": "View rooms",
+  "hotelCardSemantic": "Hotel card for {hotel}",
+  "@hotelCardSemantic": {
+    "placeholders": {
+      "hotel": {
+        "type": "String"
+      }
+    }
+  },
+  "hotelFromPrice": "From {price}",
+  "@hotelFromPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "hotelRoomsTitle": "Rooms and rates",
+  "hotelAvailableRoomsTitle": "Available rooms",
+  "hotelNoAvailabilityTitle": "No matching rooms",
+  "hotelNoAvailabilityMessage": "No local room result fits the selected guests. Change dates or guest count.",
+  "hotelRatePlansTitle": "Choose a rate plan",
+  "hotelContinueReviewAction": "Review booking",
+  "hotelContinueReviewSemantic": "Continue to booking review",
+  "hotelNights": "{nights, plural, =1{1 night} other{{nights} nights}}",
+  "@hotelNights": {
+    "placeholders": {
+      "nights": {
+        "type": "int"
+      }
+    }
+  },
+  "hotelGuestSummary": "{adults, plural, =1{1 adult} other{{adults} adults}} · {children, plural, =0{no children} =1{1 child} other{{children} children}}",
+  "@hotelGuestSummary": {
+    "placeholders": {
+      "adults": {
+        "type": "int"
+      },
+      "children": {
+        "type": "int"
+      }
+    }
+  },
+  "hotelOneRoomOnly": "1 room",
+  "hotelAddAdultAction": "Add adult",
+  "hotelExtendStayAction": "Add night",
+  "hotelRoomCardSemantic": "Room card for {room}",
+  "@hotelRoomCardSemantic": {
+    "placeholders": {
+      "room": {
+        "type": "String"
+      }
+    }
+  },
+  "hotelMaxGuests": "{guests, plural, =1{1 guest max} other{{guests} guests max}}",
+  "@hotelMaxGuests": {
+    "placeholders": {
+      "guests": {
+        "type": "int"
+      }
+    }
+  },
+  "hotelRoomSize": "{size} sqm",
+  "@hotelRoomSize": {
+    "placeholders": {
+      "size": {
+        "type": "int"
+      }
+    }
+  },
+  "hotelBedCount": "{count} × {label}",
+  "@hotelBedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "hotelRatePlanSemantic": "Rate plan {plan}",
+  "@hotelRatePlanSemantic": {
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "roomTypeStandard": "Standard",
+  "roomTypeSuperior": "Superior",
+  "roomTypeDeluxe": "Deluxe",
+  "roomTypePremier": "Premier",
+  "roomTypeExecutive": "Executive",
+  "roomTypeSuite": "Suite",
+  "roomTypeFamily": "Family",
+  "roomTypeVilla": "Villa",
+  "roomTypeBungalow": "Bungalow",
+  "bedTypeSingle": "Single bed",
+  "bedTypeDouble": "Double bed",
+  "bedTypeTwin": "Twin beds",
+  "bedTypeQueen": "Queen bed",
+  "bedTypeKing": "King bed",
+  "bedTypeSofaBed": "Sofa bed",
+  "bedTypeBunk": "Bunk bed",
+  "mealPlanRoomOnly": "Room only",
+  "mealPlanBreakfast": "Breakfast",
+  "mealPlanHalfBoard": "Half board",
+  "mealPlanFullBoard": "Full board",
+  "mealPlanAllInclusive": "All inclusive",
+  "cancellationFree": "Free cancellation",
+  "cancellationPartial": "Partially refundable",
+  "cancellationNonRefundable": "Non-refundable",
+  "cancellationCustom": "Custom policy",
+  "bookingReviewTitle": "Booking review",
+  "bookingSelectedPlanTitle": "Selected rate plan",
+  "bookingQuoteExpiry": "Quote expires at {time}",
+  "@bookingQuoteExpiry": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingAccountTitle": "Account",
+  "bookingAccountReadOnly": "This identity is read-only here and is not sent with unsupported guest-profile fields.",
+  "bookingSpecialRequestLabel": "Special request",
+  "bookingSpecialRequestHelper": "Optional note only. No payment or guest profile is collected.",
+  "bookingPriceTitle": "Pricing quote",
+  "bookingPriceSemantic": "Booking price quote",
+  "bookingFinalNightlyRate": "Final nightly rate",
+  "bookingStaySubtotal": "Stay subtotal",
+  "bookingPromotionDiscount": "Promotion discount",
+  "bookingFinalQuotedPrice": "Final quoted price",
+  "bookingCustomerBenefitsExcluded": "Coupons, loyalty, travel credit, and gift cards are outside this UI phase.",
+  "bookingQuoteNoReservation": "A quote does not create a booking or reserve inventory.",
+  "bookingQuoteUnavailable": "Quote unavailable",
+  "bookingInventoryUnavailable": "Inventory is unavailable for this quote.",
+  "bookingQuoteExpired": "This quote has expired. Refresh criteria before confirming.",
+  "bookingDemoBoundaryMessage": "Demo mode can create a clearly local booking. It is not synchronized with the backend.",
+  "bookingRealUnavailableMessage": "Online booking is not connected yet for real accounts.",
+  "bookingTermsAcknowledgement": "I understand this UI does not collect payment or reserve inventory.",
+  "bookingConfirmAction": "Confirm demo booking",
+  "bookingConfirmSemantic": "Confirm this demo booking",
+  "bookingDuplicatePrevented": "Duplicate booking creation was blocked.",
+  "bookingConfirmationTitle": "Demo booking confirmed",
+  "bookingDemoStatus": "Local demo booking",
+  "bookingLocalCode": "Local code {code}",
+  "@bookingLocalCode": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingConfirmationLocalOnly": "This booking exists only in local demo state. It is not paid, synced, or holding inventory.",
+  "bookingAddItineraryAction": "Add to itinerary",
+  "bookingAddItinerarySemantic": "Add this booking to the trip itinerary",
+  "bookingItineraryAdded": "Added to itinerary",
+  "bookingItineraryAlreadyAdded": "This stay is already in the itinerary.",
+  "bookingItineraryAddedMessage": "Stay added to the itinerary.",
+  "bookingItineraryNote": "Local demo booking {code}.",
+  "@bookingItineraryNote": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingViewBookingAction": "View booking",
+  "bookingReturnHomeAction": "Return home",
+  "myBookingsTitle": "My Bookings",
+  "myBookingsDemoLocalOnly": "Only local demo bookings appear here. Real booking endpoints are not connected in UI-6.",
+  "myBookingsRealEmptyTitle": "Bookings not connected",
+  "myBookingsRealEmptyMessage": "Real account bookings will appear after the backend integration is wired.",
+  "myBookingsEmptyTitle": "No bookings",
+  "myBookingsEmptyMessage": "Demo bookings will appear here after confirmation.",
+  "myBookingCardSemantic": "Booking card {code}",
+  "@myBookingCardSemantic": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingDetailsTitle": "Booking details",
+  "bookingPaymentUnavailableAction": "Payment unavailable",
+  "bookingPaymentUnavailable": "Payment actions are not connected in this UI phase.",
+  "bookingCancelAction": "Cancel booking",
+  "bookingCancelSemantic": "Cancel this demo booking",
+  "bookingCancelConfirmTitle": "Cancel demo booking?",
+  "bookingCancelReasonLabel": "Cancellation reason",
+  "bookingCancelledMessage": "Demo booking cancelled locally.",
+  "bookingSectionAll": "All",
+  "bookingSectionUpcoming": "Upcoming",
+  "bookingSectionActive": "Active",
+  "bookingSectionHistory": "History",
+  "bookingSectionCancelled": "Cancelled",
+  "bookingStatusPending": "Pending",
+  "bookingStatusConfirmed": "Confirmed",
+  "bookingStatusCheckInReady": "Check-in ready",
+  "bookingStatusCheckedIn": "Checked in",
+  "bookingStatusCheckedOut": "Checked out",
+  "bookingStatusCompleted": "Completed",
+  "bookingStatusCancelled": "Cancelled",
+  "bookingStatusRefunded": "Refunded",
+  "bookingStatusArchived": "Archived",
+  "bookingStatusNoShow": "No-show",
   "commonBackSemantic": "Go back",
   "demoModeLabel": "Demo Mode"
 }

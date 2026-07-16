@@ -1677,6 +1677,555 @@ class AppLocalizationsEn extends AppLocalizations {
   String get expenseCategoryOther => 'Other';
 
   @override
+  String get hotelsTitle => 'Hotels';
+
+  @override
+  String get hotelsSubtitle =>
+      'Search accommodation from public place data, then review one room and one local quote.';
+
+  @override
+  String get hotelsDestinationLabel => 'Destination';
+
+  @override
+  String get hotelsDestinationHint => 'City, hotel, or area';
+
+  @override
+  String get hotelsCheckInLabel => 'Check-in';
+
+  @override
+  String get hotelsCheckOutLabel => 'Check-out';
+
+  @override
+  String get hotelsAdultsLabel => 'Adults';
+
+  @override
+  String get hotelsChildrenLabel => 'Children';
+
+  @override
+  String get hotelsSearchAction => 'Search stays';
+
+  @override
+  String get hotelsSearchSemantic => 'Search hotel stays';
+
+  @override
+  String hotelsTripPrefillLabel(String trip) {
+    return 'Prefilled from $trip';
+  }
+
+  @override
+  String get hotelsLocalPreviewMessage =>
+      'Hotel discovery uses local accommodation place data. Availability, quotes, and bookings are presentation-only in this UI phase.';
+
+  @override
+  String hotelsResultCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count hotels',
+      one: '1 hotel',
+      zero: 'No hotels',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get hotelsEmptyTitle => 'No stays found';
+
+  @override
+  String get hotelsEmptyMessage => 'Try a different destination or guest mix.';
+
+  @override
+  String get hotelsValidationPastCheckIn => 'Check-in cannot be before today.';
+
+  @override
+  String get hotelsValidationCheckout => 'Check-out must be after check-in.';
+
+  @override
+  String get hotelsValidationAdults => 'At least one adult is required.';
+
+  @override
+  String get hotelsValidationChildren => 'Children cannot be negative.';
+
+  @override
+  String get hotelsValidationExtraBeds => 'Extra beds cannot be negative.';
+
+  @override
+  String get hotelDetailTitle => 'Hotel details';
+
+  @override
+  String hotelStars(int stars) {
+    String _temp0 = intl.Intl.pluralLogic(
+      stars,
+      locale: localeName,
+      other: '$stars stars',
+      one: '1 star',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String hotelCheckInOutMeta(String checkIn, String checkOut) {
+    return 'Check-in $checkIn · Check-out $checkOut';
+  }
+
+  @override
+  String hotelAvailableRooms(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count matching rooms',
+      one: '1 matching room',
+      zero: 'No matching rooms',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get hotelBreakfastIncluded => 'Breakfast';
+
+  @override
+  String get hotelAirportShuttle => 'Airport shuttle';
+
+  @override
+  String hotelDistanceBeach(int meters) {
+    return '$meters m to beach';
+  }
+
+  @override
+  String hotelDistanceCenter(int meters) {
+    return '$meters m to city center';
+  }
+
+  @override
+  String hotelLanguages(String languages) {
+    return 'Languages: $languages';
+  }
+
+  @override
+  String hotelPaymentMethods(String methods) {
+    return 'Payment methods: $methods';
+  }
+
+  @override
+  String get hotelFacilitiesTitle => 'Facilities';
+
+  @override
+  String get hotelServicesTitle => 'Services';
+
+  @override
+  String get hotelRoomPreviewTitle => 'Room preview';
+
+  @override
+  String get hotelCheckAvailabilityAction => 'Check availability';
+
+  @override
+  String hotelCheckAvailabilitySemantic(String hotel) {
+    return 'Check availability for $hotel';
+  }
+
+  @override
+  String get hotelViewRoomsAction => 'View rooms';
+
+  @override
+  String hotelCardSemantic(String hotel) {
+    return 'Hotel card for $hotel';
+  }
+
+  @override
+  String hotelFromPrice(String price) {
+    return 'From $price';
+  }
+
+  @override
+  String get hotelRoomsTitle => 'Rooms and rates';
+
+  @override
+  String get hotelAvailableRoomsTitle => 'Available rooms';
+
+  @override
+  String get hotelNoAvailabilityTitle => 'No matching rooms';
+
+  @override
+  String get hotelNoAvailabilityMessage =>
+      'No local room result fits the selected guests. Change dates or guest count.';
+
+  @override
+  String get hotelRatePlansTitle => 'Choose a rate plan';
+
+  @override
+  String get hotelContinueReviewAction => 'Review booking';
+
+  @override
+  String get hotelContinueReviewSemantic => 'Continue to booking review';
+
+  @override
+  String hotelNights(int nights) {
+    String _temp0 = intl.Intl.pluralLogic(
+      nights,
+      locale: localeName,
+      other: '$nights nights',
+      one: '1 night',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String hotelGuestSummary(int adults, int children) {
+    String _temp0 = intl.Intl.pluralLogic(
+      adults,
+      locale: localeName,
+      other: '$adults adults',
+      one: '1 adult',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      children,
+      locale: localeName,
+      other: '$children children',
+      one: '1 child',
+      zero: 'no children',
+    );
+    return '$_temp0 · $_temp1';
+  }
+
+  @override
+  String get hotelOneRoomOnly => '1 room';
+
+  @override
+  String get hotelAddAdultAction => 'Add adult';
+
+  @override
+  String get hotelExtendStayAction => 'Add night';
+
+  @override
+  String hotelRoomCardSemantic(String room) {
+    return 'Room card for $room';
+  }
+
+  @override
+  String hotelMaxGuests(int guests) {
+    String _temp0 = intl.Intl.pluralLogic(
+      guests,
+      locale: localeName,
+      other: '$guests guests max',
+      one: '1 guest max',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String hotelRoomSize(int size) {
+    return '$size sqm';
+  }
+
+  @override
+  String hotelBedCount(int count, String label) {
+    return '$count × $label';
+  }
+
+  @override
+  String hotelRatePlanSemantic(String plan) {
+    return 'Rate plan $plan';
+  }
+
+  @override
+  String get roomTypeStandard => 'Standard';
+
+  @override
+  String get roomTypeSuperior => 'Superior';
+
+  @override
+  String get roomTypeDeluxe => 'Deluxe';
+
+  @override
+  String get roomTypePremier => 'Premier';
+
+  @override
+  String get roomTypeExecutive => 'Executive';
+
+  @override
+  String get roomTypeSuite => 'Suite';
+
+  @override
+  String get roomTypeFamily => 'Family';
+
+  @override
+  String get roomTypeVilla => 'Villa';
+
+  @override
+  String get roomTypeBungalow => 'Bungalow';
+
+  @override
+  String get bedTypeSingle => 'Single bed';
+
+  @override
+  String get bedTypeDouble => 'Double bed';
+
+  @override
+  String get bedTypeTwin => 'Twin beds';
+
+  @override
+  String get bedTypeQueen => 'Queen bed';
+
+  @override
+  String get bedTypeKing => 'King bed';
+
+  @override
+  String get bedTypeSofaBed => 'Sofa bed';
+
+  @override
+  String get bedTypeBunk => 'Bunk bed';
+
+  @override
+  String get mealPlanRoomOnly => 'Room only';
+
+  @override
+  String get mealPlanBreakfast => 'Breakfast';
+
+  @override
+  String get mealPlanHalfBoard => 'Half board';
+
+  @override
+  String get mealPlanFullBoard => 'Full board';
+
+  @override
+  String get mealPlanAllInclusive => 'All inclusive';
+
+  @override
+  String get cancellationFree => 'Free cancellation';
+
+  @override
+  String get cancellationPartial => 'Partially refundable';
+
+  @override
+  String get cancellationNonRefundable => 'Non-refundable';
+
+  @override
+  String get cancellationCustom => 'Custom policy';
+
+  @override
+  String get bookingReviewTitle => 'Booking review';
+
+  @override
+  String get bookingSelectedPlanTitle => 'Selected rate plan';
+
+  @override
+  String bookingQuoteExpiry(String time) {
+    return 'Quote expires at $time';
+  }
+
+  @override
+  String get bookingAccountTitle => 'Account';
+
+  @override
+  String get bookingAccountReadOnly =>
+      'This identity is read-only here and is not sent with unsupported guest-profile fields.';
+
+  @override
+  String get bookingSpecialRequestLabel => 'Special request';
+
+  @override
+  String get bookingSpecialRequestHelper =>
+      'Optional note only. No payment or guest profile is collected.';
+
+  @override
+  String get bookingPriceTitle => 'Pricing quote';
+
+  @override
+  String get bookingPriceSemantic => 'Booking price quote';
+
+  @override
+  String get bookingFinalNightlyRate => 'Final nightly rate';
+
+  @override
+  String get bookingStaySubtotal => 'Stay subtotal';
+
+  @override
+  String get bookingPromotionDiscount => 'Promotion discount';
+
+  @override
+  String get bookingFinalQuotedPrice => 'Final quoted price';
+
+  @override
+  String get bookingCustomerBenefitsExcluded =>
+      'Coupons, loyalty, travel credit, and gift cards are outside this UI phase.';
+
+  @override
+  String get bookingQuoteNoReservation =>
+      'A quote does not create a booking or reserve inventory.';
+
+  @override
+  String get bookingQuoteUnavailable => 'Quote unavailable';
+
+  @override
+  String get bookingInventoryUnavailable =>
+      'Inventory is unavailable for this quote.';
+
+  @override
+  String get bookingQuoteExpired =>
+      'This quote has expired. Refresh criteria before confirming.';
+
+  @override
+  String get bookingDemoBoundaryMessage =>
+      'Demo mode can create a clearly local booking. It is not synchronized with the backend.';
+
+  @override
+  String get bookingRealUnavailableMessage =>
+      'Online booking is not connected yet for real accounts.';
+
+  @override
+  String get bookingTermsAcknowledgement =>
+      'I understand this UI does not collect payment or reserve inventory.';
+
+  @override
+  String get bookingConfirmAction => 'Confirm demo booking';
+
+  @override
+  String get bookingConfirmSemantic => 'Confirm this demo booking';
+
+  @override
+  String get bookingDuplicatePrevented =>
+      'Duplicate booking creation was blocked.';
+
+  @override
+  String get bookingConfirmationTitle => 'Demo booking confirmed';
+
+  @override
+  String get bookingDemoStatus => 'Local demo booking';
+
+  @override
+  String bookingLocalCode(String code) {
+    return 'Local code $code';
+  }
+
+  @override
+  String get bookingConfirmationLocalOnly =>
+      'This booking exists only in local demo state. It is not paid, synced, or holding inventory.';
+
+  @override
+  String get bookingAddItineraryAction => 'Add to itinerary';
+
+  @override
+  String get bookingAddItinerarySemantic =>
+      'Add this booking to the trip itinerary';
+
+  @override
+  String get bookingItineraryAdded => 'Added to itinerary';
+
+  @override
+  String get bookingItineraryAlreadyAdded =>
+      'This stay is already in the itinerary.';
+
+  @override
+  String get bookingItineraryAddedMessage => 'Stay added to the itinerary.';
+
+  @override
+  String bookingItineraryNote(String code) {
+    return 'Local demo booking $code.';
+  }
+
+  @override
+  String get bookingViewBookingAction => 'View booking';
+
+  @override
+  String get bookingReturnHomeAction => 'Return home';
+
+  @override
+  String get myBookingsTitle => 'My Bookings';
+
+  @override
+  String get myBookingsDemoLocalOnly =>
+      'Only local demo bookings appear here. Real booking endpoints are not connected in UI-6.';
+
+  @override
+  String get myBookingsRealEmptyTitle => 'Bookings not connected';
+
+  @override
+  String get myBookingsRealEmptyMessage =>
+      'Real account bookings will appear after the backend integration is wired.';
+
+  @override
+  String get myBookingsEmptyTitle => 'No bookings';
+
+  @override
+  String get myBookingsEmptyMessage =>
+      'Demo bookings will appear here after confirmation.';
+
+  @override
+  String myBookingCardSemantic(String code) {
+    return 'Booking card $code';
+  }
+
+  @override
+  String get bookingDetailsTitle => 'Booking details';
+
+  @override
+  String get bookingPaymentUnavailableAction => 'Payment unavailable';
+
+  @override
+  String get bookingPaymentUnavailable =>
+      'Payment actions are not connected in this UI phase.';
+
+  @override
+  String get bookingCancelAction => 'Cancel booking';
+
+  @override
+  String get bookingCancelSemantic => 'Cancel this demo booking';
+
+  @override
+  String get bookingCancelConfirmTitle => 'Cancel demo booking?';
+
+  @override
+  String get bookingCancelReasonLabel => 'Cancellation reason';
+
+  @override
+  String get bookingCancelledMessage => 'Demo booking cancelled locally.';
+
+  @override
+  String get bookingSectionAll => 'All';
+
+  @override
+  String get bookingSectionUpcoming => 'Upcoming';
+
+  @override
+  String get bookingSectionActive => 'Active';
+
+  @override
+  String get bookingSectionHistory => 'History';
+
+  @override
+  String get bookingSectionCancelled => 'Cancelled';
+
+  @override
+  String get bookingStatusPending => 'Pending';
+
+  @override
+  String get bookingStatusConfirmed => 'Confirmed';
+
+  @override
+  String get bookingStatusCheckInReady => 'Check-in ready';
+
+  @override
+  String get bookingStatusCheckedIn => 'Checked in';
+
+  @override
+  String get bookingStatusCheckedOut => 'Checked out';
+
+  @override
+  String get bookingStatusCompleted => 'Completed';
+
+  @override
+  String get bookingStatusCancelled => 'Cancelled';
+
+  @override
+  String get bookingStatusRefunded => 'Refunded';
+
+  @override
+  String get bookingStatusArchived => 'Archived';
+
+  @override
+  String get bookingStatusNoShow => 'No-show';
+
+  @override
   String get commonBackSemantic => 'Go back';
 
   @override

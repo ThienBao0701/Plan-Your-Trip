@@ -822,6 +822,322 @@
   "expenseCategoryVisa": "Visa",
   "expenseCategoryInsurance": "Bảo hiểm",
   "expenseCategoryOther": "Khác",
+  "hotelsTitle": "Khách sạn",
+  "hotelsSubtitle": "Tìm chỗ ở từ dữ liệu địa điểm công khai, rồi xem một phòng và một báo giá cục bộ.",
+  "hotelsDestinationLabel": "Điểm đến",
+  "hotelsDestinationHint": "Thành phố, khách sạn hoặc khu vực",
+  "hotelsCheckInLabel": "Nhận phòng",
+  "hotelsCheckOutLabel": "Trả phòng",
+  "hotelsAdultsLabel": "Người lớn",
+  "hotelsChildrenLabel": "Trẻ em",
+  "hotelsSearchAction": "Tìm chỗ ở",
+  "hotelsSearchSemantic": "Tìm chỗ ở khách sạn",
+  "hotelsTripPrefillLabel": "Điền từ {trip}",
+  "@hotelsTripPrefillLabel": {
+    "placeholders": {
+      "trip": {
+        "type": "String"
+      }
+    }
+  },
+  "hotelsLocalPreviewMessage": "Khám phá khách sạn dùng dữ liệu địa điểm chỗ ở cục bộ. Tình trạng phòng, báo giá và đặt phòng chỉ là giao diện trong giai đoạn này.",
+  "hotelsResultCount": "{count} khách sạn",
+  "@hotelsResultCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hotelsEmptyTitle": "Không tìm thấy chỗ ở",
+  "hotelsEmptyMessage": "Thử điểm đến hoặc số khách khác.",
+  "hotelsValidationPastCheckIn": "Ngày nhận phòng không được trước hôm nay.",
+  "hotelsValidationCheckout": "Ngày trả phòng phải sau ngày nhận phòng.",
+  "hotelsValidationAdults": "Cần ít nhất một người lớn.",
+  "hotelsValidationChildren": "Số trẻ em không được âm.",
+  "hotelsValidationExtraBeds": "Số giường phụ không được âm.",
+  "hotelDetailTitle": "Chi tiết khách sạn",
+  "hotelStars": "{stars} sao",
+  "@hotelStars": {
+    "placeholders": {
+      "stars": {
+        "type": "int"
+      }
+    }
+  },
+  "hotelCheckInOutMeta": "Nhận phòng {checkIn} · Trả phòng {checkOut}",
+  "@hotelCheckInOutMeta": {
+    "placeholders": {
+      "checkIn": {
+        "type": "String"
+      },
+      "checkOut": {
+        "type": "String"
+      }
+    }
+  },
+  "hotelAvailableRooms": "{count} phòng phù hợp",
+  "@hotelAvailableRooms": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hotelBreakfastIncluded": "Bữa sáng",
+  "hotelAirportShuttle": "Đưa đón sân bay",
+  "hotelDistanceBeach": "{meters} m tới biển",
+  "@hotelDistanceBeach": {
+    "placeholders": {
+      "meters": {
+        "type": "int"
+      }
+    }
+  },
+  "hotelDistanceCenter": "{meters} m tới trung tâm",
+  "@hotelDistanceCenter": {
+    "placeholders": {
+      "meters": {
+        "type": "int"
+      }
+    }
+  },
+  "hotelLanguages": "Ngôn ngữ: {languages}",
+  "@hotelLanguages": {
+    "placeholders": {
+      "languages": {
+        "type": "String"
+      }
+    }
+  },
+  "hotelPaymentMethods": "Phương thức thanh toán: {methods}",
+  "@hotelPaymentMethods": {
+    "placeholders": {
+      "methods": {
+        "type": "String"
+      }
+    }
+  },
+  "hotelFacilitiesTitle": "Tiện nghi",
+  "hotelServicesTitle": "Dịch vụ",
+  "hotelRoomPreviewTitle": "Xem trước phòng",
+  "hotelCheckAvailabilityAction": "Kiểm tra phòng",
+  "hotelCheckAvailabilitySemantic": "Kiểm tra phòng cho {hotel}",
+  "@hotelCheckAvailabilitySemantic": {
+    "placeholders": {
+      "hotel": {
+        "type": "String"
+      }
+    }
+  },
+  "hotelViewRoomsAction": "Xem phòng",
+  "hotelCardSemantic": "Thẻ khách sạn {hotel}",
+  "@hotelCardSemantic": {
+    "placeholders": {
+      "hotel": {
+        "type": "String"
+      }
+    }
+  },
+  "hotelFromPrice": "Từ {price}",
+  "@hotelFromPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "hotelRoomsTitle": "Phòng và giá",
+  "hotelAvailableRoomsTitle": "Phòng khả dụng",
+  "hotelNoAvailabilityTitle": "Không có phòng phù hợp",
+  "hotelNoAvailabilityMessage": "Không có phòng cục bộ phù hợp với số khách đã chọn. Hãy đổi ngày hoặc số khách.",
+  "hotelRatePlansTitle": "Chọn gói giá",
+  "hotelContinueReviewAction": "Xem lại đặt phòng",
+  "hotelContinueReviewSemantic": "Tiếp tục đến bước xem lại đặt phòng",
+  "hotelNights": "{nights} đêm",
+  "@hotelNights": {
+    "placeholders": {
+      "nights": {
+        "type": "int"
+      }
+    }
+  },
+  "hotelGuestSummary": "{adults} người lớn · {children} trẻ em",
+  "@hotelGuestSummary": {
+    "placeholders": {
+      "adults": {
+        "type": "int"
+      },
+      "children": {
+        "type": "int"
+      }
+    }
+  },
+  "hotelOneRoomOnly": "1 phòng",
+  "hotelAddAdultAction": "Thêm người lớn",
+  "hotelExtendStayAction": "Thêm đêm",
+  "hotelRoomCardSemantic": "Thẻ phòng {room}",
+  "@hotelRoomCardSemantic": {
+    "placeholders": {
+      "room": {
+        "type": "String"
+      }
+    }
+  },
+  "hotelMaxGuests": "Tối đa {guests} khách",
+  "@hotelMaxGuests": {
+    "placeholders": {
+      "guests": {
+        "type": "int"
+      }
+    }
+  },
+  "hotelRoomSize": "{size} m²",
+  "@hotelRoomSize": {
+    "placeholders": {
+      "size": {
+        "type": "int"
+      }
+    }
+  },
+  "hotelBedCount": "{count} × {label}",
+  "@hotelBedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "hotelRatePlanSemantic": "Gói giá {plan}",
+  "@hotelRatePlanSemantic": {
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "roomTypeStandard": "Standard",
+  "roomTypeSuperior": "Superior",
+  "roomTypeDeluxe": "Deluxe",
+  "roomTypePremier": "Premier",
+  "roomTypeExecutive": "Executive",
+  "roomTypeSuite": "Suite",
+  "roomTypeFamily": "Gia đình",
+  "roomTypeVilla": "Villa",
+  "roomTypeBungalow": "Bungalow",
+  "bedTypeSingle": "Giường đơn",
+  "bedTypeDouble": "Giường đôi",
+  "bedTypeTwin": "Hai giường đơn",
+  "bedTypeQueen": "Giường queen",
+  "bedTypeKing": "Giường king",
+  "bedTypeSofaBed": "Giường sofa",
+  "bedTypeBunk": "Giường tầng",
+  "mealPlanRoomOnly": "Chỉ phòng",
+  "mealPlanBreakfast": "Bữa sáng",
+  "mealPlanHalfBoard": "Nửa gói ăn",
+  "mealPlanFullBoard": "Trọn gói ăn",
+  "mealPlanAllInclusive": "Bao gồm tất cả",
+  "cancellationFree": "Hủy miễn phí",
+  "cancellationPartial": "Hoàn tiền một phần",
+  "cancellationNonRefundable": "Không hoàn tiền",
+  "cancellationCustom": "Chính sách riêng",
+  "bookingReviewTitle": "Xem lại đặt phòng",
+  "bookingSelectedPlanTitle": "Gói giá đã chọn",
+  "bookingQuoteExpiry": "Báo giá hết hạn lúc {time}",
+  "@bookingQuoteExpiry": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingAccountTitle": "Tài khoản",
+  "bookingAccountReadOnly": "Danh tính này chỉ để xem tại đây và không gửi kèm trường hồ sơ khách chưa hỗ trợ.",
+  "bookingSpecialRequestLabel": "Yêu cầu đặc biệt",
+  "bookingSpecialRequestHelper": "Ghi chú tùy chọn. Không thu thập thanh toán hoặc hồ sơ khách.",
+  "bookingPriceTitle": "Báo giá",
+  "bookingPriceSemantic": "Báo giá đặt phòng",
+  "bookingFinalNightlyRate": "Giá cuối mỗi đêm",
+  "bookingStaySubtotal": "Tạm tính kỳ lưu trú",
+  "bookingPromotionDiscount": "Giảm giá khuyến mãi",
+  "bookingFinalQuotedPrice": "Tổng báo giá cuối",
+  "bookingCustomerBenefitsExcluded": "Mã giảm giá, điểm thành viên, travel credit và thẻ quà tặng nằm ngoài UI này.",
+  "bookingQuoteNoReservation": "Báo giá không tạo đặt phòng và không giữ phòng.",
+  "bookingQuoteUnavailable": "Chưa có báo giá",
+  "bookingInventoryUnavailable": "Không còn phòng cho báo giá này.",
+  "bookingQuoteExpired": "Báo giá đã hết hạn. Làm mới tiêu chí trước khi xác nhận.",
+  "bookingDemoBoundaryMessage": "Chế độ demo có thể tạo đặt phòng cục bộ rõ ràng. Dữ liệu này không đồng bộ với backend.",
+  "bookingRealUnavailableMessage": "Đặt phòng online chưa được kết nối cho tài khoản thật.",
+  "bookingTermsAcknowledgement": "Tôi hiểu UI này không thu thanh toán hoặc giữ phòng.",
+  "bookingConfirmAction": "Xác nhận đặt phòng demo",
+  "bookingConfirmSemantic": "Xác nhận đặt phòng demo này",
+  "bookingDuplicatePrevented": "Đã chặn tạo đặt phòng trùng.",
+  "bookingConfirmationTitle": "Đã xác nhận đặt phòng demo",
+  "bookingDemoStatus": "Đặt phòng demo cục bộ",
+  "bookingLocalCode": "Mã cục bộ {code}",
+  "@bookingLocalCode": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingConfirmationLocalOnly": "Đặt phòng này chỉ tồn tại trong trạng thái demo cục bộ. Chưa thanh toán, chưa đồng bộ và không giữ phòng.",
+  "bookingAddItineraryAction": "Thêm vào lịch trình",
+  "bookingAddItinerarySemantic": "Thêm đặt phòng này vào lịch trình chuyến đi",
+  "bookingItineraryAdded": "Đã thêm vào lịch trình",
+  "bookingItineraryAlreadyAdded": "Chỗ ở này đã có trong lịch trình.",
+  "bookingItineraryAddedMessage": "Đã thêm chỗ ở vào lịch trình.",
+  "bookingItineraryNote": "Đặt phòng demo cục bộ {code}.",
+  "@bookingItineraryNote": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingViewBookingAction": "Xem đặt phòng",
+  "bookingReturnHomeAction": "Về trang chủ",
+  "myBookingsTitle": "Đặt phòng của tôi",
+  "myBookingsDemoLocalOnly": "Chỉ đặt phòng demo cục bộ xuất hiện tại đây. Endpoint đặt phòng thật chưa được kết nối trong UI-6.",
+  "myBookingsRealEmptyTitle": "Chưa kết nối đặt phòng",
+  "myBookingsRealEmptyMessage": "Đặt phòng tài khoản thật sẽ xuất hiện sau khi tích hợp backend.",
+  "myBookingsEmptyTitle": "Chưa có đặt phòng",
+  "myBookingsEmptyMessage": "Đặt phòng demo sẽ xuất hiện sau khi xác nhận.",
+  "myBookingCardSemantic": "Thẻ đặt phòng {code}",
+  "@myBookingCardSemantic": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingDetailsTitle": "Chi tiết đặt phòng",
+  "bookingPaymentUnavailableAction": "Chưa có thanh toán",
+  "bookingPaymentUnavailable": "Hành động thanh toán chưa được kết nối trong UI này.",
+  "bookingCancelAction": "Hủy đặt phòng",
+  "bookingCancelSemantic": "Hủy đặt phòng demo này",
+  "bookingCancelConfirmTitle": "Hủy đặt phòng demo?",
+  "bookingCancelReasonLabel": "Lý do hủy",
+  "bookingCancelledMessage": "Đã hủy đặt phòng demo cục bộ.",
+  "bookingSectionAll": "Tất cả",
+  "bookingSectionUpcoming": "Sắp tới",
+  "bookingSectionActive": "Đang ở",
+  "bookingSectionHistory": "Lịch sử",
+  "bookingSectionCancelled": "Đã hủy",
+  "bookingStatusPending": "Đang chờ",
+  "bookingStatusConfirmed": "Đã xác nhận",
+  "bookingStatusCheckInReady": "Sẵn sàng nhận phòng",
+  "bookingStatusCheckedIn": "Đã nhận phòng",
+  "bookingStatusCheckedOut": "Đã trả phòng",
+  "bookingStatusCompleted": "Hoàn tất",
+  "bookingStatusCancelled": "Đã hủy",
+  "bookingStatusRefunded": "Đã hoàn tiền",
+  "bookingStatusArchived": "Đã lưu trữ",
+  "bookingStatusNoShow": "Không đến",
   "commonBackSemantic": "Quay lại",
   "demoModeLabel": "Chế độ demo"
 }

@@ -12,6 +12,7 @@ import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/add_to_trip_sheet.dart';
 import '../../shared/widgets/glass_widgets.dart';
 import '../categories/category_discovery_screen.dart';
+import '../hotels/hotel_search_screen.dart';
 import '../places/place_detail_screen.dart';
 import '../places/places_screen.dart';
 import '../trips/create_trip_screen.dart';
@@ -48,6 +49,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _openCategory(Category category) {
+    if (category.slug == 'accommodation') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => HotelSearchScreen(today: widget.today),
+        ),
+      );
+      return;
+    }
     final mode = CategoryDiscoveryTaxonomy.modeForCategory(category);
     if (mode == null) {
       _openSearch(category: category.id);

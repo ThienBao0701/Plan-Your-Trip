@@ -10,6 +10,8 @@ import '../../design/app_spacing.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/add_to_trip_sheet.dart';
 import '../../shared/widgets/glass_widgets.dart';
+import '../hotels/hotel_room_selection_screen.dart';
+import '../hotels/hotel_utils.dart';
 
 class PlaceDetailScreen extends StatelessWidget {
   final Place place;
@@ -192,6 +194,13 @@ class PlaceDetailScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: AppSpacing.md),
                     ],
+                    if (place.hotelDetail != null) ...[
+                      _HotelDetailSection(
+                        place: place,
+                        onAvailability: () => _openHotelAvailability(context),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                    ],
                     OceanGlassCard(
                       child: Text(
                         l10n.mapUnavailableMessage,
@@ -245,6 +254,32 @@ class PlaceDetailScreen extends StatelessWidget {
         label == 'transportation' ||
         label == 'transport';
   }
+
+  void _openHotelAvailability(BuildContext context) {
+    final app = AppScope.of(context);
+    final today = app.now();
+    final upcoming = _nextTrip(app.trips, today);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => HotelRoomSelectionScreen(
+          hotel: place,
+          initialCriteria: defaultHotelCriteria(today: today, trip: upcoming)
+              .copyWith(destination: place.city),
+          today: today,
+        ),
+      ),
+    );
+  }
+
+  Trip? _nextTrip(List<Trip> trips, DateTime today) {
+    final current = hotelDateOnly(today);
+    final candidates = trips
+        .where((trip) => !hotelDateOnly(trip.endDate).isBefore(current))
+        .toList()
+      ..sort((a, b) => a.startDate.compareTo(b.startDate));
+    return candidates.isEmpty ? null : candidates.first;
+  }
 }
 
 class _HeroImage extends StatelessWidget {
@@ -296,4 +331,141 @@ class _InfoRow extends StatelessWidget {
           ],
         ),
       );
+}
+
+class _HotelDetailSection extends StatelessWidget {
+  final Place place;
+  final VoidCallback onAvailability;
+
+  const _HotelDetailSection({
+    required this.place,
+    required this.onAvailability,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final detail = place.hotelDetail!;
+    return OceanGlassCard(
+      semanticLabel: l10n.hotelDetailTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.hotelDetailTitle,
+              style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: AppSpacing.sm),
+          Wrap(
+            spacing: AppSpacing.xs,
+            runSpacing: AppSpacing.xs,
+            children: [
+              if (detail.starRating != null)
+                OceanStatusPill(
+                  label: l10n.hotelStars(detail.starRating!),
+                  icon: Icons.star_rounded,
+                ),
+              if (detail.checkInTime != null && detail.checkOutTime != null)
+                OceanStatusPill(
+                  label: l10n.hotelCheckInOutMeta(
+                    detail.checkInTime!,
+                    detail.checkOutTime!,
+                  ),
+                  icon: Icons.schedule_rounded,
+                  color: AppColors.turquoise600,
+                ),
+              if (detail.availableRooms != null && detail.availableRooms! > 0)
+                OceanStatusPill(
+                  label: l10n.hotelAvailableRooms(detail.availableRooms!),
+                  icon: Icons.meeting_room_rounded,
+                  color: AppColors.success,
+                ),
+              if (detail.breakfastIncluded == true)
+                OceanStatusPill(
+                  label: l10n.hotelBreakfastIncluded,
+                  icon: Icons.restaurant_rounded,
+                  color: AppColors.coral,
+                ),
+              if (detail.airportShuttle == true)
+                OceanStatusPill(
+                  label: l10n.hotelAirportShuttle,
+                  icon: Icons.airport_shuttle_rounded,
+                  color: AppColors.violet,
+                ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          if (detail.distanceToBeachMeters != null &&
+              detail.distanceToBeachMeters! > 0)
+            _InfoRow(
+              icon: Icons.beach_access_rounded,
+              text: l10n.hotelDistanceBeach(detail.distanceToBeachMeters!),
+            ),
+          if (detail.distanceToCityCenterMeters != null &&
+              detail.distanceToCityCenterMeters! > 0)
+            _InfoRow(
+              icon: Icons.location_city_rounded,
+              text:
+                  l10n.hotelDistanceCenter(detail.distanceToCityCenterMeters!),
+            ),
+          if (detail.parking != null)
+            _InfoRow(icon: Icons.local_parking_rounded, text: detail.parking!),
+          if (detail.internet != null)
+            _InfoRow(icon: Icons.wifi_rounded, text: detail.internet!),
+          if (detail.languages.isNotEmpty)
+            _InfoRow(
+              icon: Icons.translate_rounded,
+              text: l10n.hotelLanguages(detail.languages.join(', ')),
+            ),
+          if (detail.paymentMethods.isNotEmpty)
+            _InfoRow(
+              icon: Icons.payments_rounded,
+              text: l10n.hotelPaymentMethods(detail.paymentMethods.join(', ')),
+            ),
+          if (detail.facilities.isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.sm),
+            Text(l10n.hotelFacilitiesTitle,
+                style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: AppSpacing.xs),
+            Wrap(
+              spacing: AppSpacing.xs,
+              runSpacing: AppSpacing.xs,
+              children: [
+                for (final item in detail.facilities) Chip(label: Text(item)),
+              ],
+            ),
+          ],
+          if (detail.services.isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.sm),
+            Text(l10n.hotelServicesTitle,
+                style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: AppSpacing.xs),
+            Wrap(
+              spacing: AppSpacing.xs,
+              runSpacing: AppSpacing.xs,
+              children: [
+                for (final item in detail.services) Chip(label: Text(item)),
+              ],
+            ),
+          ],
+          if (detail.rooms.isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.md),
+            Text(l10n.hotelRoomPreviewTitle,
+                style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              detail.rooms.take(2).map((room) => room.roomName).join(' · '),
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ],
+          const SizedBox(height: AppSpacing.lg),
+          OceanPrimaryButton(
+            key: const Key('hotel-detail-check-availability'),
+            label: l10n.hotelCheckAvailabilityAction,
+            icon: Icons.king_bed_rounded,
+            semanticLabel: l10n.hotelCheckAvailabilitySemantic(place.name),
+            onPressed: onAvailability,
+          ),
+        ],
+      ),
+    );
+  }
 }

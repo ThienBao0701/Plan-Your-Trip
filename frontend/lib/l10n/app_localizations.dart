@@ -2991,6 +2991,882 @@ abstract class AppLocalizations {
   /// **'Other'**
   String get expenseCategoryOther;
 
+  /// No description provided for @hotelsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hotels'**
+  String get hotelsTitle;
+
+  /// No description provided for @hotelsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Search accommodation from public place data, then review one room and one local quote.'**
+  String get hotelsSubtitle;
+
+  /// No description provided for @hotelsDestinationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Destination'**
+  String get hotelsDestinationLabel;
+
+  /// No description provided for @hotelsDestinationHint.
+  ///
+  /// In en, this message translates to:
+  /// **'City, hotel, or area'**
+  String get hotelsDestinationHint;
+
+  /// No description provided for @hotelsCheckInLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in'**
+  String get hotelsCheckInLabel;
+
+  /// No description provided for @hotelsCheckOutLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-out'**
+  String get hotelsCheckOutLabel;
+
+  /// No description provided for @hotelsAdultsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Adults'**
+  String get hotelsAdultsLabel;
+
+  /// No description provided for @hotelsChildrenLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Children'**
+  String get hotelsChildrenLabel;
+
+  /// No description provided for @hotelsSearchAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Search stays'**
+  String get hotelsSearchAction;
+
+  /// No description provided for @hotelsSearchSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Search hotel stays'**
+  String get hotelsSearchSemantic;
+
+  /// No description provided for @hotelsTripPrefillLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Prefilled from {trip}'**
+  String hotelsTripPrefillLabel(String trip);
+
+  /// No description provided for @hotelsLocalPreviewMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Hotel discovery uses local accommodation place data. Availability, quotes, and bookings are presentation-only in this UI phase.'**
+  String get hotelsLocalPreviewMessage;
+
+  /// No description provided for @hotelsResultCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No hotels} =1{1 hotel} other{{count} hotels}}'**
+  String hotelsResultCount(int count);
+
+  /// No description provided for @hotelsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No stays found'**
+  String get hotelsEmptyTitle;
+
+  /// No description provided for @hotelsEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Try a different destination or guest mix.'**
+  String get hotelsEmptyMessage;
+
+  /// No description provided for @hotelsValidationPastCheckIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in cannot be before today.'**
+  String get hotelsValidationPastCheckIn;
+
+  /// No description provided for @hotelsValidationCheckout.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-out must be after check-in.'**
+  String get hotelsValidationCheckout;
+
+  /// No description provided for @hotelsValidationAdults.
+  ///
+  /// In en, this message translates to:
+  /// **'At least one adult is required.'**
+  String get hotelsValidationAdults;
+
+  /// No description provided for @hotelsValidationChildren.
+  ///
+  /// In en, this message translates to:
+  /// **'Children cannot be negative.'**
+  String get hotelsValidationChildren;
+
+  /// No description provided for @hotelsValidationExtraBeds.
+  ///
+  /// In en, this message translates to:
+  /// **'Extra beds cannot be negative.'**
+  String get hotelsValidationExtraBeds;
+
+  /// No description provided for @hotelDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hotel details'**
+  String get hotelDetailTitle;
+
+  /// No description provided for @hotelStars.
+  ///
+  /// In en, this message translates to:
+  /// **'{stars, plural, =1{1 star} other{{stars} stars}}'**
+  String hotelStars(int stars);
+
+  /// No description provided for @hotelCheckInOutMeta.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in {checkIn} · Check-out {checkOut}'**
+  String hotelCheckInOutMeta(String checkIn, String checkOut);
+
+  /// No description provided for @hotelAvailableRooms.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No matching rooms} =1{1 matching room} other{{count} matching rooms}}'**
+  String hotelAvailableRooms(int count);
+
+  /// No description provided for @hotelBreakfastIncluded.
+  ///
+  /// In en, this message translates to:
+  /// **'Breakfast'**
+  String get hotelBreakfastIncluded;
+
+  /// No description provided for @hotelAirportShuttle.
+  ///
+  /// In en, this message translates to:
+  /// **'Airport shuttle'**
+  String get hotelAirportShuttle;
+
+  /// No description provided for @hotelDistanceBeach.
+  ///
+  /// In en, this message translates to:
+  /// **'{meters} m to beach'**
+  String hotelDistanceBeach(int meters);
+
+  /// No description provided for @hotelDistanceCenter.
+  ///
+  /// In en, this message translates to:
+  /// **'{meters} m to city center'**
+  String hotelDistanceCenter(int meters);
+
+  /// No description provided for @hotelLanguages.
+  ///
+  /// In en, this message translates to:
+  /// **'Languages: {languages}'**
+  String hotelLanguages(String languages);
+
+  /// No description provided for @hotelPaymentMethods.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment methods: {methods}'**
+  String hotelPaymentMethods(String methods);
+
+  /// No description provided for @hotelFacilitiesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Facilities'**
+  String get hotelFacilitiesTitle;
+
+  /// No description provided for @hotelServicesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Services'**
+  String get hotelServicesTitle;
+
+  /// No description provided for @hotelRoomPreviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Room preview'**
+  String get hotelRoomPreviewTitle;
+
+  /// No description provided for @hotelCheckAvailabilityAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Check availability'**
+  String get hotelCheckAvailabilityAction;
+
+  /// No description provided for @hotelCheckAvailabilitySemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Check availability for {hotel}'**
+  String hotelCheckAvailabilitySemantic(String hotel);
+
+  /// No description provided for @hotelViewRoomsAction.
+  ///
+  /// In en, this message translates to:
+  /// **'View rooms'**
+  String get hotelViewRoomsAction;
+
+  /// No description provided for @hotelCardSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Hotel card for {hotel}'**
+  String hotelCardSemantic(String hotel);
+
+  /// No description provided for @hotelFromPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'From {price}'**
+  String hotelFromPrice(String price);
+
+  /// No description provided for @hotelRoomsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rooms and rates'**
+  String get hotelRoomsTitle;
+
+  /// No description provided for @hotelAvailableRoomsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Available rooms'**
+  String get hotelAvailableRoomsTitle;
+
+  /// No description provided for @hotelNoAvailabilityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching rooms'**
+  String get hotelNoAvailabilityTitle;
+
+  /// No description provided for @hotelNoAvailabilityMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No local room result fits the selected guests. Change dates or guest count.'**
+  String get hotelNoAvailabilityMessage;
+
+  /// No description provided for @hotelRatePlansTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a rate plan'**
+  String get hotelRatePlansTitle;
+
+  /// No description provided for @hotelContinueReviewAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Review booking'**
+  String get hotelContinueReviewAction;
+
+  /// No description provided for @hotelContinueReviewSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to booking review'**
+  String get hotelContinueReviewSemantic;
+
+  /// No description provided for @hotelNights.
+  ///
+  /// In en, this message translates to:
+  /// **'{nights, plural, =1{1 night} other{{nights} nights}}'**
+  String hotelNights(int nights);
+
+  /// No description provided for @hotelGuestSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{adults, plural, =1{1 adult} other{{adults} adults}} · {children, plural, =0{no children} =1{1 child} other{{children} children}}'**
+  String hotelGuestSummary(int adults, int children);
+
+  /// No description provided for @hotelOneRoomOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'1 room'**
+  String get hotelOneRoomOnly;
+
+  /// No description provided for @hotelAddAdultAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add adult'**
+  String get hotelAddAdultAction;
+
+  /// No description provided for @hotelExtendStayAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add night'**
+  String get hotelExtendStayAction;
+
+  /// No description provided for @hotelRoomCardSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Room card for {room}'**
+  String hotelRoomCardSemantic(String room);
+
+  /// No description provided for @hotelMaxGuests.
+  ///
+  /// In en, this message translates to:
+  /// **'{guests, plural, =1{1 guest max} other{{guests} guests max}}'**
+  String hotelMaxGuests(int guests);
+
+  /// No description provided for @hotelRoomSize.
+  ///
+  /// In en, this message translates to:
+  /// **'{size} sqm'**
+  String hotelRoomSize(int size);
+
+  /// No description provided for @hotelBedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} × {label}'**
+  String hotelBedCount(int count, String label);
+
+  /// No description provided for @hotelRatePlanSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate plan {plan}'**
+  String hotelRatePlanSemantic(String plan);
+
+  /// No description provided for @roomTypeStandard.
+  ///
+  /// In en, this message translates to:
+  /// **'Standard'**
+  String get roomTypeStandard;
+
+  /// No description provided for @roomTypeSuperior.
+  ///
+  /// In en, this message translates to:
+  /// **'Superior'**
+  String get roomTypeSuperior;
+
+  /// No description provided for @roomTypeDeluxe.
+  ///
+  /// In en, this message translates to:
+  /// **'Deluxe'**
+  String get roomTypeDeluxe;
+
+  /// No description provided for @roomTypePremier.
+  ///
+  /// In en, this message translates to:
+  /// **'Premier'**
+  String get roomTypePremier;
+
+  /// No description provided for @roomTypeExecutive.
+  ///
+  /// In en, this message translates to:
+  /// **'Executive'**
+  String get roomTypeExecutive;
+
+  /// No description provided for @roomTypeSuite.
+  ///
+  /// In en, this message translates to:
+  /// **'Suite'**
+  String get roomTypeSuite;
+
+  /// No description provided for @roomTypeFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Family'**
+  String get roomTypeFamily;
+
+  /// No description provided for @roomTypeVilla.
+  ///
+  /// In en, this message translates to:
+  /// **'Villa'**
+  String get roomTypeVilla;
+
+  /// No description provided for @roomTypeBungalow.
+  ///
+  /// In en, this message translates to:
+  /// **'Bungalow'**
+  String get roomTypeBungalow;
+
+  /// No description provided for @bedTypeSingle.
+  ///
+  /// In en, this message translates to:
+  /// **'Single bed'**
+  String get bedTypeSingle;
+
+  /// No description provided for @bedTypeDouble.
+  ///
+  /// In en, this message translates to:
+  /// **'Double bed'**
+  String get bedTypeDouble;
+
+  /// No description provided for @bedTypeTwin.
+  ///
+  /// In en, this message translates to:
+  /// **'Twin beds'**
+  String get bedTypeTwin;
+
+  /// No description provided for @bedTypeQueen.
+  ///
+  /// In en, this message translates to:
+  /// **'Queen bed'**
+  String get bedTypeQueen;
+
+  /// No description provided for @bedTypeKing.
+  ///
+  /// In en, this message translates to:
+  /// **'King bed'**
+  String get bedTypeKing;
+
+  /// No description provided for @bedTypeSofaBed.
+  ///
+  /// In en, this message translates to:
+  /// **'Sofa bed'**
+  String get bedTypeSofaBed;
+
+  /// No description provided for @bedTypeBunk.
+  ///
+  /// In en, this message translates to:
+  /// **'Bunk bed'**
+  String get bedTypeBunk;
+
+  /// No description provided for @mealPlanRoomOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Room only'**
+  String get mealPlanRoomOnly;
+
+  /// No description provided for @mealPlanBreakfast.
+  ///
+  /// In en, this message translates to:
+  /// **'Breakfast'**
+  String get mealPlanBreakfast;
+
+  /// No description provided for @mealPlanHalfBoard.
+  ///
+  /// In en, this message translates to:
+  /// **'Half board'**
+  String get mealPlanHalfBoard;
+
+  /// No description provided for @mealPlanFullBoard.
+  ///
+  /// In en, this message translates to:
+  /// **'Full board'**
+  String get mealPlanFullBoard;
+
+  /// No description provided for @mealPlanAllInclusive.
+  ///
+  /// In en, this message translates to:
+  /// **'All inclusive'**
+  String get mealPlanAllInclusive;
+
+  /// No description provided for @cancellationFree.
+  ///
+  /// In en, this message translates to:
+  /// **'Free cancellation'**
+  String get cancellationFree;
+
+  /// No description provided for @cancellationPartial.
+  ///
+  /// In en, this message translates to:
+  /// **'Partially refundable'**
+  String get cancellationPartial;
+
+  /// No description provided for @cancellationNonRefundable.
+  ///
+  /// In en, this message translates to:
+  /// **'Non-refundable'**
+  String get cancellationNonRefundable;
+
+  /// No description provided for @cancellationCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom policy'**
+  String get cancellationCustom;
+
+  /// No description provided for @bookingReviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking review'**
+  String get bookingReviewTitle;
+
+  /// No description provided for @bookingSelectedPlanTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected rate plan'**
+  String get bookingSelectedPlanTitle;
+
+  /// No description provided for @bookingQuoteExpiry.
+  ///
+  /// In en, this message translates to:
+  /// **'Quote expires at {time}'**
+  String bookingQuoteExpiry(String time);
+
+  /// No description provided for @bookingAccountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get bookingAccountTitle;
+
+  /// No description provided for @bookingAccountReadOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'This identity is read-only here and is not sent with unsupported guest-profile fields.'**
+  String get bookingAccountReadOnly;
+
+  /// No description provided for @bookingSpecialRequestLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Special request'**
+  String get bookingSpecialRequestLabel;
+
+  /// No description provided for @bookingSpecialRequestHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional note only. No payment or guest profile is collected.'**
+  String get bookingSpecialRequestHelper;
+
+  /// No description provided for @bookingPriceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pricing quote'**
+  String get bookingPriceTitle;
+
+  /// No description provided for @bookingPriceSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking price quote'**
+  String get bookingPriceSemantic;
+
+  /// No description provided for @bookingFinalNightlyRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Final nightly rate'**
+  String get bookingFinalNightlyRate;
+
+  /// No description provided for @bookingStaySubtotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay subtotal'**
+  String get bookingStaySubtotal;
+
+  /// No description provided for @bookingPromotionDiscount.
+  ///
+  /// In en, this message translates to:
+  /// **'Promotion discount'**
+  String get bookingPromotionDiscount;
+
+  /// No description provided for @bookingFinalQuotedPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Final quoted price'**
+  String get bookingFinalQuotedPrice;
+
+  /// No description provided for @bookingCustomerBenefitsExcluded.
+  ///
+  /// In en, this message translates to:
+  /// **'Coupons, loyalty, travel credit, and gift cards are outside this UI phase.'**
+  String get bookingCustomerBenefitsExcluded;
+
+  /// No description provided for @bookingQuoteNoReservation.
+  ///
+  /// In en, this message translates to:
+  /// **'A quote does not create a booking or reserve inventory.'**
+  String get bookingQuoteNoReservation;
+
+  /// No description provided for @bookingQuoteUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Quote unavailable'**
+  String get bookingQuoteUnavailable;
+
+  /// No description provided for @bookingInventoryUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Inventory is unavailable for this quote.'**
+  String get bookingInventoryUnavailable;
+
+  /// No description provided for @bookingQuoteExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'This quote has expired. Refresh criteria before confirming.'**
+  String get bookingQuoteExpired;
+
+  /// No description provided for @bookingDemoBoundaryMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo mode can create a clearly local booking. It is not synchronized with the backend.'**
+  String get bookingDemoBoundaryMessage;
+
+  /// No description provided for @bookingRealUnavailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Online booking is not connected yet for real accounts.'**
+  String get bookingRealUnavailableMessage;
+
+  /// No description provided for @bookingTermsAcknowledgement.
+  ///
+  /// In en, this message translates to:
+  /// **'I understand this UI does not collect payment or reserve inventory.'**
+  String get bookingTermsAcknowledgement;
+
+  /// No description provided for @bookingConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm demo booking'**
+  String get bookingConfirmAction;
+
+  /// No description provided for @bookingConfirmSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm this demo booking'**
+  String get bookingConfirmSemantic;
+
+  /// No description provided for @bookingDuplicatePrevented.
+  ///
+  /// In en, this message translates to:
+  /// **'Duplicate booking creation was blocked.'**
+  String get bookingDuplicatePrevented;
+
+  /// No description provided for @bookingConfirmationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo booking confirmed'**
+  String get bookingConfirmationTitle;
+
+  /// No description provided for @bookingDemoStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Local demo booking'**
+  String get bookingDemoStatus;
+
+  /// No description provided for @bookingLocalCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Local code {code}'**
+  String bookingLocalCode(String code);
+
+  /// No description provided for @bookingConfirmationLocalOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'This booking exists only in local demo state. It is not paid, synced, or holding inventory.'**
+  String get bookingConfirmationLocalOnly;
+
+  /// No description provided for @bookingAddItineraryAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to itinerary'**
+  String get bookingAddItineraryAction;
+
+  /// No description provided for @bookingAddItinerarySemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Add this booking to the trip itinerary'**
+  String get bookingAddItinerarySemantic;
+
+  /// No description provided for @bookingItineraryAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to itinerary'**
+  String get bookingItineraryAdded;
+
+  /// No description provided for @bookingItineraryAlreadyAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'This stay is already in the itinerary.'**
+  String get bookingItineraryAlreadyAdded;
+
+  /// No description provided for @bookingItineraryAddedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay added to the itinerary.'**
+  String get bookingItineraryAddedMessage;
+
+  /// No description provided for @bookingItineraryNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Local demo booking {code}.'**
+  String bookingItineraryNote(String code);
+
+  /// No description provided for @bookingViewBookingAction.
+  ///
+  /// In en, this message translates to:
+  /// **'View booking'**
+  String get bookingViewBookingAction;
+
+  /// No description provided for @bookingReturnHomeAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Return home'**
+  String get bookingReturnHomeAction;
+
+  /// No description provided for @myBookingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My Bookings'**
+  String get myBookingsTitle;
+
+  /// No description provided for @myBookingsDemoLocalOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Only local demo bookings appear here. Real booking endpoints are not connected in UI-6.'**
+  String get myBookingsDemoLocalOnly;
+
+  /// No description provided for @myBookingsRealEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookings not connected'**
+  String get myBookingsRealEmptyTitle;
+
+  /// No description provided for @myBookingsRealEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Real account bookings will appear after the backend integration is wired.'**
+  String get myBookingsRealEmptyMessage;
+
+  /// No description provided for @myBookingsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No bookings'**
+  String get myBookingsEmptyTitle;
+
+  /// No description provided for @myBookingsEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo bookings will appear here after confirmation.'**
+  String get myBookingsEmptyMessage;
+
+  /// No description provided for @myBookingCardSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking card {code}'**
+  String myBookingCardSemantic(String code);
+
+  /// No description provided for @bookingDetailsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking details'**
+  String get bookingDetailsTitle;
+
+  /// No description provided for @bookingPaymentUnavailableAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment unavailable'**
+  String get bookingPaymentUnavailableAction;
+
+  /// No description provided for @bookingPaymentUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment actions are not connected in this UI phase.'**
+  String get bookingPaymentUnavailable;
+
+  /// No description provided for @bookingCancelAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel booking'**
+  String get bookingCancelAction;
+
+  /// No description provided for @bookingCancelSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel this demo booking'**
+  String get bookingCancelSemantic;
+
+  /// No description provided for @bookingCancelConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel demo booking?'**
+  String get bookingCancelConfirmTitle;
+
+  /// No description provided for @bookingCancelReasonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancellation reason'**
+  String get bookingCancelReasonLabel;
+
+  /// No description provided for @bookingCancelledMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo booking cancelled locally.'**
+  String get bookingCancelledMessage;
+
+  /// No description provided for @bookingSectionAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get bookingSectionAll;
+
+  /// No description provided for @bookingSectionUpcoming.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get bookingSectionUpcoming;
+
+  /// No description provided for @bookingSectionActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get bookingSectionActive;
+
+  /// No description provided for @bookingSectionHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get bookingSectionHistory;
+
+  /// No description provided for @bookingSectionCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get bookingSectionCancelled;
+
+  /// No description provided for @bookingStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get bookingStatusPending;
+
+  /// No description provided for @bookingStatusConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed'**
+  String get bookingStatusConfirmed;
+
+  /// No description provided for @bookingStatusCheckInReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in ready'**
+  String get bookingStatusCheckInReady;
+
+  /// No description provided for @bookingStatusCheckedIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Checked in'**
+  String get bookingStatusCheckedIn;
+
+  /// No description provided for @bookingStatusCheckedOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Checked out'**
+  String get bookingStatusCheckedOut;
+
+  /// No description provided for @bookingStatusCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get bookingStatusCompleted;
+
+  /// No description provided for @bookingStatusCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get bookingStatusCancelled;
+
+  /// No description provided for @bookingStatusRefunded.
+  ///
+  /// In en, this message translates to:
+  /// **'Refunded'**
+  String get bookingStatusRefunded;
+
+  /// No description provided for @bookingStatusArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived'**
+  String get bookingStatusArchived;
+
+  /// No description provided for @bookingStatusNoShow.
+  ///
+  /// In en, this message translates to:
+  /// **'No-show'**
+  String get bookingStatusNoShow;
+
   /// No description provided for @commonBackSemantic.
   ///
   /// In en, this message translates to:

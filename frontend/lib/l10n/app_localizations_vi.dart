@@ -1605,6 +1605,511 @@ class AppLocalizationsVi extends AppLocalizations {
   String get expenseCategoryOther => 'Khác';
 
   @override
+  String get hotelsTitle => 'Khách sạn';
+
+  @override
+  String get hotelsSubtitle =>
+      'Tìm chỗ ở từ dữ liệu địa điểm công khai, rồi xem một phòng và một báo giá cục bộ.';
+
+  @override
+  String get hotelsDestinationLabel => 'Điểm đến';
+
+  @override
+  String get hotelsDestinationHint => 'Thành phố, khách sạn hoặc khu vực';
+
+  @override
+  String get hotelsCheckInLabel => 'Nhận phòng';
+
+  @override
+  String get hotelsCheckOutLabel => 'Trả phòng';
+
+  @override
+  String get hotelsAdultsLabel => 'Người lớn';
+
+  @override
+  String get hotelsChildrenLabel => 'Trẻ em';
+
+  @override
+  String get hotelsSearchAction => 'Tìm chỗ ở';
+
+  @override
+  String get hotelsSearchSemantic => 'Tìm chỗ ở khách sạn';
+
+  @override
+  String hotelsTripPrefillLabel(String trip) {
+    return 'Điền từ $trip';
+  }
+
+  @override
+  String get hotelsLocalPreviewMessage =>
+      'Khám phá khách sạn dùng dữ liệu địa điểm chỗ ở cục bộ. Tình trạng phòng, báo giá và đặt phòng chỉ là giao diện trong giai đoạn này.';
+
+  @override
+  String hotelsResultCount(int count) {
+    return '$count khách sạn';
+  }
+
+  @override
+  String get hotelsEmptyTitle => 'Không tìm thấy chỗ ở';
+
+  @override
+  String get hotelsEmptyMessage => 'Thử điểm đến hoặc số khách khác.';
+
+  @override
+  String get hotelsValidationPastCheckIn =>
+      'Ngày nhận phòng không được trước hôm nay.';
+
+  @override
+  String get hotelsValidationCheckout =>
+      'Ngày trả phòng phải sau ngày nhận phòng.';
+
+  @override
+  String get hotelsValidationAdults => 'Cần ít nhất một người lớn.';
+
+  @override
+  String get hotelsValidationChildren => 'Số trẻ em không được âm.';
+
+  @override
+  String get hotelsValidationExtraBeds => 'Số giường phụ không được âm.';
+
+  @override
+  String get hotelDetailTitle => 'Chi tiết khách sạn';
+
+  @override
+  String hotelStars(int stars) {
+    return '$stars sao';
+  }
+
+  @override
+  String hotelCheckInOutMeta(String checkIn, String checkOut) {
+    return 'Nhận phòng $checkIn · Trả phòng $checkOut';
+  }
+
+  @override
+  String hotelAvailableRooms(int count) {
+    return '$count phòng phù hợp';
+  }
+
+  @override
+  String get hotelBreakfastIncluded => 'Bữa sáng';
+
+  @override
+  String get hotelAirportShuttle => 'Đưa đón sân bay';
+
+  @override
+  String hotelDistanceBeach(int meters) {
+    return '$meters m tới biển';
+  }
+
+  @override
+  String hotelDistanceCenter(int meters) {
+    return '$meters m tới trung tâm';
+  }
+
+  @override
+  String hotelLanguages(String languages) {
+    return 'Ngôn ngữ: $languages';
+  }
+
+  @override
+  String hotelPaymentMethods(String methods) {
+    return 'Phương thức thanh toán: $methods';
+  }
+
+  @override
+  String get hotelFacilitiesTitle => 'Tiện nghi';
+
+  @override
+  String get hotelServicesTitle => 'Dịch vụ';
+
+  @override
+  String get hotelRoomPreviewTitle => 'Xem trước phòng';
+
+  @override
+  String get hotelCheckAvailabilityAction => 'Kiểm tra phòng';
+
+  @override
+  String hotelCheckAvailabilitySemantic(String hotel) {
+    return 'Kiểm tra phòng cho $hotel';
+  }
+
+  @override
+  String get hotelViewRoomsAction => 'Xem phòng';
+
+  @override
+  String hotelCardSemantic(String hotel) {
+    return 'Thẻ khách sạn $hotel';
+  }
+
+  @override
+  String hotelFromPrice(String price) {
+    return 'Từ $price';
+  }
+
+  @override
+  String get hotelRoomsTitle => 'Phòng và giá';
+
+  @override
+  String get hotelAvailableRoomsTitle => 'Phòng khả dụng';
+
+  @override
+  String get hotelNoAvailabilityTitle => 'Không có phòng phù hợp';
+
+  @override
+  String get hotelNoAvailabilityMessage =>
+      'Không có phòng cục bộ phù hợp với số khách đã chọn. Hãy đổi ngày hoặc số khách.';
+
+  @override
+  String get hotelRatePlansTitle => 'Chọn gói giá';
+
+  @override
+  String get hotelContinueReviewAction => 'Xem lại đặt phòng';
+
+  @override
+  String get hotelContinueReviewSemantic =>
+      'Tiếp tục đến bước xem lại đặt phòng';
+
+  @override
+  String hotelNights(int nights) {
+    return '$nights đêm';
+  }
+
+  @override
+  String hotelGuestSummary(int adults, int children) {
+    return '$adults người lớn · $children trẻ em';
+  }
+
+  @override
+  String get hotelOneRoomOnly => '1 phòng';
+
+  @override
+  String get hotelAddAdultAction => 'Thêm người lớn';
+
+  @override
+  String get hotelExtendStayAction => 'Thêm đêm';
+
+  @override
+  String hotelRoomCardSemantic(String room) {
+    return 'Thẻ phòng $room';
+  }
+
+  @override
+  String hotelMaxGuests(int guests) {
+    return 'Tối đa $guests khách';
+  }
+
+  @override
+  String hotelRoomSize(int size) {
+    return '$size m²';
+  }
+
+  @override
+  String hotelBedCount(int count, String label) {
+    return '$count × $label';
+  }
+
+  @override
+  String hotelRatePlanSemantic(String plan) {
+    return 'Gói giá $plan';
+  }
+
+  @override
+  String get roomTypeStandard => 'Standard';
+
+  @override
+  String get roomTypeSuperior => 'Superior';
+
+  @override
+  String get roomTypeDeluxe => 'Deluxe';
+
+  @override
+  String get roomTypePremier => 'Premier';
+
+  @override
+  String get roomTypeExecutive => 'Executive';
+
+  @override
+  String get roomTypeSuite => 'Suite';
+
+  @override
+  String get roomTypeFamily => 'Gia đình';
+
+  @override
+  String get roomTypeVilla => 'Villa';
+
+  @override
+  String get roomTypeBungalow => 'Bungalow';
+
+  @override
+  String get bedTypeSingle => 'Giường đơn';
+
+  @override
+  String get bedTypeDouble => 'Giường đôi';
+
+  @override
+  String get bedTypeTwin => 'Hai giường đơn';
+
+  @override
+  String get bedTypeQueen => 'Giường queen';
+
+  @override
+  String get bedTypeKing => 'Giường king';
+
+  @override
+  String get bedTypeSofaBed => 'Giường sofa';
+
+  @override
+  String get bedTypeBunk => 'Giường tầng';
+
+  @override
+  String get mealPlanRoomOnly => 'Chỉ phòng';
+
+  @override
+  String get mealPlanBreakfast => 'Bữa sáng';
+
+  @override
+  String get mealPlanHalfBoard => 'Nửa gói ăn';
+
+  @override
+  String get mealPlanFullBoard => 'Trọn gói ăn';
+
+  @override
+  String get mealPlanAllInclusive => 'Bao gồm tất cả';
+
+  @override
+  String get cancellationFree => 'Hủy miễn phí';
+
+  @override
+  String get cancellationPartial => 'Hoàn tiền một phần';
+
+  @override
+  String get cancellationNonRefundable => 'Không hoàn tiền';
+
+  @override
+  String get cancellationCustom => 'Chính sách riêng';
+
+  @override
+  String get bookingReviewTitle => 'Xem lại đặt phòng';
+
+  @override
+  String get bookingSelectedPlanTitle => 'Gói giá đã chọn';
+
+  @override
+  String bookingQuoteExpiry(String time) {
+    return 'Báo giá hết hạn lúc $time';
+  }
+
+  @override
+  String get bookingAccountTitle => 'Tài khoản';
+
+  @override
+  String get bookingAccountReadOnly =>
+      'Danh tính này chỉ để xem tại đây và không gửi kèm trường hồ sơ khách chưa hỗ trợ.';
+
+  @override
+  String get bookingSpecialRequestLabel => 'Yêu cầu đặc biệt';
+
+  @override
+  String get bookingSpecialRequestHelper =>
+      'Ghi chú tùy chọn. Không thu thập thanh toán hoặc hồ sơ khách.';
+
+  @override
+  String get bookingPriceTitle => 'Báo giá';
+
+  @override
+  String get bookingPriceSemantic => 'Báo giá đặt phòng';
+
+  @override
+  String get bookingFinalNightlyRate => 'Giá cuối mỗi đêm';
+
+  @override
+  String get bookingStaySubtotal => 'Tạm tính kỳ lưu trú';
+
+  @override
+  String get bookingPromotionDiscount => 'Giảm giá khuyến mãi';
+
+  @override
+  String get bookingFinalQuotedPrice => 'Tổng báo giá cuối';
+
+  @override
+  String get bookingCustomerBenefitsExcluded =>
+      'Mã giảm giá, điểm thành viên, travel credit và thẻ quà tặng nằm ngoài UI này.';
+
+  @override
+  String get bookingQuoteNoReservation =>
+      'Báo giá không tạo đặt phòng và không giữ phòng.';
+
+  @override
+  String get bookingQuoteUnavailable => 'Chưa có báo giá';
+
+  @override
+  String get bookingInventoryUnavailable => 'Không còn phòng cho báo giá này.';
+
+  @override
+  String get bookingQuoteExpired =>
+      'Báo giá đã hết hạn. Làm mới tiêu chí trước khi xác nhận.';
+
+  @override
+  String get bookingDemoBoundaryMessage =>
+      'Chế độ demo có thể tạo đặt phòng cục bộ rõ ràng. Dữ liệu này không đồng bộ với backend.';
+
+  @override
+  String get bookingRealUnavailableMessage =>
+      'Đặt phòng online chưa được kết nối cho tài khoản thật.';
+
+  @override
+  String get bookingTermsAcknowledgement =>
+      'Tôi hiểu UI này không thu thanh toán hoặc giữ phòng.';
+
+  @override
+  String get bookingConfirmAction => 'Xác nhận đặt phòng demo';
+
+  @override
+  String get bookingConfirmSemantic => 'Xác nhận đặt phòng demo này';
+
+  @override
+  String get bookingDuplicatePrevented => 'Đã chặn tạo đặt phòng trùng.';
+
+  @override
+  String get bookingConfirmationTitle => 'Đã xác nhận đặt phòng demo';
+
+  @override
+  String get bookingDemoStatus => 'Đặt phòng demo cục bộ';
+
+  @override
+  String bookingLocalCode(String code) {
+    return 'Mã cục bộ $code';
+  }
+
+  @override
+  String get bookingConfirmationLocalOnly =>
+      'Đặt phòng này chỉ tồn tại trong trạng thái demo cục bộ. Chưa thanh toán, chưa đồng bộ và không giữ phòng.';
+
+  @override
+  String get bookingAddItineraryAction => 'Thêm vào lịch trình';
+
+  @override
+  String get bookingAddItinerarySemantic =>
+      'Thêm đặt phòng này vào lịch trình chuyến đi';
+
+  @override
+  String get bookingItineraryAdded => 'Đã thêm vào lịch trình';
+
+  @override
+  String get bookingItineraryAlreadyAdded =>
+      'Chỗ ở này đã có trong lịch trình.';
+
+  @override
+  String get bookingItineraryAddedMessage => 'Đã thêm chỗ ở vào lịch trình.';
+
+  @override
+  String bookingItineraryNote(String code) {
+    return 'Đặt phòng demo cục bộ $code.';
+  }
+
+  @override
+  String get bookingViewBookingAction => 'Xem đặt phòng';
+
+  @override
+  String get bookingReturnHomeAction => 'Về trang chủ';
+
+  @override
+  String get myBookingsTitle => 'Đặt phòng của tôi';
+
+  @override
+  String get myBookingsDemoLocalOnly =>
+      'Chỉ đặt phòng demo cục bộ xuất hiện tại đây. Endpoint đặt phòng thật chưa được kết nối trong UI-6.';
+
+  @override
+  String get myBookingsRealEmptyTitle => 'Chưa kết nối đặt phòng';
+
+  @override
+  String get myBookingsRealEmptyMessage =>
+      'Đặt phòng tài khoản thật sẽ xuất hiện sau khi tích hợp backend.';
+
+  @override
+  String get myBookingsEmptyTitle => 'Chưa có đặt phòng';
+
+  @override
+  String get myBookingsEmptyMessage =>
+      'Đặt phòng demo sẽ xuất hiện sau khi xác nhận.';
+
+  @override
+  String myBookingCardSemantic(String code) {
+    return 'Thẻ đặt phòng $code';
+  }
+
+  @override
+  String get bookingDetailsTitle => 'Chi tiết đặt phòng';
+
+  @override
+  String get bookingPaymentUnavailableAction => 'Chưa có thanh toán';
+
+  @override
+  String get bookingPaymentUnavailable =>
+      'Hành động thanh toán chưa được kết nối trong UI này.';
+
+  @override
+  String get bookingCancelAction => 'Hủy đặt phòng';
+
+  @override
+  String get bookingCancelSemantic => 'Hủy đặt phòng demo này';
+
+  @override
+  String get bookingCancelConfirmTitle => 'Hủy đặt phòng demo?';
+
+  @override
+  String get bookingCancelReasonLabel => 'Lý do hủy';
+
+  @override
+  String get bookingCancelledMessage => 'Đã hủy đặt phòng demo cục bộ.';
+
+  @override
+  String get bookingSectionAll => 'Tất cả';
+
+  @override
+  String get bookingSectionUpcoming => 'Sắp tới';
+
+  @override
+  String get bookingSectionActive => 'Đang ở';
+
+  @override
+  String get bookingSectionHistory => 'Lịch sử';
+
+  @override
+  String get bookingSectionCancelled => 'Đã hủy';
+
+  @override
+  String get bookingStatusPending => 'Đang chờ';
+
+  @override
+  String get bookingStatusConfirmed => 'Đã xác nhận';
+
+  @override
+  String get bookingStatusCheckInReady => 'Sẵn sàng nhận phòng';
+
+  @override
+  String get bookingStatusCheckedIn => 'Đã nhận phòng';
+
+  @override
+  String get bookingStatusCheckedOut => 'Đã trả phòng';
+
+  @override
+  String get bookingStatusCompleted => 'Hoàn tất';
+
+  @override
+  String get bookingStatusCancelled => 'Đã hủy';
+
+  @override
+  String get bookingStatusRefunded => 'Đã hoàn tiền';
+
+  @override
+  String get bookingStatusArchived => 'Đã lưu trữ';
+
+  @override
+  String get bookingStatusNoShow => 'Không đến';
+
+  @override
   String get commonBackSemantic => 'Quay lại';
 
   @override

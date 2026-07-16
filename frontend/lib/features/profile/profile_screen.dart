@@ -9,6 +9,7 @@ import '../../design/app_spacing.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/glass_widgets.dart';
 import '../auth/login_screen.dart';
+import '../bookings/my_bookings_screen.dart';
 import 'notifications_screen.dart';
 import 'saved_places_screen.dart';
 import 'settings_screen.dart';
@@ -174,6 +175,14 @@ class ProfileScreen extends StatelessWidget {
           onTap: () => Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+          ),
+        ),
+        _ProfileNavCard(
+          icon: Icons.hotel_rounded,
+          title: l10n.myBookingsTitle,
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const MyBookingsScreen()),
           ),
         ),
         const SizedBox(height: AppSpacing.sm),
