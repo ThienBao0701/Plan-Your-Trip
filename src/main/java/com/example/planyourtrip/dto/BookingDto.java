@@ -91,6 +91,31 @@ public class BookingDto {
         BigDecimal ratePlanAdjustmentSnapshot
     ) {}
 
+    /**
+     * Phase 7.34 — customer modification of a PENDING (not-yet-paid) booking. Every field is
+     * OPTIONAL: an omitted (null) field keeps the booking's current value, so a caller can change
+     * just the dates, just the occupancy, or just the rate plan. Scoped deliberately to PENDING
+     * bookings to avoid the payment-settlement price-difference problem (see BookingService.modify).
+     *
+     * <p>Notes on the two fields that are NOT persisted on the booking entity:
+     * <ul>
+     *   <li>{@code extraBeds} is a pricing-only input (never stored on Booking), so an omitted
+     *       extraBeds is treated as 0 — mirroring {@code create()} where an omitted extraBeds is 0.
+     *       Resend it if the stay still needs extra beds.</li>
+     *   <li>{@code ratePlanId} omitted keeps the booking's currently-snapshotted rate plan and
+     *       re-prices it for the new params; that retained plan must remain eligible for the new
+     *       dates/occupancy or the modification is rejected (422), exactly like create().</li>
+     * </ul>
+     */
+    public record BookingModificationRequest(
+        LocalDate checkIn,
+        LocalDate checkOut,
+        @Min(1) Integer adults,
+        @Min(0) Integer children,
+        @Min(0) Integer extraBeds,
+        Long ratePlanId
+    ) {}
+
     public record BookingSummaryResponse(
         Long id,
         String bookingCode,

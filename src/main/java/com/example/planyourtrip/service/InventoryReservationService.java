@@ -114,6 +114,60 @@ public class InventoryReservationService {
     }
 
     // ═════════════════════════════════════════════════════════════════════
+    // MODIFY (Phase 7.34 — customer modification of a PENDING booking)
+    // ═════════════════════════════════════════════════════════════════════
+
+    /**
+     * Phase 7.34 — guard used by {@code BookingService.modify} BEFORE any inventory mutation: a
+     * booking may only be modified while its hold is still HELD. A PENDING booking whose hold was
+     * already RELEASED (payment failed / session cancelled) or EXPIRED (timeout sweep) no longer
+     * holds any inventory, so restoring "its" inventory would double-restore — reject instead (422).
+     * Read-only; the authoritative HELD re-check happens under the write lock in
+     * {@link #updateHoldForModification}.
+     */
+    @Transactional(readOnly = true)
+    public void assertHeldForModification(Long bookingId) {
+        InventoryReservation reservation = reservationRepo.findByBookingId(bookingId)
+            .orElseThrow(() -> new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,
+                "No active inventory hold exists for booking " + bookingId + " — cannot modify"));
+        if (reservation.getStatus() != InventoryReservationStatus.HELD)
+            throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,
+                "Inventory hold for booking " + bookingId + " is no longer active (status "
+                    + reservation.getStatus() + ") — cannot modify");
+    }
+
+    /**
+     * Phase 7.34 — after {@code BookingService.modify} has restored the old inventory and
+     * decremented the new inventory (the SAME primitives create/cancel use), REPLACE the booking's
+     * hold so it covers the new dates/room count, all in the caller's transaction. Performs NO
+     * inventory math of its own (mirrors {@link #hold}).
+     *
+     * <p>A reservation row is intentionally immutable (Phase 7.28 maps its dates/room-count as
+     * {@code updatable = false}), so a modification does NOT edit the row in place — it deletes the
+     * existing HELD row and creates a fresh HELD row via {@link #hold}, keeping one reservation per
+     * booking and never touching the Phase 7.28 entity mapping. The old row is loaded under the
+     * per-row write lock and HELD is re-asserted there, so this never races the
+     * payment/cancel/expiry paths; a hold that has slipped out of HELD is rejected (422), rolling
+     * the whole modification back.
+     */
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void updateHoldForModification(Booking booking) {
+        InventoryReservation reservation = reservationRepo.findByBookingIdForUpdate(booking.getId())
+            .orElseThrow(() -> new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,
+                "No active inventory hold exists for booking " + booking.getId() + " — cannot modify"));
+        if (reservation.getStatus() != InventoryReservationStatus.HELD)
+            throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,
+                "Inventory hold for booking " + booking.getId() + " is no longer active (status "
+                    + reservation.getStatus() + ") — cannot modify");
+
+        // Replace the immutable HELD row (delete + flush so the unique booking_id constraint is
+        // clear) with a fresh HELD row over the new dates.
+        reservationRepo.delete(reservation);
+        reservationRepo.flush();
+        hold(booking);
+    }
+
+    // ═════════════════════════════════════════════════════════════════════
     // CONSUME (payment success)
     // ═════════════════════════════════════════════════════════════════════
 

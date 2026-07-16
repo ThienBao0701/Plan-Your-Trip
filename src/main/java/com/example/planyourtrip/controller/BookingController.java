@@ -70,4 +70,12 @@ public class BookingController {
                                    @RequestBody(required = false) CancelRequest req) {
         return service.cancel(uid, id, req != null ? req.cancelReason() : null);
     }
+
+    @PatchMapping("/api/bookings/{id}/modify")
+    @Operation(summary = "Modify a PENDING booking's dates / occupancy / rate plan (owner only)")
+    public BookingResponse modify(@AuthUser Long uid,
+                                   @PathVariable Long id,
+                                   @RequestBody @Valid BookingModificationRequest req) {
+        return service.modify(uid, id, req);
+    }
 }

@@ -360,6 +360,180 @@ public class BookingService {
         return toResponse(saved);
     }
 
+    // ── Phase 7.34 — Customer: modify a PENDING booking ───────────────────────
+
+    /**
+     * Phase 7.34 — customer modification of a PENDING (not-yet-paid) booking: change the stay
+     * dates, occupancy (adults/children/extra beds) and/or selected rate plan, which re-checks
+     * inventory, re-prices and re-snapshots the rate plan by REUSING the exact same primitives as
+     * {@link #create}. Every request field is optional; an omitted field keeps the booking's
+     * current value.
+     *
+     * <p><b>PENDING-only boundary (the core scope decision).</b> Only a PENDING booking may be
+     * modified. Modifying a settled booking (CONFIRMED/paid, CHECKED_IN, COMPLETED, CANCELLED, …)
+     * would have to charge an additional amount or issue a partial refund through the
+     * payment/ledger system — a genuinely larger, separate phase that is explicitly deferred here.
+     * Any non-PENDING status is rejected with 422, mirroring {@code cancel()}'s
+     * "Cannot cancel booking with status: X" convention.
+     *
+     * <p><b>Benefit-handling rule (documented judgment call).</b> If the booking already has any
+     * checkout benefit applied (coupon, travel credit, loyalty redemption or gift card), the
+     * modification is REJECTED with 422. Rationale: re-pricing under new dates/occupancy would
+     * leave a stale benefit discount attached to a different total. Rejecting (rather than
+     * silently reversing the benefit) is the simplest rule that guarantees the invariant "final
+     * price and applied-benefit fields are always mutually consistent", and keeps the full
+     * checkout-benefit pipeline out of this phase. The customer removes the benefit (by cancelling
+     * and rebooking, or a future dedicated action) before modifying.
+     *
+     * <p><b>Inventory correctness under concurrency.</b> When the dates change the OLD nights are
+     * restored via the existing {@code restoreInventory}, then the NEW nights are pessimistically
+     * locked ({@code lockForUpdate}, Phase 7.28) BEFORE the availability check and
+     * {@code decrementInventory} — exactly like {@code create()} — so a modification can never
+     * oversell. Restore + lock + check + decrement + reservation update + re-price all run in this
+     * ONE transaction: any failure (e.g. new dates unavailable → 422) rolls everything back and
+     * leaves the booking exactly as it was, with its original inventory still held. A modification
+     * requires the hold to be currently HELD (see
+     * {@link InventoryReservationService#assertHeldForModification}); the immutable HELD row is
+     * replaced with a fresh HELD row over the new dates (see
+     * {@link InventoryReservationService#updateHoldForModification}).
+     */
+    @Transactional
+    public BookingResponse modify(Long userId, Long bookingId, BookingModificationRequest req) {
+        Booking booking = bookingRepo.findById(bookingId)
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found: " + bookingId));
+        // Ownership convention MATCHES cancel(): another user's booking → 403 (consistency within
+        // this controller wins).
+        if (!booking.getUser().getId().equals(userId))
+            throw new ApiException(HttpStatus.FORBIDDEN, "Access denied");
+
+        if (booking.getStatus() != BookingStatus.PENDING)
+            throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,
+                "Cannot modify booking with status: " + booking.getStatus());
+
+        // Benefit-handling rule (documented above): refuse when a checkout benefit is attached.
+        if (hasAppliedCheckoutBenefit(booking))
+            throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,
+                "Remove the applied coupon / travel credit / loyalty / gift card before modifying this booking");
+
+        // A booking may only be modified while its hold is still HELD (a payment-failed / expired
+        // PENDING booking holds no inventory). Checked BEFORE any inventory mutation.
+        inventoryReservationService.assertHeldForModification(bookingId);
+
+        HotelRoom room = booking.getRoom();
+        Long roomId = room.getId();
+        LocalDate oldCheckIn = booking.getCheckInDate();
+        LocalDate oldCheckOut = booking.getCheckOutDate();
+        int numRooms = booking.getNumberOfRooms(); // room count is not modifiable in this phase
+
+        // Merge request with current values (omitted field → keep current).
+        LocalDate newCheckIn  = req.checkIn()  != null ? req.checkIn()  : oldCheckIn;
+        LocalDate newCheckOut = req.checkOut() != null ? req.checkOut() : oldCheckOut;
+        int newAdults   = req.adults()   != null ? req.adults()   : booking.getAdults();
+        int newChildren = req.children() != null ? req.children() : booking.getChildren();
+        int newExtraBeds = req.extraBeds() != null ? req.extraBeds() : 0; // pricing-only, not persisted
+        // Omitted ratePlanId keeps the currently-snapshotted plan; explicit value switches plan.
+        Long effectiveRatePlanId = req.ratePlanId() != null ? req.ratePlanId() : booking.getSelectedRatePlanId();
+
+        // ── Validation (reuses the SAME rules as create()) ────────────────────
+        LocalDate today = LocalDate.now();
+        if (newCheckIn.isBefore(today))
+            throw new ApiException(HttpStatus.BAD_REQUEST, "checkIn cannot be in the past");
+        if (!newCheckOut.isAfter(newCheckIn))
+            throw new ApiException(HttpStatus.BAD_REQUEST, "checkOut must be after checkIn");
+        if (newAdults < 1)
+            throw new ApiException(HttpStatus.BAD_REQUEST, "adults must be at least 1");
+
+        int maxAdultsTotal = room.getMaxAdults() != null ? room.getMaxAdults() * numRooms : numRooms;
+        int maxGuestsTotal = room.getMaxGuests() != null ? room.getMaxGuests() * numRooms : numRooms;
+        if (newAdults > maxAdultsTotal)
+            throw new ApiException(HttpStatus.BAD_REQUEST,
+                "Adults exceed maximum capacity of " + maxAdultsTotal);
+        if ((newAdults + newChildren) > maxGuestsTotal)
+            throw new ApiException(HttpStatus.BAD_REQUEST,
+                "Total guests exceed maximum capacity of " + maxGuestsTotal);
+
+        // ── Inventory move (only when the dates actually change) ──────────────
+        boolean datesChanged = !newCheckIn.equals(oldCheckIn) || !newCheckOut.equals(oldCheckOut);
+        if (datesChanged) {
+            long newNights = ChronoUnit.DAYS.between(newCheckIn, newCheckOut);
+            // Give back the old nights first (this booking's current hold), then take the new nights
+            // under the Phase 7.28 lock. When old/new overlap the restore makes the shared nights
+            // available for the re-check, so the net effect is exactly correct.
+            inventoryRepo.restoreInventory(roomId, oldCheckIn, oldCheckOut, numRooms);
+            inventoryRepo.lockForUpdate(roomId, newCheckIn, newCheckOut);
+            long availNights = inventoryRepo.countNightsWithSufficientInventory(
+                roomId, newCheckIn, newCheckOut, numRooms);
+            if (availNights < newNights)
+                throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,
+                    "Insufficient inventory for the selected dates");
+            inventoryRepo.decrementInventory(roomId, newCheckIn, newCheckOut, numRooms);
+        }
+
+        // ── Re-resolve the rate plan + re-price for the new params ────────────
+        // Identical pipeline to create(): resolve the plan (validating an explicit/retained plan
+        // for eligibility → 422 before any state is committed), then feed its stay subtotal into
+        // the SAME pricing engine. No new pricing math is introduced here.
+        var rateResolution = ratePlanPricingService.resolveForBooking(
+            room, effectiveRatePlanId, newCheckIn, newCheckOut, newAdults, newChildren, newExtraBeds);
+        var pricing = rateResolution
+            .map(r -> pricingEngine.calculate(roomId, newCheckIn, newCheckOut,
+                r.staySubtotal(), r.plan().getRateName()))
+            .orElseGet(() -> pricingEngine.calculate(roomId, newCheckIn, newCheckOut, null, null));
+
+        // ── Apply the new state to the booking ────────────────────────────────
+        booking.setCheckInDate(newCheckIn);
+        booking.setCheckOutDate(newCheckOut);
+        booking.setAdults(newAdults);
+        booking.setChildren(newChildren);
+        booking.setBasePrice(pricing.basePrice());
+        booking.setRatePlanPrice(pricing.ratePlanPrice());
+        booking.setDiscountAmount(pricing.promotionDiscount());
+        // No checkout benefit is present (rejected above), so the payable is the promotion-discounted
+        // total with nothing further subtracted — finalPrice and the (null) benefit fields stay
+        // mutually consistent by construction.
+        booking.setFinalPrice(pricing.finalPrice());
+
+        // Re-snapshot the rate plan (or clear it when no plan is now eligible), so the snapshot never
+        // lags the re-priced total.
+        if (rateResolution.isPresent()) {
+            var r = rateResolution.get();
+            var plan = r.plan();
+            booking.setSelectedRatePlanId(plan.getId());
+            booking.setSelectedRatePlanCode(plan.getCode());
+            booking.setSelectedRatePlanName(plan.getRateName());
+            booking.setMealPlanType(plan.getMealPlanType());
+            booking.setCancellationPolicyType(plan.getCancellationPolicyType());
+            booking.setCancellationDeadlineAt(r.cancellationDeadlineAt());
+            booking.setRefundable(plan.isRefundable());
+            booking.setNightlyRateSnapshot(r.finalNightlyRate());
+            booking.setRatePlanAdjustmentSnapshot(r.ratePlanAdjustment());
+        } else {
+            booking.setSelectedRatePlanId(null);
+            booking.setSelectedRatePlanCode(null);
+            booking.setSelectedRatePlanName(null);
+            booking.setMealPlanType(null);
+            booking.setCancellationPolicyType(null);
+            booking.setCancellationDeadlineAt(null);
+            booking.setRefundable(null);
+            booking.setNightlyRateSnapshot(null);
+            booking.setRatePlanAdjustmentSnapshot(null);
+        }
+
+        // Sync the existing HELD reservation to the booking's new dates/room count (validates HELD
+        // under the write lock; NO inventory math of its own).
+        inventoryReservationService.updateHoldForModification(booking);
+
+        return toResponse(bookingRepo.save(booking));
+    }
+
+    /** True when any checkout benefit (coupon / travel credit / loyalty / gift card) is attached. */
+    private boolean hasAppliedCheckoutBenefit(Booking b) {
+        return (b.getCouponCode() != null && !b.getCouponCode().isBlank())
+            || (b.getCreditAmountUsed() != null && b.getCreditAmountUsed().signum() > 0)
+            || (b.getLoyaltyDiscountAmount() != null && b.getLoyaltyDiscountAmount().signum() > 0)
+            || (b.getGiftCardAmountUsed() != null && b.getGiftCardAmountUsed().signum() > 0);
+    }
+
     // ── Admin: list / get ─────────────────────────────────────────────────────
 
     @Transactional(readOnly = true)
