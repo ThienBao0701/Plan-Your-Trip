@@ -11,6 +11,7 @@ import '../../design/app_spacing.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/add_to_trip_sheet.dart';
 import '../../shared/widgets/glass_widgets.dart';
+import '../categories/category_discovery_screen.dart';
 import '../places/place_detail_screen.dart';
 import '../places/places_screen.dart';
 import '../trips/create_trip_screen.dart';
@@ -41,6 +42,23 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (_) => PlacesScreen(
           initialQuery: search.text.trim(),
           initialCategory: category,
+        ),
+      ),
+    );
+  }
+
+  void _openCategory(Category category) {
+    final mode = CategoryDiscoveryTaxonomy.modeForCategory(category);
+    if (mode == null) {
+      _openSearch(category: category.id);
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CategoryDiscoveryScreen(
+          mode: mode,
+          initialRoot: CategoryDiscoveryTaxonomy.rootForCategory(category),
         ),
       ),
     );
@@ -119,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: AppSpacing.sm),
               _CategoryShortcuts(
                 categories: app.categories,
-                onCategory: (category) => _openSearch(category: category.id),
+                onCategory: _openCategory,
               ),
               const SizedBox(height: AppSpacing.lg),
               _SectionHeader(

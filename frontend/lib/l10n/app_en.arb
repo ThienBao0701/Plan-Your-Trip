@@ -663,7 +663,7 @@
     }
   },
   "tripOverviewTimelineAction": "Timeline",
-  "tripOverviewExpensesAction": "Expenses",
+  "tripOverviewExpensesAction": "Budget",
   "tripOverviewActivitiesMetric": "Activities",
   "tripOverviewSpentMetric": "Spent",
   "tripOverviewBudgetMetric": "Budget",
@@ -678,6 +678,150 @@
       }
     }
   },
+  "categoryFoodTitle": "Food & cafes",
+  "categoryFoodSubtitle": "Browse local food and cafe places from supported category roots.",
+  "categoryFoodSearchHint": "Search food, cafes, or local dishes",
+  "categoryThingsTitle": "Things to do",
+  "categoryThingsSubtitle": "Attractions and entertainment stay distinct for future backend mapping.",
+  "categoryThingsSearchHint": "Search attractions or entertainment",
+  "categoryTransportTitle": "Transportation",
+  "categoryTransportSubtitle": "Browse transport listings without live routes, fares, or schedules.",
+  "categoryTransportSearchHint": "Search transport providers",
+  "categoryRootAll": "All",
+  "categoryRootFood": "Food",
+  "categoryRootCafe": "Cafe",
+  "categoryRootAttraction": "Attractions",
+  "categoryRootEntertainment": "Entertainment",
+  "categoryRootTransportation": "Transportation",
+  "categoryFiltersSemantic": "Open category filters",
+  "categoryFiltersTitle": "Category filters",
+  "categoryFilterRating": "Rating",
+  "categoryFilterRating45": "4.5+ rating",
+  "categoryFilterPrice": "Price level",
+  "categoryFilterPriceAny": "Any price",
+  "categoryFilterApply": "Apply filters",
+  "categoryEmptyTitle": "No category results",
+  "categoryEmptyMessage": "Try another keyword, root category, rating, or price level.",
+  "categoryLocalPreviewMessage": "These public category results are local preview content and are not personal server data.",
+  "categoryTransportUnavailableTitle": "Routes not connected",
+  "categoryTransportUnavailableMessage": "Live routes, fares, schedules, travel times, geolocation, and ticket booking are not connected yet.",
+  "budgetTitle": "Trip budget",
+  "budgetHeading": "Budget overview",
+  "budgetTripSelectorLabel": "Trip",
+  "budgetNoTripTitle": "No trip budget yet",
+  "budgetNoTripMessage": "Create a trip before tracking a trip-scoped budget.",
+  "budgetOverviewSemantic": "Budget overview",
+  "budgetTotalBudget": "Total budget",
+  "budgetSetAction": "Set budget",
+  "budgetSetTitle": "Set trip budget",
+  "budgetAmountLabel": "Budget amount",
+  "budgetNotSet": "Not set",
+  "budgetSpent": "Spent",
+  "budgetLeft": "Left",
+  "budgetOverBy": "Over by",
+  "budgetProgressSemantic": "Budget progress {percent} percent used",
+  "@budgetProgressSemantic": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "budgetProgressMissingSemantic": "Budget progress unavailable because no budget is set",
+  "budgetProgressLabel": "{percent}% used",
+  "@budgetProgressLabel": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "budgetOverMessage": "Over budget by {amount}",
+  "@budgetOverMessage": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "budgetMissingBudgetTitle": "Budget not configured",
+  "budgetMissingBudgetMessage": "Expenses can be tracked before a total budget is set.",
+  "budgetNoExpensesTitle": "No expenses yet",
+  "budgetNoExpensesMessage": "Add expenses to build this trip's local spending history.",
+  "budgetByCategoryTitle": "By category",
+  "budgetHistoryTitle": "Expense history",
+  "budgetMixedCurrencyWarning": "This trip has expenses outside {currency}. Totals show only {currency} to avoid mixing currencies.",
+  "@budgetMixedCurrencyWarning": {
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "budgetSavedMessage": "Budget updated locally.",
+  "budgetSaveFailed": "Could not save this budget.",
+  "expenseAddSemantic": "Add expense",
+  "expenseAddAction": "Add expense",
+  "expenseAddTitle": "Add expense",
+  "expenseEditTitle": "Edit expense",
+  "expenseSaveAction": "Save expense",
+  "expenseSaveSemantic": "Save this expense",
+  "expenseTitleLabel": "Expense title",
+  "expenseTitleRequired": "Enter an expense title.",
+  "expenseAmountLabel": "Amount",
+  "expenseAmountInvalid": "Use a finite amount above 0.",
+  "expenseCurrencyLabel": "Currency",
+  "expenseCategoryLabel": "Category",
+  "expenseDateLabel": "Expense date",
+  "expenseLinkedDayLabel": "Linked day",
+  "expenseNoLinkedDay": "No linked day",
+  "expenseLinkedDayInvalid": "Linked day must belong to the selected trip.",
+  "expenseLinkedItemLabel": "Linked activity",
+  "expenseNoLinkedItem": "No linked activity",
+  "expenseLinkedItemInvalid": "Linked activity must belong to the selected trip.",
+  "expenseNotesLabel": "Notes",
+  "expenseTripRequired": "Select a valid trip.",
+  "expenseDateOutOfRange": "Expense date must be inside the selected trip date range.",
+  "expenseSaveFailed": "Could not save this expense for the selected trip.",
+  "expenseAddedMessage": "Expense added locally.",
+  "expenseSavedMessage": "Expense updated locally.",
+  "expenseTileSemantic": "Expense {title}",
+  "@expenseTileSemantic": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "expenseActionsSemantic": "Actions for expense {title}",
+  "@expenseActionsSemantic": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "expenseEditAction": "Edit",
+  "expenseDeleteAction": "Delete",
+  "expenseDeleteConfirmTitle": "Delete expense?",
+  "expenseDeleteConfirmMessage": "Delete \"{title}\" from this trip budget?",
+  "@expenseDeleteConfirmMessage": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "expenseDeletedMessage": "Expense deleted.",
+  "expenseCategoryAccommodation": "Accommodation",
+  "expenseCategoryFood": "Food",
+  "expenseCategoryTransport": "Transport",
+  "expenseCategoryAttraction": "Attraction",
+  "expenseCategoryShopping": "Shopping",
+  "expenseCategoryHealth": "Health",
+  "expenseCategoryVisa": "Visa",
+  "expenseCategoryInsurance": "Insurance",
+  "expenseCategoryOther": "Other",
   "commonBackSemantic": "Go back",
   "demoModeLabel": "Demo Mode"
 }

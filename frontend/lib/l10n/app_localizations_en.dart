@@ -1337,7 +1337,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tripOverviewTimelineAction => 'Timeline';
 
   @override
-  String get tripOverviewExpensesAction => 'Expenses';
+  String get tripOverviewExpensesAction => 'Budget';
 
   @override
   String get tripOverviewActivitiesMetric => 'Activities';
@@ -1362,6 +1362,319 @@ class AppLocalizationsEn extends AppLocalizations {
   String tripOverviewDayLabel(int day) {
     return 'Day $day';
   }
+
+  @override
+  String get categoryFoodTitle => 'Food & cafes';
+
+  @override
+  String get categoryFoodSubtitle =>
+      'Browse local food and cafe places from supported category roots.';
+
+  @override
+  String get categoryFoodSearchHint => 'Search food, cafes, or local dishes';
+
+  @override
+  String get categoryThingsTitle => 'Things to do';
+
+  @override
+  String get categoryThingsSubtitle =>
+      'Attractions and entertainment stay distinct for future backend mapping.';
+
+  @override
+  String get categoryThingsSearchHint => 'Search attractions or entertainment';
+
+  @override
+  String get categoryTransportTitle => 'Transportation';
+
+  @override
+  String get categoryTransportSubtitle =>
+      'Browse transport listings without live routes, fares, or schedules.';
+
+  @override
+  String get categoryTransportSearchHint => 'Search transport providers';
+
+  @override
+  String get categoryRootAll => 'All';
+
+  @override
+  String get categoryRootFood => 'Food';
+
+  @override
+  String get categoryRootCafe => 'Cafe';
+
+  @override
+  String get categoryRootAttraction => 'Attractions';
+
+  @override
+  String get categoryRootEntertainment => 'Entertainment';
+
+  @override
+  String get categoryRootTransportation => 'Transportation';
+
+  @override
+  String get categoryFiltersSemantic => 'Open category filters';
+
+  @override
+  String get categoryFiltersTitle => 'Category filters';
+
+  @override
+  String get categoryFilterRating => 'Rating';
+
+  @override
+  String get categoryFilterRating45 => '4.5+ rating';
+
+  @override
+  String get categoryFilterPrice => 'Price level';
+
+  @override
+  String get categoryFilterPriceAny => 'Any price';
+
+  @override
+  String get categoryFilterApply => 'Apply filters';
+
+  @override
+  String get categoryEmptyTitle => 'No category results';
+
+  @override
+  String get categoryEmptyMessage =>
+      'Try another keyword, root category, rating, or price level.';
+
+  @override
+  String get categoryLocalPreviewMessage =>
+      'These public category results are local preview content and are not personal server data.';
+
+  @override
+  String get categoryTransportUnavailableTitle => 'Routes not connected';
+
+  @override
+  String get categoryTransportUnavailableMessage =>
+      'Live routes, fares, schedules, travel times, geolocation, and ticket booking are not connected yet.';
+
+  @override
+  String get budgetTitle => 'Trip budget';
+
+  @override
+  String get budgetHeading => 'Budget overview';
+
+  @override
+  String get budgetTripSelectorLabel => 'Trip';
+
+  @override
+  String get budgetNoTripTitle => 'No trip budget yet';
+
+  @override
+  String get budgetNoTripMessage =>
+      'Create a trip before tracking a trip-scoped budget.';
+
+  @override
+  String get budgetOverviewSemantic => 'Budget overview';
+
+  @override
+  String get budgetTotalBudget => 'Total budget';
+
+  @override
+  String get budgetSetAction => 'Set budget';
+
+  @override
+  String get budgetSetTitle => 'Set trip budget';
+
+  @override
+  String get budgetAmountLabel => 'Budget amount';
+
+  @override
+  String get budgetNotSet => 'Not set';
+
+  @override
+  String get budgetSpent => 'Spent';
+
+  @override
+  String get budgetLeft => 'Left';
+
+  @override
+  String get budgetOverBy => 'Over by';
+
+  @override
+  String budgetProgressSemantic(int percent) {
+    return 'Budget progress $percent percent used';
+  }
+
+  @override
+  String get budgetProgressMissingSemantic =>
+      'Budget progress unavailable because no budget is set';
+
+  @override
+  String budgetProgressLabel(int percent) {
+    return '$percent% used';
+  }
+
+  @override
+  String budgetOverMessage(String amount) {
+    return 'Over budget by $amount';
+  }
+
+  @override
+  String get budgetMissingBudgetTitle => 'Budget not configured';
+
+  @override
+  String get budgetMissingBudgetMessage =>
+      'Expenses can be tracked before a total budget is set.';
+
+  @override
+  String get budgetNoExpensesTitle => 'No expenses yet';
+
+  @override
+  String get budgetNoExpensesMessage =>
+      'Add expenses to build this trip\'s local spending history.';
+
+  @override
+  String get budgetByCategoryTitle => 'By category';
+
+  @override
+  String get budgetHistoryTitle => 'Expense history';
+
+  @override
+  String budgetMixedCurrencyWarning(String currency) {
+    return 'This trip has expenses outside $currency. Totals show only $currency to avoid mixing currencies.';
+  }
+
+  @override
+  String get budgetSavedMessage => 'Budget updated locally.';
+
+  @override
+  String get budgetSaveFailed => 'Could not save this budget.';
+
+  @override
+  String get expenseAddSemantic => 'Add expense';
+
+  @override
+  String get expenseAddAction => 'Add expense';
+
+  @override
+  String get expenseAddTitle => 'Add expense';
+
+  @override
+  String get expenseEditTitle => 'Edit expense';
+
+  @override
+  String get expenseSaveAction => 'Save expense';
+
+  @override
+  String get expenseSaveSemantic => 'Save this expense';
+
+  @override
+  String get expenseTitleLabel => 'Expense title';
+
+  @override
+  String get expenseTitleRequired => 'Enter an expense title.';
+
+  @override
+  String get expenseAmountLabel => 'Amount';
+
+  @override
+  String get expenseAmountInvalid => 'Use a finite amount above 0.';
+
+  @override
+  String get expenseCurrencyLabel => 'Currency';
+
+  @override
+  String get expenseCategoryLabel => 'Category';
+
+  @override
+  String get expenseDateLabel => 'Expense date';
+
+  @override
+  String get expenseLinkedDayLabel => 'Linked day';
+
+  @override
+  String get expenseNoLinkedDay => 'No linked day';
+
+  @override
+  String get expenseLinkedDayInvalid =>
+      'Linked day must belong to the selected trip.';
+
+  @override
+  String get expenseLinkedItemLabel => 'Linked activity';
+
+  @override
+  String get expenseNoLinkedItem => 'No linked activity';
+
+  @override
+  String get expenseLinkedItemInvalid =>
+      'Linked activity must belong to the selected trip.';
+
+  @override
+  String get expenseNotesLabel => 'Notes';
+
+  @override
+  String get expenseTripRequired => 'Select a valid trip.';
+
+  @override
+  String get expenseDateOutOfRange =>
+      'Expense date must be inside the selected trip date range.';
+
+  @override
+  String get expenseSaveFailed =>
+      'Could not save this expense for the selected trip.';
+
+  @override
+  String get expenseAddedMessage => 'Expense added locally.';
+
+  @override
+  String get expenseSavedMessage => 'Expense updated locally.';
+
+  @override
+  String expenseTileSemantic(String title) {
+    return 'Expense $title';
+  }
+
+  @override
+  String expenseActionsSemantic(String title) {
+    return 'Actions for expense $title';
+  }
+
+  @override
+  String get expenseEditAction => 'Edit';
+
+  @override
+  String get expenseDeleteAction => 'Delete';
+
+  @override
+  String get expenseDeleteConfirmTitle => 'Delete expense?';
+
+  @override
+  String expenseDeleteConfirmMessage(String title) {
+    return 'Delete \"$title\" from this trip budget?';
+  }
+
+  @override
+  String get expenseDeletedMessage => 'Expense deleted.';
+
+  @override
+  String get expenseCategoryAccommodation => 'Accommodation';
+
+  @override
+  String get expenseCategoryFood => 'Food';
+
+  @override
+  String get expenseCategoryTransport => 'Transport';
+
+  @override
+  String get expenseCategoryAttraction => 'Attraction';
+
+  @override
+  String get expenseCategoryShopping => 'Shopping';
+
+  @override
+  String get expenseCategoryHealth => 'Health';
+
+  @override
+  String get expenseCategoryVisa => 'Visa';
+
+  @override
+  String get expenseCategoryInsurance => 'Insurance';
+
+  @override
+  String get expenseCategoryOther => 'Other';
 
   @override
   String get commonBackSemantic => 'Go back';

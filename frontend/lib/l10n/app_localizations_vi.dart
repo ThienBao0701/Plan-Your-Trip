@@ -1265,7 +1265,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get tripOverviewTimelineAction => 'Lịch trình';
 
   @override
-  String get tripOverviewExpensesAction => 'Chi phí';
+  String get tripOverviewExpensesAction => 'Ngân sách';
 
   @override
   String get tripOverviewActivitiesMetric => 'Hoạt động';
@@ -1290,6 +1290,319 @@ class AppLocalizationsVi extends AppLocalizations {
   String tripOverviewDayLabel(int day) {
     return 'Ngày $day';
   }
+
+  @override
+  String get categoryFoodTitle => 'Ẩm thực & cà phê';
+
+  @override
+  String get categoryFoodSubtitle =>
+      'Duyệt địa điểm ăn uống và cà phê theo các danh mục được hỗ trợ.';
+
+  @override
+  String get categoryFoodSearchHint => 'Tìm món ăn, quán cà phê hoặc đặc sản';
+
+  @override
+  String get categoryThingsTitle => 'Hoạt động vui chơi';
+
+  @override
+  String get categoryThingsSubtitle =>
+      'Điểm tham quan và giải trí được tách riêng để khớp backend sau này.';
+
+  @override
+  String get categoryThingsSearchHint => 'Tìm điểm tham quan hoặc giải trí';
+
+  @override
+  String get categoryTransportTitle => 'Di chuyển';
+
+  @override
+  String get categoryTransportSubtitle =>
+      'Duyệt địa điểm di chuyển mà không giả lập tuyến, giá vé hoặc lịch chạy.';
+
+  @override
+  String get categoryTransportSearchHint => 'Tìm nhà cung cấp di chuyển';
+
+  @override
+  String get categoryRootAll => 'Tất cả';
+
+  @override
+  String get categoryRootFood => 'Ẩm thực';
+
+  @override
+  String get categoryRootCafe => 'Cà phê';
+
+  @override
+  String get categoryRootAttraction => 'Tham quan';
+
+  @override
+  String get categoryRootEntertainment => 'Giải trí';
+
+  @override
+  String get categoryRootTransportation => 'Di chuyển';
+
+  @override
+  String get categoryFiltersSemantic => 'Mở bộ lọc danh mục';
+
+  @override
+  String get categoryFiltersTitle => 'Bộ lọc danh mục';
+
+  @override
+  String get categoryFilterRating => 'Đánh giá';
+
+  @override
+  String get categoryFilterRating45 => 'Đánh giá 4,5+';
+
+  @override
+  String get categoryFilterPrice => 'Mức giá';
+
+  @override
+  String get categoryFilterPriceAny => 'Mọi mức giá';
+
+  @override
+  String get categoryFilterApply => 'Áp dụng bộ lọc';
+
+  @override
+  String get categoryEmptyTitle => 'Không có kết quả danh mục';
+
+  @override
+  String get categoryEmptyMessage =>
+      'Thử từ khóa, danh mục gốc, đánh giá hoặc mức giá khác.';
+
+  @override
+  String get categoryLocalPreviewMessage =>
+      'Kết quả danh mục công khai này là nội dung xem trước cục bộ và không phải dữ liệu cá nhân từ máy chủ.';
+
+  @override
+  String get categoryTransportUnavailableTitle => 'Chưa kết nối tuyến đường';
+
+  @override
+  String get categoryTransportUnavailableMessage =>
+      'Tuyến trực tiếp, giá vé, lịch chạy, thời gian di chuyển, định vị và đặt vé chưa được kết nối.';
+
+  @override
+  String get budgetTitle => 'Ngân sách chuyến đi';
+
+  @override
+  String get budgetHeading => 'Tổng quan ngân sách';
+
+  @override
+  String get budgetTripSelectorLabel => 'Chuyến đi';
+
+  @override
+  String get budgetNoTripTitle => 'Chưa có ngân sách chuyến đi';
+
+  @override
+  String get budgetNoTripMessage =>
+      'Tạo chuyến đi trước khi theo dõi ngân sách theo chuyến.';
+
+  @override
+  String get budgetOverviewSemantic => 'Tổng quan ngân sách';
+
+  @override
+  String get budgetTotalBudget => 'Tổng ngân sách';
+
+  @override
+  String get budgetSetAction => 'Đặt ngân sách';
+
+  @override
+  String get budgetSetTitle => 'Đặt ngân sách chuyến đi';
+
+  @override
+  String get budgetAmountLabel => 'Số tiền ngân sách';
+
+  @override
+  String get budgetNotSet => 'Chưa đặt';
+
+  @override
+  String get budgetSpent => 'Đã chi';
+
+  @override
+  String get budgetLeft => 'Còn lại';
+
+  @override
+  String get budgetOverBy => 'Vượt';
+
+  @override
+  String budgetProgressSemantic(int percent) {
+    return 'Tiến độ ngân sách đã dùng $percent phần trăm';
+  }
+
+  @override
+  String get budgetProgressMissingSemantic =>
+      'Chưa có tiến độ ngân sách vì chưa đặt ngân sách';
+
+  @override
+  String budgetProgressLabel(int percent) {
+    return 'Đã dùng $percent%';
+  }
+
+  @override
+  String budgetOverMessage(String amount) {
+    return 'Vượt ngân sách $amount';
+  }
+
+  @override
+  String get budgetMissingBudgetTitle => 'Chưa cấu hình ngân sách';
+
+  @override
+  String get budgetMissingBudgetMessage =>
+      'Bạn vẫn có thể theo dõi chi phí trước khi đặt tổng ngân sách.';
+
+  @override
+  String get budgetNoExpensesTitle => 'Chưa có chi phí';
+
+  @override
+  String get budgetNoExpensesMessage =>
+      'Thêm chi phí để tạo lịch sử chi tiêu cục bộ cho chuyến đi.';
+
+  @override
+  String get budgetByCategoryTitle => 'Theo danh mục';
+
+  @override
+  String get budgetHistoryTitle => 'Lịch sử chi phí';
+
+  @override
+  String budgetMixedCurrencyWarning(String currency) {
+    return 'Chuyến đi có chi phí ngoài $currency. Tổng chỉ hiển thị $currency để tránh cộng lẫn tiền tệ.';
+  }
+
+  @override
+  String get budgetSavedMessage => 'Đã cập nhật ngân sách cục bộ.';
+
+  @override
+  String get budgetSaveFailed => 'Không thể lưu ngân sách này.';
+
+  @override
+  String get expenseAddSemantic => 'Thêm chi phí';
+
+  @override
+  String get expenseAddAction => 'Thêm chi phí';
+
+  @override
+  String get expenseAddTitle => 'Thêm chi phí';
+
+  @override
+  String get expenseEditTitle => 'Sửa chi phí';
+
+  @override
+  String get expenseSaveAction => 'Lưu chi phí';
+
+  @override
+  String get expenseSaveSemantic => 'Lưu chi phí này';
+
+  @override
+  String get expenseTitleLabel => 'Tên khoản chi';
+
+  @override
+  String get expenseTitleRequired => 'Nhập tên khoản chi.';
+
+  @override
+  String get expenseAmountLabel => 'Số tiền';
+
+  @override
+  String get expenseAmountInvalid => 'Nhập số tiền hữu hạn lớn hơn 0.';
+
+  @override
+  String get expenseCurrencyLabel => 'Tiền tệ';
+
+  @override
+  String get expenseCategoryLabel => 'Danh mục';
+
+  @override
+  String get expenseDateLabel => 'Ngày chi';
+
+  @override
+  String get expenseLinkedDayLabel => 'Ngày liên kết';
+
+  @override
+  String get expenseNoLinkedDay => 'Không liên kết ngày';
+
+  @override
+  String get expenseLinkedDayInvalid =>
+      'Ngày liên kết phải thuộc chuyến đi đã chọn.';
+
+  @override
+  String get expenseLinkedItemLabel => 'Hoạt động liên kết';
+
+  @override
+  String get expenseNoLinkedItem => 'Không liên kết hoạt động';
+
+  @override
+  String get expenseLinkedItemInvalid =>
+      'Hoạt động liên kết phải thuộc chuyến đi đã chọn.';
+
+  @override
+  String get expenseNotesLabel => 'Ghi chú';
+
+  @override
+  String get expenseTripRequired => 'Chọn chuyến đi hợp lệ.';
+
+  @override
+  String get expenseDateOutOfRange =>
+      'Ngày chi phải nằm trong khoảng ngày của chuyến đi đã chọn.';
+
+  @override
+  String get expenseSaveFailed =>
+      'Không thể lưu chi phí này cho chuyến đi đã chọn.';
+
+  @override
+  String get expenseAddedMessage => 'Đã thêm chi phí cục bộ.';
+
+  @override
+  String get expenseSavedMessage => 'Đã cập nhật chi phí cục bộ.';
+
+  @override
+  String expenseTileSemantic(String title) {
+    return 'Chi phí $title';
+  }
+
+  @override
+  String expenseActionsSemantic(String title) {
+    return 'Hành động cho chi phí $title';
+  }
+
+  @override
+  String get expenseEditAction => 'Sửa';
+
+  @override
+  String get expenseDeleteAction => 'Xóa';
+
+  @override
+  String get expenseDeleteConfirmTitle => 'Xóa chi phí?';
+
+  @override
+  String expenseDeleteConfirmMessage(String title) {
+    return 'Xóa \"$title\" khỏi ngân sách chuyến đi này?';
+  }
+
+  @override
+  String get expenseDeletedMessage => 'Đã xóa chi phí.';
+
+  @override
+  String get expenseCategoryAccommodation => 'Chỗ ở';
+
+  @override
+  String get expenseCategoryFood => 'Ăn uống';
+
+  @override
+  String get expenseCategoryTransport => 'Di chuyển';
+
+  @override
+  String get expenseCategoryAttraction => 'Tham quan';
+
+  @override
+  String get expenseCategoryShopping => 'Mua sắm';
+
+  @override
+  String get expenseCategoryHealth => 'Sức khỏe';
+
+  @override
+  String get expenseCategoryVisa => 'Visa';
+
+  @override
+  String get expenseCategoryInsurance => 'Bảo hiểm';
+
+  @override
+  String get expenseCategoryOther => 'Khác';
 
   @override
   String get commonBackSemantic => 'Quay lại';

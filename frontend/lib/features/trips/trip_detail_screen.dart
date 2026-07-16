@@ -46,9 +46,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
         return day == 0 ? compareTimelineItems(a, b) : day;
       });
     final expenses = app.expensesForTrip(trip.id);
-    final spent =
-        expenses.fold<double>(0, (sum, expense) => sum + expense.amount);
-    final money = NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
+    final budgetSnapshot = BudgetSnapshot.from(trip, expenses);
     final date = DateFormat.yMMMd(Localizations.localeOf(context).toString());
 
     return Scaffold(
@@ -162,9 +160,15 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                     const SizedBox(height: AppSpacing.lg),
                     _SummaryGrid(
                       activityCount: items.length,
-                      spent: money.format(spent),
-                      budget:
-                          trip.budget > 0 ? money.format(trip.budget) : null,
+                      spent: formatMoney(
+                        context,
+                        budgetSnapshot.totalSpent,
+                        budgetSnapshot.currency,
+                      ),
+                      budget: trip.budget > 0
+                          ? formatMoney(
+                              context, trip.budget, budgetSnapshot.currency)
+                          : null,
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     Text(l10n.tripOverviewNextTitle,

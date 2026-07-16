@@ -128,7 +128,8 @@ class AppState extends ChangeNotifier {
   List<Place> filteredPlaces(PlaceQuery q) {
     var result = places;
     if (q.category != null && q.category!.isNotEmpty) {
-      result = result.where((p) => p.category == q.category).toList();
+      result =
+          result.where((p) => _placeMatchesCategory(p, q.category!)).toList();
     }
     if (q.keyword != null && q.keyword!.isNotEmpty) {
       final kw = q.keyword!.toLowerCase();
@@ -198,6 +199,13 @@ class AppState extends ChangeNotifier {
                 ? item.copyWith(dayNumber: updated.days)
                 : item)
         .toList();
+    expenses = expenses
+        .map((expense) => expense.tripId == updated.id &&
+                expense.tripDayId != null &&
+                expense.tripDayId! > updated.days
+            ? expense.copyWith(tripDayId: updated.days)
+            : expense)
+        .toList();
     notifyListeners();
   }
 
@@ -247,20 +255,23 @@ class AppState extends ChangeNotifier {
 
   List<Expense> expensesForTrip(int tripId) =>
       expenses.where((e) => e.tripId == tripId).toList()
-        ..sort((a, b) => b.date.compareTo(a.date));
+        ..sort((a, b) {
+          final date = b.date.compareTo(a.date);
+          return date == 0 ? b.id.compareTo(a.id) : date;
+        });
 
   double totalForTrip(int tripId) =>
       expensesForTrip(tripId).fold(0.0, (sum, e) => sum + e.amount);
 
   bool addExpense(Expense expense) {
-    if (tripById(expense.tripId) == null || expense.amount <= 0) return false;
+    if (!_isValidExpense(expense)) return false;
     expenses = [...expenses, expense];
     notifyListeners();
     return true;
   }
 
   bool updateExpense(Expense updated) {
-    if (tripById(updated.tripId) == null || updated.amount <= 0) return false;
+    if (!_isValidExpense(updated)) return false;
     expenses = expenses.map((e) => e.id == updated.id ? updated : e).toList();
     notifyListeners();
     return true;
@@ -297,6 +308,52 @@ class AppState extends ChangeNotifier {
       return null;
     }
     return hour * 60 + minute;
+  }
+
+  static bool _placeMatchesCategory(Place place, String requested) {
+    final key = requested.toLowerCase();
+    final slug = place.effectiveCategorySlug.toLowerCase();
+    final label = place.category.toLowerCase();
+    if (slug == key || label == key) return true;
+
+    switch (key) {
+      case 'accommodation':
+        return slug == 'hotel' || label == 'hotels';
+      case 'food':
+        return slug == 'restaurant' ||
+            label == 'food' ||
+            label == 'restaurants';
+      case 'cafe':
+        return label == 'cafe' || label == 'cafes';
+      case 'attraction':
+        return slug == 'photo-spot' ||
+            label == 'attractions' ||
+            label == 'photo spots' ||
+            label == 'nature' ||
+            label == 'culture';
+      case 'entertainment':
+        return label == 'entertainment' || label == 'nightlife';
+      case 'transportation':
+        return label == 'transportation' || label == 'transport';
+      default:
+        return false;
+    }
+  }
+
+  bool _isValidExpense(Expense expense) {
+    final trip = tripById(expense.tripId);
+    if (trip == null || !expense.amount.isFinite || expense.amount <= 0) {
+      return false;
+    }
+    if (expense.currency.trim().isEmpty) return false;
+    final day = expense.tripDayId;
+    if (day != null && (day < 1 || day > trip.days)) return false;
+    final itemId = expense.tripItemId;
+    if (itemId != null &&
+        !timeline.any((item) => item.id == itemId && item.tripId == trip.id)) {
+      return false;
+    }
+    return true;
   }
 
   static int _compareTimelineItems(TimelineItem a, TimelineItem b) {

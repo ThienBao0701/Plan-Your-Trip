@@ -8,74 +8,94 @@ class MockData {
 
   static const categories = <Category>[
     Category(
-        id: 'Hotels',
+        id: 'accommodation',
+        slug: 'accommodation',
+        type: 'ACCOMMODATION',
         name: 'Hotels',
         icon: Icons.hotel_rounded,
         color: AppColors.violet,
         description: 'Cozy stays and luxury resorts',
         sortOrder: 0),
     Category(
-        id: 'Restaurants',
-        name: 'Restaurants',
+        id: 'food',
+        slug: 'food',
+        type: 'FOOD',
+        name: 'Food',
         icon: Icons.restaurant_rounded,
         color: AppColors.coral,
         description: 'Local and international cuisine',
         sortOrder: 1),
     Category(
-        id: 'Cafe',
+        id: 'cafe',
+        slug: 'cafe',
+        type: 'CAFE',
         name: 'Cafes',
         icon: Icons.coffee_rounded,
         color: AppColors.warning,
         description: 'Coffee, tea and chill vibes',
         sortOrder: 2),
     Category(
-        id: 'Attractions',
+        id: 'attraction',
+        slug: 'attraction',
+        type: 'ATTRACTION',
         name: 'Attractions',
         icon: Icons.attractions_rounded,
         color: AppColors.ocean,
         description: 'Must-see sights and landmarks',
         sortOrder: 3),
     Category(
-        id: 'Photo Spots',
+        id: 'photo-spot',
+        slug: 'photo-spot',
+        type: 'PHOTO_SPOT',
         name: 'Photo Spots',
         icon: Icons.camera_alt_rounded,
         color: AppColors.aqua,
         description: 'Instagram-worthy locations',
         sortOrder: 4),
     Category(
-        id: 'Nature',
-        name: 'Nature',
-        icon: Icons.nature_people_rounded,
-        color: AppColors.mint,
-        description: 'Parks, forests and natural beauty',
-        sortOrder: 5),
-    Category(
-        id: 'Shopping',
+        id: 'shopping',
+        slug: 'shopping',
+        type: 'SHOPPING',
         name: 'Shopping',
         icon: Icons.shopping_bag_rounded,
         color: AppColors.coral,
         description: 'Markets, malls and local crafts',
-        sortOrder: 6),
+        sortOrder: 5),
     Category(
-        id: 'Nightlife',
-        name: 'Nightlife',
+        id: 'entertainment',
+        slug: 'entertainment',
+        type: 'ENTERTAINMENT',
+        name: 'Entertainment',
         icon: Icons.nightlife_rounded,
         color: AppColors.violet,
         description: 'Bars, clubs and evening entertainment',
+        sortOrder: 6),
+    Category(
+        id: 'transportation',
+        slug: 'transportation',
+        type: 'TRANSPORTATION',
+        name: 'Transportation',
+        icon: Icons.directions_bus_rounded,
+        color: AppColors.turquoise600,
+        description: 'Local transport providers and stations',
         sortOrder: 7),
     Category(
-        id: 'Food',
-        name: 'Food',
-        icon: Icons.fastfood_rounded,
-        color: AppColors.warning,
-        description: 'Street food and local delicacies',
+        id: 'tour',
+        slug: 'tour',
+        type: 'TOUR',
+        name: 'Tours',
+        icon: Icons.tour_rounded,
+        color: AppColors.ocean,
+        description: 'Guided local trip ideas',
         sortOrder: 8),
     Category(
-        id: 'Culture',
-        name: 'Culture',
-        icon: Icons.museum_rounded,
+        id: 'wellness',
+        slug: 'wellness',
+        type: 'WELLNESS',
+        name: 'Wellness',
+        icon: Icons.spa_rounded,
         color: AppColors.mint,
-        description: 'Museums, temples and heritage',
+        description: 'Spa, wellness and slower travel',
         sortOrder: 9),
   ];
 
@@ -84,6 +104,7 @@ class MockData {
         id: 1,
         name: 'Mây Lang Thang Villa',
         category: 'Hotels',
+        categorySlug: 'accommodation',
         locationName: 'Da Lat',
         city: 'Da Lat',
         province: 'Lam Dong',
@@ -102,6 +123,7 @@ class MockData {
         id: 2,
         name: 'Kombi Land',
         category: 'Photo Spots',
+        categorySlug: 'photo-spot',
         locationName: 'Da Lat',
         city: 'Da Lat',
         province: 'Lam Dong',
@@ -121,6 +143,7 @@ class MockData {
         id: 3,
         name: 'Túi Mơ To Cafe',
         category: 'Cafe',
+        categorySlug: 'cafe',
         locationName: 'Da Lat',
         city: 'Da Lat',
         province: 'Lam Dong',
@@ -140,6 +163,7 @@ class MockData {
         id: 4,
         name: 'Bánh Khọt Gốc Vú Sữa',
         category: 'Food',
+        categorySlug: 'food',
         locationName: 'Vung Tau',
         city: 'Vung Tau',
         province: 'Ba Ria - Vung Tau',
@@ -158,6 +182,7 @@ class MockData {
         id: 5,
         name: 'Hồ Mây Park',
         category: 'Attractions',
+        categorySlug: 'attraction',
         locationName: 'Vung Tau',
         city: 'Vung Tau',
         province: 'Ba Ria - Vung Tau',
@@ -177,6 +202,7 @@ class MockData {
         id: 6,
         name: 'Marina Bay Resort',
         category: 'Hotels',
+        categorySlug: 'accommodation',
         locationName: 'Vung Tau',
         city: 'Vung Tau',
         province: 'Ba Ria - Vung Tau',
@@ -195,6 +221,7 @@ class MockData {
         id: 7,
         name: 'Night Market Da Lat',
         category: 'Shopping',
+        categorySlug: 'shopping',
         locationName: 'Da Lat',
         city: 'Da Lat',
         province: 'Lam Dong',
@@ -213,6 +240,7 @@ class MockData {
         id: 8,
         name: 'Linh Phuoc Pagoda',
         category: 'Culture',
+        categorySlug: 'attraction',
         locationName: 'Da Lat',
         city: 'Da Lat',
         province: 'Lam Dong',
@@ -227,6 +255,90 @@ class MockData {
             'Stunning ceramic mosaic temple with intricate dragon sculptures and peaceful gardens.',
         tags: ['temple', 'culture', 'architecture'],
         isNearby: true),
+    const Place(
+        id: 9,
+        name: 'Bếp Quảng',
+        category: 'Food',
+        categorySlug: 'food',
+        subcategorySlug: 'local-food',
+        locationName: 'Da Nang',
+        city: 'Da Nang',
+        province: 'Da Nang',
+        address: 'Hai Chau, Da Nang',
+        imageUrl:
+            'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=900&q=80',
+        rating: 4.8,
+        reviewCount: 1600,
+        priceLevel: '\$',
+        estimatedDurationMinutes: 75,
+        openingHours: '09:00 - 21:00',
+        description:
+            'A local food stop for Mi Quang and central Vietnam flavors.',
+        tags: ['mi-quang', 'local-food', 'danang'],
+        isFeatured: true,
+        verified: true),
+    const Place(
+        id: 10,
+        name: 'Bà Nà Hills',
+        category: 'Attractions',
+        categorySlug: 'attraction',
+        subcategorySlug: 'theme-park',
+        locationName: 'Hoa Vang',
+        city: 'Da Nang',
+        province: 'Da Nang',
+        address: 'Hoa Vang, Da Nang',
+        imageUrl:
+            'https://images.unsplash.com/photo-1548013146-72479768bada?w=900&q=80',
+        rating: 4.8,
+        reviewCount: 12400,
+        priceLevel: '\$\$\$',
+        estimatedDurationMinutes: 360,
+        openingHours: '08:00 - 17:00',
+        description:
+            'Mountain attraction with cable car views and landmark photo spots. Ticketing and schedules are not connected in this app.',
+        tags: ['family', 'mountain', 'landmark'],
+        isFeatured: true,
+        verified: true),
+    const Place(
+        id: 11,
+        name: 'Helio Center',
+        category: 'Entertainment',
+        categorySlug: 'entertainment',
+        subcategorySlug: 'night-market',
+        locationName: 'Hai Chau',
+        city: 'Da Nang',
+        province: 'Da Nang',
+        imageUrl:
+            'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=900&q=80',
+        rating: 4.5,
+        reviewCount: 2100,
+        priceLevel: '\$\$',
+        estimatedDurationMinutes: 180,
+        openingHours: '17:00 - 23:00',
+        description:
+            'Evening entertainment area with local food stalls and public activities.',
+        tags: ['evening', 'family', 'nightlife'],
+        isFeatured: true),
+    const Place(
+        id: 12,
+        name: 'Da Nang Airport Shuttle Counter',
+        category: 'Transportation',
+        categorySlug: 'transportation',
+        subcategorySlug: 'shuttle',
+        locationName: 'Da Nang Airport',
+        city: 'Da Nang',
+        province: 'Da Nang',
+        imageUrl:
+            'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=900&q=80',
+        rating: 0,
+        reviewCount: 0,
+        priceLevel: '',
+        estimatedDurationMinutes: 0,
+        openingHours: 'Service availability varies',
+        description:
+            'Local transport provider listing. Live fares, schedules, route geometry, and ticket booking are not connected yet.',
+        tags: ['airport', 'shuttle', 'transport'],
+        isFeatured: false),
   ];
 
   static final trips = <Trip>[
@@ -336,51 +448,67 @@ class MockData {
         id: 1,
         tripId: 1,
         title: 'Villa deposit',
-        category: 'Hotel',
+        category: 'ACCOMMODATION',
         amount: 2200000,
+        currency: 'VND',
         date: DateTime(2026, 8, 12),
+        tripDayId: 1,
         notes: 'Paid via bank transfer'),
     Expense(
         id: 2,
         tripId: 1,
         title: 'Cafe and breakfast',
-        category: 'Food',
+        category: 'FOOD',
         amount: 420000,
+        currency: 'VND',
         date: DateTime(2026, 8, 12)),
     Expense(
         id: 3,
         tripId: 2,
         title: 'Resort booking',
-        category: 'Hotel',
+        category: 'ACCOMMODATION',
         amount: 2600000,
+        currency: 'VND',
         date: DateTime(2026, 9, 5),
+        tripDayId: 1,
         notes: 'Non-refundable rate'),
   ];
 
   static const expenseCategories = [
-    'Hotel',
-    'Food',
-    'Transport',
-    'Activity',
-    'Shopping',
-    'Entertainment',
-    'Other',
+    'ACCOMMODATION',
+    'FOOD',
+    'TRANSPORT',
+    'ATTRACTION',
+    'SHOPPING',
+    'HEALTH',
+    'VISA',
+    'INSURANCE',
+    'OTHER',
   ];
 
   static IconData expenseCategoryIcon(String category) {
     switch (category) {
+      case 'ACCOMMODATION':
       case 'Hotel':
         return Icons.hotel_rounded;
+      case 'FOOD':
       case 'Food':
         return Icons.restaurant_rounded;
+      case 'TRANSPORT':
       case 'Transport':
         return Icons.directions_car_rounded;
+      case 'ATTRACTION':
       case 'Activity':
         return Icons.local_activity_rounded;
+      case 'SHOPPING':
       case 'Shopping':
         return Icons.shopping_bag_rounded;
-      case 'Entertainment':
-        return Icons.movie_rounded;
+      case 'HEALTH':
+        return Icons.local_hospital_rounded;
+      case 'VISA':
+        return Icons.badge_rounded;
+      case 'INSURANCE':
+        return Icons.verified_user_rounded;
       default:
         return Icons.receipt_long_rounded;
     }

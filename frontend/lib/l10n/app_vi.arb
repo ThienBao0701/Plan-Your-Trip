@@ -663,7 +663,7 @@
     }
   },
   "tripOverviewTimelineAction": "Lịch trình",
-  "tripOverviewExpensesAction": "Chi phí",
+  "tripOverviewExpensesAction": "Ngân sách",
   "tripOverviewActivitiesMetric": "Hoạt động",
   "tripOverviewSpentMetric": "Đã chi",
   "tripOverviewBudgetMetric": "Ngân sách",
@@ -678,6 +678,150 @@
       }
     }
   },
+  "categoryFoodTitle": "Ẩm thực & cà phê",
+  "categoryFoodSubtitle": "Duyệt địa điểm ăn uống và cà phê theo các danh mục được hỗ trợ.",
+  "categoryFoodSearchHint": "Tìm món ăn, quán cà phê hoặc đặc sản",
+  "categoryThingsTitle": "Hoạt động vui chơi",
+  "categoryThingsSubtitle": "Điểm tham quan và giải trí được tách riêng để khớp backend sau này.",
+  "categoryThingsSearchHint": "Tìm điểm tham quan hoặc giải trí",
+  "categoryTransportTitle": "Di chuyển",
+  "categoryTransportSubtitle": "Duyệt địa điểm di chuyển mà không giả lập tuyến, giá vé hoặc lịch chạy.",
+  "categoryTransportSearchHint": "Tìm nhà cung cấp di chuyển",
+  "categoryRootAll": "Tất cả",
+  "categoryRootFood": "Ẩm thực",
+  "categoryRootCafe": "Cà phê",
+  "categoryRootAttraction": "Tham quan",
+  "categoryRootEntertainment": "Giải trí",
+  "categoryRootTransportation": "Di chuyển",
+  "categoryFiltersSemantic": "Mở bộ lọc danh mục",
+  "categoryFiltersTitle": "Bộ lọc danh mục",
+  "categoryFilterRating": "Đánh giá",
+  "categoryFilterRating45": "Đánh giá 4,5+",
+  "categoryFilterPrice": "Mức giá",
+  "categoryFilterPriceAny": "Mọi mức giá",
+  "categoryFilterApply": "Áp dụng bộ lọc",
+  "categoryEmptyTitle": "Không có kết quả danh mục",
+  "categoryEmptyMessage": "Thử từ khóa, danh mục gốc, đánh giá hoặc mức giá khác.",
+  "categoryLocalPreviewMessage": "Kết quả danh mục công khai này là nội dung xem trước cục bộ và không phải dữ liệu cá nhân từ máy chủ.",
+  "categoryTransportUnavailableTitle": "Chưa kết nối tuyến đường",
+  "categoryTransportUnavailableMessage": "Tuyến trực tiếp, giá vé, lịch chạy, thời gian di chuyển, định vị và đặt vé chưa được kết nối.",
+  "budgetTitle": "Ngân sách chuyến đi",
+  "budgetHeading": "Tổng quan ngân sách",
+  "budgetTripSelectorLabel": "Chuyến đi",
+  "budgetNoTripTitle": "Chưa có ngân sách chuyến đi",
+  "budgetNoTripMessage": "Tạo chuyến đi trước khi theo dõi ngân sách theo chuyến.",
+  "budgetOverviewSemantic": "Tổng quan ngân sách",
+  "budgetTotalBudget": "Tổng ngân sách",
+  "budgetSetAction": "Đặt ngân sách",
+  "budgetSetTitle": "Đặt ngân sách chuyến đi",
+  "budgetAmountLabel": "Số tiền ngân sách",
+  "budgetNotSet": "Chưa đặt",
+  "budgetSpent": "Đã chi",
+  "budgetLeft": "Còn lại",
+  "budgetOverBy": "Vượt",
+  "budgetProgressSemantic": "Tiến độ ngân sách đã dùng {percent} phần trăm",
+  "@budgetProgressSemantic": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "budgetProgressMissingSemantic": "Chưa có tiến độ ngân sách vì chưa đặt ngân sách",
+  "budgetProgressLabel": "Đã dùng {percent}%",
+  "@budgetProgressLabel": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "budgetOverMessage": "Vượt ngân sách {amount}",
+  "@budgetOverMessage": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "budgetMissingBudgetTitle": "Chưa cấu hình ngân sách",
+  "budgetMissingBudgetMessage": "Bạn vẫn có thể theo dõi chi phí trước khi đặt tổng ngân sách.",
+  "budgetNoExpensesTitle": "Chưa có chi phí",
+  "budgetNoExpensesMessage": "Thêm chi phí để tạo lịch sử chi tiêu cục bộ cho chuyến đi.",
+  "budgetByCategoryTitle": "Theo danh mục",
+  "budgetHistoryTitle": "Lịch sử chi phí",
+  "budgetMixedCurrencyWarning": "Chuyến đi có chi phí ngoài {currency}. Tổng chỉ hiển thị {currency} để tránh cộng lẫn tiền tệ.",
+  "@budgetMixedCurrencyWarning": {
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "budgetSavedMessage": "Đã cập nhật ngân sách cục bộ.",
+  "budgetSaveFailed": "Không thể lưu ngân sách này.",
+  "expenseAddSemantic": "Thêm chi phí",
+  "expenseAddAction": "Thêm chi phí",
+  "expenseAddTitle": "Thêm chi phí",
+  "expenseEditTitle": "Sửa chi phí",
+  "expenseSaveAction": "Lưu chi phí",
+  "expenseSaveSemantic": "Lưu chi phí này",
+  "expenseTitleLabel": "Tên khoản chi",
+  "expenseTitleRequired": "Nhập tên khoản chi.",
+  "expenseAmountLabel": "Số tiền",
+  "expenseAmountInvalid": "Nhập số tiền hữu hạn lớn hơn 0.",
+  "expenseCurrencyLabel": "Tiền tệ",
+  "expenseCategoryLabel": "Danh mục",
+  "expenseDateLabel": "Ngày chi",
+  "expenseLinkedDayLabel": "Ngày liên kết",
+  "expenseNoLinkedDay": "Không liên kết ngày",
+  "expenseLinkedDayInvalid": "Ngày liên kết phải thuộc chuyến đi đã chọn.",
+  "expenseLinkedItemLabel": "Hoạt động liên kết",
+  "expenseNoLinkedItem": "Không liên kết hoạt động",
+  "expenseLinkedItemInvalid": "Hoạt động liên kết phải thuộc chuyến đi đã chọn.",
+  "expenseNotesLabel": "Ghi chú",
+  "expenseTripRequired": "Chọn chuyến đi hợp lệ.",
+  "expenseDateOutOfRange": "Ngày chi phải nằm trong khoảng ngày của chuyến đi đã chọn.",
+  "expenseSaveFailed": "Không thể lưu chi phí này cho chuyến đi đã chọn.",
+  "expenseAddedMessage": "Đã thêm chi phí cục bộ.",
+  "expenseSavedMessage": "Đã cập nhật chi phí cục bộ.",
+  "expenseTileSemantic": "Chi phí {title}",
+  "@expenseTileSemantic": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "expenseActionsSemantic": "Hành động cho chi phí {title}",
+  "@expenseActionsSemantic": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "expenseEditAction": "Sửa",
+  "expenseDeleteAction": "Xóa",
+  "expenseDeleteConfirmTitle": "Xóa chi phí?",
+  "expenseDeleteConfirmMessage": "Xóa \"{title}\" khỏi ngân sách chuyến đi này?",
+  "@expenseDeleteConfirmMessage": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "expenseDeletedMessage": "Đã xóa chi phí.",
+  "expenseCategoryAccommodation": "Chỗ ở",
+  "expenseCategoryFood": "Ăn uống",
+  "expenseCategoryTransport": "Di chuyển",
+  "expenseCategoryAttraction": "Tham quan",
+  "expenseCategoryShopping": "Mua sắm",
+  "expenseCategoryHealth": "Sức khỏe",
+  "expenseCategoryVisa": "Visa",
+  "expenseCategoryInsurance": "Bảo hiểm",
+  "expenseCategoryOther": "Khác",
   "commonBackSemantic": "Quay lại",
   "demoModeLabel": "Chế độ demo"
 }

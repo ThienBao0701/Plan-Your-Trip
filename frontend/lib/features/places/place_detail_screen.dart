@@ -172,6 +172,26 @@ class PlaceDetailScreen extends StatelessWidget {
                         ),
                       ),
                     const SizedBox(height: AppSpacing.md),
+                    if (_isTransportation(place)) ...[
+                      OceanGlassCard(
+                        semanticLabel: l10n.categoryTransportUnavailableTitle,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              l10n.categoryTransportUnavailableTitle,
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                            const SizedBox(height: AppSpacing.xs),
+                            Text(
+                              l10n.categoryTransportUnavailableMessage,
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                    ],
                     OceanGlassCard(
                       child: Text(
                         l10n.mapUnavailableMessage,
@@ -216,6 +236,14 @@ class PlaceDetailScreen extends StatelessWidget {
     final rest = minutes % 60;
     if (rest == 0) return l10n.placeDurationHours(hours);
     return l10n.placeDurationHoursMinutes(hours, rest);
+  }
+
+  bool _isTransportation(Place place) {
+    final slug = place.effectiveCategorySlug.toLowerCase();
+    final label = place.category.toLowerCase();
+    return slug == 'transportation' ||
+        label == 'transportation' ||
+        label == 'transport';
   }
 }
 

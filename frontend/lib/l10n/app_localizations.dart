@@ -2376,7 +2376,7 @@ abstract class AppLocalizations {
   /// No description provided for @tripOverviewExpensesAction.
   ///
   /// In en, this message translates to:
-  /// **'Expenses'**
+  /// **'Budget'**
   String get tripOverviewExpensesAction;
 
   /// No description provided for @tripOverviewActivitiesMetric.
@@ -2420,6 +2420,576 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Day {day}'**
   String tripOverviewDayLabel(int day);
+
+  /// No description provided for @categoryFoodTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Food & cafes'**
+  String get categoryFoodTitle;
+
+  /// No description provided for @categoryFoodSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse local food and cafe places from supported category roots.'**
+  String get categoryFoodSubtitle;
+
+  /// No description provided for @categoryFoodSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search food, cafes, or local dishes'**
+  String get categoryFoodSearchHint;
+
+  /// No description provided for @categoryThingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Things to do'**
+  String get categoryThingsTitle;
+
+  /// No description provided for @categoryThingsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Attractions and entertainment stay distinct for future backend mapping.'**
+  String get categoryThingsSubtitle;
+
+  /// No description provided for @categoryThingsSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search attractions or entertainment'**
+  String get categoryThingsSearchHint;
+
+  /// No description provided for @categoryTransportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Transportation'**
+  String get categoryTransportTitle;
+
+  /// No description provided for @categoryTransportSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse transport listings without live routes, fares, or schedules.'**
+  String get categoryTransportSubtitle;
+
+  /// No description provided for @categoryTransportSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search transport providers'**
+  String get categoryTransportSearchHint;
+
+  /// No description provided for @categoryRootAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get categoryRootAll;
+
+  /// No description provided for @categoryRootFood.
+  ///
+  /// In en, this message translates to:
+  /// **'Food'**
+  String get categoryRootFood;
+
+  /// No description provided for @categoryRootCafe.
+  ///
+  /// In en, this message translates to:
+  /// **'Cafe'**
+  String get categoryRootCafe;
+
+  /// No description provided for @categoryRootAttraction.
+  ///
+  /// In en, this message translates to:
+  /// **'Attractions'**
+  String get categoryRootAttraction;
+
+  /// No description provided for @categoryRootEntertainment.
+  ///
+  /// In en, this message translates to:
+  /// **'Entertainment'**
+  String get categoryRootEntertainment;
+
+  /// No description provided for @categoryRootTransportation.
+  ///
+  /// In en, this message translates to:
+  /// **'Transportation'**
+  String get categoryRootTransportation;
+
+  /// No description provided for @categoryFiltersSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Open category filters'**
+  String get categoryFiltersSemantic;
+
+  /// No description provided for @categoryFiltersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Category filters'**
+  String get categoryFiltersTitle;
+
+  /// No description provided for @categoryFilterRating.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating'**
+  String get categoryFilterRating;
+
+  /// No description provided for @categoryFilterRating45.
+  ///
+  /// In en, this message translates to:
+  /// **'4.5+ rating'**
+  String get categoryFilterRating45;
+
+  /// No description provided for @categoryFilterPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Price level'**
+  String get categoryFilterPrice;
+
+  /// No description provided for @categoryFilterPriceAny.
+  ///
+  /// In en, this message translates to:
+  /// **'Any price'**
+  String get categoryFilterPriceAny;
+
+  /// No description provided for @categoryFilterApply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply filters'**
+  String get categoryFilterApply;
+
+  /// No description provided for @categoryEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No category results'**
+  String get categoryEmptyTitle;
+
+  /// No description provided for @categoryEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Try another keyword, root category, rating, or price level.'**
+  String get categoryEmptyMessage;
+
+  /// No description provided for @categoryLocalPreviewMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'These public category results are local preview content and are not personal server data.'**
+  String get categoryLocalPreviewMessage;
+
+  /// No description provided for @categoryTransportUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Routes not connected'**
+  String get categoryTransportUnavailableTitle;
+
+  /// No description provided for @categoryTransportUnavailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Live routes, fares, schedules, travel times, geolocation, and ticket booking are not connected yet.'**
+  String get categoryTransportUnavailableMessage;
+
+  /// No description provided for @budgetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip budget'**
+  String get budgetTitle;
+
+  /// No description provided for @budgetHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget overview'**
+  String get budgetHeading;
+
+  /// No description provided for @budgetTripSelectorLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip'**
+  String get budgetTripSelectorLabel;
+
+  /// No description provided for @budgetNoTripTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No trip budget yet'**
+  String get budgetNoTripTitle;
+
+  /// No description provided for @budgetNoTripMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a trip before tracking a trip-scoped budget.'**
+  String get budgetNoTripMessage;
+
+  /// No description provided for @budgetOverviewSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget overview'**
+  String get budgetOverviewSemantic;
+
+  /// No description provided for @budgetTotalBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Total budget'**
+  String get budgetTotalBudget;
+
+  /// No description provided for @budgetSetAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Set budget'**
+  String get budgetSetAction;
+
+  /// No description provided for @budgetSetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set trip budget'**
+  String get budgetSetTitle;
+
+  /// No description provided for @budgetAmountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget amount'**
+  String get budgetAmountLabel;
+
+  /// No description provided for @budgetNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set'**
+  String get budgetNotSet;
+
+  /// No description provided for @budgetSpent.
+  ///
+  /// In en, this message translates to:
+  /// **'Spent'**
+  String get budgetSpent;
+
+  /// No description provided for @budgetLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Left'**
+  String get budgetLeft;
+
+  /// No description provided for @budgetOverBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Over by'**
+  String get budgetOverBy;
+
+  /// No description provided for @budgetProgressSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget progress {percent} percent used'**
+  String budgetProgressSemantic(int percent);
+
+  /// No description provided for @budgetProgressMissingSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget progress unavailable because no budget is set'**
+  String get budgetProgressMissingSemantic;
+
+  /// No description provided for @budgetProgressLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% used'**
+  String budgetProgressLabel(int percent);
+
+  /// No description provided for @budgetOverMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Over budget by {amount}'**
+  String budgetOverMessage(String amount);
+
+  /// No description provided for @budgetMissingBudgetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget not configured'**
+  String get budgetMissingBudgetTitle;
+
+  /// No description provided for @budgetMissingBudgetMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Expenses can be tracked before a total budget is set.'**
+  String get budgetMissingBudgetMessage;
+
+  /// No description provided for @budgetNoExpensesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No expenses yet'**
+  String get budgetNoExpensesTitle;
+
+  /// No description provided for @budgetNoExpensesMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Add expenses to build this trip\'s local spending history.'**
+  String get budgetNoExpensesMessage;
+
+  /// No description provided for @budgetByCategoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'By category'**
+  String get budgetByCategoryTitle;
+
+  /// No description provided for @budgetHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense history'**
+  String get budgetHistoryTitle;
+
+  /// No description provided for @budgetMixedCurrencyWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'This trip has expenses outside {currency}. Totals show only {currency} to avoid mixing currencies.'**
+  String budgetMixedCurrencyWarning(String currency);
+
+  /// No description provided for @budgetSavedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget updated locally.'**
+  String get budgetSavedMessage;
+
+  /// No description provided for @budgetSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save this budget.'**
+  String get budgetSaveFailed;
+
+  /// No description provided for @expenseAddSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Add expense'**
+  String get expenseAddSemantic;
+
+  /// No description provided for @expenseAddAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add expense'**
+  String get expenseAddAction;
+
+  /// No description provided for @expenseAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add expense'**
+  String get expenseAddTitle;
+
+  /// No description provided for @expenseEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit expense'**
+  String get expenseEditTitle;
+
+  /// No description provided for @expenseSaveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Save expense'**
+  String get expenseSaveAction;
+
+  /// No description provided for @expenseSaveSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Save this expense'**
+  String get expenseSaveSemantic;
+
+  /// No description provided for @expenseTitleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense title'**
+  String get expenseTitleLabel;
+
+  /// No description provided for @expenseTitleRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an expense title.'**
+  String get expenseTitleRequired;
+
+  /// No description provided for @expenseAmountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get expenseAmountLabel;
+
+  /// No description provided for @expenseAmountInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Use a finite amount above 0.'**
+  String get expenseAmountInvalid;
+
+  /// No description provided for @expenseCurrencyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency'**
+  String get expenseCurrencyLabel;
+
+  /// No description provided for @expenseCategoryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get expenseCategoryLabel;
+
+  /// No description provided for @expenseDateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense date'**
+  String get expenseDateLabel;
+
+  /// No description provided for @expenseLinkedDayLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked day'**
+  String get expenseLinkedDayLabel;
+
+  /// No description provided for @expenseNoLinkedDay.
+  ///
+  /// In en, this message translates to:
+  /// **'No linked day'**
+  String get expenseNoLinkedDay;
+
+  /// No description provided for @expenseLinkedDayInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked day must belong to the selected trip.'**
+  String get expenseLinkedDayInvalid;
+
+  /// No description provided for @expenseLinkedItemLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked activity'**
+  String get expenseLinkedItemLabel;
+
+  /// No description provided for @expenseNoLinkedItem.
+  ///
+  /// In en, this message translates to:
+  /// **'No linked activity'**
+  String get expenseNoLinkedItem;
+
+  /// No description provided for @expenseLinkedItemInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked activity must belong to the selected trip.'**
+  String get expenseLinkedItemInvalid;
+
+  /// No description provided for @expenseNotesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get expenseNotesLabel;
+
+  /// No description provided for @expenseTripRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a valid trip.'**
+  String get expenseTripRequired;
+
+  /// No description provided for @expenseDateOutOfRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense date must be inside the selected trip date range.'**
+  String get expenseDateOutOfRange;
+
+  /// No description provided for @expenseSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save this expense for the selected trip.'**
+  String get expenseSaveFailed;
+
+  /// No description provided for @expenseAddedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense added locally.'**
+  String get expenseAddedMessage;
+
+  /// No description provided for @expenseSavedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense updated locally.'**
+  String get expenseSavedMessage;
+
+  /// No description provided for @expenseTileSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense {title}'**
+  String expenseTileSemantic(String title);
+
+  /// No description provided for @expenseActionsSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Actions for expense {title}'**
+  String expenseActionsSemantic(String title);
+
+  /// No description provided for @expenseEditAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get expenseEditAction;
+
+  /// No description provided for @expenseDeleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get expenseDeleteAction;
+
+  /// No description provided for @expenseDeleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete expense?'**
+  String get expenseDeleteConfirmTitle;
+
+  /// No description provided for @expenseDeleteConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{title}\" from this trip budget?'**
+  String expenseDeleteConfirmMessage(String title);
+
+  /// No description provided for @expenseDeletedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense deleted.'**
+  String get expenseDeletedMessage;
+
+  /// No description provided for @expenseCategoryAccommodation.
+  ///
+  /// In en, this message translates to:
+  /// **'Accommodation'**
+  String get expenseCategoryAccommodation;
+
+  /// No description provided for @expenseCategoryFood.
+  ///
+  /// In en, this message translates to:
+  /// **'Food'**
+  String get expenseCategoryFood;
+
+  /// No description provided for @expenseCategoryTransport.
+  ///
+  /// In en, this message translates to:
+  /// **'Transport'**
+  String get expenseCategoryTransport;
+
+  /// No description provided for @expenseCategoryAttraction.
+  ///
+  /// In en, this message translates to:
+  /// **'Attraction'**
+  String get expenseCategoryAttraction;
+
+  /// No description provided for @expenseCategoryShopping.
+  ///
+  /// In en, this message translates to:
+  /// **'Shopping'**
+  String get expenseCategoryShopping;
+
+  /// No description provided for @expenseCategoryHealth.
+  ///
+  /// In en, this message translates to:
+  /// **'Health'**
+  String get expenseCategoryHealth;
+
+  /// No description provided for @expenseCategoryVisa.
+  ///
+  /// In en, this message translates to:
+  /// **'Visa'**
+  String get expenseCategoryVisa;
+
+  /// No description provided for @expenseCategoryInsurance.
+  ///
+  /// In en, this message translates to:
+  /// **'Insurance'**
+  String get expenseCategoryInsurance;
+
+  /// No description provided for @expenseCategoryOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get expenseCategoryOther;
 
   /// No description provided for @commonBackSemantic.
   ///

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 class Category {
   final String id;
+  final String slug;
+  final String type;
+  final String? parentSlug;
   final String name;
   final IconData icon;
   final Color color;
@@ -10,18 +13,24 @@ class Category {
 
   const Category({
     required this.id,
+    String? slug,
+    String? type,
+    this.parentSlug,
     required this.name,
     required this.icon,
     required this.color,
     required this.description,
     required this.sortOrder,
-  });
+  })  : slug = slug ?? id,
+        type = type ?? id;
 }
 
 class Place {
   final int id;
   final String name;
   final String category;
+  final String? categorySlug;
+  final String? subcategorySlug;
   final String locationName;
   final String city;
   final String province;
@@ -39,11 +48,14 @@ class Place {
   final List<String> tags;
   final bool isFeatured;
   final bool isNearby;
+  final bool verified;
 
   const Place({
     required this.id,
     required this.name,
     required this.category,
+    this.categorySlug,
+    this.subcategorySlug,
     required this.locationName,
     required this.city,
     required this.province,
@@ -61,11 +73,14 @@ class Place {
     this.tags = const [],
     this.isFeatured = false,
     this.isNearby = false,
+    this.verified = false,
   });
 
   // Backward-compat accessors used by existing widgets
   String get location => locationName;
   String get priceRange => priceLevel;
+  String get effectiveCategorySlug =>
+      categorySlug ?? category.toLowerCase().replaceAll(' ', '-');
 }
 
 class Trip {
@@ -77,6 +92,8 @@ class Trip {
   final DateTime endDate;
   final int travelers;
   final double budget;
+  final String budgetCurrency;
+  final String budgetNotes;
   final String notes;
 
   const Trip({
@@ -88,6 +105,8 @@ class Trip {
     required this.endDate,
     required this.travelers,
     required this.budget,
+    this.budgetCurrency = 'VND',
+    this.budgetNotes = '',
     this.notes = '',
   });
 
@@ -106,6 +125,8 @@ class Trip {
     DateTime? endDate,
     int? travelers,
     double? budget,
+    String? budgetCurrency,
+    String? budgetNotes,
     String? notes,
   }) =>
       Trip(
@@ -117,6 +138,8 @@ class Trip {
         endDate: endDate ?? this.endDate,
         travelers: travelers ?? this.travelers,
         budget: budget ?? this.budget,
+        budgetCurrency: budgetCurrency ?? this.budgetCurrency,
+        budgetNotes: budgetNotes ?? this.budgetNotes,
         notes: notes ?? this.notes,
       );
 }
@@ -185,12 +208,17 @@ class TimelineItem {
 }
 
 class Expense {
+  static const Object _unset = Object();
+
   final int id;
   final int tripId;
   final String title;
   final String category;
   final double amount;
+  final String currency;
   final DateTime date;
+  final int? tripDayId;
+  final int? tripItemId;
   final String notes;
 
   const Expense({
@@ -199,7 +227,10 @@ class Expense {
     required this.title,
     required this.category,
     required this.amount,
+    this.currency = 'VND',
     required this.date,
+    this.tripDayId,
+    this.tripItemId,
     this.notes = '',
   });
 
@@ -209,7 +240,10 @@ class Expense {
     String? title,
     String? category,
     double? amount,
+    String? currency,
     DateTime? date,
+    Object? tripDayId = _unset,
+    Object? tripItemId = _unset,
     String? notes,
   }) =>
       Expense(
@@ -218,7 +252,13 @@ class Expense {
         title: title ?? this.title,
         category: category ?? this.category,
         amount: amount ?? this.amount,
+        currency: currency ?? this.currency,
         date: date ?? this.date,
+        tripDayId:
+            identical(tripDayId, _unset) ? this.tripDayId : tripDayId as int?,
+        tripItemId: identical(tripItemId, _unset)
+            ? this.tripItemId
+            : tripItemId as int?,
         notes: notes ?? this.notes,
       );
 }
