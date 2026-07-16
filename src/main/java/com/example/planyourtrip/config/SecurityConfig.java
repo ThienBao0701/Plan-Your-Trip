@@ -59,6 +59,9 @@ public class SecurityConfig {
                     "/api/rooms/*/rate-plans/**",
                     "/api/trips/public/**"
                 ).permitAll()
+                // Phase 7.32 — public canonical pricing quote (POST body). Read-only; same
+                // public visibility as the legacy GET /api/rooms/{roomId}/pricing endpoint.
+                .requestMatchers(HttpMethod.POST, "/api/rooms/*/pricing/quote").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/partner/profile/**").authenticated()
                 .requestMatchers("/api/partner/**").hasAnyRole("PARTNER", "ADMIN")

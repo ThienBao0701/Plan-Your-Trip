@@ -77,6 +77,18 @@ public class RatePlanPricingService {
         return buildBreakdown(plan, checkIn, checkOut, adults, children, extraBeds, true);
     }
 
+    /**
+     * Phase 7.32 — granular per-plan breakdown for the pricing quote endpoint. Inventory is NOT
+     * re-checked here ({@code checkInventory=false}); the quote reports inventory availability as a
+     * separate, non-blocking field so pricing is always shown. Reuses the SAME {@code buildBreakdown}
+     * as {@link #preview} — no pricing logic is duplicated. The plan must belong to the room.
+     */
+    public RatePlanPricingBreakdownResponse quoteBreakdown(Long roomId, Long ratePlanId, LocalDate checkIn,
+                                                           LocalDate checkOut, int adults, int children, int extraBeds) {
+        RatePlan plan = planForRoomOrThrow(roomId, ratePlanId);
+        return buildBreakdown(plan, checkIn, checkOut, adults, children, extraBeds, false);
+    }
+
     public RatePlanEligibilityResponse validate(Long ratePlanId, RatePlanEligibilityRequest req) {
         RatePlan plan = planOrThrow(ratePlanId);
         int adults   = req.adults()   != null ? req.adults()   : 1;
