@@ -13,7 +13,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,7 +24,7 @@ public class AvailabilityService {
     private final HotelDetailRepository hotelDetailRepo;
     private final HotelRoomRepository roomRepo;
     private final RoomInventoryRepository inventoryRepo;
-    private final RatePlanRepository ratePlanRepo;
+    private final RatePlanPricingService ratePlanPricingService;
     private final RoomAmenityRepository roomAmenityRepo;
     private final MediaAssetRepository mediaAssetRepo;
 
@@ -33,14 +32,14 @@ public class AvailabilityService {
                                 HotelDetailRepository hotelDetailRepo,
                                 HotelRoomRepository roomRepo,
                                 RoomInventoryRepository inventoryRepo,
-                                RatePlanRepository ratePlanRepo,
+                                RatePlanPricingService ratePlanPricingService,
                                 RoomAmenityRepository roomAmenityRepo,
                                 MediaAssetRepository mediaAssetRepo) {
         this.placeRepo       = placeRepo;
         this.hotelDetailRepo = hotelDetailRepo;
         this.roomRepo        = roomRepo;
         this.inventoryRepo   = inventoryRepo;
-        this.ratePlanRepo    = ratePlanRepo;
+        this.ratePlanPricingService = ratePlanPricingService;
         this.roomAmenityRepo = roomAmenityRepo;
         this.mediaAssetRepo  = mediaAssetRepo;
     }
@@ -81,19 +80,26 @@ public class AvailabilityService {
             long availableNights = inventoryRepo.countAvailableNights(room.getId(), checkIn, checkOut);
             if (availableNights < nights) continue;
 
-            List<RatePlan> plans = ratePlanRepo.findActiveForStay(room.getId(), checkIn, lastNight);
-            Optional<RatePlan> bestPlan = plans.stream()
-                .min(Comparator.comparing(RatePlan::getPricePerNight));
+            // Phase 7.31 — delegate to the SAME priority-based rate-plan selection that checkout
+            // uses (RatePlanPricingService.resolveForBooking → RatePlanEligibilityService), so a
+            // searching customer sees the exact plan and price they would actually be charged at
+            // booking. Inventory is already confirmed above, so resolution runs with
+            // checkInventory=false (it never re-queries or re-locks inventory). The former local
+            // min-price rate-plan selection has been removed — no business logic is duplicated here.
+            Optional<RatePlanPricingService.BookingRateResolution> resolution =
+                ratePlanPricingService.resolveForBooking(room, null, checkIn, checkOut, adults, children, 0);
 
-            BigDecimal effectivePrice = bestPlan
-                .map(RatePlan::getPricePerNight)
+            BigDecimal effectivePrice = resolution
+                .map(RatePlanPricingService.BookingRateResolution::finalNightlyRate)
                 .orElse(room.getPriceFrom());
 
-            String ratePlanName = bestPlan.map(RatePlan::getRateName).orElse(null);
+            String ratePlanName = resolution.map(r -> r.plan().getRateName()).orElse(null);
 
-            BigDecimal totalPrice = effectivePrice != null
-                ? effectivePrice.multiply(BigDecimal.valueOf(nights))
-                : null;
+            BigDecimal totalPrice = resolution
+                .map(RatePlanPricingService.BookingRateResolution::staySubtotal)
+                .orElseGet(() -> effectivePrice != null
+                    ? effectivePrice.multiply(BigDecimal.valueOf(nights))
+                    : null);
 
             List<MediaAsset> media = mediaAssetRepo
                 .findByOwnerTypeAndOwnerIdAndActiveTrueOrderBySortOrderAsc(

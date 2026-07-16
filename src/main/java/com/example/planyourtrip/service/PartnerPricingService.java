@@ -90,8 +90,17 @@ public class PartnerPricingService {
     @Transactional(readOnly = true)
     public PricingBreakdownResponse getPricingPreview(Long userId, Long roomId, LocalDate checkIn, LocalDate checkOut) {
         PartnerProfile profile = myApprovedProfileOrThrow(userId);
-        ownedRoomOrThrow(roomId, profile.getId());
-        return pricingEngineService.calculate(roomId, checkIn, checkOut);
+        HotelRoom room = ownedRoomOrThrow(roomId, profile.getId());
+        // Phase 7.31 — resolve the best eligible plan with the SAME priority-based selection used by
+        // checkout (RatePlanPricingService), then feed its resolved stay subtotal into the unchanged
+        // promotion-discount stages of the pricing engine, so the partner preview reflects the plan
+        // and price a customer would actually be charged (default single-occupancy quote). When no
+        // plan is eligible the resolution is empty and pricing falls back to the base room price —
+        // identical to the engine's own "no eligible plan" branch. DTO shape is unchanged.
+        return ratePlanPricingService.resolveForBooking(room, null, checkIn, checkOut, 1, 0, 0)
+            .map(r -> pricingEngineService.calculate(roomId, checkIn, checkOut,
+                r.staySubtotal(), r.plan().getRateName()))
+            .orElseGet(() -> pricingEngineService.calculate(roomId, checkIn, checkOut, null, null));
     }
 
     // ── Phase 7.29 — advanced rate-plan management (owner-scoped) ──────────────

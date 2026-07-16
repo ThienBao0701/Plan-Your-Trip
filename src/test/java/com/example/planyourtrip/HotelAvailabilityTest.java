@@ -266,8 +266,12 @@ class HotelAvailabilityTest {
     }
 
     @Test
-    void availability_ratePlanApplied_showsDiscountedPrice() throws Exception {
-        // STD-TWIN room is seeded with "Summer Deal" at 800,000 (priceFrom=900,000)
+    void availability_ratePlanApplied_showsPriorityBasedCheckoutPrice() throws Exception {
+        // Phase 7.31 — availability search now delegates to the SAME priority-based rate-plan
+        // selection that checkout uses (RatePlanPricingService), so the search result shows the
+        // exact plan and price a customer would be charged at booking. STD-TWIN's best-eligible
+        // plan is the seeded "Non-refundable" (priority 20 → resolved nightly 900,000), NOT the
+        // cheaper "Summer Deal" (800,000) that the OLD local min-price pick returned. priceFrom=900,000.
         LocalDate checkIn  = LocalDate.now().plusDays(1);
         LocalDate checkOut = LocalDate.now().plusDays(4);
 
@@ -282,12 +286,10 @@ class HotelAvailabilityTest {
         for (JsonNode room : rooms) {
             if ("STD-TWIN".equals(room.get("roomCode").asText())) {
                 found = true;
-                double price    = room.get("pricePerNight").asDouble();
-                double original = room.get("originalPricePerNight").asDouble();
-                assertTrue(price < original, "Rate plan price must be lower than priceFrom");
-                assertEquals(800000.0, price, 0.01);
-                assertEquals("Summer Deal", room.get("appliedRatePlan").asText());
-                assertEquals(3 * 800000.0, room.get("totalPrice").asDouble(), 0.01);
+                double price = room.get("pricePerNight").asDouble();
+                assertEquals(900000.0, price, 0.01, "priority-based resolved nightly rate");
+                assertEquals("Non-refundable", room.get("appliedRatePlan").asText());
+                assertEquals(3 * 900000.0, room.get("totalPrice").asDouble(), 0.01);
                 break;
             }
         }

@@ -174,6 +174,43 @@ class PartnerPricingPromotionTest {
             .andExpect(status().isNotFound());
     }
 
+    @Test
+    void partner_pricingPreviewUsesPriorityBasedSelection() throws Exception {
+        // Phase 7.31 — the partner pricing preview now resolves the best plan with the SAME
+        // priority-based selection as checkout (RatePlanPricingService), not the old min-price pick.
+        // Two plans whose priority-based and min-price picks DIVERGE:
+        //   "Cheap"   — priority 5,  300,000 (cheapest)
+        //   "Premium" — priority 20, 600,000 (highest priority)
+        OwnedHotelRoom r = setupOwnedHotelRoom("PreviewPriority");
+        createRatePlanWithPriority(r, "Cheap",   300000,  5, "2030-12-01", "2030-12-31");
+        createRatePlanWithPriority(r, "Premium", 600000, 20, "2030-12-01", "2030-12-31");
+
+        String body = mvc.perform(get("/api/partner/rooms/" + r.roomId() + "/pricing-preview")
+                .param("checkIn", "2030-12-01")
+                .param("checkOut", "2030-12-03") // 2 nights
+                .header("Authorization", "Bearer " + r.partner().token()))
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString();
+
+        JsonNode res = mapper.readTree(body);
+        // Priority-based winner (Premium, priority 20) — NOT the cheaper plan a min-price pick returns.
+        assertEquals("Premium", res.get("ratePlanName").asText(),
+            "preview must reflect the priority-based best-eligible plan");
+        assertEquals(1200000.0, res.get("ratePlanPrice").asDouble(), 0.01); // 600,000 × 2 nights
+    }
+
+    private void createRatePlanWithPriority(OwnedHotelRoom r, String rateName, long price, int priority,
+                                            String start, String end) throws Exception {
+        String payload = ("{\"rateName\":\"%s\",\"rateType\":\"STANDARD\",\"pricePerNight\":%d,"
+            + "\"startDate\":\"%s\",\"endDate\":\"%s\",\"active\":true,\"priority\":%d}")
+            .formatted(rateName, price, start, end, priority);
+        mvc.perform(post("/api/partner/rooms/" + r.roomId() + "/rate-plans")
+                .header("Authorization", "Bearer " + r.partner().token())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(payload))
+            .andExpect(status().isCreated());
+    }
+
     // ═══════════════════════════════════════════════════════════════════════════
     // PROMOTIONS
     // ═══════════════════════════════════════════════════════════════════════════

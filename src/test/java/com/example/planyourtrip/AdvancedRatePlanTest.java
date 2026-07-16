@@ -494,19 +494,25 @@ class AdvancedRatePlanTest {
     // ═══════════════════════════════════════════════════════════════════════════
 
     @Test
-    void scenario30_existingAvailabilitySearchBackwardCompatible() throws Exception {
+    void scenario30_availabilitySearchReflectsPriorityBasedCheckoutSelection() throws Exception {
+        // Phase 7.31 — availability search delegates to the SAME priority-based selection as
+        // checkout, so STD-TWIN now surfaces the best-eligible "Non-refundable" (priority 20 →
+        // 900,000), NOT the cheaper "Summer Deal" (800,000) the old local min-price pick returned.
         Long placeId = placeRepo.findBySlug("grand-palace-hotel-vung-tau").orElseThrow().getId();
         String body = mvc.perform(get("/api/places/" + placeId + "/availability"
                 + "?checkIn=" + today(1) + "&checkOut=" + today(4) + "&adults=2&children=0"))
             .andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
         JsonNode rooms = mapper.readTree(body).get("availableRooms");
-        boolean summerDeal = false;
+        JsonNode stdTwin = null;
         for (JsonNode r : rooms) {
-            if (r.get("appliedRatePlan") != null && !r.get("appliedRatePlan").isNull()
-                    && "Summer Deal".equals(r.get("appliedRatePlan").asText())) summerDeal = true;
+            if ("STD-TWIN".equals(r.get("roomCode").asText())) { stdTwin = r; break; }
         }
-        assertTrue(summerDeal, "STD-TWIN must still surface 'Summer Deal' as the cheapest plan");
+        assertNotNull(stdTwin, "STD-TWIN must appear in availability results");
+        assertEquals("Non-refundable", stdTwin.get("appliedRatePlan").asText(),
+            "search must surface the priority-based best-eligible plan, not the cheapest");
+        assertEquals(900000.0, stdTwin.get("pricePerNight").asDouble(), 0.01);
+        assertEquals(3 * 900000.0, stdTwin.get("totalPrice").asDouble(), 0.01);
     }
 
     @Test
@@ -628,6 +634,64 @@ class AdvancedRatePlanTest {
         // 2 nights → 2,900,000 flows into the charged rate-plan price.
         assertEquals(2900000.0, booking.get("ratePlanPrice").asDouble(), 0.01);
         assertFinalIsRatePlanMinusDiscount(booking);
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // 39. Phase 7.31 — availability search price == the price checkout actually charges
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    @Test
+    void scenario39_availabilitySearchPriceMatchesCheckoutResolvedPlan() throws Exception {
+        // Provision a room with two BASE plans whose priority-based and min-price picks DIVERGE:
+        //   "Cheap Rate"  — priority 5,  700,000 (the cheapest)
+        //   "Premium Rate"— priority 20, 1,000,000 (the highest priority, more expensive)
+        // The OLD availability search picked the cheapest (Cheap Rate). Phase 7.31 makes it pick
+        // the SAME plan checkout resolves (priority-based → Premium Rate), so a searching customer
+        // sees exactly what they will be charged.
+        Long placeId = createHotelPlace(uniq());     // published hotel place
+        createHotelDetail(placeId);
+        String roomCode = "RM-" + uniq();
+        Long roomId = createRoom(placeId, roomCode);
+        seedNight(roomId, today(3), 5, 5);
+        seedNight(roomId, today(4), 5, 5);
+
+        Map<String, Object> cheap = parentPlan("Cheap Rate", "CHEAP-INT", 700000);
+        cheap.put("priority", 5);
+        createPlanReturnId(roomId, cheap);
+        Map<String, Object> premium = parentPlan("Premium Rate", "PREM-INT", 1000000);
+        premium.put("priority", 20);
+        createPlanReturnId(roomId, premium);
+
+        // Availability search (public) for the same room / dates / occupancy.
+        String searchBody = mvc.perform(get("/api/places/" + placeId + "/availability"
+                + "?checkIn=" + today(3) + "&checkOut=" + today(5) + "&adults=2&children=0"))
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString();
+        JsonNode searchRoom = null;
+        for (JsonNode r : mapper.readTree(searchBody).get("availableRooms")) {
+            if (roomCode.equals(r.get("roomCode").asText())) { searchRoom = r; break; }
+        }
+        assertNotNull(searchRoom, "provisioned room must appear in availability results");
+
+        // Actual booking (no ratePlanId) — resolves the plan the customer is charged for.
+        String customer = registerAndLogin("search-checkout-" + uniq() + "@test.com");
+        JsonNode booking = book(customer, roomId, today(3), today(5), 2, 0, null, 0); // 2 nights
+
+        // Priority-based selection wins on BOTH paths → Premium Rate, not the cheaper plan.
+        assertEquals("Premium Rate", booking.get("selectedRatePlanName").asText());
+        assertEquals(1000000.0, booking.get("nightlyRateSnapshot").asDouble(), 0.01);
+        assertEquals(2000000.0, booking.get("ratePlanPrice").asDouble(), 0.01);
+
+        // Search reflects the SAME resolved plan and price the booking is charged.
+        assertEquals(booking.get("selectedRatePlanName").asText(),
+            searchRoom.get("appliedRatePlan").asText(),
+            "search must surface the same plan checkout resolves");
+        assertEquals(booking.get("nightlyRateSnapshot").asDouble(),
+            searchRoom.get("pricePerNight").asDouble(), 0.01,
+            "search nightly price must equal the checkout-resolved nightly rate");
+        assertEquals(booking.get("ratePlanPrice").asDouble(),
+            searchRoom.get("totalPrice").asDouble(), 0.01,
+            "search total must equal the checkout-resolved rate-plan subtotal");
     }
 
     /** finalPrice must equal the resolved rate-plan price minus the promotion discount. */
