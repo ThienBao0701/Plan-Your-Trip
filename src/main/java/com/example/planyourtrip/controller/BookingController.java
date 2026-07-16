@@ -1,7 +1,10 @@
 package com.example.planyourtrip.controller;
 
 import com.example.planyourtrip.dto.BookingDto.*;
+import com.example.planyourtrip.dto.BookingModificationPreviewDto.BookingModificationPreviewRequest;
+import com.example.planyourtrip.dto.BookingModificationPreviewDto.BookingModificationPreviewResponse;
 import com.example.planyourtrip.security.AuthUser;
+import com.example.planyourtrip.service.BookingModificationPreviewService;
 import com.example.planyourtrip.service.BookingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,8 +19,13 @@ import java.util.List;
 public class BookingController {
 
     private final BookingService service;
+    private final BookingModificationPreviewService modificationPreviewService;
 
-    public BookingController(BookingService service) { this.service = service; }
+    public BookingController(BookingService service,
+                            BookingModificationPreviewService modificationPreviewService) {
+        this.service = service;
+        this.modificationPreviewService = modificationPreviewService;
+    }
 
     @PostMapping("/api/bookings")
     @ResponseStatus(HttpStatus.CREATED)
@@ -77,5 +85,17 @@ public class BookingController {
                                    @PathVariable Long id,
                                    @RequestBody @Valid BookingModificationRequest req) {
         return service.modify(uid, id, req);
+    }
+
+    @PostMapping("/api/me/bookings/{bookingId}/modify/preview")
+    @Operation(summary = "Preview modifying a PENDING booking (read-only; owner only)",
+        description = "Computes what PATCH /api/bookings/{id}/modify WOULD do for the same inputs — new "
+            + "price, old→new totals and difference (additional payment / refundable amount), overlap-adjusted "
+            + "inventory availability and advisories — without changing anything. Optional coupon/loyalty/"
+            + "travel-credit/gift-card inputs layer a hypothetical checkout benefit preview on top.")
+    public BookingModificationPreviewResponse previewModify(@AuthUser Long uid,
+                                                            @PathVariable Long bookingId,
+                                                            @RequestBody @Valid BookingModificationPreviewRequest req) {
+        return modificationPreviewService.preview(uid, bookingId, req);
     }
 }
