@@ -89,6 +89,23 @@ public class TravelCreditService {
     }
 
     /**
+     * Phase 7.33 — STRICTLY read-only current balance, for the authenticated
+     * customer pricing quote preview ({@code CustomerPricingQuoteService}).
+     * Unlike {@link #getOrCreateMyAccount}, this NEVER creates the account row —
+     * a customer who has never touched travel credits reads {@code ZERO} and no
+     * {@code TravelCreditAccount} is inserted — so a pure pricing preview performs
+     * zero state mutation. Mirrors the read-only balance read in
+     * {@code LoyaltyRedemptionService#preview} (which reads the loyalty balance
+     * via {@code findByUserId(...).orElse(0)} rather than creating an account).
+     */
+    @Transactional(readOnly = true)
+    public BigDecimal previewAvailableBalance(Long userId) {
+        return accountRepo.findByUserId(userId)
+            .map(TravelCreditAccount::getBalance)
+            .orElse(BigDecimal.ZERO.setScale(2, RoundingMode.UNNECESSARY));
+    }
+
+    /**
      * Filtered/paginated in-stream like {@code TravelWalletService#list} —
      * every filter is optional. {@code from}/{@code to} are inclusive calendar
      * dates compared in the system zone.
