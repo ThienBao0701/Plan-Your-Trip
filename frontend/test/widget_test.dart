@@ -228,7 +228,7 @@ void main() {
 
     await tester.tap(find.text('Add'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Create a trip first'));
+    await tester.tap(find.text('Create a trip'));
     await tester.pumpAndSettle();
 
     expect(find.text('New trip'), findsOneWidget);
@@ -275,11 +275,8 @@ void main() {
     await tester.tap(find.text('Planner'));
     await tester.pumpAndSettle();
     expect(
-      find.text(
-        'Open a trip timeline and continue planning.',
-        skipOffstage: false,
-      ),
-      findsOneWidget,
+      find.text('Da Lat 3 days 2 nights', skipOffstage: false),
+      findsWidgets,
     );
 
     await tester.tap(find.text('Profile'));

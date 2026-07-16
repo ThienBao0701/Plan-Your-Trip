@@ -52,6 +52,158 @@
     }
   },
   "plannerTripCardSemantic": "Trip planner card",
+  "plannerTripSelectorLabel": "Select trip",
+  "plannerTripSelectorSemantic": "Trip selector",
+  "plannerModeSemantic": "Planner presentation mode",
+  "plannerTimelineMode": "Timeline",
+  "plannerRouteMode": "Route",
+  "plannerDaySelectorSemantic": "Day selector",
+  "plannerDaySemantic": "Select day {day}",
+  "@plannerDaySemantic": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "plannerQuickAddAction": "Quick Add",
+  "plannerQuickAddSemantic": "Quick add an activity or place",
+  "plannerAddActivityAction": "Add activity",
+  "plannerAddActivitySemantic": "Add a manual activity",
+  "plannerEmptyDayTitle": "No activities this day",
+  "plannerEmptyDayMessage": "Add a place or manual activity to build this day.",
+  "plannerActivityCardSemantic": "{title}, {time}",
+  "@plannerActivityCardSemantic": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "plannerInvalidTimeLabel": "Invalid time",
+  "plannerRouteFallbackSemantic": "Planner route fallback",
+  "plannerRouteUnavailableMessage": "Live maps, route geometry, traffic, distance, and travel time are not connected yet. Timeline data remains local.",
+  "plannerRoutePreviewTitle": "Day stops",
+  "plannerBackToTimelineAction": "Back to timeline",
+  "plannerLocalOnlyMessage": "Planner changes are local to this app state and are not synchronized to a backend.",
+  "activityAddTitle": "Add activity",
+  "activityEditTitle": "Edit activity",
+  "activityCloseAction": "Close",
+  "activityTitleLabel": "Activity title",
+  "activityNotesLabel": "Notes",
+  "activityDayLabel": "Day",
+  "activityStartTimeLabel": "Start time",
+  "activityEndTimeLabel": "End time",
+  "activityTimeHint": "Use HH:mm",
+  "activityCategoryLabel": "Category",
+  "activityAddAction": "Add activity",
+  "activitySaveAction": "Save changes",
+  "activityAddSemantic": "Add this activity",
+  "activitySaveSemantic": "Save this activity",
+  "activityTitleRequired": "Enter an activity title.",
+  "activityInvalidTimeRange": "Enter a valid time range where end time is later than start time.",
+  "activityOutOfRangeDay": "Select a day inside this trip.",
+  "activitySaveFailed": "Could not save this activity for the selected trip day.",
+  "activityAddedMessage": "Activity added locally.",
+  "activitySavedMessage": "Activity updated locally.",
+  "activityDetailTitle": "Activity details",
+  "activityEditAction": "Edit",
+  "activityEditSemantic": "Edit {title}",
+  "@activityEditSemantic": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "activityViewPlaceAction": "View place",
+  "activityEstimatedCostLabel": "Estimated cost",
+  "activityDeleteAction": "Delete activity",
+  "activityDeleteSemantic": "Delete {title}",
+  "@activityDeleteSemantic": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "activityDeleteConfirmTitle": "Delete activity?",
+  "activityDeleteConfirmMessage": "Delete \"{title}\" from this trip day?",
+  "@activityDeleteConfirmMessage": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "activityDeletedMessage": "Activity deleted.",
+  "activityConflictTitle": "Schedule conflict",
+  "activityConflictMessage": "\"{title}\" overlaps {time}. Change time or keep both activities explicitly.",
+  "@activityConflictMessage": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "activityConflictChangeTime": "Change time",
+  "activityConflictAddAnyway": "Add anyway",
+  "activityConflictSaveAnyway": "Save anyway",
+  "activityConflictKeepBothTitle": "Keep both activities?",
+  "activityConflictKeepBothMessage": "This will preserve both overlapping activities. No activity will be moved or overwritten.",
+  "activityConflictKeepBothAction": "Keep both",
+  "quickAddTitle": "Quick Add",
+  "quickAddSearchHint": "Search places or activities",
+  "quickAddSuggestionsTitle": "Suggestions for {day}",
+  "@quickAddSuggestionsTitle": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "quickAddPlaceSubtitle": "Add {place} to an actual trip day.",
+  "@quickAddPlaceSubtitle": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "quickAddNoTripTitle": "No trip available",
+  "quickAddNoTripMessage": "Create a trip before adding this place to a timeline.",
+  "quickAddNoPlacesTitle": "No places found",
+  "quickAddNoPlacesMessage": "Try another local search term.",
+  "quickAddSelectTripLabel": "Select trip",
+  "quickAddSelectDayLabel": "Select day",
+  "quickAddSubmitAction": "Add to Day {day}",
+  "@quickAddSubmitAction": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "quickAddAddedMessage": "{place} added to {trip} · Day {day}",
+  "@quickAddAddedMessage": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      },
+      "trip": {
+        "type": "String"
+      },
+      "day": {
+        "type": "int"
+      }
+    }
+  },
   "authLoginHero": "Every day away, one trip worth remembering.",
   "authLoginTitle": "Welcome back",
   "authLoginSubtitle": "Log in to continue your journey.",

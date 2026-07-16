@@ -141,6 +141,243 @@ class AppLocalizationsEn extends AppLocalizations {
   String get plannerTripCardSemantic => 'Trip planner card';
 
   @override
+  String get plannerTripSelectorLabel => 'Select trip';
+
+  @override
+  String get plannerTripSelectorSemantic => 'Trip selector';
+
+  @override
+  String get plannerModeSemantic => 'Planner presentation mode';
+
+  @override
+  String get plannerTimelineMode => 'Timeline';
+
+  @override
+  String get plannerRouteMode => 'Route';
+
+  @override
+  String get plannerDaySelectorSemantic => 'Day selector';
+
+  @override
+  String plannerDaySemantic(int day) {
+    return 'Select day $day';
+  }
+
+  @override
+  String get plannerQuickAddAction => 'Quick Add';
+
+  @override
+  String get plannerQuickAddSemantic => 'Quick add an activity or place';
+
+  @override
+  String get plannerAddActivityAction => 'Add activity';
+
+  @override
+  String get plannerAddActivitySemantic => 'Add a manual activity';
+
+  @override
+  String get plannerEmptyDayTitle => 'No activities this day';
+
+  @override
+  String get plannerEmptyDayMessage =>
+      'Add a place or manual activity to build this day.';
+
+  @override
+  String plannerActivityCardSemantic(String title, String time) {
+    return '$title, $time';
+  }
+
+  @override
+  String get plannerInvalidTimeLabel => 'Invalid time';
+
+  @override
+  String get plannerRouteFallbackSemantic => 'Planner route fallback';
+
+  @override
+  String get plannerRouteUnavailableMessage =>
+      'Live maps, route geometry, traffic, distance, and travel time are not connected yet. Timeline data remains local.';
+
+  @override
+  String get plannerRoutePreviewTitle => 'Day stops';
+
+  @override
+  String get plannerBackToTimelineAction => 'Back to timeline';
+
+  @override
+  String get plannerLocalOnlyMessage =>
+      'Planner changes are local to this app state and are not synchronized to a backend.';
+
+  @override
+  String get activityAddTitle => 'Add activity';
+
+  @override
+  String get activityEditTitle => 'Edit activity';
+
+  @override
+  String get activityCloseAction => 'Close';
+
+  @override
+  String get activityTitleLabel => 'Activity title';
+
+  @override
+  String get activityNotesLabel => 'Notes';
+
+  @override
+  String get activityDayLabel => 'Day';
+
+  @override
+  String get activityStartTimeLabel => 'Start time';
+
+  @override
+  String get activityEndTimeLabel => 'End time';
+
+  @override
+  String get activityTimeHint => 'Use HH:mm';
+
+  @override
+  String get activityCategoryLabel => 'Category';
+
+  @override
+  String get activityAddAction => 'Add activity';
+
+  @override
+  String get activitySaveAction => 'Save changes';
+
+  @override
+  String get activityAddSemantic => 'Add this activity';
+
+  @override
+  String get activitySaveSemantic => 'Save this activity';
+
+  @override
+  String get activityTitleRequired => 'Enter an activity title.';
+
+  @override
+  String get activityInvalidTimeRange =>
+      'Enter a valid time range where end time is later than start time.';
+
+  @override
+  String get activityOutOfRangeDay => 'Select a day inside this trip.';
+
+  @override
+  String get activitySaveFailed =>
+      'Could not save this activity for the selected trip day.';
+
+  @override
+  String get activityAddedMessage => 'Activity added locally.';
+
+  @override
+  String get activitySavedMessage => 'Activity updated locally.';
+
+  @override
+  String get activityDetailTitle => 'Activity details';
+
+  @override
+  String get activityEditAction => 'Edit';
+
+  @override
+  String activityEditSemantic(String title) {
+    return 'Edit $title';
+  }
+
+  @override
+  String get activityViewPlaceAction => 'View place';
+
+  @override
+  String get activityEstimatedCostLabel => 'Estimated cost';
+
+  @override
+  String get activityDeleteAction => 'Delete activity';
+
+  @override
+  String activityDeleteSemantic(String title) {
+    return 'Delete $title';
+  }
+
+  @override
+  String get activityDeleteConfirmTitle => 'Delete activity?';
+
+  @override
+  String activityDeleteConfirmMessage(String title) {
+    return 'Delete \"$title\" from this trip day?';
+  }
+
+  @override
+  String get activityDeletedMessage => 'Activity deleted.';
+
+  @override
+  String get activityConflictTitle => 'Schedule conflict';
+
+  @override
+  String activityConflictMessage(String title, String time) {
+    return '\"$title\" overlaps $time. Change time or keep both activities explicitly.';
+  }
+
+  @override
+  String get activityConflictChangeTime => 'Change time';
+
+  @override
+  String get activityConflictAddAnyway => 'Add anyway';
+
+  @override
+  String get activityConflictSaveAnyway => 'Save anyway';
+
+  @override
+  String get activityConflictKeepBothTitle => 'Keep both activities?';
+
+  @override
+  String get activityConflictKeepBothMessage =>
+      'This will preserve both overlapping activities. No activity will be moved or overwritten.';
+
+  @override
+  String get activityConflictKeepBothAction => 'Keep both';
+
+  @override
+  String get quickAddTitle => 'Quick Add';
+
+  @override
+  String get quickAddSearchHint => 'Search places or activities';
+
+  @override
+  String quickAddSuggestionsTitle(String day) {
+    return 'Suggestions for $day';
+  }
+
+  @override
+  String quickAddPlaceSubtitle(String place) {
+    return 'Add $place to an actual trip day.';
+  }
+
+  @override
+  String get quickAddNoTripTitle => 'No trip available';
+
+  @override
+  String get quickAddNoTripMessage =>
+      'Create a trip before adding this place to a timeline.';
+
+  @override
+  String get quickAddNoPlacesTitle => 'No places found';
+
+  @override
+  String get quickAddNoPlacesMessage => 'Try another local search term.';
+
+  @override
+  String get quickAddSelectTripLabel => 'Select trip';
+
+  @override
+  String get quickAddSelectDayLabel => 'Select day';
+
+  @override
+  String quickAddSubmitAction(int day) {
+    return 'Add to Day $day';
+  }
+
+  @override
+  String quickAddAddedMessage(String place, String trip, int day) {
+    return '$place added to $trip · Day $day';
+  }
+
+  @override
   String get authLoginHero => 'Every day away, one trip worth remembering.';
 
   @override

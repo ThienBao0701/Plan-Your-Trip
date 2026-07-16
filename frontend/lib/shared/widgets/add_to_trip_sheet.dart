@@ -1,173 +1,229 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
 import '../../core/app_state.dart';
 import '../../core/mock/app_models.dart';
 import '../../design/app_colors.dart';
+import '../../design/app_radii.dart';
+import '../../design/app_spacing.dart';
+import '../../features/planner/planner_timeline.dart';
+import '../../features/planner/planner_utils.dart';
+import '../../features/timeline/timeline_screen.dart';
 import '../../features/trips/create_trip_screen.dart';
-import '../../features/trips/trip_detail_screen.dart';
+import '../../l10n/app_localizations.dart';
 import 'glass_widgets.dart';
-
-final _money = NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
 
 Future<void> showAddToTripSheet(BuildContext context, Place place) {
   return showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (ctx) => _AddToTripSheet(parentContext: context, place: place),
+    builder: (_) => _AddToTripSheet(parentContext: context, place: place),
   );
 }
 
 class _AddToTripSheet extends StatefulWidget {
   final BuildContext parentContext;
   final Place place;
+
   const _AddToTripSheet({required this.parentContext, required this.place});
+
   @override
   State<_AddToTripSheet> createState() => _AddToTripSheetState();
 }
 
 class _AddToTripSheetState extends State<_AddToTripSheet> {
-  Trip? _selectedTrip;
+  final _start = TextEditingController(text: '10:00');
+  final _end = TextEditingController(text: '12:00');
+  final _startFocus = FocusNode();
+  int? _selectedTripId;
   int _selectedDay = 1;
-  String _startTime = '10:00';
-  String _endTime = '12:00';
+  bool _submitting = false;
   bool _navigating = false;
+
+  @override
+  void dispose() {
+    _start.dispose();
+    _end.dispose();
+    _startFocus.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final app = AppScope.of(context);
-    final trips = app.trips;
-    return Container(
-      margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-      padding:
-          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-      child: GlassCard(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                    child: Container(
-                        width: 40,
-                        height: 4,
-                        margin: const EdgeInsets.only(bottom: 16),
-                        decoration: BoxDecoration(
-                            color: AppColors.slate.withValues(alpha: .4),
-                            borderRadius: BorderRadius.circular(2)))),
-                Text('Add to trip',
-                    style: Theme.of(context).textTheme.titleLarge),
-                const SizedBox(height: 4),
-                Text(widget.place.name,
-                    style: const TextStyle(
-                        color: AppColors.ocean, fontWeight: FontWeight.w700)),
-                const SizedBox(height: 16),
-                if (trips.isEmpty) ...[
-                  const Text('You have no trips yet.',
-                      style: TextStyle(color: AppColors.slate)),
-                  const SizedBox(height: 12),
-                  GlassButton(
-                      text: 'Create a trip first',
-                      icon: Icons.add_rounded,
-                      onPressed: () {
-                        if (_navigating) return;
-                        _navigating = true;
-                        final nav = Navigator.of(widget.parentContext);
-                        Navigator.of(context).pop();
-                        nav.push(MaterialPageRoute(
-                            builder: (_) => const CreateTripScreen()));
-                      }),
-                ] else ...[
-                  Text('Select trip',
-                      style: Theme.of(context).textTheme.titleMedium),
-                  const SizedBox(height: 8),
-                  ...trips.map((t) => _TripOption(
-                        trip: t,
-                        selected: _selectedTrip?.id == t.id,
-                        onTap: () => setState(() {
-                          _selectedTrip = t;
-                          _selectedDay = 1;
-                        }),
-                      )),
-                  if (_selectedTrip != null) ...[
-                    const SizedBox(height: 16),
-                    Text('Select day',
-                        style: Theme.of(context).textTheme.titleMedium),
-                    const SizedBox(height: 8),
-                    SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                            children: List.generate(
-                                _selectedTrip!.days,
-                                (i) => Padding(
-                                    padding: const EdgeInsets.only(right: 8),
-                                    child: ChoiceChip(
-                                        label: Text('Day ${i + 1}'),
-                                        selected: _selectedDay == i + 1,
-                                        onSelected: (_) => setState(
-                                            () => _selectedDay = i + 1)))))),
-                    const SizedBox(height: 16),
-                    Text('Time range',
-                        style: Theme.of(context).textTheme.titleMedium),
-                    const SizedBox(height: 8),
-                    Row(children: [
-                      _TimeButton(
-                          label: 'Start',
-                          time: _startTime,
-                          onTap: () => _pickTime(isStart: true)),
-                      const SizedBox(width: 12),
-                      const Text('→', style: TextStyle(fontSize: 18)),
-                      const SizedBox(width: 12),
-                      _TimeButton(
-                          label: 'End',
-                          time: _endTime,
-                          onTap: () => _pickTime(isStart: false)),
-                    ]),
-                    const SizedBox(height: 20),
-                    GlassButton(
-                        text: 'Add to Day $_selectedDay',
-                        icon: Icons.add_rounded,
-                        onPressed: _confirm),
+    final l10n = AppLocalizations.of(context)!;
+    final trips = List<Trip>.from(app.trips)
+      ..sort((a, b) => a.startDate.compareTo(b.startDate));
+    Trip? selectedTrip;
+    if (_selectedTripId != null) {
+      try {
+        selectedTrip = trips.firstWhere((trip) => trip.id == _selectedTripId);
+      } catch (_) {
+        selectedTrip = null;
+      }
+    }
+    if (selectedTrip == null && trips.isNotEmpty && _selectedTripId != null) {
+      _selectedTripId = trips.first.id;
+      _selectedDay = 1;
+    }
+
+    return OceanGlassBottomSheet(
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Center(
+              child: Container(
+                width: 48,
+                height: 5,
+                margin: const EdgeInsets.only(bottom: AppSpacing.md),
+                decoration: BoxDecoration(
+                  color: AppColors.disabled,
+                  borderRadius: BorderRadius.circular(AppRadii.pill),
+                ),
+              ),
+            ),
+            Text(l10n.quickAddTitle,
+                style: Theme.of(context).textTheme.headlineMedium),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              l10n.quickAddPlaceSubtitle(widget.place.name),
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            if (trips.isEmpty)
+              OceanEmptyState(
+                title: l10n.quickAddNoTripTitle,
+                message: l10n.quickAddNoTripMessage,
+                actionLabel: l10n.plannerCreateTripAction,
+                onAction: _openCreateTrip,
+              )
+            else ...[
+              Text(l10n.quickAddSelectTripLabel,
+                  style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: AppSpacing.sm),
+              for (final trip in trips)
+                _TripOption(
+                  key: Key('quick-add-trip-${trip.id}'),
+                  trip: trip,
+                  selected: selectedTrip?.id == trip.id,
+                  onTap: () => setState(() {
+                    _selectedTripId = trip.id;
+                    _selectedDay = 1;
+                  }),
+                ),
+              if (selectedTrip != null) ...[
+                const SizedBox(height: AppSpacing.md),
+                Text(l10n.quickAddSelectDayLabel,
+                    style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: AppSpacing.xs),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      for (var i = 1; i <= selectedTrip.days; i++)
+                        Padding(
+                          padding: const EdgeInsets.only(right: AppSpacing.xs),
+                          child: ChoiceChip(
+                            key: Key('quick-add-day-$i'),
+                            selected: _selectedDay == i,
+                            label: Text(l10n.tripOverviewDayLabel(i)),
+                            onSelected: (_) => setState(() => _selectedDay = i),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _TimeField(
+                        key: const Key('quick-add-start-field'),
+                        controller: _start,
+                        focusNode: _startFocus,
+                        label: l10n.activityStartTimeLabel,
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: _TimeField(
+                        key: const Key('quick-add-end-field'),
+                        controller: _end,
+                        label: l10n.activityEndTimeLabel,
+                      ),
+                    ),
                   ],
-                ],
-              ])),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                OceanGlassSurface(
+                  blur: 0,
+                  color: AppColors.paleCyan,
+                  child: Text(
+                    l10n.plannerLocalOnlyMessage,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                _submitting
+                    ? const Center(
+                        child: SizedBox(width: 280, child: OceanLoadingState()))
+                    : OceanPrimaryButton(
+                        key: const Key('quick-add-submit'),
+                        label: l10n.quickAddSubmitAction(_selectedDay),
+                        icon: Icons.add_rounded,
+                        semanticLabel:
+                            l10n.placeAddToTripSemantic(widget.place.name),
+                        onPressed: _confirm,
+                      ),
+              ],
+            ],
+          ],
+        ),
+      ),
     );
   }
 
-  Future<void> _pickTime({required bool isStart}) async {
-    final parts = (isStart ? _startTime : _endTime).split(':');
-    final initial =
-        TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
-    final picked = await showTimePicker(context: context, initialTime: initial);
-    if (picked == null) return;
-    final str =
-        '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
-    setState(() {
-      if (isStart) {
-        _startTime = str;
-      } else {
-        _endTime = str;
-      }
-    });
+  Future<void> _openCreateTrip() async {
+    if (_navigating) return;
+    _navigating = true;
+    final nav = Navigator.of(widget.parentContext);
+    Navigator.pop(context);
+    final created = await nav.push<Trip>(
+      MaterialPageRoute(builder: (_) => const CreateTripScreen()),
+    );
+    _navigating = false;
+    if (!mounted || created == null) return;
   }
 
-  void _confirm() {
-    if (_selectedTrip == null) return;
+  Future<void> _confirm() async {
+    if (_submitting) return;
+    final l10n = AppLocalizations.of(context)!;
     final app = AppScope.of(context);
-    final messenger = ScaffoldMessenger.of(widget.parentContext);
-    final nav = Navigator.of(widget.parentContext);
-    final trip = _selectedTrip!;
-    if (!AppState.isValidTimeRange(_startTime, _endTime)) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('End time must be later than start time.')));
+    final trip = app.tripById(_selectedTripId ?? -1);
+    if (trip == null) return;
+    if (!AppState.isValidTimeRange(_start.text.trim(), _end.text.trim())) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.activityInvalidTimeRange)),
+      );
+      _startFocus.requestFocus();
       return;
     }
+    if (!plannerDayIsInTrip(trip, _selectedDay)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.activityOutOfRangeDay)),
+      );
+      return;
+    }
+    setState(() => _submitting = true);
     final item = TimelineItem(
       id: app.newId,
       tripId: trip.id,
       dayNumber: _selectedDay,
-      startTime: _startTime,
-      endTime: _endTime,
+      startTime: _start.text.trim(),
+      endTime: _end.text.trim(),
       title: widget.place.name,
       notes: widget.place.description,
       place: widget.place,
@@ -175,21 +231,52 @@ class _AddToTripSheetState extends State<_AddToTripSheet> {
       category: widget.place.category,
       estimatedCost: 0,
     );
-    if (!app.addTimeline(item)) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Could not add this activity to the selected trip.')));
+    final conflict = findPlannerConflict(app.timeline, item);
+    if (conflict != null) {
+      setState(() => _submitting = false);
+      final decision = await showPlannerConflictSheet(
+        context,
+        conflict: conflict,
+        candidate: item,
+        isEdit: false,
+      );
+      if (!mounted) return;
+      if (decision == PlannerConflictDecision.changeTime) {
+        _startFocus.requestFocus();
+        return;
+      }
+      if (decision != PlannerConflictDecision.saveAnyway) return;
+      setState(() => _submitting = true);
+    }
+    final added = app.addTimeline(item);
+    if (!added) {
+      if (mounted) {
+        setState(() => _submitting = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.activitySaveFailed)),
+        );
+      }
       return;
     }
-    Navigator.of(context).pop();
-    messenger.showSnackBar(SnackBar(
-        content: Text(
-            '${widget.place.name} added to ${trip.title} · Day $_selectedDay'),
+    if (!mounted || !widget.parentContext.mounted) return;
+    final messenger = ScaffoldMessenger.of(widget.parentContext);
+    final nav = Navigator.of(widget.parentContext);
+    Navigator.pop(context);
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(l10n.quickAddAddedMessage(
+          widget.place.name,
+          trip.title,
+          _selectedDay,
+        )),
         action: SnackBarAction(
-            label: 'View trip',
-            onPressed: () {
-              nav.push(MaterialPageRoute(
-                  builder: (_) => TripDetailScreen(trip: trip)));
-            })));
+          label: l10n.plannerOpenTimelineAction,
+          onPressed: () => nav.push(
+            MaterialPageRoute(builder: (_) => TimelineScreen(trip: trip)),
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -197,68 +284,78 @@ class _TripOption extends StatelessWidget {
   final Trip trip;
   final bool selected;
   final VoidCallback onTap;
-  const _TripOption(
-      {required this.trip, required this.selected, required this.onTap});
+
+  const _TripOption({
+    super.key,
+    required this.trip,
+    required this.selected,
+    required this.onTap,
+  });
+
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) {
+    final locale = Localizations.localeOf(context).toString();
+    final date = DateFormat.yMMMd(locale);
+    return OceanGlassSurface(
+      blur: 0,
+      color: selected
+          ? AppColors.ocean.withValues(alpha: .10)
+          : AppColors.surfaceOverlay,
+      border: Border.all(
+        color: selected ? AppColors.ocean : AppColors.divider,
+      ),
+      padding: const EdgeInsets.all(AppSpacing.sm),
       onTap: onTap,
-      child: Container(
-          margin: const EdgeInsets.only(bottom: 8),
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              color: selected
-                  ? AppColors.ocean.withValues(alpha: .12)
-                  : Colors.white.withValues(alpha: .5),
-              border: Border.all(
-                  color: selected ? AppColors.ocean : Colors.transparent,
-                  width: 2)),
-          child: Row(children: [
-            Icon(Icons.map_rounded,
-                color: selected ? AppColors.ocean : AppColors.slate),
-            const SizedBox(width: 12),
-            Expanded(
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                  Text(trip.title,
-                      style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          color: selected ? AppColors.ocean : AppColors.ink)),
-                  Text('${trip.days} days • ${trip.travelers} travelers',
-                      style: const TextStyle(
-                          fontSize: 12, color: AppColors.slate)),
-                ])),
-            Text(_money.format(trip.budget),
-                style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.slate)),
-            if (selected)
-              const Icon(Icons.check_circle_rounded, color: AppColors.ocean)
-          ])));
+      child: Row(
+        children: [
+          Icon(Icons.map_rounded,
+              color: selected ? AppColors.ocean : AppColors.textSecondary),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(trip.title,
+                    style: Theme.of(context).textTheme.titleMedium),
+                Text(
+                  '${date.format(trip.startDate)} - ${date.format(trip.endDate)}',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ],
+            ),
+          ),
+          if (selected)
+            const Icon(Icons.check_circle_rounded, color: AppColors.ocean),
+        ],
+      ),
+    );
+  }
 }
 
-class _TimeButton extends StatelessWidget {
+class _TimeField extends StatelessWidget {
+  final TextEditingController controller;
+  final FocusNode? focusNode;
   final String label;
-  final String time;
-  final VoidCallback onTap;
-  const _TimeButton(
-      {required this.label, required this.time, required this.onTap});
+
+  const _TimeField({
+    super.key,
+    required this.controller,
+    required this.label,
+    this.focusNode,
+  });
+
   @override
-  Widget build(BuildContext context) => GestureDetector(
-      onTap: onTap,
-      child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
-              color: AppColors.ocean.withValues(alpha: .1),
-              border: Border.all(color: AppColors.ocean.withValues(alpha: .3))),
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Text(label,
-                style: const TextStyle(fontSize: 11, color: AppColors.slate)),
-            Text(time,
-                style: const TextStyle(
-                    fontWeight: FontWeight.w800, color: AppColors.ocean)),
-          ])));
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return TextField(
+      controller: controller,
+      focusNode: focusNode,
+      keyboardType: TextInputType.datetime,
+      decoration: InputDecoration(
+        labelText: label,
+        helperText: l10n.activityTimeHint,
+        prefixIcon: const Icon(Icons.schedule_rounded),
+      ),
+    );
+  }
 }

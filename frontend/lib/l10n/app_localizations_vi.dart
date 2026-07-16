@@ -131,6 +131,244 @@ class AppLocalizationsVi extends AppLocalizations {
   String get plannerTripCardSemantic => 'Thẻ lập lịch chuyến đi';
 
   @override
+  String get plannerTripSelectorLabel => 'Chọn chuyến đi';
+
+  @override
+  String get plannerTripSelectorSemantic => 'Bộ chọn chuyến đi';
+
+  @override
+  String get plannerModeSemantic => 'Chế độ hiển thị lịch trình';
+
+  @override
+  String get plannerTimelineMode => 'Dòng thời gian';
+
+  @override
+  String get plannerRouteMode => 'Tuyến đường';
+
+  @override
+  String get plannerDaySelectorSemantic => 'Bộ chọn ngày';
+
+  @override
+  String plannerDaySemantic(int day) {
+    return 'Chọn ngày $day';
+  }
+
+  @override
+  String get plannerQuickAddAction => 'Thêm nhanh';
+
+  @override
+  String get plannerQuickAddSemantic => 'Thêm nhanh hoạt động hoặc địa điểm';
+
+  @override
+  String get plannerAddActivityAction => 'Thêm hoạt động';
+
+  @override
+  String get plannerAddActivitySemantic => 'Thêm hoạt động thủ công';
+
+  @override
+  String get plannerEmptyDayTitle => 'Ngày này chưa có hoạt động';
+
+  @override
+  String get plannerEmptyDayMessage =>
+      'Thêm địa điểm hoặc hoạt động thủ công để xây dựng ngày này.';
+
+  @override
+  String plannerActivityCardSemantic(String title, String time) {
+    return '$title, $time';
+  }
+
+  @override
+  String get plannerInvalidTimeLabel => 'Thời gian không hợp lệ';
+
+  @override
+  String get plannerRouteFallbackSemantic =>
+      'Trạng thái tuyến đường chưa kết nối';
+
+  @override
+  String get plannerRouteUnavailableMessage =>
+      'Bản đồ trực tiếp, tuyến đường, giao thông, khoảng cách và thời gian di chuyển chưa được kết nối. Dữ liệu lịch trình vẫn là cục bộ.';
+
+  @override
+  String get plannerRoutePreviewTitle => 'Điểm dừng trong ngày';
+
+  @override
+  String get plannerBackToTimelineAction => 'Quay lại dòng thời gian';
+
+  @override
+  String get plannerLocalOnlyMessage =>
+      'Thay đổi lịch trình là cục bộ trong trạng thái ứng dụng này và không đồng bộ với backend.';
+
+  @override
+  String get activityAddTitle => 'Thêm hoạt động';
+
+  @override
+  String get activityEditTitle => 'Sửa hoạt động';
+
+  @override
+  String get activityCloseAction => 'Đóng';
+
+  @override
+  String get activityTitleLabel => 'Tên hoạt động';
+
+  @override
+  String get activityNotesLabel => 'Ghi chú';
+
+  @override
+  String get activityDayLabel => 'Ngày';
+
+  @override
+  String get activityStartTimeLabel => 'Giờ bắt đầu';
+
+  @override
+  String get activityEndTimeLabel => 'Giờ kết thúc';
+
+  @override
+  String get activityTimeHint => 'Dùng HH:mm';
+
+  @override
+  String get activityCategoryLabel => 'Danh mục';
+
+  @override
+  String get activityAddAction => 'Thêm hoạt động';
+
+  @override
+  String get activitySaveAction => 'Lưu thay đổi';
+
+  @override
+  String get activityAddSemantic => 'Thêm hoạt động này';
+
+  @override
+  String get activitySaveSemantic => 'Lưu hoạt động này';
+
+  @override
+  String get activityTitleRequired => 'Nhập tên hoạt động.';
+
+  @override
+  String get activityInvalidTimeRange =>
+      'Nhập khoảng thời gian hợp lệ, giờ kết thúc phải sau giờ bắt đầu.';
+
+  @override
+  String get activityOutOfRangeDay => 'Chọn một ngày nằm trong chuyến đi này.';
+
+  @override
+  String get activitySaveFailed =>
+      'Không thể lưu hoạt động này vào ngày đã chọn.';
+
+  @override
+  String get activityAddedMessage => 'Đã thêm hoạt động cục bộ.';
+
+  @override
+  String get activitySavedMessage => 'Đã cập nhật hoạt động cục bộ.';
+
+  @override
+  String get activityDetailTitle => 'Chi tiết hoạt động';
+
+  @override
+  String get activityEditAction => 'Chỉnh sửa';
+
+  @override
+  String activityEditSemantic(String title) {
+    return 'Sửa $title';
+  }
+
+  @override
+  String get activityViewPlaceAction => 'Xem địa điểm';
+
+  @override
+  String get activityEstimatedCostLabel => 'Chi phí dự kiến';
+
+  @override
+  String get activityDeleteAction => 'Xóa hoạt động';
+
+  @override
+  String activityDeleteSemantic(String title) {
+    return 'Xóa $title';
+  }
+
+  @override
+  String get activityDeleteConfirmTitle => 'Xóa hoạt động?';
+
+  @override
+  String activityDeleteConfirmMessage(String title) {
+    return 'Xóa \"$title\" khỏi ngày này?';
+  }
+
+  @override
+  String get activityDeletedMessage => 'Đã xóa hoạt động.';
+
+  @override
+  String get activityConflictTitle => 'Xung đột lịch trình';
+
+  @override
+  String activityConflictMessage(String title, String time) {
+    return '\"$title\" trùng với $time. Hãy đổi giờ hoặc chủ động giữ cả hai hoạt động.';
+  }
+
+  @override
+  String get activityConflictChangeTime => 'Đổi giờ';
+
+  @override
+  String get activityConflictAddAnyway => 'Vẫn thêm';
+
+  @override
+  String get activityConflictSaveAnyway => 'Vẫn lưu';
+
+  @override
+  String get activityConflictKeepBothTitle => 'Giữ cả hai hoạt động?';
+
+  @override
+  String get activityConflictKeepBothMessage =>
+      'Thao tác này giữ cả hai hoạt động bị trùng giờ. Không có hoạt động nào bị di chuyển hoặc ghi đè.';
+
+  @override
+  String get activityConflictKeepBothAction => 'Giữ cả hai';
+
+  @override
+  String get quickAddTitle => 'Thêm nhanh';
+
+  @override
+  String get quickAddSearchHint => 'Tìm địa điểm hoặc hoạt động';
+
+  @override
+  String quickAddSuggestionsTitle(String day) {
+    return 'Gợi ý cho $day';
+  }
+
+  @override
+  String quickAddPlaceSubtitle(String place) {
+    return 'Thêm $place vào một ngày thực tế của chuyến đi.';
+  }
+
+  @override
+  String get quickAddNoTripTitle => 'Chưa có chuyến đi';
+
+  @override
+  String get quickAddNoTripMessage =>
+      'Tạo chuyến đi trước khi thêm địa điểm này vào lịch trình.';
+
+  @override
+  String get quickAddNoPlacesTitle => 'Không tìm thấy địa điểm';
+
+  @override
+  String get quickAddNoPlacesMessage => 'Thử từ khóa cục bộ khác.';
+
+  @override
+  String get quickAddSelectTripLabel => 'Chọn chuyến đi';
+
+  @override
+  String get quickAddSelectDayLabel => 'Chọn ngày';
+
+  @override
+  String quickAddSubmitAction(int day) {
+    return 'Thêm vào Ngày $day';
+  }
+
+  @override
+  String quickAddAddedMessage(String place, String trip, int day) {
+    return 'Đã thêm $place vào $trip · Ngày $day';
+  }
+
+  @override
   String get authLoginHero => 'Mỗi ngày đi, một hành trình đáng nhớ.';
 
   @override

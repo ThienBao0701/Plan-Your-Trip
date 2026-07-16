@@ -332,6 +332,426 @@ abstract class AppLocalizations {
   /// **'Trip planner card'**
   String get plannerTripCardSemantic;
 
+  /// No description provided for @plannerTripSelectorLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Select trip'**
+  String get plannerTripSelectorLabel;
+
+  /// No description provided for @plannerTripSelectorSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip selector'**
+  String get plannerTripSelectorSemantic;
+
+  /// No description provided for @plannerModeSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Planner presentation mode'**
+  String get plannerModeSemantic;
+
+  /// No description provided for @plannerTimelineMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Timeline'**
+  String get plannerTimelineMode;
+
+  /// No description provided for @plannerRouteMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Route'**
+  String get plannerRouteMode;
+
+  /// No description provided for @plannerDaySelectorSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Day selector'**
+  String get plannerDaySelectorSemantic;
+
+  /// No description provided for @plannerDaySemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Select day {day}'**
+  String plannerDaySemantic(int day);
+
+  /// No description provided for @plannerQuickAddAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Add'**
+  String get plannerQuickAddAction;
+
+  /// No description provided for @plannerQuickAddSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick add an activity or place'**
+  String get plannerQuickAddSemantic;
+
+  /// No description provided for @plannerAddActivityAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add activity'**
+  String get plannerAddActivityAction;
+
+  /// No description provided for @plannerAddActivitySemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a manual activity'**
+  String get plannerAddActivitySemantic;
+
+  /// No description provided for @plannerEmptyDayTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No activities this day'**
+  String get plannerEmptyDayTitle;
+
+  /// No description provided for @plannerEmptyDayMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a place or manual activity to build this day.'**
+  String get plannerEmptyDayMessage;
+
+  /// No description provided for @plannerActivityCardSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{title}, {time}'**
+  String plannerActivityCardSemantic(String title, String time);
+
+  /// No description provided for @plannerInvalidTimeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid time'**
+  String get plannerInvalidTimeLabel;
+
+  /// No description provided for @plannerRouteFallbackSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Planner route fallback'**
+  String get plannerRouteFallbackSemantic;
+
+  /// No description provided for @plannerRouteUnavailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Live maps, route geometry, traffic, distance, and travel time are not connected yet. Timeline data remains local.'**
+  String get plannerRouteUnavailableMessage;
+
+  /// No description provided for @plannerRoutePreviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Day stops'**
+  String get plannerRoutePreviewTitle;
+
+  /// No description provided for @plannerBackToTimelineAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to timeline'**
+  String get plannerBackToTimelineAction;
+
+  /// No description provided for @plannerLocalOnlyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Planner changes are local to this app state and are not synchronized to a backend.'**
+  String get plannerLocalOnlyMessage;
+
+  /// No description provided for @activityAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add activity'**
+  String get activityAddTitle;
+
+  /// No description provided for @activityEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit activity'**
+  String get activityEditTitle;
+
+  /// No description provided for @activityCloseAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get activityCloseAction;
+
+  /// No description provided for @activityTitleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity title'**
+  String get activityTitleLabel;
+
+  /// No description provided for @activityNotesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get activityNotesLabel;
+
+  /// No description provided for @activityDayLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Day'**
+  String get activityDayLabel;
+
+  /// No description provided for @activityStartTimeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Start time'**
+  String get activityStartTimeLabel;
+
+  /// No description provided for @activityEndTimeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'End time'**
+  String get activityEndTimeLabel;
+
+  /// No description provided for @activityTimeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Use HH:mm'**
+  String get activityTimeHint;
+
+  /// No description provided for @activityCategoryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get activityCategoryLabel;
+
+  /// No description provided for @activityAddAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add activity'**
+  String get activityAddAction;
+
+  /// No description provided for @activitySaveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get activitySaveAction;
+
+  /// No description provided for @activityAddSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Add this activity'**
+  String get activityAddSemantic;
+
+  /// No description provided for @activitySaveSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Save this activity'**
+  String get activitySaveSemantic;
+
+  /// No description provided for @activityTitleRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an activity title.'**
+  String get activityTitleRequired;
+
+  /// No description provided for @activityInvalidTimeRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid time range where end time is later than start time.'**
+  String get activityInvalidTimeRange;
+
+  /// No description provided for @activityOutOfRangeDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a day inside this trip.'**
+  String get activityOutOfRangeDay;
+
+  /// No description provided for @activitySaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save this activity for the selected trip day.'**
+  String get activitySaveFailed;
+
+  /// No description provided for @activityAddedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity added locally.'**
+  String get activityAddedMessage;
+
+  /// No description provided for @activitySavedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity updated locally.'**
+  String get activitySavedMessage;
+
+  /// No description provided for @activityDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity details'**
+  String get activityDetailTitle;
+
+  /// No description provided for @activityEditAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get activityEditAction;
+
+  /// No description provided for @activityEditSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit {title}'**
+  String activityEditSemantic(String title);
+
+  /// No description provided for @activityViewPlaceAction.
+  ///
+  /// In en, this message translates to:
+  /// **'View place'**
+  String get activityViewPlaceAction;
+
+  /// No description provided for @activityEstimatedCostLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated cost'**
+  String get activityEstimatedCostLabel;
+
+  /// No description provided for @activityDeleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete activity'**
+  String get activityDeleteAction;
+
+  /// No description provided for @activityDeleteSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {title}'**
+  String activityDeleteSemantic(String title);
+
+  /// No description provided for @activityDeleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete activity?'**
+  String get activityDeleteConfirmTitle;
+
+  /// No description provided for @activityDeleteConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{title}\" from this trip day?'**
+  String activityDeleteConfirmMessage(String title);
+
+  /// No description provided for @activityDeletedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity deleted.'**
+  String get activityDeletedMessage;
+
+  /// No description provided for @activityConflictTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule conflict'**
+  String get activityConflictTitle;
+
+  /// No description provided for @activityConflictMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'\"{title}\" overlaps {time}. Change time or keep both activities explicitly.'**
+  String activityConflictMessage(String title, String time);
+
+  /// No description provided for @activityConflictChangeTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Change time'**
+  String get activityConflictChangeTime;
+
+  /// No description provided for @activityConflictAddAnyway.
+  ///
+  /// In en, this message translates to:
+  /// **'Add anyway'**
+  String get activityConflictAddAnyway;
+
+  /// No description provided for @activityConflictSaveAnyway.
+  ///
+  /// In en, this message translates to:
+  /// **'Save anyway'**
+  String get activityConflictSaveAnyway;
+
+  /// No description provided for @activityConflictKeepBothTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep both activities?'**
+  String get activityConflictKeepBothTitle;
+
+  /// No description provided for @activityConflictKeepBothMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This will preserve both overlapping activities. No activity will be moved or overwritten.'**
+  String get activityConflictKeepBothMessage;
+
+  /// No description provided for @activityConflictKeepBothAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep both'**
+  String get activityConflictKeepBothAction;
+
+  /// No description provided for @quickAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Add'**
+  String get quickAddTitle;
+
+  /// No description provided for @quickAddSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search places or activities'**
+  String get quickAddSearchHint;
+
+  /// No description provided for @quickAddSuggestionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggestions for {day}'**
+  String quickAddSuggestionsTitle(String day);
+
+  /// No description provided for @quickAddPlaceSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add {place} to an actual trip day.'**
+  String quickAddPlaceSubtitle(String place);
+
+  /// No description provided for @quickAddNoTripTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No trip available'**
+  String get quickAddNoTripTitle;
+
+  /// No description provided for @quickAddNoTripMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a trip before adding this place to a timeline.'**
+  String get quickAddNoTripMessage;
+
+  /// No description provided for @quickAddNoPlacesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No places found'**
+  String get quickAddNoPlacesTitle;
+
+  /// No description provided for @quickAddNoPlacesMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Try another local search term.'**
+  String get quickAddNoPlacesMessage;
+
+  /// No description provided for @quickAddSelectTripLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Select trip'**
+  String get quickAddSelectTripLabel;
+
+  /// No description provided for @quickAddSelectDayLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Select day'**
+  String get quickAddSelectDayLabel;
+
+  /// No description provided for @quickAddSubmitAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to Day {day}'**
+  String quickAddSubmitAction(int day);
+
+  /// No description provided for @quickAddAddedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{place} added to {trip} · Day {day}'**
+  String quickAddAddedMessage(String place, String trip, int day);
+
   /// No description provided for @authLoginHero.
   ///
   /// In en, this message translates to:

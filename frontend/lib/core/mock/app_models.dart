@@ -91,7 +91,11 @@ class Trip {
     this.notes = '',
   });
 
-  int get days => endDate.difference(startDate).inDays + 1;
+  int get days {
+    final start = DateTime(startDate.year, startDate.month, startDate.day);
+    final end = DateTime(endDate.year, endDate.month, endDate.day);
+    return end.difference(start).inDays + 1;
+  }
 
   Trip copyWith({
     int? id,

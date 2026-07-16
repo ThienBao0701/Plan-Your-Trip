@@ -10,6 +10,7 @@ import '../../design/app_radii.dart';
 import '../../design/app_spacing.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/glass_widgets.dart';
+import '../planner/planner_utils.dart';
 import '../expenses/expenses_screen.dart';
 import '../places/places_screen.dart';
 import '../timeline/timeline_screen.dart';
@@ -42,7 +43,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
     final items = app.timeline.where((item) => item.tripId == trip.id).toList()
       ..sort((a, b) {
         final day = a.dayNumber.compareTo(b.dayNumber);
-        return day == 0 ? a.startTime.compareTo(b.startTime) : day;
+        return day == 0 ? compareTimelineItems(a, b) : day;
       });
     final expenses = app.expensesForTrip(trip.id);
     final spent =

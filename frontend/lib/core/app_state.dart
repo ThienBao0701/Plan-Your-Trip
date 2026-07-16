@@ -212,7 +212,7 @@ class AppState extends ChangeNotifier {
 
   List<TimelineItem> itemsForTrip(int id, int day) =>
       timeline.where((e) => e.tripId == id && e.dayNumber == day).toList()
-        ..sort((a, b) => a.startTime.compareTo(b.startTime));
+        ..sort(_compareTimelineItems);
 
   bool addTimeline(TimelineItem item) {
     if (!isValidTimeRange(item.startTime, item.endTime)) return false;
@@ -297,6 +297,19 @@ class AppState extends ChangeNotifier {
       return null;
     }
     return hour * 60 + minute;
+  }
+
+  static int _compareTimelineItems(TimelineItem a, TimelineItem b) {
+    final aStart = _minutes(a.startTime);
+    final bStart = _minutes(b.startTime);
+    if (aStart != null && bStart != null && aStart != bStart) {
+      return aStart.compareTo(bStart);
+    }
+    if (aStart != null && bStart == null) return -1;
+    if (aStart == null && bStart != null) return 1;
+    final sortOrder = a.sortOrder.compareTo(b.sortOrder);
+    if (sortOrder != 0) return sortOrder;
+    return a.id.compareTo(b.id);
   }
 }
 

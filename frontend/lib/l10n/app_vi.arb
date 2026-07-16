@@ -52,6 +52,158 @@
     }
   },
   "plannerTripCardSemantic": "Thẻ lập lịch chuyến đi",
+  "plannerTripSelectorLabel": "Chọn chuyến đi",
+  "plannerTripSelectorSemantic": "Bộ chọn chuyến đi",
+  "plannerModeSemantic": "Chế độ hiển thị lịch trình",
+  "plannerTimelineMode": "Dòng thời gian",
+  "plannerRouteMode": "Tuyến đường",
+  "plannerDaySelectorSemantic": "Bộ chọn ngày",
+  "plannerDaySemantic": "Chọn ngày {day}",
+  "@plannerDaySemantic": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "plannerQuickAddAction": "Thêm nhanh",
+  "plannerQuickAddSemantic": "Thêm nhanh hoạt động hoặc địa điểm",
+  "plannerAddActivityAction": "Thêm hoạt động",
+  "plannerAddActivitySemantic": "Thêm hoạt động thủ công",
+  "plannerEmptyDayTitle": "Ngày này chưa có hoạt động",
+  "plannerEmptyDayMessage": "Thêm địa điểm hoặc hoạt động thủ công để xây dựng ngày này.",
+  "plannerActivityCardSemantic": "{title}, {time}",
+  "@plannerActivityCardSemantic": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "plannerInvalidTimeLabel": "Thời gian không hợp lệ",
+  "plannerRouteFallbackSemantic": "Trạng thái tuyến đường chưa kết nối",
+  "plannerRouteUnavailableMessage": "Bản đồ trực tiếp, tuyến đường, giao thông, khoảng cách và thời gian di chuyển chưa được kết nối. Dữ liệu lịch trình vẫn là cục bộ.",
+  "plannerRoutePreviewTitle": "Điểm dừng trong ngày",
+  "plannerBackToTimelineAction": "Quay lại dòng thời gian",
+  "plannerLocalOnlyMessage": "Thay đổi lịch trình là cục bộ trong trạng thái ứng dụng này và không đồng bộ với backend.",
+  "activityAddTitle": "Thêm hoạt động",
+  "activityEditTitle": "Sửa hoạt động",
+  "activityCloseAction": "Đóng",
+  "activityTitleLabel": "Tên hoạt động",
+  "activityNotesLabel": "Ghi chú",
+  "activityDayLabel": "Ngày",
+  "activityStartTimeLabel": "Giờ bắt đầu",
+  "activityEndTimeLabel": "Giờ kết thúc",
+  "activityTimeHint": "Dùng HH:mm",
+  "activityCategoryLabel": "Danh mục",
+  "activityAddAction": "Thêm hoạt động",
+  "activitySaveAction": "Lưu thay đổi",
+  "activityAddSemantic": "Thêm hoạt động này",
+  "activitySaveSemantic": "Lưu hoạt động này",
+  "activityTitleRequired": "Nhập tên hoạt động.",
+  "activityInvalidTimeRange": "Nhập khoảng thời gian hợp lệ, giờ kết thúc phải sau giờ bắt đầu.",
+  "activityOutOfRangeDay": "Chọn một ngày nằm trong chuyến đi này.",
+  "activitySaveFailed": "Không thể lưu hoạt động này vào ngày đã chọn.",
+  "activityAddedMessage": "Đã thêm hoạt động cục bộ.",
+  "activitySavedMessage": "Đã cập nhật hoạt động cục bộ.",
+  "activityDetailTitle": "Chi tiết hoạt động",
+  "activityEditAction": "Chỉnh sửa",
+  "activityEditSemantic": "Sửa {title}",
+  "@activityEditSemantic": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "activityViewPlaceAction": "Xem địa điểm",
+  "activityEstimatedCostLabel": "Chi phí dự kiến",
+  "activityDeleteAction": "Xóa hoạt động",
+  "activityDeleteSemantic": "Xóa {title}",
+  "@activityDeleteSemantic": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "activityDeleteConfirmTitle": "Xóa hoạt động?",
+  "activityDeleteConfirmMessage": "Xóa \"{title}\" khỏi ngày này?",
+  "@activityDeleteConfirmMessage": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "activityDeletedMessage": "Đã xóa hoạt động.",
+  "activityConflictTitle": "Xung đột lịch trình",
+  "activityConflictMessage": "\"{title}\" trùng với {time}. Hãy đổi giờ hoặc chủ động giữ cả hai hoạt động.",
+  "@activityConflictMessage": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "activityConflictChangeTime": "Đổi giờ",
+  "activityConflictAddAnyway": "Vẫn thêm",
+  "activityConflictSaveAnyway": "Vẫn lưu",
+  "activityConflictKeepBothTitle": "Giữ cả hai hoạt động?",
+  "activityConflictKeepBothMessage": "Thao tác này giữ cả hai hoạt động bị trùng giờ. Không có hoạt động nào bị di chuyển hoặc ghi đè.",
+  "activityConflictKeepBothAction": "Giữ cả hai",
+  "quickAddTitle": "Thêm nhanh",
+  "quickAddSearchHint": "Tìm địa điểm hoặc hoạt động",
+  "quickAddSuggestionsTitle": "Gợi ý cho {day}",
+  "@quickAddSuggestionsTitle": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "quickAddPlaceSubtitle": "Thêm {place} vào một ngày thực tế của chuyến đi.",
+  "@quickAddPlaceSubtitle": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "quickAddNoTripTitle": "Chưa có chuyến đi",
+  "quickAddNoTripMessage": "Tạo chuyến đi trước khi thêm địa điểm này vào lịch trình.",
+  "quickAddNoPlacesTitle": "Không tìm thấy địa điểm",
+  "quickAddNoPlacesMessage": "Thử từ khóa cục bộ khác.",
+  "quickAddSelectTripLabel": "Chọn chuyến đi",
+  "quickAddSelectDayLabel": "Chọn ngày",
+  "quickAddSubmitAction": "Thêm vào Ngày {day}",
+  "@quickAddSubmitAction": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "quickAddAddedMessage": "Đã thêm {place} vào {trip} · Ngày {day}",
+  "@quickAddAddedMessage": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      },
+      "trip": {
+        "type": "String"
+      },
+      "day": {
+        "type": "int"
+      }
+    }
+  },
   "authLoginHero": "Mỗi ngày đi, một hành trình đáng nhớ.",
   "authLoginTitle": "Chào mừng trở lại",
   "authLoginSubtitle": "Đăng nhập để tiếp tục hành trình của bạn.",
