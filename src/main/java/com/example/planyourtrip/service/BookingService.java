@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -40,6 +41,7 @@ public class BookingService {
     private final GiftCardService giftCardService;
     private final InventoryReservationService inventoryReservationService;
     private final RatePlanPricingService ratePlanPricingService;
+    private final BookingModificationRepository bookingModificationRepo;
 
     private static final Set<BookingStatus> UPCOMING_STATUSES =
         EnumSet.of(BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.CHECK_IN_READY);
@@ -67,7 +69,8 @@ public class BookingService {
                           ReferralService referralService,
                           GiftCardService giftCardService,
                           InventoryReservationService inventoryReservationService,
-                          RatePlanPricingService ratePlanPricingService) {
+                          RatePlanPricingService ratePlanPricingService,
+                          BookingModificationRepository bookingModificationRepo) {
         this.bookingRepo   = bookingRepo;
         this.roomRepo      = roomRepo;
         this.inventoryRepo = inventoryRepo;
@@ -84,6 +87,7 @@ public class BookingService {
         this.giftCardService = giftCardService;
         this.inventoryReservationService = inventoryReservationService;
         this.ratePlanPricingService = ratePlanPricingService;
+        this.bookingModificationRepo = bookingModificationRepo;
     }
 
     // ── Create ────────────────────────────────────────────────────────────────
@@ -425,6 +429,15 @@ public class BookingService {
         LocalDate oldCheckOut = booking.getCheckOutDate();
         int numRooms = booking.getNumberOfRooms(); // room count is not modifiable in this phase
 
+        // Phase 7.36 — capture the pre-modification values for the immutable audit row BEFORE any
+        // of the setters below overwrite them (the old finalPrice/rate-plan snapshot especially,
+        // which would otherwise be lost once re-pricing/re-snapshotting runs).
+        int oldAdults = booking.getAdults();
+        int oldChildren = booking.getChildren();
+        Long oldRatePlanId = booking.getSelectedRatePlanId();
+        String oldRatePlanName = booking.getSelectedRatePlanName();
+        BigDecimal oldTotalPrice = booking.getFinalPrice();
+
         // Merge request with current values (omitted field → keep current).
         LocalDate newCheckIn  = req.checkIn()  != null ? req.checkIn()  : oldCheckIn;
         LocalDate newCheckOut = req.checkOut() != null ? req.checkOut() : oldCheckOut;
@@ -523,7 +536,44 @@ public class BookingService {
         // under the write lock; NO inventory math of its own).
         inventoryReservationService.updateHoldForModification(booking);
 
-        return toResponse(bookingRepo.save(booking));
+        Booking saved = bookingRepo.save(booking);
+
+        // ── Phase 7.36 — Booking Modification Audit & Notification (purely additive) ──
+        // Everything below runs in this SAME transaction, so any failure ABOVE (e.g. new dates
+        // unavailable → 422, ineligible plan → 422) rolls back with NO audit row and NO
+        // notification. NO pricing/inventory/payment math is performed here — the price fields are
+        // just the booking's finalPrice before/after as already computed by the pipeline above.
+        BigDecimal newTotalPrice = saved.getFinalPrice();
+        BookingModification mod = new BookingModification();
+        mod.setBooking(saved);
+        mod.setOldCheckInDate(oldCheckIn);
+        mod.setNewCheckInDate(newCheckIn);
+        mod.setOldCheckOutDate(oldCheckOut);
+        mod.setNewCheckOutDate(newCheckOut);
+        mod.setOldAdults(oldAdults);
+        mod.setNewAdults(newAdults);
+        mod.setOldChildren(oldChildren);
+        mod.setNewChildren(newChildren);
+        mod.setOldRatePlanId(oldRatePlanId);
+        mod.setNewRatePlanId(saved.getSelectedRatePlanId());
+        mod.setOldRatePlanName(oldRatePlanName);
+        mod.setNewRatePlanName(saved.getSelectedRatePlanName());
+        mod.setOldTotalPrice(oldTotalPrice);
+        mod.setNewTotalPrice(newTotalPrice);
+        mod.setPriceDifference(newTotalPrice.subtract(oldTotalPrice));
+        bookingModificationRepo.save(mod);
+
+        // Fire a customer-safe "Booking modified" confirmation — mirrors cancel()'s exact call
+        // shape (reusing NotificationService; no second notification path). The message carries
+        // only customer-facing fields (new dates + new total), never internal state.
+        notificationService.create(userId, NotificationType.BOOKING, Priority.NORMAL,
+            "Booking modified",
+            "Your booking " + saved.getBookingCode() + " has been updated. New stay: "
+                + saved.getCheckInDate() + " to " + saved.getCheckOutDate()
+                + ", new total " + newTotalPrice.toPlainString() + " " + saved.getCurrency() + ".",
+            RelatedEntityType.BOOKING, saved.getId());
+
+        return toResponse(saved);
     }
 
     /** True when any checkout benefit (coupon / travel credit / loyalty / gift card) is attached. */
@@ -780,8 +830,26 @@ public class BookingService {
         if (b.getArchivedAt() != null)
             events.add(new TimelineEvent("ARCHIVED", b.getArchivedAt(), "Reservation archived"));
 
+        // Phase 7.36 — one MODIFIED event per audit row (so repeated modifications each show),
+        // sourced from the immutable booking_modifications history.
+        bookingModificationRepo.findByBookingIdOrderByCreatedAtAscIdAsc(b.getId())
+            .forEach(m -> events.add(new TimelineEvent("MODIFIED", m.getCreatedAt(), describeModification(m))));
+
         events.sort(Comparator.comparing(TimelineEvent::occurredAt));
         return new BookingTimelineResponse(b.getId(), b.getBookingCode(), events);
+    }
+
+    /** Phase 7.36 — customer-safe summary of which categories a modification changed. */
+    private String describeModification(BookingModification m) {
+        List<String> changed = new ArrayList<>();
+        if (!m.getOldCheckInDate().equals(m.getNewCheckInDate())
+            || !m.getOldCheckOutDate().equals(m.getNewCheckOutDate()))
+            changed.add("dates");
+        if (m.getOldAdults() != m.getNewAdults() || m.getOldChildren() != m.getNewChildren())
+            changed.add("occupancy");
+        if (!Objects.equals(m.getOldRatePlanId(), m.getNewRatePlanId()))
+            changed.add("plan");
+        return "Booking modified (" + (changed.isEmpty() ? "details" : String.join("/", changed)) + ")";
     }
 
     private String generateCode(Long id) {
