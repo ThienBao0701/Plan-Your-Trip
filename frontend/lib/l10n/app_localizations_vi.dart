@@ -582,6 +582,478 @@ class AppLocalizationsVi extends AppLocalizations {
   String get notificationBudgetDate => '12 Th7';
 
   @override
+  String get exploreHeroTitle => 'Bạn muốn đi đâu?';
+
+  @override
+  String get exploreHeroSubtitle =>
+      'Địa điểm gợi ý là dữ liệu xem trước cục bộ. Chuyến đi cá nhân vẫn ở cục bộ cho đến khi có backend.';
+
+  @override
+  String get exploreSearchHint =>
+      'Tìm thành phố, địa điểm, quán cà phê, khách sạn...';
+
+  @override
+  String get exploreSearchActionSemantic => 'Mở kết quả tìm kiếm';
+
+  @override
+  String get exploreFiltersSemantic => 'Mở bộ lọc tìm kiếm';
+
+  @override
+  String get exploreNoUpcomingTitle => 'Chưa có chuyến đi sắp tới';
+
+  @override
+  String get exploreNoUpcomingMessage =>
+      'Tạo chuyến đi demo cục bộ khi bạn sẵn sàng lên kế hoạch.';
+
+  @override
+  String get exploreCategoriesTitle => 'Khám phá theo danh mục';
+
+  @override
+  String get exploreRecommendedTitle => 'Địa điểm gợi ý';
+
+  @override
+  String get exploreSeeAll => 'Xem tất cả';
+
+  @override
+  String get exploreNoPlacesTitle => 'Chưa có địa điểm';
+
+  @override
+  String get exploreNoPlacesMessage =>
+      'Nội dung Khám phá sẽ xuất hiện khi có dữ liệu cục bộ.';
+
+  @override
+  String get exploreUpcomingTripSemantic => 'Tóm tắt chuyến đi sắp tới';
+
+  @override
+  String explorePlanningProgress(int count) {
+    return '$count hoạt động đã lên kế hoạch';
+  }
+
+  @override
+  String get searchTitle => 'Khám phá địa điểm';
+
+  @override
+  String get searchHint => 'Tìm khách sạn, món ăn, cà phê, điểm tham quan...';
+
+  @override
+  String get searchClearSemantic => 'Xóa tìm kiếm';
+
+  @override
+  String get searchModeSemantic => 'Chế độ hiển thị tìm kiếm';
+
+  @override
+  String get searchListMode => 'Danh sách';
+
+  @override
+  String get searchMapMode => 'Bản đồ';
+
+  @override
+  String searchResultCount(int count) {
+    return '$count địa điểm';
+  }
+
+  @override
+  String get searchClearFilters => 'Xóa bộ lọc';
+
+  @override
+  String get searchEmptyTitle => 'Không tìm thấy địa điểm';
+
+  @override
+  String get searchEmptyMessage => 'Thử từ khóa, danh mục hoặc thẻ khác.';
+
+  @override
+  String get searchFiltersTitle => 'Bộ lọc';
+
+  @override
+  String get searchSortTitle => 'Sắp xếp';
+
+  @override
+  String get searchSortRelevance => 'Phù hợp';
+
+  @override
+  String get searchSortRating => 'Đánh giá';
+
+  @override
+  String get searchSortDuration => 'Thời lượng';
+
+  @override
+  String get searchTagsTitle => 'Thẻ';
+
+  @override
+  String get searchApplyFilters => 'Áp dụng bộ lọc';
+
+  @override
+  String get searchBackToList => 'Quay lại danh sách';
+
+  @override
+  String get mapFallbackSemantic => 'Bản đồ minh họa không trực tiếp';
+
+  @override
+  String get mapUnavailableTitle => 'Chưa kết nối nhà cung cấp bản đồ';
+
+  @override
+  String get mapUnavailableMessage =>
+      'Bản đồ trực tiếp, tuyến đường, giao thông và tọa độ chính xác chưa được kết nối. Bản xem trước này chỉ là sơ đồ minh họa.';
+
+  @override
+  String placeReviewCount(int count) {
+    return '$count đánh giá';
+  }
+
+  @override
+  String get placeAddToTrip => 'Thêm vào chuyến đi';
+
+  @override
+  String placeAddToTripSemantic(String place) {
+    return 'Thêm $place vào chuyến đi';
+  }
+
+  @override
+  String get placeHighlightsTitle => 'Điểm nổi bật';
+
+  @override
+  String get placeUsefulInfoTitle => 'Thông tin hữu ích';
+
+  @override
+  String placeDurationMinutes(int minutes) {
+    return '$minutes phút';
+  }
+
+  @override
+  String placeDurationHours(int hours) {
+    return '$hours giờ';
+  }
+
+  @override
+  String placeDurationHoursMinutes(int hours, int minutes) {
+    return '$hours giờ $minutes phút';
+  }
+
+  @override
+  String get savedPlacesDemoLocalOnly =>
+      'Địa điểm đã lưu chỉ nằm trong phiên demo cục bộ này.';
+
+  @override
+  String get tripsTitle => 'My trips';
+
+  @override
+  String get tripsSubtitle =>
+      'Các mục thông minh được suy ra từ ngày chuyến đi.';
+
+  @override
+  String get tripsCreateAction => 'Tạo chuyến đi';
+
+  @override
+  String get tripsCreateSemantic => 'Tạo chuyến đi mới';
+
+  @override
+  String get tripsEmptyTitle => 'Chưa có chuyến đi';
+
+  @override
+  String get tripsEmptyMessage => 'Tạo chuyến đi cục bộ đầu tiên để bắt đầu.';
+
+  @override
+  String get tripsRealUnavailableMessage =>
+      'Lịch sử chuyến đi cá nhân chưa được kết nối với kho backend.';
+
+  @override
+  String get tripsOngoing => 'Đang diễn ra';
+
+  @override
+  String get tripsUpcoming => 'Sắp tới';
+
+  @override
+  String get tripsPast => 'Đã kết thúc';
+
+  @override
+  String get tripsOngoingEmpty => 'Không có chuyến đi nào diễn ra hôm nay.';
+
+  @override
+  String get tripsUpcomingEmpty => 'Chưa có chuyến đi sắp tới.';
+
+  @override
+  String get tripsPastEmpty => 'Chưa có chuyến đi đã hoàn thành.';
+
+  @override
+  String tripCardSemantic(String trip) {
+    return 'Thẻ chuyến đi $trip';
+  }
+
+  @override
+  String tripActionsSemantic(String trip) {
+    return 'Hành động cho $trip';
+  }
+
+  @override
+  String get tripEditAction => 'Sửa chuyến đi';
+
+  @override
+  String get tripDeleteAction => 'Xóa chuyến đi';
+
+  @override
+  String get tripDeleteConfirmTitle => 'Xóa chuyến đi?';
+
+  @override
+  String tripDeleteConfirmMessage(String trip) {
+    return 'Xóa \"$trip\"? Thao tác này cũng xóa lịch trình và chi phí của chuyến đi.';
+  }
+
+  @override
+  String get tripDeletedMessage => 'Đã xóa chuyến đi.';
+
+  @override
+  String get tripCreatedMessage => 'Đã tạo chuyến đi cục bộ.';
+
+  @override
+  String tripDayCount(int days) {
+    return '$days ngày';
+  }
+
+  @override
+  String tripTravelerCount(int travelers) {
+    return '$travelers người';
+  }
+
+  @override
+  String tripDateTravelerMeta(String start, String end, int travelers) {
+    return '$start - $end · $travelers người';
+  }
+
+  @override
+  String tripDaysAway(int days) {
+    return 'Bắt đầu sau $days ngày';
+  }
+
+  @override
+  String get createTripTitle => 'New trip';
+
+  @override
+  String get createBackStep => 'Quay lại bước trước';
+
+  @override
+  String get createCloseSemantic => 'Đóng luồng tạo chuyến đi';
+
+  @override
+  String createStepLabel(int step) {
+    return 'Bước $step/3';
+  }
+
+  @override
+  String get createContinueAction => 'Tiếp tục';
+
+  @override
+  String get createContinueSemantic =>
+      'Chuyển sang bước tạo chuyến đi tiếp theo';
+
+  @override
+  String get createSubmitAction => 'Tạo chuyến đi';
+
+  @override
+  String get createSubmitSemantic => 'Tạo chuyến đi này';
+
+  @override
+  String get createDestinationRequired => 'Vui lòng nhập điểm đến.';
+
+  @override
+  String get createDatesRequired =>
+      'Nhập ngày bắt đầu và kết thúc theo định dạng dd/mm/yyyy.';
+
+  @override
+  String get createInvalidDateRange =>
+      'Ngày kết thúc không được trước ngày bắt đầu.';
+
+  @override
+  String get createInvalidTravelers => 'Số người phải từ 1 đến 20.';
+
+  @override
+  String get createDiscardTitle => 'Bỏ bản nháp chuyến đi?';
+
+  @override
+  String get createDiscardMessage => 'Chi tiết chuyến đi đã nhập sẽ bị mất.';
+
+  @override
+  String get createDiscardAction => 'Bỏ';
+
+  @override
+  String get createDestinationTitle => 'Bạn muốn đi đâu?';
+
+  @override
+  String get createDestinationSubtitle =>
+      'Chọn điểm đến từ dữ liệu cục bộ hoặc tự nhập.';
+
+  @override
+  String get createDestinationLabel => 'Điểm đến';
+
+  @override
+  String get createTripNameLabel => 'Tên chuyến đi';
+
+  @override
+  String get createDestinationSuggestions => 'Điểm đến gợi ý';
+
+  @override
+  String get createDatesTitle => 'Khi nào bạn sẽ đi?';
+
+  @override
+  String get createDatesSubtitle =>
+      'Nhập ngày và số người cho chuyến đi cục bộ này.';
+
+  @override
+  String get createStartDateLabel => 'Ngày bắt đầu';
+
+  @override
+  String get createEndDateLabel => 'Ngày kết thúc';
+
+  @override
+  String get createDateFormatHint => 'Dùng dd/mm/yyyy';
+
+  @override
+  String get createTravelersLabel => 'Số người';
+
+  @override
+  String get createDecreaseTravelers => 'Giảm số người';
+
+  @override
+  String get createIncreaseTravelers => 'Tăng số người';
+
+  @override
+  String get createBudgetLabel => 'Ngân sách (VND)';
+
+  @override
+  String get createPersonalizationTitle =>
+      'Thiết kế chuyến đi theo cách của bạn';
+
+  @override
+  String get createPersonalizationSubtitle =>
+      'Các tùy chọn này chỉ là bản nháp cục bộ.';
+
+  @override
+  String get createPreferencesTitle => 'Sở thích';
+
+  @override
+  String get createPreferenceFood => 'Ẩm thực';
+
+  @override
+  String get createPreferenceCulture => 'Văn hóa';
+
+  @override
+  String get createPreferenceNature => 'Thiên nhiên';
+
+  @override
+  String get createPreferenceRelax => 'Thư giãn';
+
+  @override
+  String get createPreferenceAdventure => 'Phiêu lưu';
+
+  @override
+  String get createPreferenceShopping => 'Mua sắm';
+
+  @override
+  String get createPaceTitle => 'Nhịp độ';
+
+  @override
+  String get createPaceSlow => 'Thư thả';
+
+  @override
+  String get createPaceBalanced => 'Cân bằng';
+
+  @override
+  String get createPacePacked => 'Dày đặc';
+
+  @override
+  String get createBudgetStyleTitle => 'Kiểu ngân sách';
+
+  @override
+  String get createBudgetSaving => 'Tiết kiệm';
+
+  @override
+  String get createBudgetComfort => 'Thoải mái';
+
+  @override
+  String get createBudgetPremium => 'Cao cấp';
+
+  @override
+  String get createNotesLabel => 'Ghi chú';
+
+  @override
+  String get createPersonalizationLocalOnly =>
+      'Sở thích chỉ được giữ trong bản nháp này và không gửi tới backend.';
+
+  @override
+  String get createReviewTitle => 'Xem lại';
+
+  @override
+  String createReviewSummary(String title, String destination, String start,
+      String end, int travelers) {
+    return '$title · $destination · $start đến $end · $travelers người';
+  }
+
+  @override
+  String get createConfirmAction => 'Xác nhận';
+
+  @override
+  String editTripTitle(String trip) {
+    return 'Sửa $trip';
+  }
+
+  @override
+  String get editTripHeading => 'Cập nhật chuyến đi';
+
+  @override
+  String get editTripSaveAction => 'Cập nhật chuyến đi';
+
+  @override
+  String get editTripUpdatedMessage => 'Đã cập nhật chuyến đi.';
+
+  @override
+  String get editMoveActivitiesTitle => 'Di chuyển hoạt động?';
+
+  @override
+  String editMoveActivitiesMessage(int days) {
+    return 'Chuyến đi ngắn hơn này có $days ngày. Hoạt động ở các ngày bị xóa sẽ chuyển về ngày cuối mới.';
+  }
+
+  @override
+  String get editMoveActivitiesAction => 'Chuyển về ngày cuối';
+
+  @override
+  String get tripOverviewProgressTitle => 'Tiến độ chuyến đi';
+
+  @override
+  String tripOverviewProgressValue(int percent) {
+    return 'Hoàn thành $percent%';
+  }
+
+  @override
+  String get tripOverviewTimelineAction => 'Lịch trình';
+
+  @override
+  String get tripOverviewExpensesAction => 'Chi phí';
+
+  @override
+  String get tripOverviewActivitiesMetric => 'Hoạt động';
+
+  @override
+  String get tripOverviewSpentMetric => 'Đã chi';
+
+  @override
+  String get tripOverviewBudgetMetric => 'Ngân sách';
+
+  @override
+  String get tripOverviewNextTitle => 'Tiếp theo';
+
+  @override
+  String get tripOverviewNoActivitiesTitle => 'Chưa có hoạt động';
+
+  @override
+  String get tripOverviewNoActivitiesMessage =>
+      'Mở lịch trình hiện có để thêm hoạt động.';
+
+  @override
+  String tripOverviewDayLabel(int day) {
+    return 'Ngày $day';
+  }
+
+  @override
   String get commonBackSemantic => 'Quay lại';
 
   @override

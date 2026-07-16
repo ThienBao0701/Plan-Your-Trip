@@ -601,6 +601,532 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notificationBudgetDate => '12 Jul';
 
   @override
+  String get exploreHeroTitle => 'Where will you wander?';
+
+  @override
+  String get exploreHeroSubtitle =>
+      'Curated places are local preview content. Personal trips stay local until a backend exists.';
+
+  @override
+  String get exploreSearchHint => 'Search cities, places, cafes, hotels...';
+
+  @override
+  String get exploreSearchActionSemantic => 'Open search results';
+
+  @override
+  String get exploreFiltersSemantic => 'Open search filters';
+
+  @override
+  String get exploreNoUpcomingTitle => 'No upcoming trip';
+
+  @override
+  String get exploreNoUpcomingMessage =>
+      'Create a local demo trip when you are ready to plan.';
+
+  @override
+  String get exploreCategoriesTitle => 'Explore by category';
+
+  @override
+  String get exploreRecommendedTitle => 'Recommended places';
+
+  @override
+  String get exploreSeeAll => 'See all';
+
+  @override
+  String get exploreNoPlacesTitle => 'No places available';
+
+  @override
+  String get exploreNoPlacesMessage =>
+      'Curated Explore content will appear here when local data is available.';
+
+  @override
+  String get exploreUpcomingTripSemantic => 'Upcoming trip summary';
+
+  @override
+  String explorePlanningProgress(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count planned activities',
+      one: '1 planned activity',
+      zero: 'No activities planned yet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get searchTitle => 'Explore places';
+
+  @override
+  String get searchHint => 'Search hotels, food, cafes, attractions...';
+
+  @override
+  String get searchClearSemantic => 'Clear search';
+
+  @override
+  String get searchModeSemantic => 'Search presentation mode';
+
+  @override
+  String get searchListMode => 'List';
+
+  @override
+  String get searchMapMode => 'Map';
+
+  @override
+  String searchResultCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count places',
+      one: '1 place',
+      zero: 'No places',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get searchClearFilters => 'Clear filters';
+
+  @override
+  String get searchEmptyTitle => 'No places found';
+
+  @override
+  String get searchEmptyMessage => 'Try a different keyword, category, or tag.';
+
+  @override
+  String get searchFiltersTitle => 'Filters';
+
+  @override
+  String get searchSortTitle => 'Sort';
+
+  @override
+  String get searchSortRelevance => 'Relevant';
+
+  @override
+  String get searchSortRating => 'Rating';
+
+  @override
+  String get searchSortDuration => 'Duration';
+
+  @override
+  String get searchTagsTitle => 'Tags';
+
+  @override
+  String get searchApplyFilters => 'Apply filters';
+
+  @override
+  String get searchBackToList => 'Back to list';
+
+  @override
+  String get mapFallbackSemantic => 'Non-live map preview';
+
+  @override
+  String get mapUnavailableTitle => 'Map provider not connected';
+
+  @override
+  String get mapUnavailableMessage =>
+      'Live maps, routing, traffic, and exact coordinates are not connected yet. This preview is schematic only.';
+
+  @override
+  String placeReviewCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count reviews',
+      one: '1 review',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get placeAddToTrip => 'Add to trip';
+
+  @override
+  String placeAddToTripSemantic(String place) {
+    return 'Add $place to a trip';
+  }
+
+  @override
+  String get placeHighlightsTitle => 'Highlights';
+
+  @override
+  String get placeUsefulInfoTitle => 'Useful information';
+
+  @override
+  String placeDurationMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String placeDurationHours(int hours) {
+    return '$hours h';
+  }
+
+  @override
+  String placeDurationHoursMinutes(int hours, int minutes) {
+    return '$hours h $minutes min';
+  }
+
+  @override
+  String get savedPlacesDemoLocalOnly =>
+      'Saved places are local to this demo session.';
+
+  @override
+  String get tripsTitle => 'My trips';
+
+  @override
+  String get tripsSubtitle => 'Smart local sections derived from trip dates.';
+
+  @override
+  String get tripsCreateAction => 'Create a trip';
+
+  @override
+  String get tripsCreateSemantic => 'Create a new trip';
+
+  @override
+  String get tripsEmptyTitle => 'No trips yet';
+
+  @override
+  String get tripsEmptyMessage =>
+      'Create your first local trip to get started.';
+
+  @override
+  String get tripsRealUnavailableMessage =>
+      'Personal trip history is not connected to a backend repository yet.';
+
+  @override
+  String get tripsOngoing => 'Ongoing';
+
+  @override
+  String get tripsUpcoming => 'Upcoming';
+
+  @override
+  String get tripsPast => 'Past';
+
+  @override
+  String get tripsOngoingEmpty => 'No trips are happening today.';
+
+  @override
+  String get tripsUpcomingEmpty => 'No upcoming trips yet.';
+
+  @override
+  String get tripsPastEmpty => 'No completed trips yet.';
+
+  @override
+  String tripCardSemantic(String trip) {
+    return 'Trip card for $trip';
+  }
+
+  @override
+  String tripActionsSemantic(String trip) {
+    return 'Actions for $trip';
+  }
+
+  @override
+  String get tripEditAction => 'Edit trip';
+
+  @override
+  String get tripDeleteAction => 'Delete trip';
+
+  @override
+  String get tripDeleteConfirmTitle => 'Delete trip?';
+
+  @override
+  String tripDeleteConfirmMessage(String trip) {
+    return 'Delete \"$trip\"? This also removes its timeline items and expenses.';
+  }
+
+  @override
+  String get tripDeletedMessage => 'Trip deleted.';
+
+  @override
+  String get tripCreatedMessage => 'Trip created locally.';
+
+  @override
+  String tripDayCount(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days',
+      one: '1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String tripTravelerCount(int travelers) {
+    String _temp0 = intl.Intl.pluralLogic(
+      travelers,
+      locale: localeName,
+      other: '$travelers travelers',
+      one: '1 traveler',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String tripDateTravelerMeta(String start, String end, int travelers) {
+    String _temp0 = intl.Intl.pluralLogic(
+      travelers,
+      locale: localeName,
+      other: '$travelers travelers',
+      one: '1 traveler',
+    );
+    return '$start - $end · $_temp0';
+  }
+
+  @override
+  String tripDaysAway(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'Starts in $days days',
+      one: 'Starts tomorrow',
+      zero: 'Starts today',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get createTripTitle => 'New trip';
+
+  @override
+  String get createBackStep => 'Back to previous step';
+
+  @override
+  String get createCloseSemantic => 'Close create trip flow';
+
+  @override
+  String createStepLabel(int step) {
+    return 'Step $step/3';
+  }
+
+  @override
+  String get createContinueAction => 'Continue';
+
+  @override
+  String get createContinueSemantic => 'Continue to next create trip step';
+
+  @override
+  String get createSubmitAction => 'Create trip';
+
+  @override
+  String get createSubmitSemantic => 'Create this trip';
+
+  @override
+  String get createDestinationRequired => 'Please enter a destination.';
+
+  @override
+  String get createDatesRequired =>
+      'Enter start and end dates in dd/mm/yyyy format.';
+
+  @override
+  String get createInvalidDateRange => 'End date cannot be before start date.';
+
+  @override
+  String get createInvalidTravelers =>
+      'Traveler count must be between 1 and 20.';
+
+  @override
+  String get createDiscardTitle => 'Discard trip draft?';
+
+  @override
+  String get createDiscardMessage => 'Your entered trip details will be lost.';
+
+  @override
+  String get createDiscardAction => 'Discard';
+
+  @override
+  String get createDestinationTitle => 'Where do you want to go?';
+
+  @override
+  String get createDestinationSubtitle =>
+      'Choose a supported destination from local data or type your own.';
+
+  @override
+  String get createDestinationLabel => 'Destination';
+
+  @override
+  String get createTripNameLabel => 'Trip name';
+
+  @override
+  String get createDestinationSuggestions => 'Suggested destinations';
+
+  @override
+  String get createDatesTitle => 'When will you go?';
+
+  @override
+  String get createDatesSubtitle =>
+      'Enter dates and traveler count for this local trip.';
+
+  @override
+  String get createStartDateLabel => 'Start date';
+
+  @override
+  String get createEndDateLabel => 'End date';
+
+  @override
+  String get createDateFormatHint => 'Use dd/mm/yyyy';
+
+  @override
+  String get createTravelersLabel => 'Travelers';
+
+  @override
+  String get createDecreaseTravelers => 'Decrease travelers';
+
+  @override
+  String get createIncreaseTravelers => 'Increase travelers';
+
+  @override
+  String get createBudgetLabel => 'Budget (VND)';
+
+  @override
+  String get createPersonalizationTitle => 'Shape the trip your way';
+
+  @override
+  String get createPersonalizationSubtitle =>
+      'These preferences are local draft presentation only.';
+
+  @override
+  String get createPreferencesTitle => 'Preferences';
+
+  @override
+  String get createPreferenceFood => 'Food';
+
+  @override
+  String get createPreferenceCulture => 'Culture';
+
+  @override
+  String get createPreferenceNature => 'Nature';
+
+  @override
+  String get createPreferenceRelax => 'Relax';
+
+  @override
+  String get createPreferenceAdventure => 'Adventure';
+
+  @override
+  String get createPreferenceShopping => 'Shopping';
+
+  @override
+  String get createPaceTitle => 'Pace';
+
+  @override
+  String get createPaceSlow => 'Slow';
+
+  @override
+  String get createPaceBalanced => 'Balanced';
+
+  @override
+  String get createPacePacked => 'Packed';
+
+  @override
+  String get createBudgetStyleTitle => 'Budget style';
+
+  @override
+  String get createBudgetSaving => 'Saving';
+
+  @override
+  String get createBudgetComfort => 'Comfort';
+
+  @override
+  String get createBudgetPremium => 'Premium';
+
+  @override
+  String get createNotesLabel => 'Notes';
+
+  @override
+  String get createPersonalizationLocalOnly =>
+      'Preferences are kept in this draft only and are not sent to any backend.';
+
+  @override
+  String get createReviewTitle => 'Review';
+
+  @override
+  String createReviewSummary(String title, String destination, String start,
+      String end, int travelers) {
+    String _temp0 = intl.Intl.pluralLogic(
+      travelers,
+      locale: localeName,
+      other: '$travelers travelers',
+      one: '1 traveler',
+    );
+    return '$title · $destination · $start to $end · $_temp0';
+  }
+
+  @override
+  String get createConfirmAction => 'Confirm';
+
+  @override
+  String editTripTitle(String trip) {
+    return 'Edit $trip';
+  }
+
+  @override
+  String get editTripHeading => 'Update your trip';
+
+  @override
+  String get editTripSaveAction => 'Update trip';
+
+  @override
+  String get editTripUpdatedMessage => 'Trip updated.';
+
+  @override
+  String get editMoveActivitiesTitle => 'Move activities?';
+
+  @override
+  String editMoveActivitiesMessage(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days',
+      one: '1 day',
+    );
+    return 'This shorter trip has $_temp0. Activities from removed days will move to the new last day.';
+  }
+
+  @override
+  String get editMoveActivitiesAction => 'Move to last day';
+
+  @override
+  String get tripOverviewProgressTitle => 'Trip progress';
+
+  @override
+  String tripOverviewProgressValue(int percent) {
+    return '$percent% complete';
+  }
+
+  @override
+  String get tripOverviewTimelineAction => 'Timeline';
+
+  @override
+  String get tripOverviewExpensesAction => 'Expenses';
+
+  @override
+  String get tripOverviewActivitiesMetric => 'Activities';
+
+  @override
+  String get tripOverviewSpentMetric => 'Spent';
+
+  @override
+  String get tripOverviewBudgetMetric => 'Budget';
+
+  @override
+  String get tripOverviewNextTitle => 'Next';
+
+  @override
+  String get tripOverviewNoActivitiesTitle => 'No activities yet';
+
+  @override
+  String get tripOverviewNoActivitiesMessage =>
+      'Open the existing timeline to add activities.';
+
+  @override
+  String tripOverviewDayLabel(int day) {
+    return 'Day $day';
+  }
+
+  @override
   String get commonBackSemantic => 'Go back';
 
   @override

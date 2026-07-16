@@ -1172,6 +1172,835 @@ abstract class AppLocalizations {
   /// **'12 Jul'**
   String get notificationBudgetDate;
 
+  /// No description provided for @exploreHeroTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Where will you wander?'**
+  String get exploreHeroTitle;
+
+  /// No description provided for @exploreHeroSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Curated places are local preview content. Personal trips stay local until a backend exists.'**
+  String get exploreHeroSubtitle;
+
+  /// No description provided for @exploreSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search cities, places, cafes, hotels...'**
+  String get exploreSearchHint;
+
+  /// No description provided for @exploreSearchActionSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Open search results'**
+  String get exploreSearchActionSemantic;
+
+  /// No description provided for @exploreFiltersSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Open search filters'**
+  String get exploreFiltersSemantic;
+
+  /// No description provided for @exploreNoUpcomingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No upcoming trip'**
+  String get exploreNoUpcomingTitle;
+
+  /// No description provided for @exploreNoUpcomingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a local demo trip when you are ready to plan.'**
+  String get exploreNoUpcomingMessage;
+
+  /// No description provided for @exploreCategoriesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore by category'**
+  String get exploreCategoriesTitle;
+
+  /// No description provided for @exploreRecommendedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended places'**
+  String get exploreRecommendedTitle;
+
+  /// No description provided for @exploreSeeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'See all'**
+  String get exploreSeeAll;
+
+  /// No description provided for @exploreNoPlacesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No places available'**
+  String get exploreNoPlacesTitle;
+
+  /// No description provided for @exploreNoPlacesMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Curated Explore content will appear here when local data is available.'**
+  String get exploreNoPlacesMessage;
+
+  /// No description provided for @exploreUpcomingTripSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming trip summary'**
+  String get exploreUpcomingTripSemantic;
+
+  /// No description provided for @explorePlanningProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No activities planned yet} =1{1 planned activity} other{{count} planned activities}}'**
+  String explorePlanningProgress(int count);
+
+  /// No description provided for @searchTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore places'**
+  String get searchTitle;
+
+  /// No description provided for @searchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search hotels, food, cafes, attractions...'**
+  String get searchHint;
+
+  /// No description provided for @searchClearSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get searchClearSemantic;
+
+  /// No description provided for @searchModeSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Search presentation mode'**
+  String get searchModeSemantic;
+
+  /// No description provided for @searchListMode.
+  ///
+  /// In en, this message translates to:
+  /// **'List'**
+  String get searchListMode;
+
+  /// No description provided for @searchMapMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Map'**
+  String get searchMapMode;
+
+  /// No description provided for @searchResultCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No places} =1{1 place} other{{count} places}}'**
+  String searchResultCount(int count);
+
+  /// No description provided for @searchClearFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear filters'**
+  String get searchClearFilters;
+
+  /// No description provided for @searchEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No places found'**
+  String get searchEmptyTitle;
+
+  /// No description provided for @searchEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Try a different keyword, category, or tag.'**
+  String get searchEmptyMessage;
+
+  /// No description provided for @searchFiltersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Filters'**
+  String get searchFiltersTitle;
+
+  /// No description provided for @searchSortTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort'**
+  String get searchSortTitle;
+
+  /// No description provided for @searchSortRelevance.
+  ///
+  /// In en, this message translates to:
+  /// **'Relevant'**
+  String get searchSortRelevance;
+
+  /// No description provided for @searchSortRating.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating'**
+  String get searchSortRating;
+
+  /// No description provided for @searchSortDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get searchSortDuration;
+
+  /// No description provided for @searchTagsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get searchTagsTitle;
+
+  /// No description provided for @searchApplyFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply filters'**
+  String get searchApplyFilters;
+
+  /// No description provided for @searchBackToList.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to list'**
+  String get searchBackToList;
+
+  /// No description provided for @mapFallbackSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Non-live map preview'**
+  String get mapFallbackSemantic;
+
+  /// No description provided for @mapUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Map provider not connected'**
+  String get mapUnavailableTitle;
+
+  /// No description provided for @mapUnavailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Live maps, routing, traffic, and exact coordinates are not connected yet. This preview is schematic only.'**
+  String get mapUnavailableMessage;
+
+  /// No description provided for @placeReviewCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 review} other{{count} reviews}}'**
+  String placeReviewCount(int count);
+
+  /// No description provided for @placeAddToTrip.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to trip'**
+  String get placeAddToTrip;
+
+  /// No description provided for @placeAddToTripSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Add {place} to a trip'**
+  String placeAddToTripSemantic(String place);
+
+  /// No description provided for @placeHighlightsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Highlights'**
+  String get placeHighlightsTitle;
+
+  /// No description provided for @placeUsefulInfoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Useful information'**
+  String get placeUsefulInfoTitle;
+
+  /// No description provided for @placeDurationMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String placeDurationMinutes(int minutes);
+
+  /// No description provided for @placeDurationHours.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} h'**
+  String placeDurationHours(int hours);
+
+  /// No description provided for @placeDurationHoursMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} h {minutes} min'**
+  String placeDurationHoursMinutes(int hours, int minutes);
+
+  /// No description provided for @savedPlacesDemoLocalOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved places are local to this demo session.'**
+  String get savedPlacesDemoLocalOnly;
+
+  /// No description provided for @tripsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My trips'**
+  String get tripsTitle;
+
+  /// No description provided for @tripsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Smart local sections derived from trip dates.'**
+  String get tripsSubtitle;
+
+  /// No description provided for @tripsCreateAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a trip'**
+  String get tripsCreateAction;
+
+  /// No description provided for @tripsCreateSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a new trip'**
+  String get tripsCreateSemantic;
+
+  /// No description provided for @tripsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No trips yet'**
+  String get tripsEmptyTitle;
+
+  /// No description provided for @tripsEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your first local trip to get started.'**
+  String get tripsEmptyMessage;
+
+  /// No description provided for @tripsRealUnavailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal trip history is not connected to a backend repository yet.'**
+  String get tripsRealUnavailableMessage;
+
+  /// No description provided for @tripsOngoing.
+  ///
+  /// In en, this message translates to:
+  /// **'Ongoing'**
+  String get tripsOngoing;
+
+  /// No description provided for @tripsUpcoming.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get tripsUpcoming;
+
+  /// No description provided for @tripsPast.
+  ///
+  /// In en, this message translates to:
+  /// **'Past'**
+  String get tripsPast;
+
+  /// No description provided for @tripsOngoingEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No trips are happening today.'**
+  String get tripsOngoingEmpty;
+
+  /// No description provided for @tripsUpcomingEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No upcoming trips yet.'**
+  String get tripsUpcomingEmpty;
+
+  /// No description provided for @tripsPastEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No completed trips yet.'**
+  String get tripsPastEmpty;
+
+  /// No description provided for @tripCardSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip card for {trip}'**
+  String tripCardSemantic(String trip);
+
+  /// No description provided for @tripActionsSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Actions for {trip}'**
+  String tripActionsSemantic(String trip);
+
+  /// No description provided for @tripEditAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit trip'**
+  String get tripEditAction;
+
+  /// No description provided for @tripDeleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete trip'**
+  String get tripDeleteAction;
+
+  /// No description provided for @tripDeleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete trip?'**
+  String get tripDeleteConfirmTitle;
+
+  /// No description provided for @tripDeleteConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{trip}\"? This also removes its timeline items and expenses.'**
+  String tripDeleteConfirmMessage(String trip);
+
+  /// No description provided for @tripDeletedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip deleted.'**
+  String get tripDeletedMessage;
+
+  /// No description provided for @tripCreatedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip created locally.'**
+  String get tripCreatedMessage;
+
+  /// No description provided for @tripDayCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, =1{1 day} other{{days} days}}'**
+  String tripDayCount(int days);
+
+  /// No description provided for @tripTravelerCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{travelers, plural, =1{1 traveler} other{{travelers} travelers}}'**
+  String tripTravelerCount(int travelers);
+
+  /// No description provided for @tripDateTravelerMeta.
+  ///
+  /// In en, this message translates to:
+  /// **'{start} - {end} · {travelers, plural, =1{1 traveler} other{{travelers} travelers}}'**
+  String tripDateTravelerMeta(String start, String end, int travelers);
+
+  /// No description provided for @tripDaysAway.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, =0{Starts today} =1{Starts tomorrow} other{Starts in {days} days}}'**
+  String tripDaysAway(int days);
+
+  /// No description provided for @createTripTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New trip'**
+  String get createTripTitle;
+
+  /// No description provided for @createBackStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to previous step'**
+  String get createBackStep;
+
+  /// No description provided for @createCloseSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Close create trip flow'**
+  String get createCloseSemantic;
+
+  /// No description provided for @createStepLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Step {step}/3'**
+  String createStepLabel(int step);
+
+  /// No description provided for @createContinueAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get createContinueAction;
+
+  /// No description provided for @createContinueSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to next create trip step'**
+  String get createContinueSemantic;
+
+  /// No description provided for @createSubmitAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Create trip'**
+  String get createSubmitAction;
+
+  /// No description provided for @createSubmitSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Create this trip'**
+  String get createSubmitSemantic;
+
+  /// No description provided for @createDestinationRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a destination.'**
+  String get createDestinationRequired;
+
+  /// No description provided for @createDatesRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter start and end dates in dd/mm/yyyy format.'**
+  String get createDatesRequired;
+
+  /// No description provided for @createInvalidDateRange.
+  ///
+  /// In en, this message translates to:
+  /// **'End date cannot be before start date.'**
+  String get createInvalidDateRange;
+
+  /// No description provided for @createInvalidTravelers.
+  ///
+  /// In en, this message translates to:
+  /// **'Traveler count must be between 1 and 20.'**
+  String get createInvalidTravelers;
+
+  /// No description provided for @createDiscardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard trip draft?'**
+  String get createDiscardTitle;
+
+  /// No description provided for @createDiscardMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your entered trip details will be lost.'**
+  String get createDiscardMessage;
+
+  /// No description provided for @createDiscardAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get createDiscardAction;
+
+  /// No description provided for @createDestinationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Where do you want to go?'**
+  String get createDestinationTitle;
+
+  /// No description provided for @createDestinationSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a supported destination from local data or type your own.'**
+  String get createDestinationSubtitle;
+
+  /// No description provided for @createDestinationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Destination'**
+  String get createDestinationLabel;
+
+  /// No description provided for @createTripNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip name'**
+  String get createTripNameLabel;
+
+  /// No description provided for @createDestinationSuggestions.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggested destinations'**
+  String get createDestinationSuggestions;
+
+  /// No description provided for @createDatesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'When will you go?'**
+  String get createDatesTitle;
+
+  /// No description provided for @createDatesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter dates and traveler count for this local trip.'**
+  String get createDatesSubtitle;
+
+  /// No description provided for @createStartDateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Start date'**
+  String get createStartDateLabel;
+
+  /// No description provided for @createEndDateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'End date'**
+  String get createEndDateLabel;
+
+  /// No description provided for @createDateFormatHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Use dd/mm/yyyy'**
+  String get createDateFormatHint;
+
+  /// No description provided for @createTravelersLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Travelers'**
+  String get createTravelersLabel;
+
+  /// No description provided for @createDecreaseTravelers.
+  ///
+  /// In en, this message translates to:
+  /// **'Decrease travelers'**
+  String get createDecreaseTravelers;
+
+  /// No description provided for @createIncreaseTravelers.
+  ///
+  /// In en, this message translates to:
+  /// **'Increase travelers'**
+  String get createIncreaseTravelers;
+
+  /// No description provided for @createBudgetLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget (VND)'**
+  String get createBudgetLabel;
+
+  /// No description provided for @createPersonalizationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Shape the trip your way'**
+  String get createPersonalizationTitle;
+
+  /// No description provided for @createPersonalizationSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'These preferences are local draft presentation only.'**
+  String get createPersonalizationSubtitle;
+
+  /// No description provided for @createPreferencesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferences'**
+  String get createPreferencesTitle;
+
+  /// No description provided for @createPreferenceFood.
+  ///
+  /// In en, this message translates to:
+  /// **'Food'**
+  String get createPreferenceFood;
+
+  /// No description provided for @createPreferenceCulture.
+  ///
+  /// In en, this message translates to:
+  /// **'Culture'**
+  String get createPreferenceCulture;
+
+  /// No description provided for @createPreferenceNature.
+  ///
+  /// In en, this message translates to:
+  /// **'Nature'**
+  String get createPreferenceNature;
+
+  /// No description provided for @createPreferenceRelax.
+  ///
+  /// In en, this message translates to:
+  /// **'Relax'**
+  String get createPreferenceRelax;
+
+  /// No description provided for @createPreferenceAdventure.
+  ///
+  /// In en, this message translates to:
+  /// **'Adventure'**
+  String get createPreferenceAdventure;
+
+  /// No description provided for @createPreferenceShopping.
+  ///
+  /// In en, this message translates to:
+  /// **'Shopping'**
+  String get createPreferenceShopping;
+
+  /// No description provided for @createPaceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pace'**
+  String get createPaceTitle;
+
+  /// No description provided for @createPaceSlow.
+  ///
+  /// In en, this message translates to:
+  /// **'Slow'**
+  String get createPaceSlow;
+
+  /// No description provided for @createPaceBalanced.
+  ///
+  /// In en, this message translates to:
+  /// **'Balanced'**
+  String get createPaceBalanced;
+
+  /// No description provided for @createPacePacked.
+  ///
+  /// In en, this message translates to:
+  /// **'Packed'**
+  String get createPacePacked;
+
+  /// No description provided for @createBudgetStyleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget style'**
+  String get createBudgetStyleTitle;
+
+  /// No description provided for @createBudgetSaving.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving'**
+  String get createBudgetSaving;
+
+  /// No description provided for @createBudgetComfort.
+  ///
+  /// In en, this message translates to:
+  /// **'Comfort'**
+  String get createBudgetComfort;
+
+  /// No description provided for @createBudgetPremium.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium'**
+  String get createBudgetPremium;
+
+  /// No description provided for @createNotesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get createNotesLabel;
+
+  /// No description provided for @createPersonalizationLocalOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferences are kept in this draft only and are not sent to any backend.'**
+  String get createPersonalizationLocalOnly;
+
+  /// No description provided for @createReviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review'**
+  String get createReviewTitle;
+
+  /// No description provided for @createReviewSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{title} · {destination} · {start} to {end} · {travelers, plural, =1{1 traveler} other{{travelers} travelers}}'**
+  String createReviewSummary(String title, String destination, String start,
+      String end, int travelers);
+
+  /// No description provided for @createConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get createConfirmAction;
+
+  /// No description provided for @editTripTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit {trip}'**
+  String editTripTitle(String trip);
+
+  /// No description provided for @editTripHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Update your trip'**
+  String get editTripHeading;
+
+  /// No description provided for @editTripSaveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Update trip'**
+  String get editTripSaveAction;
+
+  /// No description provided for @editTripUpdatedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip updated.'**
+  String get editTripUpdatedMessage;
+
+  /// No description provided for @editMoveActivitiesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Move activities?'**
+  String get editMoveActivitiesTitle;
+
+  /// No description provided for @editMoveActivitiesMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This shorter trip has {days, plural, =1{1 day} other{{days} days}}. Activities from removed days will move to the new last day.'**
+  String editMoveActivitiesMessage(int days);
+
+  /// No description provided for @editMoveActivitiesAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Move to last day'**
+  String get editMoveActivitiesAction;
+
+  /// No description provided for @tripOverviewProgressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip progress'**
+  String get tripOverviewProgressTitle;
+
+  /// No description provided for @tripOverviewProgressValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% complete'**
+  String tripOverviewProgressValue(int percent);
+
+  /// No description provided for @tripOverviewTimelineAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Timeline'**
+  String get tripOverviewTimelineAction;
+
+  /// No description provided for @tripOverviewExpensesAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Expenses'**
+  String get tripOverviewExpensesAction;
+
+  /// No description provided for @tripOverviewActivitiesMetric.
+  ///
+  /// In en, this message translates to:
+  /// **'Activities'**
+  String get tripOverviewActivitiesMetric;
+
+  /// No description provided for @tripOverviewSpentMetric.
+  ///
+  /// In en, this message translates to:
+  /// **'Spent'**
+  String get tripOverviewSpentMetric;
+
+  /// No description provided for @tripOverviewBudgetMetric.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget'**
+  String get tripOverviewBudgetMetric;
+
+  /// No description provided for @tripOverviewNextTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get tripOverviewNextTitle;
+
+  /// No description provided for @tripOverviewNoActivitiesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No activities yet'**
+  String get tripOverviewNoActivitiesTitle;
+
+  /// No description provided for @tripOverviewNoActivitiesMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the existing timeline to add activities.'**
+  String get tripOverviewNoActivitiesMessage;
+
+  /// No description provided for @tripOverviewDayLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day}'**
+  String tripOverviewDayLabel(int day);
+
   /// No description provided for @commonBackSemantic.
   ///
   /// In en, this message translates to:

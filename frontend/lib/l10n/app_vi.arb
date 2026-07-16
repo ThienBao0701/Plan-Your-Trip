@@ -227,6 +227,305 @@
   "notificationBudgetMessage": "Bạn đã dùng 62% ngân sách demo dự kiến.",
   "notificationYesterday": "Hôm qua",
   "notificationBudgetDate": "12 Th7",
+  "exploreHeroTitle": "Bạn muốn đi đâu?",
+  "exploreHeroSubtitle": "Địa điểm gợi ý là dữ liệu xem trước cục bộ. Chuyến đi cá nhân vẫn ở cục bộ cho đến khi có backend.",
+  "exploreSearchHint": "Tìm thành phố, địa điểm, quán cà phê, khách sạn...",
+  "exploreSearchActionSemantic": "Mở kết quả tìm kiếm",
+  "exploreFiltersSemantic": "Mở bộ lọc tìm kiếm",
+  "exploreNoUpcomingTitle": "Chưa có chuyến đi sắp tới",
+  "exploreNoUpcomingMessage": "Tạo chuyến đi demo cục bộ khi bạn sẵn sàng lên kế hoạch.",
+  "exploreCategoriesTitle": "Khám phá theo danh mục",
+  "exploreRecommendedTitle": "Địa điểm gợi ý",
+  "exploreSeeAll": "Xem tất cả",
+  "exploreNoPlacesTitle": "Chưa có địa điểm",
+  "exploreNoPlacesMessage": "Nội dung Khám phá sẽ xuất hiện khi có dữ liệu cục bộ.",
+  "exploreUpcomingTripSemantic": "Tóm tắt chuyến đi sắp tới",
+  "explorePlanningProgress": "{count} hoạt động đã lên kế hoạch",
+  "@explorePlanningProgress": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "searchTitle": "Khám phá địa điểm",
+  "searchHint": "Tìm khách sạn, món ăn, cà phê, điểm tham quan...",
+  "searchClearSemantic": "Xóa tìm kiếm",
+  "searchModeSemantic": "Chế độ hiển thị tìm kiếm",
+  "searchListMode": "Danh sách",
+  "searchMapMode": "Bản đồ",
+  "searchResultCount": "{count} địa điểm",
+  "@searchResultCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "searchClearFilters": "Xóa bộ lọc",
+  "searchEmptyTitle": "Không tìm thấy địa điểm",
+  "searchEmptyMessage": "Thử từ khóa, danh mục hoặc thẻ khác.",
+  "searchFiltersTitle": "Bộ lọc",
+  "searchSortTitle": "Sắp xếp",
+  "searchSortRelevance": "Phù hợp",
+  "searchSortRating": "Đánh giá",
+  "searchSortDuration": "Thời lượng",
+  "searchTagsTitle": "Thẻ",
+  "searchApplyFilters": "Áp dụng bộ lọc",
+  "searchBackToList": "Quay lại danh sách",
+  "mapFallbackSemantic": "Bản đồ minh họa không trực tiếp",
+  "mapUnavailableTitle": "Chưa kết nối nhà cung cấp bản đồ",
+  "mapUnavailableMessage": "Bản đồ trực tiếp, tuyến đường, giao thông và tọa độ chính xác chưa được kết nối. Bản xem trước này chỉ là sơ đồ minh họa.",
+  "placeReviewCount": "{count} đánh giá",
+  "@placeReviewCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "placeAddToTrip": "Thêm vào chuyến đi",
+  "placeAddToTripSemantic": "Thêm {place} vào chuyến đi",
+  "@placeAddToTripSemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "placeHighlightsTitle": "Điểm nổi bật",
+  "placeUsefulInfoTitle": "Thông tin hữu ích",
+  "placeDurationMinutes": "{minutes} phút",
+  "@placeDurationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "placeDurationHours": "{hours} giờ",
+  "@placeDurationHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "placeDurationHoursMinutes": "{hours} giờ {minutes} phút",
+  "@placeDurationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesDemoLocalOnly": "Địa điểm đã lưu chỉ nằm trong phiên demo cục bộ này.",
+  "tripsTitle": "My trips",
+  "tripsSubtitle": "Các mục thông minh được suy ra từ ngày chuyến đi.",
+  "tripsCreateAction": "Tạo chuyến đi",
+  "tripsCreateSemantic": "Tạo chuyến đi mới",
+  "tripsEmptyTitle": "Chưa có chuyến đi",
+  "tripsEmptyMessage": "Tạo chuyến đi cục bộ đầu tiên để bắt đầu.",
+  "tripsRealUnavailableMessage": "Lịch sử chuyến đi cá nhân chưa được kết nối với kho backend.",
+  "tripsOngoing": "Đang diễn ra",
+  "tripsUpcoming": "Sắp tới",
+  "tripsPast": "Đã kết thúc",
+  "tripsOngoingEmpty": "Không có chuyến đi nào diễn ra hôm nay.",
+  "tripsUpcomingEmpty": "Chưa có chuyến đi sắp tới.",
+  "tripsPastEmpty": "Chưa có chuyến đi đã hoàn thành.",
+  "tripCardSemantic": "Thẻ chuyến đi {trip}",
+  "@tripCardSemantic": {
+    "placeholders": {
+      "trip": {
+        "type": "String"
+      }
+    }
+  },
+  "tripActionsSemantic": "Hành động cho {trip}",
+  "@tripActionsSemantic": {
+    "placeholders": {
+      "trip": {
+        "type": "String"
+      }
+    }
+  },
+  "tripEditAction": "Sửa chuyến đi",
+  "tripDeleteAction": "Xóa chuyến đi",
+  "tripDeleteConfirmTitle": "Xóa chuyến đi?",
+  "tripDeleteConfirmMessage": "Xóa \"{trip}\"? Thao tác này cũng xóa lịch trình và chi phí của chuyến đi.",
+  "@tripDeleteConfirmMessage": {
+    "placeholders": {
+      "trip": {
+        "type": "String"
+      }
+    }
+  },
+  "tripDeletedMessage": "Đã xóa chuyến đi.",
+  "tripCreatedMessage": "Đã tạo chuyến đi cục bộ.",
+  "tripDayCount": "{days} ngày",
+  "@tripDayCount": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "tripTravelerCount": "{travelers} người",
+  "@tripTravelerCount": {
+    "placeholders": {
+      "travelers": {
+        "type": "int"
+      }
+    }
+  },
+  "tripDateTravelerMeta": "{start} - {end} · {travelers} người",
+  "@tripDateTravelerMeta": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      },
+      "travelers": {
+        "type": "int"
+      }
+    }
+  },
+  "tripDaysAway": "Bắt đầu sau {days} ngày",
+  "@tripDaysAway": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "createTripTitle": "New trip",
+  "createBackStep": "Quay lại bước trước",
+  "createCloseSemantic": "Đóng luồng tạo chuyến đi",
+  "createStepLabel": "Bước {step}/3",
+  "@createStepLabel": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
+  "createContinueAction": "Tiếp tục",
+  "createContinueSemantic": "Chuyển sang bước tạo chuyến đi tiếp theo",
+  "createSubmitAction": "Tạo chuyến đi",
+  "createSubmitSemantic": "Tạo chuyến đi này",
+  "createDestinationRequired": "Vui lòng nhập điểm đến.",
+  "createDatesRequired": "Nhập ngày bắt đầu và kết thúc theo định dạng dd/mm/yyyy.",
+  "createInvalidDateRange": "Ngày kết thúc không được trước ngày bắt đầu.",
+  "createInvalidTravelers": "Số người phải từ 1 đến 20.",
+  "createDiscardTitle": "Bỏ bản nháp chuyến đi?",
+  "createDiscardMessage": "Chi tiết chuyến đi đã nhập sẽ bị mất.",
+  "createDiscardAction": "Bỏ",
+  "createDestinationTitle": "Bạn muốn đi đâu?",
+  "createDestinationSubtitle": "Chọn điểm đến từ dữ liệu cục bộ hoặc tự nhập.",
+  "createDestinationLabel": "Điểm đến",
+  "createTripNameLabel": "Tên chuyến đi",
+  "createDestinationSuggestions": "Điểm đến gợi ý",
+  "createDatesTitle": "Khi nào bạn sẽ đi?",
+  "createDatesSubtitle": "Nhập ngày và số người cho chuyến đi cục bộ này.",
+  "createStartDateLabel": "Ngày bắt đầu",
+  "createEndDateLabel": "Ngày kết thúc",
+  "createDateFormatHint": "Dùng dd/mm/yyyy",
+  "createTravelersLabel": "Số người",
+  "createDecreaseTravelers": "Giảm số người",
+  "createIncreaseTravelers": "Tăng số người",
+  "createBudgetLabel": "Ngân sách (VND)",
+  "createPersonalizationTitle": "Thiết kế chuyến đi theo cách của bạn",
+  "createPersonalizationSubtitle": "Các tùy chọn này chỉ là bản nháp cục bộ.",
+  "createPreferencesTitle": "Sở thích",
+  "createPreferenceFood": "Ẩm thực",
+  "createPreferenceCulture": "Văn hóa",
+  "createPreferenceNature": "Thiên nhiên",
+  "createPreferenceRelax": "Thư giãn",
+  "createPreferenceAdventure": "Phiêu lưu",
+  "createPreferenceShopping": "Mua sắm",
+  "createPaceTitle": "Nhịp độ",
+  "createPaceSlow": "Thư thả",
+  "createPaceBalanced": "Cân bằng",
+  "createPacePacked": "Dày đặc",
+  "createBudgetStyleTitle": "Kiểu ngân sách",
+  "createBudgetSaving": "Tiết kiệm",
+  "createBudgetComfort": "Thoải mái",
+  "createBudgetPremium": "Cao cấp",
+  "createNotesLabel": "Ghi chú",
+  "createPersonalizationLocalOnly": "Sở thích chỉ được giữ trong bản nháp này và không gửi tới backend.",
+  "createReviewTitle": "Xem lại",
+  "createReviewSummary": "{title} · {destination} · {start} đến {end} · {travelers} người",
+  "@createReviewSummary": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "destination": {
+        "type": "String"
+      },
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      },
+      "travelers": {
+        "type": "int"
+      }
+    }
+  },
+  "createConfirmAction": "Xác nhận",
+  "editTripTitle": "Sửa {trip}",
+  "@editTripTitle": {
+    "placeholders": {
+      "trip": {
+        "type": "String"
+      }
+    }
+  },
+  "editTripHeading": "Cập nhật chuyến đi",
+  "editTripSaveAction": "Cập nhật chuyến đi",
+  "editTripUpdatedMessage": "Đã cập nhật chuyến đi.",
+  "editMoveActivitiesTitle": "Di chuyển hoạt động?",
+  "editMoveActivitiesMessage": "Chuyến đi ngắn hơn này có {days} ngày. Hoạt động ở các ngày bị xóa sẽ chuyển về ngày cuối mới.",
+  "@editMoveActivitiesMessage": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "editMoveActivitiesAction": "Chuyển về ngày cuối",
+  "tripOverviewProgressTitle": "Tiến độ chuyến đi",
+  "tripOverviewProgressValue": "Hoàn thành {percent}%",
+  "@tripOverviewProgressValue": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "tripOverviewTimelineAction": "Lịch trình",
+  "tripOverviewExpensesAction": "Chi phí",
+  "tripOverviewActivitiesMetric": "Hoạt động",
+  "tripOverviewSpentMetric": "Đã chi",
+  "tripOverviewBudgetMetric": "Ngân sách",
+  "tripOverviewNextTitle": "Tiếp theo",
+  "tripOverviewNoActivitiesTitle": "Chưa có hoạt động",
+  "tripOverviewNoActivitiesMessage": "Mở lịch trình hiện có để thêm hoạt động.",
+  "tripOverviewDayLabel": "Ngày {day}",
+  "@tripOverviewDayLabel": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
   "commonBackSemantic": "Quay lại",
   "demoModeLabel": "Chế độ demo"
 }

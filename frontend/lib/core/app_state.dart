@@ -41,6 +41,7 @@ class AppState extends ChangeNotifier {
     api.demoMode = savedDemo;
     demoMode = savedDemo;
     email = savedDemo || savedToken != null ? savedEmail : null;
+    _applyPersonalDataMode();
     localeOverride = await preferences.locale();
     tripRemindersEnabled = await preferences.tripReminders();
     bookingUpdatesEnabled = await preferences.bookingUpdates();
@@ -54,6 +55,7 @@ class AppState extends ChangeNotifier {
     if (r['success'] == true) {
       email = e.trim();
       demoMode = r['demo'] == true;
+      _applyPersonalDataMode();
       await storage.save(
           email: email!, token: r['token'] as String?, demo: demoMode);
       notifyListeners();
@@ -75,6 +77,18 @@ class AppState extends ChangeNotifier {
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
     notifyListeners();
+  }
+
+  void _applyPersonalDataMode() {
+    if (demoMode) {
+      trips = List.from(MockData.trips);
+      timeline = List.from(MockData.timeline);
+      expenses = List.from(MockData.expenses);
+      return;
+    }
+    trips = [];
+    timeline = [];
+    expenses = [];
   }
 
   // ── Local preferences ────────────────────────────────────────────────────

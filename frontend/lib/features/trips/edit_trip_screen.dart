@@ -1,8 +1,9 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../core/app_state.dart';
 import '../../core/mock/app_models.dart';
 import '../../design/app_colors.dart';
+import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/glass_widgets.dart';
 
 class EditTripScreen extends StatefulWidget {
@@ -65,10 +66,11 @@ class _EditTripScreenState extends State<EditTripScreen> {
   }
 
   void _save() async {
+    final l10n = AppLocalizations.of(context)!;
     final dest = _destCtrl.text.trim();
     if (dest.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please enter a destination.')));
+          SnackBar(content: Text(l10n.createDestinationRequired)));
       return;
     }
     setState(() => _saving = true);
@@ -96,16 +98,15 @@ class _EditTripScreenState extends State<EditTripScreen> {
             builder: (dialogContext) => AlertDialog(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24)),
-              title: const Text('Move activities?'),
-              content: Text(
-                  'This shorter trip has ${updated.days} days. Activities from removed days will move to Day ${updated.days}.'),
+              title: Text(l10n.editMoveActivitiesTitle),
+              content: Text(l10n.editMoveActivitiesMessage(updated.days)),
               actions: [
                 TextButton(
                     onPressed: () => Navigator.pop(dialogContext, false),
-                    child: const Text('Cancel')),
+                    child: Text(l10n.profileCancel)),
                 FilledButton(
                     onPressed: () => Navigator.pop(dialogContext, true),
-                    child: const Text('Move to last day')),
+                    child: Text(l10n.editMoveActivitiesAction)),
               ],
             ),
           ) ??
@@ -122,34 +123,41 @@ class _EditTripScreenState extends State<EditTripScreen> {
       final nav = Navigator.of(context);
       setState(() => _saving = false);
       nav.pop(updated);
-      messenger.showSnackBar(const SnackBar(content: Text('Trip updated!')));
+      messenger
+          .showSnackBar(SnackBar(content: Text(l10n.editTripUpdatedMessage)));
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final fmt = DateFormat('dd/MM/yyyy');
     final dateLabel =
         '${fmt.format(_dateRange.start)} → ${fmt.format(_dateRange.end)}';
 
     return Scaffold(
-        appBar: AppBar(title: Text('Edit ${widget.trip.title}')),
+        appBar: OceanGlassAppBar(
+            title: Text(l10n.editTripTitle(widget.trip.title)),
+            leading: IconButton(
+                tooltip: l10n.commonBackSemantic,
+                onPressed: () => Navigator.maybePop(context),
+                icon: const Icon(Icons.arrow_back_rounded))),
         body: BubbleBackground(
             child: SafeArea(
                 child: ListView(padding: const EdgeInsets.all(20), children: [
-          Text('Update your trip',
+          Text(l10n.editTripHeading,
               style: Theme.of(context).textTheme.headlineMedium),
           const SizedBox(height: 20),
           GlassCard(
               child: Column(children: [
             GlassTextField(
                 controller: _destCtrl,
-                hint: 'Destination',
+                hint: l10n.createDestinationLabel,
                 icon: Icons.place_rounded),
             const SizedBox(height: 12),
             GlassTextField(
                 controller: _titleCtrl,
-                hint: 'Trip title',
+                hint: l10n.createTripNameLabel,
                 icon: Icons.drive_file_rename_outline_rounded),
             const SizedBox(height: 12),
             _PickerRow(
@@ -159,24 +167,24 @@ class _EditTripScreenState extends State<EditTripScreen> {
             const SizedBox(height: 12),
             _PickerRow(
                 icon: Icons.people_rounded,
-                label: '$_travelers traveler${_travelers == 1 ? '' : 's'}',
+                label: l10n.tripTravelerCount(_travelers),
                 onTap: _pickTravelers),
             const SizedBox(height: 12),
             GlassTextField(
                 controller: _budgetCtrl,
-                hint: 'Budget (₫)',
+                hint: l10n.createBudgetLabel,
                 icon: Icons.savings_rounded,
                 keyboardType: TextInputType.number),
             const SizedBox(height: 12),
             GlassTextField(
                 controller: _notesCtrl,
-                hint: 'Notes',
+                hint: l10n.createNotesLabel,
                 icon: Icons.notes_rounded),
             const SizedBox(height: 20),
             _saving
                 ? const PremiumLoading()
                 : GlassButton(
-                    text: 'Update trip',
+                    text: l10n.editTripSaveAction,
                     icon: Icons.save_rounded,
                     onPressed: _save),
           ])),
@@ -229,7 +237,7 @@ class _TravelerDialogState extends State<_TravelerDialog> {
   Widget build(BuildContext context) => AlertDialog(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-          title: const Text('Travelers'),
+          title: Text(AppLocalizations.of(context)!.createTravelersLabel),
           content: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
@@ -250,12 +258,12 @@ class _TravelerDialogState extends State<_TravelerDialog> {
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel')),
+                child: Text(AppLocalizations.of(context)!.profileCancel)),
             FilledButton(
                 onPressed: () {
                   widget.onChanged(_count);
                   Navigator.pop(context);
                 },
-                child: const Text('Confirm')),
+                child: Text(AppLocalizations.of(context)!.createConfirmAction)),
           ]);
 }

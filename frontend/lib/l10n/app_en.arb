@@ -227,6 +227,305 @@
   "notificationBudgetMessage": "You have used 62% of the planned demo budget.",
   "notificationYesterday": "Yesterday",
   "notificationBudgetDate": "12 Jul",
+  "exploreHeroTitle": "Where will you wander?",
+  "exploreHeroSubtitle": "Curated places are local preview content. Personal trips stay local until a backend exists.",
+  "exploreSearchHint": "Search cities, places, cafes, hotels...",
+  "exploreSearchActionSemantic": "Open search results",
+  "exploreFiltersSemantic": "Open search filters",
+  "exploreNoUpcomingTitle": "No upcoming trip",
+  "exploreNoUpcomingMessage": "Create a local demo trip when you are ready to plan.",
+  "exploreCategoriesTitle": "Explore by category",
+  "exploreRecommendedTitle": "Recommended places",
+  "exploreSeeAll": "See all",
+  "exploreNoPlacesTitle": "No places available",
+  "exploreNoPlacesMessage": "Curated Explore content will appear here when local data is available.",
+  "exploreUpcomingTripSemantic": "Upcoming trip summary",
+  "explorePlanningProgress": "{count, plural, =0{No activities planned yet} =1{1 planned activity} other{{count} planned activities}}",
+  "@explorePlanningProgress": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "searchTitle": "Explore places",
+  "searchHint": "Search hotels, food, cafes, attractions...",
+  "searchClearSemantic": "Clear search",
+  "searchModeSemantic": "Search presentation mode",
+  "searchListMode": "List",
+  "searchMapMode": "Map",
+  "searchResultCount": "{count, plural, =0{No places} =1{1 place} other{{count} places}}",
+  "@searchResultCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "searchClearFilters": "Clear filters",
+  "searchEmptyTitle": "No places found",
+  "searchEmptyMessage": "Try a different keyword, category, or tag.",
+  "searchFiltersTitle": "Filters",
+  "searchSortTitle": "Sort",
+  "searchSortRelevance": "Relevant",
+  "searchSortRating": "Rating",
+  "searchSortDuration": "Duration",
+  "searchTagsTitle": "Tags",
+  "searchApplyFilters": "Apply filters",
+  "searchBackToList": "Back to list",
+  "mapFallbackSemantic": "Non-live map preview",
+  "mapUnavailableTitle": "Map provider not connected",
+  "mapUnavailableMessage": "Live maps, routing, traffic, and exact coordinates are not connected yet. This preview is schematic only.",
+  "placeReviewCount": "{count, plural, =1{1 review} other{{count} reviews}}",
+  "@placeReviewCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "placeAddToTrip": "Add to trip",
+  "placeAddToTripSemantic": "Add {place} to a trip",
+  "@placeAddToTripSemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "placeHighlightsTitle": "Highlights",
+  "placeUsefulInfoTitle": "Useful information",
+  "placeDurationMinutes": "{minutes} min",
+  "@placeDurationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "placeDurationHours": "{hours} h",
+  "@placeDurationHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "placeDurationHoursMinutes": "{hours} h {minutes} min",
+  "@placeDurationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesDemoLocalOnly": "Saved places are local to this demo session.",
+  "tripsTitle": "My trips",
+  "tripsSubtitle": "Smart local sections derived from trip dates.",
+  "tripsCreateAction": "Create a trip",
+  "tripsCreateSemantic": "Create a new trip",
+  "tripsEmptyTitle": "No trips yet",
+  "tripsEmptyMessage": "Create your first local trip to get started.",
+  "tripsRealUnavailableMessage": "Personal trip history is not connected to a backend repository yet.",
+  "tripsOngoing": "Ongoing",
+  "tripsUpcoming": "Upcoming",
+  "tripsPast": "Past",
+  "tripsOngoingEmpty": "No trips are happening today.",
+  "tripsUpcomingEmpty": "No upcoming trips yet.",
+  "tripsPastEmpty": "No completed trips yet.",
+  "tripCardSemantic": "Trip card for {trip}",
+  "@tripCardSemantic": {
+    "placeholders": {
+      "trip": {
+        "type": "String"
+      }
+    }
+  },
+  "tripActionsSemantic": "Actions for {trip}",
+  "@tripActionsSemantic": {
+    "placeholders": {
+      "trip": {
+        "type": "String"
+      }
+    }
+  },
+  "tripEditAction": "Edit trip",
+  "tripDeleteAction": "Delete trip",
+  "tripDeleteConfirmTitle": "Delete trip?",
+  "tripDeleteConfirmMessage": "Delete \"{trip}\"? This also removes its timeline items and expenses.",
+  "@tripDeleteConfirmMessage": {
+    "placeholders": {
+      "trip": {
+        "type": "String"
+      }
+    }
+  },
+  "tripDeletedMessage": "Trip deleted.",
+  "tripCreatedMessage": "Trip created locally.",
+  "tripDayCount": "{days, plural, =1{1 day} other{{days} days}}",
+  "@tripDayCount": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "tripTravelerCount": "{travelers, plural, =1{1 traveler} other{{travelers} travelers}}",
+  "@tripTravelerCount": {
+    "placeholders": {
+      "travelers": {
+        "type": "int"
+      }
+    }
+  },
+  "tripDateTravelerMeta": "{start} - {end} · {travelers, plural, =1{1 traveler} other{{travelers} travelers}}",
+  "@tripDateTravelerMeta": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      },
+      "travelers": {
+        "type": "int"
+      }
+    }
+  },
+  "tripDaysAway": "{days, plural, =0{Starts today} =1{Starts tomorrow} other{Starts in {days} days}}",
+  "@tripDaysAway": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "createTripTitle": "New trip",
+  "createBackStep": "Back to previous step",
+  "createCloseSemantic": "Close create trip flow",
+  "createStepLabel": "Step {step}/3",
+  "@createStepLabel": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
+  "createContinueAction": "Continue",
+  "createContinueSemantic": "Continue to next create trip step",
+  "createSubmitAction": "Create trip",
+  "createSubmitSemantic": "Create this trip",
+  "createDestinationRequired": "Please enter a destination.",
+  "createDatesRequired": "Enter start and end dates in dd/mm/yyyy format.",
+  "createInvalidDateRange": "End date cannot be before start date.",
+  "createInvalidTravelers": "Traveler count must be between 1 and 20.",
+  "createDiscardTitle": "Discard trip draft?",
+  "createDiscardMessage": "Your entered trip details will be lost.",
+  "createDiscardAction": "Discard",
+  "createDestinationTitle": "Where do you want to go?",
+  "createDestinationSubtitle": "Choose a supported destination from local data or type your own.",
+  "createDestinationLabel": "Destination",
+  "createTripNameLabel": "Trip name",
+  "createDestinationSuggestions": "Suggested destinations",
+  "createDatesTitle": "When will you go?",
+  "createDatesSubtitle": "Enter dates and traveler count for this local trip.",
+  "createStartDateLabel": "Start date",
+  "createEndDateLabel": "End date",
+  "createDateFormatHint": "Use dd/mm/yyyy",
+  "createTravelersLabel": "Travelers",
+  "createDecreaseTravelers": "Decrease travelers",
+  "createIncreaseTravelers": "Increase travelers",
+  "createBudgetLabel": "Budget (VND)",
+  "createPersonalizationTitle": "Shape the trip your way",
+  "createPersonalizationSubtitle": "These preferences are local draft presentation only.",
+  "createPreferencesTitle": "Preferences",
+  "createPreferenceFood": "Food",
+  "createPreferenceCulture": "Culture",
+  "createPreferenceNature": "Nature",
+  "createPreferenceRelax": "Relax",
+  "createPreferenceAdventure": "Adventure",
+  "createPreferenceShopping": "Shopping",
+  "createPaceTitle": "Pace",
+  "createPaceSlow": "Slow",
+  "createPaceBalanced": "Balanced",
+  "createPacePacked": "Packed",
+  "createBudgetStyleTitle": "Budget style",
+  "createBudgetSaving": "Saving",
+  "createBudgetComfort": "Comfort",
+  "createBudgetPremium": "Premium",
+  "createNotesLabel": "Notes",
+  "createPersonalizationLocalOnly": "Preferences are kept in this draft only and are not sent to any backend.",
+  "createReviewTitle": "Review",
+  "createReviewSummary": "{title} · {destination} · {start} to {end} · {travelers, plural, =1{1 traveler} other{{travelers} travelers}}",
+  "@createReviewSummary": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "destination": {
+        "type": "String"
+      },
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      },
+      "travelers": {
+        "type": "int"
+      }
+    }
+  },
+  "createConfirmAction": "Confirm",
+  "editTripTitle": "Edit {trip}",
+  "@editTripTitle": {
+    "placeholders": {
+      "trip": {
+        "type": "String"
+      }
+    }
+  },
+  "editTripHeading": "Update your trip",
+  "editTripSaveAction": "Update trip",
+  "editTripUpdatedMessage": "Trip updated.",
+  "editMoveActivitiesTitle": "Move activities?",
+  "editMoveActivitiesMessage": "This shorter trip has {days, plural, =1{1 day} other{{days} days}}. Activities from removed days will move to the new last day.",
+  "@editMoveActivitiesMessage": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "editMoveActivitiesAction": "Move to last day",
+  "tripOverviewProgressTitle": "Trip progress",
+  "tripOverviewProgressValue": "{percent}% complete",
+  "@tripOverviewProgressValue": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "tripOverviewTimelineAction": "Timeline",
+  "tripOverviewExpensesAction": "Expenses",
+  "tripOverviewActivitiesMetric": "Activities",
+  "tripOverviewSpentMetric": "Spent",
+  "tripOverviewBudgetMetric": "Budget",
+  "tripOverviewNextTitle": "Next",
+  "tripOverviewNoActivitiesTitle": "No activities yet",
+  "tripOverviewNoActivitiesMessage": "Open the existing timeline to add activities.",
+  "tripOverviewDayLabel": "Day {day}",
+  "@tripOverviewDayLabel": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
   "commonBackSemantic": "Go back",
   "demoModeLabel": "Demo Mode"
 }

@@ -208,6 +208,9 @@ void main() {
       AppScope(
         notifier: app,
         child: MaterialApp(
+          theme: AppTheme.light(),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Builder(
             builder: (context) => Scaffold(
               body: Center(
