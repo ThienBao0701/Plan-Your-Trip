@@ -591,6 +591,291 @@ class MockData {
         isFeatured: false),
   ];
 
+  static final travelCreditAccount = TravelCreditAccount(
+    id: 'tc-demo-account',
+    userId: 'demo-user',
+    balanceMinor: 750000,
+    currency: 'VND',
+    createdAt: DateTime(2026, 1, 3),
+    updatedAt: DateTime(2026, 7, 16),
+  );
+
+  static final travelCreditTransactions = <TravelCreditTransaction>[
+    TravelCreditTransaction(
+      id: 'tc-txn-1',
+      accountId: 'tc-demo-account',
+      transactionType: TravelCreditTransactionType.promotion,
+      amountMinor: 500000,
+      balanceBeforeMinor: 0,
+      balanceAfterMinor: 500000,
+      description: 'Summer campaign credit',
+      referenceType: 'PROMOTION',
+      referenceId: 'SUMMER26',
+      expiresAt: DateTime(2026, 12, 31),
+      createdAt: DateTime(2026, 6, 1),
+    ),
+    TravelCreditTransaction(
+      id: 'tc-txn-2',
+      accountId: 'tc-demo-account',
+      transactionType: TravelCreditTransactionType.refundCredit,
+      amountMinor: 350000,
+      balanceBeforeMinor: 500000,
+      balanceAfterMinor: 850000,
+      description: 'Local demo refund credit',
+      referenceType: 'BOOKING',
+      referenceId: 'DEMO-REFUND',
+      createdAt: DateTime(2026, 7, 2),
+    ),
+    TravelCreditTransaction(
+      id: 'tc-txn-3',
+      accountId: 'tc-demo-account',
+      transactionType: TravelCreditTransactionType.redemption,
+      amountMinor: 100000,
+      balanceBeforeMinor: 850000,
+      balanceAfterMinor: 750000,
+      description: 'Demo booking preview redemption',
+      referenceType: 'BOOKING_PREVIEW',
+      referenceId: 'DEMO-QUOTE',
+      createdAt: DateTime(2026, 7, 8),
+    ),
+  ];
+
+  static final loyaltyAccount = LoyaltyAccount(
+    id: 'loyalty-demo-account',
+    userId: 'demo-user',
+    currentBalance: 4200,
+    lifetimePointsEarned: 9800,
+    createdAt: DateTime(2026, 1, 3),
+    updatedAt: DateTime(2026, 7, 16),
+  );
+
+  static final loyaltyTransactions = <LoyaltyTransaction>[
+    LoyaltyTransaction(
+      transactionType: LoyaltyTransactionType.earnBooking,
+      points: 2600,
+      balanceBefore: 1200,
+      balanceAfter: 3800,
+      description: 'Earned from a completed hotel demo booking',
+      referenceType: 'BOOKING',
+      referenceId: 'DEMO-BOOKING-1',
+      createdAt: DateTime(2026, 5, 12),
+    ),
+    LoyaltyTransaction(
+      transactionType: LoyaltyTransactionType.earnReview,
+      points: 400,
+      balanceBefore: 3800,
+      balanceAfter: 4200,
+      description: 'Review contribution points',
+      referenceType: 'REVIEW',
+      referenceId: 'DEMO-REVIEW-1',
+      createdAt: DateTime(2026, 6, 4),
+    ),
+    LoyaltyTransaction(
+      transactionType: LoyaltyTransactionType.redemptionDebit,
+      points: 800,
+      balanceBefore: 5000,
+      balanceAfter: 4200,
+      description: 'Demo redemption preview',
+      referenceType: 'BOOKING_PREVIEW',
+      referenceId: 'DEMO-QUOTE',
+      createdAt: DateTime(2026, 7, 5),
+    ),
+  ];
+
+  static final membershipAccount = MembershipAccount(
+    currentTier: MembershipTier.silver,
+    effectiveTier: MembershipTier.silver,
+    validUntil: DateTime(2026, 12, 31),
+  );
+
+  static final membershipProgress = MembershipProgress(
+    currentTier: MembershipTier.silver,
+    effectiveTier: MembershipTier.silver,
+    lifetimePointsEarned: 9800,
+    completedBookings: 4,
+    nextTier: MembershipTier.gold,
+    pointsRequiredForNextTier: 12000,
+    bookingsRequiredForNextTier: 6,
+    progressPercentage: 68,
+    validUntil: DateTime(2026, 12, 31),
+  );
+
+  static final membershipBenefits = <MembershipBenefit>[
+    const MembershipBenefit(
+      id: 'benefit-points',
+      tier: MembershipTier.silver,
+      type: MembershipBenefitType.pointsMultiplier,
+      title: '1.25x points preview',
+      description: 'Metadata for future booking rewards calculation.',
+      conditions: 'Displayed only; not applied to UI-6 quotes.',
+    ),
+    const MembershipBenefit(
+      id: 'benefit-coupons',
+      tier: MembershipTier.silver,
+      type: MembershipBenefitType.memberOnlyCoupons,
+      title: 'Member-only coupon access',
+      description: 'Shows eligible coupon metadata when connected later.',
+      conditions: 'Does not claim an operational discount.',
+    ),
+    const MembershipBenefit(
+      id: 'benefit-support',
+      tier: MembershipTier.gold,
+      type: MembershipBenefitType.prioritySupport,
+      title: 'Priority support metadata',
+      description: 'Future support routing benefit description.',
+      conditions: 'No support queue is connected in this UI phase.',
+    ),
+  ];
+
+  static final membershipHistory = <MembershipHistoryItem>[
+    MembershipHistoryItem(
+      tier: MembershipTier.bronze,
+      changedAt: DateTime(2026, 1, 3),
+      description: 'Demo profile created',
+    ),
+    MembershipHistoryItem(
+      tier: MembershipTier.silver,
+      changedAt: DateTime(2026, 5, 12),
+      description: 'Qualified through demo booking activity',
+    ),
+  ];
+
+  static final coupons = <CustomerCoupon>[
+    CustomerCoupon(
+      id: 'coupon-1',
+      code: 'STAY15',
+      name: 'Stay 15%',
+      description: 'Percentage coupon metadata for hotel stays.',
+      discountType: CouponDiscountType.percentage,
+      discountValue: 15,
+      maximumDiscountMinor: 500000,
+      minimumSpendMinor: 2000000,
+      currency: 'VND',
+      validFrom: DateTime(2026, 6, 1),
+      validUntil: DateTime(2026, 12, 31),
+      targetType: CouponTargetType.hotel,
+      minimumStay: 2,
+      status: 'CLAIMED',
+      effectiveStatus: 'ACTIVE',
+      claimedAt: DateTime(2026, 6, 10),
+      expiresAt: DateTime(2026, 12, 31),
+      minimumMembershipTier: MembershipTier.silver,
+      eligibilityReason: 'Eligible for demo hotel previews only.',
+    ),
+    CustomerCoupon(
+      id: 'coupon-2',
+      code: 'LOCAL300',
+      name: 'Local fixed credit',
+      description: 'Fixed-amount coupon metadata.',
+      discountType: CouponDiscountType.fixedAmount,
+      discountValue: 300000,
+      minimumSpendMinor: 1500000,
+      currency: 'VND',
+      validFrom: DateTime(2026, 6, 15),
+      validUntil: DateTime(2026, 10, 31),
+      targetType: CouponTargetType.all,
+      status: 'AVAILABLE',
+      effectiveStatus: 'AVAILABLE',
+      expiresAt: DateTime(2026, 10, 31),
+      eligibilityReason: 'Claim locally with demo code LOCAL300.',
+    ),
+    CustomerCoupon(
+      id: 'coupon-3',
+      code: 'USED10',
+      name: 'Used demo coupon',
+      description: 'Used coupons are shown as history only.',
+      discountType: CouponDiscountType.percentage,
+      discountValue: 10,
+      validFrom: DateTime(2026, 1, 1),
+      validUntil: DateTime(2026, 4, 30),
+      targetType: CouponTargetType.room,
+      status: 'USED',
+      effectiveStatus: 'USED',
+      claimedAt: DateTime(2026, 2, 1),
+      usedAt: DateTime(2026, 3, 2),
+      associatedBookingId: 'DEMO-OLD',
+    ),
+  ];
+
+  static final referralSummary = ReferralSummary(
+    code: 'PYTDEMO',
+    successfulReferrals: 2,
+    pendingReferrals: 1,
+    createdAt: DateTime(2026, 1, 3),
+  );
+
+  static final referralHistory = <ReferralHistoryItem>[
+    ReferralHistoryItem(
+      role: ReferralRole.inviter,
+      campaignCode: 'SPRING26',
+      status: ReferralStatus.rewarded,
+      usedAt: DateTime(2026, 4, 2),
+      qualifiedAt: DateTime(2026, 4, 22),
+      qualifyingBookingId: 'DEMO-REF-1',
+      rewardedAt: DateTime(2026, 4, 23),
+    ),
+    ReferralHistoryItem(
+      role: ReferralRole.inviter,
+      campaignCode: 'SUMMER26',
+      status: ReferralStatus.used,
+      usedAt: DateTime(2026, 7, 1),
+    ),
+  ];
+
+  static final giftCards = <GiftCard>[
+    GiftCard(
+      id: 'gift-1',
+      maskedCode: 'PYT-****-2048',
+      productName: 'Plan Your Trip Gift Card',
+      originalAmountMinor: 1000000,
+      currentBalanceMinor: 650000,
+      currency: 'VND',
+      status: GiftCardStatus.partiallyRedeemed,
+      effectiveStatus: GiftCardStatus.partiallyRedeemed,
+      issuedAt: DateTime(2026, 2, 14),
+      activatedAt: DateTime(2026, 2, 15),
+      expiresAt: DateTime(2027, 2, 14),
+      personalMessage: 'For a future weekend escape.',
+      purchaserSummary: 'Demo sender',
+      recipientSummary: 'Demo Traveler',
+      transactions: [
+        GiftCardTransaction(
+          id: 'gift-txn-1',
+          transactionType: GiftCardTransactionType.activation,
+          amountMinor: 1000000,
+          balanceBeforeMinor: 0,
+          balanceAfterMinor: 1000000,
+          description: 'Demo card activation',
+          createdAt: DateTime(2026, 2, 15),
+        ),
+        GiftCardTransaction(
+          id: 'gift-txn-2',
+          transactionType: GiftCardTransactionType.redemption,
+          amountMinor: 350000,
+          balanceBeforeMinor: 1000000,
+          balanceAfterMinor: 650000,
+          description: 'Read-only booking preview redemption',
+          createdAt: DateTime(2026, 6, 8),
+        ),
+      ],
+    ),
+    GiftCard(
+      id: 'gift-2',
+      maskedCode: 'PYT-****-7711',
+      productName: 'Ocean Glass Travel Gift',
+      originalAmountMinor: 500000,
+      currentBalanceMinor: 500000,
+      currency: 'VND',
+      status: GiftCardStatus.issued,
+      effectiveStatus: GiftCardStatus.issued,
+      issuedAt: DateTime(2026, 7, 1),
+      expiresAt: DateTime(2027, 7, 1),
+      personalMessage: 'Claimed locally in demo mode.',
+      purchaserSummary: 'Demo campaign',
+      recipientSummary: 'Demo Traveler',
+    ),
+  ];
+
   static final trips = <Trip>[
     Trip(
         id: 1,

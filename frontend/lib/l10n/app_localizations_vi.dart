@@ -2110,6 +2110,523 @@ class AppLocalizationsVi extends AppLocalizations {
   String get bookingStatusNoShow => 'Không đến';
 
   @override
+  String get rewardsTitle => 'Ưu đãi & quyền lợi';
+
+  @override
+  String get rewardsDemoSubtitle =>
+      'Ưu đãi demo cục bộ để xem trước tín dụng, điểm, mã giảm giá, giới thiệu và thẻ quà tặng.';
+
+  @override
+  String get rewardsRealUnavailableMessage =>
+      'Endpoint ưu đãi chưa được kết nối cho tài khoản thật.';
+
+  @override
+  String get rewardsRealEmptyTitle => 'Chưa kết nối ưu đãi';
+
+  @override
+  String get rewardsNotConnected => 'Chưa kết nối';
+
+  @override
+  String rewardsCountValue(int count) {
+    return '$count mục';
+  }
+
+  @override
+  String get rewardsHistoryEmptyTitle => 'Chưa có lịch sử';
+
+  @override
+  String get rewardsHistoryEmptyMessage =>
+      'Lịch sử ưu đãi sẽ xuất hiện khi có dữ liệu.';
+
+  @override
+  String get rewardsActionUnavailable =>
+      'Hành động ưu đãi này chưa được kết nối cho tài khoản thật.';
+
+  @override
+  String get rewardsCodeBlank => 'Hãy nhập mã trước.';
+
+  @override
+  String get rewardsCodeDuplicate => 'Mã này đã được dùng hoặc đã được nhận.';
+
+  @override
+  String get rewardsCodeRejected => 'Mã demo này không đủ điều kiện.';
+
+  @override
+  String rewardsExpiresOn(String date) {
+    return 'Hết hạn $date';
+  }
+
+  @override
+  String get travelCreditsTitle => 'Tín dụng du lịch';
+
+  @override
+  String get travelCreditsSubtitle =>
+      'Tín dụng khuyến mãi dạng tiền, tách biệt với ví giấy tờ du lịch.';
+
+  @override
+  String get travelCreditsSemantic => 'Mở Tín dụng du lịch';
+
+  @override
+  String get travelCreditsBalance => 'Tín dụng khả dụng';
+
+  @override
+  String get travelCreditsBalanceSemantic => 'Số dư tín dụng du lịch';
+
+  @override
+  String get travelCreditsLocalOnly =>
+      'Tín dụng demo là dữ liệu xem trước cục bộ và không đồng bộ.';
+
+  @override
+  String get travelCreditsNoCashOut =>
+      'Rút tiền, chuyển khoản và chuyển nhượng được cố ý tắt.';
+
+  @override
+  String get travelCreditsTransactions => 'Giao dịch tín dụng';
+
+  @override
+  String get creditTxnGrant => 'Cấp tín dụng';
+
+  @override
+  String get creditTxnPromotion => 'Khuyến mãi';
+
+  @override
+  String get creditTxnRefund => 'Hoàn bằng tín dụng';
+
+  @override
+  String get creditTxnAdjustment => 'Điều chỉnh';
+
+  @override
+  String get creditTxnRedemption => 'Sử dụng';
+
+  @override
+  String get creditTxnExpiration => 'Hết hạn';
+
+  @override
+  String get creditTxnReversal => 'Hoàn tác';
+
+  @override
+  String get loyaltyTitle => 'Điểm thành viên';
+
+  @override
+  String get loyaltySubtitle =>
+      'Số dư điểm nguyên và lịch sử giao dịch bất biến.';
+
+  @override
+  String get loyaltySemantic => 'Mở Điểm thành viên';
+
+  @override
+  String get loyaltyBalanceSemantic => 'Số dư điểm thành viên';
+
+  @override
+  String get loyaltyCurrentBalance => 'Số dư hiện tại';
+
+  @override
+  String get loyaltyLifetimeEarned => 'Tổng điểm đã kiếm';
+
+  @override
+  String loyaltyPointsValue(int points) {
+    return '$points điểm';
+  }
+
+  @override
+  String get pointsUnit => 'điểm';
+
+  @override
+  String get loyaltyNoDirectRedeem =>
+      'Điểm không phải tiền và đổi điểm trực tiếp chưa được kết nối trong UI-7.';
+
+  @override
+  String get loyaltyTransactions => 'Giao dịch điểm';
+
+  @override
+  String get loyaltyTxnEarnBooking => 'Kiếm từ đặt phòng';
+
+  @override
+  String get loyaltyTxnEarnReview => 'Kiếm từ đánh giá';
+
+  @override
+  String get loyaltyTxnGrant => 'Cấp điểm';
+
+  @override
+  String get loyaltyTxnAdjustment => 'Điều chỉnh';
+
+  @override
+  String get loyaltyTxnReversal => 'Hoàn tác';
+
+  @override
+  String get loyaltyTxnRedemptionDebit => 'Trừ điểm đổi thưởng';
+
+  @override
+  String get loyaltyTxnRedemptionRelease => 'Giải phóng điểm';
+
+  @override
+  String get loyaltyTxnRedemptionRefund => 'Hoàn điểm';
+
+  @override
+  String get membershipTitle => 'Hạng thành viên';
+
+  @override
+  String get membershipSubtitle =>
+      'Tiến độ hạng, metadata quyền lợi và lịch sử hạng.';
+
+  @override
+  String get membershipSemantic => 'Mở Hạng thành viên';
+
+  @override
+  String get membershipRealUnavailable =>
+      'Đăng ký thành viên chưa được kết nối cho tài khoản thật.';
+
+  @override
+  String get membershipTierSemantic => 'Hạng và tiến độ thành viên';
+
+  @override
+  String get membershipActiveStatus => 'Đang hoạt động';
+
+  @override
+  String get membershipPreviewStatus => 'Xem trước';
+
+  @override
+  String get membershipExpiredStatus => 'Hết hạn';
+
+  @override
+  String get membershipActiveMessage =>
+      'Hạng thành viên demo này đang hoạt động cục bộ.';
+
+  @override
+  String get membershipPreviewMessage =>
+      'Xem trước quyền lợi trước khi đăng ký demo.';
+
+  @override
+  String membershipProgressSemantic(int percent) {
+    return 'Tiến độ hạng thành viên $percent phần trăm';
+  }
+
+  @override
+  String get membershipHighestTier =>
+      'Đã đạt hạng cao nhất. Không hiển thị hạng kế tiếp giả.';
+
+  @override
+  String membershipNextTier(String tier) {
+    return 'Hạng tiếp theo: $tier';
+  }
+
+  @override
+  String get membershipEnrollAction => 'Đăng ký cục bộ';
+
+  @override
+  String get membershipEnrolledAction => 'Đã đăng ký cục bộ';
+
+  @override
+  String get membershipEnrollSemantic => 'Đăng ký hạng thành viên demo cục bộ';
+
+  @override
+  String get membershipEnrollSuccess => 'Đã đăng ký thành viên demo cục bộ.';
+
+  @override
+  String get membershipBenefitsTitle => 'Metadata quyền lợi';
+
+  @override
+  String get membershipHistoryTitle => 'Lịch sử hạng';
+
+  @override
+  String get membershipTierBronze => 'Đồng';
+
+  @override
+  String get membershipTierSilver => 'Bạc';
+
+  @override
+  String get membershipTierGold => 'Vàng';
+
+  @override
+  String get membershipTierPlatinum => 'Bạch kim';
+
+  @override
+  String get membershipTierDiamond => 'Kim cương';
+
+  @override
+  String get benefitPointsMultiplier => 'Hệ số điểm';
+
+  @override
+  String get benefitMemberCoupons => 'Mã chỉ dành cho thành viên';
+
+  @override
+  String get benefitPrioritySupport => 'Hỗ trợ ưu tiên';
+
+  @override
+  String get benefitEarlyAccess => 'Truy cập sớm';
+
+  @override
+  String get benefitLateCheckout => 'Trả phòng muộn';
+
+  @override
+  String get benefitEarlyCheckin => 'Nhận phòng sớm';
+
+  @override
+  String get benefitRoomUpgrade => 'Nâng hạng phòng';
+
+  @override
+  String get benefitFreeBreakfast => 'Bữa sáng miễn phí';
+
+  @override
+  String get benefitAirportTransfer => 'Đưa đón sân bay';
+
+  @override
+  String get benefitCustom => 'Quyền lợi tùy chỉnh';
+
+  @override
+  String get couponsTitle => 'Mã giảm giá';
+
+  @override
+  String get couponsSubtitle =>
+      'Mã đã nhận và xem trước điều kiện dạng chỉ đọc.';
+
+  @override
+  String get couponsSemantic => 'Mở Mã giảm giá';
+
+  @override
+  String get couponsRealUnavailable =>
+      'Nhận mã giảm giá chưa được kết nối cho tài khoản thật.';
+
+  @override
+  String get couponClaimTitle => 'Nhận mã demo';
+
+  @override
+  String get couponCodeLabel => 'Mã giảm giá';
+
+  @override
+  String get couponClaimHelper =>
+      'Dùng LOCAL300 để nhận demo cục bộ. Mã không được áp vào đặt phòng.';
+
+  @override
+  String get couponClaimAction => 'Nhận mã';
+
+  @override
+  String get couponClaimSemantic => 'Nhận mã giảm giá demo cục bộ';
+
+  @override
+  String get couponClaimSuccess => 'Đã nhận mã demo cục bộ.';
+
+  @override
+  String get couponsEmptyTitle => 'Chưa có mã';
+
+  @override
+  String get couponsEmptyMessage =>
+      'Mã giảm giá sẽ xuất hiện sau khi nhận hoặc kết nối.';
+
+  @override
+  String couponCardSemantic(String code) {
+    return 'Mã giảm giá $code';
+  }
+
+  @override
+  String get couponPreviewReadOnly =>
+      'Xem trước chỉ đọc và không đánh dấu mã là đã dùng.';
+
+  @override
+  String couponPercentageValue(int percent) {
+    return 'Giảm $percent%';
+  }
+
+  @override
+  String couponFixedValue(String amount) {
+    return 'Giảm $amount';
+  }
+
+  @override
+  String get couponAmountUnavailable => 'Chưa có số tiền';
+
+  @override
+  String get couponTargetAll => 'Tất cả';
+
+  @override
+  String get couponTargetHotel => 'Khách sạn';
+
+  @override
+  String get couponTargetRoom => 'Phòng';
+
+  @override
+  String get couponTargetPlaceType => 'Loại địa điểm';
+
+  @override
+  String get referralTitle => 'Giới thiệu';
+
+  @override
+  String get referralSubtitle =>
+      'Mã giới thiệu, thống kê và dùng mã demo cục bộ.';
+
+  @override
+  String get referralSemantic => 'Mở Giới thiệu';
+
+  @override
+  String get referralRealUnavailable =>
+      'Hành động giới thiệu chưa được kết nối cho tài khoản thật.';
+
+  @override
+  String get referralCodeSemantic => 'Mã giới thiệu';
+
+  @override
+  String get referralYourCode => 'Mã giới thiệu của bạn';
+
+  @override
+  String referralStats(int successful, int pending) {
+    return '$successful thành công · $pending đang chờ';
+  }
+
+  @override
+  String get referralCopyAction => 'Sao chép mã';
+
+  @override
+  String get referralCopiedAction => 'Đã sao chép';
+
+  @override
+  String get referralCopySemantic => 'Sao chép mã giới thiệu';
+
+  @override
+  String get referralUseCodeTitle => 'Dùng mã giới thiệu';
+
+  @override
+  String get referralCodeLabel => 'Mã giới thiệu';
+
+  @override
+  String get referralUseCodeHelper =>
+      'Dùng mã chỉ tạo giới thiệu cục bộ đang chờ. Không cấp thưởng ngay.';
+
+  @override
+  String get referralUseCodeAction => 'Dùng mã';
+
+  @override
+  String get referralUseCodeSemantic => 'Dùng mã giới thiệu demo cục bộ';
+
+  @override
+  String get referralUseSuccess =>
+      'Đã ghi nhận mã giới thiệu cục bộ ở trạng thái chờ.';
+
+  @override
+  String get referralOwnCodeRejected =>
+      'Bạn không thể dùng mã giới thiệu của chính mình.';
+
+  @override
+  String get referralHistoryTitle => 'Lịch sử giới thiệu';
+
+  @override
+  String get referralUsedNoReward =>
+      'USED nghĩa là đang chờ đủ điều kiện; chưa cấp thưởng.';
+
+  @override
+  String get referralRoleInviter => 'Người mời';
+
+  @override
+  String get referralRoleInvitee => 'Người được mời';
+
+  @override
+  String get referralStatusUsed => 'Đã dùng';
+
+  @override
+  String get referralStatusRewarded => 'Đã thưởng';
+
+  @override
+  String get giftCardsTitle => 'Thẻ quà tặng';
+
+  @override
+  String get giftCardsSubtitle =>
+      'Thẻ đã che mã, số dư, chi tiết và xem trước chỉ đọc.';
+
+  @override
+  String get giftCardsSemantic => 'Mở Thẻ quà tặng';
+
+  @override
+  String get giftCardsRealUnavailable =>
+      'Hành động thẻ quà tặng chưa được kết nối cho tài khoản thật.';
+
+  @override
+  String get giftCardClaimTitle => 'Nhận thẻ quà tặng demo';
+
+  @override
+  String get giftCardCodeLabel => 'Mã thẻ quà tặng';
+
+  @override
+  String get giftCardClaimHelper =>
+      'Dùng GIFTDEMO để nhận demo cục bộ. Không có luồng mua hoặc thanh toán.';
+
+  @override
+  String get giftCardClaimAction => 'Nhận thẻ';
+
+  @override
+  String get giftCardClaimSemantic => 'Nhận thẻ quà tặng demo cục bộ';
+
+  @override
+  String get giftCardClaimSuccess => 'Đã nhận thẻ quà tặng demo cục bộ.';
+
+  @override
+  String get giftCardsEmptyTitle => 'Chưa có thẻ quà tặng';
+
+  @override
+  String get giftCardsEmptyMessage =>
+      'Thẻ quà tặng sẽ xuất hiện sau khi nhận hoặc kết nối.';
+
+  @override
+  String giftCardCardSemantic(String code) {
+    return 'Thẻ quà tặng $code';
+  }
+
+  @override
+  String get giftCardBalance => 'Số dư thẻ';
+
+  @override
+  String get giftCardTransactionsTitle => 'Giao dịch thẻ quà tặng';
+
+  @override
+  String get giftCardPreviewAction => 'Chỉ xem trước';
+
+  @override
+  String get giftCardPreviewSemantic =>
+      'Xem trước thẻ quà tặng mà không đổi số dư';
+
+  @override
+  String get giftCardPreviewReadOnly =>
+      'Xem trước thẻ quà tặng chỉ đọc và không đổi số dư.';
+
+  @override
+  String get giftCardActivateAction => 'Kích hoạt cục bộ';
+
+  @override
+  String get giftCardActivateSuccess =>
+      'Đã kích hoạt thẻ quà tặng demo cục bộ.';
+
+  @override
+  String get giftCardStatusIssued => 'Đã phát hành';
+
+  @override
+  String get giftCardStatusActive => 'Đang hoạt động';
+
+  @override
+  String get giftCardStatusPartiallyRedeemed => 'Đã dùng một phần';
+
+  @override
+  String get giftCardStatusFullyRedeemed => 'Đã dùng hết';
+
+  @override
+  String get giftCardStatusExpired => 'Hết hạn';
+
+  @override
+  String get giftCardStatusCancelled => 'Đã hủy';
+
+  @override
+  String get giftCardTxnIssue => 'Phát hành';
+
+  @override
+  String get giftCardTxnActivation => 'Kích hoạt';
+
+  @override
+  String get giftCardTxnRedemption => 'Sử dụng';
+
+  @override
+  String get giftCardTxnRefund => 'Hoàn lại';
+
+  @override
+  String get giftCardTxnExpiry => 'Hết hạn';
+
+  @override
   String get commonBackSemantic => 'Quay lại';
 
   @override

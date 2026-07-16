@@ -3867,6 +3867,936 @@ abstract class AppLocalizations {
   /// **'No-show'**
   String get bookingStatusNoShow;
 
+  /// No description provided for @rewardsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rewards & Benefits'**
+  String get rewardsTitle;
+
+  /// No description provided for @rewardsDemoSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Local demo rewards for previewing credits, points, coupons, referrals, and gift cards.'**
+  String get rewardsDemoSubtitle;
+
+  /// No description provided for @rewardsRealUnavailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Rewards endpoints are not connected yet for real accounts.'**
+  String get rewardsRealUnavailableMessage;
+
+  /// No description provided for @rewardsRealEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rewards not connected'**
+  String get rewardsRealEmptyTitle;
+
+  /// No description provided for @rewardsNotConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Not connected'**
+  String get rewardsNotConnected;
+
+  /// No description provided for @rewardsCountValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} items'**
+  String rewardsCountValue(int count);
+
+  /// No description provided for @rewardsHistoryEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No history'**
+  String get rewardsHistoryEmptyTitle;
+
+  /// No description provided for @rewardsHistoryEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Reward history will appear here when available.'**
+  String get rewardsHistoryEmptyMessage;
+
+  /// No description provided for @rewardsActionUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This reward action is not connected for real accounts.'**
+  String get rewardsActionUnavailable;
+
+  /// No description provided for @rewardsCodeBlank.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a code first.'**
+  String get rewardsCodeBlank;
+
+  /// No description provided for @rewardsCodeDuplicate.
+  ///
+  /// In en, this message translates to:
+  /// **'This code is already used or claimed.'**
+  String get rewardsCodeDuplicate;
+
+  /// No description provided for @rewardsCodeRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'This demo code is not eligible.'**
+  String get rewardsCodeRejected;
+
+  /// No description provided for @rewardsExpiresOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires {date}'**
+  String rewardsExpiresOn(String date);
+
+  /// No description provided for @travelCreditsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Travel Credits'**
+  String get travelCreditsTitle;
+
+  /// No description provided for @travelCreditsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Promotional monetary credit, separate from travel wallet documents.'**
+  String get travelCreditsSubtitle;
+
+  /// No description provided for @travelCreditsSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Travel Credits'**
+  String get travelCreditsSemantic;
+
+  /// No description provided for @travelCreditsBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Available travel credit'**
+  String get travelCreditsBalance;
+
+  /// No description provided for @travelCreditsBalanceSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Travel credit balance'**
+  String get travelCreditsBalanceSemantic;
+
+  /// No description provided for @travelCreditsLocalOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo credits are local preview data and are not synchronized.'**
+  String get travelCreditsLocalOnly;
+
+  /// No description provided for @travelCreditsNoCashOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash-out, withdrawal, and transfer controls are intentionally unavailable.'**
+  String get travelCreditsNoCashOut;
+
+  /// No description provided for @travelCreditsTransactions.
+  ///
+  /// In en, this message translates to:
+  /// **'Credit transactions'**
+  String get travelCreditsTransactions;
+
+  /// No description provided for @creditTxnGrant.
+  ///
+  /// In en, this message translates to:
+  /// **'Grant'**
+  String get creditTxnGrant;
+
+  /// No description provided for @creditTxnPromotion.
+  ///
+  /// In en, this message translates to:
+  /// **'Promotion'**
+  String get creditTxnPromotion;
+
+  /// No description provided for @creditTxnRefund.
+  ///
+  /// In en, this message translates to:
+  /// **'Refund credit'**
+  String get creditTxnRefund;
+
+  /// No description provided for @creditTxnAdjustment.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjustment'**
+  String get creditTxnAdjustment;
+
+  /// No description provided for @creditTxnRedemption.
+  ///
+  /// In en, this message translates to:
+  /// **'Redemption'**
+  String get creditTxnRedemption;
+
+  /// No description provided for @creditTxnExpiration.
+  ///
+  /// In en, this message translates to:
+  /// **'Expiration'**
+  String get creditTxnExpiration;
+
+  /// No description provided for @creditTxnReversal.
+  ///
+  /// In en, this message translates to:
+  /// **'Reversal'**
+  String get creditTxnReversal;
+
+  /// No description provided for @loyaltyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Loyalty Points'**
+  String get loyaltyTitle;
+
+  /// No description provided for @loyaltySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Integer point balance and immutable transaction history.'**
+  String get loyaltySubtitle;
+
+  /// No description provided for @loyaltySemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Loyalty Points'**
+  String get loyaltySemantic;
+
+  /// No description provided for @loyaltyBalanceSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Loyalty point balance'**
+  String get loyaltyBalanceSemantic;
+
+  /// No description provided for @loyaltyCurrentBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Current balance'**
+  String get loyaltyCurrentBalance;
+
+  /// No description provided for @loyaltyLifetimeEarned.
+  ///
+  /// In en, this message translates to:
+  /// **'Lifetime earned'**
+  String get loyaltyLifetimeEarned;
+
+  /// No description provided for @loyaltyPointsValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{points} points'**
+  String loyaltyPointsValue(int points);
+
+  /// No description provided for @pointsUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'points'**
+  String get pointsUnit;
+
+  /// No description provided for @loyaltyNoDirectRedeem.
+  ///
+  /// In en, this message translates to:
+  /// **'Points are not money and direct redemption is not connected in UI-7.'**
+  String get loyaltyNoDirectRedeem;
+
+  /// No description provided for @loyaltyTransactions.
+  ///
+  /// In en, this message translates to:
+  /// **'Point transactions'**
+  String get loyaltyTransactions;
+
+  /// No description provided for @loyaltyTxnEarnBooking.
+  ///
+  /// In en, this message translates to:
+  /// **'Earn from booking'**
+  String get loyaltyTxnEarnBooking;
+
+  /// No description provided for @loyaltyTxnEarnReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Earn from review'**
+  String get loyaltyTxnEarnReview;
+
+  /// No description provided for @loyaltyTxnGrant.
+  ///
+  /// In en, this message translates to:
+  /// **'Grant'**
+  String get loyaltyTxnGrant;
+
+  /// No description provided for @loyaltyTxnAdjustment.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjustment'**
+  String get loyaltyTxnAdjustment;
+
+  /// No description provided for @loyaltyTxnReversal.
+  ///
+  /// In en, this message translates to:
+  /// **'Reversal'**
+  String get loyaltyTxnReversal;
+
+  /// No description provided for @loyaltyTxnRedemptionDebit.
+  ///
+  /// In en, this message translates to:
+  /// **'Redemption debit'**
+  String get loyaltyTxnRedemptionDebit;
+
+  /// No description provided for @loyaltyTxnRedemptionRelease.
+  ///
+  /// In en, this message translates to:
+  /// **'Redemption release'**
+  String get loyaltyTxnRedemptionRelease;
+
+  /// No description provided for @loyaltyTxnRedemptionRefund.
+  ///
+  /// In en, this message translates to:
+  /// **'Redemption refund'**
+  String get loyaltyTxnRedemptionRefund;
+
+  /// No description provided for @membershipTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Membership'**
+  String get membershipTitle;
+
+  /// No description provided for @membershipSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tier progress, benefits metadata, and tier history.'**
+  String get membershipSubtitle;
+
+  /// No description provided for @membershipSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Membership'**
+  String get membershipSemantic;
+
+  /// No description provided for @membershipRealUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Membership enrollment is not connected yet for real accounts.'**
+  String get membershipRealUnavailable;
+
+  /// No description provided for @membershipTierSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Membership tier and progress'**
+  String get membershipTierSemantic;
+
+  /// No description provided for @membershipActiveStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get membershipActiveStatus;
+
+  /// No description provided for @membershipPreviewStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get membershipPreviewStatus;
+
+  /// No description provided for @membershipExpiredStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get membershipExpiredStatus;
+
+  /// No description provided for @membershipActiveMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This demo membership is active locally.'**
+  String get membershipActiveMessage;
+
+  /// No description provided for @membershipPreviewMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview benefits before demo enrollment.'**
+  String get membershipPreviewMessage;
+
+  /// No description provided for @membershipProgressSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Membership progress {percent} percent'**
+  String membershipProgressSemantic(int percent);
+
+  /// No description provided for @membershipHighestTier.
+  ///
+  /// In en, this message translates to:
+  /// **'Highest tier reached. No fictional next tier is shown.'**
+  String get membershipHighestTier;
+
+  /// No description provided for @membershipNextTier.
+  ///
+  /// In en, this message translates to:
+  /// **'Next tier: {tier}'**
+  String membershipNextTier(String tier);
+
+  /// No description provided for @membershipEnrollAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Enroll locally'**
+  String get membershipEnrollAction;
+
+  /// No description provided for @membershipEnrolledAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Enrolled locally'**
+  String get membershipEnrolledAction;
+
+  /// No description provided for @membershipEnrollSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Enroll in local demo membership'**
+  String get membershipEnrollSemantic;
+
+  /// No description provided for @membershipEnrollSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo membership enrolled locally.'**
+  String get membershipEnrollSuccess;
+
+  /// No description provided for @membershipBenefitsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Benefits metadata'**
+  String get membershipBenefitsTitle;
+
+  /// No description provided for @membershipHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tier history'**
+  String get membershipHistoryTitle;
+
+  /// No description provided for @membershipTierBronze.
+  ///
+  /// In en, this message translates to:
+  /// **'Bronze'**
+  String get membershipTierBronze;
+
+  /// No description provided for @membershipTierSilver.
+  ///
+  /// In en, this message translates to:
+  /// **'Silver'**
+  String get membershipTierSilver;
+
+  /// No description provided for @membershipTierGold.
+  ///
+  /// In en, this message translates to:
+  /// **'Gold'**
+  String get membershipTierGold;
+
+  /// No description provided for @membershipTierPlatinum.
+  ///
+  /// In en, this message translates to:
+  /// **'Platinum'**
+  String get membershipTierPlatinum;
+
+  /// No description provided for @membershipTierDiamond.
+  ///
+  /// In en, this message translates to:
+  /// **'Diamond'**
+  String get membershipTierDiamond;
+
+  /// No description provided for @benefitPointsMultiplier.
+  ///
+  /// In en, this message translates to:
+  /// **'Points multiplier'**
+  String get benefitPointsMultiplier;
+
+  /// No description provided for @benefitMemberCoupons.
+  ///
+  /// In en, this message translates to:
+  /// **'Member-only coupons'**
+  String get benefitMemberCoupons;
+
+  /// No description provided for @benefitPrioritySupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Priority support'**
+  String get benefitPrioritySupport;
+
+  /// No description provided for @benefitEarlyAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Early access'**
+  String get benefitEarlyAccess;
+
+  /// No description provided for @benefitLateCheckout.
+  ///
+  /// In en, this message translates to:
+  /// **'Late checkout'**
+  String get benefitLateCheckout;
+
+  /// No description provided for @benefitEarlyCheckin.
+  ///
+  /// In en, this message translates to:
+  /// **'Early check-in'**
+  String get benefitEarlyCheckin;
+
+  /// No description provided for @benefitRoomUpgrade.
+  ///
+  /// In en, this message translates to:
+  /// **'Room upgrade'**
+  String get benefitRoomUpgrade;
+
+  /// No description provided for @benefitFreeBreakfast.
+  ///
+  /// In en, this message translates to:
+  /// **'Free breakfast'**
+  String get benefitFreeBreakfast;
+
+  /// No description provided for @benefitAirportTransfer.
+  ///
+  /// In en, this message translates to:
+  /// **'Airport transfer'**
+  String get benefitAirportTransfer;
+
+  /// No description provided for @benefitCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom benefit'**
+  String get benefitCustom;
+
+  /// No description provided for @couponsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Coupons'**
+  String get couponsTitle;
+
+  /// No description provided for @couponsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Claimed coupons and read-only eligibility previews.'**
+  String get couponsSubtitle;
+
+  /// No description provided for @couponsSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Coupons'**
+  String get couponsSemantic;
+
+  /// No description provided for @couponsRealUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Coupon claiming is not connected yet for real accounts.'**
+  String get couponsRealUnavailable;
+
+  /// No description provided for @couponClaimTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Claim demo coupon'**
+  String get couponClaimTitle;
+
+  /// No description provided for @couponCodeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Coupon code'**
+  String get couponCodeLabel;
+
+  /// No description provided for @couponClaimHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Use LOCAL300 for the local demo claim. Coupons are not applied to bookings.'**
+  String get couponClaimHelper;
+
+  /// No description provided for @couponClaimAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Claim coupon'**
+  String get couponClaimAction;
+
+  /// No description provided for @couponClaimSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Claim local demo coupon'**
+  String get couponClaimSemantic;
+
+  /// No description provided for @couponClaimSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo coupon claimed locally.'**
+  String get couponClaimSuccess;
+
+  /// No description provided for @couponsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No coupons'**
+  String get couponsEmptyTitle;
+
+  /// No description provided for @couponsEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Coupons will appear after they are claimed or connected.'**
+  String get couponsEmptyMessage;
+
+  /// No description provided for @couponCardSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Coupon {code}'**
+  String couponCardSemantic(String code);
+
+  /// No description provided for @couponPreviewReadOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview is read-only and does not mark the coupon used.'**
+  String get couponPreviewReadOnly;
+
+  /// No description provided for @couponPercentageValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% off'**
+  String couponPercentageValue(int percent);
+
+  /// No description provided for @couponFixedValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} off'**
+  String couponFixedValue(String amount);
+
+  /// No description provided for @couponAmountUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount unavailable'**
+  String get couponAmountUnavailable;
+
+  /// No description provided for @couponTargetAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get couponTargetAll;
+
+  /// No description provided for @couponTargetHotel.
+  ///
+  /// In en, this message translates to:
+  /// **'Hotel'**
+  String get couponTargetHotel;
+
+  /// No description provided for @couponTargetRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Room'**
+  String get couponTargetRoom;
+
+  /// No description provided for @couponTargetPlaceType.
+  ///
+  /// In en, this message translates to:
+  /// **'Place type'**
+  String get couponTargetPlaceType;
+
+  /// No description provided for @referralTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Referral'**
+  String get referralTitle;
+
+  /// No description provided for @referralSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Referral code, statistics, and local demo code use.'**
+  String get referralSubtitle;
+
+  /// No description provided for @referralSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Referral'**
+  String get referralSemantic;
+
+  /// No description provided for @referralRealUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Referral actions are not connected yet for real accounts.'**
+  String get referralRealUnavailable;
+
+  /// No description provided for @referralCodeSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Referral code'**
+  String get referralCodeSemantic;
+
+  /// No description provided for @referralYourCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Your referral code'**
+  String get referralYourCode;
+
+  /// No description provided for @referralStats.
+  ///
+  /// In en, this message translates to:
+  /// **'{successful} successful · {pending} pending'**
+  String referralStats(int successful, int pending);
+
+  /// No description provided for @referralCopyAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy code'**
+  String get referralCopyAction;
+
+  /// No description provided for @referralCopiedAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied'**
+  String get referralCopiedAction;
+
+  /// No description provided for @referralCopySemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy referral code'**
+  String get referralCopySemantic;
+
+  /// No description provided for @referralUseCodeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use referral code'**
+  String get referralUseCodeTitle;
+
+  /// No description provided for @referralCodeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Referral code'**
+  String get referralCodeLabel;
+
+  /// No description provided for @referralUseCodeHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Using a code creates a pending local referral only. No reward is granted immediately.'**
+  String get referralUseCodeHelper;
+
+  /// No description provided for @referralUseCodeAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Use code'**
+  String get referralUseCodeAction;
+
+  /// No description provided for @referralUseCodeSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Use local demo referral code'**
+  String get referralUseCodeSemantic;
+
+  /// No description provided for @referralUseSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Referral code recorded locally as pending.'**
+  String get referralUseSuccess;
+
+  /// No description provided for @referralOwnCodeRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'You cannot use your own referral code.'**
+  String get referralOwnCodeRejected;
+
+  /// No description provided for @referralHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Referral history'**
+  String get referralHistoryTitle;
+
+  /// No description provided for @referralUsedNoReward.
+  ///
+  /// In en, this message translates to:
+  /// **'USED means pending qualification; no reward was granted.'**
+  String get referralUsedNoReward;
+
+  /// No description provided for @referralRoleInviter.
+  ///
+  /// In en, this message translates to:
+  /// **'Inviter'**
+  String get referralRoleInviter;
+
+  /// No description provided for @referralRoleInvitee.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitee'**
+  String get referralRoleInvitee;
+
+  /// No description provided for @referralStatusUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'Used'**
+  String get referralStatusUsed;
+
+  /// No description provided for @referralStatusRewarded.
+  ///
+  /// In en, this message translates to:
+  /// **'Rewarded'**
+  String get referralStatusRewarded;
+
+  /// No description provided for @giftCardsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Gift Cards'**
+  String get giftCardsTitle;
+
+  /// No description provided for @giftCardsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Masked cards, balances, details, and read-only previews.'**
+  String get giftCardsSubtitle;
+
+  /// No description provided for @giftCardsSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Gift Cards'**
+  String get giftCardsSemantic;
+
+  /// No description provided for @giftCardsRealUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Gift-card actions are not connected yet for real accounts.'**
+  String get giftCardsRealUnavailable;
+
+  /// No description provided for @giftCardClaimTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Claim demo gift card'**
+  String get giftCardClaimTitle;
+
+  /// No description provided for @giftCardCodeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Gift-card code'**
+  String get giftCardCodeLabel;
+
+  /// No description provided for @giftCardClaimHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Use GIFTDEMO for a local demo claim. No purchase or payment flow exists.'**
+  String get giftCardClaimHelper;
+
+  /// No description provided for @giftCardClaimAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Claim gift card'**
+  String get giftCardClaimAction;
+
+  /// No description provided for @giftCardClaimSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Claim local demo gift card'**
+  String get giftCardClaimSemantic;
+
+  /// No description provided for @giftCardClaimSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo gift card claimed locally.'**
+  String get giftCardClaimSuccess;
+
+  /// No description provided for @giftCardsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No gift cards'**
+  String get giftCardsEmptyTitle;
+
+  /// No description provided for @giftCardsEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Gift cards will appear after they are claimed or connected.'**
+  String get giftCardsEmptyMessage;
+
+  /// No description provided for @giftCardCardSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Gift card {code}'**
+  String giftCardCardSemantic(String code);
+
+  /// No description provided for @giftCardBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Card balance'**
+  String get giftCardBalance;
+
+  /// No description provided for @giftCardTransactionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Gift-card transactions'**
+  String get giftCardTransactionsTitle;
+
+  /// No description provided for @giftCardPreviewAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview only'**
+  String get giftCardPreviewAction;
+
+  /// No description provided for @giftCardPreviewSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview gift card without changing balance'**
+  String get giftCardPreviewSemantic;
+
+  /// No description provided for @giftCardPreviewReadOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Gift-card preview is read-only and does not change balance.'**
+  String get giftCardPreviewReadOnly;
+
+  /// No description provided for @giftCardActivateAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Activate locally'**
+  String get giftCardActivateAction;
+
+  /// No description provided for @giftCardActivateSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo gift card activated locally.'**
+  String get giftCardActivateSuccess;
+
+  /// No description provided for @giftCardStatusIssued.
+  ///
+  /// In en, this message translates to:
+  /// **'Issued'**
+  String get giftCardStatusIssued;
+
+  /// No description provided for @giftCardStatusActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get giftCardStatusActive;
+
+  /// No description provided for @giftCardStatusPartiallyRedeemed.
+  ///
+  /// In en, this message translates to:
+  /// **'Partially redeemed'**
+  String get giftCardStatusPartiallyRedeemed;
+
+  /// No description provided for @giftCardStatusFullyRedeemed.
+  ///
+  /// In en, this message translates to:
+  /// **'Fully redeemed'**
+  String get giftCardStatusFullyRedeemed;
+
+  /// No description provided for @giftCardStatusExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get giftCardStatusExpired;
+
+  /// No description provided for @giftCardStatusCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get giftCardStatusCancelled;
+
+  /// No description provided for @giftCardTxnIssue.
+  ///
+  /// In en, this message translates to:
+  /// **'Issue'**
+  String get giftCardTxnIssue;
+
+  /// No description provided for @giftCardTxnActivation.
+  ///
+  /// In en, this message translates to:
+  /// **'Activation'**
+  String get giftCardTxnActivation;
+
+  /// No description provided for @giftCardTxnRedemption.
+  ///
+  /// In en, this message translates to:
+  /// **'Redemption'**
+  String get giftCardTxnRedemption;
+
+  /// No description provided for @giftCardTxnRefund.
+  ///
+  /// In en, this message translates to:
+  /// **'Refund'**
+  String get giftCardTxnRefund;
+
+  /// No description provided for @giftCardTxnExpiry.
+  ///
+  /// In en, this message translates to:
+  /// **'Expiry'**
+  String get giftCardTxnExpiry;
+
   /// No description provided for @commonBackSemantic.
   ///
   /// In en, this message translates to:

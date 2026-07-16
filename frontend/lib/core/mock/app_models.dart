@@ -587,6 +587,730 @@ class DemoBooking {
   static const Object _unset = Object();
 }
 
+enum RewardActionResult {
+  success,
+  unavailable,
+  blank,
+  duplicate,
+  rejected,
+  ownCode,
+}
+
+enum TravelCreditTransactionType {
+  grant,
+  promotion,
+  refundCredit,
+  adjustment,
+  redemption,
+  expiration,
+  reversal,
+}
+
+extension TravelCreditTransactionTypeData on TravelCreditTransactionType {
+  String get code {
+    switch (this) {
+      case TravelCreditTransactionType.grant:
+        return 'GRANT';
+      case TravelCreditTransactionType.promotion:
+        return 'PROMOTION';
+      case TravelCreditTransactionType.refundCredit:
+        return 'REFUND_CREDIT';
+      case TravelCreditTransactionType.adjustment:
+        return 'ADJUSTMENT';
+      case TravelCreditTransactionType.redemption:
+        return 'REDEMPTION';
+      case TravelCreditTransactionType.expiration:
+        return 'EXPIRATION';
+      case TravelCreditTransactionType.reversal:
+        return 'REVERSAL';
+    }
+  }
+
+  bool get increasesBalance =>
+      this == TravelCreditTransactionType.grant ||
+      this == TravelCreditTransactionType.promotion ||
+      this == TravelCreditTransactionType.refundCredit ||
+      this == TravelCreditTransactionType.reversal;
+}
+
+class TravelCreditAccount {
+  final String id;
+  final String userId;
+  final int balanceMinor;
+  final String currency;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  const TravelCreditAccount({
+    required this.id,
+    required this.userId,
+    required this.balanceMinor,
+    required this.currency,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+}
+
+class TravelCreditTransaction {
+  final String id;
+  final String accountId;
+  final TravelCreditTransactionType transactionType;
+  final int amountMinor;
+  final int balanceBeforeMinor;
+  final int balanceAfterMinor;
+  final String description;
+  final String? referenceType;
+  final String? referenceId;
+  final DateTime? expiresAt;
+  final DateTime createdAt;
+
+  const TravelCreditTransaction({
+    required this.id,
+    required this.accountId,
+    required this.transactionType,
+    required this.amountMinor,
+    required this.balanceBeforeMinor,
+    required this.balanceAfterMinor,
+    required this.description,
+    this.referenceType,
+    this.referenceId,
+    this.expiresAt,
+    required this.createdAt,
+  });
+}
+
+enum LoyaltyTransactionType {
+  earnBooking,
+  earnReview,
+  grant,
+  adjustment,
+  reversal,
+  redemptionDebit,
+  redemptionRelease,
+  redemptionRefund,
+}
+
+extension LoyaltyTransactionTypeData on LoyaltyTransactionType {
+  String get code {
+    switch (this) {
+      case LoyaltyTransactionType.earnBooking:
+        return 'EARN_BOOKING';
+      case LoyaltyTransactionType.earnReview:
+        return 'EARN_REVIEW';
+      case LoyaltyTransactionType.grant:
+        return 'GRANT';
+      case LoyaltyTransactionType.adjustment:
+        return 'ADJUSTMENT';
+      case LoyaltyTransactionType.reversal:
+        return 'REVERSAL';
+      case LoyaltyTransactionType.redemptionDebit:
+        return 'REDEMPTION_DEBIT';
+      case LoyaltyTransactionType.redemptionRelease:
+        return 'REDEMPTION_RELEASE';
+      case LoyaltyTransactionType.redemptionRefund:
+        return 'REDEMPTION_REFUND';
+    }
+  }
+
+  bool? get knownIncrease {
+    switch (this) {
+      case LoyaltyTransactionType.earnBooking:
+      case LoyaltyTransactionType.earnReview:
+      case LoyaltyTransactionType.grant:
+      case LoyaltyTransactionType.redemptionRelease:
+      case LoyaltyTransactionType.redemptionRefund:
+        return true;
+      case LoyaltyTransactionType.redemptionDebit:
+        return false;
+      case LoyaltyTransactionType.adjustment:
+      case LoyaltyTransactionType.reversal:
+        return null;
+    }
+  }
+}
+
+class LoyaltyAccount {
+  final String id;
+  final String userId;
+  final int currentBalance;
+  final int lifetimePointsEarned;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  const LoyaltyAccount({
+    required this.id,
+    required this.userId,
+    required this.currentBalance,
+    required this.lifetimePointsEarned,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+}
+
+class LoyaltyTransaction {
+  final LoyaltyTransactionType transactionType;
+  final int points;
+  final int balanceBefore;
+  final int balanceAfter;
+  final String description;
+  final String? referenceType;
+  final String? referenceId;
+  final DateTime createdAt;
+
+  const LoyaltyTransaction({
+    required this.transactionType,
+    required this.points,
+    required this.balanceBefore,
+    required this.balanceAfter,
+    required this.description,
+    this.referenceType,
+    this.referenceId,
+    required this.createdAt,
+  });
+
+  bool get increasesBalance =>
+      transactionType.knownIncrease ?? balanceAfter > balanceBefore;
+}
+
+enum MembershipTier { bronze, silver, gold, platinum, diamond }
+
+extension MembershipTierData on MembershipTier {
+  String get code {
+    switch (this) {
+      case MembershipTier.bronze:
+        return 'BRONZE';
+      case MembershipTier.silver:
+        return 'SILVER';
+      case MembershipTier.gold:
+        return 'GOLD';
+      case MembershipTier.platinum:
+        return 'PLATINUM';
+      case MembershipTier.diamond:
+        return 'DIAMOND';
+    }
+  }
+}
+
+enum MembershipBenefitType {
+  pointsMultiplier,
+  memberOnlyCoupons,
+  prioritySupport,
+  earlyAccess,
+  lateCheckout,
+  earlyCheckin,
+  roomUpgrade,
+  freeBreakfast,
+  airportTransfer,
+  custom,
+}
+
+extension MembershipBenefitTypeData on MembershipBenefitType {
+  String get code {
+    switch (this) {
+      case MembershipBenefitType.pointsMultiplier:
+        return 'POINTS_MULTIPLIER';
+      case MembershipBenefitType.memberOnlyCoupons:
+        return 'MEMBER_ONLY_COUPONS';
+      case MembershipBenefitType.prioritySupport:
+        return 'PRIORITY_SUPPORT';
+      case MembershipBenefitType.earlyAccess:
+        return 'EARLY_ACCESS';
+      case MembershipBenefitType.lateCheckout:
+        return 'LATE_CHECKOUT';
+      case MembershipBenefitType.earlyCheckin:
+        return 'EARLY_CHECKIN';
+      case MembershipBenefitType.roomUpgrade:
+        return 'ROOM_UPGRADE';
+      case MembershipBenefitType.freeBreakfast:
+        return 'FREE_BREAKFAST';
+      case MembershipBenefitType.airportTransfer:
+        return 'AIRPORT_TRANSFER';
+      case MembershipBenefitType.custom:
+        return 'CUSTOM';
+    }
+  }
+}
+
+class MembershipAccount {
+  final MembershipTier currentTier;
+  final MembershipTier? effectiveTier;
+  final DateTime? qualifiedAt;
+  final DateTime? validFrom;
+  final DateTime? validUntil;
+  final bool manuallyAssigned;
+  final bool active;
+  final bool expired;
+
+  const MembershipAccount({
+    this.currentTier = MembershipTier.bronze,
+    this.effectiveTier,
+    this.qualifiedAt,
+    this.validFrom,
+    this.validUntil,
+    this.manuallyAssigned = false,
+    this.active = false,
+    this.expired = false,
+  });
+
+  MembershipTier get displayTier =>
+      active && !expired ? effectiveTier ?? currentTier : MembershipTier.bronze;
+
+  MembershipAccount copyWith({
+    MembershipTier? currentTier,
+    Object? effectiveTier = _unset,
+    Object? qualifiedAt = _unset,
+    Object? validFrom = _unset,
+    Object? validUntil = _unset,
+    bool? manuallyAssigned,
+    bool? active,
+    bool? expired,
+  }) =>
+      MembershipAccount(
+        currentTier: currentTier ?? this.currentTier,
+        effectiveTier: identical(effectiveTier, _unset)
+            ? this.effectiveTier
+            : effectiveTier as MembershipTier?,
+        qualifiedAt: identical(qualifiedAt, _unset)
+            ? this.qualifiedAt
+            : qualifiedAt as DateTime?,
+        validFrom: identical(validFrom, _unset)
+            ? this.validFrom
+            : validFrom as DateTime?,
+        validUntil: identical(validUntil, _unset)
+            ? this.validUntil
+            : validUntil as DateTime?,
+        manuallyAssigned: manuallyAssigned ?? this.manuallyAssigned,
+        active: active ?? this.active,
+        expired: expired ?? this.expired,
+      );
+
+  static const Object _unset = Object();
+}
+
+class MembershipProgress {
+  final MembershipTier currentTier;
+  final MembershipTier effectiveTier;
+  final int lifetimePointsEarned;
+  final int completedBookings;
+  final MembershipTier? nextTier;
+  final int? pointsRequiredForNextTier;
+  final int? bookingsRequiredForNextTier;
+  final int progressPercentage;
+  final DateTime? validUntil;
+  final bool expired;
+  final bool manuallyAssigned;
+
+  const MembershipProgress({
+    required this.currentTier,
+    required this.effectiveTier,
+    required this.lifetimePointsEarned,
+    required this.completedBookings,
+    this.nextTier,
+    this.pointsRequiredForNextTier,
+    this.bookingsRequiredForNextTier,
+    required this.progressPercentage,
+    this.validUntil,
+    this.expired = false,
+    this.manuallyAssigned = false,
+  });
+
+  int get clampedProgress => progressPercentage.clamp(0, 100);
+  bool get isHighestTier => nextTier == null;
+}
+
+class MembershipBenefit {
+  final String id;
+  final MembershipTier tier;
+  final MembershipBenefitType type;
+  final String title;
+  final String description;
+  final String conditions;
+
+  const MembershipBenefit({
+    required this.id,
+    required this.tier,
+    required this.type,
+    required this.title,
+    required this.description,
+    this.conditions = '',
+  });
+}
+
+class MembershipHistoryItem {
+  final MembershipTier tier;
+  final DateTime changedAt;
+  final String description;
+
+  const MembershipHistoryItem({
+    required this.tier,
+    required this.changedAt,
+    required this.description,
+  });
+}
+
+enum CouponDiscountType { percentage, fixedAmount }
+
+extension CouponDiscountTypeData on CouponDiscountType {
+  String get code =>
+      this == CouponDiscountType.percentage ? 'PERCENTAGE' : 'FIXED_AMOUNT';
+}
+
+enum CouponTargetType { all, hotel, room, placeType }
+
+extension CouponTargetTypeData on CouponTargetType {
+  String get code {
+    switch (this) {
+      case CouponTargetType.all:
+        return 'ALL';
+      case CouponTargetType.hotel:
+        return 'HOTEL';
+      case CouponTargetType.room:
+        return 'ROOM';
+      case CouponTargetType.placeType:
+        return 'PLACE_TYPE';
+    }
+  }
+}
+
+class CustomerCoupon {
+  final String id;
+  final String code;
+  final String name;
+  final String description;
+  final CouponDiscountType discountType;
+  final int discountValue;
+  final int? maximumDiscountMinor;
+  final int? minimumSpendMinor;
+  final String? currency;
+  final DateTime validFrom;
+  final DateTime validUntil;
+  final CouponTargetType targetType;
+  final int? minimumStay;
+  final String status;
+  final String effectiveStatus;
+  final DateTime? claimedAt;
+  final DateTime? usedAt;
+  final DateTime? expiresAt;
+  final String? associatedBookingId;
+  final MembershipTier? minimumMembershipTier;
+  final bool stackableWithPromotion;
+  final bool stackableWithCredit;
+  final String eligibilityReason;
+
+  const CustomerCoupon({
+    required this.id,
+    required this.code,
+    required this.name,
+    required this.description,
+    required this.discountType,
+    required this.discountValue,
+    this.maximumDiscountMinor,
+    this.minimumSpendMinor,
+    this.currency,
+    required this.validFrom,
+    required this.validUntil,
+    this.targetType = CouponTargetType.all,
+    this.minimumStay,
+    this.status = 'AVAILABLE',
+    this.effectiveStatus = 'AVAILABLE',
+    this.claimedAt,
+    this.usedAt,
+    this.expiresAt,
+    this.associatedBookingId,
+    this.minimumMembershipTier,
+    this.stackableWithPromotion = false,
+    this.stackableWithCredit = false,
+    this.eligibilityReason = '',
+  });
+
+  bool get isClaimed => claimedAt != null;
+  bool get isUsable => effectiveStatus == 'ACTIVE';
+
+  CustomerCoupon copyWith({
+    String? id,
+    String? code,
+    String? name,
+    String? description,
+    CouponDiscountType? discountType,
+    int? discountValue,
+    Object? maximumDiscountMinor = _unset,
+    Object? minimumSpendMinor = _unset,
+    Object? currency = _unset,
+    DateTime? validFrom,
+    DateTime? validUntil,
+    CouponTargetType? targetType,
+    Object? minimumStay = _unset,
+    String? status,
+    String? effectiveStatus,
+    Object? claimedAt = _unset,
+    Object? usedAt = _unset,
+    Object? expiresAt = _unset,
+    Object? associatedBookingId = _unset,
+    Object? minimumMembershipTier = _unset,
+    bool? stackableWithPromotion,
+    bool? stackableWithCredit,
+    String? eligibilityReason,
+  }) =>
+      CustomerCoupon(
+        id: id ?? this.id,
+        code: code ?? this.code,
+        name: name ?? this.name,
+        description: description ?? this.description,
+        discountType: discountType ?? this.discountType,
+        discountValue: discountValue ?? this.discountValue,
+        maximumDiscountMinor: identical(maximumDiscountMinor, _unset)
+            ? this.maximumDiscountMinor
+            : maximumDiscountMinor as int?,
+        minimumSpendMinor: identical(minimumSpendMinor, _unset)
+            ? this.minimumSpendMinor
+            : minimumSpendMinor as int?,
+        currency:
+            identical(currency, _unset) ? this.currency : currency as String?,
+        validFrom: validFrom ?? this.validFrom,
+        validUntil: validUntil ?? this.validUntil,
+        targetType: targetType ?? this.targetType,
+        minimumStay: identical(minimumStay, _unset)
+            ? this.minimumStay
+            : minimumStay as int?,
+        status: status ?? this.status,
+        effectiveStatus: effectiveStatus ?? this.effectiveStatus,
+        claimedAt: identical(claimedAt, _unset)
+            ? this.claimedAt
+            : claimedAt as DateTime?,
+        usedAt: identical(usedAt, _unset) ? this.usedAt : usedAt as DateTime?,
+        expiresAt: identical(expiresAt, _unset)
+            ? this.expiresAt
+            : expiresAt as DateTime?,
+        associatedBookingId: identical(associatedBookingId, _unset)
+            ? this.associatedBookingId
+            : associatedBookingId as String?,
+        minimumMembershipTier: identical(minimumMembershipTier, _unset)
+            ? this.minimumMembershipTier
+            : minimumMembershipTier as MembershipTier?,
+        stackableWithPromotion:
+            stackableWithPromotion ?? this.stackableWithPromotion,
+        stackableWithCredit: stackableWithCredit ?? this.stackableWithCredit,
+        eligibilityReason: eligibilityReason ?? this.eligibilityReason,
+      );
+
+  static const Object _unset = Object();
+}
+
+enum ReferralRole { inviter, invitee }
+
+extension ReferralRoleData on ReferralRole {
+  String get code => this == ReferralRole.inviter ? 'INVITER' : 'INVITEE';
+}
+
+enum ReferralStatus { used, rewarded }
+
+extension ReferralStatusData on ReferralStatus {
+  String get code => this == ReferralStatus.used ? 'USED' : 'REWARDED';
+}
+
+class ReferralSummary {
+  final String code;
+  final int successfulReferrals;
+  final int pendingReferrals;
+  final DateTime createdAt;
+  final String? usedCode;
+
+  const ReferralSummary({
+    required this.code,
+    required this.successfulReferrals,
+    required this.pendingReferrals,
+    required this.createdAt,
+    this.usedCode,
+  });
+
+  ReferralSummary copyWith({
+    String? code,
+    int? successfulReferrals,
+    int? pendingReferrals,
+    DateTime? createdAt,
+    Object? usedCode = _unset,
+  }) =>
+      ReferralSummary(
+        code: code ?? this.code,
+        successfulReferrals: successfulReferrals ?? this.successfulReferrals,
+        pendingReferrals: pendingReferrals ?? this.pendingReferrals,
+        createdAt: createdAt ?? this.createdAt,
+        usedCode:
+            identical(usedCode, _unset) ? this.usedCode : usedCode as String?,
+      );
+
+  static const Object _unset = Object();
+}
+
+class ReferralHistoryItem {
+  final ReferralRole role;
+  final String campaignCode;
+  final ReferralStatus status;
+  final DateTime usedAt;
+  final DateTime? qualifiedAt;
+  final String? qualifyingBookingId;
+  final DateTime? rewardedAt;
+
+  const ReferralHistoryItem({
+    required this.role,
+    required this.campaignCode,
+    required this.status,
+    required this.usedAt,
+    this.qualifiedAt,
+    this.qualifyingBookingId,
+    this.rewardedAt,
+  });
+}
+
+enum GiftCardStatus {
+  issued,
+  active,
+  partiallyRedeemed,
+  fullyRedeemed,
+  expired,
+  cancelled,
+}
+
+extension GiftCardStatusData on GiftCardStatus {
+  String get code {
+    switch (this) {
+      case GiftCardStatus.issued:
+        return 'ISSUED';
+      case GiftCardStatus.active:
+        return 'ACTIVE';
+      case GiftCardStatus.partiallyRedeemed:
+        return 'PARTIALLY_REDEEMED';
+      case GiftCardStatus.fullyRedeemed:
+        return 'FULLY_REDEEMED';
+      case GiftCardStatus.expired:
+        return 'EXPIRED';
+      case GiftCardStatus.cancelled:
+        return 'CANCELLED';
+    }
+  }
+
+  bool get canRedeem =>
+      this == GiftCardStatus.active || this == GiftCardStatus.partiallyRedeemed;
+}
+
+enum GiftCardTransactionType { issue, activation, redemption, refund, expiry }
+
+extension GiftCardTransactionTypeData on GiftCardTransactionType {
+  String get code {
+    switch (this) {
+      case GiftCardTransactionType.issue:
+        return 'ISSUE';
+      case GiftCardTransactionType.activation:
+        return 'ACTIVATION';
+      case GiftCardTransactionType.redemption:
+        return 'REDEMPTION';
+      case GiftCardTransactionType.refund:
+        return 'REFUND';
+      case GiftCardTransactionType.expiry:
+        return 'EXPIRY';
+    }
+  }
+}
+
+class GiftCardTransaction {
+  final String id;
+  final GiftCardTransactionType transactionType;
+  final int amountMinor;
+  final int balanceBeforeMinor;
+  final int balanceAfterMinor;
+  final String description;
+  final DateTime createdAt;
+
+  const GiftCardTransaction({
+    required this.id,
+    required this.transactionType,
+    required this.amountMinor,
+    required this.balanceBeforeMinor,
+    required this.balanceAfterMinor,
+    required this.description,
+    required this.createdAt,
+  });
+
+  bool get increasesBalance => balanceAfterMinor > balanceBeforeMinor;
+}
+
+class GiftCard {
+  final String id;
+  final String maskedCode;
+  final String productName;
+  final int originalAmountMinor;
+  final int currentBalanceMinor;
+  final String currency;
+  final GiftCardStatus status;
+  final GiftCardStatus effectiveStatus;
+  final DateTime issuedAt;
+  final DateTime? activatedAt;
+  final DateTime? expiresAt;
+  final String personalMessage;
+  final String purchaserSummary;
+  final String recipientSummary;
+  final List<GiftCardTransaction> transactions;
+
+  const GiftCard({
+    required this.id,
+    required this.maskedCode,
+    required this.productName,
+    required this.originalAmountMinor,
+    required this.currentBalanceMinor,
+    required this.currency,
+    required this.status,
+    required this.effectiveStatus,
+    required this.issuedAt,
+    this.activatedAt,
+    this.expiresAt,
+    this.personalMessage = '',
+    this.purchaserSummary = '',
+    this.recipientSummary = '',
+    this.transactions = const [],
+  });
+
+  GiftCard copyWith({
+    String? id,
+    String? maskedCode,
+    String? productName,
+    int? originalAmountMinor,
+    int? currentBalanceMinor,
+    String? currency,
+    GiftCardStatus? status,
+    GiftCardStatus? effectiveStatus,
+    DateTime? issuedAt,
+    Object? activatedAt = _unset,
+    Object? expiresAt = _unset,
+    String? personalMessage,
+    String? purchaserSummary,
+    String? recipientSummary,
+    List<GiftCardTransaction>? transactions,
+  }) =>
+      GiftCard(
+        id: id ?? this.id,
+        maskedCode: maskedCode ?? this.maskedCode,
+        productName: productName ?? this.productName,
+        originalAmountMinor: originalAmountMinor ?? this.originalAmountMinor,
+        currentBalanceMinor: currentBalanceMinor ?? this.currentBalanceMinor,
+        currency: currency ?? this.currency,
+        status: status ?? this.status,
+        effectiveStatus: effectiveStatus ?? this.effectiveStatus,
+        issuedAt: issuedAt ?? this.issuedAt,
+        activatedAt: identical(activatedAt, _unset)
+            ? this.activatedAt
+            : activatedAt as DateTime?,
+        expiresAt: identical(expiresAt, _unset)
+            ? this.expiresAt
+            : expiresAt as DateTime?,
+        personalMessage: personalMessage ?? this.personalMessage,
+        purchaserSummary: purchaserSummary ?? this.purchaserSummary,
+        recipientSummary: recipientSummary ?? this.recipientSummary,
+        transactions: transactions ?? this.transactions,
+      );
+
+  static const Object _unset = Object();
+}
+
 class Trip {
   final int id;
   final String title;

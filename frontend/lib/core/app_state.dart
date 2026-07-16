@@ -39,6 +39,23 @@ class AppState extends ChangeNotifier {
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
   List<DemoBooking> demoBookings = [];
+  TravelCreditAccount? travelCreditAccount = MockData.travelCreditAccount;
+  List<TravelCreditTransaction> travelCreditTransactions =
+      List.from(MockData.travelCreditTransactions);
+  LoyaltyAccount? loyaltyAccount = MockData.loyaltyAccount;
+  List<LoyaltyTransaction> loyaltyTransactions =
+      List.from(MockData.loyaltyTransactions);
+  MembershipAccount? membershipAccount = MockData.membershipAccount;
+  MembershipProgress? membershipProgress = MockData.membershipProgress;
+  List<MembershipBenefit> membershipBenefits =
+      List.from(MockData.membershipBenefits);
+  List<MembershipHistoryItem> membershipHistory =
+      List.from(MockData.membershipHistory);
+  List<CustomerCoupon> coupons = List.from(MockData.coupons);
+  ReferralSummary? referralSummary = MockData.referralSummary;
+  List<ReferralHistoryItem> referralHistory =
+      List.from(MockData.referralHistory);
+  List<GiftCard> giftCards = List.from(MockData.giftCards);
   List<Category> get categories => MockData.categories;
 
   // ── Session ──────────────────────────────────────────────────────────────
@@ -87,6 +104,7 @@ class AppState extends ChangeNotifier {
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
     demoBookings = [];
+    _applyRewardDataMode();
     notifyListeners();
   }
 
@@ -96,12 +114,44 @@ class AppState extends ChangeNotifier {
       timeline = List.from(MockData.timeline);
       expenses = List.from(MockData.expenses);
       demoBookings = [];
+      _applyRewardDataMode();
       return;
     }
     trips = [];
     timeline = [];
     expenses = [];
     demoBookings = [];
+    _applyRewardDataMode();
+  }
+
+  void _applyRewardDataMode() {
+    if (demoMode) {
+      travelCreditAccount = MockData.travelCreditAccount;
+      travelCreditTransactions = List.from(MockData.travelCreditTransactions);
+      loyaltyAccount = MockData.loyaltyAccount;
+      loyaltyTransactions = List.from(MockData.loyaltyTransactions);
+      membershipAccount = MockData.membershipAccount;
+      membershipProgress = MockData.membershipProgress;
+      membershipBenefits = List.from(MockData.membershipBenefits);
+      membershipHistory = List.from(MockData.membershipHistory);
+      coupons = List.from(MockData.coupons);
+      referralSummary = MockData.referralSummary;
+      referralHistory = List.from(MockData.referralHistory);
+      giftCards = List.from(MockData.giftCards);
+      return;
+    }
+    travelCreditAccount = null;
+    travelCreditTransactions = [];
+    loyaltyAccount = null;
+    loyaltyTransactions = [];
+    membershipAccount = null;
+    membershipProgress = null;
+    membershipBenefits = [];
+    membershipHistory = [];
+    coupons = [];
+    referralSummary = null;
+    referralHistory = [];
+    giftCards = [];
   }
 
   // ── Local preferences ────────────────────────────────────────────────────
@@ -350,6 +400,164 @@ class AppState extends ChangeNotifier {
     ];
     notifyListeners();
     return true;
+  }
+
+  // ── Demo rewards ─────────────────────────────────────────────────────────
+
+  RewardActionResult enrollDemoMembership() {
+    if (!demoMode) return RewardActionResult.unavailable;
+    final current = membershipAccount ?? const MembershipAccount();
+    if (current.active && !current.expired) return RewardActionResult.success;
+    final enrolled = current.copyWith(
+      active: true,
+      expired: false,
+      qualifiedAt: now(),
+      validFrom: now(),
+      validUntil: current.validUntil ?? now().add(const Duration(days: 365)),
+    );
+    membershipAccount = enrolled;
+    if (!membershipHistory.any((item) =>
+        item.tier == enrolled.displayTier &&
+        item.description == 'Local demo enrollment')) {
+      membershipHistory = [
+        ...membershipHistory,
+        MembershipHistoryItem(
+          tier: enrolled.displayTier,
+          changedAt: now(),
+          description: 'Local demo enrollment',
+        ),
+      ];
+    }
+    notifyListeners();
+    return RewardActionResult.success;
+  }
+
+  RewardActionResult claimDemoCoupon(String code) {
+    if (!demoMode) return RewardActionResult.unavailable;
+    final normalized = code.trim().toUpperCase();
+    if (normalized.isEmpty) return RewardActionResult.blank;
+    final index =
+        coupons.indexWhere((coupon) => coupon.code.toUpperCase() == normalized);
+    if (index < 0) return RewardActionResult.rejected;
+    if (coupons[index].isClaimed) return RewardActionResult.duplicate;
+    final updated = coupons[index].copyWith(
+      status: 'CLAIMED',
+      effectiveStatus: 'ACTIVE',
+      claimedAt: now(),
+      expiresAt: coupons[index].expiresAt ?? coupons[index].validUntil,
+    );
+    coupons = [
+      for (var i = 0; i < coupons.length; i++) i == index ? updated : coupons[i]
+    ];
+    notifyListeners();
+    return RewardActionResult.success;
+  }
+
+  RewardActionResult useDemoReferralCode(String code) {
+    if (!demoMode) return RewardActionResult.unavailable;
+    final normalized = code.trim().toUpperCase();
+    if (normalized.isEmpty) return RewardActionResult.blank;
+    final summary = referralSummary;
+    if (summary == null) return RewardActionResult.unavailable;
+    if (normalized == summary.code.toUpperCase()) {
+      return RewardActionResult.ownCode;
+    }
+    if (summary.usedCode != null ||
+        referralHistory.any((item) =>
+            item.role == ReferralRole.invitee &&
+            item.campaignCode.toUpperCase() == normalized)) {
+      return RewardActionResult.duplicate;
+    }
+    referralSummary = summary.copyWith(
+      pendingReferrals: summary.pendingReferrals + 1,
+      usedCode: normalized,
+    );
+    referralHistory = [
+      ReferralHistoryItem(
+        role: ReferralRole.invitee,
+        campaignCode: normalized,
+        status: ReferralStatus.used,
+        usedAt: now(),
+      ),
+      ...referralHistory,
+    ];
+    notifyListeners();
+    return RewardActionResult.success;
+  }
+
+  RewardActionResult claimDemoGiftCard(String code) {
+    if (!demoMode) return RewardActionResult.unavailable;
+    final normalized = code.trim().toUpperCase();
+    if (normalized.isEmpty) return RewardActionResult.blank;
+    if (giftCards.any((card) => card.id == 'gift-claimed-local')) {
+      return RewardActionResult.duplicate;
+    }
+    if (normalized != 'GIFTDEMO') return RewardActionResult.rejected;
+    giftCards = [
+      GiftCard(
+        id: 'gift-claimed-local',
+        maskedCode: 'PYT-****-9900',
+        productName: 'Demo Claimed Gift Card',
+        originalAmountMinor: 300000,
+        currentBalanceMinor: 300000,
+        currency: 'VND',
+        status: GiftCardStatus.active,
+        effectiveStatus: GiftCardStatus.active,
+        issuedAt: now(),
+        activatedAt: now(),
+        expiresAt: now().add(const Duration(days: 365)),
+        personalMessage: 'Local demo claim only.',
+        purchaserSummary: 'Demo campaign',
+        recipientSummary: email ?? MockData.demoEmail,
+        transactions: [
+          GiftCardTransaction(
+            id: 'gift-claimed-local-activation',
+            transactionType: GiftCardTransactionType.activation,
+            amountMinor: 300000,
+            balanceBeforeMinor: 0,
+            balanceAfterMinor: 300000,
+            description: 'Local demo gift-card claim',
+            createdAt: now(),
+          ),
+        ],
+      ),
+      ...giftCards,
+    ];
+    notifyListeners();
+    return RewardActionResult.success;
+  }
+
+  RewardActionResult activateDemoGiftCard(String id) {
+    if (!demoMode) return RewardActionResult.unavailable;
+    final index = giftCards.indexWhere((card) => card.id == id);
+    if (index < 0) return RewardActionResult.rejected;
+    final card = giftCards[index];
+    if (card.effectiveStatus != GiftCardStatus.issued) {
+      return RewardActionResult.duplicate;
+    }
+    final updated = card.copyWith(
+      status: GiftCardStatus.active,
+      effectiveStatus: GiftCardStatus.active,
+      activatedAt: now(),
+      transactions: [
+        GiftCardTransaction(
+          id: '${card.id}-activation',
+          transactionType: GiftCardTransactionType.activation,
+          amountMinor: card.currentBalanceMinor,
+          balanceBeforeMinor: 0,
+          balanceAfterMinor: card.currentBalanceMinor,
+          description: 'Local demo activation',
+          createdAt: now(),
+        ),
+        ...card.transactions,
+      ],
+    );
+    giftCards = [
+      for (var i = 0; i < giftCards.length; i++)
+        i == index ? updated : giftCards[i],
+    ];
+    notifyListeners();
+    return RewardActionResult.success;
   }
 
   // ── Unique ID helper ──────────────────────────────────────────────────────

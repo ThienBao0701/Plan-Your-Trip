@@ -10,6 +10,7 @@ import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/glass_widgets.dart';
 import '../auth/login_screen.dart';
 import '../bookings/my_bookings_screen.dart';
+import '../rewards/rewards_screen.dart';
 import 'notifications_screen.dart';
 import 'saved_places_screen.dart';
 import 'settings_screen.dart';
@@ -185,6 +186,15 @@ class ProfileScreen extends StatelessWidget {
             MaterialPageRoute(builder: (_) => const MyBookingsScreen()),
           ),
         ),
+        _ProfileNavCard(
+          key: const Key('profile-rewards'),
+          icon: Icons.redeem_rounded,
+          title: l10n.rewardsTitle,
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const RewardsHubScreen()),
+          ),
+        ),
         const SizedBox(height: AppSpacing.sm),
         _SectionHeader(l10n.profileLegalSection),
         _ProfileNavCard(
@@ -321,6 +331,7 @@ class _ProfileNavCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const _ProfileNavCard({
+    super.key,
     required this.icon,
     required this.title,
     required this.onTap,

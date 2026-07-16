@@ -2226,6 +2226,521 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bookingStatusNoShow => 'No-show';
 
   @override
+  String get rewardsTitle => 'Rewards & Benefits';
+
+  @override
+  String get rewardsDemoSubtitle =>
+      'Local demo rewards for previewing credits, points, coupons, referrals, and gift cards.';
+
+  @override
+  String get rewardsRealUnavailableMessage =>
+      'Rewards endpoints are not connected yet for real accounts.';
+
+  @override
+  String get rewardsRealEmptyTitle => 'Rewards not connected';
+
+  @override
+  String get rewardsNotConnected => 'Not connected';
+
+  @override
+  String rewardsCountValue(int count) {
+    return '$count items';
+  }
+
+  @override
+  String get rewardsHistoryEmptyTitle => 'No history';
+
+  @override
+  String get rewardsHistoryEmptyMessage =>
+      'Reward history will appear here when available.';
+
+  @override
+  String get rewardsActionUnavailable =>
+      'This reward action is not connected for real accounts.';
+
+  @override
+  String get rewardsCodeBlank => 'Enter a code first.';
+
+  @override
+  String get rewardsCodeDuplicate => 'This code is already used or claimed.';
+
+  @override
+  String get rewardsCodeRejected => 'This demo code is not eligible.';
+
+  @override
+  String rewardsExpiresOn(String date) {
+    return 'Expires $date';
+  }
+
+  @override
+  String get travelCreditsTitle => 'Travel Credits';
+
+  @override
+  String get travelCreditsSubtitle =>
+      'Promotional monetary credit, separate from travel wallet documents.';
+
+  @override
+  String get travelCreditsSemantic => 'Open Travel Credits';
+
+  @override
+  String get travelCreditsBalance => 'Available travel credit';
+
+  @override
+  String get travelCreditsBalanceSemantic => 'Travel credit balance';
+
+  @override
+  String get travelCreditsLocalOnly =>
+      'Demo credits are local preview data and are not synchronized.';
+
+  @override
+  String get travelCreditsNoCashOut =>
+      'Cash-out, withdrawal, and transfer controls are intentionally unavailable.';
+
+  @override
+  String get travelCreditsTransactions => 'Credit transactions';
+
+  @override
+  String get creditTxnGrant => 'Grant';
+
+  @override
+  String get creditTxnPromotion => 'Promotion';
+
+  @override
+  String get creditTxnRefund => 'Refund credit';
+
+  @override
+  String get creditTxnAdjustment => 'Adjustment';
+
+  @override
+  String get creditTxnRedemption => 'Redemption';
+
+  @override
+  String get creditTxnExpiration => 'Expiration';
+
+  @override
+  String get creditTxnReversal => 'Reversal';
+
+  @override
+  String get loyaltyTitle => 'Loyalty Points';
+
+  @override
+  String get loyaltySubtitle =>
+      'Integer point balance and immutable transaction history.';
+
+  @override
+  String get loyaltySemantic => 'Open Loyalty Points';
+
+  @override
+  String get loyaltyBalanceSemantic => 'Loyalty point balance';
+
+  @override
+  String get loyaltyCurrentBalance => 'Current balance';
+
+  @override
+  String get loyaltyLifetimeEarned => 'Lifetime earned';
+
+  @override
+  String loyaltyPointsValue(int points) {
+    return '$points points';
+  }
+
+  @override
+  String get pointsUnit => 'points';
+
+  @override
+  String get loyaltyNoDirectRedeem =>
+      'Points are not money and direct redemption is not connected in UI-7.';
+
+  @override
+  String get loyaltyTransactions => 'Point transactions';
+
+  @override
+  String get loyaltyTxnEarnBooking => 'Earn from booking';
+
+  @override
+  String get loyaltyTxnEarnReview => 'Earn from review';
+
+  @override
+  String get loyaltyTxnGrant => 'Grant';
+
+  @override
+  String get loyaltyTxnAdjustment => 'Adjustment';
+
+  @override
+  String get loyaltyTxnReversal => 'Reversal';
+
+  @override
+  String get loyaltyTxnRedemptionDebit => 'Redemption debit';
+
+  @override
+  String get loyaltyTxnRedemptionRelease => 'Redemption release';
+
+  @override
+  String get loyaltyTxnRedemptionRefund => 'Redemption refund';
+
+  @override
+  String get membershipTitle => 'Membership';
+
+  @override
+  String get membershipSubtitle =>
+      'Tier progress, benefits metadata, and tier history.';
+
+  @override
+  String get membershipSemantic => 'Open Membership';
+
+  @override
+  String get membershipRealUnavailable =>
+      'Membership enrollment is not connected yet for real accounts.';
+
+  @override
+  String get membershipTierSemantic => 'Membership tier and progress';
+
+  @override
+  String get membershipActiveStatus => 'Active';
+
+  @override
+  String get membershipPreviewStatus => 'Preview';
+
+  @override
+  String get membershipExpiredStatus => 'Expired';
+
+  @override
+  String get membershipActiveMessage =>
+      'This demo membership is active locally.';
+
+  @override
+  String get membershipPreviewMessage =>
+      'Preview benefits before demo enrollment.';
+
+  @override
+  String membershipProgressSemantic(int percent) {
+    return 'Membership progress $percent percent';
+  }
+
+  @override
+  String get membershipHighestTier =>
+      'Highest tier reached. No fictional next tier is shown.';
+
+  @override
+  String membershipNextTier(String tier) {
+    return 'Next tier: $tier';
+  }
+
+  @override
+  String get membershipEnrollAction => 'Enroll locally';
+
+  @override
+  String get membershipEnrolledAction => 'Enrolled locally';
+
+  @override
+  String get membershipEnrollSemantic => 'Enroll in local demo membership';
+
+  @override
+  String get membershipEnrollSuccess => 'Demo membership enrolled locally.';
+
+  @override
+  String get membershipBenefitsTitle => 'Benefits metadata';
+
+  @override
+  String get membershipHistoryTitle => 'Tier history';
+
+  @override
+  String get membershipTierBronze => 'Bronze';
+
+  @override
+  String get membershipTierSilver => 'Silver';
+
+  @override
+  String get membershipTierGold => 'Gold';
+
+  @override
+  String get membershipTierPlatinum => 'Platinum';
+
+  @override
+  String get membershipTierDiamond => 'Diamond';
+
+  @override
+  String get benefitPointsMultiplier => 'Points multiplier';
+
+  @override
+  String get benefitMemberCoupons => 'Member-only coupons';
+
+  @override
+  String get benefitPrioritySupport => 'Priority support';
+
+  @override
+  String get benefitEarlyAccess => 'Early access';
+
+  @override
+  String get benefitLateCheckout => 'Late checkout';
+
+  @override
+  String get benefitEarlyCheckin => 'Early check-in';
+
+  @override
+  String get benefitRoomUpgrade => 'Room upgrade';
+
+  @override
+  String get benefitFreeBreakfast => 'Free breakfast';
+
+  @override
+  String get benefitAirportTransfer => 'Airport transfer';
+
+  @override
+  String get benefitCustom => 'Custom benefit';
+
+  @override
+  String get couponsTitle => 'Coupons';
+
+  @override
+  String get couponsSubtitle =>
+      'Claimed coupons and read-only eligibility previews.';
+
+  @override
+  String get couponsSemantic => 'Open Coupons';
+
+  @override
+  String get couponsRealUnavailable =>
+      'Coupon claiming is not connected yet for real accounts.';
+
+  @override
+  String get couponClaimTitle => 'Claim demo coupon';
+
+  @override
+  String get couponCodeLabel => 'Coupon code';
+
+  @override
+  String get couponClaimHelper =>
+      'Use LOCAL300 for the local demo claim. Coupons are not applied to bookings.';
+
+  @override
+  String get couponClaimAction => 'Claim coupon';
+
+  @override
+  String get couponClaimSemantic => 'Claim local demo coupon';
+
+  @override
+  String get couponClaimSuccess => 'Demo coupon claimed locally.';
+
+  @override
+  String get couponsEmptyTitle => 'No coupons';
+
+  @override
+  String get couponsEmptyMessage =>
+      'Coupons will appear after they are claimed or connected.';
+
+  @override
+  String couponCardSemantic(String code) {
+    return 'Coupon $code';
+  }
+
+  @override
+  String get couponPreviewReadOnly =>
+      'Preview is read-only and does not mark the coupon used.';
+
+  @override
+  String couponPercentageValue(int percent) {
+    return '$percent% off';
+  }
+
+  @override
+  String couponFixedValue(String amount) {
+    return '$amount off';
+  }
+
+  @override
+  String get couponAmountUnavailable => 'Amount unavailable';
+
+  @override
+  String get couponTargetAll => 'All';
+
+  @override
+  String get couponTargetHotel => 'Hotel';
+
+  @override
+  String get couponTargetRoom => 'Room';
+
+  @override
+  String get couponTargetPlaceType => 'Place type';
+
+  @override
+  String get referralTitle => 'Referral';
+
+  @override
+  String get referralSubtitle =>
+      'Referral code, statistics, and local demo code use.';
+
+  @override
+  String get referralSemantic => 'Open Referral';
+
+  @override
+  String get referralRealUnavailable =>
+      'Referral actions are not connected yet for real accounts.';
+
+  @override
+  String get referralCodeSemantic => 'Referral code';
+
+  @override
+  String get referralYourCode => 'Your referral code';
+
+  @override
+  String referralStats(int successful, int pending) {
+    return '$successful successful · $pending pending';
+  }
+
+  @override
+  String get referralCopyAction => 'Copy code';
+
+  @override
+  String get referralCopiedAction => 'Copied';
+
+  @override
+  String get referralCopySemantic => 'Copy referral code';
+
+  @override
+  String get referralUseCodeTitle => 'Use referral code';
+
+  @override
+  String get referralCodeLabel => 'Referral code';
+
+  @override
+  String get referralUseCodeHelper =>
+      'Using a code creates a pending local referral only. No reward is granted immediately.';
+
+  @override
+  String get referralUseCodeAction => 'Use code';
+
+  @override
+  String get referralUseCodeSemantic => 'Use local demo referral code';
+
+  @override
+  String get referralUseSuccess => 'Referral code recorded locally as pending.';
+
+  @override
+  String get referralOwnCodeRejected =>
+      'You cannot use your own referral code.';
+
+  @override
+  String get referralHistoryTitle => 'Referral history';
+
+  @override
+  String get referralUsedNoReward =>
+      'USED means pending qualification; no reward was granted.';
+
+  @override
+  String get referralRoleInviter => 'Inviter';
+
+  @override
+  String get referralRoleInvitee => 'Invitee';
+
+  @override
+  String get referralStatusUsed => 'Used';
+
+  @override
+  String get referralStatusRewarded => 'Rewarded';
+
+  @override
+  String get giftCardsTitle => 'Gift Cards';
+
+  @override
+  String get giftCardsSubtitle =>
+      'Masked cards, balances, details, and read-only previews.';
+
+  @override
+  String get giftCardsSemantic => 'Open Gift Cards';
+
+  @override
+  String get giftCardsRealUnavailable =>
+      'Gift-card actions are not connected yet for real accounts.';
+
+  @override
+  String get giftCardClaimTitle => 'Claim demo gift card';
+
+  @override
+  String get giftCardCodeLabel => 'Gift-card code';
+
+  @override
+  String get giftCardClaimHelper =>
+      'Use GIFTDEMO for a local demo claim. No purchase or payment flow exists.';
+
+  @override
+  String get giftCardClaimAction => 'Claim gift card';
+
+  @override
+  String get giftCardClaimSemantic => 'Claim local demo gift card';
+
+  @override
+  String get giftCardClaimSuccess => 'Demo gift card claimed locally.';
+
+  @override
+  String get giftCardsEmptyTitle => 'No gift cards';
+
+  @override
+  String get giftCardsEmptyMessage =>
+      'Gift cards will appear after they are claimed or connected.';
+
+  @override
+  String giftCardCardSemantic(String code) {
+    return 'Gift card $code';
+  }
+
+  @override
+  String get giftCardBalance => 'Card balance';
+
+  @override
+  String get giftCardTransactionsTitle => 'Gift-card transactions';
+
+  @override
+  String get giftCardPreviewAction => 'Preview only';
+
+  @override
+  String get giftCardPreviewSemantic =>
+      'Preview gift card without changing balance';
+
+  @override
+  String get giftCardPreviewReadOnly =>
+      'Gift-card preview is read-only and does not change balance.';
+
+  @override
+  String get giftCardActivateAction => 'Activate locally';
+
+  @override
+  String get giftCardActivateSuccess => 'Demo gift card activated locally.';
+
+  @override
+  String get giftCardStatusIssued => 'Issued';
+
+  @override
+  String get giftCardStatusActive => 'Active';
+
+  @override
+  String get giftCardStatusPartiallyRedeemed => 'Partially redeemed';
+
+  @override
+  String get giftCardStatusFullyRedeemed => 'Fully redeemed';
+
+  @override
+  String get giftCardStatusExpired => 'Expired';
+
+  @override
+  String get giftCardStatusCancelled => 'Cancelled';
+
+  @override
+  String get giftCardTxnIssue => 'Issue';
+
+  @override
+  String get giftCardTxnActivation => 'Activation';
+
+  @override
+  String get giftCardTxnRedemption => 'Redemption';
+
+  @override
+  String get giftCardTxnRefund => 'Refund';
+
+  @override
+  String get giftCardTxnExpiry => 'Expiry';
+
+  @override
   String get commonBackSemantic => 'Go back';
 
   @override

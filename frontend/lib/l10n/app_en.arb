@@ -1138,6 +1138,234 @@
   "bookingStatusRefunded": "Refunded",
   "bookingStatusArchived": "Archived",
   "bookingStatusNoShow": "No-show",
+  "rewardsTitle": "Rewards & Benefits",
+  "rewardsDemoSubtitle": "Local demo rewards for previewing credits, points, coupons, referrals, and gift cards.",
+  "rewardsRealUnavailableMessage": "Rewards endpoints are not connected yet for real accounts.",
+  "rewardsRealEmptyTitle": "Rewards not connected",
+  "rewardsNotConnected": "Not connected",
+  "rewardsCountValue": "{count} items",
+  "@rewardsCountValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rewardsHistoryEmptyTitle": "No history",
+  "rewardsHistoryEmptyMessage": "Reward history will appear here when available.",
+  "rewardsActionUnavailable": "This reward action is not connected for real accounts.",
+  "rewardsCodeBlank": "Enter a code first.",
+  "rewardsCodeDuplicate": "This code is already used or claimed.",
+  "rewardsCodeRejected": "This demo code is not eligible.",
+  "rewardsExpiresOn": "Expires {date}",
+  "@rewardsExpiresOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "travelCreditsTitle": "Travel Credits",
+  "travelCreditsSubtitle": "Promotional monetary credit, separate from travel wallet documents.",
+  "travelCreditsSemantic": "Open Travel Credits",
+  "travelCreditsBalance": "Available travel credit",
+  "travelCreditsBalanceSemantic": "Travel credit balance",
+  "travelCreditsLocalOnly": "Demo credits are local preview data and are not synchronized.",
+  "travelCreditsNoCashOut": "Cash-out, withdrawal, and transfer controls are intentionally unavailable.",
+  "travelCreditsTransactions": "Credit transactions",
+  "creditTxnGrant": "Grant",
+  "creditTxnPromotion": "Promotion",
+  "creditTxnRefund": "Refund credit",
+  "creditTxnAdjustment": "Adjustment",
+  "creditTxnRedemption": "Redemption",
+  "creditTxnExpiration": "Expiration",
+  "creditTxnReversal": "Reversal",
+  "loyaltyTitle": "Loyalty Points",
+  "loyaltySubtitle": "Integer point balance and immutable transaction history.",
+  "loyaltySemantic": "Open Loyalty Points",
+  "loyaltyBalanceSemantic": "Loyalty point balance",
+  "loyaltyCurrentBalance": "Current balance",
+  "loyaltyLifetimeEarned": "Lifetime earned",
+  "loyaltyPointsValue": "{points} points",
+  "@loyaltyPointsValue": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "pointsUnit": "points",
+  "loyaltyNoDirectRedeem": "Points are not money and direct redemption is not connected in UI-7.",
+  "loyaltyTransactions": "Point transactions",
+  "loyaltyTxnEarnBooking": "Earn from booking",
+  "loyaltyTxnEarnReview": "Earn from review",
+  "loyaltyTxnGrant": "Grant",
+  "loyaltyTxnAdjustment": "Adjustment",
+  "loyaltyTxnReversal": "Reversal",
+  "loyaltyTxnRedemptionDebit": "Redemption debit",
+  "loyaltyTxnRedemptionRelease": "Redemption release",
+  "loyaltyTxnRedemptionRefund": "Redemption refund",
+  "membershipTitle": "Membership",
+  "membershipSubtitle": "Tier progress, benefits metadata, and tier history.",
+  "membershipSemantic": "Open Membership",
+  "membershipRealUnavailable": "Membership enrollment is not connected yet for real accounts.",
+  "membershipTierSemantic": "Membership tier and progress",
+  "membershipActiveStatus": "Active",
+  "membershipPreviewStatus": "Preview",
+  "membershipExpiredStatus": "Expired",
+  "membershipActiveMessage": "This demo membership is active locally.",
+  "membershipPreviewMessage": "Preview benefits before demo enrollment.",
+  "membershipProgressSemantic": "Membership progress {percent} percent",
+  "@membershipProgressSemantic": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "membershipHighestTier": "Highest tier reached. No fictional next tier is shown.",
+  "membershipNextTier": "Next tier: {tier}",
+  "@membershipNextTier": {
+    "placeholders": {
+      "tier": {
+        "type": "String"
+      }
+    }
+  },
+  "membershipEnrollAction": "Enroll locally",
+  "membershipEnrolledAction": "Enrolled locally",
+  "membershipEnrollSemantic": "Enroll in local demo membership",
+  "membershipEnrollSuccess": "Demo membership enrolled locally.",
+  "membershipBenefitsTitle": "Benefits metadata",
+  "membershipHistoryTitle": "Tier history",
+  "membershipTierBronze": "Bronze",
+  "membershipTierSilver": "Silver",
+  "membershipTierGold": "Gold",
+  "membershipTierPlatinum": "Platinum",
+  "membershipTierDiamond": "Diamond",
+  "benefitPointsMultiplier": "Points multiplier",
+  "benefitMemberCoupons": "Member-only coupons",
+  "benefitPrioritySupport": "Priority support",
+  "benefitEarlyAccess": "Early access",
+  "benefitLateCheckout": "Late checkout",
+  "benefitEarlyCheckin": "Early check-in",
+  "benefitRoomUpgrade": "Room upgrade",
+  "benefitFreeBreakfast": "Free breakfast",
+  "benefitAirportTransfer": "Airport transfer",
+  "benefitCustom": "Custom benefit",
+  "couponsTitle": "Coupons",
+  "couponsSubtitle": "Claimed coupons and read-only eligibility previews.",
+  "couponsSemantic": "Open Coupons",
+  "couponsRealUnavailable": "Coupon claiming is not connected yet for real accounts.",
+  "couponClaimTitle": "Claim demo coupon",
+  "couponCodeLabel": "Coupon code",
+  "couponClaimHelper": "Use LOCAL300 for the local demo claim. Coupons are not applied to bookings.",
+  "couponClaimAction": "Claim coupon",
+  "couponClaimSemantic": "Claim local demo coupon",
+  "couponClaimSuccess": "Demo coupon claimed locally.",
+  "couponsEmptyTitle": "No coupons",
+  "couponsEmptyMessage": "Coupons will appear after they are claimed or connected.",
+  "couponCardSemantic": "Coupon {code}",
+  "@couponCardSemantic": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "couponPreviewReadOnly": "Preview is read-only and does not mark the coupon used.",
+  "couponPercentageValue": "{percent}% off",
+  "@couponPercentageValue": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "couponFixedValue": "{amount} off",
+  "@couponFixedValue": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "couponAmountUnavailable": "Amount unavailable",
+  "couponTargetAll": "All",
+  "couponTargetHotel": "Hotel",
+  "couponTargetRoom": "Room",
+  "couponTargetPlaceType": "Place type",
+  "referralTitle": "Referral",
+  "referralSubtitle": "Referral code, statistics, and local demo code use.",
+  "referralSemantic": "Open Referral",
+  "referralRealUnavailable": "Referral actions are not connected yet for real accounts.",
+  "referralCodeSemantic": "Referral code",
+  "referralYourCode": "Your referral code",
+  "referralStats": "{successful} successful · {pending} pending",
+  "@referralStats": {
+    "placeholders": {
+      "successful": {
+        "type": "int"
+      },
+      "pending": {
+        "type": "int"
+      }
+    }
+  },
+  "referralCopyAction": "Copy code",
+  "referralCopiedAction": "Copied",
+  "referralCopySemantic": "Copy referral code",
+  "referralUseCodeTitle": "Use referral code",
+  "referralCodeLabel": "Referral code",
+  "referralUseCodeHelper": "Using a code creates a pending local referral only. No reward is granted immediately.",
+  "referralUseCodeAction": "Use code",
+  "referralUseCodeSemantic": "Use local demo referral code",
+  "referralUseSuccess": "Referral code recorded locally as pending.",
+  "referralOwnCodeRejected": "You cannot use your own referral code.",
+  "referralHistoryTitle": "Referral history",
+  "referralUsedNoReward": "USED means pending qualification; no reward was granted.",
+  "referralRoleInviter": "Inviter",
+  "referralRoleInvitee": "Invitee",
+  "referralStatusUsed": "Used",
+  "referralStatusRewarded": "Rewarded",
+  "giftCardsTitle": "Gift Cards",
+  "giftCardsSubtitle": "Masked cards, balances, details, and read-only previews.",
+  "giftCardsSemantic": "Open Gift Cards",
+  "giftCardsRealUnavailable": "Gift-card actions are not connected yet for real accounts.",
+  "giftCardClaimTitle": "Claim demo gift card",
+  "giftCardCodeLabel": "Gift-card code",
+  "giftCardClaimHelper": "Use GIFTDEMO for a local demo claim. No purchase or payment flow exists.",
+  "giftCardClaimAction": "Claim gift card",
+  "giftCardClaimSemantic": "Claim local demo gift card",
+  "giftCardClaimSuccess": "Demo gift card claimed locally.",
+  "giftCardsEmptyTitle": "No gift cards",
+  "giftCardsEmptyMessage": "Gift cards will appear after they are claimed or connected.",
+  "giftCardCardSemantic": "Gift card {code}",
+  "@giftCardCardSemantic": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "giftCardBalance": "Card balance",
+  "giftCardTransactionsTitle": "Gift-card transactions",
+  "giftCardPreviewAction": "Preview only",
+  "giftCardPreviewSemantic": "Preview gift card without changing balance",
+  "giftCardPreviewReadOnly": "Gift-card preview is read-only and does not change balance.",
+  "giftCardActivateAction": "Activate locally",
+  "giftCardActivateSuccess": "Demo gift card activated locally.",
+  "giftCardStatusIssued": "Issued",
+  "giftCardStatusActive": "Active",
+  "giftCardStatusPartiallyRedeemed": "Partially redeemed",
+  "giftCardStatusFullyRedeemed": "Fully redeemed",
+  "giftCardStatusExpired": "Expired",
+  "giftCardStatusCancelled": "Cancelled",
+  "giftCardTxnIssue": "Issue",
+  "giftCardTxnActivation": "Activation",
+  "giftCardTxnRedemption": "Redemption",
+  "giftCardTxnRefund": "Refund",
+  "giftCardTxnExpiry": "Expiry",
   "commonBackSemantic": "Go back",
   "demoModeLabel": "Demo Mode"
 }

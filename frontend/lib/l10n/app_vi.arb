@@ -1138,6 +1138,234 @@
   "bookingStatusRefunded": "Đã hoàn tiền",
   "bookingStatusArchived": "Đã lưu trữ",
   "bookingStatusNoShow": "Không đến",
+  "rewardsTitle": "Ưu đãi & quyền lợi",
+  "rewardsDemoSubtitle": "Ưu đãi demo cục bộ để xem trước tín dụng, điểm, mã giảm giá, giới thiệu và thẻ quà tặng.",
+  "rewardsRealUnavailableMessage": "Endpoint ưu đãi chưa được kết nối cho tài khoản thật.",
+  "rewardsRealEmptyTitle": "Chưa kết nối ưu đãi",
+  "rewardsNotConnected": "Chưa kết nối",
+  "rewardsCountValue": "{count} mục",
+  "@rewardsCountValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rewardsHistoryEmptyTitle": "Chưa có lịch sử",
+  "rewardsHistoryEmptyMessage": "Lịch sử ưu đãi sẽ xuất hiện khi có dữ liệu.",
+  "rewardsActionUnavailable": "Hành động ưu đãi này chưa được kết nối cho tài khoản thật.",
+  "rewardsCodeBlank": "Hãy nhập mã trước.",
+  "rewardsCodeDuplicate": "Mã này đã được dùng hoặc đã được nhận.",
+  "rewardsCodeRejected": "Mã demo này không đủ điều kiện.",
+  "rewardsExpiresOn": "Hết hạn {date}",
+  "@rewardsExpiresOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "travelCreditsTitle": "Tín dụng du lịch",
+  "travelCreditsSubtitle": "Tín dụng khuyến mãi dạng tiền, tách biệt với ví giấy tờ du lịch.",
+  "travelCreditsSemantic": "Mở Tín dụng du lịch",
+  "travelCreditsBalance": "Tín dụng khả dụng",
+  "travelCreditsBalanceSemantic": "Số dư tín dụng du lịch",
+  "travelCreditsLocalOnly": "Tín dụng demo là dữ liệu xem trước cục bộ và không đồng bộ.",
+  "travelCreditsNoCashOut": "Rút tiền, chuyển khoản và chuyển nhượng được cố ý tắt.",
+  "travelCreditsTransactions": "Giao dịch tín dụng",
+  "creditTxnGrant": "Cấp tín dụng",
+  "creditTxnPromotion": "Khuyến mãi",
+  "creditTxnRefund": "Hoàn bằng tín dụng",
+  "creditTxnAdjustment": "Điều chỉnh",
+  "creditTxnRedemption": "Sử dụng",
+  "creditTxnExpiration": "Hết hạn",
+  "creditTxnReversal": "Hoàn tác",
+  "loyaltyTitle": "Điểm thành viên",
+  "loyaltySubtitle": "Số dư điểm nguyên và lịch sử giao dịch bất biến.",
+  "loyaltySemantic": "Mở Điểm thành viên",
+  "loyaltyBalanceSemantic": "Số dư điểm thành viên",
+  "loyaltyCurrentBalance": "Số dư hiện tại",
+  "loyaltyLifetimeEarned": "Tổng điểm đã kiếm",
+  "loyaltyPointsValue": "{points} điểm",
+  "@loyaltyPointsValue": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "pointsUnit": "điểm",
+  "loyaltyNoDirectRedeem": "Điểm không phải tiền và đổi điểm trực tiếp chưa được kết nối trong UI-7.",
+  "loyaltyTransactions": "Giao dịch điểm",
+  "loyaltyTxnEarnBooking": "Kiếm từ đặt phòng",
+  "loyaltyTxnEarnReview": "Kiếm từ đánh giá",
+  "loyaltyTxnGrant": "Cấp điểm",
+  "loyaltyTxnAdjustment": "Điều chỉnh",
+  "loyaltyTxnReversal": "Hoàn tác",
+  "loyaltyTxnRedemptionDebit": "Trừ điểm đổi thưởng",
+  "loyaltyTxnRedemptionRelease": "Giải phóng điểm",
+  "loyaltyTxnRedemptionRefund": "Hoàn điểm",
+  "membershipTitle": "Hạng thành viên",
+  "membershipSubtitle": "Tiến độ hạng, metadata quyền lợi và lịch sử hạng.",
+  "membershipSemantic": "Mở Hạng thành viên",
+  "membershipRealUnavailable": "Đăng ký thành viên chưa được kết nối cho tài khoản thật.",
+  "membershipTierSemantic": "Hạng và tiến độ thành viên",
+  "membershipActiveStatus": "Đang hoạt động",
+  "membershipPreviewStatus": "Xem trước",
+  "membershipExpiredStatus": "Hết hạn",
+  "membershipActiveMessage": "Hạng thành viên demo này đang hoạt động cục bộ.",
+  "membershipPreviewMessage": "Xem trước quyền lợi trước khi đăng ký demo.",
+  "membershipProgressSemantic": "Tiến độ hạng thành viên {percent} phần trăm",
+  "@membershipProgressSemantic": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "membershipHighestTier": "Đã đạt hạng cao nhất. Không hiển thị hạng kế tiếp giả.",
+  "membershipNextTier": "Hạng tiếp theo: {tier}",
+  "@membershipNextTier": {
+    "placeholders": {
+      "tier": {
+        "type": "String"
+      }
+    }
+  },
+  "membershipEnrollAction": "Đăng ký cục bộ",
+  "membershipEnrolledAction": "Đã đăng ký cục bộ",
+  "membershipEnrollSemantic": "Đăng ký hạng thành viên demo cục bộ",
+  "membershipEnrollSuccess": "Đã đăng ký thành viên demo cục bộ.",
+  "membershipBenefitsTitle": "Metadata quyền lợi",
+  "membershipHistoryTitle": "Lịch sử hạng",
+  "membershipTierBronze": "Đồng",
+  "membershipTierSilver": "Bạc",
+  "membershipTierGold": "Vàng",
+  "membershipTierPlatinum": "Bạch kim",
+  "membershipTierDiamond": "Kim cương",
+  "benefitPointsMultiplier": "Hệ số điểm",
+  "benefitMemberCoupons": "Mã chỉ dành cho thành viên",
+  "benefitPrioritySupport": "Hỗ trợ ưu tiên",
+  "benefitEarlyAccess": "Truy cập sớm",
+  "benefitLateCheckout": "Trả phòng muộn",
+  "benefitEarlyCheckin": "Nhận phòng sớm",
+  "benefitRoomUpgrade": "Nâng hạng phòng",
+  "benefitFreeBreakfast": "Bữa sáng miễn phí",
+  "benefitAirportTransfer": "Đưa đón sân bay",
+  "benefitCustom": "Quyền lợi tùy chỉnh",
+  "couponsTitle": "Mã giảm giá",
+  "couponsSubtitle": "Mã đã nhận và xem trước điều kiện dạng chỉ đọc.",
+  "couponsSemantic": "Mở Mã giảm giá",
+  "couponsRealUnavailable": "Nhận mã giảm giá chưa được kết nối cho tài khoản thật.",
+  "couponClaimTitle": "Nhận mã demo",
+  "couponCodeLabel": "Mã giảm giá",
+  "couponClaimHelper": "Dùng LOCAL300 để nhận demo cục bộ. Mã không được áp vào đặt phòng.",
+  "couponClaimAction": "Nhận mã",
+  "couponClaimSemantic": "Nhận mã giảm giá demo cục bộ",
+  "couponClaimSuccess": "Đã nhận mã demo cục bộ.",
+  "couponsEmptyTitle": "Chưa có mã",
+  "couponsEmptyMessage": "Mã giảm giá sẽ xuất hiện sau khi nhận hoặc kết nối.",
+  "couponCardSemantic": "Mã giảm giá {code}",
+  "@couponCardSemantic": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "couponPreviewReadOnly": "Xem trước chỉ đọc và không đánh dấu mã là đã dùng.",
+  "couponPercentageValue": "Giảm {percent}%",
+  "@couponPercentageValue": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "couponFixedValue": "Giảm {amount}",
+  "@couponFixedValue": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "couponAmountUnavailable": "Chưa có số tiền",
+  "couponTargetAll": "Tất cả",
+  "couponTargetHotel": "Khách sạn",
+  "couponTargetRoom": "Phòng",
+  "couponTargetPlaceType": "Loại địa điểm",
+  "referralTitle": "Giới thiệu",
+  "referralSubtitle": "Mã giới thiệu, thống kê và dùng mã demo cục bộ.",
+  "referralSemantic": "Mở Giới thiệu",
+  "referralRealUnavailable": "Hành động giới thiệu chưa được kết nối cho tài khoản thật.",
+  "referralCodeSemantic": "Mã giới thiệu",
+  "referralYourCode": "Mã giới thiệu của bạn",
+  "referralStats": "{successful} thành công · {pending} đang chờ",
+  "@referralStats": {
+    "placeholders": {
+      "successful": {
+        "type": "int"
+      },
+      "pending": {
+        "type": "int"
+      }
+    }
+  },
+  "referralCopyAction": "Sao chép mã",
+  "referralCopiedAction": "Đã sao chép",
+  "referralCopySemantic": "Sao chép mã giới thiệu",
+  "referralUseCodeTitle": "Dùng mã giới thiệu",
+  "referralCodeLabel": "Mã giới thiệu",
+  "referralUseCodeHelper": "Dùng mã chỉ tạo giới thiệu cục bộ đang chờ. Không cấp thưởng ngay.",
+  "referralUseCodeAction": "Dùng mã",
+  "referralUseCodeSemantic": "Dùng mã giới thiệu demo cục bộ",
+  "referralUseSuccess": "Đã ghi nhận mã giới thiệu cục bộ ở trạng thái chờ.",
+  "referralOwnCodeRejected": "Bạn không thể dùng mã giới thiệu của chính mình.",
+  "referralHistoryTitle": "Lịch sử giới thiệu",
+  "referralUsedNoReward": "USED nghĩa là đang chờ đủ điều kiện; chưa cấp thưởng.",
+  "referralRoleInviter": "Người mời",
+  "referralRoleInvitee": "Người được mời",
+  "referralStatusUsed": "Đã dùng",
+  "referralStatusRewarded": "Đã thưởng",
+  "giftCardsTitle": "Thẻ quà tặng",
+  "giftCardsSubtitle": "Thẻ đã che mã, số dư, chi tiết và xem trước chỉ đọc.",
+  "giftCardsSemantic": "Mở Thẻ quà tặng",
+  "giftCardsRealUnavailable": "Hành động thẻ quà tặng chưa được kết nối cho tài khoản thật.",
+  "giftCardClaimTitle": "Nhận thẻ quà tặng demo",
+  "giftCardCodeLabel": "Mã thẻ quà tặng",
+  "giftCardClaimHelper": "Dùng GIFTDEMO để nhận demo cục bộ. Không có luồng mua hoặc thanh toán.",
+  "giftCardClaimAction": "Nhận thẻ",
+  "giftCardClaimSemantic": "Nhận thẻ quà tặng demo cục bộ",
+  "giftCardClaimSuccess": "Đã nhận thẻ quà tặng demo cục bộ.",
+  "giftCardsEmptyTitle": "Chưa có thẻ quà tặng",
+  "giftCardsEmptyMessage": "Thẻ quà tặng sẽ xuất hiện sau khi nhận hoặc kết nối.",
+  "giftCardCardSemantic": "Thẻ quà tặng {code}",
+  "@giftCardCardSemantic": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "giftCardBalance": "Số dư thẻ",
+  "giftCardTransactionsTitle": "Giao dịch thẻ quà tặng",
+  "giftCardPreviewAction": "Chỉ xem trước",
+  "giftCardPreviewSemantic": "Xem trước thẻ quà tặng mà không đổi số dư",
+  "giftCardPreviewReadOnly": "Xem trước thẻ quà tặng chỉ đọc và không đổi số dư.",
+  "giftCardActivateAction": "Kích hoạt cục bộ",
+  "giftCardActivateSuccess": "Đã kích hoạt thẻ quà tặng demo cục bộ.",
+  "giftCardStatusIssued": "Đã phát hành",
+  "giftCardStatusActive": "Đang hoạt động",
+  "giftCardStatusPartiallyRedeemed": "Đã dùng một phần",
+  "giftCardStatusFullyRedeemed": "Đã dùng hết",
+  "giftCardStatusExpired": "Hết hạn",
+  "giftCardStatusCancelled": "Đã hủy",
+  "giftCardTxnIssue": "Phát hành",
+  "giftCardTxnActivation": "Kích hoạt",
+  "giftCardTxnRedemption": "Sử dụng",
+  "giftCardTxnRefund": "Hoàn lại",
+  "giftCardTxnExpiry": "Hết hạn",
   "commonBackSemantic": "Quay lại",
   "demoModeLabel": "Chế độ demo"
 }
