@@ -2,17 +2,28 @@ import 'package:flutter/widgets.dart';
 import 'mock/app_models.dart';
 import 'mock/mock_data.dart';
 import 'network/api_client.dart';
+import 'storage/preference_storage.dart';
 import 'storage/session_storage.dart';
 
 class AppState extends ChangeNotifier {
   final ApiClient api;
   final SessionStorage storage;
-  AppState({ApiClient? api, SessionStorage? storage})
-      : api = api ?? ApiClient(),
-        storage = storage ?? SessionStorage();
+  final PreferenceStorage preferences;
+  AppState({
+    ApiClient? api,
+    SessionStorage? storage,
+    PreferenceStorage? preferences,
+  })  : api = api ?? ApiClient(),
+        storage = storage ?? SessionStorage(),
+        preferences = preferences ?? PreferenceStorage();
 
   bool demoMode = true;
   String? email;
+  Locale? localeOverride;
+  bool tripRemindersEnabled = true;
+  bool bookingUpdatesEnabled = true;
+  bool travelTipsEnabled = false;
+  bool reduceMotionEnabled = false;
 
   List<Place> places = List.from(MockData.places);
   List<Trip> trips = List.from(MockData.trips);
@@ -30,6 +41,11 @@ class AppState extends ChangeNotifier {
     api.demoMode = savedDemo;
     demoMode = savedDemo;
     email = savedDemo || savedToken != null ? savedEmail : null;
+    localeOverride = await preferences.locale();
+    tripRemindersEnabled = await preferences.tripReminders();
+    bookingUpdatesEnabled = await preferences.bookingUpdates();
+    travelTipsEnabled = await preferences.travelTips();
+    reduceMotionEnabled = await preferences.reduceMotion();
     notifyListeners();
   }
 
@@ -58,6 +74,38 @@ class AppState extends ChangeNotifier {
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
+    notifyListeners();
+  }
+
+  // ── Local preferences ────────────────────────────────────────────────────
+
+  Future<void> setLocaleOverride(Locale? locale) async {
+    localeOverride = locale;
+    await preferences.saveLocale(locale);
+    notifyListeners();
+  }
+
+  Future<void> setTripRemindersEnabled(bool value) async {
+    tripRemindersEnabled = value;
+    await preferences.saveTripReminders(value);
+    notifyListeners();
+  }
+
+  Future<void> setBookingUpdatesEnabled(bool value) async {
+    bookingUpdatesEnabled = value;
+    await preferences.saveBookingUpdates(value);
+    notifyListeners();
+  }
+
+  Future<void> setTravelTipsEnabled(bool value) async {
+    travelTipsEnabled = value;
+    await preferences.saveTravelTips(value);
+    notifyListeners();
+  }
+
+  Future<void> setReduceMotionEnabled(bool value) async {
+    reduceMotionEnabled = value;
+    await preferences.saveReduceMotion(value);
     notifyListeners();
   }
 

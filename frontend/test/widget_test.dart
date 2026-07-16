@@ -109,7 +109,7 @@ void main() {
 
     await tester.tap(find.text('Start planning'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Login'));
+    await tester.tap(find.text('Use Demo Mode'));
     await tester.pumpAndSettle();
 
     expect(app.demoMode, isTrue);
@@ -282,7 +282,7 @@ void main() {
     await tester.tap(find.text('Profile'));
     await tester.pumpAndSettle();
     expect(
-      find.text('Traveler', skipOffstage: false),
+      find.text('Demo Traveler', skipOffstage: false),
       findsOneWidget,
     );
   });

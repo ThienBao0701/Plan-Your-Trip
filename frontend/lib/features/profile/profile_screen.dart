@@ -1,169 +1,370 @@
 import 'package:flutter/material.dart';
+
 import '../../core/app_state.dart';
+import '../../core/mock/mock_data.dart';
 import '../../design/app_colors.dart';
+import '../../design/app_icon_sizes.dart';
+import '../../design/app_radii.dart';
+import '../../design/app_spacing.dart';
+import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/glass_widgets.dart';
 import '../auth/login_screen.dart';
+import 'notifications_screen.dart';
+import 'saved_places_screen.dart';
 import 'settings_screen.dart';
 import 'static_page.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     final app = AppScope.of(context);
-    final tripCount = app.trips.length;
-    final expenseCount = app.expenses.length;
-
+    final l10n = AppLocalizations.of(context)!;
+    final isDemo = app.demoMode;
     return ListView(
-        padding: const EdgeInsets.fromLTRB(20, 18, 20, 120),
-        children: [
-          Text('Profile', style: Theme.of(context).textTheme.headlineMedium),
-          const SizedBox(height: 16),
-          // User card
-          GlassCard(
-              child: Row(children: [
-            CircleAvatar(
-                radius: 30,
-                backgroundColor: AppColors.ocean.withValues(alpha: .15),
-                child: const Icon(Icons.person_rounded,
-                    color: AppColors.ocean, size: 32)),
-            const SizedBox(width: 14),
+      key: const PageStorageKey('profile-scroll'),
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 120),
+      children: [
+        Row(
+          children: [
             Expanded(
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                  Text(app.email ?? 'Traveler',
-                      style: Theme.of(context).textTheme.titleMedium),
-                  const SizedBox(height: 2),
-                  Row(children: [
-                    if (app.demoMode)
-                      Container(
-                          margin: const EdgeInsets.only(right: 6),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                              color: AppColors.ocean,
-                              borderRadius: BorderRadius.circular(999)),
-                          child: const Text('Demo Mode',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w800))),
-                    Text(app.demoMode ? 'Mock data active' : 'Backend account',
-                        style: const TextStyle(
-                            color: AppColors.slate, fontSize: 12)),
-                  ]),
-                ]))
-          ])),
-          const SizedBox(height: 12),
-          // Stats card
-          GlassCard(
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                _stat(context, '$tripCount', 'Trips'),
-                Container(
-                    width: 1,
-                    height: 40,
-                    color: AppColors.slate.withValues(alpha: .3)),
-                _stat(context, '$expenseCount', 'Expenses'),
-                Container(
-                    width: 1,
-                    height: 40,
-                    color: AppColors.slate.withValues(alpha: .3)),
-                _stat(context, '${app.timeline.length}', 'Activities'),
-              ])),
-          const SizedBox(height: 16),
-          const _SectionHeader('Account'),
-          _navCard(context, Icons.settings_rounded, 'Settings', () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const SettingsScreen()));
-          }),
-          const SizedBox(height: 6),
-          const _SectionHeader('Legal'),
-          _navCard(context, Icons.privacy_tip_rounded, 'Privacy Policy', () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => const StaticPage(title: 'Privacy Policy')));
-          }),
-          _navCard(context, Icons.gavel_rounded, 'Terms of Service', () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) =>
-                        const StaticPage(title: 'Terms of Service')));
-          }),
-          _navCard(context, Icons.info_outline_rounded, 'About App', () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => const StaticPage(title: 'About App')));
-          }),
-          const SizedBox(height: 16),
-          GlassButton(
-              text: 'Logout',
-              icon: Icons.logout_rounded,
-              onPressed: () async {
-                await app.logout();
-                if (context.mounted) {
-                  Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (_) => const LoginScreen()),
-                      (_) => false);
-                }
-              }),
-          const SizedBox(height: 8),
-          Center(
-              child: Text('Plan Your Trip v1.0.0',
-                  style: TextStyle(
-                      fontSize: 12,
-                      color: AppColors.slate.withValues(alpha: .7)))),
-        ]);
+              child: Text(
+                l10n.profileTitle,
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+            ),
+            Semantics(
+              button: true,
+              label: l10n.profileSettingsSemantic,
+              child: IconButton.filledTonal(
+                tooltip: l10n.profileSettingsSemantic,
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                ),
+                icon: const Icon(Icons.settings_rounded),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        OceanGlassCard(
+          child: Column(
+            children: [
+              CircleAvatar(
+                radius: 42,
+                backgroundColor: AppColors.ocean.withValues(alpha: .12),
+                child: Icon(
+                  isDemo ? Icons.flight_takeoff_rounded : Icons.person_rounded,
+                  color: AppColors.ocean,
+                  size: AppIconSizes.xl,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                isDemo ? l10n.profileDemoName : l10n.profileRealAccountTitle,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+              const SizedBox(height: AppSpacing.xxs),
+              Text(
+                app.email ??
+                    (isDemo ? MockData.demoEmail : l10n.profileEmailMissing),
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              OceanStatusPill(
+                label: isDemo ? l10n.profileDemoStatus : l10n.profileRealStatus,
+                icon: isDemo ? Icons.science_rounded : Icons.cloud_done_rounded,
+                color: isDemo ? AppColors.ocean : AppColors.success,
+              ),
+              if (!isDemo) ...[
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  l10n.profileBackendProfileUnavailable,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ],
+            ],
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        OceanGlassCard(
+          child: Row(
+            children: [
+              _ProfileStat(
+                icon: Icons.work_rounded,
+                value: isDemo ? '${app.trips.length}' : '-',
+                label: l10n.profileTripsStat,
+              ),
+              const _StatDivider(),
+              _ProfileStat(
+                icon: Icons.bookmark_rounded,
+                value: isDemo ? '4' : '-',
+                label: l10n.profileSavedPlacesStat,
+              ),
+              const _StatDivider(),
+              _ProfileStat(
+                icon: Icons.notifications_rounded,
+                value: isDemo ? '4' : '-',
+                label: l10n.profileNotificationsStat,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        Text(
+          l10n.profileTravelPreferences,
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        if (isDemo)
+          Wrap(
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
+            children: [
+              OceanStatusPill(
+                label: l10n.profileDemoPreferences.split(', ')[0],
+                icon: Icons.restaurant_rounded,
+                color: AppColors.coral,
+              ),
+              OceanStatusPill(
+                label: l10n.profileDemoPreferences.split(', ')[1],
+                icon: Icons.museum_rounded,
+                color: AppColors.turquoise600,
+              ),
+              OceanStatusPill(
+                label: l10n.profileDemoPreferences.split(', ')[2],
+                icon: Icons.terrain_rounded,
+                color: AppColors.ocean,
+              ),
+            ],
+          )
+        else
+          OceanGlassCard(
+            child: Text(
+              l10n.profileBackendProfileUnavailable,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ),
+        const SizedBox(height: AppSpacing.lg),
+        _SectionHeader(l10n.profileAccountSection),
+        _ProfileNavCard(
+          icon: Icons.settings_rounded,
+          title: l10n.profileSettings,
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const SettingsScreen()),
+          ),
+        ),
+        _ProfileNavCard(
+          icon: Icons.bookmark_rounded,
+          title: l10n.profileSavedPlaces,
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const SavedPlacesScreen()),
+          ),
+        ),
+        _ProfileNavCard(
+          icon: Icons.notifications_rounded,
+          title: l10n.profileNotifications,
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        _SectionHeader(l10n.profileLegalSection),
+        _ProfileNavCard(
+          icon: Icons.privacy_tip_rounded,
+          title: l10n.profilePrivacyPolicy,
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => StaticPage(title: l10n.profilePrivacyPolicy),
+            ),
+          ),
+        ),
+        _ProfileNavCard(
+          icon: Icons.gavel_rounded,
+          title: l10n.profileTerms,
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => StaticPage(title: l10n.profileTerms),
+            ),
+          ),
+        ),
+        _ProfileNavCard(
+          icon: Icons.info_outline_rounded,
+          title: l10n.profileAboutApp,
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => StaticPage(title: l10n.profileAboutApp),
+            ),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        OceanSecondaryButton(
+          label: l10n.profileLogout,
+          icon: Icons.logout_rounded,
+          semanticLabel: l10n.profileLogoutSemantic,
+          onPressed: () => _confirmLogout(context, app),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        Center(
+          child: Text(
+            l10n.profileVersion,
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium
+                ?.copyWith(color: AppColors.textTertiary),
+          ),
+        ),
+      ],
+    );
   }
 
-  Widget _stat(BuildContext context, String value, String label) =>
-      Column(mainAxisSize: MainAxisSize.min, children: [
-        Text(value,
-            style: const TextStyle(
+  Future<void> _confirmLogout(BuildContext context, AppState app) async {
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.profileLogoutConfirmTitle),
+        content: Text(l10n.profileLogoutConfirmMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(l10n.profileCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(l10n.profileConfirmLogout),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    await app.logout();
+    if (!context.mounted) return;
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
+      (_) => false,
+    );
+  }
+}
+
+class _ProfileStat extends StatelessWidget {
+  final IconData icon;
+  final String value;
+  final String label;
+
+  const _ProfileStat({
+    required this.icon,
+    required this.value,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) => Expanded(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: AppColors.ocean, size: AppIconSizes.md),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              value,
+              style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w900,
-                color: AppColors.ocean)),
-        Text(label,
-            style: const TextStyle(fontSize: 12, color: AppColors.slate)),
-      ]);
+                color: AppColors.ocean,
+              ),
+            ),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ],
+        ),
+      );
+}
 
-  Widget _navCard(BuildContext context, IconData icon, String title,
-          VoidCallback onTap) =>
-      Padding(
-          padding: const EdgeInsets.only(bottom: 10),
-          child: GlassCard(
-              onTap: onTap,
-              child: Row(children: [
-                Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                        color: AppColors.ocean.withValues(alpha: .1),
-                        borderRadius: BorderRadius.circular(12)),
-                    child: Icon(icon, color: AppColors.ocean, size: 20)),
-                const SizedBox(width: 14),
-                Expanded(
-                    child: Text(title,
-                        style: Theme.of(context).textTheme.titleMedium)),
-                const Icon(Icons.chevron_right_rounded, color: AppColors.slate),
-              ])));
+class _StatDivider extends StatelessWidget {
+  const _StatDivider();
+
+  @override
+  Widget build(BuildContext context) => Container(
+        width: 1,
+        height: 58,
+        color: AppColors.divider,
+      );
+}
+
+class _ProfileNavCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final VoidCallback onTap;
+
+  const _ProfileNavCard({
+    required this.icon,
+    required this.title,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+        child: OceanGlassCard(
+          onTap: onTap,
+          child: Row(
+            children: [
+              Container(
+                width: AppSpacing.minTouchTarget,
+                height: AppSpacing.minTouchTarget,
+                decoration: BoxDecoration(
+                  color: AppColors.ocean.withValues(alpha: .10),
+                  borderRadius: BorderRadius.circular(AppRadii.md),
+                ),
+                child:
+                    Icon(icon, color: AppColors.ocean, size: AppIconSizes.sm),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Text(
+                  title,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
+              const Icon(Icons.chevron_right_rounded,
+                  color: AppColors.textSecondary),
+            ],
+          ),
+        ),
+      );
 }
 
 class _SectionHeader extends StatelessWidget {
   final String text;
+
   const _SectionHeader(this.text);
+
   @override
   Widget build(BuildContext context) => Padding(
-      padding: const EdgeInsets.fromLTRB(4, 4, 0, 8),
-      child: Text(text,
+        padding: const EdgeInsets.fromLTRB(4, 4, 0, 8),
+        child: Text(
+          text,
           style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w800,
-              color: AppColors.slate,
-              letterSpacing: 0.8)));
+            fontSize: 12,
+            fontWeight: FontWeight.w800,
+            color: AppColors.textSecondary,
+            letterSpacing: 0,
+          ),
+        ),
+      );
 }

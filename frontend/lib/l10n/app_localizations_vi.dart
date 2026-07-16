@@ -131,5 +131,459 @@ class AppLocalizationsVi extends AppLocalizations {
   String get plannerTripCardSemantic => 'Thẻ lập lịch chuyến đi';
 
   @override
+  String get authLoginHero => 'Mỗi ngày đi, một hành trình đáng nhớ.';
+
+  @override
+  String get authLoginTitle => 'Chào mừng trở lại';
+
+  @override
+  String get authLoginSubtitle => 'Đăng nhập để tiếp tục hành trình của bạn.';
+
+  @override
+  String get authEmailLabel => 'Email';
+
+  @override
+  String get authPasswordLabel => 'Mật khẩu';
+
+  @override
+  String get authFullNameLabel => 'Họ và tên';
+
+  @override
+  String get authConfirmPasswordLabel => 'Xác nhận mật khẩu';
+
+  @override
+  String get authLoginAction => 'Đăng nhập';
+
+  @override
+  String get authDemoAction => 'Dùng Chế độ demo';
+
+  @override
+  String get authCreateAccountAction => 'Tạo tài khoản';
+
+  @override
+  String get authAlreadyHaveAccount => 'Đã có tài khoản?';
+
+  @override
+  String get authNeedAccount => 'Chưa có tài khoản?';
+
+  @override
+  String get authForgotPasswordAction => 'Quên mật khẩu?';
+
+  @override
+  String get authVerifyEmailAction => 'Xác minh email';
+
+  @override
+  String get authDemoHint =>
+      'Tài khoản demo dùng dữ liệu mẫu cục bộ và không gọi backend.';
+
+  @override
+  String get authBackendHint => 'Đăng nhập backend chỉ dùng /auth/login.';
+
+  @override
+  String get authRegisterTitle => 'Tạo tài khoản';
+
+  @override
+  String get authRegisterSubtitle =>
+      'Bắt đầu không gian lập kế hoạch của riêng bạn.';
+
+  @override
+  String get authRegisterAction => 'Đăng ký';
+
+  @override
+  String get authRegistrationComplete =>
+      'Đăng ký hoàn tất. Vui lòng đăng nhập.';
+
+  @override
+  String get authPasswordRequirement => 'Mật khẩu cần ít nhất 8 ký tự.';
+
+  @override
+  String get authTermsNote =>
+      'Khi tiếp tục, bạn đồng ý với điều khoản và thông tin quyền riêng tư hiện có trong ứng dụng.';
+
+  @override
+  String get authShowPassword => 'Hiện mật khẩu';
+
+  @override
+  String get authHidePassword => 'Ẩn mật khẩu';
+
+  @override
+  String get authShowConfirmPassword => 'Hiện mật khẩu xác nhận';
+
+  @override
+  String get authHideConfirmPassword => 'Ẩn mật khẩu xác nhận';
+
+  @override
+  String get authValidationName => 'Nhập họ và tên của bạn.';
+
+  @override
+  String get authValidationEmail => 'Nhập địa chỉ email hợp lệ.';
+
+  @override
+  String get authValidationPasswordRequired => 'Nhập mật khẩu của bạn.';
+
+  @override
+  String get authValidationPasswordMin => 'Mật khẩu cần ít nhất 8 ký tự.';
+
+  @override
+  String get authValidationConfirmPassword => 'Xác nhận mật khẩu của bạn.';
+
+  @override
+  String get authValidationPasswordMismatch => 'Mật khẩu không khớp.';
+
+  @override
+  String get authLoginFailed => 'Đăng nhập thất bại.';
+
+  @override
+  String get authRegistrationFailed => 'Đăng ký thất bại.';
+
+  @override
+  String get authUnsupportedForgotPassword =>
+      'Đặt lại mật khẩu chưa được kết nối với backend.';
+
+  @override
+  String get authUnsupportedVerification =>
+      'Xác minh email chưa được kết nối với backend.';
+
+  @override
+  String get authUnsupportedResend => 'Gửi lại mã xác minh chưa được kết nối.';
+
+  @override
+  String get forgotPasswordTitle => 'Quên mật khẩu?';
+
+  @override
+  String get forgotPasswordSubtitle =>
+      'Nhập email tài khoản của bạn. Màn hình này đã sẵn sàng cho endpoint đặt lại mật khẩu sau này.';
+
+  @override
+  String get forgotPasswordSendAction => 'Gửi liên kết đặt lại';
+
+  @override
+  String get forgotPasswordReturnAction => 'Quay lại đăng nhập';
+
+  @override
+  String get forgotPasswordInfo =>
+      'Chưa thể gửi liên kết đặt lại cho đến khi backend được kết nối.';
+
+  @override
+  String get emailVerificationTitle => 'Xác minh email';
+
+  @override
+  String emailVerificationSubtitle(String email) {
+    return 'Nhập mã gồm 6 chữ số cho $email.';
+  }
+
+  @override
+  String emailVerificationDigitSemantic(int position) {
+    return 'Chữ số xác minh $position';
+  }
+
+  @override
+  String get emailVerificationAction => 'Xác minh';
+
+  @override
+  String emailVerificationResendIn(int seconds) {
+    return 'Gửi lại mã sau 00:$seconds';
+  }
+
+  @override
+  String get emailVerificationResendAction => 'Gửi lại mã';
+
+  @override
+  String get emailVerificationChangeEmail => 'Đổi địa chỉ email';
+
+  @override
+  String get emailVerificationIncomplete => 'Nhập đủ 6 chữ số.';
+
+  @override
+  String get profileTitle => 'Hồ sơ';
+
+  @override
+  String get profileSettingsSemantic => 'Mở cài đặt';
+
+  @override
+  String get profileDemoName => 'Khách du lịch demo';
+
+  @override
+  String get profileRealAccountTitle => 'Tài khoản đã đăng nhập';
+
+  @override
+  String get profileEmailMissing => 'Chưa có email';
+
+  @override
+  String get profileDemoStatus => 'Dữ liệu demo đang hoạt động';
+
+  @override
+  String get profileRealStatus => 'Tài khoản backend';
+
+  @override
+  String get profileBackendProfileUnavailable =>
+      'Chi tiết hồ sơ chưa được kết nối với endpoint backend.';
+
+  @override
+  String get profileTripsStat => 'Chuyến đi';
+
+  @override
+  String get profileSavedPlacesStat => 'Đã lưu';
+
+  @override
+  String get profileNotificationsStat => 'Thông báo';
+
+  @override
+  String get profileTravelPreferences => 'Sở thích du lịch';
+
+  @override
+  String get profileDemoPreferences => 'Ẩm thực, Văn hóa, Thiên nhiên';
+
+  @override
+  String get profileAccountSection => 'Tài khoản';
+
+  @override
+  String get profileLegalSection => 'Pháp lý';
+
+  @override
+  String get profileSettings => 'Cài đặt';
+
+  @override
+  String get profileSavedPlaces => 'Địa điểm đã lưu';
+
+  @override
+  String get profileNotifications => 'Thông báo';
+
+  @override
+  String get profilePrivacyPolicy => 'Chính sách bảo mật';
+
+  @override
+  String get profileTerms => 'Điều khoản dịch vụ';
+
+  @override
+  String get profileAboutApp => 'Về ứng dụng';
+
+  @override
+  String get profileLogout => 'Đăng xuất';
+
+  @override
+  String get profileLogoutSemantic => 'Đăng xuất khỏi tài khoản này';
+
+  @override
+  String get profileLogoutConfirmTitle => 'Đăng xuất?';
+
+  @override
+  String get profileLogoutConfirmMessage =>
+      'Thao tác này xóa phiên đã lưu và loại bỏ token Authorization khỏi các yêu cầu sau.';
+
+  @override
+  String get profileCancel => 'Hủy';
+
+  @override
+  String get profileConfirmLogout => 'Đăng xuất';
+
+  @override
+  String get profileVersion => 'Plan Your Trip v1.0.0';
+
+  @override
+  String get settingsTitle => 'Cài đặt';
+
+  @override
+  String get settingsLanguageRegion => 'Ngôn ngữ & khu vực';
+
+  @override
+  String get settingsLanguage => 'Ngôn ngữ';
+
+  @override
+  String get settingsLanguageDevice => 'Theo thiết bị';
+
+  @override
+  String get settingsLanguageEnglish => 'Tiếng Anh';
+
+  @override
+  String get settingsLanguageVietnamese => 'Tiếng Việt';
+
+  @override
+  String get settingsCurrency => 'Tiền tệ';
+
+  @override
+  String get settingsTimeFormat => 'Định dạng thời gian';
+
+  @override
+  String get settingsNotifications => 'Thông báo';
+
+  @override
+  String get settingsTripReminders => 'Nhắc lịch trình';
+
+  @override
+  String get settingsBookingUpdates => 'Cập nhật booking';
+
+  @override
+  String get settingsTravelTips => 'Gợi ý chuyến đi';
+
+  @override
+  String get settingsLocalOnly =>
+      'Chỉ là tùy chọn cục bộ. Đăng ký push chưa được kết nối.';
+
+  @override
+  String get settingsStoredOnDevice => 'Chỉ lưu trên thiết bị này.';
+
+  @override
+  String get settingsAppearance => 'Giao diện';
+
+  @override
+  String get settingsTheme => 'Chủ đề';
+
+  @override
+  String get settingsThemeLight => 'Sáng';
+
+  @override
+  String get settingsReduceMotion => 'Giảm chuyển động';
+
+  @override
+  String get settingsAccountSecurity => 'Tài khoản & bảo mật';
+
+  @override
+  String get settingsPasswordReset => 'Đặt lại mật khẩu';
+
+  @override
+  String get settingsPasswordResetSubtitle =>
+      'Chỉ là luồng giao diện cho đến khi backend có endpoint.';
+
+  @override
+  String get settingsPrivacy => 'Quyền riêng tư';
+
+  @override
+  String get settingsAbout => 'Giới thiệu';
+
+  @override
+  String get settingsDemoData => 'Dữ liệu demo';
+
+  @override
+  String get settingsResetDemoData => 'Đặt lại dữ liệu demo';
+
+  @override
+  String get settingsResetDemoSubtitle =>
+      'Khôi phục chuyến đi, địa điểm và chi phí mẫu ban đầu.';
+
+  @override
+  String get settingsResetDemoConfirmTitle => 'Đặt lại dữ liệu demo?';
+
+  @override
+  String get settingsResetDemoConfirmMessage =>
+      'Thao tác này đăng nhập lại Chế độ demo và khôi phục dữ liệu du lịch mẫu.';
+
+  @override
+  String get settingsReset => 'Đặt lại';
+
+  @override
+  String get settingsDemoRestored => 'Đã khôi phục dữ liệu demo.';
+
+  @override
+  String get settingsConnectedReal => 'Đã kết nối backend';
+
+  @override
+  String get savedPlacesTitle => 'Địa điểm đã lưu';
+
+  @override
+  String get savedPlacesSearchHint => 'Tìm địa điểm đã lưu';
+
+  @override
+  String get savedPlacesAllFilter => 'Tất cả';
+
+  @override
+  String savedPlacesCount(int count) {
+    return '$count địa điểm';
+  }
+
+  @override
+  String get savedPlacesRealEmptyTitle => 'Chưa có địa điểm đã lưu';
+
+  @override
+  String get savedPlacesRealEmptyMessage =>
+      'Địa điểm đã lưu chưa được kết nối với backend cho tài khoản thật.';
+
+  @override
+  String get savedPlacesDemoEmptyTitle => 'Không có địa điểm phù hợp';
+
+  @override
+  String get savedPlacesDemoEmptyMessage => 'Thử bộ lọc hoặc từ khóa khác.';
+
+  @override
+  String savedPlacesBookmarkSemantic(String place) {
+    return 'Dấu trang đã lưu cho $place';
+  }
+
+  @override
+  String get savedPlacesRemoved => 'Đã xóa khỏi danh sách đã lưu cục bộ.';
+
+  @override
+  String get notificationsTitle => 'Thông báo';
+
+  @override
+  String get notificationsMarkAllRead => 'Đánh dấu đã đọc';
+
+  @override
+  String get notificationsToday => 'Hôm nay';
+
+  @override
+  String get notificationsEarlier => 'Trước đó';
+
+  @override
+  String get notificationsRealEmptyTitle => 'Chưa có thông báo';
+
+  @override
+  String get notificationsRealEmptyMessage =>
+      'Thông báo máy chủ chưa được kết nối cho tài khoản thật.';
+
+  @override
+  String get notificationsDemoEmptyTitle => 'Chưa có thông báo demo';
+
+  @override
+  String get notificationsDemoEmptyMessage =>
+      'Nhắc lịch trình và cập nhật sẽ xuất hiện tại đây.';
+
+  @override
+  String get notificationUnreadSemantic => 'Thông báo chưa đọc';
+
+  @override
+  String get notificationReadSemantic => 'Thông báo đã đọc';
+
+  @override
+  String get notificationsSettingsSemantic => 'Mở cài đặt thông báo';
+
+  @override
+  String get notificationScheduleTitle => 'Lịch trình sắp bắt đầu';
+
+  @override
+  String get notificationScheduleMessage =>
+      'Chuyến đi Đà Lạt của bạn bắt đầu sau 2 ngày.';
+
+  @override
+  String get notificationBookingTitle => 'Cập nhật booking';
+
+  @override
+  String get notificationBookingMessage =>
+      'Chỗ ở demo của bạn đã sẵn sàng cho chuyến đi.';
+
+  @override
+  String get notificationTipsTitle => 'Gợi ý dành cho bạn';
+
+  @override
+  String get notificationTipsMessage =>
+      'Khám phá 5 điểm ăn uống được yêu thích gần nơi đã lưu.';
+
+  @override
+  String get notificationBudgetTitle => 'Ngân sách chuyến đi';
+
+  @override
+  String get notificationBudgetMessage =>
+      'Bạn đã dùng 62% ngân sách demo dự kiến.';
+
+  @override
+  String get notificationYesterday => 'Hôm qua';
+
+  @override
+  String get notificationBudgetDate => '12 Th7';
+
+  @override
+  String get commonBackSemantic => 'Quay lại';
+
+  @override
   String get demoModeLabel => 'Chế độ demo';
 }

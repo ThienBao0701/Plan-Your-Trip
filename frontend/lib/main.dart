@@ -21,6 +21,7 @@ class PlanYourTripApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
         theme: AppTheme.light(),
+        locale: app.localeOverride,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: app.email == null ? const OnboardingScreen() : const AppShell());
