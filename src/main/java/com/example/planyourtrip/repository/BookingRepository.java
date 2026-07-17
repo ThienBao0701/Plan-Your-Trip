@@ -11,11 +11,19 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking, Long>,
         JpaSpecificationExecutor<Booking> {
 
     List<Booking> findByUserIdOrderByCreatedAtDesc(Long userId);
+
+    /**
+     * Phase 7.39 — resolve a booking by its immutable, unique {@code bookingCode} (the value signed
+     * into the customer voucher QR payload). Read-only derived finder backed by the existing unique
+     * index {@code idx_bookings_code}.
+     */
+    Optional<Booking> findByBookingCode(String bookingCode);
 
     List<Booking> findAllByOrderByCreatedAtDesc();
 

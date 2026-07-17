@@ -3,8 +3,11 @@ package com.example.planyourtrip.controller;
 import com.example.planyourtrip.dto.BookingDto.BookingResponse;
 import com.example.planyourtrip.dto.PageResponse;
 import com.example.planyourtrip.dto.PartnerBookingDto.*;
+import com.example.planyourtrip.dto.PartnerVoucherDto.VoucherVerificationResponse;
+import com.example.planyourtrip.dto.PartnerVoucherDto.VoucherVerifyRequest;
 import com.example.planyourtrip.security.AuthUser;
 import com.example.planyourtrip.service.PartnerBookingService;
+import com.example.planyourtrip.service.PartnerVoucherVerificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,8 +22,13 @@ import java.time.LocalDate;
 public class PartnerBookingController {
 
     private final PartnerBookingService service;
+    private final PartnerVoucherVerificationService voucherVerificationService;
 
-    public PartnerBookingController(PartnerBookingService service) { this.service = service; }
+    public PartnerBookingController(PartnerBookingService service,
+                                    PartnerVoucherVerificationService voucherVerificationService) {
+        this.service = service;
+        this.voucherVerificationService = voucherVerificationService;
+    }
 
     @GetMapping("/api/partner/bookings")
     @Operation(summary = "List/search my bookings (paginated)")
@@ -79,5 +87,19 @@ public class PartnerBookingController {
     @Operation(summary = "Partner dashboard summary across all owned hotels")
     public PartnerDashboardResponse getDashboard(@AuthUser Long uid) {
         return service.getDashboard(uid);
+    }
+
+    // ── Phase 7.39 — Partner Voucher Verification (read-only; NO check-in) ──────
+
+    @PostMapping("/api/partner/bookings/voucher/verify")
+    @Operation(summary = "Verify a signed customer voucher QR payload for one of my hotels",
+        description = "Verifies the Phase 7.38 HMAC-signed voucher payload, resolves the booking, "
+            + "confirms it belongs to one of the caller's OWN hotels and reports check-in eligibility. "
+            + "Strictly READ-ONLY — performs no check-in and mutates nothing (check-in is deferred to "
+            + "Phase 7.40). Invalid signature / unknown booking / another partner's booking all return "
+            + "a uniform 404; a valid, owned but ineligible booking returns 200 with eligible=false.")
+    public VoucherVerificationResponse verifyVoucher(@AuthUser Long uid,
+                                                     @RequestBody VoucherVerifyRequest req) {
+        return voucherVerificationService.verify(uid, req);
     }
 }
