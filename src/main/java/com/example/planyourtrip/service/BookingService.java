@@ -1,9 +1,12 @@
 package com.example.planyourtrip.service;
 
 import com.example.planyourtrip.dto.BookingDto.*;
+import com.example.planyourtrip.dto.BookingVoucherDto.BookingVoucherResponse;
+import com.example.planyourtrip.dto.BookingVoucherDto.VoucherStatus;
 import com.example.planyourtrip.exception.ApiException;
 import com.example.planyourtrip.model.*;
 import com.example.planyourtrip.repository.*;
+import com.example.planyourtrip.security.VoucherSignatureService;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -42,6 +45,7 @@ public class BookingService {
     private final InventoryReservationService inventoryReservationService;
     private final RatePlanPricingService ratePlanPricingService;
     private final BookingModificationRepository bookingModificationRepo;
+    private final VoucherSignatureService voucherSignatureService;
 
     private static final Set<BookingStatus> UPCOMING_STATUSES =
         EnumSet.of(BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.CHECK_IN_READY);
@@ -70,7 +74,8 @@ public class BookingService {
                           GiftCardService giftCardService,
                           InventoryReservationService inventoryReservationService,
                           RatePlanPricingService ratePlanPricingService,
-                          BookingModificationRepository bookingModificationRepo) {
+                          BookingModificationRepository bookingModificationRepo,
+                          VoucherSignatureService voucherSignatureService) {
         this.bookingRepo   = bookingRepo;
         this.roomRepo      = roomRepo;
         this.inventoryRepo = inventoryRepo;
@@ -88,6 +93,7 @@ public class BookingService {
         this.inventoryReservationService = inventoryReservationService;
         this.ratePlanPricingService = ratePlanPricingService;
         this.bookingModificationRepo = bookingModificationRepo;
+        this.voucherSignatureService = voucherSignatureService;
     }
 
     // ── Create ────────────────────────────────────────────────────────────────
@@ -316,6 +322,137 @@ public class BookingService {
         if (!b.getUser().getId().equals(userId) && !"ADMIN".equals(requestingUser.getRole()))
             throw new ApiException(HttpStatus.FORBIDDEN, "Access denied");
         return buildTimeline(b);
+    }
+
+    // ── Phase 7.38 — Customer Booking Digital Voucher (read-only) ──────────────
+
+    /**
+     * Phase 7.38 — build a safe, customer-facing check-in voucher for a booking, DERIVED entirely
+     * from already-persisted Booking / Payment / BookingModification snapshots. Strictly READ-ONLY:
+     * pure read + DTO mapping, no price recomputation, no mutation of anything (no Booking/Payment
+     * write, no inventory/reservation change, no ledger/notification/audit row, no lock).
+     *
+     * <p><b>Ownership — deliberate 404 (not 403) for a non-owner.</b> Unlike {@link #getById} /
+     * {@link #cancel} / {@link #modify}, which return 403 "Access denied" for another user's booking
+     * (and let ADMIN read), this voucher surface returns 404 for ANY booking that is not the caller's
+     * own — the same "don't leak existence" privacy pattern the coupon / gift-card / wallet read
+     * surfaces use. This is the one intentional convention divergence in this phase: the voucher is a
+     * customer self-service artifact, so it never confirms the existence of a booking the caller does
+     * not own (and grants no admin bypass).
+     *
+     * <p>The voucher reflects the CURRENT persisted booking row, so a Phase 7.34 modification is
+     * automatically reflected (dates/occupancy/price). {@code voucherCode} / {@code bookingReference}
+     * stay stable across a modification because they derive from the immutable {@code bookingCode}.
+     */
+    @Transactional(readOnly = true)
+    public BookingVoucherResponse getVoucher(Long userId, Long bookingId) {
+        Booking b = bookingRepo.findById(bookingId)
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found: " + bookingId));
+        // Owner-scoped 404 (see javadoc): a booking that is not the caller's is indistinguishable from
+        // one that does not exist. No ADMIN bypass on this customer surface.
+        if (!b.getUser().getId().equals(userId))
+            throw new ApiException(HttpStatus.NOT_FOUND, "Booking not found: " + bookingId);
+        return toVoucher(b);
+    }
+
+    /** Latest persisted payment status for a booking, or null when no payment row exists. */
+    private PaymentStatus latestPaymentStatus(Long bookingId) {
+        return paymentRepo.findByBookingIdOrderByCreatedAtDesc(bookingId).stream()
+            .findFirst()
+            .map(Payment::getStatus)
+            .orElse(null);
+    }
+
+    /**
+     * Derive the voucher's check-in validity from the persisted booking + latest payment status.
+     * NO pricing is recomputed. Terminal/historical booking states win first (so the app can render a
+     * clear cancelled/refunded/closed state via 200 rather than an error); otherwise payment status
+     * decides between VALID / INVALID / NOT_READY. Final mapping (documented in the phase report):
+     * <pre>
+     *   status CANCELLED                                           → CANCELLED
+     *   status REFUNDED                                            → REFUNDED
+     *   status CHECKED_IN/CHECKED_OUT/COMPLETED/ARCHIVED/NO_SHOW   → HISTORICAL
+     *   payment FAILED (active booking)                           → INVALID
+     *   status CONFIRMED/CHECK_IN_READY AND payment PAID          → VALID
+     *   otherwise (PENDING, or payment PENDING/absent)            → NOT_READY
+     * </pre>
+     */
+    private VoucherStatus voucherStatusOf(BookingStatus status, PaymentStatus payment) {
+        if (status == BookingStatus.CANCELLED) return VoucherStatus.CANCELLED;
+        if (status == BookingStatus.REFUNDED)  return VoucherStatus.REFUNDED;
+        if (status == BookingStatus.CHECKED_IN || status == BookingStatus.CHECKED_OUT
+            || status == BookingStatus.COMPLETED || status == BookingStatus.ARCHIVED
+            || status == BookingStatus.NO_SHOW)
+            return VoucherStatus.HISTORICAL;
+        if (payment == PaymentStatus.FAILED) return VoucherStatus.INVALID;
+        if ((status == BookingStatus.CONFIRMED || status == BookingStatus.CHECK_IN_READY)
+            && payment == PaymentStatus.PAID)
+            return VoucherStatus.VALID;
+        return VoucherStatus.NOT_READY;
+    }
+
+    /** Customer-safe advisory strings for a voucher status (empty when VALID). */
+    private List<String> voucherWarnings(VoucherStatus vs, Boolean refundable) {
+        List<String> warnings = new ArrayList<>();
+        switch (vs) {
+            case NOT_READY -> warnings.add(
+                "This voucher is not yet valid for check-in. Complete payment to confirm your booking.");
+            case INVALID -> warnings.add(
+                "Payment for this booking did not succeed. Complete payment to obtain a valid voucher.");
+            case CANCELLED -> warnings.add("This booking has been cancelled.");
+            case REFUNDED -> warnings.add("This booking has been refunded.");
+            case HISTORICAL -> warnings.add("This booking is no longer active for check-in.");
+            case VALID -> { /* no advisory */ }
+        }
+        if (Boolean.FALSE.equals(refundable) && vs != VoucherStatus.CANCELLED && vs != VoucherStatus.REFUNDED)
+            warnings.add("This rate is non-refundable.");
+        return warnings;
+    }
+
+    /** Pure read + mapping — reads the live booking row, never writes. */
+    private BookingVoucherResponse toVoucher(Booking b) {
+        int nights = (int) ChronoUnit.DAYS.between(b.getCheckInDate(), b.getCheckOutDate());
+        PaymentStatus payment = latestPaymentStatus(b.getId());
+        VoucherStatus vs = voucherStatusOf(b.getStatus(), payment);
+
+        // Latest modification timestamp (max createdAt) from the immutable audit history; null if none.
+        List<BookingModification> mods = bookingModificationRepo.findByBookingIdOrderByCreatedAtAscIdAsc(b.getId());
+        Instant latestModificationAt = mods.isEmpty() ? null : mods.get(mods.size() - 1).getCreatedAt();
+
+        // Persisted pre-discount stay amount: the rate-plan subtotal when present, else the base price.
+        BigDecimal subtotal = b.getRatePlanPrice() != null ? b.getRatePlanPrice() : b.getBasePrice();
+
+        String bookingCode = b.getBookingCode();
+        return new BookingVoucherResponse(
+            b.getId(),
+            bookingCode,                         // bookingReference
+            bookingCode,                         // confirmationCode
+            "VCH-" + bookingCode,                // voucherCode (stable transform of immutable code)
+            vs.name(),
+            voucherSignatureService.sign(bookingCode), // qrPayload: versioned HMAC-signed payload (PYT-V1.<code>.<sig>)
+            b.getStatus().name(),
+            payment != null ? payment.name() : null,
+            b.getUser().getFullName(),
+            b.getHotel().getName(),
+            b.getHotel().getAddress(),
+            b.getRoom().getRoomName(), b.getRoom().getRoomCode(),
+            b.getCheckInDate(), b.getCheckOutDate(),
+            nights, b.getAdults(), b.getChildren(), b.getNumberOfRooms(),
+            b.getSelectedRatePlanCode(), b.getSelectedRatePlanName(),
+            b.getMealPlanType() != null ? b.getMealPlanType().name() : null,
+            b.getCancellationPolicyType() != null ? b.getCancellationPolicyType().name() : null,
+            b.getCancellationDeadlineAt(), b.getRefundable(),
+            subtotal,
+            b.getDiscountAmount(),
+            b.getCouponDiscountAmount(),
+            b.getCreditAmountUsed(),
+            b.getLoyaltyDiscountAmount(),
+            b.getGiftCardAmountUsed(),
+            b.getFinalPrice(),
+            b.getCurrency(),
+            latestModificationAt,
+            voucherWarnings(vs, b.getRefundable())
+        );
     }
 
     // ── Cancel ────────────────────────────────────────────────────────────────

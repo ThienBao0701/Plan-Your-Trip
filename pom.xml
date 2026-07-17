@@ -30,6 +30,22 @@
       <plugin><groupId>org.springframework.boot</groupId><artifactId>spring-boot-maven-plugin</artifactId>
         <configuration><excludes><exclude><groupId>org.projectlombok</groupId><artifactId>lombok</artifactId></exclude></excludes></configuration>
       </plugin>
+      <!-- Phase 7.38 hardening: the shared application.properties provides NO usable voucher-secret
+           default (${VOUCHER_SIGNING_SECRET:} resolves empty, and VoucherSignatureService fails fast).
+           Supply a deterministic, non-placeholder, >=32-char secret to the TEST JVM as a system
+           property so the ~60 @SpringBootTest contexts still boot and QR payloads stay stable. This is
+           ADDITIVE: Spring resolves ${VOUCHER_SIGNING_SECRET} from system properties, feeding the main
+           application.properties placeholder WITHOUT any src/test/resources file that would shadow it.
+           This is NOT any real secret and is NOT reused from jwt/payment/db config. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <systemPropertyVariables>
+            <VOUCHER_SIGNING_SECRET>test-voucher-signing-secret-deterministic-32plus-chars-x</VOUCHER_SIGNING_SECRET>
+          </systemPropertyVariables>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 </project>

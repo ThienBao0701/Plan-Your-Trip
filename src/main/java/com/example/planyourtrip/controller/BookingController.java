@@ -3,6 +3,7 @@ package com.example.planyourtrip.controller;
 import com.example.planyourtrip.dto.BookingDto.*;
 import com.example.planyourtrip.dto.BookingModificationPreviewDto.BookingModificationPreviewRequest;
 import com.example.planyourtrip.dto.BookingModificationPreviewDto.BookingModificationPreviewResponse;
+import com.example.planyourtrip.dto.BookingVoucherDto.BookingVoucherResponse;
 import com.example.planyourtrip.security.AuthUser;
 import com.example.planyourtrip.service.BookingModificationPreviewService;
 import com.example.planyourtrip.service.BookingService;
@@ -69,6 +70,22 @@ public class BookingController {
     @Operation(summary = "Active bookings (currently checked in)")
     public List<BookingSummaryResponse> getActive(@AuthUser Long uid) {
         return service.getActiveBookings(uid);
+    }
+
+    // Phase 7.38 — Customer Booking Digital Voucher (read-only). Owner-scoped and, unlike
+    // getById/cancel/modify (403 for another user's booking, ADMIN allowed), this surface returns
+    // 404 for ANY booking that is not the caller's own — a deliberate "don't leak existence" privacy
+    // choice for the customer voucher (mirroring the coupon / gift-card / wallet read surfaces). See
+    // BookingService.getVoucher.
+    @GetMapping("/api/me/bookings/{bookingId}/voucher")
+    @Operation(summary = "Get the read-only digital check-in voucher for one of the caller's bookings",
+        description = "Returns a safe, customer-facing voucher/confirmation DERIVED from the persisted "
+            + "booking, latest payment and modification snapshots — no price recomputation, no mutation. "
+            + "voucherStatus reflects check-in validity (VALID / NOT_READY / INVALID / CANCELLED / "
+            + "REFUNDED / HISTORICAL); terminal states return 200 so the app can render them. qrPayload "
+            + "is compact non-sensitive text (booking code only). 404 for a booking the caller does not own.")
+    public BookingVoucherResponse getVoucher(@AuthUser Long uid, @PathVariable Long bookingId) {
+        return service.getVoucher(uid, bookingId);
     }
 
     @PatchMapping("/api/bookings/{id}/cancel")
