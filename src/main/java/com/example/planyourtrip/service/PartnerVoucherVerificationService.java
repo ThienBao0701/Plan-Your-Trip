@@ -68,27 +68,11 @@ public class PartnerVoucherVerificationService {
     }
 
     public VoucherVerificationResponse verify(Long userId, VoucherVerifyRequest req) {
-        // Resolve the calling partner FIRST so an unapproved/absent partner profile is rejected
-        // identically regardless of the payload (no signal about the payload's validity).
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
-
-        // 1) Verify signature + extract bookingCode. Empty (tampered/invalid/wrong-version/malformed)
-        //    → uniform 404, indistinguishable from "unknown booking".
+        // Reuse the shared verify+resolve+ownership step, then report eligibility WITHOUT mutating.
         String payload = req != null ? req.voucherPayload() : null;
-        String bookingCode = voucherSignatureService.verifyAndExtractBookingCode(payload)
-            .orElseThrow(this::notFound);
+        Booking booking = resolveOwnedBookingByPayload(userId, payload);
 
-        // 2) Resolve the booking by its immutable, unique code.
-        Booking booking = bookingRepo.findByBookingCode(bookingCode)
-            .orElseThrow(this::notFound);
-
-        // 3) Ownership: the booking's hotel (a Place) must be owned by THIS partner. Otherwise 404
-        //    (never 403) — a partner must not learn that another hotel's booking exists.
-        PartnerProfile owner = booking.getHotel().getOwner();
-        if (owner == null || !owner.getId().equals(profile.getId()))
-            throw notFound();
-
-        // 4) Eligibility — verification only, NEVER a mutation or status transition.
+        // Eligibility — verification only, NEVER a mutation or status transition.
         BookingStatus status = booking.getStatus();
         boolean eligible = ELIGIBLE_STATUSES.contains(status);
         String reason = eligible ? null
@@ -112,6 +96,46 @@ public class PartnerVoucherVerificationService {
             new Occupancy(booking.getAdults(), booking.getChildren()),
             nights
         );
+    }
+
+    /**
+     * Phase 7.40 reuse — the shared "verify signed payload → resolved, owned {@link Booking}" step.
+     *
+     * <p>Resolves the caller's approved partner profile, verifies + extracts the bookingCode from the
+     * signed payload (reusing {@link VoucherSignatureService#verifyAndExtractBookingCode}), resolves the
+     * booking, and confirms it belongs to one of the caller's OWN hotels. Every invalid /
+     * tampered / unknown / not-owned case collapses to the SAME uniform 404 — identical semantics to
+     * {@link #verify}. Callers (e.g. the Phase 7.40 check-in mutation) get back the managed Booking and
+     * apply their own status/window logic; this method itself mutates NOTHING.
+     */
+    public Booking resolveOwnedBookingByPayload(Long userId, String voucherPayload) {
+        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        String bookingCode = voucherSignatureService.verifyAndExtractBookingCode(voucherPayload)
+            .orElseThrow(this::notFound);
+        return ownedBookingByCodeOrThrow(bookingCode, profile);
+    }
+
+    /**
+     * Phase 7.40 reuse — resolve a booking from a directly-supplied {@code bookingCode} (no scanned QR),
+     * still enforcing ownership. Same uniform-404 semantics as {@link #resolveOwnedBookingByPayload}: an
+     * unknown code and another partner's booking are indistinguishable. No crypto is involved (the code
+     * was typed, not signed), but the ownership guarantee is identical.
+     */
+    public Booking resolveOwnedBookingByCode(Long userId, String bookingCode) {
+        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        return ownedBookingByCodeOrThrow(bookingCode, profile);
+    }
+
+    /** Resolve by immutable unique code + confirm the calling partner owns the booking's hotel. */
+    private Booking ownedBookingByCodeOrThrow(String bookingCode, PartnerProfile profile) {
+        Booking booking = bookingRepo.findByBookingCode(bookingCode)
+            .orElseThrow(this::notFound);
+        // Ownership: the booking's hotel (a Place) must be owned by THIS partner. Otherwise 404
+        // (never 403) — a partner must not learn that another hotel's booking exists.
+        PartnerProfile owner = booking.getHotel().getOwner();
+        if (owner == null || !owner.getId().equals(profile.getId()))
+            throw notFound();
+        return booking;
     }
 
     /** Same approved-profile gate as PartnerBookingService / PartnerAnalyticsService. */

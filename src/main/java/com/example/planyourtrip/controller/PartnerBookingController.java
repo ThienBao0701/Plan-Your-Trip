@@ -3,10 +3,13 @@ package com.example.planyourtrip.controller;
 import com.example.planyourtrip.dto.BookingDto.BookingResponse;
 import com.example.planyourtrip.dto.PageResponse;
 import com.example.planyourtrip.dto.PartnerBookingDto.*;
+import com.example.planyourtrip.dto.PartnerCheckInDto.CheckInRequest;
+import com.example.planyourtrip.dto.PartnerCheckInDto.CheckInResponse;
 import com.example.planyourtrip.dto.PartnerVoucherDto.VoucherVerificationResponse;
 import com.example.planyourtrip.dto.PartnerVoucherDto.VoucherVerifyRequest;
 import com.example.planyourtrip.security.AuthUser;
 import com.example.planyourtrip.service.PartnerBookingService;
+import com.example.planyourtrip.service.PartnerCheckInService;
 import com.example.planyourtrip.service.PartnerVoucherVerificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -23,11 +26,14 @@ public class PartnerBookingController {
 
     private final PartnerBookingService service;
     private final PartnerVoucherVerificationService voucherVerificationService;
+    private final PartnerCheckInService checkInService;
 
     public PartnerBookingController(PartnerBookingService service,
-                                    PartnerVoucherVerificationService voucherVerificationService) {
+                                    PartnerVoucherVerificationService voucherVerificationService,
+                                    PartnerCheckInService checkInService) {
         this.service = service;
         this.voucherVerificationService = voucherVerificationService;
+        this.checkInService = checkInService;
     }
 
     @GetMapping("/api/partner/bookings")
@@ -101,5 +107,21 @@ public class PartnerBookingController {
     public VoucherVerificationResponse verifyVoucher(@AuthUser Long uid,
                                                      @RequestBody VoucherVerifyRequest req) {
         return voucherVerificationService.verify(uid, req);
+    }
+
+    // ── Phase 7.40 — Partner Guest Check-in (first staff-performed booking MUTATION) ──
+
+    @PostMapping("/api/partner/bookings/check-in")
+    @Operation(summary = "Check in a guest via signed voucher payload or booking code",
+        description = "The MUTATION counterpart to the Phase 7.39 read-only verify endpoint. Reuses the "
+            + "same signature-verify + booking-resolution + ownership check, then transitions the booking "
+            + "to CHECKED_IN (via BookingStatusEngineService), notifies the customer and writes one "
+            + "immutable audit row. Exactly one of voucherPayload / bookingCode is required (400 "
+            + "otherwise). Ineligible status / outside the check-in window → 422; invalid signature / "
+            + "unknown / another partner's booking → uniform 404. IDEMPOTENT: repeating a check-in on an "
+            + "already-CHECKED_IN booking returns a deterministic 200 with the unchanged check-in time and "
+            + "no duplicate notification/audit/timeline event.")
+    public CheckInResponse checkInGuest(@AuthUser Long uid, @RequestBody CheckInRequest req) {
+        return checkInService.checkIn(uid, req);
     }
 }
