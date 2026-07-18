@@ -2,9 +2,11 @@ package com.example.planyourtrip.service;
 
 import com.example.planyourtrip.dto.BookingDto.BookingResponse;
 import com.example.planyourtrip.dto.BookingDto.BookingTimelineResponse;
+import com.example.planyourtrip.dto.BookingVoucherDto.VoucherStatus;
 import com.example.planyourtrip.dto.InvoiceDto.InvoiceSummaryResponse;
 import com.example.planyourtrip.dto.PageResponse;
 import com.example.planyourtrip.dto.PartnerBookingDto.*;
+import com.example.planyourtrip.dto.PartnerGuestStayDto.*;
 import com.example.planyourtrip.dto.PaymentDto.PaymentResponse;
 import com.example.planyourtrip.exception.ApiException;
 import com.example.planyourtrip.model.*;
@@ -22,6 +24,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
@@ -38,6 +41,9 @@ public class PartnerBookingService {
     private final PaymentRepository paymentRepo;
     private final InvoiceRepository invoiceRepo;
     private final UserRepository userRepo;
+    private final BookingModificationRepository bookingModificationRepo;
+    private final BookingCheckInAuditRepository checkInAuditRepo;
+    private final BookingCheckOutAuditRepository checkOutAuditRepo;
     private final BookingService bookingService;
     private final PaymentService paymentService;
     private final InvoiceService invoiceService;
@@ -60,6 +66,9 @@ public class PartnerBookingService {
                                   PaymentRepository paymentRepo,
                                   InvoiceRepository invoiceRepo,
                                   UserRepository userRepo,
+                                  BookingModificationRepository bookingModificationRepo,
+                                  BookingCheckInAuditRepository checkInAuditRepo,
+                                  BookingCheckOutAuditRepository checkOutAuditRepo,
                                   BookingService bookingService,
                                   PaymentService paymentService,
                                   InvoiceService invoiceService,
@@ -74,6 +83,9 @@ public class PartnerBookingService {
         this.paymentRepo = paymentRepo;
         this.invoiceRepo = invoiceRepo;
         this.userRepo = userRepo;
+        this.bookingModificationRepo = bookingModificationRepo;
+        this.checkInAuditRepo = checkInAuditRepo;
+        this.checkOutAuditRepo = checkOutAuditRepo;
         this.bookingService = bookingService;
         this.paymentService = paymentService;
         this.invoiceService = invoiceService;
@@ -137,6 +149,187 @@ public class PartnerBookingService {
         BookingTimelineResponse timeline = bookingService.adminGetTimeline(bookingId);
 
         return new PartnerBookingDetailResponse(bookingResponse, payments, invoice, timeline);
+    }
+
+    // ── Phase 7.42 — Consolidated READ-ONLY guest stay detail ──────────────────
+
+    /**
+     * Phase 7.42 — one consolidated, ownership-scoped, strictly READ-ONLY guest-stay projection for a
+     * single booking. Reuses the SAME ownership resolution ({@link #myApprovedProfileOrThrow} +
+     * {@link #ownedBookingOrThrow}, which already returns a uniform 404 for both an unknown booking and
+     * a booking outside the caller's properties — so another partner's booking never leaks), the SAME
+     * lifecycle timeline ({@link BookingService#adminGetTimeline}) and the SAME voucher-status derivation
+     * ({@link BookingService#partnerVoucherStatus}) as the existing endpoints. Performs NO mutation: it
+     * only reads the booking, its timeline, its immutable modification history and its at-most-one
+     * check-in / check-out audit rows. Bounded, deterministic (ascending) per-booking queries — no N+1.
+     */
+    @Transactional(readOnly = true)
+    public PartnerGuestStayResponse getGuestStay(Long userId, Long bookingId) {
+        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        Booking booking = ownedBookingOrThrow(bookingId, profile.getId());
+
+        BookingTimelineResponse timeline = bookingService.adminGetTimeline(bookingId);
+        VoucherStatus vs = bookingService.partnerVoucherStatus(booking);
+
+        List<StayModification> modifications = bookingModificationRepo
+            .findByBookingIdOrderByCreatedAtAscIdAsc(bookingId)
+            .stream().map(this::toStayModification).toList();
+
+        StayCheckAudit checkInAudit = checkInAuditRepo.findByBookingId(bookingId).stream()
+            .findFirst().map(this::toCheckInAudit).orElse(null);
+        StayCheckAudit checkOutAudit = checkOutAuditRepo.findByBookingId(bookingId).stream()
+            .findFirst().map(this::toCheckOutAudit).orElse(null);
+
+        LocalDate today = LocalDate.now();
+        long totalNights = Math.max(0,
+            ChronoUnit.DAYS.between(booking.getCheckInDate(), booking.getCheckOutDate()));
+        long currentNight = currentNightNumber(booking, today, totalNights);
+        long remainingNights = Math.max(0, totalNights - currentNight);
+
+        StaySchedule schedule = new StaySchedule(
+            booking.getCheckInDate(), booking.getCheckOutDate(), totalNights,
+            booking.getActualCheckInAt(), booking.getActualCheckOutAt(),
+            deriveStayState(booking, today), currentNight, remainingNights);
+
+        return new PartnerGuestStayResponse(
+            booking.getId(), booking.getBookingCode(), booking.getStatus().name(),
+            booking.getCreatedAt(), booking.getUpdatedAt(),
+            booking.getUser().getFullName(),
+            new OccupancyInfo(booking.getAdults(), booking.getChildren()),
+            booking.getHotel().getId(), booking.getHotel().getName(),
+            booking.getRoom().getId(), booking.getRoom().getRoomName(), booking.getRoom().getRoomCode(),
+            schedule,
+            new VoucherSummary(vs == VoucherStatus.VALID, vs.name()),
+            timeline,
+            modifications,
+            checkInAudit, checkOutAudit,
+            deriveWarnings(booking, today));
+    }
+
+    /**
+     * Derive the response-level {@code currentStayState} from persisted status + dates + today
+     * (using {@code LocalDate.now()}, the convention the rest of the booking/check-in code uses — no
+     * property timezone exists). Table (real {@link BookingStatus} values):
+     * <pre>
+     *   CANCELLED / REFUNDED                                → CANCELLED
+     *   NO_SHOW                                             → NO_SHOW
+     *   CHECKED_OUT                                         → CHECKED_OUT
+     *   COMPLETED / ARCHIVED                                → COMPLETED
+     *   CHECKED_IN                                          → IN_HOUSE
+     *   CONFIRMED / CHECK_IN_READY, today &lt; checkIn      → UPCOMING
+     *   CONFIRMED / CHECK_IN_READY, checkIn &le; today &le; checkOut → READY_FOR_CHECK_IN
+     *   CONFIRMED / CHECK_IN_READY, today &gt; checkOut     → EXPIRED (window passed, never checked in)
+     *   PENDING, today &gt; checkOut                        → EXPIRED
+     *   PENDING, otherwise                                 → UPCOMING (not confirmed ⇒ not check-in ready)
+     * </pre>
+     */
+    private String deriveStayState(Booking b, LocalDate today) {
+        switch (b.getStatus()) {
+            case CANCELLED:
+            case REFUNDED:
+                return "CANCELLED";
+            case NO_SHOW:
+                return "NO_SHOW";
+            case CHECKED_OUT:
+                return "CHECKED_OUT";
+            case COMPLETED:
+            case ARCHIVED:
+                return "COMPLETED";
+            case CHECKED_IN:
+                return "IN_HOUSE";
+            case CONFIRMED:
+            case CHECK_IN_READY:
+                if (today.isBefore(b.getCheckInDate())) return "UPCOMING";
+                if (!today.isAfter(b.getCheckOutDate())) return "READY_FOR_CHECK_IN";
+                return "EXPIRED";
+            case PENDING:
+            default:
+                return today.isAfter(b.getCheckOutDate()) ? "EXPIRED" : "UPCOMING";
+        }
+    }
+
+    /**
+     * Deterministic, never-negative current night number.
+     * <ul>
+     *   <li>CHECKED_OUT / COMPLETED / ARCHIVED → {@code totalNights} (stay fully elapsed).</li>
+     *   <li>CHECKED_IN (in-house) → nights elapsed since check-in, {@code arrival day = night 1}
+     *       ({@code DAYS.between(checkIn, today) + 1}), clamped to {@code [1, totalNights]} (an early
+     *       check-in before {@code checkInDate} clamps up to 1; a same-day arrival is night 1).</li>
+     *   <li>every other state (future / not-yet-checked-in / cancelled / refunded / no-show) → 0.</li>
+     * </ul>
+     * When {@code totalNights == 0} (degenerate same-day check-in/out) the result is 0.
+     */
+    private long currentNightNumber(Booking b, LocalDate today, long totalNights) {
+        switch (b.getStatus()) {
+            case CHECKED_OUT:
+            case COMPLETED:
+            case ARCHIVED:
+                return totalNights;
+            case CHECKED_IN:
+                if (totalNights == 0) return 0;
+                long elapsed = ChronoUnit.DAYS.between(b.getCheckInDate(), today) + 1;
+                return Math.max(1, Math.min(elapsed, totalNights));
+            default:
+                return 0;
+        }
+    }
+
+    /**
+     * Derive operational warning tokens from status + dates + today (documented conditions):
+     * <ul>
+     *   <li>{@code CANCELLED_STAY} — CANCELLED / REFUNDED / NO_SHOW.</li>
+     *   <li>{@code COMPLETED_STAY} — CHECKED_OUT / COMPLETED / ARCHIVED.</li>
+     *   <li>{@code CURRENTLY_STAYING} — CHECKED_IN; plus {@code CHECK_OUT_OVERDUE} when
+     *       {@code today > checkOutDate}.</li>
+     *   <li>Pre-arrival active states (PENDING / CONFIRMED / CHECK_IN_READY):
+     *       {@code FUTURE_BOOKING} when {@code today < checkInDate}, or {@code CHECK_IN_OVERDUE} when
+     *       {@code today > checkInDate} (arrival day itself is neither).</li>
+     * </ul>
+     */
+    private List<String> deriveWarnings(Booking b, LocalDate today) {
+        List<String> warnings = new ArrayList<>();
+        switch (b.getStatus()) {
+            case CANCELLED:
+            case REFUNDED:
+            case NO_SHOW:
+                warnings.add("CANCELLED_STAY");
+                return warnings;
+            case CHECKED_OUT:
+            case COMPLETED:
+            case ARCHIVED:
+                warnings.add("COMPLETED_STAY");
+                return warnings;
+            case CHECKED_IN:
+                warnings.add("CURRENTLY_STAYING");
+                if (today.isAfter(b.getCheckOutDate())) warnings.add("CHECK_OUT_OVERDUE");
+                return warnings;
+            default: // PENDING / CONFIRMED / CHECK_IN_READY
+                if (today.isBefore(b.getCheckInDate())) warnings.add("FUTURE_BOOKING");
+                else if (today.isAfter(b.getCheckInDate())) warnings.add("CHECK_IN_OVERDUE");
+                return warnings;
+        }
+    }
+
+    private StayModification toStayModification(BookingModification m) {
+        return new StayModification(
+            m.getOldCheckInDate(), m.getNewCheckInDate(),
+            m.getOldCheckOutDate(), m.getNewCheckOutDate(),
+            m.getOldAdults(), m.getNewAdults(),
+            m.getOldChildren(), m.getNewChildren(),
+            m.getOldRatePlanId(), m.getNewRatePlanId(),
+            m.getOldRatePlanName(), m.getNewRatePlanName(),
+            m.getOldTotalPrice(), m.getNewTotalPrice(),
+            m.getCreatedAt());
+    }
+
+    private StayCheckAudit toCheckInAudit(BookingCheckInAudit a) {
+        return new StayCheckAudit(a.getPartnerProfileId(), a.getPartnerUserId(),
+            a.getOperation(), null, a.getCreatedAt());
+    }
+
+    private StayCheckAudit toCheckOutAudit(BookingCheckOutAudit a) {
+        return new StayCheckAudit(a.getPartnerProfileId(), a.getPartnerUserId(),
+            a.getOperation(), a.getMethod().name(), a.getCreatedAt());
     }
 
     // ── Status transitions ──────────────────────────────────────────────────

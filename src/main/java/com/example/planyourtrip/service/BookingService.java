@@ -355,6 +355,18 @@ public class BookingService {
         return toVoucher(b);
     }
 
+    /**
+     * Phase 7.42 — read-only voucher classification for an already-loaded booking, reusing the SAME
+     * derivation as {@link #getVoucher} ({@link #voucherStatusOf} + latest payment status). Exposed so
+     * the consolidated partner stay endpoint can surface {@code voucherStatus} / {@code voucherAvailable}
+     * without duplicating the derivation, and WITHOUT generating a QR payload or touching the signing
+     * secret. Returns only the classification enum. Pure read.
+     */
+    @Transactional(readOnly = true)
+    public VoucherStatus partnerVoucherStatus(Booking b) {
+        return voucherStatusOf(b.getStatus(), latestPaymentStatus(b.getId()));
+    }
+
     /** Latest persisted payment status for a booking, or null when no payment row exists. */
     private PaymentStatus latestPaymentStatus(Long bookingId) {
         return paymentRepo.findByBookingIdOrderByCreatedAtDesc(bookingId).stream()
