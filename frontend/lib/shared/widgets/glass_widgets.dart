@@ -29,7 +29,6 @@ class BubbleBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) => const DecoratedBox(
         decoration: BoxDecoration(gradient: AppGradients.page),
-        child: SizedBox.expand(),
       ).withChild(child);
 }
 
@@ -37,7 +36,7 @@ extension _DecoratedBoxChild on DecoratedBox {
   Widget withChild(Widget child) => DecoratedBox(
         decoration: decoration,
         position: position,
-        child: child,
+        child: SizedBox.expand(child: child),
       );
 }
 
@@ -927,28 +926,34 @@ class OceanBottomNavigationBar extends StatelessWidget {
               AppSpacing.sm,
               AppSpacing.xs,
             ),
-            child: OceanContentConstraint(
-              maxWidth: AppBreakpoints.maxContentWidth,
-              child: OceanGlassSurface(
-                blur: AppGlass.lightBlur,
-                radius: AppRadii.sheet,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.xs,
-                  vertical: AppSpacing.xs,
+            child: Align(
+              alignment: Alignment.center,
+              heightFactor: 1,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxWidth: AppBreakpoints.maxContentWidth,
                 ),
-                boxShadow: AppShadows.soft,
-                child: Row(
-                  children: [
-                    for (var i = 0; i < destinations.length; i++)
-                      Expanded(
-                        child: _OceanNavigationItem(
-                          destination: destinations[i],
-                          selected: i == currentIndex,
-                          reduceMotion: reduceMotion,
-                          onTap: () => onTap?.call(i),
+                child: OceanGlassSurface(
+                  blur: AppGlass.lightBlur,
+                  radius: AppRadii.sheet,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.xs,
+                    vertical: AppSpacing.xs,
+                  ),
+                  boxShadow: AppShadows.soft,
+                  child: Row(
+                    children: [
+                      for (var i = 0; i < destinations.length; i++)
+                        Expanded(
+                          child: _OceanNavigationItem(
+                            destination: destinations[i],
+                            selected: i == currentIndex,
+                            reduceMotion: reduceMotion,
+                            onTap: () => onTap?.call(i),
+                          ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

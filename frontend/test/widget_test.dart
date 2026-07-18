@@ -60,6 +60,26 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  AppState realEmptyApp() => AppState()
+    ..demoMode = false
+    ..email = 'real@example.com'
+    ..trips = []
+    ..timeline = []
+    ..expenses = []
+    ..demoBookings = []
+    ..travelCreditAccount = null
+    ..travelCreditTransactions = []
+    ..loyaltyAccount = null
+    ..loyaltyTransactions = []
+    ..membershipAccount = null
+    ..membershipProgress = null
+    ..membershipBenefits = []
+    ..membershipHistory = []
+    ..coupons = []
+    ..referralSummary = null
+    ..referralHistory = []
+    ..giftCards = [];
+
   Widget localizedApp({
     required Widget child,
     AppState? app,
@@ -315,6 +335,102 @@ void main() {
         tester.getSize(find.byType(TextField, skipOffstage: false).first).width;
     expect(firstFieldWidth, lessThan(920));
     expect(tester.takeException(), isNull);
+  });
+
+  Future<void> verifyVisibleShellContent(
+    WidgetTester tester, {
+    required Size size,
+    required AppState app,
+    required String plannerContent,
+    required String profileContent,
+  }) async {
+    await pumpSize(
+      tester,
+      localizedApp(child: const AppShell(), app: app),
+      size,
+    );
+
+    void expectActiveTab(int activeIndex, String contentText) {
+      final activeRoot = find.byKey(ValueKey('shell-tab-$activeIndex'));
+      expect(activeRoot, findsOneWidget);
+      final rootSize = tester.getSize(activeRoot);
+      final scaffoldSize = tester.getSize(find.byType(Scaffold).first);
+      expect(rootSize.width, greaterThan(0),
+          reason: 'tab=$activeIndex root=$rootSize scaffold=$scaffoldSize');
+      expect(rootSize.height, greaterThan(0),
+          reason: 'tab=$activeIndex root=$rootSize scaffold=$scaffoldSize');
+      expect(find.text(contentText), findsWidgets);
+      for (var i = 0; i < 4; i++) {
+        if (i == activeIndex) continue;
+        expect(find.byKey(ValueKey('shell-tab-$i')), findsNothing);
+      }
+      expect(tester.takeException(), isNull);
+    }
+
+    expectActiveTab(0, 'Where will you wander?');
+    final field = tester.widget<TextField>(
+      find.byType(TextField, skipOffstage: false).first,
+    );
+    field.controller!.text = 'Ha Noi';
+    await tester.pump();
+
+    await tester.tap(find.text('Trips'));
+    await tester.pumpAndSettle();
+    expectActiveTab(1, 'My trips');
+
+    await tester.tap(find.text('Planner'));
+    await tester.pumpAndSettle();
+    expectActiveTab(2, plannerContent);
+
+    await tester.tap(find.text('Profile'));
+    await tester.pumpAndSettle();
+    expectActiveTab(3, profileContent);
+
+    await tester.tap(find.text('Explore'));
+    await tester.pumpAndSettle();
+    expectActiveTab(0, 'Where will you wander?');
+    final preservedField = tester.widget<TextField>(
+      find.byType(TextField, skipOffstage: false).first,
+    );
+    expect(preservedField.controller?.text, 'Ha Noi');
+  }
+
+  testWidgets('shell paints selected demo tab content across viewports',
+      (tester) async {
+    ignoreNetworkImageErrors();
+
+    for (final size in const [
+      Size(1920, 1080),
+      Size(1440, 900),
+      Size(430, 932),
+    ]) {
+      await verifyVisibleShellContent(
+        tester,
+        size: size,
+        app: AppState(),
+        plannerContent: 'Da Lat 3 days 2 nights',
+        profileContent: 'Demo Traveler',
+      );
+    }
+  });
+
+  testWidgets('shell paints selected real-state content across viewports',
+      (tester) async {
+    ignoreNetworkImageErrors();
+
+    for (final size in const [
+      Size(1920, 1080),
+      Size(1440, 900),
+      Size(430, 932),
+    ]) {
+      await verifyVisibleShellContent(
+        tester,
+        size: size,
+        app: realEmptyApp(),
+        plannerContent: 'No trips to plan yet',
+        profileContent: 'Signed-in account',
+      );
+    }
   });
 
   testWidgets('localized Vietnamese tab labels render', (tester) async {

@@ -69,14 +69,12 @@ class _AppShellState extends State<AppShell> {
             fit: StackFit.expand,
             children: [
               for (final i in _paintOrder)
-                KeyedSubtree(
-                  key: ValueKey('shell-tab-$i'),
-                  child: _PreservedTab(
-                    active: index == i,
-                    child: OceanContentConstraint(
-                      maxWidth: AppBreakpoints.maxShellWidth,
-                      child: KeyedSubtree(key: _tabKeys[i], child: _pages[i]),
-                    ),
+                _PreservedTab(
+                  contentKey: ValueKey('shell-tab-$i'),
+                  active: index == i,
+                  child: OceanContentConstraint(
+                    maxWidth: AppBreakpoints.maxShellWidth,
+                    child: KeyedSubtree(key: _tabKeys[i], child: _pages[i]),
                   ),
                 ),
             ],
@@ -100,26 +98,25 @@ class _AppShellState extends State<AppShell> {
 }
 
 class _PreservedTab extends StatelessWidget {
+  final Key contentKey;
   final bool active;
   final Widget child;
 
-  const _PreservedTab({required this.active, required this.child});
+  const _PreservedTab({
+    required this.contentKey,
+    required this.active,
+    required this.child,
+  });
 
   @override
-  Widget build(BuildContext context) {
-    if (active) {
-      return TickerMode(enabled: true, child: child);
-    }
-    return TickerMode(
-      enabled: false,
-      child: IgnorePointer(
-        child: ExcludeSemantics(
-          child: Opacity(
-            opacity: 0,
+  Widget build(BuildContext context) => Offstage(
+        offstage: !active,
+        child: TickerMode(
+          enabled: active,
+          child: SizedBox.expand(
+            key: contentKey,
             child: child,
           ),
         ),
-      ),
-    );
-  }
+      );
 }

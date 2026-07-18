@@ -382,42 +382,55 @@ class _CategoryShortcuts extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => SizedBox(
-        height: 116,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          itemCount: categories.take(8).length,
-          separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.sm),
-          itemBuilder: (context, index) {
-            final category = categories[index];
-            return SizedBox(
-              width: 132,
-              child: OceanGlassCard(
-                onTap: () => onCategory(category),
-                padding: const EdgeInsets.all(AppSpacing.sm),
-                semanticLabel: category.name,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: category.color.withValues(alpha: .14),
-                      child: Icon(category.icon, color: category.color),
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
+  Widget build(BuildContext context) {
+    final labelStyle = Theme.of(context).textTheme.titleSmall;
+    final labelFontSize = labelStyle?.fontSize ?? 14;
+    final labelLineHeight =
+        MediaQuery.textScalerOf(context).scale(labelFontSize) *
+            (labelStyle?.height ?? 1.2);
+    final shortcutHeight =
+        (40 + AppSpacing.xs + labelLineHeight * 2 + AppSpacing.sm * 2)
+            .clamp(116.0, 168.0);
+
+    return SizedBox(
+      height: shortcutHeight,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: categories.take(8).length,
+        separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.sm),
+        itemBuilder: (context, index) {
+          final category = categories[index];
+          return SizedBox(
+            width: 132,
+            child: OceanGlassCard(
+              onTap: () => onCategory(category),
+              padding: const EdgeInsets.all(AppSpacing.sm),
+              semanticLabel: category.name,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircleAvatar(
+                    backgroundColor: category.color.withValues(alpha: .14),
+                    child: Icon(category.icon, color: category.color),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Flexible(
+                    child: Text(
                       category.name,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.titleSmall,
+                      style: labelStyle,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            );
-          },
-        ),
-      );
+            ),
+          );
+        },
+      ),
+    );
+  }
 }
 
 class _FeaturedPlaces extends StatelessWidget {
