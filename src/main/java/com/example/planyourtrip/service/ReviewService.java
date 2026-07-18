@@ -32,40 +32,75 @@ public class ReviewService {
         this.notificationService = notificationService;
     }
 
+    /** Body-based create route: {@code POST /api/reviews} (bookingId in the payload). */
     @Transactional
     public ReviewResponse createReview(Long userId, ReviewRequest req) {
-        Booking booking = bookingRepo.findById(req.bookingId())
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found: " + req.bookingId()));
+        return create(userId, req.bookingId(),
+            req.ratingOverall(), req.ratingCleanliness(), req.ratingService(),
+            req.ratingLocation(), req.ratingValue(), req.ratingFacilities(),
+            req.title(), req.content());
+    }
+
+    /**
+     * Phase 7.43 — booking-scoped alias route:
+     * {@code POST /api/me/bookings/{bookingId}/review} (bookingId in the path).
+     * Delegates to the SAME shared create logic as the body-based route.
+     */
+    @Transactional
+    public ReviewResponse createReviewForBooking(Long userId, Long bookingId, BookingScopedReviewRequest req) {
+        return create(userId, bookingId,
+            req.ratingOverall(), req.ratingCleanliness(), req.ratingService(),
+            req.ratingLocation(), req.ratingValue(), req.ratingFacilities(),
+            req.title(), req.content());
+    }
+
+    /** Shared create logic used by both the body-based and path-based routes. */
+    private ReviewResponse create(Long userId, Long bookingId,
+                                  Integer ratingOverall, Integer ratingCleanliness, Integer ratingService,
+                                  Integer ratingLocation, Integer ratingValue, Integer ratingFacilities,
+                                  String title, String content) {
+        Booking booking = bookingRepo.findById(bookingId)
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found: " + bookingId));
         if (!booking.getUser().getId().equals(userId))
             throw new ApiException(HttpStatus.FORBIDDEN, "Access denied: booking belongs to another user");
         if (booking.getStatus() != BookingStatus.COMPLETED)
             throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY, "Only completed bookings can be reviewed");
         if (reviewRepo.existsByBookingId(booking.getId()))
-            throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY, "A review already exists for this booking");
+            throw new ApiException(HttpStatus.CONFLICT, "A review already exists for this booking");
 
         Review review = new Review();
         review.setBooking(booking);
         review.setUser(booking.getUser());
         review.setPlace(booking.getHotel());
-        review.setRatingOverall(req.ratingOverall());
-        review.setRatingCleanliness(req.ratingCleanliness());
-        review.setRatingService(req.ratingService());
-        review.setRatingLocation(req.ratingLocation());
-        review.setRatingValue(req.ratingValue());
-        review.setRatingFacilities(req.ratingFacilities());
-        review.setTitle(req.title());
-        review.setContent(req.content());
+        review.setRatingOverall(ratingOverall);
+        review.setRatingCleanliness(ratingCleanliness);
+        review.setRatingService(ratingService);
+        review.setRatingLocation(ratingLocation);
+        review.setRatingValue(ratingValue);
+        review.setRatingFacilities(ratingFacilities);
+        review.setTitle(title);
+        review.setContent(content);
         review.setStatus(ReviewStatus.PENDING);
 
         review = reviewRepo.save(review);
         Review savedReview = review;
 
+        // Notify ADMINS — a new review is pending moderation (unchanged).
         userRepo.findAll().stream()
             .filter(u -> "ADMIN".equals(u.getRole()))
             .forEach(admin -> notificationService.create(admin.getId(), NotificationType.REVIEW, Priority.NORMAL,
                 "New review submitted",
                 "A new review was submitted for " + savedReview.getPlace().getName() + " and is pending moderation.",
                 RelatedEntityType.HOTEL, savedReview.getPlace().getId()));
+
+        // Phase 7.43 — notify the hotel/place OWNER (partner) that a review arrived.
+        PartnerProfile owner = savedReview.getPlace().getOwner();
+        if (owner != null && owner.getUser() != null) {
+            notificationService.create(owner.getUser().getId(), NotificationType.REVIEW, Priority.NORMAL,
+                "New review submitted",
+                "A new review has been submitted for " + savedReview.getPlace().getName() + ".",
+                RelatedEntityType.HOTEL, savedReview.getPlace().getId());
+        }
 
         return toResponse(review);
     }

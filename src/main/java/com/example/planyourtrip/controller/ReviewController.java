@@ -26,6 +26,14 @@ public class ReviewController {
         return service.createReview(uid, req);
     }
 
+    @PostMapping("/api/me/bookings/{bookingId}/review")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Create a review for a completed booking, booking-scoped (owner only)")
+    public ReviewResponse createForBooking(@AuthUser Long uid, @PathVariable Long bookingId,
+                                           @RequestBody @Valid BookingScopedReviewRequest req) {
+        return service.createReviewForBooking(uid, bookingId, req);
+    }
+
     @GetMapping("/api/reviews/{id}")
     @Operation(summary = "Get review by ID (owner or admin)")
     public ReviewResponse getById(@AuthUser Long uid, @PathVariable Long id) {

@@ -84,7 +84,7 @@ class ReviewTest {
     }
 
     @Test
-    void review_create_rejectsDuplicateForSameBooking_returns422() throws Exception {
+    void review_create_rejectsDuplicateForSameBooking_returns409() throws Exception {
         Long bookingId = createCompletedBooking();
         createReview(bookingId, 4, null, null, null, null, null, null, null);
 
@@ -92,7 +92,7 @@ class ReviewTest {
                 .header("Authorization", "Bearer " + userToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(reviewJson(bookingId, 4, null, null, null, null, null, null, null)))
-            .andExpect(status().isUnprocessableEntity());
+            .andExpect(status().isConflict());
     }
 
     @Test

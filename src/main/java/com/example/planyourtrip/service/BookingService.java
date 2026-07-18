@@ -46,6 +46,7 @@ public class BookingService {
     private final RatePlanPricingService ratePlanPricingService;
     private final BookingModificationRepository bookingModificationRepo;
     private final VoucherSignatureService voucherSignatureService;
+    private final ReviewRepository reviewRepo;
 
     private static final Set<BookingStatus> UPCOMING_STATUSES =
         EnumSet.of(BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.CHECK_IN_READY);
@@ -75,7 +76,8 @@ public class BookingService {
                           InventoryReservationService inventoryReservationService,
                           RatePlanPricingService ratePlanPricingService,
                           BookingModificationRepository bookingModificationRepo,
-                          VoucherSignatureService voucherSignatureService) {
+                          VoucherSignatureService voucherSignatureService,
+                          ReviewRepository reviewRepo) {
         this.bookingRepo   = bookingRepo;
         this.roomRepo      = roomRepo;
         this.inventoryRepo = inventoryRepo;
@@ -94,6 +96,7 @@ public class BookingService {
         this.ratePlanPricingService = ratePlanPricingService;
         this.bookingModificationRepo = bookingModificationRepo;
         this.voucherSignatureService = voucherSignatureService;
+        this.reviewRepo = reviewRepo;
     }
 
     // ── Create ────────────────────────────────────────────────────────────────
@@ -983,6 +986,10 @@ public class BookingService {
         // sourced from the immutable booking_modifications history.
         bookingModificationRepo.findByBookingIdOrderByCreatedAtAscIdAsc(b.getId())
             .forEach(m -> events.add(new TimelineEvent("MODIFIED", m.getCreatedAt(), describeModification(m))));
+
+        // Phase 7.43 — REVIEW_SUBMITTED sourced from the booking's review (single bounded query).
+        reviewRepo.findByBookingId(b.getId())
+            .ifPresent(r -> events.add(new TimelineEvent("REVIEW_SUBMITTED", r.getCreatedAt(), "Customer submitted a review")));
 
         events.sort(Comparator.comparing(TimelineEvent::occurredAt));
         return new BookingTimelineResponse(b.getId(), b.getBookingCode(), events);
