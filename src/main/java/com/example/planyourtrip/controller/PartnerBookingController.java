@@ -5,11 +5,14 @@ import com.example.planyourtrip.dto.PageResponse;
 import com.example.planyourtrip.dto.PartnerBookingDto.*;
 import com.example.planyourtrip.dto.PartnerCheckInDto.CheckInRequest;
 import com.example.planyourtrip.dto.PartnerCheckInDto.CheckInResponse;
+import com.example.planyourtrip.dto.PartnerCheckOutDto.CheckOutRequest;
+import com.example.planyourtrip.dto.PartnerCheckOutDto.CheckOutResponse;
 import com.example.planyourtrip.dto.PartnerVoucherDto.VoucherVerificationResponse;
 import com.example.planyourtrip.dto.PartnerVoucherDto.VoucherVerifyRequest;
 import com.example.planyourtrip.security.AuthUser;
 import com.example.planyourtrip.service.PartnerBookingService;
 import com.example.planyourtrip.service.PartnerCheckInService;
+import com.example.planyourtrip.service.PartnerCheckOutService;
 import com.example.planyourtrip.service.PartnerVoucherVerificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -27,13 +30,16 @@ public class PartnerBookingController {
     private final PartnerBookingService service;
     private final PartnerVoucherVerificationService voucherVerificationService;
     private final PartnerCheckInService checkInService;
+    private final PartnerCheckOutService checkOutService;
 
     public PartnerBookingController(PartnerBookingService service,
                                     PartnerVoucherVerificationService voucherVerificationService,
-                                    PartnerCheckInService checkInService) {
+                                    PartnerCheckInService checkInService,
+                                    PartnerCheckOutService checkOutService) {
         this.service = service;
         this.voucherVerificationService = voucherVerificationService;
         this.checkInService = checkInService;
+        this.checkOutService = checkOutService;
     }
 
     @GetMapping("/api/partner/bookings")
@@ -123,5 +129,22 @@ public class PartnerBookingController {
             + "no duplicate notification/audit/timeline event.")
     public CheckInResponse checkInGuest(@AuthUser Long uid, @RequestBody CheckInRequest req) {
         return checkInService.checkIn(uid, req);
+    }
+
+    // ── Phase 7.41 — Partner Guest Check-out (near-mirror of the 7.40 check-in mutation) ──
+
+    @PostMapping("/api/partner/bookings/check-out")
+    @Operation(summary = "Check out a guest via signed voucher payload or booking code",
+        description = "The departure counterpart to the Phase 7.40 check-in endpoint. Reuses the same "
+            + "signature-verify + booking-resolution + ownership check, then transitions the booking from "
+            + "CHECKED_IN to CHECKED_OUT (via BookingStatusEngineService), which notifies the customer; "
+            + "writes one immutable audit row carrying the method (QR_SCAN for a scanned payload, MANUAL "
+            + "for a typed code). Exactly one of voucherPayload / bookingCode is required (400 otherwise). "
+            + "A booking that is not CHECKED_IN, or outside the check-out window → 422; invalid signature / "
+            + "unknown / another partner's booking → uniform 404. IDEMPOTENT: repeating a check-out on an "
+            + "already-CHECKED_OUT booking returns a deterministic 200 with the unchanged check-out time "
+            + "and no duplicate notification/audit/timeline event.")
+    public CheckOutResponse checkOutGuest(@AuthUser Long uid, @RequestBody CheckOutRequest req) {
+        return checkOutService.checkOut(uid, req);
     }
 }
