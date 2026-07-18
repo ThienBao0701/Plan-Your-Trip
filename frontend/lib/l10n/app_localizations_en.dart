@@ -3256,4 +3256,495 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get docTypeOther => 'Other';
+
+  @override
+  String get tripCompanionAction => 'Trip companion';
+
+  @override
+  String get tripCompanionTitle => 'Trip Companion';
+
+  @override
+  String tripCompanionSubtitle(String trip) {
+    return 'Local demo tools for $trip: sharing, notes, packing, reminders, and documents.';
+  }
+
+  @override
+  String get tripCompanionRealEmptyTitle =>
+      'Trip companion is not connected yet';
+
+  @override
+  String get tripCompanionRealEmptyMessage =>
+      'Real collaboration, notes, packing, and reminders will appear after backend integration. No seeded demo data is shown for real sessions.';
+
+  @override
+  String tripCompanionPermissionLabel(String role) {
+    return 'Access: $role';
+  }
+
+  @override
+  String get tripCompanionReadOnlyNotice =>
+      'This trip is read-only for your current local role.';
+
+  @override
+  String get tripCompanionNoAccessRole => 'No access';
+
+  @override
+  String get tripCompanionCountCollaborators => 'Collaborators';
+
+  @override
+  String get tripCompanionCountNotes => 'Notes';
+
+  @override
+  String get tripCompanionCountPacking => 'To pack';
+
+  @override
+  String get tripCompanionCountReminders => 'Pending reminders';
+
+  @override
+  String get tripCompanionCountDocuments => 'Documents';
+
+  @override
+  String get tripCompanionCollaborationTitle => 'Collaboration';
+
+  @override
+  String get tripCompanionCollaborationSubtitle =>
+      'Manage local demo collaborators, roles, and trip privacy.';
+
+  @override
+  String get tripCompanionNotesTitle => 'Notes & Journal';
+
+  @override
+  String get tripCompanionNotesSubtitle =>
+      'Capture pinned notes, ideas, memories, and journal entries.';
+
+  @override
+  String get tripCompanionPackingTitle => 'Packing Checklist';
+
+  @override
+  String get tripCompanionPackingSubtitle =>
+      'Track what is packed, assigned, and still pending.';
+
+  @override
+  String get tripCompanionRemindersTitle => 'Reminders';
+
+  @override
+  String get tripCompanionRemindersSubtitle =>
+      'Manage in-app reminder records without delivery scheduling.';
+
+  @override
+  String get tripCompanionDocumentsSubtitle =>
+      'Open the existing trip document metadata screen.';
+
+  @override
+  String tripCompanionOpenSemantic(String module) {
+    return 'Open $module';
+  }
+
+  @override
+  String get sharedWithMeTitle => 'Shared with me';
+
+  @override
+  String get sharedWithMeSubtitle =>
+      'Active local demo trips shared by another owner.';
+
+  @override
+  String get sharedWithMeRealEmptyTitle => 'Shared trips are not connected yet';
+
+  @override
+  String get sharedWithMeRealEmptyMessage =>
+      'Real shared trips will appear after backend integration. No demo shared trips are shown for real sessions.';
+
+  @override
+  String get sharedWithMeEmptyTitle => 'No shared trips';
+
+  @override
+  String get sharedWithMeEmptyMessage =>
+      'Trips shared with you will appear here in Demo Mode.';
+
+  @override
+  String get sharedWithMeSummaryReadOnlyNotice =>
+      'This summary is local demo presentation only. Full shared-trip tools will open when the backend provides the complete trip record.';
+
+  @override
+  String sharedWithMeOwnerLabel(String owner) {
+    return 'Owner: $owner';
+  }
+
+  @override
+  String sharedWithMeRoleLabel(String role) {
+    return 'Role: $role';
+  }
+
+  @override
+  String sharedWithMeCount(int count) {
+    return '$count shared trips';
+  }
+
+  @override
+  String get collaborationPrivacyPrivate => 'Private local demo trip';
+
+  @override
+  String get collaborationPrivacyPublic => 'Public local demo visibility';
+
+  @override
+  String get collaborationPrivacyNotice =>
+      'Only the owner can manage collaborators and public/private state. Demo visibility does not publish a real share link.';
+
+  @override
+  String get collaborationInviteTitle => 'Invite collaborator';
+
+  @override
+  String get collaborationInviteEmailLabel => 'Demo user email';
+
+  @override
+  String get collaborationInviteAction => 'Invite';
+
+  @override
+  String get collaborationRoleViewer => 'Viewer';
+
+  @override
+  String get collaborationRoleEditor => 'Editor';
+
+  @override
+  String get collaborationOwnerRole => 'Owner';
+
+  @override
+  String get collaborationActiveLabel => 'Active';
+
+  @override
+  String get collaborationInactiveLabel => 'Inactive';
+
+  @override
+  String get collaborationChangeRoleAction => 'Role';
+
+  @override
+  String get collaborationRemoveAction => 'Remove';
+
+  @override
+  String get collaborationRemoveConfirmTitle => 'Remove collaborator?';
+
+  @override
+  String collaborationRemoveConfirmMessage(String name) {
+    return 'Remove $name from this local demo trip? Their authored notes stay as history.';
+  }
+
+  @override
+  String get collaborationPublicToggleLabel => 'Public demo visibility';
+
+  @override
+  String get collaborationNoShareUrlNotice =>
+      'No public URL, QR code, or external share delivery is created in this UI phase.';
+
+  @override
+  String get tripToolSavedMessage => 'Trip companion changes saved locally.';
+
+  @override
+  String get tripToolUnavailableMessage =>
+      'Trip companion actions are not connected for real accounts in this UI phase.';
+
+  @override
+  String get tripToolForbiddenMessage =>
+      'Your current role cannot perform this action.';
+
+  @override
+  String get tripToolBlankMessage => 'Required text cannot be empty.';
+
+  @override
+  String get tripToolInvalidEmailMessage => 'Enter a valid email address.';
+
+  @override
+  String get tripToolDuplicateMessage => 'That local record already exists.';
+
+  @override
+  String get tripToolRejectedMessage =>
+      'That action cannot be completed with the current trip data.';
+
+  @override
+  String get tripToolUnsafeUrlMessage =>
+      'Use a valid http or https URL with a host and no credentials.';
+
+  @override
+  String get tripToolNotFoundMessage =>
+      'The selected record is no longer available.';
+
+  @override
+  String get tripToolInvalidQuantityMessage =>
+      'Quantity must be an integer of at least 1.';
+
+  @override
+  String get tripToolInvalidReorderMessage =>
+      'Packing reorder must contain each current item exactly once.';
+
+  @override
+  String get tripToolInvalidDateMessage => 'Use a valid local date and time.';
+
+  @override
+  String get notesSearchHint => 'Search notes, authors, or journal text';
+
+  @override
+  String get notesAddAction => 'Add note';
+
+  @override
+  String get notesEditAction => 'Edit note';
+
+  @override
+  String get notesContentLabel => 'Content';
+
+  @override
+  String get notesTitleLabel => 'Title';
+
+  @override
+  String get notesTypeLabel => 'Note type';
+
+  @override
+  String get notesMoodLabel => 'Mood';
+
+  @override
+  String get notesPhotoUrlLabel => 'Safe photo URL';
+
+  @override
+  String get notesPhotoMetadataLabel => 'Photo URL metadata';
+
+  @override
+  String get notesLinkedDayLabel => 'Linked day';
+
+  @override
+  String get notesLinkedItemLabel => 'Linked activity';
+
+  @override
+  String get notesEmptyTitle => 'No notes match';
+
+  @override
+  String get notesEmptyMessage =>
+      'Add a local demo note or adjust search and filters.';
+
+  @override
+  String get notesPinAction => 'Pin';
+
+  @override
+  String get notesUnpinAction => 'Unpin';
+
+  @override
+  String get notesDeleteAction => 'Delete note';
+
+  @override
+  String get notesDeleteConfirmTitle => 'Delete note?';
+
+  @override
+  String notesDeleteConfirmMessage(String title) {
+    return 'Delete $title from the local demo journal?';
+  }
+
+  @override
+  String get noteTypeNote => 'Note';
+
+  @override
+  String get noteTypeJournal => 'Journal';
+
+  @override
+  String get noteTypeReminder => 'Reminder note';
+
+  @override
+  String get noteTypeIdea => 'Idea';
+
+  @override
+  String get noteTypeMemory => 'Memory';
+
+  @override
+  String get moodHappy => 'Happy';
+
+  @override
+  String get moodExcited => 'Excited';
+
+  @override
+  String get moodCalm => 'Calm';
+
+  @override
+  String get moodTired => 'Tired';
+
+  @override
+  String get moodStressed => 'Stressed';
+
+  @override
+  String get moodNeutral => 'Neutral';
+
+  @override
+  String get packingSearchHint => 'Search packing items, notes, or assignees';
+
+  @override
+  String get packingAddAction => 'Add packing item';
+
+  @override
+  String get packingEditAction => 'Edit item';
+
+  @override
+  String get packingLabelField => 'Item label';
+
+  @override
+  String get packingQuantityField => 'Quantity';
+
+  @override
+  String get packingCategoryLabel => 'Packing category';
+
+  @override
+  String get packingAssigneeLabel => 'Assigned to';
+
+  @override
+  String get packingNotesField => 'Notes';
+
+  @override
+  String get packingEmptyTitle => 'No packing items match';
+
+  @override
+  String get packingEmptyMessage =>
+      'Add local demo packing items or adjust filters.';
+
+  @override
+  String packingProgressValue(int checked, int total, int percent) {
+    return '$checked of $total packed ($percent%)';
+  }
+
+  @override
+  String packingUncheckedCount(int count) {
+    return '$count still unpacked';
+  }
+
+  @override
+  String get packingDeleteAction => 'Delete item';
+
+  @override
+  String get packingDeleteConfirmTitle => 'Delete packing item?';
+
+  @override
+  String packingDeleteConfirmMessage(String label) {
+    return 'Delete $label from this local demo checklist?';
+  }
+
+  @override
+  String get packingMoveUpAction => 'Move up';
+
+  @override
+  String get packingMoveDownAction => 'Move down';
+
+  @override
+  String get packingUnassignedLabel => 'Unassigned';
+
+  @override
+  String get packingCategoryDocuments => 'Documents';
+
+  @override
+  String get packingCategoryClothes => 'Clothes';
+
+  @override
+  String get packingCategoryToiletries => 'Toiletries';
+
+  @override
+  String get packingCategoryElectronics => 'Electronics';
+
+  @override
+  String get packingCategoryMedicine => 'Medicine';
+
+  @override
+  String get packingCategoryMoney => 'Money';
+
+  @override
+  String get packingCategoryFood => 'Food';
+
+  @override
+  String get packingCategoryBaby => 'Baby';
+
+  @override
+  String get packingCategoryPet => 'Pet';
+
+  @override
+  String get packingCategoryOther => 'Other';
+
+  @override
+  String get remindersIncludeCancelled => 'Include cancelled';
+
+  @override
+  String get remindersAddAction => 'Add reminder';
+
+  @override
+  String get remindersEditAction => 'Edit reminder';
+
+  @override
+  String get reminderTitleField => 'Reminder title';
+
+  @override
+  String get reminderMessageField => 'Message';
+
+  @override
+  String get reminderAtField => 'Local date and time';
+
+  @override
+  String get reminderTypeLabel => 'Reminder type';
+
+  @override
+  String get reminderStatusPending => 'Pending';
+
+  @override
+  String get reminderStatusCompleted => 'Completed';
+
+  @override
+  String get reminderStatusCancelled => 'Cancelled';
+
+  @override
+  String get reminderOverdue => 'Overdue';
+
+  @override
+  String get reminderEmptyTitle => 'No reminders match';
+
+  @override
+  String get reminderEmptyMessage =>
+      'Add local in-app reminder records or include cancelled items.';
+
+  @override
+  String get reminderCompleteAction => 'Complete';
+
+  @override
+  String get reminderCancelAction => 'Cancel reminder';
+
+  @override
+  String get reminderDeleteAction => 'Delete reminder';
+
+  @override
+  String get reminderDeleteConfirmTitle => 'Delete reminder?';
+
+  @override
+  String reminderDeleteConfirmMessage(String title) {
+    return 'Delete $title from this local demo trip?';
+  }
+
+  @override
+  String get reminderTypeCustom => 'Custom';
+
+  @override
+  String get reminderTypeDocument => 'Document';
+
+  @override
+  String get reminderTypeCheckIn => 'Check-in';
+
+  @override
+  String get reminderTypeFlight => 'Flight';
+
+  @override
+  String get reminderTypeActivity => 'Activity';
+
+  @override
+  String get reminderTypePayment => 'Payment';
+
+  @override
+  String get reminderTypePacking => 'Packing';
+
+  @override
+  String get reminderTypeOther => 'Other';
+
+  @override
+  String get reminderLocalTimeHelper =>
+      'Format: yyyy-MM-dd HH:mm. Stored as UTC for future API mapping.';
+
+  @override
+  String get reminderNoDeliveryNotice =>
+      'These are in-app reminder records only. UI-9 does not schedule push, email, SMS, or OS notifications.';
 }

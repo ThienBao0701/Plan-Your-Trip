@@ -13,6 +13,7 @@ import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/glass_widgets.dart';
 import 'create_trip_screen.dart';
 import 'edit_trip_screen.dart';
+import 'trip_companion_screen.dart';
 import 'trip_detail_screen.dart';
 import 'trip_sections.dart';
 
@@ -77,6 +78,14 @@ class TripsScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: AppSpacing.lg),
+              _SharedWithMeEntry(
+                count: app.visibleSharedTrips().length,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const SharedWithMeScreen()),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.lg),
               if (visibleTrips.isEmpty)
                 OceanEmptyState(
                   title: l10n.tripsEmptyTitle,
@@ -122,6 +131,60 @@ class TripsScreen extends StatelessWidget {
           ),
         );
     return seeded ? <Trip>[] : app.trips;
+  }
+}
+
+class _SharedWithMeEntry extends StatelessWidget {
+  final int count;
+  final VoidCallback onTap;
+
+  const _SharedWithMeEntry({required this.count, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return OceanGlassCard(
+      key: const Key('shared-with-me-action'),
+      onTap: onTap,
+      semanticLabel: l10n.sharedWithMeTitle,
+      child: Row(
+        children: [
+          Container(
+            width: AppSpacing.minTouchTarget,
+            height: AppSpacing.minTouchTarget,
+            decoration: BoxDecoration(
+              color: AppColors.ocean.withValues(alpha: .10),
+              borderRadius: BorderRadius.circular(AppRadii.md),
+            ),
+            child: const Icon(
+              Icons.group_rounded,
+              color: AppColors.ocean,
+              size: AppIconSizes.sm,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.sharedWithMeTitle,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                Text(
+                  l10n.sharedWithMeCount(count),
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ],
+            ),
+          ),
+          const Icon(
+            Icons.chevron_right_rounded,
+            color: AppColors.textSecondary,
+          ),
+        ],
+      ),
+    );
   }
 }
 

@@ -1599,5 +1599,242 @@
   "docTypeReceipt": "Receipt",
   "docTypePdf": "PDF",
   "docTypeImage": "Image",
-  "docTypeOther": "Other"
+  "docTypeOther": "Other",
+  "tripCompanionAction": "Trip companion",
+  "tripCompanionTitle": "Trip Companion",
+  "tripCompanionSubtitle": "Local demo tools for {trip}: sharing, notes, packing, reminders, and documents.",
+  "@tripCompanionSubtitle": {
+    "placeholders": {
+      "trip": {
+        "type": "String"
+      }
+    }
+  },
+  "tripCompanionRealEmptyTitle": "Trip companion is not connected yet",
+  "tripCompanionRealEmptyMessage": "Real collaboration, notes, packing, and reminders will appear after backend integration. No seeded demo data is shown for real sessions.",
+  "tripCompanionPermissionLabel": "Access: {role}",
+  "@tripCompanionPermissionLabel": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
+    }
+  },
+  "tripCompanionReadOnlyNotice": "This trip is read-only for your current local role.",
+  "tripCompanionNoAccessRole": "No access",
+  "tripCompanionCountCollaborators": "Collaborators",
+  "tripCompanionCountNotes": "Notes",
+  "tripCompanionCountPacking": "To pack",
+  "tripCompanionCountReminders": "Pending reminders",
+  "tripCompanionCountDocuments": "Documents",
+  "tripCompanionCollaborationTitle": "Collaboration",
+  "tripCompanionCollaborationSubtitle": "Manage local demo collaborators, roles, and trip privacy.",
+  "tripCompanionNotesTitle": "Notes & Journal",
+  "tripCompanionNotesSubtitle": "Capture pinned notes, ideas, memories, and journal entries.",
+  "tripCompanionPackingTitle": "Packing Checklist",
+  "tripCompanionPackingSubtitle": "Track what is packed, assigned, and still pending.",
+  "tripCompanionRemindersTitle": "Reminders",
+  "tripCompanionRemindersSubtitle": "Manage in-app reminder records without delivery scheduling.",
+  "tripCompanionDocumentsSubtitle": "Open the existing trip document metadata screen.",
+  "tripCompanionOpenSemantic": "Open {module}",
+  "@tripCompanionOpenSemantic": {
+    "placeholders": {
+      "module": {
+        "type": "String"
+      }
+    }
+  },
+  "sharedWithMeTitle": "Shared with me",
+  "sharedWithMeSubtitle": "Active local demo trips shared by another owner.",
+  "sharedWithMeRealEmptyTitle": "Shared trips are not connected yet",
+  "sharedWithMeRealEmptyMessage": "Real shared trips will appear after backend integration. No demo shared trips are shown for real sessions.",
+  "sharedWithMeEmptyTitle": "No shared trips",
+  "sharedWithMeEmptyMessage": "Trips shared with you will appear here in Demo Mode.",
+  "sharedWithMeSummaryReadOnlyNotice": "This summary is local demo presentation only. Full shared-trip tools will open when the backend provides the complete trip record.",
+  "sharedWithMeOwnerLabel": "Owner: {owner}",
+  "@sharedWithMeOwnerLabel": {
+    "placeholders": {
+      "owner": {
+        "type": "String"
+      }
+    }
+  },
+  "sharedWithMeRoleLabel": "Role: {role}",
+  "@sharedWithMeRoleLabel": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
+    }
+  },
+  "sharedWithMeCount": "{count} shared trips",
+  "@sharedWithMeCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "collaborationPrivacyPrivate": "Private local demo trip",
+  "collaborationPrivacyPublic": "Public local demo visibility",
+  "collaborationPrivacyNotice": "Only the owner can manage collaborators and public/private state. Demo visibility does not publish a real share link.",
+  "collaborationInviteTitle": "Invite collaborator",
+  "collaborationInviteEmailLabel": "Demo user email",
+  "collaborationInviteAction": "Invite",
+  "collaborationRoleViewer": "Viewer",
+  "collaborationRoleEditor": "Editor",
+  "collaborationOwnerRole": "Owner",
+  "collaborationActiveLabel": "Active",
+  "collaborationInactiveLabel": "Inactive",
+  "collaborationChangeRoleAction": "Role",
+  "collaborationRemoveAction": "Remove",
+  "collaborationRemoveConfirmTitle": "Remove collaborator?",
+  "collaborationRemoveConfirmMessage": "Remove {name} from this local demo trip? Their authored notes stay as history.",
+  "@collaborationRemoveConfirmMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "collaborationPublicToggleLabel": "Public demo visibility",
+  "collaborationNoShareUrlNotice": "No public URL, QR code, or external share delivery is created in this UI phase.",
+  "tripToolSavedMessage": "Trip companion changes saved locally.",
+  "tripToolUnavailableMessage": "Trip companion actions are not connected for real accounts in this UI phase.",
+  "tripToolForbiddenMessage": "Your current role cannot perform this action.",
+  "tripToolBlankMessage": "Required text cannot be empty.",
+  "tripToolInvalidEmailMessage": "Enter a valid email address.",
+  "tripToolDuplicateMessage": "That local record already exists.",
+  "tripToolRejectedMessage": "That action cannot be completed with the current trip data.",
+  "tripToolUnsafeUrlMessage": "Use a valid http or https URL with a host and no credentials.",
+  "tripToolNotFoundMessage": "The selected record is no longer available.",
+  "tripToolInvalidQuantityMessage": "Quantity must be an integer of at least 1.",
+  "tripToolInvalidReorderMessage": "Packing reorder must contain each current item exactly once.",
+  "tripToolInvalidDateMessage": "Use a valid local date and time.",
+  "notesSearchHint": "Search notes, authors, or journal text",
+  "notesAddAction": "Add note",
+  "notesEditAction": "Edit note",
+  "notesContentLabel": "Content",
+  "notesTitleLabel": "Title",
+  "notesTypeLabel": "Note type",
+  "notesMoodLabel": "Mood",
+  "notesPhotoUrlLabel": "Safe photo URL",
+  "notesPhotoMetadataLabel": "Photo URL metadata",
+  "notesLinkedDayLabel": "Linked day",
+  "notesLinkedItemLabel": "Linked activity",
+  "notesEmptyTitle": "No notes match",
+  "notesEmptyMessage": "Add a local demo note or adjust search and filters.",
+  "notesPinAction": "Pin",
+  "notesUnpinAction": "Unpin",
+  "notesDeleteAction": "Delete note",
+  "notesDeleteConfirmTitle": "Delete note?",
+  "notesDeleteConfirmMessage": "Delete {title} from the local demo journal?",
+  "@notesDeleteConfirmMessage": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "noteTypeNote": "Note",
+  "noteTypeJournal": "Journal",
+  "noteTypeReminder": "Reminder note",
+  "noteTypeIdea": "Idea",
+  "noteTypeMemory": "Memory",
+  "moodHappy": "Happy",
+  "moodExcited": "Excited",
+  "moodCalm": "Calm",
+  "moodTired": "Tired",
+  "moodStressed": "Stressed",
+  "moodNeutral": "Neutral",
+  "packingSearchHint": "Search packing items, notes, or assignees",
+  "packingAddAction": "Add packing item",
+  "packingEditAction": "Edit item",
+  "packingLabelField": "Item label",
+  "packingQuantityField": "Quantity",
+  "packingCategoryLabel": "Packing category",
+  "packingAssigneeLabel": "Assigned to",
+  "packingNotesField": "Notes",
+  "packingEmptyTitle": "No packing items match",
+  "packingEmptyMessage": "Add local demo packing items or adjust filters.",
+  "packingProgressValue": "{checked} of {total} packed ({percent}%)",
+  "@packingProgressValue": {
+    "placeholders": {
+      "checked": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "packingUncheckedCount": "{count} still unpacked",
+  "@packingUncheckedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "packingDeleteAction": "Delete item",
+  "packingDeleteConfirmTitle": "Delete packing item?",
+  "packingDeleteConfirmMessage": "Delete {label} from this local demo checklist?",
+  "@packingDeleteConfirmMessage": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "packingMoveUpAction": "Move up",
+  "packingMoveDownAction": "Move down",
+  "packingUnassignedLabel": "Unassigned",
+  "packingCategoryDocuments": "Documents",
+  "packingCategoryClothes": "Clothes",
+  "packingCategoryToiletries": "Toiletries",
+  "packingCategoryElectronics": "Electronics",
+  "packingCategoryMedicine": "Medicine",
+  "packingCategoryMoney": "Money",
+  "packingCategoryFood": "Food",
+  "packingCategoryBaby": "Baby",
+  "packingCategoryPet": "Pet",
+  "packingCategoryOther": "Other",
+  "remindersIncludeCancelled": "Include cancelled",
+  "remindersAddAction": "Add reminder",
+  "remindersEditAction": "Edit reminder",
+  "reminderTitleField": "Reminder title",
+  "reminderMessageField": "Message",
+  "reminderAtField": "Local date and time",
+  "reminderTypeLabel": "Reminder type",
+  "reminderStatusPending": "Pending",
+  "reminderStatusCompleted": "Completed",
+  "reminderStatusCancelled": "Cancelled",
+  "reminderOverdue": "Overdue",
+  "reminderEmptyTitle": "No reminders match",
+  "reminderEmptyMessage": "Add local in-app reminder records or include cancelled items.",
+  "reminderCompleteAction": "Complete",
+  "reminderCancelAction": "Cancel reminder",
+  "reminderDeleteAction": "Delete reminder",
+  "reminderDeleteConfirmTitle": "Delete reminder?",
+  "reminderDeleteConfirmMessage": "Delete {title} from this local demo trip?",
+  "@reminderDeleteConfirmMessage": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderTypeCustom": "Custom",
+  "reminderTypeDocument": "Document",
+  "reminderTypeCheckIn": "Check-in",
+  "reminderTypeFlight": "Flight",
+  "reminderTypeActivity": "Activity",
+  "reminderTypePayment": "Payment",
+  "reminderTypePacking": "Packing",
+  "reminderTypeOther": "Other",
+  "reminderLocalTimeHelper": "Format: yyyy-MM-dd HH:mm. Stored as UTC for future API mapping.",
+  "reminderNoDeliveryNotice": "These are in-app reminder records only. UI-9 does not schedule push, email, SMS, or OS notifications."
 }

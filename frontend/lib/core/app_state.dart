@@ -59,6 +59,13 @@ class AppState extends ChangeNotifier {
   List<TravelWalletItem> travelWalletItems =
       List.from(MockData.travelWalletItems);
   List<TripDocument> tripDocuments = List.from(MockData.tripDocuments);
+  List<TripCollaborator> tripCollaborators =
+      List.from(MockData.tripCollaborators);
+  List<SharedTripSummary> sharedTrips = List.from(MockData.sharedTrips);
+  List<TripNote> tripNotes = List.from(MockData.tripNotes);
+  List<PackingItem> packingItems = List.from(MockData.packingItems);
+  List<TripReminder> tripReminders = List.from(MockData.tripReminders);
+  Set<int> publicTripIds = Set<int>.from(MockData.publicTripIds);
   List<Category> get categories => MockData.categories;
 
   // ── Session ──────────────────────────────────────────────────────────────
@@ -109,6 +116,12 @@ class AppState extends ChangeNotifier {
     demoBookings = [];
     travelWalletItems = List.from(MockData.travelWalletItems);
     tripDocuments = List.from(MockData.tripDocuments);
+    tripCollaborators = List.from(MockData.tripCollaborators);
+    sharedTrips = List.from(MockData.sharedTrips);
+    tripNotes = List.from(MockData.tripNotes);
+    packingItems = List.from(MockData.packingItems);
+    tripReminders = List.from(MockData.tripReminders);
+    publicTripIds = Set<int>.from(MockData.publicTripIds);
     _applyRewardDataMode();
     notifyListeners();
   }
@@ -121,6 +134,12 @@ class AppState extends ChangeNotifier {
       demoBookings = [];
       travelWalletItems = List.from(MockData.travelWalletItems);
       tripDocuments = List.from(MockData.tripDocuments);
+      tripCollaborators = List.from(MockData.tripCollaborators);
+      sharedTrips = List.from(MockData.sharedTrips);
+      tripNotes = List.from(MockData.tripNotes);
+      packingItems = List.from(MockData.packingItems);
+      tripReminders = List.from(MockData.tripReminders);
+      publicTripIds = Set<int>.from(MockData.publicTripIds);
       _applyRewardDataMode();
       return;
     }
@@ -130,6 +149,12 @@ class AppState extends ChangeNotifier {
     demoBookings = [];
     travelWalletItems = [];
     tripDocuments = [];
+    tripCollaborators = [];
+    sharedTrips = [];
+    tripNotes = [];
+    packingItems = [];
+    tripReminders = [];
+    publicTripIds = {};
     _applyRewardDataMode();
   }
 
@@ -265,6 +290,7 @@ class AppState extends ChangeNotifier {
 
   void updateTrip(Trip updated) {
     trips = trips.map((t) => t.id == updated.id ? updated : t).toList();
+    final changedAt = now();
     timeline = timeline
         .map((item) =>
             item.tripId == updated.id && item.dayNumber > updated.days
@@ -278,6 +304,27 @@ class AppState extends ChangeNotifier {
             ? expense.copyWith(tripDayId: updated.days)
             : expense)
         .toList();
+    tripDocuments = tripDocuments
+        .map((document) => document.tripId == updated.id &&
+                document.tripDayId != null &&
+                document.tripDayId! > updated.days
+            ? document.copyWith(tripDayId: updated.days, updatedAt: changedAt)
+            : document)
+        .toList();
+    tripNotes = tripNotes
+        .map((note) => note.tripPlanId == updated.id &&
+                note.tripDayId != null &&
+                note.tripDayId! > updated.days
+            ? note.copyWith(tripDayId: updated.days, updatedAt: changedAt)
+            : note)
+        .toList();
+    tripReminders = tripReminders
+        .map((reminder) => reminder.tripPlanId == updated.id &&
+                reminder.tripDayId != null &&
+                reminder.tripDayId! > updated.days
+            ? reminder.copyWith(tripDayId: updated.days, updatedAt: changedAt)
+            : reminder)
+        .toList();
     notifyListeners();
   }
 
@@ -290,6 +337,14 @@ class AppState extends ChangeNotifier {
     timeline = timeline.where((t) => t.tripId != id).toList();
     expenses = expenses.where((e) => e.tripId != id).toList();
     tripDocuments = tripDocuments.where((doc) => doc.tripId != id).toList();
+    tripCollaborators =
+        tripCollaborators.where((collab) => collab.tripPlanId != id).toList();
+    sharedTrips = sharedTrips.where((trip) => trip.tripId != id).toList();
+    tripNotes = tripNotes.where((note) => note.tripPlanId != id).toList();
+    packingItems = packingItems.where((item) => item.tripPlanId != id).toList();
+    tripReminders =
+        tripReminders.where((reminder) => reminder.tripPlanId != id).toList();
+    publicTripIds = {...publicTripIds}..remove(id);
     travelWalletItems = travelWalletItems
         .map((item) {
           if (item.linkedDocumentId != null &&
@@ -343,6 +398,17 @@ class AppState extends ChangeNotifier {
 
   void deleteTimeline(int id) {
     timeline = timeline.where((e) => e.id != id).toList();
+    final changedAt = now();
+    tripNotes = tripNotes
+        .map((note) => note.tripItemId == id
+            ? note.copyWith(tripItemId: null, updatedAt: changedAt)
+            : note)
+        .toList();
+    tripReminders = tripReminders
+        .map((reminder) => reminder.tripItemId == id
+            ? reminder.copyWith(tripItemId: null, updatedAt: changedAt)
+            : reminder)
+        .toList();
     notifyListeners();
   }
 
@@ -739,9 +805,15 @@ class AppState extends ChangeNotifier {
     if (!tripDocuments.any((doc) => doc.id == id)) {
       return WalletActionResult.notFound;
     }
+    final changedAt = now();
     tripDocuments = tripDocuments.where((doc) => doc.id != id).toList();
     travelWalletItems =
         travelWalletItems.where((item) => item.linkedDocumentId != id).toList();
+    tripReminders = tripReminders
+        .map((reminder) => reminder.documentId == id
+            ? reminder.copyWith(documentId: null, updatedAt: changedAt)
+            : reminder)
+        .toList();
     notifyListeners();
     return WalletActionResult.success;
   }
@@ -827,6 +899,518 @@ class AppState extends ChangeNotifier {
     travelWalletItems = [...travelWalletItems, item];
     notifyListeners();
     return item;
+  }
+
+  // ── Trip collaboration and companion tools ──────────────────────────────
+
+  String get currentUserEmail =>
+      (email?.trim().isNotEmpty ?? false) ? email!.trim() : MockData.demoEmail;
+
+  DemoTripUser get currentDemoUser {
+    final normalized = _normalizeEmail(currentUserEmail);
+    return _firstWhereOrNull(
+          MockData.demoTripUsers,
+          (user) => _normalizeEmail(user.email) == normalized,
+        ) ??
+        MockData.demoTripUsers.first;
+  }
+
+  TripPermission tripAccessLevel(int tripId) {
+    if (!demoMode) return TripPermission.noAccess;
+    final actor = _normalizeEmail(currentUserEmail);
+    final trip = tripById(tripId);
+    if (trip != null && _normalizeEmail(trip.ownerEmail) == actor) {
+      return TripPermission.owner;
+    }
+    final collaborator = _firstWhereOrNull(
+      tripCollaborators,
+      (item) =>
+          item.tripPlanId == tripId &&
+          item.active &&
+          _normalizeEmail(item.userEmail) == actor,
+    );
+    if (collaborator == null) return TripPermission.noAccess;
+    return collaborator.role == TripCollaboratorRole.editor
+        ? TripPermission.editor
+        : TripPermission.viewer;
+  }
+
+  bool isTripPublic(int tripId) => publicTripIds.contains(tripId);
+
+  List<TripCollaborator> collaboratorsForTrip(int tripId) =>
+      tripCollaborators.where((item) => item.tripPlanId == tripId).toList()
+        ..sort((a, b) {
+          if (a.active != b.active) return a.active ? -1 : 1;
+          return a.userFullName.compareTo(b.userFullName);
+        });
+
+  List<TripCollaborator> activeCollaboratorsForTrip(int tripId) =>
+      collaboratorsForTrip(tripId).where((item) => item.active).toList();
+
+  List<SharedTripSummary> visibleSharedTrips() {
+    if (!demoMode) return <SharedTripSummary>[];
+    final actor = _normalizeEmail(currentUserEmail);
+    final ownedTripIds = trips
+        .where((trip) => _normalizeEmail(trip.ownerEmail) == actor)
+        .map((trip) => trip.id)
+        .toSet();
+    final visible = <SharedTripSummary>[];
+    final seen = <int>{};
+
+    for (final collaborator in tripCollaborators) {
+      if (!collaborator.active ||
+          _normalizeEmail(collaborator.userEmail) != actor ||
+          ownedTripIds.contains(collaborator.tripPlanId)) {
+        continue;
+      }
+      final trip = tripById(collaborator.tripPlanId);
+      if (trip == null || !seen.add(trip.id)) continue;
+      visible.add(SharedTripSummary(
+        tripId: trip.id,
+        title: trip.title,
+        destination: trip.destination,
+        coverImage: trip.imageUrl,
+        startDate: trip.startDate,
+        endDate: trip.endDate,
+        status: 'ACTIVE',
+        ownerName: trip.ownerName,
+        role: collaborator.role,
+      ));
+    }
+
+    if (actor == _normalizeEmail(MockData.demoEmail)) {
+      for (final summary in sharedTrips) {
+        if (seen.add(summary.tripId)) visible.add(summary);
+      }
+    }
+
+    return visible..sort((a, b) => a.startDate.compareTo(b.startDate));
+  }
+
+  TripCompanionCounts companionCountsForTrip(int tripId) => TripCompanionCounts(
+        activeCollaborators: activeCollaboratorsForTrip(tripId).length,
+        notes: notesForTrip(tripId).length,
+        uncheckedPacking: packingProgressForTrip(tripId).unchecked,
+        pendingReminders: remindersForTrip(tripId)
+            .where((item) => item.status == TripReminderStatus.pending)
+            .length,
+        documents: documentsForTrip(tripId).length,
+      );
+
+  TripToolActionResult inviteTripCollaborator(
+    int tripId,
+    String email, {
+    TripCollaboratorRole role = TripCollaboratorRole.viewer,
+  }) {
+    if (!demoMode) return TripToolActionResult.unavailable;
+    if (tripAccessLevel(tripId) != TripPermission.owner) {
+      return TripToolActionResult.forbidden;
+    }
+    final trip = tripById(tripId);
+    if (trip == null) return TripToolActionResult.notFound;
+    final normalized = _normalizeEmail(email);
+    if (normalized.isEmpty) return TripToolActionResult.blank;
+    if (!_looksLikeEmail(normalized)) return TripToolActionResult.invalidEmail;
+    if (_normalizeEmail(trip.ownerEmail) == normalized) {
+      return TripToolActionResult.rejected;
+    }
+    if (tripCollaborators.any((item) =>
+        item.tripPlanId == tripId &&
+        _normalizeEmail(item.userEmail) == normalized)) {
+      return TripToolActionResult.duplicate;
+    }
+    final user = _firstWhereOrNull(
+      MockData.demoTripUsers,
+      (item) => _normalizeEmail(item.email) == normalized,
+    );
+    if (user == null) return TripToolActionResult.rejected;
+    final timestamp = now();
+    tripCollaborators = [
+      ...tripCollaborators,
+      TripCollaborator(
+        id: 'collab-$tripId-${user.id}',
+        tripPlanId: tripId,
+        userId: user.id,
+        userEmail: user.email,
+        userFullName: user.fullName,
+        role: role,
+        invitedAt: timestamp,
+        acceptedAt: timestamp,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      ),
+    ];
+    notifyListeners();
+    return TripToolActionResult.success;
+  }
+
+  TripToolActionResult updateCollaboratorRole(
+    int tripId,
+    String collaboratorId,
+    TripCollaboratorRole role,
+  ) {
+    if (!demoMode) return TripToolActionResult.unavailable;
+    if (tripAccessLevel(tripId) != TripPermission.owner) {
+      return TripToolActionResult.forbidden;
+    }
+    final index = tripCollaborators.indexWhere(
+      (item) => item.id == collaboratorId && item.tripPlanId == tripId,
+    );
+    if (index < 0) return TripToolActionResult.notFound;
+    tripCollaborators = [
+      for (var i = 0; i < tripCollaborators.length; i++)
+        i == index
+            ? tripCollaborators[i].copyWith(role: role, updatedAt: now())
+            : tripCollaborators[i],
+    ];
+    notifyListeners();
+    return TripToolActionResult.success;
+  }
+
+  TripToolActionResult removeCollaborator(int tripId, String collaboratorId) {
+    if (!demoMode) return TripToolActionResult.unavailable;
+    if (tripAccessLevel(tripId) != TripPermission.owner) {
+      return TripToolActionResult.forbidden;
+    }
+    final removed = _firstWhereOrNull(
+      tripCollaborators,
+      (item) => item.id == collaboratorId && item.tripPlanId == tripId,
+    );
+    if (removed == null) return TripToolActionResult.notFound;
+    tripCollaborators =
+        tripCollaborators.where((item) => item.id != collaboratorId).toList();
+    packingItems = packingItems
+        .map((item) =>
+            item.tripPlanId == tripId && item.assignedToUserId == removed.userId
+                ? item.copyWith(
+                    assignedToUserId: null,
+                    assignedToUserName: null,
+                    updatedAt: now(),
+                  )
+                : item)
+        .toList();
+    notifyListeners();
+    return TripToolActionResult.success;
+  }
+
+  TripToolActionResult setTripPublic(int tripId, bool isPublic) {
+    if (!demoMode) return TripToolActionResult.unavailable;
+    if (tripAccessLevel(tripId) != TripPermission.owner) {
+      return TripToolActionResult.forbidden;
+    }
+    if (tripById(tripId) == null) return TripToolActionResult.notFound;
+    publicTripIds = {...publicTripIds};
+    isPublic ? publicTripIds.add(tripId) : publicTripIds.remove(tripId);
+    notifyListeners();
+    return TripToolActionResult.success;
+  }
+
+  List<TripNote> notesForTrip(int tripId) =>
+      tripNotes.where((note) => note.tripPlanId == tripId).toList()
+        ..sort((a, b) {
+          if (a.pinned != b.pinned) return a.pinned ? -1 : 1;
+          final updated = b.updatedAt.compareTo(a.updatedAt);
+          return updated == 0 ? b.createdAt.compareTo(a.createdAt) : updated;
+        });
+
+  TripToolActionResult addTripNote(TripNote note) {
+    if (!demoMode) return TripToolActionResult.unavailable;
+    if (!tripAccessLevel(note.tripPlanId).canEdit) {
+      return TripToolActionResult.forbidden;
+    }
+    final validation = _validateTripNote(note);
+    if (validation != TripToolActionResult.success) return validation;
+    if (tripNotes.any((item) => item.id == note.id)) {
+      return TripToolActionResult.duplicate;
+    }
+    final user = currentDemoUser;
+    final safe = note.copyWith(
+      authorUserId: user.id,
+      authorUserName: user.fullName,
+      title: note.title.trim(),
+      content: note.content.trim(),
+      photoUrl: note.photoUrl.trim(),
+    );
+    tripNotes = [...tripNotes, safe];
+    notifyListeners();
+    return TripToolActionResult.success;
+  }
+
+  TripToolActionResult updateTripNote(TripNote note) {
+    if (!demoMode) return TripToolActionResult.unavailable;
+    final index = tripNotes.indexWhere((item) => item.id == note.id);
+    if (index < 0) return TripToolActionResult.notFound;
+    final original = tripNotes[index];
+    if (!tripAccessLevel(original.tripPlanId).canEdit) {
+      return TripToolActionResult.forbidden;
+    }
+    final validation = _validateTripNote(note.copyWith(
+      tripPlanId: original.tripPlanId,
+      authorUserId: original.authorUserId,
+      authorUserName: original.authorUserName,
+      createdAt: original.createdAt,
+    ));
+    if (validation != TripToolActionResult.success) return validation;
+    final safe = note.copyWith(
+      tripPlanId: original.tripPlanId,
+      authorUserId: original.authorUserId,
+      authorUserName: original.authorUserName,
+      createdAt: original.createdAt,
+      title: note.title.trim(),
+      content: note.content.trim(),
+      photoUrl: note.photoUrl.trim(),
+      updatedAt: now(),
+    );
+    tripNotes = [
+      for (var i = 0; i < tripNotes.length; i++)
+        i == index ? safe : tripNotes[i],
+    ];
+    notifyListeners();
+    return TripToolActionResult.success;
+  }
+
+  TripToolActionResult deleteTripNote(String noteId) {
+    final note = _firstWhereOrNull(tripNotes, (item) => item.id == noteId);
+    if (!demoMode) return TripToolActionResult.unavailable;
+    if (note == null) return TripToolActionResult.notFound;
+    if (!tripAccessLevel(note.tripPlanId).canEdit) {
+      return TripToolActionResult.forbidden;
+    }
+    tripNotes = tripNotes.where((item) => item.id != noteId).toList();
+    notifyListeners();
+    return TripToolActionResult.success;
+  }
+
+  TripToolActionResult setTripNotePinned(String noteId, bool pinned) {
+    final index = tripNotes.indexWhere((item) => item.id == noteId);
+    if (!demoMode) return TripToolActionResult.unavailable;
+    if (index < 0) return TripToolActionResult.notFound;
+    final note = tripNotes[index];
+    if (!tripAccessLevel(note.tripPlanId).canEdit) {
+      return TripToolActionResult.forbidden;
+    }
+    tripNotes = [
+      for (var i = 0; i < tripNotes.length; i++)
+        i == index
+            ? note.copyWith(pinned: pinned, updatedAt: now())
+            : tripNotes[i],
+    ];
+    notifyListeners();
+    return TripToolActionResult.success;
+  }
+
+  List<PackingItem> packingForTrip(int tripId) =>
+      packingItems.where((item) => item.tripPlanId == tripId).toList()
+        ..sort(_comparePackingItems);
+
+  PackingProgress packingProgressForTrip(int tripId) {
+    final items = packingItems.where((item) => item.tripPlanId == tripId);
+    return PackingProgress(
+      total: items.length,
+      checked: items.where((item) => item.checked).length,
+    );
+  }
+
+  TripToolActionResult addPackingItem(PackingItem item) {
+    if (!demoMode) return TripToolActionResult.unavailable;
+    if (!tripAccessLevel(item.tripPlanId).canEdit) {
+      return TripToolActionResult.forbidden;
+    }
+    final validation = _validatePackingItem(item);
+    if (validation != TripToolActionResult.success) return validation;
+    if (packingItems.any((existing) => existing.id == item.id)) {
+      return TripToolActionResult.duplicate;
+    }
+    packingItems = [...packingItems, _sanitizePackingItem(item)];
+    notifyListeners();
+    return TripToolActionResult.success;
+  }
+
+  TripToolActionResult updatePackingItem(PackingItem item) {
+    if (!demoMode) return TripToolActionResult.unavailable;
+    final index = packingItems.indexWhere((existing) => existing.id == item.id);
+    if (index < 0) return TripToolActionResult.notFound;
+    final original = packingItems[index];
+    if (!tripAccessLevel(original.tripPlanId).canEdit) {
+      return TripToolActionResult.forbidden;
+    }
+    final validation = _validatePackingItem(item.copyWith(
+      tripPlanId: original.tripPlanId,
+      sortOrder: original.sortOrder,
+      createdAt: original.createdAt,
+    ));
+    if (validation != TripToolActionResult.success) return validation;
+    final safe = _sanitizePackingItem(item.copyWith(
+      tripPlanId: original.tripPlanId,
+      sortOrder: original.sortOrder,
+      createdAt: original.createdAt,
+      checked: original.checked,
+      checkedAt: original.checkedAt,
+      updatedAt: now(),
+    ));
+    packingItems = [
+      for (var i = 0; i < packingItems.length; i++)
+        i == index ? safe : packingItems[i],
+    ];
+    notifyListeners();
+    return TripToolActionResult.success;
+  }
+
+  TripToolActionResult deletePackingItem(String id) {
+    final item =
+        _firstWhereOrNull(packingItems, (existing) => existing.id == id);
+    if (!demoMode) return TripToolActionResult.unavailable;
+    if (item == null) return TripToolActionResult.notFound;
+    if (!tripAccessLevel(item.tripPlanId).canEdit) {
+      return TripToolActionResult.forbidden;
+    }
+    packingItems = packingItems.where((existing) => existing.id != id).toList();
+    notifyListeners();
+    return TripToolActionResult.success;
+  }
+
+  TripToolActionResult setPackingChecked(String id, bool checked) {
+    final index = packingItems.indexWhere((item) => item.id == id);
+    if (!demoMode) return TripToolActionResult.unavailable;
+    if (index < 0) return TripToolActionResult.notFound;
+    final item = packingItems[index];
+    if (!tripAccessLevel(item.tripPlanId).canEdit) {
+      return TripToolActionResult.forbidden;
+    }
+    packingItems = [
+      for (var i = 0; i < packingItems.length; i++)
+        i == index
+            ? item.copyWith(
+                checked: checked,
+                checkedAt: checked ? now().toUtc() : null,
+                updatedAt: now(),
+              )
+            : packingItems[i],
+    ];
+    notifyListeners();
+    return TripToolActionResult.success;
+  }
+
+  TripToolActionResult reorderPackingItems(
+      int tripId, List<String> orderedIds) {
+    if (!demoMode) return TripToolActionResult.unavailable;
+    if (!tripAccessLevel(tripId).canEdit) return TripToolActionResult.forbidden;
+    final currentIds = packingItems
+        .where((item) => item.tripPlanId == tripId)
+        .map((item) => item.id)
+        .toSet();
+    final suppliedIds = orderedIds.toSet();
+    if (orderedIds.length != currentIds.length ||
+        suppliedIds.length != orderedIds.length ||
+        suppliedIds.difference(currentIds).isNotEmpty ||
+        currentIds.difference(suppliedIds).isNotEmpty) {
+      return TripToolActionResult.invalidReorder;
+    }
+    final order = {
+      for (var i = 0; i < orderedIds.length; i++) orderedIds[i]: i,
+    };
+    packingItems = packingItems
+        .map((item) => item.tripPlanId == tripId
+            ? item.copyWith(sortOrder: order[item.id], updatedAt: now())
+            : item)
+        .toList();
+    notifyListeners();
+    return TripToolActionResult.success;
+  }
+
+  List<TripReminder> remindersForTrip(
+    int tripId, {
+    bool includeCancelled = false,
+  }) =>
+      tripReminders
+          .where((item) =>
+              item.tripPlanId == tripId &&
+              (includeCancelled || item.status != TripReminderStatus.cancelled))
+          .toList()
+        ..sort((a, b) {
+          final date = a.reminderAt.compareTo(b.reminderAt);
+          return date == 0 ? a.id.compareTo(b.id) : date;
+        });
+
+  TripToolActionResult addTripReminder(TripReminder reminder) {
+    if (!demoMode) return TripToolActionResult.unavailable;
+    if (!tripAccessLevel(reminder.tripPlanId).canEdit) {
+      return TripToolActionResult.forbidden;
+    }
+    final validation = _validateReminder(reminder);
+    if (validation != TripToolActionResult.success) return validation;
+    if (tripReminders.any((item) => item.id == reminder.id)) {
+      return TripToolActionResult.duplicate;
+    }
+    final user = currentDemoUser;
+    tripReminders = [
+      ...tripReminders,
+      reminder.copyWith(
+        userId: user.id,
+        userName: user.fullName,
+        title: reminder.title.trim(),
+        message: reminder.message.trim(),
+        reminderAt: reminder.reminderAt.toUtc(),
+      ),
+    ];
+    notifyListeners();
+    return TripToolActionResult.success;
+  }
+
+  TripToolActionResult updateTripReminder(TripReminder reminder) {
+    if (!demoMode) return TripToolActionResult.unavailable;
+    final index = tripReminders.indexWhere((item) => item.id == reminder.id);
+    if (index < 0) return TripToolActionResult.notFound;
+    final original = tripReminders[index];
+    if (!tripAccessLevel(original.tripPlanId).canEdit) {
+      return TripToolActionResult.forbidden;
+    }
+    final validation = _validateReminder(reminder.copyWith(
+      tripPlanId: original.tripPlanId,
+      userId: original.userId,
+      userName: original.userName,
+      createdAt: original.createdAt,
+      status: original.status,
+      completedAt: original.completedAt,
+    ));
+    if (validation != TripToolActionResult.success) return validation;
+    tripReminders = [
+      for (var i = 0; i < tripReminders.length; i++)
+        i == index
+            ? reminder.copyWith(
+                tripPlanId: original.tripPlanId,
+                userId: original.userId,
+                userName: original.userName,
+                title: reminder.title.trim(),
+                message: reminder.message.trim(),
+                reminderAt: reminder.reminderAt.toUtc(),
+                status: original.status,
+                completedAt: original.completedAt,
+                createdAt: original.createdAt,
+                updatedAt: now(),
+              )
+            : tripReminders[i],
+    ];
+    notifyListeners();
+    return TripToolActionResult.success;
+  }
+
+  TripToolActionResult completeTripReminder(String id) =>
+      _setReminderStatus(id, TripReminderStatus.completed);
+
+  TripToolActionResult cancelTripReminder(String id) =>
+      _setReminderStatus(id, TripReminderStatus.cancelled);
+
+  TripToolActionResult deleteTripReminder(String id) {
+    final reminder = _firstWhereOrNull(tripReminders, (item) => item.id == id);
+    if (!demoMode) return TripToolActionResult.unavailable;
+    if (reminder == null) return TripToolActionResult.notFound;
+    if (!tripAccessLevel(reminder.tripPlanId).canEdit) {
+      return TripToolActionResult.forbidden;
+    }
+    tripReminders = tripReminders.where((item) => item.id != id).toList();
+    notifyListeners();
+    return TripToolActionResult.success;
   }
 
   // ── Unique ID helper ──────────────────────────────────────────────────────
@@ -951,6 +1535,135 @@ class AppState extends ChangeNotifier {
     if (mediaUrl.isEmpty) return document.mediaLabel.trim().isNotEmpty;
     return isSafeDocumentMediaUrl(mediaUrl);
   }
+
+  TripToolActionResult _validateTripNote(TripNote note) {
+    final trip = tripById(note.tripPlanId);
+    if (trip == null) return TripToolActionResult.notFound;
+    if (note.content.trim().isEmpty) return TripToolActionResult.blank;
+    if (!_validTripDay(trip, note.tripDayId)) {
+      return TripToolActionResult.rejected;
+    }
+    if (!_validTripItem(note.tripPlanId, note.tripItemId)) {
+      return TripToolActionResult.rejected;
+    }
+    if (note.photoUrl.trim().isNotEmpty &&
+        !isSafeDocumentMediaUrl(note.photoUrl)) {
+      return TripToolActionResult.unsafeUrl;
+    }
+    return TripToolActionResult.success;
+  }
+
+  TripToolActionResult _validatePackingItem(PackingItem item) {
+    if (tripById(item.tripPlanId) == null) {
+      return TripToolActionResult.notFound;
+    }
+    if (item.label.trim().isEmpty) return TripToolActionResult.blank;
+    if (item.quantity < 1) return TripToolActionResult.invalidQuantity;
+    if (!_validAssignee(item.tripPlanId, item.assignedToUserId)) {
+      return TripToolActionResult.rejected;
+    }
+    return TripToolActionResult.success;
+  }
+
+  PackingItem _sanitizePackingItem(PackingItem item) {
+    final assignee = item.assignedToUserId == null
+        ? null
+        : _assigneeFor(item.tripPlanId, item.assignedToUserId!);
+    return item.copyWith(
+      label: item.label.trim(),
+      notes: item.notes.trim(),
+      assignedToUserName: assignee?.$2,
+    );
+  }
+
+  TripToolActionResult _validateReminder(TripReminder reminder) {
+    final trip = tripById(reminder.tripPlanId);
+    if (trip == null) return TripToolActionResult.notFound;
+    if (reminder.title.trim().isEmpty) return TripToolActionResult.blank;
+    if (!_validTripDay(trip, reminder.tripDayId)) {
+      return TripToolActionResult.rejected;
+    }
+    if (!_validTripItem(reminder.tripPlanId, reminder.tripItemId)) {
+      return TripToolActionResult.rejected;
+    }
+    if (reminder.documentId != null &&
+        !tripDocuments.any((document) =>
+            document.id == reminder.documentId &&
+            document.tripId == reminder.tripPlanId)) {
+      return TripToolActionResult.rejected;
+    }
+    return TripToolActionResult.success;
+  }
+
+  TripToolActionResult _setReminderStatus(
+    String id,
+    TripReminderStatus status,
+  ) {
+    final index = tripReminders.indexWhere((item) => item.id == id);
+    if (!demoMode) return TripToolActionResult.unavailable;
+    if (index < 0) return TripToolActionResult.notFound;
+    final reminder = tripReminders[index];
+    if (!tripAccessLevel(reminder.tripPlanId).canEdit) {
+      return TripToolActionResult.forbidden;
+    }
+    if (reminder.status == status) return TripToolActionResult.success;
+    if (reminder.status != TripReminderStatus.pending) {
+      return TripToolActionResult.rejected;
+    }
+    final timestamp = now().toUtc();
+    tripReminders = [
+      for (var i = 0; i < tripReminders.length; i++)
+        i == index
+            ? reminder.copyWith(
+                status: status,
+                completedAt:
+                    status == TripReminderStatus.completed ? timestamp : null,
+                updatedAt: timestamp,
+              )
+            : tripReminders[i],
+    ];
+    notifyListeners();
+    return TripToolActionResult.success;
+  }
+
+  bool _validTripDay(Trip trip, int? day) =>
+      day == null || (day >= 1 && day <= trip.days);
+
+  bool _validTripItem(int tripId, int? itemId) =>
+      itemId == null ||
+      timeline.any((item) => item.id == itemId && item.tripId == tripId);
+
+  bool _validAssignee(int tripId, String? userId) {
+    if (userId == null || userId.trim().isEmpty) return true;
+    return _assigneeFor(tripId, userId) != null;
+  }
+
+  (String, String)? _assigneeFor(int tripId, String userId) {
+    final trip = tripById(tripId);
+    if (trip != null && trip.ownerUserId == userId) {
+      return (trip.ownerUserId, trip.ownerName);
+    }
+    final collaborator = _firstWhereOrNull(
+      tripCollaborators,
+      (item) =>
+          item.tripPlanId == tripId && item.active && item.userId == userId,
+    );
+    return collaborator == null
+        ? null
+        : (collaborator.userId, collaborator.userFullName);
+  }
+
+  static int _comparePackingItems(PackingItem a, PackingItem b) {
+    if (a.checked != b.checked) return a.checked ? 1 : -1;
+    final order = a.sortOrder.compareTo(b.sortOrder);
+    if (order != 0) return order;
+    return a.createdAt.compareTo(b.createdAt);
+  }
+
+  static String _normalizeEmail(String value) => value.trim().toLowerCase();
+
+  static bool _looksLikeEmail(String value) =>
+      RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(value.trim());
 
   static int _compareWalletItems(
     TravelWalletItem a,

@@ -1599,5 +1599,242 @@
   "docTypeReceipt": "Biên lai",
   "docTypePdf": "PDF",
   "docTypeImage": "Hình ảnh",
-  "docTypeOther": "Khác"
+  "docTypeOther": "Khác",
+  "tripCompanionAction": "Công cụ chuyến đi",
+  "tripCompanionTitle": "Đồng hành chuyến đi",
+  "tripCompanionSubtitle": "Công cụ demo cục bộ cho {trip}: chia sẻ, ghi chú, hành lý, nhắc việc và tài liệu.",
+  "@tripCompanionSubtitle": {
+    "placeholders": {
+      "trip": {
+        "type": "String"
+      }
+    }
+  },
+  "tripCompanionRealEmptyTitle": "Công cụ chuyến đi chưa kết nối",
+  "tripCompanionRealEmptyMessage": "Cộng tác, ghi chú, hành lý và nhắc việc của tài khoản thật sẽ hiển thị sau khi kết nối backend. Dữ liệu demo không hiển thị cho phiên thật.",
+  "tripCompanionPermissionLabel": "Quyền: {role}",
+  "@tripCompanionPermissionLabel": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
+    }
+  },
+  "tripCompanionReadOnlyNotice": "Chuyến đi này chỉ đọc với vai trò cục bộ hiện tại của bạn.",
+  "tripCompanionNoAccessRole": "Không có quyền",
+  "tripCompanionCountCollaborators": "Cộng tác viên",
+  "tripCompanionCountNotes": "Ghi chú",
+  "tripCompanionCountPacking": "Cần mang",
+  "tripCompanionCountReminders": "Nhắc việc chờ xử lý",
+  "tripCompanionCountDocuments": "Tài liệu",
+  "tripCompanionCollaborationTitle": "Cộng tác",
+  "tripCompanionCollaborationSubtitle": "Quản lý cộng tác viên demo cục bộ, vai trò và trạng thái riêng tư.",
+  "tripCompanionNotesTitle": "Ghi chú & Nhật ký",
+  "tripCompanionNotesSubtitle": "Lưu ghi chú ghim, ý tưởng, kỷ niệm và nhật ký.",
+  "tripCompanionPackingTitle": "Danh sách hành lý",
+  "tripCompanionPackingSubtitle": "Theo dõi món đã đóng gói, người phụ trách và việc còn lại.",
+  "tripCompanionRemindersTitle": "Nhắc việc",
+  "tripCompanionRemindersSubtitle": "Quản lý bản ghi nhắc việc trong ứng dụng, không lập lịch gửi.",
+  "tripCompanionDocumentsSubtitle": "Mở màn hình tài liệu chuyến đi hiện có.",
+  "tripCompanionOpenSemantic": "Mở {module}",
+  "@tripCompanionOpenSemantic": {
+    "placeholders": {
+      "module": {
+        "type": "String"
+      }
+    }
+  },
+  "sharedWithMeTitle": "Được chia sẻ với tôi",
+  "sharedWithMeSubtitle": "Các chuyến đi demo cục bộ đang hoạt động do người khác sở hữu.",
+  "sharedWithMeRealEmptyTitle": "Chuyến đi được chia sẻ chưa kết nối",
+  "sharedWithMeRealEmptyMessage": "Chuyến đi được chia sẻ của tài khoản thật sẽ hiển thị sau khi kết nối backend. Dữ liệu demo không hiển thị cho phiên thật.",
+  "sharedWithMeEmptyTitle": "Chưa có chuyến đi được chia sẻ",
+  "sharedWithMeEmptyMessage": "Chuyến đi được chia sẻ với bạn sẽ hiển thị tại đây trong Demo Mode.",
+  "sharedWithMeSummaryReadOnlyNotice": "Tóm tắt này chỉ là phần trình bày demo cục bộ. Công cụ chuyến đi được chia sẻ đầy đủ sẽ mở khi backend cung cấp bản ghi chuyến đi hoàn chỉnh.",
+  "sharedWithMeOwnerLabel": "Chủ sở hữu: {owner}",
+  "@sharedWithMeOwnerLabel": {
+    "placeholders": {
+      "owner": {
+        "type": "String"
+      }
+    }
+  },
+  "sharedWithMeRoleLabel": "Vai trò: {role}",
+  "@sharedWithMeRoleLabel": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
+    }
+  },
+  "sharedWithMeCount": "{count} chuyến đi được chia sẻ",
+  "@sharedWithMeCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "collaborationPrivacyPrivate": "Chuyến đi demo riêng tư",
+  "collaborationPrivacyPublic": "Hiển thị công khai demo",
+  "collaborationPrivacyNotice": "Chỉ chủ sở hữu mới được quản lý cộng tác viên và trạng thái công khai/riêng tư. Hiển thị demo không tạo liên kết chia sẻ thật.",
+  "collaborationInviteTitle": "Mời cộng tác viên",
+  "collaborationInviteEmailLabel": "Email người dùng demo",
+  "collaborationInviteAction": "Mời",
+  "collaborationRoleViewer": "Người xem",
+  "collaborationRoleEditor": "Người sửa",
+  "collaborationOwnerRole": "Chủ sở hữu",
+  "collaborationActiveLabel": "Đang hoạt động",
+  "collaborationInactiveLabel": "Không hoạt động",
+  "collaborationChangeRoleAction": "Vai trò",
+  "collaborationRemoveAction": "Xóa",
+  "collaborationRemoveConfirmTitle": "Xóa cộng tác viên?",
+  "collaborationRemoveConfirmMessage": "Xóa {name} khỏi chuyến đi demo cục bộ này? Ghi chú đã viết vẫn được giữ trong lịch sử.",
+  "@collaborationRemoveConfirmMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "collaborationPublicToggleLabel": "Hiển thị công khai demo",
+  "collaborationNoShareUrlNotice": "UI phase này không tạo URL công khai, mã QR hay kết quả gửi chia sẻ bên ngoài.",
+  "tripToolSavedMessage": "Thay đổi công cụ chuyến đi đã lưu cục bộ.",
+  "tripToolUnavailableMessage": "Tác vụ công cụ chuyến đi chưa kết nối cho tài khoản thật trong UI phase này.",
+  "tripToolForbiddenMessage": "Vai trò hiện tại không được thực hiện tác vụ này.",
+  "tripToolBlankMessage": "Nội dung bắt buộc không được để trống.",
+  "tripToolInvalidEmailMessage": "Nhập địa chỉ email hợp lệ.",
+  "tripToolDuplicateMessage": "Bản ghi cục bộ này đã tồn tại.",
+  "tripToolRejectedMessage": "Tác vụ này không thể hoàn tất với dữ liệu chuyến đi hiện tại.",
+  "tripToolUnsafeUrlMessage": "Dùng URL http hoặc https hợp lệ, có host và không có thông tin đăng nhập.",
+  "tripToolNotFoundMessage": "Bản ghi đã chọn không còn khả dụng.",
+  "tripToolInvalidQuantityMessage": "Số lượng phải là số nguyên tối thiểu 1.",
+  "tripToolInvalidReorderMessage": "Sắp xếp hành lý phải gồm mỗi item hiện tại đúng một lần.",
+  "tripToolInvalidDateMessage": "Dùng ngày giờ cục bộ hợp lệ.",
+  "notesSearchHint": "Tìm ghi chú, tác giả hoặc nội dung nhật ký",
+  "notesAddAction": "Thêm ghi chú",
+  "notesEditAction": "Sửa ghi chú",
+  "notesContentLabel": "Nội dung",
+  "notesTitleLabel": "Tiêu đề",
+  "notesTypeLabel": "Loại ghi chú",
+  "notesMoodLabel": "Tâm trạng",
+  "notesPhotoUrlLabel": "URL ảnh an toàn",
+  "notesPhotoMetadataLabel": "Siêu dữ liệu URL ảnh",
+  "notesLinkedDayLabel": "Ngày liên kết",
+  "notesLinkedItemLabel": "Hoạt động liên kết",
+  "notesEmptyTitle": "Không có ghi chú phù hợp",
+  "notesEmptyMessage": "Thêm ghi chú demo cục bộ hoặc điều chỉnh tìm kiếm và bộ lọc.",
+  "notesPinAction": "Ghim",
+  "notesUnpinAction": "Bỏ ghim",
+  "notesDeleteAction": "Xóa ghi chú",
+  "notesDeleteConfirmTitle": "Xóa ghi chú?",
+  "notesDeleteConfirmMessage": "Xóa {title} khỏi nhật ký demo cục bộ?",
+  "@notesDeleteConfirmMessage": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "noteTypeNote": "Ghi chú",
+  "noteTypeJournal": "Nhật ký",
+  "noteTypeReminder": "Ghi chú nhắc việc",
+  "noteTypeIdea": "Ý tưởng",
+  "noteTypeMemory": "Kỷ niệm",
+  "moodHappy": "Vui",
+  "moodExcited": "Hào hứng",
+  "moodCalm": "Bình tĩnh",
+  "moodTired": "Mệt",
+  "moodStressed": "Căng thẳng",
+  "moodNeutral": "Trung lập",
+  "packingSearchHint": "Tìm hành lý, ghi chú hoặc người phụ trách",
+  "packingAddAction": "Thêm món hành lý",
+  "packingEditAction": "Sửa món",
+  "packingLabelField": "Tên món",
+  "packingQuantityField": "Số lượng",
+  "packingCategoryLabel": "Nhóm hành lý",
+  "packingAssigneeLabel": "Giao cho",
+  "packingNotesField": "Ghi chú",
+  "packingEmptyTitle": "Không có món hành lý phù hợp",
+  "packingEmptyMessage": "Thêm món hành lý demo cục bộ hoặc điều chỉnh bộ lọc.",
+  "packingProgressValue": "{checked} / {total} đã đóng gói ({percent}%)",
+  "@packingProgressValue": {
+    "placeholders": {
+      "checked": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "packingUncheckedCount": "{count} món chưa đóng gói",
+  "@packingUncheckedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "packingDeleteAction": "Xóa món",
+  "packingDeleteConfirmTitle": "Xóa món hành lý?",
+  "packingDeleteConfirmMessage": "Xóa {label} khỏi danh sách demo cục bộ này?",
+  "@packingDeleteConfirmMessage": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "packingMoveUpAction": "Chuyển lên",
+  "packingMoveDownAction": "Chuyển xuống",
+  "packingUnassignedLabel": "Chưa giao",
+  "packingCategoryDocuments": "Tài liệu",
+  "packingCategoryClothes": "Quần áo",
+  "packingCategoryToiletries": "Đồ cá nhân",
+  "packingCategoryElectronics": "Điện tử",
+  "packingCategoryMedicine": "Thuốc",
+  "packingCategoryMoney": "Tiền",
+  "packingCategoryFood": "Đồ ăn",
+  "packingCategoryBaby": "Em bé",
+  "packingCategoryPet": "Thú cưng",
+  "packingCategoryOther": "Khác",
+  "remindersIncludeCancelled": "Gồm mục đã hủy",
+  "remindersAddAction": "Thêm nhắc việc",
+  "remindersEditAction": "Sửa nhắc việc",
+  "reminderTitleField": "Tiêu đề nhắc việc",
+  "reminderMessageField": "Thông điệp",
+  "reminderAtField": "Ngày giờ cục bộ",
+  "reminderTypeLabel": "Loại nhắc việc",
+  "reminderStatusPending": "Chờ xử lý",
+  "reminderStatusCompleted": "Đã hoàn tất",
+  "reminderStatusCancelled": "Đã hủy",
+  "reminderOverdue": "Quá hạn",
+  "reminderEmptyTitle": "Không có nhắc việc phù hợp",
+  "reminderEmptyMessage": "Thêm bản ghi nhắc việc cục bộ hoặc bật hiển thị mục đã hủy.",
+  "reminderCompleteAction": "Hoàn tất",
+  "reminderCancelAction": "Hủy nhắc việc",
+  "reminderDeleteAction": "Xóa nhắc việc",
+  "reminderDeleteConfirmTitle": "Xóa nhắc việc?",
+  "reminderDeleteConfirmMessage": "Xóa {title} khỏi chuyến đi demo cục bộ này?",
+  "@reminderDeleteConfirmMessage": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderTypeCustom": "Tùy chỉnh",
+  "reminderTypeDocument": "Tài liệu",
+  "reminderTypeCheckIn": "Nhận phòng",
+  "reminderTypeFlight": "Chuyến bay",
+  "reminderTypeActivity": "Hoạt động",
+  "reminderTypePayment": "Thanh toán",
+  "reminderTypePacking": "Hành lý",
+  "reminderTypeOther": "Khác",
+  "reminderLocalTimeHelper": "Định dạng: yyyy-MM-dd HH:mm. Sẽ lưu theo UTC để phù hợp API sau này.",
+  "reminderNoDeliveryNotice": "Đây chỉ là bản ghi nhắc việc trong ứng dụng. UI-9 không lập lịch push, email, SMS hay thông báo hệ điều hành."
 }

@@ -15,6 +15,7 @@ import '../expenses/expenses_screen.dart';
 import '../places/places_screen.dart';
 import '../timeline/timeline_screen.dart';
 import 'edit_trip_screen.dart';
+import 'trip_companion_screen.dart';
 import 'trip_documents_screen.dart';
 
 class TripDetailScreen extends StatefulWidget {
@@ -163,6 +164,12 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                           builder: (_) => TripDocumentsScreen(trip: trip),
                         ),
                       ),
+                      onCompanion: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => TripCompanionScreen(trip: trip),
+                        ),
+                      ),
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     _SummaryGrid(
@@ -307,12 +314,14 @@ class _QuickActions extends StatelessWidget {
   final VoidCallback onExplore;
   final VoidCallback onExpenses;
   final VoidCallback onDocuments;
+  final VoidCallback onCompanion;
 
   const _QuickActions({
     required this.onTimeline,
     required this.onExplore,
     required this.onExpenses,
     required this.onDocuments,
+    required this.onCompanion,
   });
 
   @override
@@ -333,6 +342,12 @@ class _QuickActions extends StatelessWidget {
         icon: Icons.receipt_long_rounded,
         label: l10n.tripOverviewExpensesAction,
         onTap: onExpenses,
+      ),
+      _ActionSpec(
+        key: const Key('trip-companion-action'),
+        icon: Icons.handshake_rounded,
+        label: l10n.tripCompanionAction,
+        onTap: onCompanion,
       ),
       _ActionSpec(
         key: const Key('trip-documents-action'),

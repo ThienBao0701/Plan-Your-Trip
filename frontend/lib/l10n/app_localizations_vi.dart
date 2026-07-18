@@ -3141,4 +3141,495 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get docTypeOther => 'Khác';
+
+  @override
+  String get tripCompanionAction => 'Công cụ chuyến đi';
+
+  @override
+  String get tripCompanionTitle => 'Đồng hành chuyến đi';
+
+  @override
+  String tripCompanionSubtitle(String trip) {
+    return 'Công cụ demo cục bộ cho $trip: chia sẻ, ghi chú, hành lý, nhắc việc và tài liệu.';
+  }
+
+  @override
+  String get tripCompanionRealEmptyTitle => 'Công cụ chuyến đi chưa kết nối';
+
+  @override
+  String get tripCompanionRealEmptyMessage =>
+      'Cộng tác, ghi chú, hành lý và nhắc việc của tài khoản thật sẽ hiển thị sau khi kết nối backend. Dữ liệu demo không hiển thị cho phiên thật.';
+
+  @override
+  String tripCompanionPermissionLabel(String role) {
+    return 'Quyền: $role';
+  }
+
+  @override
+  String get tripCompanionReadOnlyNotice =>
+      'Chuyến đi này chỉ đọc với vai trò cục bộ hiện tại của bạn.';
+
+  @override
+  String get tripCompanionNoAccessRole => 'Không có quyền';
+
+  @override
+  String get tripCompanionCountCollaborators => 'Cộng tác viên';
+
+  @override
+  String get tripCompanionCountNotes => 'Ghi chú';
+
+  @override
+  String get tripCompanionCountPacking => 'Cần mang';
+
+  @override
+  String get tripCompanionCountReminders => 'Nhắc việc chờ xử lý';
+
+  @override
+  String get tripCompanionCountDocuments => 'Tài liệu';
+
+  @override
+  String get tripCompanionCollaborationTitle => 'Cộng tác';
+
+  @override
+  String get tripCompanionCollaborationSubtitle =>
+      'Quản lý cộng tác viên demo cục bộ, vai trò và trạng thái riêng tư.';
+
+  @override
+  String get tripCompanionNotesTitle => 'Ghi chú & Nhật ký';
+
+  @override
+  String get tripCompanionNotesSubtitle =>
+      'Lưu ghi chú ghim, ý tưởng, kỷ niệm và nhật ký.';
+
+  @override
+  String get tripCompanionPackingTitle => 'Danh sách hành lý';
+
+  @override
+  String get tripCompanionPackingSubtitle =>
+      'Theo dõi món đã đóng gói, người phụ trách và việc còn lại.';
+
+  @override
+  String get tripCompanionRemindersTitle => 'Nhắc việc';
+
+  @override
+  String get tripCompanionRemindersSubtitle =>
+      'Quản lý bản ghi nhắc việc trong ứng dụng, không lập lịch gửi.';
+
+  @override
+  String get tripCompanionDocumentsSubtitle =>
+      'Mở màn hình tài liệu chuyến đi hiện có.';
+
+  @override
+  String tripCompanionOpenSemantic(String module) {
+    return 'Mở $module';
+  }
+
+  @override
+  String get sharedWithMeTitle => 'Được chia sẻ với tôi';
+
+  @override
+  String get sharedWithMeSubtitle =>
+      'Các chuyến đi demo cục bộ đang hoạt động do người khác sở hữu.';
+
+  @override
+  String get sharedWithMeRealEmptyTitle =>
+      'Chuyến đi được chia sẻ chưa kết nối';
+
+  @override
+  String get sharedWithMeRealEmptyMessage =>
+      'Chuyến đi được chia sẻ của tài khoản thật sẽ hiển thị sau khi kết nối backend. Dữ liệu demo không hiển thị cho phiên thật.';
+
+  @override
+  String get sharedWithMeEmptyTitle => 'Chưa có chuyến đi được chia sẻ';
+
+  @override
+  String get sharedWithMeEmptyMessage =>
+      'Chuyến đi được chia sẻ với bạn sẽ hiển thị tại đây trong Demo Mode.';
+
+  @override
+  String get sharedWithMeSummaryReadOnlyNotice =>
+      'Tóm tắt này chỉ là phần trình bày demo cục bộ. Công cụ chuyến đi được chia sẻ đầy đủ sẽ mở khi backend cung cấp bản ghi chuyến đi hoàn chỉnh.';
+
+  @override
+  String sharedWithMeOwnerLabel(String owner) {
+    return 'Chủ sở hữu: $owner';
+  }
+
+  @override
+  String sharedWithMeRoleLabel(String role) {
+    return 'Vai trò: $role';
+  }
+
+  @override
+  String sharedWithMeCount(int count) {
+    return '$count chuyến đi được chia sẻ';
+  }
+
+  @override
+  String get collaborationPrivacyPrivate => 'Chuyến đi demo riêng tư';
+
+  @override
+  String get collaborationPrivacyPublic => 'Hiển thị công khai demo';
+
+  @override
+  String get collaborationPrivacyNotice =>
+      'Chỉ chủ sở hữu mới được quản lý cộng tác viên và trạng thái công khai/riêng tư. Hiển thị demo không tạo liên kết chia sẻ thật.';
+
+  @override
+  String get collaborationInviteTitle => 'Mời cộng tác viên';
+
+  @override
+  String get collaborationInviteEmailLabel => 'Email người dùng demo';
+
+  @override
+  String get collaborationInviteAction => 'Mời';
+
+  @override
+  String get collaborationRoleViewer => 'Người xem';
+
+  @override
+  String get collaborationRoleEditor => 'Người sửa';
+
+  @override
+  String get collaborationOwnerRole => 'Chủ sở hữu';
+
+  @override
+  String get collaborationActiveLabel => 'Đang hoạt động';
+
+  @override
+  String get collaborationInactiveLabel => 'Không hoạt động';
+
+  @override
+  String get collaborationChangeRoleAction => 'Vai trò';
+
+  @override
+  String get collaborationRemoveAction => 'Xóa';
+
+  @override
+  String get collaborationRemoveConfirmTitle => 'Xóa cộng tác viên?';
+
+  @override
+  String collaborationRemoveConfirmMessage(String name) {
+    return 'Xóa $name khỏi chuyến đi demo cục bộ này? Ghi chú đã viết vẫn được giữ trong lịch sử.';
+  }
+
+  @override
+  String get collaborationPublicToggleLabel => 'Hiển thị công khai demo';
+
+  @override
+  String get collaborationNoShareUrlNotice =>
+      'UI phase này không tạo URL công khai, mã QR hay kết quả gửi chia sẻ bên ngoài.';
+
+  @override
+  String get tripToolSavedMessage =>
+      'Thay đổi công cụ chuyến đi đã lưu cục bộ.';
+
+  @override
+  String get tripToolUnavailableMessage =>
+      'Tác vụ công cụ chuyến đi chưa kết nối cho tài khoản thật trong UI phase này.';
+
+  @override
+  String get tripToolForbiddenMessage =>
+      'Vai trò hiện tại không được thực hiện tác vụ này.';
+
+  @override
+  String get tripToolBlankMessage => 'Nội dung bắt buộc không được để trống.';
+
+  @override
+  String get tripToolInvalidEmailMessage => 'Nhập địa chỉ email hợp lệ.';
+
+  @override
+  String get tripToolDuplicateMessage => 'Bản ghi cục bộ này đã tồn tại.';
+
+  @override
+  String get tripToolRejectedMessage =>
+      'Tác vụ này không thể hoàn tất với dữ liệu chuyến đi hiện tại.';
+
+  @override
+  String get tripToolUnsafeUrlMessage =>
+      'Dùng URL http hoặc https hợp lệ, có host và không có thông tin đăng nhập.';
+
+  @override
+  String get tripToolNotFoundMessage => 'Bản ghi đã chọn không còn khả dụng.';
+
+  @override
+  String get tripToolInvalidQuantityMessage =>
+      'Số lượng phải là số nguyên tối thiểu 1.';
+
+  @override
+  String get tripToolInvalidReorderMessage =>
+      'Sắp xếp hành lý phải gồm mỗi item hiện tại đúng một lần.';
+
+  @override
+  String get tripToolInvalidDateMessage => 'Dùng ngày giờ cục bộ hợp lệ.';
+
+  @override
+  String get notesSearchHint => 'Tìm ghi chú, tác giả hoặc nội dung nhật ký';
+
+  @override
+  String get notesAddAction => 'Thêm ghi chú';
+
+  @override
+  String get notesEditAction => 'Sửa ghi chú';
+
+  @override
+  String get notesContentLabel => 'Nội dung';
+
+  @override
+  String get notesTitleLabel => 'Tiêu đề';
+
+  @override
+  String get notesTypeLabel => 'Loại ghi chú';
+
+  @override
+  String get notesMoodLabel => 'Tâm trạng';
+
+  @override
+  String get notesPhotoUrlLabel => 'URL ảnh an toàn';
+
+  @override
+  String get notesPhotoMetadataLabel => 'Siêu dữ liệu URL ảnh';
+
+  @override
+  String get notesLinkedDayLabel => 'Ngày liên kết';
+
+  @override
+  String get notesLinkedItemLabel => 'Hoạt động liên kết';
+
+  @override
+  String get notesEmptyTitle => 'Không có ghi chú phù hợp';
+
+  @override
+  String get notesEmptyMessage =>
+      'Thêm ghi chú demo cục bộ hoặc điều chỉnh tìm kiếm và bộ lọc.';
+
+  @override
+  String get notesPinAction => 'Ghim';
+
+  @override
+  String get notesUnpinAction => 'Bỏ ghim';
+
+  @override
+  String get notesDeleteAction => 'Xóa ghi chú';
+
+  @override
+  String get notesDeleteConfirmTitle => 'Xóa ghi chú?';
+
+  @override
+  String notesDeleteConfirmMessage(String title) {
+    return 'Xóa $title khỏi nhật ký demo cục bộ?';
+  }
+
+  @override
+  String get noteTypeNote => 'Ghi chú';
+
+  @override
+  String get noteTypeJournal => 'Nhật ký';
+
+  @override
+  String get noteTypeReminder => 'Ghi chú nhắc việc';
+
+  @override
+  String get noteTypeIdea => 'Ý tưởng';
+
+  @override
+  String get noteTypeMemory => 'Kỷ niệm';
+
+  @override
+  String get moodHappy => 'Vui';
+
+  @override
+  String get moodExcited => 'Hào hứng';
+
+  @override
+  String get moodCalm => 'Bình tĩnh';
+
+  @override
+  String get moodTired => 'Mệt';
+
+  @override
+  String get moodStressed => 'Căng thẳng';
+
+  @override
+  String get moodNeutral => 'Trung lập';
+
+  @override
+  String get packingSearchHint => 'Tìm hành lý, ghi chú hoặc người phụ trách';
+
+  @override
+  String get packingAddAction => 'Thêm món hành lý';
+
+  @override
+  String get packingEditAction => 'Sửa món';
+
+  @override
+  String get packingLabelField => 'Tên món';
+
+  @override
+  String get packingQuantityField => 'Số lượng';
+
+  @override
+  String get packingCategoryLabel => 'Nhóm hành lý';
+
+  @override
+  String get packingAssigneeLabel => 'Giao cho';
+
+  @override
+  String get packingNotesField => 'Ghi chú';
+
+  @override
+  String get packingEmptyTitle => 'Không có món hành lý phù hợp';
+
+  @override
+  String get packingEmptyMessage =>
+      'Thêm món hành lý demo cục bộ hoặc điều chỉnh bộ lọc.';
+
+  @override
+  String packingProgressValue(int checked, int total, int percent) {
+    return '$checked / $total đã đóng gói ($percent%)';
+  }
+
+  @override
+  String packingUncheckedCount(int count) {
+    return '$count món chưa đóng gói';
+  }
+
+  @override
+  String get packingDeleteAction => 'Xóa món';
+
+  @override
+  String get packingDeleteConfirmTitle => 'Xóa món hành lý?';
+
+  @override
+  String packingDeleteConfirmMessage(String label) {
+    return 'Xóa $label khỏi danh sách demo cục bộ này?';
+  }
+
+  @override
+  String get packingMoveUpAction => 'Chuyển lên';
+
+  @override
+  String get packingMoveDownAction => 'Chuyển xuống';
+
+  @override
+  String get packingUnassignedLabel => 'Chưa giao';
+
+  @override
+  String get packingCategoryDocuments => 'Tài liệu';
+
+  @override
+  String get packingCategoryClothes => 'Quần áo';
+
+  @override
+  String get packingCategoryToiletries => 'Đồ cá nhân';
+
+  @override
+  String get packingCategoryElectronics => 'Điện tử';
+
+  @override
+  String get packingCategoryMedicine => 'Thuốc';
+
+  @override
+  String get packingCategoryMoney => 'Tiền';
+
+  @override
+  String get packingCategoryFood => 'Đồ ăn';
+
+  @override
+  String get packingCategoryBaby => 'Em bé';
+
+  @override
+  String get packingCategoryPet => 'Thú cưng';
+
+  @override
+  String get packingCategoryOther => 'Khác';
+
+  @override
+  String get remindersIncludeCancelled => 'Gồm mục đã hủy';
+
+  @override
+  String get remindersAddAction => 'Thêm nhắc việc';
+
+  @override
+  String get remindersEditAction => 'Sửa nhắc việc';
+
+  @override
+  String get reminderTitleField => 'Tiêu đề nhắc việc';
+
+  @override
+  String get reminderMessageField => 'Thông điệp';
+
+  @override
+  String get reminderAtField => 'Ngày giờ cục bộ';
+
+  @override
+  String get reminderTypeLabel => 'Loại nhắc việc';
+
+  @override
+  String get reminderStatusPending => 'Chờ xử lý';
+
+  @override
+  String get reminderStatusCompleted => 'Đã hoàn tất';
+
+  @override
+  String get reminderStatusCancelled => 'Đã hủy';
+
+  @override
+  String get reminderOverdue => 'Quá hạn';
+
+  @override
+  String get reminderEmptyTitle => 'Không có nhắc việc phù hợp';
+
+  @override
+  String get reminderEmptyMessage =>
+      'Thêm bản ghi nhắc việc cục bộ hoặc bật hiển thị mục đã hủy.';
+
+  @override
+  String get reminderCompleteAction => 'Hoàn tất';
+
+  @override
+  String get reminderCancelAction => 'Hủy nhắc việc';
+
+  @override
+  String get reminderDeleteAction => 'Xóa nhắc việc';
+
+  @override
+  String get reminderDeleteConfirmTitle => 'Xóa nhắc việc?';
+
+  @override
+  String reminderDeleteConfirmMessage(String title) {
+    return 'Xóa $title khỏi chuyến đi demo cục bộ này?';
+  }
+
+  @override
+  String get reminderTypeCustom => 'Tùy chỉnh';
+
+  @override
+  String get reminderTypeDocument => 'Tài liệu';
+
+  @override
+  String get reminderTypeCheckIn => 'Nhận phòng';
+
+  @override
+  String get reminderTypeFlight => 'Chuyến bay';
+
+  @override
+  String get reminderTypeActivity => 'Hoạt động';
+
+  @override
+  String get reminderTypePayment => 'Thanh toán';
+
+  @override
+  String get reminderTypePacking => 'Hành lý';
+
+  @override
+  String get reminderTypeOther => 'Khác';
+
+  @override
+  String get reminderLocalTimeHelper =>
+      'Định dạng: yyyy-MM-dd HH:mm. Sẽ lưu theo UTC để phù hợp API sau này.';
+
+  @override
+  String get reminderNoDeliveryNotice =>
+      'Đây chỉ là bản ghi nhắc việc trong ứng dụng. UI-9 không lập lịch push, email, SMS hay thông báo hệ điều hành.';
 }

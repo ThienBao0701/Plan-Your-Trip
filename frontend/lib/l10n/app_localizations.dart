@@ -5744,6 +5744,888 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Other'**
   String get docTypeOther;
+
+  /// No description provided for @tripCompanionAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip companion'**
+  String get tripCompanionAction;
+
+  /// No description provided for @tripCompanionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip Companion'**
+  String get tripCompanionTitle;
+
+  /// No description provided for @tripCompanionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Local demo tools for {trip}: sharing, notes, packing, reminders, and documents.'**
+  String tripCompanionSubtitle(String trip);
+
+  /// No description provided for @tripCompanionRealEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip companion is not connected yet'**
+  String get tripCompanionRealEmptyTitle;
+
+  /// No description provided for @tripCompanionRealEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Real collaboration, notes, packing, and reminders will appear after backend integration. No seeded demo data is shown for real sessions.'**
+  String get tripCompanionRealEmptyMessage;
+
+  /// No description provided for @tripCompanionPermissionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Access: {role}'**
+  String tripCompanionPermissionLabel(String role);
+
+  /// No description provided for @tripCompanionReadOnlyNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'This trip is read-only for your current local role.'**
+  String get tripCompanionReadOnlyNotice;
+
+  /// No description provided for @tripCompanionNoAccessRole.
+  ///
+  /// In en, this message translates to:
+  /// **'No access'**
+  String get tripCompanionNoAccessRole;
+
+  /// No description provided for @tripCompanionCountCollaborators.
+  ///
+  /// In en, this message translates to:
+  /// **'Collaborators'**
+  String get tripCompanionCountCollaborators;
+
+  /// No description provided for @tripCompanionCountNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get tripCompanionCountNotes;
+
+  /// No description provided for @tripCompanionCountPacking.
+  ///
+  /// In en, this message translates to:
+  /// **'To pack'**
+  String get tripCompanionCountPacking;
+
+  /// No description provided for @tripCompanionCountReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending reminders'**
+  String get tripCompanionCountReminders;
+
+  /// No description provided for @tripCompanionCountDocuments.
+  ///
+  /// In en, this message translates to:
+  /// **'Documents'**
+  String get tripCompanionCountDocuments;
+
+  /// No description provided for @tripCompanionCollaborationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Collaboration'**
+  String get tripCompanionCollaborationTitle;
+
+  /// No description provided for @tripCompanionCollaborationSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage local demo collaborators, roles, and trip privacy.'**
+  String get tripCompanionCollaborationSubtitle;
+
+  /// No description provided for @tripCompanionNotesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes & Journal'**
+  String get tripCompanionNotesTitle;
+
+  /// No description provided for @tripCompanionNotesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Capture pinned notes, ideas, memories, and journal entries.'**
+  String get tripCompanionNotesSubtitle;
+
+  /// No description provided for @tripCompanionPackingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Packing Checklist'**
+  String get tripCompanionPackingTitle;
+
+  /// No description provided for @tripCompanionPackingSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Track what is packed, assigned, and still pending.'**
+  String get tripCompanionPackingSubtitle;
+
+  /// No description provided for @tripCompanionRemindersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders'**
+  String get tripCompanionRemindersTitle;
+
+  /// No description provided for @tripCompanionRemindersSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage in-app reminder records without delivery scheduling.'**
+  String get tripCompanionRemindersSubtitle;
+
+  /// No description provided for @tripCompanionDocumentsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the existing trip document metadata screen.'**
+  String get tripCompanionDocumentsSubtitle;
+
+  /// No description provided for @tripCompanionOpenSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Open {module}'**
+  String tripCompanionOpenSemantic(String module);
+
+  /// No description provided for @sharedWithMeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared with me'**
+  String get sharedWithMeTitle;
+
+  /// No description provided for @sharedWithMeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Active local demo trips shared by another owner.'**
+  String get sharedWithMeSubtitle;
+
+  /// No description provided for @sharedWithMeRealEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared trips are not connected yet'**
+  String get sharedWithMeRealEmptyTitle;
+
+  /// No description provided for @sharedWithMeRealEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Real shared trips will appear after backend integration. No demo shared trips are shown for real sessions.'**
+  String get sharedWithMeRealEmptyMessage;
+
+  /// No description provided for @sharedWithMeEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No shared trips'**
+  String get sharedWithMeEmptyTitle;
+
+  /// No description provided for @sharedWithMeEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Trips shared with you will appear here in Demo Mode.'**
+  String get sharedWithMeEmptyMessage;
+
+  /// No description provided for @sharedWithMeSummaryReadOnlyNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'This summary is local demo presentation only. Full shared-trip tools will open when the backend provides the complete trip record.'**
+  String get sharedWithMeSummaryReadOnlyNotice;
+
+  /// No description provided for @sharedWithMeOwnerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner: {owner}'**
+  String sharedWithMeOwnerLabel(String owner);
+
+  /// No description provided for @sharedWithMeRoleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Role: {role}'**
+  String sharedWithMeRoleLabel(String role);
+
+  /// No description provided for @sharedWithMeCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} shared trips'**
+  String sharedWithMeCount(int count);
+
+  /// No description provided for @collaborationPrivacyPrivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Private local demo trip'**
+  String get collaborationPrivacyPrivate;
+
+  /// No description provided for @collaborationPrivacyPublic.
+  ///
+  /// In en, this message translates to:
+  /// **'Public local demo visibility'**
+  String get collaborationPrivacyPublic;
+
+  /// No description provided for @collaborationPrivacyNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the owner can manage collaborators and public/private state. Demo visibility does not publish a real share link.'**
+  String get collaborationPrivacyNotice;
+
+  /// No description provided for @collaborationInviteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite collaborator'**
+  String get collaborationInviteTitle;
+
+  /// No description provided for @collaborationInviteEmailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo user email'**
+  String get collaborationInviteEmailLabel;
+
+  /// No description provided for @collaborationInviteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite'**
+  String get collaborationInviteAction;
+
+  /// No description provided for @collaborationRoleViewer.
+  ///
+  /// In en, this message translates to:
+  /// **'Viewer'**
+  String get collaborationRoleViewer;
+
+  /// No description provided for @collaborationRoleEditor.
+  ///
+  /// In en, this message translates to:
+  /// **'Editor'**
+  String get collaborationRoleEditor;
+
+  /// No description provided for @collaborationOwnerRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner'**
+  String get collaborationOwnerRole;
+
+  /// No description provided for @collaborationActiveLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get collaborationActiveLabel;
+
+  /// No description provided for @collaborationInactiveLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive'**
+  String get collaborationInactiveLabel;
+
+  /// No description provided for @collaborationChangeRoleAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Role'**
+  String get collaborationChangeRoleAction;
+
+  /// No description provided for @collaborationRemoveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get collaborationRemoveAction;
+
+  /// No description provided for @collaborationRemoveConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove collaborator?'**
+  String get collaborationRemoveConfirmTitle;
+
+  /// No description provided for @collaborationRemoveConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {name} from this local demo trip? Their authored notes stay as history.'**
+  String collaborationRemoveConfirmMessage(String name);
+
+  /// No description provided for @collaborationPublicToggleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Public demo visibility'**
+  String get collaborationPublicToggleLabel;
+
+  /// No description provided for @collaborationNoShareUrlNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'No public URL, QR code, or external share delivery is created in this UI phase.'**
+  String get collaborationNoShareUrlNotice;
+
+  /// No description provided for @tripToolSavedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip companion changes saved locally.'**
+  String get tripToolSavedMessage;
+
+  /// No description provided for @tripToolUnavailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip companion actions are not connected for real accounts in this UI phase.'**
+  String get tripToolUnavailableMessage;
+
+  /// No description provided for @tripToolForbiddenMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your current role cannot perform this action.'**
+  String get tripToolForbiddenMessage;
+
+  /// No description provided for @tripToolBlankMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Required text cannot be empty.'**
+  String get tripToolBlankMessage;
+
+  /// No description provided for @tripToolInvalidEmailMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email address.'**
+  String get tripToolInvalidEmailMessage;
+
+  /// No description provided for @tripToolDuplicateMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'That local record already exists.'**
+  String get tripToolDuplicateMessage;
+
+  /// No description provided for @tripToolRejectedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'That action cannot be completed with the current trip data.'**
+  String get tripToolRejectedMessage;
+
+  /// No description provided for @tripToolUnsafeUrlMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Use a valid http or https URL with a host and no credentials.'**
+  String get tripToolUnsafeUrlMessage;
+
+  /// No description provided for @tripToolNotFoundMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The selected record is no longer available.'**
+  String get tripToolNotFoundMessage;
+
+  /// No description provided for @tripToolInvalidQuantityMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity must be an integer of at least 1.'**
+  String get tripToolInvalidQuantityMessage;
+
+  /// No description provided for @tripToolInvalidReorderMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Packing reorder must contain each current item exactly once.'**
+  String get tripToolInvalidReorderMessage;
+
+  /// No description provided for @tripToolInvalidDateMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Use a valid local date and time.'**
+  String get tripToolInvalidDateMessage;
+
+  /// No description provided for @notesSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search notes, authors, or journal text'**
+  String get notesSearchHint;
+
+  /// No description provided for @notesAddAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add note'**
+  String get notesAddAction;
+
+  /// No description provided for @notesEditAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit note'**
+  String get notesEditAction;
+
+  /// No description provided for @notesContentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Content'**
+  String get notesContentLabel;
+
+  /// No description provided for @notesTitleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get notesTitleLabel;
+
+  /// No description provided for @notesTypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Note type'**
+  String get notesTypeLabel;
+
+  /// No description provided for @notesMoodLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Mood'**
+  String get notesMoodLabel;
+
+  /// No description provided for @notesPhotoUrlLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Safe photo URL'**
+  String get notesPhotoUrlLabel;
+
+  /// No description provided for @notesPhotoMetadataLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo URL metadata'**
+  String get notesPhotoMetadataLabel;
+
+  /// No description provided for @notesLinkedDayLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked day'**
+  String get notesLinkedDayLabel;
+
+  /// No description provided for @notesLinkedItemLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked activity'**
+  String get notesLinkedItemLabel;
+
+  /// No description provided for @notesEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No notes match'**
+  String get notesEmptyTitle;
+
+  /// No description provided for @notesEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a local demo note or adjust search and filters.'**
+  String get notesEmptyMessage;
+
+  /// No description provided for @notesPinAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Pin'**
+  String get notesPinAction;
+
+  /// No description provided for @notesUnpinAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Unpin'**
+  String get notesUnpinAction;
+
+  /// No description provided for @notesDeleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete note'**
+  String get notesDeleteAction;
+
+  /// No description provided for @notesDeleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete note?'**
+  String get notesDeleteConfirmTitle;
+
+  /// No description provided for @notesDeleteConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {title} from the local demo journal?'**
+  String notesDeleteConfirmMessage(String title);
+
+  /// No description provided for @noteTypeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note'**
+  String get noteTypeNote;
+
+  /// No description provided for @noteTypeJournal.
+  ///
+  /// In en, this message translates to:
+  /// **'Journal'**
+  String get noteTypeJournal;
+
+  /// No description provided for @noteTypeReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder note'**
+  String get noteTypeReminder;
+
+  /// No description provided for @noteTypeIdea.
+  ///
+  /// In en, this message translates to:
+  /// **'Idea'**
+  String get noteTypeIdea;
+
+  /// No description provided for @noteTypeMemory.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory'**
+  String get noteTypeMemory;
+
+  /// No description provided for @moodHappy.
+  ///
+  /// In en, this message translates to:
+  /// **'Happy'**
+  String get moodHappy;
+
+  /// No description provided for @moodExcited.
+  ///
+  /// In en, this message translates to:
+  /// **'Excited'**
+  String get moodExcited;
+
+  /// No description provided for @moodCalm.
+  ///
+  /// In en, this message translates to:
+  /// **'Calm'**
+  String get moodCalm;
+
+  /// No description provided for @moodTired.
+  ///
+  /// In en, this message translates to:
+  /// **'Tired'**
+  String get moodTired;
+
+  /// No description provided for @moodStressed.
+  ///
+  /// In en, this message translates to:
+  /// **'Stressed'**
+  String get moodStressed;
+
+  /// No description provided for @moodNeutral.
+  ///
+  /// In en, this message translates to:
+  /// **'Neutral'**
+  String get moodNeutral;
+
+  /// No description provided for @packingSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search packing items, notes, or assignees'**
+  String get packingSearchHint;
+
+  /// No description provided for @packingAddAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add packing item'**
+  String get packingAddAction;
+
+  /// No description provided for @packingEditAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit item'**
+  String get packingEditAction;
+
+  /// No description provided for @packingLabelField.
+  ///
+  /// In en, this message translates to:
+  /// **'Item label'**
+  String get packingLabelField;
+
+  /// No description provided for @packingQuantityField.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity'**
+  String get packingQuantityField;
+
+  /// No description provided for @packingCategoryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Packing category'**
+  String get packingCategoryLabel;
+
+  /// No description provided for @packingAssigneeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Assigned to'**
+  String get packingAssigneeLabel;
+
+  /// No description provided for @packingNotesField.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get packingNotesField;
+
+  /// No description provided for @packingEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No packing items match'**
+  String get packingEmptyTitle;
+
+  /// No description provided for @packingEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Add local demo packing items or adjust filters.'**
+  String get packingEmptyMessage;
+
+  /// No description provided for @packingProgressValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{checked} of {total} packed ({percent}%)'**
+  String packingProgressValue(int checked, int total, int percent);
+
+  /// No description provided for @packingUncheckedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} still unpacked'**
+  String packingUncheckedCount(int count);
+
+  /// No description provided for @packingDeleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete item'**
+  String get packingDeleteAction;
+
+  /// No description provided for @packingDeleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete packing item?'**
+  String get packingDeleteConfirmTitle;
+
+  /// No description provided for @packingDeleteConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {label} from this local demo checklist?'**
+  String packingDeleteConfirmMessage(String label);
+
+  /// No description provided for @packingMoveUpAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Move up'**
+  String get packingMoveUpAction;
+
+  /// No description provided for @packingMoveDownAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Move down'**
+  String get packingMoveDownAction;
+
+  /// No description provided for @packingUnassignedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Unassigned'**
+  String get packingUnassignedLabel;
+
+  /// No description provided for @packingCategoryDocuments.
+  ///
+  /// In en, this message translates to:
+  /// **'Documents'**
+  String get packingCategoryDocuments;
+
+  /// No description provided for @packingCategoryClothes.
+  ///
+  /// In en, this message translates to:
+  /// **'Clothes'**
+  String get packingCategoryClothes;
+
+  /// No description provided for @packingCategoryToiletries.
+  ///
+  /// In en, this message translates to:
+  /// **'Toiletries'**
+  String get packingCategoryToiletries;
+
+  /// No description provided for @packingCategoryElectronics.
+  ///
+  /// In en, this message translates to:
+  /// **'Electronics'**
+  String get packingCategoryElectronics;
+
+  /// No description provided for @packingCategoryMedicine.
+  ///
+  /// In en, this message translates to:
+  /// **'Medicine'**
+  String get packingCategoryMedicine;
+
+  /// No description provided for @packingCategoryMoney.
+  ///
+  /// In en, this message translates to:
+  /// **'Money'**
+  String get packingCategoryMoney;
+
+  /// No description provided for @packingCategoryFood.
+  ///
+  /// In en, this message translates to:
+  /// **'Food'**
+  String get packingCategoryFood;
+
+  /// No description provided for @packingCategoryBaby.
+  ///
+  /// In en, this message translates to:
+  /// **'Baby'**
+  String get packingCategoryBaby;
+
+  /// No description provided for @packingCategoryPet.
+  ///
+  /// In en, this message translates to:
+  /// **'Pet'**
+  String get packingCategoryPet;
+
+  /// No description provided for @packingCategoryOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get packingCategoryOther;
+
+  /// No description provided for @remindersIncludeCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Include cancelled'**
+  String get remindersIncludeCancelled;
+
+  /// No description provided for @remindersAddAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add reminder'**
+  String get remindersAddAction;
+
+  /// No description provided for @remindersEditAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit reminder'**
+  String get remindersEditAction;
+
+  /// No description provided for @reminderTitleField.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder title'**
+  String get reminderTitleField;
+
+  /// No description provided for @reminderMessageField.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get reminderMessageField;
+
+  /// No description provided for @reminderAtField.
+  ///
+  /// In en, this message translates to:
+  /// **'Local date and time'**
+  String get reminderAtField;
+
+  /// No description provided for @reminderTypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder type'**
+  String get reminderTypeLabel;
+
+  /// No description provided for @reminderStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get reminderStatusPending;
+
+  /// No description provided for @reminderStatusCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get reminderStatusCompleted;
+
+  /// No description provided for @reminderStatusCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get reminderStatusCancelled;
+
+  /// No description provided for @reminderOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue'**
+  String get reminderOverdue;
+
+  /// No description provided for @reminderEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No reminders match'**
+  String get reminderEmptyTitle;
+
+  /// No description provided for @reminderEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Add local in-app reminder records or include cancelled items.'**
+  String get reminderEmptyMessage;
+
+  /// No description provided for @reminderCompleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete'**
+  String get reminderCompleteAction;
+
+  /// No description provided for @reminderCancelAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel reminder'**
+  String get reminderCancelAction;
+
+  /// No description provided for @reminderDeleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete reminder'**
+  String get reminderDeleteAction;
+
+  /// No description provided for @reminderDeleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete reminder?'**
+  String get reminderDeleteConfirmTitle;
+
+  /// No description provided for @reminderDeleteConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {title} from this local demo trip?'**
+  String reminderDeleteConfirmMessage(String title);
+
+  /// No description provided for @reminderTypeCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get reminderTypeCustom;
+
+  /// No description provided for @reminderTypeDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'Document'**
+  String get reminderTypeDocument;
+
+  /// No description provided for @reminderTypeCheckIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in'**
+  String get reminderTypeCheckIn;
+
+  /// No description provided for @reminderTypeFlight.
+  ///
+  /// In en, this message translates to:
+  /// **'Flight'**
+  String get reminderTypeFlight;
+
+  /// No description provided for @reminderTypeActivity.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity'**
+  String get reminderTypeActivity;
+
+  /// No description provided for @reminderTypePayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment'**
+  String get reminderTypePayment;
+
+  /// No description provided for @reminderTypePacking.
+  ///
+  /// In en, this message translates to:
+  /// **'Packing'**
+  String get reminderTypePacking;
+
+  /// No description provided for @reminderTypeOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get reminderTypeOther;
+
+  /// No description provided for @reminderLocalTimeHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Format: yyyy-MM-dd HH:mm. Stored as UTC for future API mapping.'**
+  String get reminderLocalTimeHelper;
+
+  /// No description provided for @reminderNoDeliveryNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'These are in-app reminder records only. UI-9 does not schedule push, email, SMS, or OS notifications.'**
+  String get reminderNoDeliveryNotice;
 }
 
 class _AppLocalizationsDelegate

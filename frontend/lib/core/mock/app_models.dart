@@ -1729,6 +1729,521 @@ class TripDocument {
       );
 }
 
+enum TripPermission { owner, editor, viewer, noAccess }
+
+extension TripPermissionData on TripPermission {
+  bool get canRead => this != TripPermission.noAccess;
+  bool get canEdit =>
+      this == TripPermission.owner || this == TripPermission.editor;
+  bool get canManage => this == TripPermission.owner;
+}
+
+enum TripCollaboratorRole { viewer, editor }
+
+extension TripCollaboratorRoleData on TripCollaboratorRole {
+  String get code {
+    switch (this) {
+      case TripCollaboratorRole.viewer:
+        return 'VIEWER';
+      case TripCollaboratorRole.editor:
+        return 'EDITOR';
+    }
+  }
+}
+
+class DemoTripUser {
+  final String id;
+  final String email;
+  final String fullName;
+
+  const DemoTripUser({
+    required this.id,
+    required this.email,
+    required this.fullName,
+  });
+}
+
+class TripCollaborator {
+  final String id;
+  final int tripPlanId;
+  final String userId;
+  final String userEmail;
+  final String userFullName;
+  final TripCollaboratorRole role;
+  final bool active;
+  final DateTime invitedAt;
+  final DateTime? acceptedAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  const TripCollaborator({
+    required this.id,
+    required this.tripPlanId,
+    required this.userId,
+    required this.userEmail,
+    required this.userFullName,
+    required this.role,
+    this.active = true,
+    required this.invitedAt,
+    this.acceptedAt,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  TripCollaborator copyWith({
+    String? id,
+    int? tripPlanId,
+    String? userId,
+    String? userEmail,
+    String? userFullName,
+    TripCollaboratorRole? role,
+    bool? active,
+    DateTime? invitedAt,
+    Object? acceptedAt = _unset,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) =>
+      TripCollaborator(
+        id: id ?? this.id,
+        tripPlanId: tripPlanId ?? this.tripPlanId,
+        userId: userId ?? this.userId,
+        userEmail: userEmail ?? this.userEmail,
+        userFullName: userFullName ?? this.userFullName,
+        role: role ?? this.role,
+        active: active ?? this.active,
+        invitedAt: invitedAt ?? this.invitedAt,
+        acceptedAt: identical(acceptedAt, _unset)
+            ? this.acceptedAt
+            : acceptedAt as DateTime?,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
+
+  static const Object _unset = Object();
+}
+
+class SharedTripSummary {
+  final int tripId;
+  final String title;
+  final String destination;
+  final String coverImage;
+  final DateTime startDate;
+  final DateTime endDate;
+  final String status;
+  final String ownerName;
+  final TripCollaboratorRole role;
+
+  const SharedTripSummary({
+    required this.tripId,
+    required this.title,
+    required this.destination,
+    required this.coverImage,
+    required this.startDate,
+    required this.endDate,
+    required this.status,
+    required this.ownerName,
+    required this.role,
+  });
+}
+
+enum TripNoteType { note, journal, reminder, idea, memory }
+
+extension TripNoteTypeData on TripNoteType {
+  String get code {
+    switch (this) {
+      case TripNoteType.note:
+        return 'NOTE';
+      case TripNoteType.journal:
+        return 'JOURNAL';
+      case TripNoteType.reminder:
+        return 'REMINDER';
+      case TripNoteType.idea:
+        return 'IDEA';
+      case TripNoteType.memory:
+        return 'MEMORY';
+    }
+  }
+}
+
+enum TripMood { happy, excited, calm, tired, stressed, neutral }
+
+extension TripMoodData on TripMood {
+  String get code {
+    switch (this) {
+      case TripMood.happy:
+        return 'HAPPY';
+      case TripMood.excited:
+        return 'EXCITED';
+      case TripMood.calm:
+        return 'CALM';
+      case TripMood.tired:
+        return 'TIRED';
+      case TripMood.stressed:
+        return 'STRESSED';
+      case TripMood.neutral:
+        return 'NEUTRAL';
+    }
+  }
+}
+
+class TripNote {
+  static const Object _unset = Object();
+
+  final String id;
+  final int tripPlanId;
+  final int? tripDayId;
+  final int? tripItemId;
+  final String authorUserId;
+  final String authorUserName;
+  final TripNoteType noteType;
+  final String title;
+  final String content;
+  final TripMood? mood;
+  final String photoUrl;
+  final bool pinned;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  const TripNote({
+    required this.id,
+    required this.tripPlanId,
+    this.tripDayId,
+    this.tripItemId,
+    required this.authorUserId,
+    required this.authorUserName,
+    this.noteType = TripNoteType.note,
+    this.title = '',
+    required this.content,
+    this.mood,
+    this.photoUrl = '',
+    this.pinned = false,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  TripNote copyWith({
+    String? id,
+    int? tripPlanId,
+    Object? tripDayId = _unset,
+    Object? tripItemId = _unset,
+    String? authorUserId,
+    String? authorUserName,
+    TripNoteType? noteType,
+    String? title,
+    String? content,
+    Object? mood = _unset,
+    String? photoUrl,
+    bool? pinned,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) =>
+      TripNote(
+        id: id ?? this.id,
+        tripPlanId: tripPlanId ?? this.tripPlanId,
+        tripDayId:
+            identical(tripDayId, _unset) ? this.tripDayId : tripDayId as int?,
+        tripItemId: identical(tripItemId, _unset)
+            ? this.tripItemId
+            : tripItemId as int?,
+        authorUserId: authorUserId ?? this.authorUserId,
+        authorUserName: authorUserName ?? this.authorUserName,
+        noteType: noteType ?? this.noteType,
+        title: title ?? this.title,
+        content: content ?? this.content,
+        mood: identical(mood, _unset) ? this.mood : mood as TripMood?,
+        photoUrl: photoUrl ?? this.photoUrl,
+        pinned: pinned ?? this.pinned,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
+}
+
+enum PackingCategory {
+  documents,
+  clothes,
+  toiletries,
+  electronics,
+  medicine,
+  money,
+  food,
+  baby,
+  pet,
+  other,
+}
+
+extension PackingCategoryData on PackingCategory {
+  String get code {
+    switch (this) {
+      case PackingCategory.documents:
+        return 'DOCUMENTS';
+      case PackingCategory.clothes:
+        return 'CLOTHES';
+      case PackingCategory.toiletries:
+        return 'TOILETRIES';
+      case PackingCategory.electronics:
+        return 'ELECTRONICS';
+      case PackingCategory.medicine:
+        return 'MEDICINE';
+      case PackingCategory.money:
+        return 'MONEY';
+      case PackingCategory.food:
+        return 'FOOD';
+      case PackingCategory.baby:
+        return 'BABY';
+      case PackingCategory.pet:
+        return 'PET';
+      case PackingCategory.other:
+        return 'OTHER';
+    }
+  }
+}
+
+class PackingItem {
+  static const Object _unset = Object();
+
+  final String id;
+  final int tripPlanId;
+  final String label;
+  final PackingCategory category;
+  final int quantity;
+  final bool checked;
+  final String? assignedToUserId;
+  final String? assignedToUserName;
+  final String notes;
+  final int sortOrder;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? checkedAt;
+
+  const PackingItem({
+    required this.id,
+    required this.tripPlanId,
+    required this.label,
+    required this.category,
+    this.quantity = 1,
+    this.checked = false,
+    this.assignedToUserId,
+    this.assignedToUserName,
+    this.notes = '',
+    this.sortOrder = 0,
+    required this.createdAt,
+    required this.updatedAt,
+    this.checkedAt,
+  });
+
+  PackingItem copyWith({
+    String? id,
+    int? tripPlanId,
+    String? label,
+    PackingCategory? category,
+    int? quantity,
+    bool? checked,
+    Object? assignedToUserId = _unset,
+    Object? assignedToUserName = _unset,
+    String? notes,
+    int? sortOrder,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Object? checkedAt = _unset,
+  }) =>
+      PackingItem(
+        id: id ?? this.id,
+        tripPlanId: tripPlanId ?? this.tripPlanId,
+        label: label ?? this.label,
+        category: category ?? this.category,
+        quantity: quantity ?? this.quantity,
+        checked: checked ?? this.checked,
+        assignedToUserId: identical(assignedToUserId, _unset)
+            ? this.assignedToUserId
+            : assignedToUserId as String?,
+        assignedToUserName: identical(assignedToUserName, _unset)
+            ? this.assignedToUserName
+            : assignedToUserName as String?,
+        notes: notes ?? this.notes,
+        sortOrder: sortOrder ?? this.sortOrder,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+        checkedAt: identical(checkedAt, _unset)
+            ? this.checkedAt
+            : checkedAt as DateTime?,
+      );
+}
+
+class PackingProgress {
+  final int total;
+  final int checked;
+
+  const PackingProgress({required this.total, required this.checked});
+
+  int get unchecked => total - checked;
+  double get ratio => total == 0 ? 0 : (checked / total).clamp(0.0, 1.0);
+  int get percent => (ratio * 100).round();
+}
+
+enum TripReminderType {
+  custom,
+  document,
+  checkIn,
+  flight,
+  activity,
+  payment,
+  packing,
+  other,
+}
+
+extension TripReminderTypeData on TripReminderType {
+  String get code {
+    switch (this) {
+      case TripReminderType.custom:
+        return 'CUSTOM';
+      case TripReminderType.document:
+        return 'DOCUMENT';
+      case TripReminderType.checkIn:
+        return 'CHECK_IN';
+      case TripReminderType.flight:
+        return 'FLIGHT';
+      case TripReminderType.activity:
+        return 'ACTIVITY';
+      case TripReminderType.payment:
+        return 'PAYMENT';
+      case TripReminderType.packing:
+        return 'PACKING';
+      case TripReminderType.other:
+        return 'OTHER';
+    }
+  }
+}
+
+enum TripReminderStatus { pending, completed, cancelled }
+
+extension TripReminderStatusData on TripReminderStatus {
+  String get code {
+    switch (this) {
+      case TripReminderStatus.pending:
+        return 'PENDING';
+      case TripReminderStatus.completed:
+        return 'COMPLETED';
+      case TripReminderStatus.cancelled:
+        return 'CANCELLED';
+    }
+  }
+}
+
+class TripReminder {
+  static const Object _unset = Object();
+
+  final String id;
+  final int tripPlanId;
+  final int? tripDayId;
+  final int? tripItemId;
+  final String? documentId;
+  final String userId;
+  final String userName;
+  final TripReminderType reminderType;
+  final String title;
+  final String message;
+  final DateTime reminderAt;
+  final TripReminderStatus status;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? completedAt;
+
+  const TripReminder({
+    required this.id,
+    required this.tripPlanId,
+    this.tripDayId,
+    this.tripItemId,
+    this.documentId,
+    required this.userId,
+    required this.userName,
+    this.reminderType = TripReminderType.custom,
+    required this.title,
+    this.message = '',
+    required this.reminderAt,
+    this.status = TripReminderStatus.pending,
+    required this.createdAt,
+    required this.updatedAt,
+    this.completedAt,
+  });
+
+  bool isOverdue(DateTime current) =>
+      status == TripReminderStatus.pending &&
+      reminderAt.isBefore(current.toUtc());
+
+  TripReminder copyWith({
+    String? id,
+    int? tripPlanId,
+    Object? tripDayId = _unset,
+    Object? tripItemId = _unset,
+    Object? documentId = _unset,
+    String? userId,
+    String? userName,
+    TripReminderType? reminderType,
+    String? title,
+    String? message,
+    DateTime? reminderAt,
+    TripReminderStatus? status,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Object? completedAt = _unset,
+  }) =>
+      TripReminder(
+        id: id ?? this.id,
+        tripPlanId: tripPlanId ?? this.tripPlanId,
+        tripDayId:
+            identical(tripDayId, _unset) ? this.tripDayId : tripDayId as int?,
+        tripItemId: identical(tripItemId, _unset)
+            ? this.tripItemId
+            : tripItemId as int?,
+        documentId: identical(documentId, _unset)
+            ? this.documentId
+            : documentId as String?,
+        userId: userId ?? this.userId,
+        userName: userName ?? this.userName,
+        reminderType: reminderType ?? this.reminderType,
+        title: title ?? this.title,
+        message: message ?? this.message,
+        reminderAt: reminderAt ?? this.reminderAt,
+        status: status ?? this.status,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+        completedAt: identical(completedAt, _unset)
+            ? this.completedAt
+            : completedAt as DateTime?,
+      );
+}
+
+enum TripToolActionResult {
+  success,
+  unavailable,
+  forbidden,
+  blank,
+  invalidEmail,
+  duplicate,
+  rejected,
+  unsafeUrl,
+  notFound,
+  invalidQuantity,
+  invalidReorder,
+  invalidDate,
+}
+
+class TripCompanionCounts {
+  final int activeCollaborators;
+  final int notes;
+  final int uncheckedPacking;
+  final int pendingReminders;
+  final int documents;
+
+  const TripCompanionCounts({
+    required this.activeCollaborators,
+    required this.notes,
+    required this.uncheckedPacking,
+    required this.pendingReminders,
+    required this.documents,
+  });
+}
+
 WalletItemStatus computeWalletEffectiveStatus({
   required bool archived,
   required WalletItemStatus storedStatus,
@@ -1773,6 +2288,9 @@ bool isSafeDocumentMediaUrl(String value) {
 
 class Trip {
   final int id;
+  final String ownerUserId;
+  final String ownerEmail;
+  final String ownerName;
   final String title;
   final String destination;
   final String imageUrl;
@@ -1786,6 +2304,9 @@ class Trip {
 
   const Trip({
     required this.id,
+    this.ownerUserId = 'demo-owner',
+    this.ownerEmail = 'demo@planyourtrip.com',
+    this.ownerName = 'Demo Traveler',
     required this.title,
     required this.destination,
     required this.imageUrl,
@@ -1806,6 +2327,9 @@ class Trip {
 
   Trip copyWith({
     int? id,
+    String? ownerUserId,
+    String? ownerEmail,
+    String? ownerName,
     String? title,
     String? destination,
     String? imageUrl,
@@ -1819,6 +2343,9 @@ class Trip {
   }) =>
       Trip(
         id: id ?? this.id,
+        ownerUserId: ownerUserId ?? this.ownerUserId,
+        ownerEmail: ownerEmail ?? this.ownerEmail,
+        ownerName: ownerName ?? this.ownerName,
         title: title ?? this.title,
         destination: destination ?? this.destination,
         imageUrl: imageUrl ?? this.imageUrl,
