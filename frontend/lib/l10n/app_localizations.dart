@@ -4808,6 +4808,942 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Demo Mode'**
   String get demoModeLabel;
+
+  /// No description provided for @travelWalletTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Travel Wallet'**
+  String get travelWalletTitle;
+
+  /// No description provided for @walletDemoSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Local demo organizer for passports, visas, tickets, vouchers, receipts, and booking confirmations.'**
+  String get walletDemoSubtitle;
+
+  /// No description provided for @walletPrivacyNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Sensitive document numbers are masked before storage. UI-8 does not upload files, scan documents, or synchronize wallet data.'**
+  String get walletPrivacyNotice;
+
+  /// No description provided for @walletRealEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Travel Wallet is not connected yet'**
+  String get walletRealEmptyTitle;
+
+  /// No description provided for @walletRealEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Real accounts will show wallet documents after backend integration. No demo wallet data is shown for real sessions.'**
+  String get walletRealEmptyMessage;
+
+  /// No description provided for @walletSummaryTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get walletSummaryTotal;
+
+  /// No description provided for @walletSummaryActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get walletSummaryActive;
+
+  /// No description provided for @walletSummaryUpcoming.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get walletSummaryUpcoming;
+
+  /// No description provided for @walletSummaryExpiringSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Expiring soon'**
+  String get walletSummaryExpiringSoon;
+
+  /// No description provided for @walletSummaryExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get walletSummaryExpired;
+
+  /// No description provided for @walletSummaryFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorites'**
+  String get walletSummaryFavorites;
+
+  /// No description provided for @walletSummaryArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived'**
+  String get walletSummaryArchived;
+
+  /// No description provided for @walletSummaryUnlinked.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlinked'**
+  String get walletSummaryUnlinked;
+
+  /// No description provided for @walletSummarySemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{label}: {count}'**
+  String walletSummarySemantic(String label, int count);
+
+  /// No description provided for @walletSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search title, issuer, masked reference, or trip'**
+  String get walletSearchHint;
+
+  /// No description provided for @walletFilterCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get walletFilterCategory;
+
+  /// No description provided for @walletFilterType.
+  ///
+  /// In en, this message translates to:
+  /// **'Item type'**
+  String get walletFilterType;
+
+  /// No description provided for @walletFilterStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get walletFilterStatus;
+
+  /// No description provided for @walletFilterLinkedTrip.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked trip'**
+  String get walletFilterLinkedTrip;
+
+  /// No description provided for @walletFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get walletFilterAll;
+
+  /// No description provided for @walletFavoritesOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorites only'**
+  String get walletFavoritesOnly;
+
+  /// No description provided for @walletArchivedOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived only'**
+  String get walletArchivedOnly;
+
+  /// No description provided for @walletCreateItemAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add wallet item'**
+  String get walletCreateItemAction;
+
+  /// No description provided for @walletImportBookingAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Import booking'**
+  String get walletImportBookingAction;
+
+  /// No description provided for @walletNoBookingsToImport.
+  ///
+  /// In en, this message translates to:
+  /// **'No local demo bookings are available to import.'**
+  String get walletNoBookingsToImport;
+
+  /// No description provided for @walletEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No wallet items match'**
+  String get walletEmptyTitle;
+
+  /// No description provided for @walletEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust search or filters, or add local demo metadata.'**
+  String get walletEmptyMessage;
+
+  /// No description provided for @walletSectionFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorites'**
+  String get walletSectionFavorites;
+
+  /// No description provided for @walletSectionExpiringSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Expiring soon'**
+  String get walletSectionExpiringSoon;
+
+  /// No description provided for @walletSectionUpcoming.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get walletSectionUpcoming;
+
+  /// No description provided for @walletSectionActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get walletSectionActive;
+
+  /// No description provided for @walletSectionExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get walletSectionExpired;
+
+  /// No description provided for @walletSectionArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived'**
+  String get walletSectionArchived;
+
+  /// No description provided for @walletSectionByCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'By category'**
+  String get walletSectionByCategory;
+
+  /// No description provided for @walletSectionByTrip.
+  ///
+  /// In en, this message translates to:
+  /// **'By trip'**
+  String get walletSectionByTrip;
+
+  /// No description provided for @walletItemSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet item {title}'**
+  String walletItemSemantic(String title);
+
+  /// No description provided for @walletSourceMetadata.
+  ///
+  /// In en, this message translates to:
+  /// **'Metadata only'**
+  String get walletSourceMetadata;
+
+  /// No description provided for @walletSourceTripDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip document'**
+  String get walletSourceTripDocument;
+
+  /// No description provided for @walletSourceBooking.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking'**
+  String get walletSourceBooking;
+
+  /// No description provided for @walletSourceInvoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice'**
+  String get walletSourceInvoice;
+
+  /// No description provided for @walletReferenceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Masked reference'**
+  String get walletReferenceLabel;
+
+  /// No description provided for @walletMaskedReference.
+  ///
+  /// In en, this message translates to:
+  /// **'Masked reference {reference}'**
+  String walletMaskedReference(String reference);
+
+  /// No description provided for @walletValidityLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Validity'**
+  String get walletValidityLabel;
+
+  /// No description provided for @walletNoValidity.
+  ///
+  /// In en, this message translates to:
+  /// **'No validity dates supplied'**
+  String get walletNoValidity;
+
+  /// No description provided for @walletValidUntil.
+  ///
+  /// In en, this message translates to:
+  /// **'Valid until {date}'**
+  String walletValidUntil(String date);
+
+  /// No description provided for @walletValidFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Valid from {date}'**
+  String walletValidFrom(String date);
+
+  /// No description provided for @walletValidPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'{from} - {until}'**
+  String walletValidPeriod(String from, String until);
+
+  /// No description provided for @walletLinkedTripLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked trip'**
+  String get walletLinkedTripLabel;
+
+  /// No description provided for @walletReminderLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Expiry reminder'**
+  String get walletReminderLabel;
+
+  /// No description provided for @walletReminderEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Local reminder preference enabled'**
+  String get walletReminderEnabled;
+
+  /// No description provided for @walletReminderDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Local reminder preference disabled'**
+  String get walletReminderDisabled;
+
+  /// No description provided for @walletReminderEnableAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable reminder'**
+  String get walletReminderEnableAction;
+
+  /// No description provided for @walletReminderDisableAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable reminder'**
+  String get walletReminderDisableAction;
+
+  /// No description provided for @walletFavoriteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorite'**
+  String get walletFavoriteAction;
+
+  /// No description provided for @walletUnfavoriteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Unfavorite'**
+  String get walletUnfavoriteAction;
+
+  /// No description provided for @walletArchiveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive'**
+  String get walletArchiveAction;
+
+  /// No description provided for @walletRestoreAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get walletRestoreAction;
+
+  /// No description provided for @walletDeleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get walletDeleteAction;
+
+  /// No description provided for @walletEditAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get walletEditAction;
+
+  /// No description provided for @walletSaveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get walletSaveAction;
+
+  /// No description provided for @walletCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add wallet metadata'**
+  String get walletCreateTitle;
+
+  /// No description provided for @walletEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit wallet metadata'**
+  String get walletEditTitle;
+
+  /// No description provided for @walletTitleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get walletTitleLabel;
+
+  /// No description provided for @walletIssuerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Issuer'**
+  String get walletIssuerLabel;
+
+  /// No description provided for @walletReferenceInputLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reference number'**
+  String get walletReferenceInputLabel;
+
+  /// No description provided for @walletReferencePrivacyHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Reference input is masked immediately and the raw value is not retained.'**
+  String get walletReferencePrivacyHelper;
+
+  /// No description provided for @walletTypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet item type'**
+  String get walletTypeLabel;
+
+  /// No description provided for @walletStatusLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Stored status'**
+  String get walletStatusLabel;
+
+  /// No description provided for @walletNoValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Not supplied'**
+  String get walletNoValue;
+
+  /// No description provided for @walletUpdatedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated'**
+  String get walletUpdatedLabel;
+
+  /// No description provided for @walletDeleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete wallet item?'**
+  String get walletDeleteConfirmTitle;
+
+  /// No description provided for @walletDeleteConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {title} from the local demo wallet? The linked trip, booking, or document will not be deleted.'**
+  String walletDeleteConfirmMessage(String title);
+
+  /// No description provided for @walletSavedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet item saved locally.'**
+  String get walletSavedMessage;
+
+  /// No description provided for @walletDeletedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet item deleted locally.'**
+  String get walletDeletedMessage;
+
+  /// No description provided for @walletDuplicateMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'That local item already exists.'**
+  String get walletDuplicateMessage;
+
+  /// No description provided for @walletActionRejectedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'That wallet action cannot be completed with the current data.'**
+  String get walletActionRejectedMessage;
+
+  /// No description provided for @walletInvalidDateMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Valid-until date cannot be before valid-from date.'**
+  String get walletInvalidDateMessage;
+
+  /// No description provided for @walletNotFoundMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The selected wallet item no longer exists.'**
+  String get walletNotFoundMessage;
+
+  /// No description provided for @walletActionUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Travel Wallet actions are not connected for real accounts in this UI phase.'**
+  String get walletActionUnavailable;
+
+  /// No description provided for @walletTitleRequiredMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a title before saving.'**
+  String get walletTitleRequiredMessage;
+
+  /// No description provided for @walletBookingImportedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking confirmation saved to the local demo wallet.'**
+  String get walletBookingImportedMessage;
+
+  /// No description provided for @walletBookingAlreadyImportedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'That booking is already in the local demo wallet.'**
+  String get walletBookingAlreadyImportedMessage;
+
+  /// No description provided for @walletSaveBookingAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Save to Travel Wallet'**
+  String get walletSaveBookingAction;
+
+  /// No description provided for @walletSaveBookingSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Save this local demo booking to Travel Wallet'**
+  String get walletSaveBookingSemantic;
+
+  /// No description provided for @walletTypePassport.
+  ///
+  /// In en, this message translates to:
+  /// **'Passport'**
+  String get walletTypePassport;
+
+  /// No description provided for @walletTypeVisa.
+  ///
+  /// In en, this message translates to:
+  /// **'Visa'**
+  String get walletTypeVisa;
+
+  /// No description provided for @walletTypeBoardingPass.
+  ///
+  /// In en, this message translates to:
+  /// **'Boarding pass'**
+  String get walletTypeBoardingPass;
+
+  /// No description provided for @walletTypeFlightTicket.
+  ///
+  /// In en, this message translates to:
+  /// **'Flight ticket'**
+  String get walletTypeFlightTicket;
+
+  /// No description provided for @walletTypeTrainTicket.
+  ///
+  /// In en, this message translates to:
+  /// **'Train ticket'**
+  String get walletTypeTrainTicket;
+
+  /// No description provided for @walletTypeBusTicket.
+  ///
+  /// In en, this message translates to:
+  /// **'Bus ticket'**
+  String get walletTypeBusTicket;
+
+  /// No description provided for @walletTypeHotelVoucher.
+  ///
+  /// In en, this message translates to:
+  /// **'Hotel voucher'**
+  String get walletTypeHotelVoucher;
+
+  /// No description provided for @walletTypeTourVoucher.
+  ///
+  /// In en, this message translates to:
+  /// **'Tour voucher'**
+  String get walletTypeTourVoucher;
+
+  /// No description provided for @walletTypeInsurance.
+  ///
+  /// In en, this message translates to:
+  /// **'Insurance'**
+  String get walletTypeInsurance;
+
+  /// No description provided for @walletTypeBookingConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking confirmation'**
+  String get walletTypeBookingConfirmation;
+
+  /// No description provided for @walletTypeInvoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice'**
+  String get walletTypeInvoice;
+
+  /// No description provided for @walletTypeReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt'**
+  String get walletTypeReceipt;
+
+  /// No description provided for @walletTypeItinerary.
+  ///
+  /// In en, this message translates to:
+  /// **'Itinerary'**
+  String get walletTypeItinerary;
+
+  /// No description provided for @walletTypeOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get walletTypeOther;
+
+  /// No description provided for @walletCategoryIdentity.
+  ///
+  /// In en, this message translates to:
+  /// **'Identity'**
+  String get walletCategoryIdentity;
+
+  /// No description provided for @walletCategoryTransport.
+  ///
+  /// In en, this message translates to:
+  /// **'Transport'**
+  String get walletCategoryTransport;
+
+  /// No description provided for @walletCategoryAccommodation.
+  ///
+  /// In en, this message translates to:
+  /// **'Accommodation'**
+  String get walletCategoryAccommodation;
+
+  /// No description provided for @walletCategoryActivity.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity'**
+  String get walletCategoryActivity;
+
+  /// No description provided for @walletCategoryInsurance.
+  ///
+  /// In en, this message translates to:
+  /// **'Insurance'**
+  String get walletCategoryInsurance;
+
+  /// No description provided for @walletCategoryFinancial.
+  ///
+  /// In en, this message translates to:
+  /// **'Financial'**
+  String get walletCategoryFinancial;
+
+  /// No description provided for @walletCategoryOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get walletCategoryOther;
+
+  /// No description provided for @walletStatusActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get walletStatusActive;
+
+  /// No description provided for @walletStatusUpcoming.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get walletStatusUpcoming;
+
+  /// No description provided for @walletStatusExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get walletStatusExpired;
+
+  /// No description provided for @walletStatusCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get walletStatusCancelled;
+
+  /// No description provided for @walletStatusArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived'**
+  String get walletStatusArchived;
+
+  /// No description provided for @tripDocumentsAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Documents'**
+  String get tripDocumentsAction;
+
+  /// No description provided for @tripDocumentsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip Documents'**
+  String get tripDocumentsTitle;
+
+  /// No description provided for @tripDocumentsDemoSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Local demo metadata for {trip}. No file upload is performed.'**
+  String tripDocumentsDemoSubtitle(String trip);
+
+  /// No description provided for @tripDocumentsRealEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip documents are not connected yet'**
+  String get tripDocumentsRealEmptyTitle;
+
+  /// No description provided for @tripDocumentsRealEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Real trip documents will appear after backend integration. No seeded demo documents are shown for real sessions.'**
+  String get tripDocumentsRealEmptyMessage;
+
+  /// No description provided for @tripDocumentsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No documents'**
+  String get tripDocumentsEmptyTitle;
+
+  /// No description provided for @tripDocumentsEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Add local demo metadata for tickets, bookings, receipts, or documents.'**
+  String get tripDocumentsEmptyMessage;
+
+  /// No description provided for @tripDocumentsTripDeletedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This trip is no longer available.'**
+  String get tripDocumentsTripDeletedMessage;
+
+  /// No description provided for @tripDocumentAddAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add document'**
+  String get tripDocumentAddAction;
+
+  /// No description provided for @tripDocumentCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add trip document'**
+  String get tripDocumentCreateTitle;
+
+  /// No description provided for @tripDocumentEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit trip document'**
+  String get tripDocumentEditTitle;
+
+  /// No description provided for @tripDocumentTitleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Document title'**
+  String get tripDocumentTitleLabel;
+
+  /// No description provided for @tripDocumentNotesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get tripDocumentNotesLabel;
+
+  /// No description provided for @tripDocumentTypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Document type'**
+  String get tripDocumentTypeLabel;
+
+  /// No description provided for @tripDocumentMediaLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Media label'**
+  String get tripDocumentMediaLabel;
+
+  /// No description provided for @tripDocumentMediaUrlLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Safe URL reference'**
+  String get tripDocumentMediaUrlLabel;
+
+  /// No description provided for @tripDocumentMediaHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Only http or https references with a host are accepted. UI-8 does not upload files.'**
+  String get tripDocumentMediaHelper;
+
+  /// No description provided for @tripDocumentUploaderLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploader'**
+  String get tripDocumentUploaderLabel;
+
+  /// No description provided for @tripDocumentNoUploadNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'This phase stores local demo metadata only. It does not upload files, parse PDFs, scan images, or share documents.'**
+  String get tripDocumentNoUploadNotice;
+
+  /// No description provided for @tripDocumentPinned.
+  ///
+  /// In en, this message translates to:
+  /// **'Pinned'**
+  String get tripDocumentPinned;
+
+  /// No description provided for @tripDocumentUnpinned.
+  ///
+  /// In en, this message translates to:
+  /// **'Not pinned'**
+  String get tripDocumentUnpinned;
+
+  /// No description provided for @tripDocumentPinAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Pin'**
+  String get tripDocumentPinAction;
+
+  /// No description provided for @tripDocumentUnpinAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Unpin'**
+  String get tripDocumentUnpinAction;
+
+  /// No description provided for @tripDocumentDeleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete document'**
+  String get tripDocumentDeleteAction;
+
+  /// No description provided for @tripDocumentSaveToWalletAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Save to wallet'**
+  String get tripDocumentSaveToWalletAction;
+
+  /// No description provided for @tripDocumentUnsafeUrlMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Use a valid http or https URL with a host.'**
+  String get tripDocumentUnsafeUrlMessage;
+
+  /// No description provided for @tripDocumentSafeLinkLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Safe link'**
+  String get tripDocumentSafeLinkLabel;
+
+  /// No description provided for @tripDocumentSavedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip document saved locally.'**
+  String get tripDocumentSavedMessage;
+
+  /// No description provided for @tripDocumentDeletedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip document deleted locally.'**
+  String get tripDocumentDeletedMessage;
+
+  /// No description provided for @tripDocumentWalletImportedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip document saved to the local demo wallet.'**
+  String get tripDocumentWalletImportedMessage;
+
+  /// No description provided for @tripDocumentWalletDuplicateMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'That trip document is already in the local demo wallet.'**
+  String get tripDocumentWalletDuplicateMessage;
+
+  /// No description provided for @tripDocumentDeleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete trip document?'**
+  String get tripDocumentDeleteConfirmTitle;
+
+  /// No description provided for @tripDocumentDeleteConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {title} from this local demo trip? Linked wallet items will be removed, but the trip remains unchanged.'**
+  String tripDocumentDeleteConfirmMessage(String title);
+
+  /// No description provided for @tripDocumentCardSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip document {title}'**
+  String tripDocumentCardSemantic(String title);
+
+  /// No description provided for @docTypeFlightTicket.
+  ///
+  /// In en, this message translates to:
+  /// **'Flight ticket'**
+  String get docTypeFlightTicket;
+
+  /// No description provided for @docTypeHotelBooking.
+  ///
+  /// In en, this message translates to:
+  /// **'Hotel booking'**
+  String get docTypeHotelBooking;
+
+  /// No description provided for @docTypeTrainTicket.
+  ///
+  /// In en, this message translates to:
+  /// **'Train ticket'**
+  String get docTypeTrainTicket;
+
+  /// No description provided for @docTypeBusTicket.
+  ///
+  /// In en, this message translates to:
+  /// **'Bus ticket'**
+  String get docTypeBusTicket;
+
+  /// No description provided for @docTypePassport.
+  ///
+  /// In en, this message translates to:
+  /// **'Passport'**
+  String get docTypePassport;
+
+  /// No description provided for @docTypeVisa.
+  ///
+  /// In en, this message translates to:
+  /// **'Visa'**
+  String get docTypeVisa;
+
+  /// No description provided for @docTypeInsurance.
+  ///
+  /// In en, this message translates to:
+  /// **'Insurance'**
+  String get docTypeInsurance;
+
+  /// No description provided for @docTypeTour.
+  ///
+  /// In en, this message translates to:
+  /// **'Tour'**
+  String get docTypeTour;
+
+  /// No description provided for @docTypeReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt'**
+  String get docTypeReceipt;
+
+  /// No description provided for @docTypePdf.
+  ///
+  /// In en, this message translates to:
+  /// **'PDF'**
+  String get docTypePdf;
+
+  /// No description provided for @docTypeImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Image'**
+  String get docTypeImage;
+
+  /// No description provided for @docTypeOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get docTypeOther;
 }
 
 class _AppLocalizationsDelegate

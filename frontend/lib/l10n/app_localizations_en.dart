@@ -2745,4 +2745,515 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get demoModeLabel => 'Demo Mode';
+
+  @override
+  String get travelWalletTitle => 'Travel Wallet';
+
+  @override
+  String get walletDemoSubtitle =>
+      'Local demo organizer for passports, visas, tickets, vouchers, receipts, and booking confirmations.';
+
+  @override
+  String get walletPrivacyNotice =>
+      'Sensitive document numbers are masked before storage. UI-8 does not upload files, scan documents, or synchronize wallet data.';
+
+  @override
+  String get walletRealEmptyTitle => 'Travel Wallet is not connected yet';
+
+  @override
+  String get walletRealEmptyMessage =>
+      'Real accounts will show wallet documents after backend integration. No demo wallet data is shown for real sessions.';
+
+  @override
+  String get walletSummaryTotal => 'Total';
+
+  @override
+  String get walletSummaryActive => 'Active';
+
+  @override
+  String get walletSummaryUpcoming => 'Upcoming';
+
+  @override
+  String get walletSummaryExpiringSoon => 'Expiring soon';
+
+  @override
+  String get walletSummaryExpired => 'Expired';
+
+  @override
+  String get walletSummaryFavorites => 'Favorites';
+
+  @override
+  String get walletSummaryArchived => 'Archived';
+
+  @override
+  String get walletSummaryUnlinked => 'Unlinked';
+
+  @override
+  String walletSummarySemantic(String label, int count) {
+    return '$label: $count';
+  }
+
+  @override
+  String get walletSearchHint =>
+      'Search title, issuer, masked reference, or trip';
+
+  @override
+  String get walletFilterCategory => 'Category';
+
+  @override
+  String get walletFilterType => 'Item type';
+
+  @override
+  String get walletFilterStatus => 'Status';
+
+  @override
+  String get walletFilterLinkedTrip => 'Linked trip';
+
+  @override
+  String get walletFilterAll => 'All';
+
+  @override
+  String get walletFavoritesOnly => 'Favorites only';
+
+  @override
+  String get walletArchivedOnly => 'Archived only';
+
+  @override
+  String get walletCreateItemAction => 'Add wallet item';
+
+  @override
+  String get walletImportBookingAction => 'Import booking';
+
+  @override
+  String get walletNoBookingsToImport =>
+      'No local demo bookings are available to import.';
+
+  @override
+  String get walletEmptyTitle => 'No wallet items match';
+
+  @override
+  String get walletEmptyMessage =>
+      'Adjust search or filters, or add local demo metadata.';
+
+  @override
+  String get walletSectionFavorites => 'Favorites';
+
+  @override
+  String get walletSectionExpiringSoon => 'Expiring soon';
+
+  @override
+  String get walletSectionUpcoming => 'Upcoming';
+
+  @override
+  String get walletSectionActive => 'Active';
+
+  @override
+  String get walletSectionExpired => 'Expired';
+
+  @override
+  String get walletSectionArchived => 'Archived';
+
+  @override
+  String get walletSectionByCategory => 'By category';
+
+  @override
+  String get walletSectionByTrip => 'By trip';
+
+  @override
+  String walletItemSemantic(String title) {
+    return 'Wallet item $title';
+  }
+
+  @override
+  String get walletSourceMetadata => 'Metadata only';
+
+  @override
+  String get walletSourceTripDocument => 'Trip document';
+
+  @override
+  String get walletSourceBooking => 'Booking';
+
+  @override
+  String get walletSourceInvoice => 'Invoice';
+
+  @override
+  String get walletReferenceLabel => 'Masked reference';
+
+  @override
+  String walletMaskedReference(String reference) {
+    return 'Masked reference $reference';
+  }
+
+  @override
+  String get walletValidityLabel => 'Validity';
+
+  @override
+  String get walletNoValidity => 'No validity dates supplied';
+
+  @override
+  String walletValidUntil(String date) {
+    return 'Valid until $date';
+  }
+
+  @override
+  String walletValidFrom(String date) {
+    return 'Valid from $date';
+  }
+
+  @override
+  String walletValidPeriod(String from, String until) {
+    return '$from - $until';
+  }
+
+  @override
+  String get walletLinkedTripLabel => 'Linked trip';
+
+  @override
+  String get walletReminderLabel => 'Expiry reminder';
+
+  @override
+  String get walletReminderEnabled => 'Local reminder preference enabled';
+
+  @override
+  String get walletReminderDisabled => 'Local reminder preference disabled';
+
+  @override
+  String get walletReminderEnableAction => 'Enable reminder';
+
+  @override
+  String get walletReminderDisableAction => 'Disable reminder';
+
+  @override
+  String get walletFavoriteAction => 'Favorite';
+
+  @override
+  String get walletUnfavoriteAction => 'Unfavorite';
+
+  @override
+  String get walletArchiveAction => 'Archive';
+
+  @override
+  String get walletRestoreAction => 'Restore';
+
+  @override
+  String get walletDeleteAction => 'Delete';
+
+  @override
+  String get walletEditAction => 'Edit';
+
+  @override
+  String get walletSaveAction => 'Save';
+
+  @override
+  String get walletCreateTitle => 'Add wallet metadata';
+
+  @override
+  String get walletEditTitle => 'Edit wallet metadata';
+
+  @override
+  String get walletTitleLabel => 'Title';
+
+  @override
+  String get walletIssuerLabel => 'Issuer';
+
+  @override
+  String get walletReferenceInputLabel => 'Reference number';
+
+  @override
+  String get walletReferencePrivacyHelper =>
+      'Reference input is masked immediately and the raw value is not retained.';
+
+  @override
+  String get walletTypeLabel => 'Wallet item type';
+
+  @override
+  String get walletStatusLabel => 'Stored status';
+
+  @override
+  String get walletNoValue => 'Not supplied';
+
+  @override
+  String get walletUpdatedLabel => 'Updated';
+
+  @override
+  String get walletDeleteConfirmTitle => 'Delete wallet item?';
+
+  @override
+  String walletDeleteConfirmMessage(String title) {
+    return 'Delete $title from the local demo wallet? The linked trip, booking, or document will not be deleted.';
+  }
+
+  @override
+  String get walletSavedMessage => 'Wallet item saved locally.';
+
+  @override
+  String get walletDeletedMessage => 'Wallet item deleted locally.';
+
+  @override
+  String get walletDuplicateMessage => 'That local item already exists.';
+
+  @override
+  String get walletActionRejectedMessage =>
+      'That wallet action cannot be completed with the current data.';
+
+  @override
+  String get walletInvalidDateMessage =>
+      'Valid-until date cannot be before valid-from date.';
+
+  @override
+  String get walletNotFoundMessage =>
+      'The selected wallet item no longer exists.';
+
+  @override
+  String get walletActionUnavailable =>
+      'Travel Wallet actions are not connected for real accounts in this UI phase.';
+
+  @override
+  String get walletTitleRequiredMessage => 'Enter a title before saving.';
+
+  @override
+  String get walletBookingImportedMessage =>
+      'Booking confirmation saved to the local demo wallet.';
+
+  @override
+  String get walletBookingAlreadyImportedMessage =>
+      'That booking is already in the local demo wallet.';
+
+  @override
+  String get walletSaveBookingAction => 'Save to Travel Wallet';
+
+  @override
+  String get walletSaveBookingSemantic =>
+      'Save this local demo booking to Travel Wallet';
+
+  @override
+  String get walletTypePassport => 'Passport';
+
+  @override
+  String get walletTypeVisa => 'Visa';
+
+  @override
+  String get walletTypeBoardingPass => 'Boarding pass';
+
+  @override
+  String get walletTypeFlightTicket => 'Flight ticket';
+
+  @override
+  String get walletTypeTrainTicket => 'Train ticket';
+
+  @override
+  String get walletTypeBusTicket => 'Bus ticket';
+
+  @override
+  String get walletTypeHotelVoucher => 'Hotel voucher';
+
+  @override
+  String get walletTypeTourVoucher => 'Tour voucher';
+
+  @override
+  String get walletTypeInsurance => 'Insurance';
+
+  @override
+  String get walletTypeBookingConfirmation => 'Booking confirmation';
+
+  @override
+  String get walletTypeInvoice => 'Invoice';
+
+  @override
+  String get walletTypeReceipt => 'Receipt';
+
+  @override
+  String get walletTypeItinerary => 'Itinerary';
+
+  @override
+  String get walletTypeOther => 'Other';
+
+  @override
+  String get walletCategoryIdentity => 'Identity';
+
+  @override
+  String get walletCategoryTransport => 'Transport';
+
+  @override
+  String get walletCategoryAccommodation => 'Accommodation';
+
+  @override
+  String get walletCategoryActivity => 'Activity';
+
+  @override
+  String get walletCategoryInsurance => 'Insurance';
+
+  @override
+  String get walletCategoryFinancial => 'Financial';
+
+  @override
+  String get walletCategoryOther => 'Other';
+
+  @override
+  String get walletStatusActive => 'Active';
+
+  @override
+  String get walletStatusUpcoming => 'Upcoming';
+
+  @override
+  String get walletStatusExpired => 'Expired';
+
+  @override
+  String get walletStatusCancelled => 'Cancelled';
+
+  @override
+  String get walletStatusArchived => 'Archived';
+
+  @override
+  String get tripDocumentsAction => 'Documents';
+
+  @override
+  String get tripDocumentsTitle => 'Trip Documents';
+
+  @override
+  String tripDocumentsDemoSubtitle(String trip) {
+    return 'Local demo metadata for $trip. No file upload is performed.';
+  }
+
+  @override
+  String get tripDocumentsRealEmptyTitle =>
+      'Trip documents are not connected yet';
+
+  @override
+  String get tripDocumentsRealEmptyMessage =>
+      'Real trip documents will appear after backend integration. No seeded demo documents are shown for real sessions.';
+
+  @override
+  String get tripDocumentsEmptyTitle => 'No documents';
+
+  @override
+  String get tripDocumentsEmptyMessage =>
+      'Add local demo metadata for tickets, bookings, receipts, or documents.';
+
+  @override
+  String get tripDocumentsTripDeletedMessage =>
+      'This trip is no longer available.';
+
+  @override
+  String get tripDocumentAddAction => 'Add document';
+
+  @override
+  String get tripDocumentCreateTitle => 'Add trip document';
+
+  @override
+  String get tripDocumentEditTitle => 'Edit trip document';
+
+  @override
+  String get tripDocumentTitleLabel => 'Document title';
+
+  @override
+  String get tripDocumentNotesLabel => 'Notes';
+
+  @override
+  String get tripDocumentTypeLabel => 'Document type';
+
+  @override
+  String get tripDocumentMediaLabel => 'Media label';
+
+  @override
+  String get tripDocumentMediaUrlLabel => 'Safe URL reference';
+
+  @override
+  String get tripDocumentMediaHelper =>
+      'Only http or https references with a host are accepted. UI-8 does not upload files.';
+
+  @override
+  String get tripDocumentUploaderLabel => 'Uploader';
+
+  @override
+  String get tripDocumentNoUploadNotice =>
+      'This phase stores local demo metadata only. It does not upload files, parse PDFs, scan images, or share documents.';
+
+  @override
+  String get tripDocumentPinned => 'Pinned';
+
+  @override
+  String get tripDocumentUnpinned => 'Not pinned';
+
+  @override
+  String get tripDocumentPinAction => 'Pin';
+
+  @override
+  String get tripDocumentUnpinAction => 'Unpin';
+
+  @override
+  String get tripDocumentDeleteAction => 'Delete document';
+
+  @override
+  String get tripDocumentSaveToWalletAction => 'Save to wallet';
+
+  @override
+  String get tripDocumentUnsafeUrlMessage =>
+      'Use a valid http or https URL with a host.';
+
+  @override
+  String get tripDocumentSafeLinkLabel => 'Safe link';
+
+  @override
+  String get tripDocumentSavedMessage => 'Trip document saved locally.';
+
+  @override
+  String get tripDocumentDeletedMessage => 'Trip document deleted locally.';
+
+  @override
+  String get tripDocumentWalletImportedMessage =>
+      'Trip document saved to the local demo wallet.';
+
+  @override
+  String get tripDocumentWalletDuplicateMessage =>
+      'That trip document is already in the local demo wallet.';
+
+  @override
+  String get tripDocumentDeleteConfirmTitle => 'Delete trip document?';
+
+  @override
+  String tripDocumentDeleteConfirmMessage(String title) {
+    return 'Delete $title from this local demo trip? Linked wallet items will be removed, but the trip remains unchanged.';
+  }
+
+  @override
+  String tripDocumentCardSemantic(String title) {
+    return 'Trip document $title';
+  }
+
+  @override
+  String get docTypeFlightTicket => 'Flight ticket';
+
+  @override
+  String get docTypeHotelBooking => 'Hotel booking';
+
+  @override
+  String get docTypeTrainTicket => 'Train ticket';
+
+  @override
+  String get docTypeBusTicket => 'Bus ticket';
+
+  @override
+  String get docTypePassport => 'Passport';
+
+  @override
+  String get docTypeVisa => 'Visa';
+
+  @override
+  String get docTypeInsurance => 'Insurance';
+
+  @override
+  String get docTypeTour => 'Tour';
+
+  @override
+  String get docTypeReceipt => 'Receipt';
+
+  @override
+  String get docTypePdf => 'PDF';
+
+  @override
+  String get docTypeImage => 'Image';
+
+  @override
+  String get docTypeOther => 'Other';
 }

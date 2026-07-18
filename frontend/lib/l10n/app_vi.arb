@@ -1367,5 +1367,237 @@
   "giftCardTxnRefund": "Hoàn lại",
   "giftCardTxnExpiry": "Hết hạn",
   "commonBackSemantic": "Quay lại",
-  "demoModeLabel": "Chế độ demo"
+  "demoModeLabel": "Chế độ demo",
+  "travelWalletTitle": "Ví du lịch",
+  "walletDemoSubtitle": "Trình sắp xếp demo cục bộ cho hộ chiếu, thị thực, vé, voucher, biên lai và xác nhận đặt chỗ.",
+  "walletPrivacyNotice": "Số giấy tờ nhạy cảm được che trước khi lưu. UI-8 không tải tệp lên, quét giấy tờ hoặc đồng bộ dữ liệu ví.",
+  "walletRealEmptyTitle": "Ví du lịch chưa được kết nối",
+  "walletRealEmptyMessage": "Tài khoản thật sẽ hiển thị giấy tờ trong ví sau khi tích hợp backend. Dữ liệu ví demo không hiển thị trong phiên thật.",
+  "walletSummaryTotal": "Tổng",
+  "walletSummaryActive": "Đang hiệu lực",
+  "walletSummaryUpcoming": "Sắp tới",
+  "walletSummaryExpiringSoon": "Sắp hết hạn",
+  "walletSummaryExpired": "Đã hết hạn",
+  "walletSummaryFavorites": "Yêu thích",
+  "walletSummaryArchived": "Lưu trữ",
+  "walletSummaryUnlinked": "Chưa liên kết",
+  "walletSummarySemantic": "{label}: {count}",
+  "@walletSummarySemantic": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "walletSearchHint": "Tìm tiêu đề, đơn vị cấp, mã đã che hoặc chuyến đi",
+  "walletFilterCategory": "Nhóm",
+  "walletFilterType": "Loại mục",
+  "walletFilterStatus": "Trạng thái",
+  "walletFilterLinkedTrip": "Chuyến đi liên kết",
+  "walletFilterAll": "Tất cả",
+  "walletFavoritesOnly": "Chỉ yêu thích",
+  "walletArchivedOnly": "Chỉ lưu trữ",
+  "walletCreateItemAction": "Thêm mục ví",
+  "walletImportBookingAction": "Nhập đặt chỗ",
+  "walletNoBookingsToImport": "Không có đặt chỗ demo cục bộ để nhập.",
+  "walletEmptyTitle": "Không có mục ví phù hợp",
+  "walletEmptyMessage": "Điều chỉnh tìm kiếm hoặc bộ lọc, hoặc thêm metadata demo cục bộ.",
+  "walletSectionFavorites": "Yêu thích",
+  "walletSectionExpiringSoon": "Sắp hết hạn",
+  "walletSectionUpcoming": "Sắp tới",
+  "walletSectionActive": "Đang hiệu lực",
+  "walletSectionExpired": "Đã hết hạn",
+  "walletSectionArchived": "Lưu trữ",
+  "walletSectionByCategory": "Theo nhóm",
+  "walletSectionByTrip": "Theo chuyến đi",
+  "walletItemSemantic": "Mục ví {title}",
+  "@walletItemSemantic": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "walletSourceMetadata": "Chỉ metadata",
+  "walletSourceTripDocument": "Giấy tờ chuyến đi",
+  "walletSourceBooking": "Đặt chỗ",
+  "walletSourceInvoice": "Hóa đơn",
+  "walletReferenceLabel": "Mã tham chiếu đã che",
+  "walletMaskedReference": "Mã tham chiếu đã che {reference}",
+  "@walletMaskedReference": {
+    "placeholders": {
+      "reference": {
+        "type": "String"
+      }
+    }
+  },
+  "walletValidityLabel": "Hiệu lực",
+  "walletNoValidity": "Chưa có ngày hiệu lực",
+  "walletValidUntil": "Hiệu lực đến {date}",
+  "@walletValidUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "walletValidFrom": "Hiệu lực từ {date}",
+  "@walletValidFrom": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "walletValidPeriod": "{from} - {until}",
+  "@walletValidPeriod": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "until": {
+        "type": "String"
+      }
+    }
+  },
+  "walletLinkedTripLabel": "Chuyến đi liên kết",
+  "walletReminderLabel": "Nhắc hết hạn",
+  "walletReminderEnabled": "Đã bật tùy chọn nhắc cục bộ",
+  "walletReminderDisabled": "Đã tắt tùy chọn nhắc cục bộ",
+  "walletReminderEnableAction": "Bật nhắc",
+  "walletReminderDisableAction": "Tắt nhắc",
+  "walletFavoriteAction": "Yêu thích",
+  "walletUnfavoriteAction": "Bỏ yêu thích",
+  "walletArchiveAction": "Lưu trữ",
+  "walletRestoreAction": "Khôi phục",
+  "walletDeleteAction": "Xóa",
+  "walletEditAction": "Sửa",
+  "walletSaveAction": "Lưu",
+  "walletCreateTitle": "Thêm metadata ví",
+  "walletEditTitle": "Sửa metadata ví",
+  "walletTitleLabel": "Tiêu đề",
+  "walletIssuerLabel": "Đơn vị cấp",
+  "walletReferenceInputLabel": "Số tham chiếu",
+  "walletReferencePrivacyHelper": "Mã tham chiếu được che ngay và giá trị gốc không được giữ lại.",
+  "walletTypeLabel": "Loại mục ví",
+  "walletStatusLabel": "Trạng thái đã lưu",
+  "walletNoValue": "Chưa cung cấp",
+  "walletUpdatedLabel": "Cập nhật",
+  "walletDeleteConfirmTitle": "Xóa mục ví?",
+  "walletDeleteConfirmMessage": "Xóa {title} khỏi ví demo cục bộ? Chuyến đi, đặt chỗ hoặc giấy tờ liên kết sẽ không bị xóa.",
+  "@walletDeleteConfirmMessage": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "walletSavedMessage": "Đã lưu mục ví cục bộ.",
+  "walletDeletedMessage": "Đã xóa mục ví cục bộ.",
+  "walletDuplicateMessage": "Mục cục bộ đó đã tồn tại.",
+  "walletActionRejectedMessage": "Không thể hoàn tất thao tác ví với dữ liệu hiện tại.",
+  "walletInvalidDateMessage": "Ngày hết hiệu lực không được trước ngày bắt đầu hiệu lực.",
+  "walletNotFoundMessage": "Mục ví đã chọn không còn tồn tại.",
+  "walletActionUnavailable": "Thao tác Ví du lịch chưa được kết nối cho tài khoản thật trong giai đoạn UI này.",
+  "walletTitleRequiredMessage": "Nhập tiêu đề trước khi lưu.",
+  "walletBookingImportedMessage": "Đã lưu xác nhận đặt chỗ vào ví demo cục bộ.",
+  "walletBookingAlreadyImportedMessage": "Đặt chỗ đó đã có trong ví demo cục bộ.",
+  "walletSaveBookingAction": "Lưu vào Ví du lịch",
+  "walletSaveBookingSemantic": "Lưu đặt chỗ demo cục bộ này vào Ví du lịch",
+  "walletTypePassport": "Hộ chiếu",
+  "walletTypeVisa": "Thị thực",
+  "walletTypeBoardingPass": "Thẻ lên máy bay",
+  "walletTypeFlightTicket": "Vé máy bay",
+  "walletTypeTrainTicket": "Vé tàu",
+  "walletTypeBusTicket": "Vé xe buýt",
+  "walletTypeHotelVoucher": "Voucher khách sạn",
+  "walletTypeTourVoucher": "Voucher tour",
+  "walletTypeInsurance": "Bảo hiểm",
+  "walletTypeBookingConfirmation": "Xác nhận đặt chỗ",
+  "walletTypeInvoice": "Hóa đơn",
+  "walletTypeReceipt": "Biên lai",
+  "walletTypeItinerary": "Lịch trình",
+  "walletTypeOther": "Khác",
+  "walletCategoryIdentity": "Định danh",
+  "walletCategoryTransport": "Di chuyển",
+  "walletCategoryAccommodation": "Lưu trú",
+  "walletCategoryActivity": "Hoạt động",
+  "walletCategoryInsurance": "Bảo hiểm",
+  "walletCategoryFinancial": "Tài chính",
+  "walletCategoryOther": "Khác",
+  "walletStatusActive": "Đang hiệu lực",
+  "walletStatusUpcoming": "Sắp tới",
+  "walletStatusExpired": "Đã hết hạn",
+  "walletStatusCancelled": "Đã hủy",
+  "walletStatusArchived": "Đã lưu trữ",
+  "tripDocumentsAction": "Giấy tờ",
+  "tripDocumentsTitle": "Giấy tờ chuyến đi",
+  "tripDocumentsDemoSubtitle": "Metadata demo cục bộ cho {trip}. Không thực hiện tải tệp lên.",
+  "@tripDocumentsDemoSubtitle": {
+    "placeholders": {
+      "trip": {
+        "type": "String"
+      }
+    }
+  },
+  "tripDocumentsRealEmptyTitle": "Giấy tờ chuyến đi chưa được kết nối",
+  "tripDocumentsRealEmptyMessage": "Giấy tờ chuyến đi thật sẽ xuất hiện sau khi tích hợp backend. Dữ liệu demo không hiển thị trong phiên thật.",
+  "tripDocumentsEmptyTitle": "Chưa có giấy tờ",
+  "tripDocumentsEmptyMessage": "Thêm metadata demo cục bộ cho vé, đặt chỗ, biên lai hoặc giấy tờ.",
+  "tripDocumentsTripDeletedMessage": "Chuyến đi này không còn khả dụng.",
+  "tripDocumentAddAction": "Thêm giấy tờ",
+  "tripDocumentCreateTitle": "Thêm giấy tờ chuyến đi",
+  "tripDocumentEditTitle": "Sửa giấy tờ chuyến đi",
+  "tripDocumentTitleLabel": "Tiêu đề giấy tờ",
+  "tripDocumentNotesLabel": "Ghi chú",
+  "tripDocumentTypeLabel": "Loại giấy tờ",
+  "tripDocumentMediaLabel": "Nhãn media",
+  "tripDocumentMediaUrlLabel": "URL tham chiếu an toàn",
+  "tripDocumentMediaHelper": "Chỉ chấp nhận tham chiếu http hoặc https có host. UI-8 không tải tệp lên.",
+  "tripDocumentUploaderLabel": "Người tải",
+  "tripDocumentNoUploadNotice": "Giai đoạn này chỉ lưu metadata demo cục bộ. Không tải tệp, phân tích PDF, quét ảnh hoặc chia sẻ giấy tờ.",
+  "tripDocumentPinned": "Đã ghim",
+  "tripDocumentUnpinned": "Chưa ghim",
+  "tripDocumentPinAction": "Ghim",
+  "tripDocumentUnpinAction": "Bỏ ghim",
+  "tripDocumentDeleteAction": "Xóa giấy tờ",
+  "tripDocumentSaveToWalletAction": "Lưu vào ví",
+  "tripDocumentUnsafeUrlMessage": "Dùng URL http hoặc https hợp lệ có host.",
+  "tripDocumentSafeLinkLabel": "Liên kết an toàn",
+  "tripDocumentSavedMessage": "Đã lưu giấy tờ chuyến đi cục bộ.",
+  "tripDocumentDeletedMessage": "Đã xóa giấy tờ chuyến đi cục bộ.",
+  "tripDocumentWalletImportedMessage": "Đã lưu giấy tờ chuyến đi vào ví demo cục bộ.",
+  "tripDocumentWalletDuplicateMessage": "Giấy tờ chuyến đi đó đã có trong ví demo cục bộ.",
+  "tripDocumentDeleteConfirmTitle": "Xóa giấy tờ chuyến đi?",
+  "tripDocumentDeleteConfirmMessage": "Xóa {title} khỏi chuyến đi demo cục bộ này? Mục ví liên kết sẽ bị gỡ, nhưng chuyến đi không đổi.",
+  "@tripDocumentDeleteConfirmMessage": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "tripDocumentCardSemantic": "Giấy tờ chuyến đi {title}",
+  "@tripDocumentCardSemantic": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "docTypeFlightTicket": "Vé máy bay",
+  "docTypeHotelBooking": "Đặt phòng khách sạn",
+  "docTypeTrainTicket": "Vé tàu",
+  "docTypeBusTicket": "Vé xe buýt",
+  "docTypePassport": "Hộ chiếu",
+  "docTypeVisa": "Thị thực",
+  "docTypeInsurance": "Bảo hiểm",
+  "docTypeTour": "Tour",
+  "docTypeReceipt": "Biên lai",
+  "docTypePdf": "PDF",
+  "docTypeImage": "Hình ảnh",
+  "docTypeOther": "Khác"
 }

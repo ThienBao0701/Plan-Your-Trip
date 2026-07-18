@@ -131,6 +131,35 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
             ),
           );
         },
+        onSaveWallet: () {
+          Navigator.pop(context);
+          _saveBookingToWallet(booking);
+        },
+      ),
+    );
+  }
+
+  void _saveBookingToWallet(DemoBooking booking) {
+    final app = AppScope.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    if (!app.demoMode) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.walletActionUnavailable)),
+      );
+      return;
+    }
+    final existed = app.travelWalletItems
+        .any((item) => item.linkedBookingId == booking.code);
+    final imported = app.importDemoBookingToWallet(booking.code);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          imported == null
+              ? l10n.walletActionUnavailable
+              : existed
+                  ? l10n.walletBookingAlreadyImportedMessage
+                  : l10n.walletBookingImportedMessage,
+        ),
       ),
     );
   }
@@ -300,11 +329,13 @@ class _BookingDetailSheet extends StatelessWidget {
   final DemoBooking booking;
   final VoidCallback? onCancel;
   final VoidCallback onPayment;
+  final VoidCallback onSaveWallet;
 
   const _BookingDetailSheet({
     required this.booking,
     required this.onCancel,
     required this.onPayment,
+    required this.onSaveWallet,
   });
 
   @override
@@ -367,6 +398,14 @@ class _BookingDetailSheet extends StatelessWidget {
               label: l10n.bookingPaymentUnavailableAction,
               icon: Icons.credit_card_off_rounded,
               onPressed: onPayment,
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            OceanSecondaryButton(
+              key: const Key('booking-detail-save-wallet'),
+              label: l10n.walletSaveBookingAction,
+              icon: Icons.wallet_rounded,
+              semanticLabel: l10n.walletSaveBookingSemantic,
+              onPressed: onSaveWallet,
             ),
             if (onCancel != null) ...[
               const SizedBox(height: AppSpacing.sm),

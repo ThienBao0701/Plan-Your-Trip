@@ -2631,4 +2631,514 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get demoModeLabel => 'Chế độ demo';
+
+  @override
+  String get travelWalletTitle => 'Ví du lịch';
+
+  @override
+  String get walletDemoSubtitle =>
+      'Trình sắp xếp demo cục bộ cho hộ chiếu, thị thực, vé, voucher, biên lai và xác nhận đặt chỗ.';
+
+  @override
+  String get walletPrivacyNotice =>
+      'Số giấy tờ nhạy cảm được che trước khi lưu. UI-8 không tải tệp lên, quét giấy tờ hoặc đồng bộ dữ liệu ví.';
+
+  @override
+  String get walletRealEmptyTitle => 'Ví du lịch chưa được kết nối';
+
+  @override
+  String get walletRealEmptyMessage =>
+      'Tài khoản thật sẽ hiển thị giấy tờ trong ví sau khi tích hợp backend. Dữ liệu ví demo không hiển thị trong phiên thật.';
+
+  @override
+  String get walletSummaryTotal => 'Tổng';
+
+  @override
+  String get walletSummaryActive => 'Đang hiệu lực';
+
+  @override
+  String get walletSummaryUpcoming => 'Sắp tới';
+
+  @override
+  String get walletSummaryExpiringSoon => 'Sắp hết hạn';
+
+  @override
+  String get walletSummaryExpired => 'Đã hết hạn';
+
+  @override
+  String get walletSummaryFavorites => 'Yêu thích';
+
+  @override
+  String get walletSummaryArchived => 'Lưu trữ';
+
+  @override
+  String get walletSummaryUnlinked => 'Chưa liên kết';
+
+  @override
+  String walletSummarySemantic(String label, int count) {
+    return '$label: $count';
+  }
+
+  @override
+  String get walletSearchHint =>
+      'Tìm tiêu đề, đơn vị cấp, mã đã che hoặc chuyến đi';
+
+  @override
+  String get walletFilterCategory => 'Nhóm';
+
+  @override
+  String get walletFilterType => 'Loại mục';
+
+  @override
+  String get walletFilterStatus => 'Trạng thái';
+
+  @override
+  String get walletFilterLinkedTrip => 'Chuyến đi liên kết';
+
+  @override
+  String get walletFilterAll => 'Tất cả';
+
+  @override
+  String get walletFavoritesOnly => 'Chỉ yêu thích';
+
+  @override
+  String get walletArchivedOnly => 'Chỉ lưu trữ';
+
+  @override
+  String get walletCreateItemAction => 'Thêm mục ví';
+
+  @override
+  String get walletImportBookingAction => 'Nhập đặt chỗ';
+
+  @override
+  String get walletNoBookingsToImport =>
+      'Không có đặt chỗ demo cục bộ để nhập.';
+
+  @override
+  String get walletEmptyTitle => 'Không có mục ví phù hợp';
+
+  @override
+  String get walletEmptyMessage =>
+      'Điều chỉnh tìm kiếm hoặc bộ lọc, hoặc thêm metadata demo cục bộ.';
+
+  @override
+  String get walletSectionFavorites => 'Yêu thích';
+
+  @override
+  String get walletSectionExpiringSoon => 'Sắp hết hạn';
+
+  @override
+  String get walletSectionUpcoming => 'Sắp tới';
+
+  @override
+  String get walletSectionActive => 'Đang hiệu lực';
+
+  @override
+  String get walletSectionExpired => 'Đã hết hạn';
+
+  @override
+  String get walletSectionArchived => 'Lưu trữ';
+
+  @override
+  String get walletSectionByCategory => 'Theo nhóm';
+
+  @override
+  String get walletSectionByTrip => 'Theo chuyến đi';
+
+  @override
+  String walletItemSemantic(String title) {
+    return 'Mục ví $title';
+  }
+
+  @override
+  String get walletSourceMetadata => 'Chỉ metadata';
+
+  @override
+  String get walletSourceTripDocument => 'Giấy tờ chuyến đi';
+
+  @override
+  String get walletSourceBooking => 'Đặt chỗ';
+
+  @override
+  String get walletSourceInvoice => 'Hóa đơn';
+
+  @override
+  String get walletReferenceLabel => 'Mã tham chiếu đã che';
+
+  @override
+  String walletMaskedReference(String reference) {
+    return 'Mã tham chiếu đã che $reference';
+  }
+
+  @override
+  String get walletValidityLabel => 'Hiệu lực';
+
+  @override
+  String get walletNoValidity => 'Chưa có ngày hiệu lực';
+
+  @override
+  String walletValidUntil(String date) {
+    return 'Hiệu lực đến $date';
+  }
+
+  @override
+  String walletValidFrom(String date) {
+    return 'Hiệu lực từ $date';
+  }
+
+  @override
+  String walletValidPeriod(String from, String until) {
+    return '$from - $until';
+  }
+
+  @override
+  String get walletLinkedTripLabel => 'Chuyến đi liên kết';
+
+  @override
+  String get walletReminderLabel => 'Nhắc hết hạn';
+
+  @override
+  String get walletReminderEnabled => 'Đã bật tùy chọn nhắc cục bộ';
+
+  @override
+  String get walletReminderDisabled => 'Đã tắt tùy chọn nhắc cục bộ';
+
+  @override
+  String get walletReminderEnableAction => 'Bật nhắc';
+
+  @override
+  String get walletReminderDisableAction => 'Tắt nhắc';
+
+  @override
+  String get walletFavoriteAction => 'Yêu thích';
+
+  @override
+  String get walletUnfavoriteAction => 'Bỏ yêu thích';
+
+  @override
+  String get walletArchiveAction => 'Lưu trữ';
+
+  @override
+  String get walletRestoreAction => 'Khôi phục';
+
+  @override
+  String get walletDeleteAction => 'Xóa';
+
+  @override
+  String get walletEditAction => 'Sửa';
+
+  @override
+  String get walletSaveAction => 'Lưu';
+
+  @override
+  String get walletCreateTitle => 'Thêm metadata ví';
+
+  @override
+  String get walletEditTitle => 'Sửa metadata ví';
+
+  @override
+  String get walletTitleLabel => 'Tiêu đề';
+
+  @override
+  String get walletIssuerLabel => 'Đơn vị cấp';
+
+  @override
+  String get walletReferenceInputLabel => 'Số tham chiếu';
+
+  @override
+  String get walletReferencePrivacyHelper =>
+      'Mã tham chiếu được che ngay và giá trị gốc không được giữ lại.';
+
+  @override
+  String get walletTypeLabel => 'Loại mục ví';
+
+  @override
+  String get walletStatusLabel => 'Trạng thái đã lưu';
+
+  @override
+  String get walletNoValue => 'Chưa cung cấp';
+
+  @override
+  String get walletUpdatedLabel => 'Cập nhật';
+
+  @override
+  String get walletDeleteConfirmTitle => 'Xóa mục ví?';
+
+  @override
+  String walletDeleteConfirmMessage(String title) {
+    return 'Xóa $title khỏi ví demo cục bộ? Chuyến đi, đặt chỗ hoặc giấy tờ liên kết sẽ không bị xóa.';
+  }
+
+  @override
+  String get walletSavedMessage => 'Đã lưu mục ví cục bộ.';
+
+  @override
+  String get walletDeletedMessage => 'Đã xóa mục ví cục bộ.';
+
+  @override
+  String get walletDuplicateMessage => 'Mục cục bộ đó đã tồn tại.';
+
+  @override
+  String get walletActionRejectedMessage =>
+      'Không thể hoàn tất thao tác ví với dữ liệu hiện tại.';
+
+  @override
+  String get walletInvalidDateMessage =>
+      'Ngày hết hiệu lực không được trước ngày bắt đầu hiệu lực.';
+
+  @override
+  String get walletNotFoundMessage => 'Mục ví đã chọn không còn tồn tại.';
+
+  @override
+  String get walletActionUnavailable =>
+      'Thao tác Ví du lịch chưa được kết nối cho tài khoản thật trong giai đoạn UI này.';
+
+  @override
+  String get walletTitleRequiredMessage => 'Nhập tiêu đề trước khi lưu.';
+
+  @override
+  String get walletBookingImportedMessage =>
+      'Đã lưu xác nhận đặt chỗ vào ví demo cục bộ.';
+
+  @override
+  String get walletBookingAlreadyImportedMessage =>
+      'Đặt chỗ đó đã có trong ví demo cục bộ.';
+
+  @override
+  String get walletSaveBookingAction => 'Lưu vào Ví du lịch';
+
+  @override
+  String get walletSaveBookingSemantic =>
+      'Lưu đặt chỗ demo cục bộ này vào Ví du lịch';
+
+  @override
+  String get walletTypePassport => 'Hộ chiếu';
+
+  @override
+  String get walletTypeVisa => 'Thị thực';
+
+  @override
+  String get walletTypeBoardingPass => 'Thẻ lên máy bay';
+
+  @override
+  String get walletTypeFlightTicket => 'Vé máy bay';
+
+  @override
+  String get walletTypeTrainTicket => 'Vé tàu';
+
+  @override
+  String get walletTypeBusTicket => 'Vé xe buýt';
+
+  @override
+  String get walletTypeHotelVoucher => 'Voucher khách sạn';
+
+  @override
+  String get walletTypeTourVoucher => 'Voucher tour';
+
+  @override
+  String get walletTypeInsurance => 'Bảo hiểm';
+
+  @override
+  String get walletTypeBookingConfirmation => 'Xác nhận đặt chỗ';
+
+  @override
+  String get walletTypeInvoice => 'Hóa đơn';
+
+  @override
+  String get walletTypeReceipt => 'Biên lai';
+
+  @override
+  String get walletTypeItinerary => 'Lịch trình';
+
+  @override
+  String get walletTypeOther => 'Khác';
+
+  @override
+  String get walletCategoryIdentity => 'Định danh';
+
+  @override
+  String get walletCategoryTransport => 'Di chuyển';
+
+  @override
+  String get walletCategoryAccommodation => 'Lưu trú';
+
+  @override
+  String get walletCategoryActivity => 'Hoạt động';
+
+  @override
+  String get walletCategoryInsurance => 'Bảo hiểm';
+
+  @override
+  String get walletCategoryFinancial => 'Tài chính';
+
+  @override
+  String get walletCategoryOther => 'Khác';
+
+  @override
+  String get walletStatusActive => 'Đang hiệu lực';
+
+  @override
+  String get walletStatusUpcoming => 'Sắp tới';
+
+  @override
+  String get walletStatusExpired => 'Đã hết hạn';
+
+  @override
+  String get walletStatusCancelled => 'Đã hủy';
+
+  @override
+  String get walletStatusArchived => 'Đã lưu trữ';
+
+  @override
+  String get tripDocumentsAction => 'Giấy tờ';
+
+  @override
+  String get tripDocumentsTitle => 'Giấy tờ chuyến đi';
+
+  @override
+  String tripDocumentsDemoSubtitle(String trip) {
+    return 'Metadata demo cục bộ cho $trip. Không thực hiện tải tệp lên.';
+  }
+
+  @override
+  String get tripDocumentsRealEmptyTitle =>
+      'Giấy tờ chuyến đi chưa được kết nối';
+
+  @override
+  String get tripDocumentsRealEmptyMessage =>
+      'Giấy tờ chuyến đi thật sẽ xuất hiện sau khi tích hợp backend. Dữ liệu demo không hiển thị trong phiên thật.';
+
+  @override
+  String get tripDocumentsEmptyTitle => 'Chưa có giấy tờ';
+
+  @override
+  String get tripDocumentsEmptyMessage =>
+      'Thêm metadata demo cục bộ cho vé, đặt chỗ, biên lai hoặc giấy tờ.';
+
+  @override
+  String get tripDocumentsTripDeletedMessage =>
+      'Chuyến đi này không còn khả dụng.';
+
+  @override
+  String get tripDocumentAddAction => 'Thêm giấy tờ';
+
+  @override
+  String get tripDocumentCreateTitle => 'Thêm giấy tờ chuyến đi';
+
+  @override
+  String get tripDocumentEditTitle => 'Sửa giấy tờ chuyến đi';
+
+  @override
+  String get tripDocumentTitleLabel => 'Tiêu đề giấy tờ';
+
+  @override
+  String get tripDocumentNotesLabel => 'Ghi chú';
+
+  @override
+  String get tripDocumentTypeLabel => 'Loại giấy tờ';
+
+  @override
+  String get tripDocumentMediaLabel => 'Nhãn media';
+
+  @override
+  String get tripDocumentMediaUrlLabel => 'URL tham chiếu an toàn';
+
+  @override
+  String get tripDocumentMediaHelper =>
+      'Chỉ chấp nhận tham chiếu http hoặc https có host. UI-8 không tải tệp lên.';
+
+  @override
+  String get tripDocumentUploaderLabel => 'Người tải';
+
+  @override
+  String get tripDocumentNoUploadNotice =>
+      'Giai đoạn này chỉ lưu metadata demo cục bộ. Không tải tệp, phân tích PDF, quét ảnh hoặc chia sẻ giấy tờ.';
+
+  @override
+  String get tripDocumentPinned => 'Đã ghim';
+
+  @override
+  String get tripDocumentUnpinned => 'Chưa ghim';
+
+  @override
+  String get tripDocumentPinAction => 'Ghim';
+
+  @override
+  String get tripDocumentUnpinAction => 'Bỏ ghim';
+
+  @override
+  String get tripDocumentDeleteAction => 'Xóa giấy tờ';
+
+  @override
+  String get tripDocumentSaveToWalletAction => 'Lưu vào ví';
+
+  @override
+  String get tripDocumentUnsafeUrlMessage =>
+      'Dùng URL http hoặc https hợp lệ có host.';
+
+  @override
+  String get tripDocumentSafeLinkLabel => 'Liên kết an toàn';
+
+  @override
+  String get tripDocumentSavedMessage => 'Đã lưu giấy tờ chuyến đi cục bộ.';
+
+  @override
+  String get tripDocumentDeletedMessage => 'Đã xóa giấy tờ chuyến đi cục bộ.';
+
+  @override
+  String get tripDocumentWalletImportedMessage =>
+      'Đã lưu giấy tờ chuyến đi vào ví demo cục bộ.';
+
+  @override
+  String get tripDocumentWalletDuplicateMessage =>
+      'Giấy tờ chuyến đi đó đã có trong ví demo cục bộ.';
+
+  @override
+  String get tripDocumentDeleteConfirmTitle => 'Xóa giấy tờ chuyến đi?';
+
+  @override
+  String tripDocumentDeleteConfirmMessage(String title) {
+    return 'Xóa $title khỏi chuyến đi demo cục bộ này? Mục ví liên kết sẽ bị gỡ, nhưng chuyến đi không đổi.';
+  }
+
+  @override
+  String tripDocumentCardSemantic(String title) {
+    return 'Giấy tờ chuyến đi $title';
+  }
+
+  @override
+  String get docTypeFlightTicket => 'Vé máy bay';
+
+  @override
+  String get docTypeHotelBooking => 'Đặt phòng khách sạn';
+
+  @override
+  String get docTypeTrainTicket => 'Vé tàu';
+
+  @override
+  String get docTypeBusTicket => 'Vé xe buýt';
+
+  @override
+  String get docTypePassport => 'Hộ chiếu';
+
+  @override
+  String get docTypeVisa => 'Thị thực';
+
+  @override
+  String get docTypeInsurance => 'Bảo hiểm';
+
+  @override
+  String get docTypeTour => 'Tour';
+
+  @override
+  String get docTypeReceipt => 'Biên lai';
+
+  @override
+  String get docTypePdf => 'PDF';
+
+  @override
+  String get docTypeImage => 'Hình ảnh';
+
+  @override
+  String get docTypeOther => 'Khác';
 }

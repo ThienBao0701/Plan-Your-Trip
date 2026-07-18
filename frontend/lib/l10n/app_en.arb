@@ -1367,5 +1367,237 @@
   "giftCardTxnRefund": "Refund",
   "giftCardTxnExpiry": "Expiry",
   "commonBackSemantic": "Go back",
-  "demoModeLabel": "Demo Mode"
+  "demoModeLabel": "Demo Mode",
+  "travelWalletTitle": "Travel Wallet",
+  "walletDemoSubtitle": "Local demo organizer for passports, visas, tickets, vouchers, receipts, and booking confirmations.",
+  "walletPrivacyNotice": "Sensitive document numbers are masked before storage. UI-8 does not upload files, scan documents, or synchronize wallet data.",
+  "walletRealEmptyTitle": "Travel Wallet is not connected yet",
+  "walletRealEmptyMessage": "Real accounts will show wallet documents after backend integration. No demo wallet data is shown for real sessions.",
+  "walletSummaryTotal": "Total",
+  "walletSummaryActive": "Active",
+  "walletSummaryUpcoming": "Upcoming",
+  "walletSummaryExpiringSoon": "Expiring soon",
+  "walletSummaryExpired": "Expired",
+  "walletSummaryFavorites": "Favorites",
+  "walletSummaryArchived": "Archived",
+  "walletSummaryUnlinked": "Unlinked",
+  "walletSummarySemantic": "{label}: {count}",
+  "@walletSummarySemantic": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "walletSearchHint": "Search title, issuer, masked reference, or trip",
+  "walletFilterCategory": "Category",
+  "walletFilterType": "Item type",
+  "walletFilterStatus": "Status",
+  "walletFilterLinkedTrip": "Linked trip",
+  "walletFilterAll": "All",
+  "walletFavoritesOnly": "Favorites only",
+  "walletArchivedOnly": "Archived only",
+  "walletCreateItemAction": "Add wallet item",
+  "walletImportBookingAction": "Import booking",
+  "walletNoBookingsToImport": "No local demo bookings are available to import.",
+  "walletEmptyTitle": "No wallet items match",
+  "walletEmptyMessage": "Adjust search or filters, or add local demo metadata.",
+  "walletSectionFavorites": "Favorites",
+  "walletSectionExpiringSoon": "Expiring soon",
+  "walletSectionUpcoming": "Upcoming",
+  "walletSectionActive": "Active",
+  "walletSectionExpired": "Expired",
+  "walletSectionArchived": "Archived",
+  "walletSectionByCategory": "By category",
+  "walletSectionByTrip": "By trip",
+  "walletItemSemantic": "Wallet item {title}",
+  "@walletItemSemantic": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "walletSourceMetadata": "Metadata only",
+  "walletSourceTripDocument": "Trip document",
+  "walletSourceBooking": "Booking",
+  "walletSourceInvoice": "Invoice",
+  "walletReferenceLabel": "Masked reference",
+  "walletMaskedReference": "Masked reference {reference}",
+  "@walletMaskedReference": {
+    "placeholders": {
+      "reference": {
+        "type": "String"
+      }
+    }
+  },
+  "walletValidityLabel": "Validity",
+  "walletNoValidity": "No validity dates supplied",
+  "walletValidUntil": "Valid until {date}",
+  "@walletValidUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "walletValidFrom": "Valid from {date}",
+  "@walletValidFrom": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "walletValidPeriod": "{from} - {until}",
+  "@walletValidPeriod": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "until": {
+        "type": "String"
+      }
+    }
+  },
+  "walletLinkedTripLabel": "Linked trip",
+  "walletReminderLabel": "Expiry reminder",
+  "walletReminderEnabled": "Local reminder preference enabled",
+  "walletReminderDisabled": "Local reminder preference disabled",
+  "walletReminderEnableAction": "Enable reminder",
+  "walletReminderDisableAction": "Disable reminder",
+  "walletFavoriteAction": "Favorite",
+  "walletUnfavoriteAction": "Unfavorite",
+  "walletArchiveAction": "Archive",
+  "walletRestoreAction": "Restore",
+  "walletDeleteAction": "Delete",
+  "walletEditAction": "Edit",
+  "walletSaveAction": "Save",
+  "walletCreateTitle": "Add wallet metadata",
+  "walletEditTitle": "Edit wallet metadata",
+  "walletTitleLabel": "Title",
+  "walletIssuerLabel": "Issuer",
+  "walletReferenceInputLabel": "Reference number",
+  "walletReferencePrivacyHelper": "Reference input is masked immediately and the raw value is not retained.",
+  "walletTypeLabel": "Wallet item type",
+  "walletStatusLabel": "Stored status",
+  "walletNoValue": "Not supplied",
+  "walletUpdatedLabel": "Updated",
+  "walletDeleteConfirmTitle": "Delete wallet item?",
+  "walletDeleteConfirmMessage": "Delete {title} from the local demo wallet? The linked trip, booking, or document will not be deleted.",
+  "@walletDeleteConfirmMessage": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "walletSavedMessage": "Wallet item saved locally.",
+  "walletDeletedMessage": "Wallet item deleted locally.",
+  "walletDuplicateMessage": "That local item already exists.",
+  "walletActionRejectedMessage": "That wallet action cannot be completed with the current data.",
+  "walletInvalidDateMessage": "Valid-until date cannot be before valid-from date.",
+  "walletNotFoundMessage": "The selected wallet item no longer exists.",
+  "walletActionUnavailable": "Travel Wallet actions are not connected for real accounts in this UI phase.",
+  "walletTitleRequiredMessage": "Enter a title before saving.",
+  "walletBookingImportedMessage": "Booking confirmation saved to the local demo wallet.",
+  "walletBookingAlreadyImportedMessage": "That booking is already in the local demo wallet.",
+  "walletSaveBookingAction": "Save to Travel Wallet",
+  "walletSaveBookingSemantic": "Save this local demo booking to Travel Wallet",
+  "walletTypePassport": "Passport",
+  "walletTypeVisa": "Visa",
+  "walletTypeBoardingPass": "Boarding pass",
+  "walletTypeFlightTicket": "Flight ticket",
+  "walletTypeTrainTicket": "Train ticket",
+  "walletTypeBusTicket": "Bus ticket",
+  "walletTypeHotelVoucher": "Hotel voucher",
+  "walletTypeTourVoucher": "Tour voucher",
+  "walletTypeInsurance": "Insurance",
+  "walletTypeBookingConfirmation": "Booking confirmation",
+  "walletTypeInvoice": "Invoice",
+  "walletTypeReceipt": "Receipt",
+  "walletTypeItinerary": "Itinerary",
+  "walletTypeOther": "Other",
+  "walletCategoryIdentity": "Identity",
+  "walletCategoryTransport": "Transport",
+  "walletCategoryAccommodation": "Accommodation",
+  "walletCategoryActivity": "Activity",
+  "walletCategoryInsurance": "Insurance",
+  "walletCategoryFinancial": "Financial",
+  "walletCategoryOther": "Other",
+  "walletStatusActive": "Active",
+  "walletStatusUpcoming": "Upcoming",
+  "walletStatusExpired": "Expired",
+  "walletStatusCancelled": "Cancelled",
+  "walletStatusArchived": "Archived",
+  "tripDocumentsAction": "Documents",
+  "tripDocumentsTitle": "Trip Documents",
+  "tripDocumentsDemoSubtitle": "Local demo metadata for {trip}. No file upload is performed.",
+  "@tripDocumentsDemoSubtitle": {
+    "placeholders": {
+      "trip": {
+        "type": "String"
+      }
+    }
+  },
+  "tripDocumentsRealEmptyTitle": "Trip documents are not connected yet",
+  "tripDocumentsRealEmptyMessage": "Real trip documents will appear after backend integration. No seeded demo documents are shown for real sessions.",
+  "tripDocumentsEmptyTitle": "No documents",
+  "tripDocumentsEmptyMessage": "Add local demo metadata for tickets, bookings, receipts, or documents.",
+  "tripDocumentsTripDeletedMessage": "This trip is no longer available.",
+  "tripDocumentAddAction": "Add document",
+  "tripDocumentCreateTitle": "Add trip document",
+  "tripDocumentEditTitle": "Edit trip document",
+  "tripDocumentTitleLabel": "Document title",
+  "tripDocumentNotesLabel": "Notes",
+  "tripDocumentTypeLabel": "Document type",
+  "tripDocumentMediaLabel": "Media label",
+  "tripDocumentMediaUrlLabel": "Safe URL reference",
+  "tripDocumentMediaHelper": "Only http or https references with a host are accepted. UI-8 does not upload files.",
+  "tripDocumentUploaderLabel": "Uploader",
+  "tripDocumentNoUploadNotice": "This phase stores local demo metadata only. It does not upload files, parse PDFs, scan images, or share documents.",
+  "tripDocumentPinned": "Pinned",
+  "tripDocumentUnpinned": "Not pinned",
+  "tripDocumentPinAction": "Pin",
+  "tripDocumentUnpinAction": "Unpin",
+  "tripDocumentDeleteAction": "Delete document",
+  "tripDocumentSaveToWalletAction": "Save to wallet",
+  "tripDocumentUnsafeUrlMessage": "Use a valid http or https URL with a host.",
+  "tripDocumentSafeLinkLabel": "Safe link",
+  "tripDocumentSavedMessage": "Trip document saved locally.",
+  "tripDocumentDeletedMessage": "Trip document deleted locally.",
+  "tripDocumentWalletImportedMessage": "Trip document saved to the local demo wallet.",
+  "tripDocumentWalletDuplicateMessage": "That trip document is already in the local demo wallet.",
+  "tripDocumentDeleteConfirmTitle": "Delete trip document?",
+  "tripDocumentDeleteConfirmMessage": "Delete {title} from this local demo trip? Linked wallet items will be removed, but the trip remains unchanged.",
+  "@tripDocumentDeleteConfirmMessage": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "tripDocumentCardSemantic": "Trip document {title}",
+  "@tripDocumentCardSemantic": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "docTypeFlightTicket": "Flight ticket",
+  "docTypeHotelBooking": "Hotel booking",
+  "docTypeTrainTicket": "Train ticket",
+  "docTypeBusTicket": "Bus ticket",
+  "docTypePassport": "Passport",
+  "docTypeVisa": "Visa",
+  "docTypeInsurance": "Insurance",
+  "docTypeTour": "Tour",
+  "docTypeReceipt": "Receipt",
+  "docTypePdf": "PDF",
+  "docTypeImage": "Image",
+  "docTypeOther": "Other"
 }

@@ -11,6 +11,7 @@ import '../../shared/widgets/glass_widgets.dart';
 import '../auth/login_screen.dart';
 import '../bookings/my_bookings_screen.dart';
 import '../rewards/rewards_screen.dart';
+import '../wallet/travel_wallet_screen.dart';
 import 'notifications_screen.dart';
 import 'saved_places_screen.dart';
 import 'settings_screen.dart';
@@ -193,6 +194,15 @@ class ProfileScreen extends StatelessWidget {
           onTap: () => Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const RewardsHubScreen()),
+          ),
+        ),
+        _ProfileNavCard(
+          key: const Key('profile-wallet'),
+          icon: Icons.wallet_rounded,
+          title: l10n.travelWalletTitle,
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const TravelWalletScreen()),
           ),
         ),
         const SizedBox(height: AppSpacing.sm),

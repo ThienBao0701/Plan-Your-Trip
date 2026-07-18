@@ -1311,6 +1311,466 @@ class GiftCard {
   static const Object _unset = Object();
 }
 
+enum WalletItemType {
+  passport,
+  visa,
+  boardingPass,
+  flightTicket,
+  trainTicket,
+  busTicket,
+  hotelVoucher,
+  tourVoucher,
+  insurance,
+  bookingConfirmation,
+  invoice,
+  receipt,
+  itinerary,
+  other,
+}
+
+extension WalletItemTypeData on WalletItemType {
+  String get code {
+    switch (this) {
+      case WalletItemType.passport:
+        return 'PASSPORT';
+      case WalletItemType.visa:
+        return 'VISA';
+      case WalletItemType.boardingPass:
+        return 'BOARDING_PASS';
+      case WalletItemType.flightTicket:
+        return 'FLIGHT_TICKET';
+      case WalletItemType.trainTicket:
+        return 'TRAIN_TICKET';
+      case WalletItemType.busTicket:
+        return 'BUS_TICKET';
+      case WalletItemType.hotelVoucher:
+        return 'HOTEL_VOUCHER';
+      case WalletItemType.tourVoucher:
+        return 'TOUR_VOUCHER';
+      case WalletItemType.insurance:
+        return 'INSURANCE';
+      case WalletItemType.bookingConfirmation:
+        return 'BOOKING_CONFIRMATION';
+      case WalletItemType.invoice:
+        return 'INVOICE';
+      case WalletItemType.receipt:
+        return 'RECEIPT';
+      case WalletItemType.itinerary:
+        return 'ITINERARY';
+      case WalletItemType.other:
+        return 'OTHER';
+    }
+  }
+
+  OrganizerCategory get organizerCategory {
+    switch (this) {
+      case WalletItemType.passport:
+      case WalletItemType.visa:
+        return OrganizerCategory.identity;
+      case WalletItemType.boardingPass:
+      case WalletItemType.flightTicket:
+      case WalletItemType.trainTicket:
+      case WalletItemType.busTicket:
+        return OrganizerCategory.transport;
+      case WalletItemType.hotelVoucher:
+        return OrganizerCategory.accommodation;
+      case WalletItemType.tourVoucher:
+      case WalletItemType.itinerary:
+        return OrganizerCategory.activity;
+      case WalletItemType.insurance:
+        return OrganizerCategory.insurance;
+      case WalletItemType.bookingConfirmation:
+      case WalletItemType.invoice:
+      case WalletItemType.receipt:
+        return OrganizerCategory.financial;
+      case WalletItemType.other:
+        return OrganizerCategory.other;
+    }
+  }
+}
+
+enum WalletItemStatus { active, upcoming, expired, cancelled, archived }
+
+extension WalletItemStatusData on WalletItemStatus {
+  String get code {
+    switch (this) {
+      case WalletItemStatus.active:
+        return 'ACTIVE';
+      case WalletItemStatus.upcoming:
+        return 'UPCOMING';
+      case WalletItemStatus.expired:
+        return 'EXPIRED';
+      case WalletItemStatus.cancelled:
+        return 'CANCELLED';
+      case WalletItemStatus.archived:
+        return 'ARCHIVED';
+    }
+  }
+}
+
+enum OrganizerCategory {
+  identity,
+  transport,
+  accommodation,
+  activity,
+  insurance,
+  financial,
+  other,
+}
+
+extension OrganizerCategoryData on OrganizerCategory {
+  String get code {
+    switch (this) {
+      case OrganizerCategory.identity:
+        return 'IDENTITY';
+      case OrganizerCategory.transport:
+        return 'TRANSPORT';
+      case OrganizerCategory.accommodation:
+        return 'ACCOMMODATION';
+      case OrganizerCategory.activity:
+        return 'ACTIVITY';
+      case OrganizerCategory.insurance:
+        return 'INSURANCE';
+      case OrganizerCategory.financial:
+        return 'FINANCIAL';
+      case OrganizerCategory.other:
+        return 'OTHER';
+    }
+  }
+}
+
+enum WalletSourceType { metadata, tripDocument, booking, invoice }
+
+extension WalletSourceTypeData on WalletSourceType {
+  String get code {
+    switch (this) {
+      case WalletSourceType.metadata:
+        return 'METADATA';
+      case WalletSourceType.tripDocument:
+        return 'TRIP_DOCUMENT';
+      case WalletSourceType.booking:
+        return 'BOOKING';
+      case WalletSourceType.invoice:
+        return 'INVOICE';
+    }
+  }
+}
+
+enum TripDocumentType {
+  flightTicket,
+  hotelBooking,
+  trainTicket,
+  busTicket,
+  passport,
+  visa,
+  insurance,
+  tour,
+  receipt,
+  pdf,
+  image,
+  other,
+}
+
+extension TripDocumentTypeData on TripDocumentType {
+  String get code {
+    switch (this) {
+      case TripDocumentType.flightTicket:
+        return 'FLIGHT_TICKET';
+      case TripDocumentType.hotelBooking:
+        return 'HOTEL_BOOKING';
+      case TripDocumentType.trainTicket:
+        return 'TRAIN_TICKET';
+      case TripDocumentType.busTicket:
+        return 'BUS_TICKET';
+      case TripDocumentType.passport:
+        return 'PASSPORT';
+      case TripDocumentType.visa:
+        return 'VISA';
+      case TripDocumentType.insurance:
+        return 'INSURANCE';
+      case TripDocumentType.tour:
+        return 'TOUR';
+      case TripDocumentType.receipt:
+        return 'RECEIPT';
+      case TripDocumentType.pdf:
+        return 'PDF';
+      case TripDocumentType.image:
+        return 'IMAGE';
+      case TripDocumentType.other:
+        return 'OTHER';
+    }
+  }
+
+  WalletItemType get walletItemType {
+    switch (this) {
+      case TripDocumentType.flightTicket:
+        return WalletItemType.flightTicket;
+      case TripDocumentType.hotelBooking:
+        return WalletItemType.hotelVoucher;
+      case TripDocumentType.trainTicket:
+        return WalletItemType.trainTicket;
+      case TripDocumentType.busTicket:
+        return WalletItemType.busTicket;
+      case TripDocumentType.passport:
+        return WalletItemType.passport;
+      case TripDocumentType.visa:
+        return WalletItemType.visa;
+      case TripDocumentType.insurance:
+        return WalletItemType.insurance;
+      case TripDocumentType.tour:
+        return WalletItemType.tourVoucher;
+      case TripDocumentType.receipt:
+        return WalletItemType.receipt;
+      case TripDocumentType.pdf:
+      case TripDocumentType.image:
+      case TripDocumentType.other:
+        return WalletItemType.other;
+    }
+  }
+}
+
+enum WalletActionResult {
+  success,
+  unavailable,
+  blank,
+  duplicate,
+  rejected,
+  invalidDateRange,
+  unsafeUrl,
+  notFound,
+}
+
+class TravelWalletItem {
+  static const Object _unset = Object();
+
+  final String id;
+  final int? linkedTripId;
+  final String? linkedTripTitle;
+  final String? linkedDocumentId;
+  final String? linkedBookingId;
+  final String? linkedInvoiceId;
+  final WalletItemType type;
+  final String title;
+  final String issuer;
+  final String maskedReference;
+  final DateTime? validFrom;
+  final DateTime? validUntil;
+  final WalletItemStatus status;
+  final bool favorite;
+  final bool archived;
+  final bool expiryReminderEnabled;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  const TravelWalletItem({
+    required this.id,
+    this.linkedTripId,
+    this.linkedTripTitle,
+    this.linkedDocumentId,
+    this.linkedBookingId,
+    this.linkedInvoiceId,
+    required this.type,
+    required this.title,
+    this.issuer = '',
+    this.maskedReference = '',
+    this.validFrom,
+    this.validUntil,
+    this.status = WalletItemStatus.active,
+    this.favorite = false,
+    this.archived = false,
+    this.expiryReminderEnabled = false,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  OrganizerCategory get organizerCategory => type.organizerCategory;
+
+  WalletSourceType get sourceType {
+    if (linkedDocumentId != null) return WalletSourceType.tripDocument;
+    if (linkedBookingId != null) return WalletSourceType.booking;
+    if (linkedInvoiceId != null) return WalletSourceType.invoice;
+    return WalletSourceType.metadata;
+  }
+
+  WalletItemStatus effectiveStatus(DateTime today) =>
+      computeWalletEffectiveStatus(
+        archived: archived,
+        storedStatus: status,
+        validFrom: validFrom,
+        validUntil: validUntil,
+        today: today,
+      );
+
+  TravelWalletItem copyWith({
+    String? id,
+    Object? linkedTripId = _unset,
+    Object? linkedTripTitle = _unset,
+    Object? linkedDocumentId = _unset,
+    Object? linkedBookingId = _unset,
+    Object? linkedInvoiceId = _unset,
+    WalletItemType? type,
+    String? title,
+    String? issuer,
+    String? maskedReference,
+    Object? validFrom = _unset,
+    Object? validUntil = _unset,
+    WalletItemStatus? status,
+    bool? favorite,
+    bool? archived,
+    bool? expiryReminderEnabled,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) =>
+      TravelWalletItem(
+        id: id ?? this.id,
+        linkedTripId: identical(linkedTripId, _unset)
+            ? this.linkedTripId
+            : linkedTripId as int?,
+        linkedTripTitle: identical(linkedTripTitle, _unset)
+            ? this.linkedTripTitle
+            : linkedTripTitle as String?,
+        linkedDocumentId: identical(linkedDocumentId, _unset)
+            ? this.linkedDocumentId
+            : linkedDocumentId as String?,
+        linkedBookingId: identical(linkedBookingId, _unset)
+            ? this.linkedBookingId
+            : linkedBookingId as String?,
+        linkedInvoiceId: identical(linkedInvoiceId, _unset)
+            ? this.linkedInvoiceId
+            : linkedInvoiceId as String?,
+        type: type ?? this.type,
+        title: title ?? this.title,
+        issuer: issuer ?? this.issuer,
+        maskedReference: maskedReference ?? this.maskedReference,
+        validFrom: identical(validFrom, _unset)
+            ? this.validFrom
+            : validFrom as DateTime?,
+        validUntil: identical(validUntil, _unset)
+            ? this.validUntil
+            : validUntil as DateTime?,
+        status: status ?? this.status,
+        favorite: favorite ?? this.favorite,
+        archived: archived ?? this.archived,
+        expiryReminderEnabled:
+            expiryReminderEnabled ?? this.expiryReminderEnabled,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
+}
+
+class TripDocument {
+  static const Object _unset = Object();
+
+  final String id;
+  final int tripId;
+  final int? tripDayId;
+  final int? tripActivityId;
+  final TripDocumentType type;
+  final String title;
+  final String notes;
+  final String mediaLabel;
+  final String mediaUrl;
+  final String uploaderName;
+  final bool pinned;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  const TripDocument({
+    required this.id,
+    required this.tripId,
+    this.tripDayId,
+    this.tripActivityId,
+    required this.type,
+    required this.title,
+    this.notes = '',
+    this.mediaLabel = '',
+    this.mediaUrl = '',
+    this.uploaderName = '',
+    this.pinned = false,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  bool get hasSafeMedia =>
+      mediaLabel.isNotEmpty || isSafeDocumentMediaUrl(mediaUrl);
+
+  TripDocument copyWith({
+    String? id,
+    int? tripId,
+    Object? tripDayId = _unset,
+    Object? tripActivityId = _unset,
+    TripDocumentType? type,
+    String? title,
+    String? notes,
+    String? mediaLabel,
+    String? mediaUrl,
+    String? uploaderName,
+    bool? pinned,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) =>
+      TripDocument(
+        id: id ?? this.id,
+        tripId: tripId ?? this.tripId,
+        tripDayId:
+            identical(tripDayId, _unset) ? this.tripDayId : tripDayId as int?,
+        tripActivityId: identical(tripActivityId, _unset)
+            ? this.tripActivityId
+            : tripActivityId as int?,
+        type: type ?? this.type,
+        title: title ?? this.title,
+        notes: notes ?? this.notes,
+        mediaLabel: mediaLabel ?? this.mediaLabel,
+        mediaUrl: mediaUrl ?? this.mediaUrl,
+        uploaderName: uploaderName ?? this.uploaderName,
+        pinned: pinned ?? this.pinned,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
+}
+
+WalletItemStatus computeWalletEffectiveStatus({
+  required bool archived,
+  required WalletItemStatus storedStatus,
+  DateTime? validFrom,
+  DateTime? validUntil,
+  required DateTime today,
+}) {
+  if (archived) return WalletItemStatus.archived;
+  if (storedStatus == WalletItemStatus.cancelled) {
+    return WalletItemStatus.cancelled;
+  }
+  final current = dateOnly(today);
+  if (validUntil != null && dateOnly(validUntil).isBefore(current)) {
+    return WalletItemStatus.expired;
+  }
+  if (validFrom != null && dateOnly(validFrom).isAfter(current)) {
+    return WalletItemStatus.upcoming;
+  }
+  return storedStatus;
+}
+
+DateTime dateOnly(DateTime value) =>
+    DateTime(value.year, value.month, value.day);
+
+String maskSensitiveReference(String raw) {
+  final safe = raw.trim().replaceAll(RegExp('[^A-Za-z0-9]'), '').toUpperCase();
+  if (safe.isEmpty) return '';
+  final tail = safe.length <= 4 ? safe : safe.substring(safe.length - 4);
+  return '****-$tail';
+}
+
+bool isSafeDocumentMediaUrl(String value) {
+  final trimmed = value.trim();
+  if (trimmed.isEmpty) return false;
+  final uri = Uri.tryParse(trimmed);
+  return uri != null &&
+      (uri.scheme == 'http' || uri.scheme == 'https') &&
+      uri.hasAuthority &&
+      uri.host.trim().isNotEmpty &&
+      uri.userInfo.isEmpty;
+}
+
 class Trip {
   final int id;
   final String title;

@@ -15,6 +15,7 @@ import '../expenses/expenses_screen.dart';
 import '../places/places_screen.dart';
 import '../timeline/timeline_screen.dart';
 import 'edit_trip_screen.dart';
+import 'trip_documents_screen.dart';
 
 class TripDetailScreen extends StatefulWidget {
   final Trip trip;
@@ -154,6 +155,12 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (_) => ExpensesScreen(filterTripId: trip.id),
+                        ),
+                      ),
+                      onDocuments: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => TripDocumentsScreen(trip: trip),
                         ),
                       ),
                     ),
@@ -299,44 +306,78 @@ class _QuickActions extends StatelessWidget {
   final VoidCallback onTimeline;
   final VoidCallback onExplore;
   final VoidCallback onExpenses;
+  final VoidCallback onDocuments;
 
   const _QuickActions({
     required this.onTimeline,
     required this.onExplore,
     required this.onExpenses,
+    required this.onDocuments,
   });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Row(
-      children: [
-        Expanded(
-          child: _ActionCard(
-            icon: Icons.timeline_rounded,
-            label: l10n.tripOverviewTimelineAction,
-            onTap: onTimeline,
-          ),
-        ),
-        const SizedBox(width: AppSpacing.sm),
-        Expanded(
-          child: _ActionCard(
-            icon: Icons.explore_rounded,
-            label: l10n.tabExplore,
-            onTap: onExplore,
-          ),
-        ),
-        const SizedBox(width: AppSpacing.sm),
-        Expanded(
-          child: _ActionCard(
-            icon: Icons.receipt_long_rounded,
-            label: l10n.tripOverviewExpensesAction,
-            onTap: onExpenses,
-          ),
-        ),
-      ],
+    final actions = [
+      _ActionSpec(
+        icon: Icons.timeline_rounded,
+        label: l10n.tripOverviewTimelineAction,
+        onTap: onTimeline,
+      ),
+      _ActionSpec(
+        icon: Icons.explore_rounded,
+        label: l10n.tabExplore,
+        onTap: onExplore,
+      ),
+      _ActionSpec(
+        icon: Icons.receipt_long_rounded,
+        label: l10n.tripOverviewExpensesAction,
+        onTap: onExpenses,
+      ),
+      _ActionSpec(
+        key: const Key('trip-documents-action'),
+        icon: Icons.folder_copy_rounded,
+        label: l10n.tripDocumentsAction,
+        onTap: onDocuments,
+      ),
+    ];
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final cardWidth =
+            constraints.maxWidth >= AppBreakpoints.tablet ? 172.0 : 154.0;
+        return Wrap(
+          spacing: AppSpacing.sm,
+          runSpacing: AppSpacing.sm,
+          children: [
+            for (final action in actions)
+              SizedBox(
+                key: action.key,
+                width: cardWidth,
+                child: _ActionCard(
+                  icon: action.icon,
+                  label: action.label,
+                  onTap: action.onTap,
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
+}
+
+class _ActionSpec {
+  final Key? key;
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _ActionSpec({
+    this.key,
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
 }
 
 class _ActionCard extends StatelessWidget {

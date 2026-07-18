@@ -56,6 +56,9 @@ class AppState extends ChangeNotifier {
   List<ReferralHistoryItem> referralHistory =
       List.from(MockData.referralHistory);
   List<GiftCard> giftCards = List.from(MockData.giftCards);
+  List<TravelWalletItem> travelWalletItems =
+      List.from(MockData.travelWalletItems);
+  List<TripDocument> tripDocuments = List.from(MockData.tripDocuments);
   List<Category> get categories => MockData.categories;
 
   // ── Session ──────────────────────────────────────────────────────────────
@@ -104,6 +107,8 @@ class AppState extends ChangeNotifier {
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
     demoBookings = [];
+    travelWalletItems = List.from(MockData.travelWalletItems);
+    tripDocuments = List.from(MockData.tripDocuments);
     _applyRewardDataMode();
     notifyListeners();
   }
@@ -114,6 +119,8 @@ class AppState extends ChangeNotifier {
       timeline = List.from(MockData.timeline);
       expenses = List.from(MockData.expenses);
       demoBookings = [];
+      travelWalletItems = List.from(MockData.travelWalletItems);
+      tripDocuments = List.from(MockData.tripDocuments);
       _applyRewardDataMode();
       return;
     }
@@ -121,6 +128,8 @@ class AppState extends ChangeNotifier {
     timeline = [];
     expenses = [];
     demoBookings = [];
+    travelWalletItems = [];
+    tripDocuments = [];
     _applyRewardDataMode();
   }
 
@@ -273,9 +282,32 @@ class AppState extends ChangeNotifier {
   }
 
   void deleteTrip(int id) {
+    final removedDocumentIds = tripDocuments
+        .where((doc) => doc.tripId == id)
+        .map((doc) => doc.id)
+        .toSet();
     trips = trips.where((t) => t.id != id).toList();
     timeline = timeline.where((t) => t.tripId != id).toList();
     expenses = expenses.where((e) => e.tripId != id).toList();
+    tripDocuments = tripDocuments.where((doc) => doc.tripId != id).toList();
+    travelWalletItems = travelWalletItems
+        .map((item) {
+          if (item.linkedDocumentId != null &&
+              removedDocumentIds.contains(item.linkedDocumentId)) {
+            return null;
+          }
+          if (item.linkedTripId == id && item.linkedBookingId != null) {
+            return item.copyWith(
+              linkedTripId: null,
+              linkedTripTitle: null,
+              updatedAt: now(),
+            );
+          }
+          if (item.linkedTripId == id) return null;
+          return item;
+        })
+        .whereType<TravelWalletItem>()
+        .toList();
     notifyListeners();
   }
 
@@ -560,6 +592,243 @@ class AppState extends ChangeNotifier {
     return RewardActionResult.success;
   }
 
+  // ── Travel wallet and trip documents ────────────────────────────────────
+
+  List<TravelWalletItem> sortedWalletItems({DateTime? today}) {
+    final current = today ?? now();
+    return List<TravelWalletItem>.from(travelWalletItems)
+      ..sort((a, b) => _compareWalletItems(a, b, current));
+  }
+
+  List<TripDocument> documentsForTrip(int tripId) =>
+      tripDocuments.where((doc) => doc.tripId == tripId).toList()
+        ..sort((a, b) {
+          if (a.pinned != b.pinned) return a.pinned ? -1 : 1;
+          final updated = b.updatedAt.compareTo(a.updatedAt);
+          return updated == 0 ? b.createdAt.compareTo(a.createdAt) : updated;
+        });
+
+  WalletActionResult addWalletItem(TravelWalletItem item) {
+    if (!demoMode) return WalletActionResult.unavailable;
+    if (item.title.trim().isEmpty) return WalletActionResult.blank;
+    if (!_validWalletDates(item.validFrom, item.validUntil)) {
+      return WalletActionResult.invalidDateRange;
+    }
+    if (travelWalletItems.any((existing) => existing.id == item.id)) {
+      return WalletActionResult.duplicate;
+    }
+    travelWalletItems = [...travelWalletItems, _sanitizeWalletItem(item)];
+    notifyListeners();
+    return WalletActionResult.success;
+  }
+
+  WalletActionResult updateWalletItem(TravelWalletItem item) {
+    if (!demoMode) return WalletActionResult.unavailable;
+    final index =
+        travelWalletItems.indexWhere((existing) => existing.id == item.id);
+    if (index < 0) return WalletActionResult.notFound;
+    if (item.title.trim().isEmpty) return WalletActionResult.blank;
+    if (!_validWalletDates(item.validFrom, item.validUntil)) {
+      return WalletActionResult.invalidDateRange;
+    }
+    final original = travelWalletItems[index];
+    final safe = _sanitizeWalletItem(item.copyWith(
+      linkedTripId: original.linkedTripId,
+      linkedTripTitle: original.linkedTripTitle,
+      linkedDocumentId: original.linkedDocumentId,
+      linkedBookingId: original.linkedBookingId,
+      linkedInvoiceId: original.linkedInvoiceId,
+      updatedAt: now(),
+    ));
+    travelWalletItems = [
+      for (var i = 0; i < travelWalletItems.length; i++)
+        i == index ? safe : travelWalletItems[i],
+    ];
+    notifyListeners();
+    return WalletActionResult.success;
+  }
+
+  WalletActionResult deleteWalletItem(String id) {
+    if (!demoMode) return WalletActionResult.unavailable;
+    if (!travelWalletItems.any((item) => item.id == id)) {
+      return WalletActionResult.notFound;
+    }
+    travelWalletItems =
+        travelWalletItems.where((item) => item.id != id).toList();
+    notifyListeners();
+    return WalletActionResult.success;
+  }
+
+  WalletActionResult setWalletFavorite(String id, bool favorite) =>
+      _updateWalletFlag(
+          id,
+          (item) => item.copyWith(
+                favorite: favorite,
+                updatedAt: now(),
+              ));
+
+  WalletActionResult setWalletArchived(String id, bool archived) =>
+      _updateWalletFlag(
+          id,
+          (item) => item.copyWith(
+                archived: archived,
+                updatedAt: now(),
+              ));
+
+  WalletActionResult setWalletExpiryReminder(String id, bool enabled) =>
+      _updateWalletFlag(
+          id,
+          (item) => item.copyWith(
+                expiryReminderEnabled: enabled,
+                updatedAt: now(),
+              ));
+
+  WalletActionResult addTripDocument(TripDocument document) {
+    if (!demoMode) return WalletActionResult.unavailable;
+    if (tripById(document.tripId) == null) return WalletActionResult.notFound;
+    if (document.title.trim().isEmpty) return WalletActionResult.blank;
+    if (!_hasSafeDocumentMedia(document)) {
+      return WalletActionResult.unsafeUrl;
+    }
+    if (document.tripDayId != null) {
+      final trip = tripById(document.tripId)!;
+      if (document.tripDayId! < 1 || document.tripDayId! > trip.days) {
+        return WalletActionResult.rejected;
+      }
+    }
+    if (document.tripActivityId != null &&
+        !timeline.any((item) =>
+            item.id == document.tripActivityId &&
+            item.tripId == document.tripId)) {
+      return WalletActionResult.rejected;
+    }
+    if (tripDocuments.any((existing) => existing.id == document.id)) {
+      return WalletActionResult.duplicate;
+    }
+    tripDocuments = [...tripDocuments, document];
+    notifyListeners();
+    return WalletActionResult.success;
+  }
+
+  WalletActionResult updateTripDocument(TripDocument document) {
+    if (!demoMode) return WalletActionResult.unavailable;
+    final index =
+        tripDocuments.indexWhere((existing) => existing.id == document.id);
+    if (index < 0) return WalletActionResult.notFound;
+    if (document.title.trim().isEmpty) return WalletActionResult.blank;
+    if (!_hasSafeDocumentMedia(document)) {
+      return WalletActionResult.unsafeUrl;
+    }
+    final original = tripDocuments[index];
+    final safe = document.copyWith(
+      tripId: original.tripId,
+      mediaUrl: original.mediaUrl,
+      mediaLabel: original.mediaLabel,
+      updatedAt: now(),
+    );
+    tripDocuments = [
+      for (var i = 0; i < tripDocuments.length; i++)
+        i == index ? safe : tripDocuments[i],
+    ];
+    notifyListeners();
+    return WalletActionResult.success;
+  }
+
+  WalletActionResult deleteTripDocument(String id) {
+    if (!demoMode) return WalletActionResult.unavailable;
+    if (!tripDocuments.any((doc) => doc.id == id)) {
+      return WalletActionResult.notFound;
+    }
+    tripDocuments = tripDocuments.where((doc) => doc.id != id).toList();
+    travelWalletItems =
+        travelWalletItems.where((item) => item.linkedDocumentId != id).toList();
+    notifyListeners();
+    return WalletActionResult.success;
+  }
+
+  WalletActionResult setTripDocumentPinned(String id, bool pinned) {
+    if (!demoMode) return WalletActionResult.unavailable;
+    final index = tripDocuments.indexWhere((doc) => doc.id == id);
+    if (index < 0) return WalletActionResult.notFound;
+    tripDocuments = [
+      for (var i = 0; i < tripDocuments.length; i++)
+        i == index
+            ? tripDocuments[i].copyWith(pinned: pinned, updatedAt: now())
+            : tripDocuments[i],
+    ];
+    notifyListeners();
+    return WalletActionResult.success;
+  }
+
+  TravelWalletItem? importDemoBookingToWallet(String bookingCode) {
+    if (!demoMode) return null;
+    final existing = _firstWhereOrNull(
+      travelWalletItems,
+      (item) => item.linkedBookingId == bookingCode,
+    );
+    if (existing != null) return existing;
+    final booking = _firstWhereOrNull(
+      demoBookings,
+      (item) => item.code == bookingCode,
+    );
+    if (booking == null) return null;
+    final trip = booking.criteria.tripId == null
+        ? null
+        : tripById(booking.criteria.tripId!);
+    final item = TravelWalletItem(
+      id: 'wallet-booking-${booking.code}',
+      linkedTripId: trip?.id,
+      linkedTripTitle: trip?.title,
+      linkedBookingId: booking.code,
+      type: WalletItemType.bookingConfirmation,
+      title: booking.hotel.name,
+      issuer: 'Plan Your Trip local demo',
+      maskedReference: maskSensitiveReference(booking.code),
+      validFrom: booking.criteria.checkIn,
+      validUntil: booking.criteria.checkOut,
+      status: booking.status == BookingStatus.cancelled
+          ? WalletItemStatus.cancelled
+          : WalletItemStatus.active,
+      createdAt: now(),
+      updatedAt: now(),
+    );
+    travelWalletItems = [...travelWalletItems, item];
+    notifyListeners();
+    return item;
+  }
+
+  TravelWalletItem? importTripDocumentToWallet(String documentId) {
+    if (!demoMode) return null;
+    final existing = _firstWhereOrNull(
+      travelWalletItems,
+      (item) => item.linkedDocumentId == documentId,
+    );
+    if (existing != null) return existing;
+    final document = _firstWhereOrNull(
+      tripDocuments,
+      (item) => item.id == documentId,
+    );
+    if (document == null) return null;
+    final trip = tripById(document.tripId);
+    final item = TravelWalletItem(
+      id: 'wallet-doc-${document.id}',
+      linkedTripId: trip?.id,
+      linkedTripTitle: trip?.title,
+      linkedDocumentId: document.id,
+      type: document.type.walletItemType,
+      title: document.title,
+      issuer: document.uploaderName,
+      maskedReference: maskSensitiveReference(document.id),
+      validFrom: trip?.startDate,
+      validUntil: trip?.endDate,
+      createdAt: now(),
+      updatedAt: now(),
+    );
+    travelWalletItems = [...travelWalletItems, item];
+    notifyListeners();
+    return item;
+  }
+
   // ── Unique ID helper ──────────────────────────────────────────────────────
 
   int get newId => DateTime.now().millisecondsSinceEpoch;
@@ -645,6 +914,84 @@ class AppState extends ChangeNotifier {
     final sortOrder = a.sortOrder.compareTo(b.sortOrder);
     if (sortOrder != 0) return sortOrder;
     return a.id.compareTo(b.id);
+  }
+
+  WalletActionResult _updateWalletFlag(
+    String id,
+    TravelWalletItem Function(TravelWalletItem item) update,
+  ) {
+    if (!demoMode) return WalletActionResult.unavailable;
+    final index = travelWalletItems.indexWhere((item) => item.id == id);
+    if (index < 0) return WalletActionResult.notFound;
+    travelWalletItems = [
+      for (var i = 0; i < travelWalletItems.length; i++)
+        i == index ? update(travelWalletItems[i]) : travelWalletItems[i],
+    ];
+    notifyListeners();
+    return WalletActionResult.success;
+  }
+
+  TravelWalletItem _sanitizeWalletItem(TravelWalletItem item) {
+    final masked = item.maskedReference.trim().isEmpty
+        ? ''
+        : maskSensitiveReference(item.maskedReference);
+    final storedStatus = item.status == WalletItemStatus.expired
+        ? WalletItemStatus.active
+        : item.status;
+    return item.copyWith(maskedReference: masked, status: storedStatus);
+  }
+
+  static bool _validWalletDates(DateTime? from, DateTime? until) {
+    if (from == null || until == null) return true;
+    return !dateOnly(until).isBefore(dateOnly(from));
+  }
+
+  static bool _hasSafeDocumentMedia(TripDocument document) {
+    final mediaUrl = document.mediaUrl.trim();
+    if (mediaUrl.isEmpty) return document.mediaLabel.trim().isNotEmpty;
+    return isSafeDocumentMediaUrl(mediaUrl);
+  }
+
+  static int _compareWalletItems(
+    TravelWalletItem a,
+    TravelWalletItem b,
+    DateTime today,
+  ) {
+    if (a.archived != b.archived) return a.archived ? 1 : -1;
+    if (a.favorite != b.favorite) return a.favorite ? -1 : 1;
+    final aStatus = a.effectiveStatus(today);
+    final bStatus = b.effectiveStatus(today);
+    final statusOrder = {
+      WalletItemStatus.active: 0,
+      WalletItemStatus.upcoming: 1,
+      WalletItemStatus.expired: 2,
+      WalletItemStatus.cancelled: 3,
+      WalletItemStatus.archived: 4,
+    };
+    final status = statusOrder[aStatus]!.compareTo(statusOrder[bStatus]!);
+    if (status != 0) return status;
+    final aFrom = a.validFrom;
+    final bFrom = b.validFrom;
+    if (aFrom != null && bFrom != null) {
+      final date = dateOnly(aFrom).compareTo(dateOnly(bFrom));
+      if (date != 0) return date;
+    } else if (aFrom != null) {
+      return -1;
+    } else if (bFrom != null) {
+      return 1;
+    }
+    final created = b.createdAt.compareTo(a.createdAt);
+    return created == 0 ? a.id.compareTo(b.id) : created;
+  }
+
+  static T? _firstWhereOrNull<T>(
+    Iterable<T> values,
+    bool Function(T value) test,
+  ) {
+    for (final value in values) {
+      if (test(value)) return value;
+    }
+    return null;
   }
 }
 

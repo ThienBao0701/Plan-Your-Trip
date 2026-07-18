@@ -31,6 +31,7 @@ class HotelBookingConfirmationScreen extends StatefulWidget {
 class _HotelBookingConfirmationScreenState
     extends State<HotelBookingConfirmationScreen> {
   bool _adding = false;
+  bool _savingToWallet = false;
 
   @override
   Widget build(BuildContext context) {
@@ -151,6 +152,16 @@ class _HotelBookingConfirmationScreenState
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     OceanSecondaryButton(
+                      key: const Key('booking-save-wallet'),
+                      label: l10n.walletSaveBookingAction,
+                      icon: Icons.wallet_rounded,
+                      semanticLabel: l10n.walletSaveBookingSemantic,
+                      onPressed: _savingToWallet
+                          ? null
+                          : () => _saveBookingToWallet(booking),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    OceanSecondaryButton(
                       key: const Key('booking-view-booking'),
                       label: l10n.bookingViewBookingAction,
                       icon: Icons.list_alt_rounded,
@@ -249,6 +260,35 @@ class _HotelBookingConfirmationScreenState
             context,
             MaterialPageRoute(builder: (_) => TimelineScreen(trip: trip)),
           ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _saveBookingToWallet(DemoBooking booking) async {
+    if (_savingToWallet) return;
+    final app = AppScope.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    if (!app.demoMode) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.walletActionUnavailable)),
+      );
+      return;
+    }
+    final existed = app.travelWalletItems
+        .any((item) => item.linkedBookingId == booking.code);
+    setState(() => _savingToWallet = true);
+    final imported = app.importDemoBookingToWallet(booking.code);
+    if (!mounted) return;
+    setState(() => _savingToWallet = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          imported == null
+              ? l10n.walletActionUnavailable
+              : existed
+                  ? l10n.walletBookingAlreadyImportedMessage
+                  : l10n.walletBookingImportedMessage,
         ),
       ),
     );
