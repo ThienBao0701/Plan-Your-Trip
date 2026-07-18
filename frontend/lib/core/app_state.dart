@@ -65,6 +65,7 @@ class AppState extends ChangeNotifier {
   List<TripNote> tripNotes = List.from(MockData.tripNotes);
   List<PackingItem> packingItems = List.from(MockData.packingItems);
   List<TripReminder> tripReminders = List.from(MockData.tripReminders);
+  List<TravelerReview> reviews = List.from(MockData.reviews);
   Set<int> publicTripIds = Set<int>.from(MockData.publicTripIds);
   List<Category> get categories => MockData.categories;
 
@@ -121,6 +122,7 @@ class AppState extends ChangeNotifier {
     tripNotes = List.from(MockData.tripNotes);
     packingItems = List.from(MockData.packingItems);
     tripReminders = List.from(MockData.tripReminders);
+    reviews = List.from(MockData.reviews);
     publicTripIds = Set<int>.from(MockData.publicTripIds);
     _applyRewardDataMode();
     notifyListeners();
@@ -139,6 +141,7 @@ class AppState extends ChangeNotifier {
       tripNotes = List.from(MockData.tripNotes);
       packingItems = List.from(MockData.packingItems);
       tripReminders = List.from(MockData.tripReminders);
+      reviews = List.from(MockData.reviews);
       publicTripIds = Set<int>.from(MockData.publicTripIds);
       _applyRewardDataMode();
       return;
@@ -154,6 +157,7 @@ class AppState extends ChangeNotifier {
     tripNotes = [];
     packingItems = [];
     tripReminders = [];
+    reviews = [];
     publicTripIds = {};
     _applyRewardDataMode();
   }
@@ -498,6 +502,184 @@ class AppState extends ChangeNotifier {
     ];
     notifyListeners();
     return true;
+  }
+
+  // ── Reviews and traveler trust ──────────────────────────────────────────
+
+  TravelerReview? reviewById(int id) =>
+      _firstWhereOrNull(reviews, (review) => review.id == id);
+
+  List<TravelerReview> publicReviewsForPlace(
+    int placeId, {
+    ReviewSort sort = ReviewSort.newest,
+    int? rating,
+    bool verifiedOnly = false,
+  }) {
+    if (!demoMode) return <TravelerReview>[];
+    final filtered = reviews.where((review) {
+      if (review.placeId != placeId || !review.status.isPublic) return false;
+      if (rating != null && review.ratingOverall != rating) return false;
+      if (verifiedOnly && !review.hasVerifiedBooking) return false;
+      return true;
+    }).toList();
+    filtered.sort((a, b) => _compareReviews(a, b, sort));
+    return filtered;
+  }
+
+  List<TravelerReview> myReviews({ReviewStatus? status}) {
+    if (!demoMode) return <TravelerReview>[];
+    final user = currentDemoUser;
+    final mine = reviews
+        .where((review) =>
+            review.authorUserId == user.id &&
+            (status == null || review.status == status))
+        .toList();
+    mine.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return mine;
+  }
+
+  PlaceReviewSummary reviewSummaryForPlace(int placeId) {
+    final public = publicReviewsForPlace(placeId);
+    final distribution = {
+      for (var rating = 1; rating <= 5; rating++)
+        rating: public.where((review) => review.ratingOverall == rating).length,
+    };
+    final average = public.isEmpty
+        ? null
+        : public.map((review) => review.ratingOverall).reduce((a, b) => a + b) /
+            public.length;
+    final categoryAverages = <ReviewRatingCategory, double>{};
+    for (final category in ReviewRatingCategory.values) {
+      final ratings = public
+          .map((review) => review.ratingFor(category))
+          .whereType<int>()
+          .toList();
+      if (ratings.isNotEmpty) {
+        categoryAverages[category] =
+            ratings.reduce((a, b) => a + b) / ratings.length;
+      }
+    }
+    return PlaceReviewSummary(
+      placeId: placeId,
+      total: public.length,
+      average: average,
+      distribution: distribution,
+      categoryAverages: categoryAverages,
+      verifiedCount: public.where((review) => review.hasVerifiedBooking).length,
+      preview: public.take(3).toList(),
+    );
+  }
+
+  ReviewEligibility reviewEligibilityForPlace(int placeId) {
+    if (!demoMode) {
+      return const ReviewEligibility(result: ReviewActionResult.unavailable);
+    }
+    final booking = _firstWhereOrNull(
+      demoBookings,
+      (item) =>
+          item.hotel.id == placeId &&
+          item.status == BookingStatus.completed &&
+          !reviews.any((review) => review.bookingCode == item.code),
+    );
+    if (booking == null) {
+      return const ReviewEligibility(result: ReviewActionResult.ineligible);
+    }
+    return ReviewEligibility(
+        result: ReviewActionResult.success, booking: booking);
+  }
+
+  ReviewEligibility reviewEligibilityForBooking(DemoBooking booking) {
+    if (!demoMode) {
+      return const ReviewEligibility(result: ReviewActionResult.unavailable);
+    }
+    final current =
+        _firstWhereOrNull(demoBookings, (item) => item.code == booking.code);
+    if (current == null) {
+      return const ReviewEligibility(result: ReviewActionResult.notFound);
+    }
+    if (current.status != BookingStatus.completed) {
+      return ReviewEligibility(
+        result: ReviewActionResult.ineligible,
+        booking: current,
+      );
+    }
+    if (reviews.any((review) => review.bookingCode == current.code)) {
+      return ReviewEligibility(
+        result: ReviewActionResult.duplicate,
+        booking: current,
+      );
+    }
+    return ReviewEligibility(
+        result: ReviewActionResult.success, booking: current);
+  }
+
+  ReviewActionResult createDemoReviewForBooking({
+    required String bookingCode,
+    required int ratingOverall,
+    int? ratingCleanliness,
+    int? ratingService,
+    int? ratingLocation,
+    int? ratingValue,
+    int? ratingFacilities,
+    String title = '',
+    String content = '',
+  }) {
+    if (!demoMode) return ReviewActionResult.unavailable;
+    final booking =
+        _firstWhereOrNull(demoBookings, (item) => item.code == bookingCode);
+    if (booking == null) return ReviewActionResult.notFound;
+    final eligibility = reviewEligibilityForBooking(booking);
+    if (eligibility.result != ReviewActionResult.success) {
+      return eligibility.result;
+    }
+    final ratings = [
+      ratingOverall,
+      if (ratingCleanliness != null) ratingCleanliness,
+      if (ratingService != null) ratingService,
+      if (ratingLocation != null) ratingLocation,
+      if (ratingValue != null) ratingValue,
+      if (ratingFacilities != null) ratingFacilities,
+    ];
+    if (!ratings.every(_validReviewRating)) {
+      return ReviewActionResult.invalidRating;
+    }
+    final safeTitle = title.trim();
+    final safeContent = content.trim();
+    if (safeTitle.length > 200) return ReviewActionResult.titleTooLong;
+    if (safeContent.length > 5000) return ReviewActionResult.contentTooLong;
+
+    final user = currentDemoUser;
+    final timestamp = now();
+    final id = reviews.fold<int>(
+          0,
+          (value, review) => review.id > value ? review.id : value,
+        ) +
+        1;
+    reviews = [
+      TravelerReview(
+        id: id,
+        bookingId: booking.code,
+        bookingCode: booking.code,
+        authorUserId: user.id,
+        authorName: user.fullName,
+        placeId: booking.hotel.id,
+        placeName: booking.hotel.name,
+        ratingOverall: ratingOverall,
+        ratingCleanliness: ratingCleanliness,
+        ratingService: ratingService,
+        ratingLocation: ratingLocation,
+        ratingValue: ratingValue,
+        ratingFacilities: ratingFacilities,
+        title: safeTitle,
+        content: safeContent,
+        status: ReviewStatus.pending,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      ),
+      ...reviews,
+    ];
+    notifyListeners();
+    return ReviewActionResult.success;
   }
 
   // ── Demo rewards ─────────────────────────────────────────────────────────
@@ -1468,6 +1650,34 @@ class AppState extends ChangeNotifier {
         return label == 'transportation' || label == 'transport';
       default:
         return false;
+    }
+  }
+
+  static bool _validReviewRating(int rating) => rating >= 1 && rating <= 5;
+
+  static int _compareReviews(
+    TravelerReview a,
+    TravelerReview b,
+    ReviewSort sort,
+  ) {
+    switch (sort) {
+      case ReviewSort.newest:
+        final created = b.createdAt.compareTo(a.createdAt);
+        return created == 0 ? b.id.compareTo(a.id) : created;
+      case ReviewSort.oldest:
+        final created = a.createdAt.compareTo(b.createdAt);
+        return created == 0 ? a.id.compareTo(b.id) : created;
+      case ReviewSort.highestRating:
+        final rating = b.ratingOverall.compareTo(a.ratingOverall);
+        return rating == 0 ? _compareReviews(a, b, ReviewSort.newest) : rating;
+      case ReviewSort.lowestRating:
+        final rating = a.ratingOverall.compareTo(b.ratingOverall);
+        return rating == 0 ? _compareReviews(a, b, ReviewSort.newest) : rating;
+      case ReviewSort.mostHelpful:
+        final helpful = b.helpfulCount.compareTo(a.helpfulCount);
+        return helpful == 0
+            ? _compareReviews(a, b, ReviewSort.newest)
+            : helpful;
     }
   }
 

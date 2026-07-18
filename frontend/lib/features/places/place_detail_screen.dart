@@ -12,6 +12,7 @@ import '../../shared/widgets/add_to_trip_sheet.dart';
 import '../../shared/widgets/glass_widgets.dart';
 import '../hotels/hotel_room_selection_screen.dart';
 import '../hotels/hotel_utils.dart';
+import '../reviews/reviews_screen.dart';
 
 class PlaceDetailScreen extends StatelessWidget {
   final Place place;
@@ -201,6 +202,8 @@ class PlaceDetailScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: AppSpacing.md),
                     ],
+                    PlaceReviewSummaryCard(place: place),
+                    const SizedBox(height: AppSpacing.md),
                     OceanGlassCard(
                       child: Text(
                         l10n.mapUnavailableMessage,

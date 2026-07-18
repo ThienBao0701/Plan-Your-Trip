@@ -1836,5 +1836,181 @@
   "reminderTypePacking": "Packing",
   "reminderTypeOther": "Other",
   "reminderLocalTimeHelper": "Format: yyyy-MM-dd HH:mm. Stored as UTC for future API mapping.",
-  "reminderNoDeliveryNotice": "These are in-app reminder records only. UI-9 does not schedule push, email, SMS, or OS notifications."
+  "reminderNoDeliveryNotice": "These are in-app reminder records only. UI-9 does not schedule push, email, SMS, or OS notifications.",
+  "reviewsTitle": "Reviews",
+  "reviewsSubtitle": "Browse local demo review summaries shaped by the committed customer review contract.",
+  "reviewsRealUnavailableTitle": "Reviews are not connected yet",
+  "reviewsRealUnavailableMessage": "Review APIs are not wired in this UI phase. No local review data is shown for real sessions.",
+  "reviewSummaryTitle": "Traveler trust",
+  "reviewSummarySemantic": "Review summary for {place}",
+  "@reviewSummarySemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewPublicVisibilityNotice": "Public lists use approved, sanitized review summaries only.",
+  "reviewNoReviewsTitle": "No approved reviews yet",
+  "reviewNoReviewsMessage": "Approved local demo reviews will appear here without exposing booking details.",
+  "reviewSeeAllAction": "See all reviews",
+  "reviewWriteAction": "Write review",
+  "reviewWriteSemantic": "Write a review for {place}",
+  "@reviewWriteSemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewAggregateAverage": "{average} average",
+  "@reviewAggregateAverage": {
+    "placeholders": {
+      "average": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewRatingSemantic": "Average rating {rating} out of 5",
+  "@reviewRatingSemantic": {
+    "placeholders": {
+      "rating": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewRatingOutOfFive": "{rating} out of 5",
+  "@reviewRatingOutOfFive": {
+    "placeholders": {
+      "rating": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewCountExact": "{count, plural, =1{1 approved review} other{{count} approved reviews}}",
+  "@reviewCountExact": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewVerifiedCount": "{count, plural, =1{1 verified stay} other{{count} verified stays}}",
+  "@reviewVerifiedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewDistributionSemantic": "Rating distribution",
+  "reviewStars": "Rating {rating}",
+  "@reviewStars": {
+    "placeholders": {
+      "rating": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewCategoryAverage": "{category}: {average}",
+  "@reviewCategoryAverage": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      },
+      "average": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewCategoryCleanliness": "Cleanliness",
+  "reviewCategoryService": "Service",
+  "reviewCategoryLocation": "Location",
+  "reviewCategoryValue": "Value",
+  "reviewCategoryFacilities": "Facilities",
+  "reviewFiltersTitle": "Review controls",
+  "reviewSortLabel": "Sort",
+  "reviewSortNewest": "Newest",
+  "reviewSortOldest": "Oldest",
+  "reviewSortHighest": "Highest rating",
+  "reviewSortLowest": "Lowest rating",
+  "reviewSortHelpful": "Most helpful",
+  "reviewFilterRating": "Rating",
+  "reviewFilterVerifiedOnly": "Verified stays only",
+  "reviewFilteredEmptyTitle": "No reviews match",
+  "reviewFilteredEmptyMessage": "Adjust the local filters to see approved demo review summaries.",
+  "reviewDetailTitle": "Review detail",
+  "reviewNotFoundTitle": "Review unavailable",
+  "reviewNotFoundMessage": "This review is no longer available in local demo state.",
+  "reviewCardSemantic": "Review for {place}, {rating} out of 5",
+  "@reviewCardSemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      },
+      "rating": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewVerifiedStay": "Verified stay",
+  "reviewUntitled": "Untitled review",
+  "reviewAuthorLine": "By {author}",
+  "@reviewAuthorLine": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewPublicSummaryOnly": "The public backend contract exposes sanitized summaries only. Full review text is shown only in the author's review view.",
+  "reviewUnsupportedActionsNotice": "Customer edit/delete, helpful voting, reporting, media upload, and partner responses are not exposed by the committed user review contract.",
+  "reviewDetailMetadataTitle": "Review metadata",
+  "reviewLinkedBookingLabel": "Linked booking",
+  "reviewCreatedAtLabel": "Submitted",
+  "reviewApprovedAtLabel": "Approved",
+  "reviewRejectedAtLabel": "Rejected",
+  "reviewRejectReasonLabel": "Safe rejection reason",
+  "reviewHelpfulCountLabel": "Helpful count",
+  "reviewReportedCountLabel": "Reported count",
+  "reviewWriteTitle": "Write a review",
+  "reviewIneligibleTitle": "Review not available",
+  "reviewBackendCreateNotice": "A local demo review maps to the booking-scoped customer review route and starts as Pending. It is not sent to the backend.",
+  "reviewOverallRatingLabel": "Overall rating",
+  "reviewTitleLabel": "Title",
+  "reviewTitleHelper": "Optional. Maximum 200 characters.",
+  "reviewContentLabel": "Review text",
+  "reviewContentHelper": "Optional. Maximum 5000 characters.",
+  "reviewCategoryRatingsTitle": "Optional category ratings",
+  "reviewCategorySkipped": "Not rated",
+  "reviewSubmitAction": "Submit local demo review",
+  "reviewSubmittedMessage": "Local demo review submitted as Pending.",
+  "reviewUnavailableMessage": "Review integration is not enabled for real sessions in this UI phase.",
+  "reviewIneligibleCompletedOnly": "Only completed local demo bookings owned by you can be reviewed.",
+  "reviewDuplicateMessage": "A review already exists for this booking.",
+  "reviewInvalidRatingMessage": "Ratings must be between 1 and 5.",
+  "reviewTitleTooLongMessage": "Review title must be 200 characters or fewer.",
+  "reviewContentTooLongMessage": "Review text must be 5000 characters or fewer.",
+  "myReviewsTitle": "My Reviews",
+  "myReviewsSubtitle": "Your local demo review history. Statuses mirror the committed backend review statuses.",
+  "myReviewsRealEmptyTitle": "My Reviews is not connected yet",
+  "myReviewsRealEmptyMessage": "Real sessions do not show seeded review history until the customer review API is wired.",
+  "myReviewsEmptyTitle": "No local reviews yet",
+  "myReviewsEmptyMessage": "Completed demo bookings can create one local pending review each.",
+  "reviewSectionHeader": "{title} ({count})",
+  "@reviewSectionHeader": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewStatusPending": "Pending",
+  "reviewStatusApproved": "Approved",
+  "reviewStatusRejected": "Rejected",
+  "reviewStatusHidden": "Hidden",
+  "reviewStatusReported": "Reported"
 }

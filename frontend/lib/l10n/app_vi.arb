@@ -1836,5 +1836,181 @@
   "reminderTypePacking": "Hành lý",
   "reminderTypeOther": "Khác",
   "reminderLocalTimeHelper": "Định dạng: yyyy-MM-dd HH:mm. Sẽ lưu theo UTC để phù hợp API sau này.",
-  "reminderNoDeliveryNotice": "Đây chỉ là bản ghi nhắc việc trong ứng dụng. UI-9 không lập lịch push, email, SMS hay thông báo hệ điều hành."
+  "reminderNoDeliveryNotice": "Đây chỉ là bản ghi nhắc việc trong ứng dụng. UI-9 không lập lịch push, email, SMS hay thông báo hệ điều hành.",
+  "reviewsTitle": "Đánh giá",
+  "reviewsSubtitle": "Duyệt tóm tắt đánh giá demo cục bộ theo hợp đồng đánh giá khách hàng đã commit.",
+  "reviewsRealUnavailableTitle": "Đánh giá chưa được kết nối",
+  "reviewsRealUnavailableMessage": "API đánh giá chưa được nối trong giai đoạn UI này. Phiên thật không hiển thị dữ liệu đánh giá cục bộ.",
+  "reviewSummaryTitle": "Niềm tin du khách",
+  "reviewSummarySemantic": "Tóm tắt đánh giá cho {place}",
+  "@reviewSummarySemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewPublicVisibilityNotice": "Danh sách công khai chỉ dùng tóm tắt đánh giá đã duyệt và đã được lọc an toàn.",
+  "reviewNoReviewsTitle": "Chưa có đánh giá đã duyệt",
+  "reviewNoReviewsMessage": "Đánh giá demo cục bộ đã duyệt sẽ xuất hiện ở đây mà không lộ chi tiết đặt phòng.",
+  "reviewSeeAllAction": "Xem tất cả đánh giá",
+  "reviewWriteAction": "Viết đánh giá",
+  "reviewWriteSemantic": "Viết đánh giá cho {place}",
+  "@reviewWriteSemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewAggregateAverage": "Trung bình {average}",
+  "@reviewAggregateAverage": {
+    "placeholders": {
+      "average": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewRatingSemantic": "Điểm trung bình {rating} trên 5",
+  "@reviewRatingSemantic": {
+    "placeholders": {
+      "rating": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewRatingOutOfFive": "{rating} trên 5",
+  "@reviewRatingOutOfFive": {
+    "placeholders": {
+      "rating": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewCountExact": "{count, plural, =1{1 đánh giá đã duyệt} other{{count} đánh giá đã duyệt}}",
+  "@reviewCountExact": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewVerifiedCount": "{count, plural, =1{1 kỳ lưu trú xác thực} other{{count} kỳ lưu trú xác thực}}",
+  "@reviewVerifiedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewDistributionSemantic": "Phân bố điểm đánh giá",
+  "reviewStars": "Điểm {rating}",
+  "@reviewStars": {
+    "placeholders": {
+      "rating": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewCategoryAverage": "{category}: {average}",
+  "@reviewCategoryAverage": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      },
+      "average": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewCategoryCleanliness": "Sạch sẽ",
+  "reviewCategoryService": "Dịch vụ",
+  "reviewCategoryLocation": "Vị trí",
+  "reviewCategoryValue": "Giá trị",
+  "reviewCategoryFacilities": "Tiện nghi",
+  "reviewFiltersTitle": "Bộ điều khiển đánh giá",
+  "reviewSortLabel": "Sắp xếp",
+  "reviewSortNewest": "Mới nhất",
+  "reviewSortOldest": "Cũ nhất",
+  "reviewSortHighest": "Điểm cao nhất",
+  "reviewSortLowest": "Điểm thấp nhất",
+  "reviewSortHelpful": "Hữu ích nhất",
+  "reviewFilterRating": "Điểm",
+  "reviewFilterVerifiedOnly": "Chỉ kỳ lưu trú xác thực",
+  "reviewFilteredEmptyTitle": "Không có đánh giá phù hợp",
+  "reviewFilteredEmptyMessage": "Điều chỉnh bộ lọc cục bộ để xem tóm tắt đánh giá demo đã duyệt.",
+  "reviewDetailTitle": "Chi tiết đánh giá",
+  "reviewNotFoundTitle": "Không có đánh giá",
+  "reviewNotFoundMessage": "Đánh giá này không còn trong trạng thái demo cục bộ.",
+  "reviewCardSemantic": "Đánh giá cho {place}, {rating} trên 5",
+  "@reviewCardSemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      },
+      "rating": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewVerifiedStay": "Lưu trú xác thực",
+  "reviewUntitled": "Đánh giá chưa có tiêu đề",
+  "reviewAuthorLine": "Bởi {author}",
+  "@reviewAuthorLine": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewPublicSummaryOnly": "Hợp đồng backend công khai chỉ trả tóm tắt đã lọc an toàn. Nội dung đầy đủ chỉ hiển thị trong phần đánh giá của tác giả.",
+  "reviewUnsupportedActionsNotice": "Hợp đồng đánh giá người dùng đã commit chưa có sửa/xóa phía khách hàng, bình chọn hữu ích, báo cáo, tải ảnh hoặc phản hồi từ đối tác.",
+  "reviewDetailMetadataTitle": "Siêu dữ liệu đánh giá",
+  "reviewLinkedBookingLabel": "Đặt phòng liên kết",
+  "reviewCreatedAtLabel": "Đã gửi",
+  "reviewApprovedAtLabel": "Đã duyệt",
+  "reviewRejectedAtLabel": "Đã từ chối",
+  "reviewRejectReasonLabel": "Lý do từ chối an toàn",
+  "reviewHelpfulCountLabel": "Lượt hữu ích",
+  "reviewReportedCountLabel": "Lượt báo cáo",
+  "reviewWriteTitle": "Viết đánh giá",
+  "reviewIneligibleTitle": "Chưa thể đánh giá",
+  "reviewBackendCreateNotice": "Đánh giá demo cục bộ ánh xạ tới tuyến đánh giá khách hàng theo đặt phòng và bắt đầu ở trạng thái Chờ duyệt. Đánh giá không được gửi lên backend.",
+  "reviewOverallRatingLabel": "Điểm tổng thể",
+  "reviewTitleLabel": "Tiêu đề",
+  "reviewTitleHelper": "Không bắt buộc. Tối đa 200 ký tự.",
+  "reviewContentLabel": "Nội dung đánh giá",
+  "reviewContentHelper": "Không bắt buộc. Tối đa 5000 ký tự.",
+  "reviewCategoryRatingsTitle": "Điểm hạng mục tùy chọn",
+  "reviewCategorySkipped": "Không chấm",
+  "reviewSubmitAction": "Gửi đánh giá demo cục bộ",
+  "reviewSubmittedMessage": "Đã gửi đánh giá demo cục bộ ở trạng thái Chờ duyệt.",
+  "reviewUnavailableMessage": "Tích hợp đánh giá chưa bật cho phiên thật trong giai đoạn UI này.",
+  "reviewIneligibleCompletedOnly": "Chỉ có đặt phòng demo cục bộ đã hoàn tất và thuộc về bạn mới có thể đánh giá.",
+  "reviewDuplicateMessage": "Đặt phòng này đã có đánh giá.",
+  "reviewInvalidRatingMessage": "Điểm đánh giá phải từ 1 đến 5.",
+  "reviewTitleTooLongMessage": "Tiêu đề đánh giá tối đa 200 ký tự.",
+  "reviewContentTooLongMessage": "Nội dung đánh giá tối đa 5000 ký tự.",
+  "myReviewsTitle": "Đánh giá của tôi",
+  "myReviewsSubtitle": "Lịch sử đánh giá demo cục bộ của bạn. Trạng thái bám theo trạng thái đánh giá backend đã commit.",
+  "myReviewsRealEmptyTitle": "Đánh giá của tôi chưa được kết nối",
+  "myReviewsRealEmptyMessage": "Phiên thật không hiển thị lịch sử đánh giá seed cho đến khi API đánh giá khách hàng được nối.",
+  "myReviewsEmptyTitle": "Chưa có đánh giá cục bộ",
+  "myReviewsEmptyMessage": "Mỗi đặt phòng demo đã hoàn tất có thể tạo một đánh giá cục bộ ở trạng thái chờ duyệt.",
+  "reviewSectionHeader": "{title} ({count})",
+  "@reviewSectionHeader": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewStatusPending": "Chờ duyệt",
+  "reviewStatusApproved": "Đã duyệt",
+  "reviewStatusRejected": "Đã từ chối",
+  "reviewStatusHidden": "Đã ẩn",
+  "reviewStatusReported": "Đã báo cáo"
 }

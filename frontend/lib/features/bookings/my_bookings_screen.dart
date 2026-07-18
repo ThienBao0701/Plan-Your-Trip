@@ -10,6 +10,7 @@ import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/glass_widgets.dart';
 import '../expenses/expenses_screen.dart';
 import '../hotels/hotel_utils.dart';
+import '../reviews/reviews_screen.dart';
 
 class MyBookingsScreen extends StatefulWidget {
   final DateTime? today;
@@ -135,7 +136,30 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
           Navigator.pop(context);
           _saveBookingToWallet(booking);
         },
+        onWriteReview: () {
+          Navigator.pop(context);
+          _openWriteReview(booking);
+        },
       ),
+    );
+  }
+
+  void _openWriteReview(DemoBooking booking) {
+    final app = AppScope.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final eligibility = app.reviewEligibilityForBooking(booking);
+    if (!eligibility.canReview) {
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          SnackBar(
+              content: Text(reviewActionMessage(l10n, eligibility.result))),
+        );
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => WriteReviewScreen(booking: booking)),
     );
   }
 
@@ -330,12 +354,14 @@ class _BookingDetailSheet extends StatelessWidget {
   final VoidCallback? onCancel;
   final VoidCallback onPayment;
   final VoidCallback onSaveWallet;
+  final VoidCallback onWriteReview;
 
   const _BookingDetailSheet({
     required this.booking,
     required this.onCancel,
     required this.onPayment,
     required this.onSaveWallet,
+    required this.onWriteReview,
   });
 
   @override
@@ -406,6 +432,14 @@ class _BookingDetailSheet extends StatelessWidget {
               icon: Icons.wallet_rounded,
               semanticLabel: l10n.walletSaveBookingSemantic,
               onPressed: onSaveWallet,
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            OceanSecondaryButton(
+              key: const Key('booking-detail-write-review'),
+              label: l10n.reviewWriteAction,
+              icon: Icons.rate_review_rounded,
+              semanticLabel: l10n.reviewWriteSemantic(booking.hotel.name),
+              onPressed: onWriteReview,
             ),
             if (onCancel != null) ...[
               const SizedBox(height: AppSpacing.sm),

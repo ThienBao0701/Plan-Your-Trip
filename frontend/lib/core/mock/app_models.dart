@@ -587,6 +587,249 @@ class DemoBooking {
   static const Object _unset = Object();
 }
 
+enum ReviewStatus {
+  pending,
+  approved,
+  rejected,
+  hidden,
+  reported,
+}
+
+extension ReviewStatusData on ReviewStatus {
+  String get code {
+    switch (this) {
+      case ReviewStatus.pending:
+        return 'PENDING';
+      case ReviewStatus.approved:
+        return 'APPROVED';
+      case ReviewStatus.rejected:
+        return 'REJECTED';
+      case ReviewStatus.hidden:
+        return 'HIDDEN';
+      case ReviewStatus.reported:
+        return 'REPORTED';
+    }
+  }
+
+  bool get isPublic => this == ReviewStatus.approved;
+}
+
+enum ReviewRatingCategory {
+  cleanliness,
+  service,
+  location,
+  value,
+  facilities,
+}
+
+extension ReviewRatingCategoryData on ReviewRatingCategory {
+  String get code {
+    switch (this) {
+      case ReviewRatingCategory.cleanliness:
+        return 'ratingCleanliness';
+      case ReviewRatingCategory.service:
+        return 'ratingService';
+      case ReviewRatingCategory.location:
+        return 'ratingLocation';
+      case ReviewRatingCategory.value:
+        return 'ratingValue';
+      case ReviewRatingCategory.facilities:
+        return 'ratingFacilities';
+    }
+  }
+}
+
+enum ReviewSort {
+  newest,
+  oldest,
+  highestRating,
+  lowestRating,
+  mostHelpful,
+}
+
+enum ReviewActionResult {
+  success,
+  unavailable,
+  notFound,
+  ineligible,
+  duplicate,
+  invalidRating,
+  titleTooLong,
+  contentTooLong,
+  unsupported,
+}
+
+class ReviewEligibility {
+  final ReviewActionResult result;
+  final DemoBooking? booking;
+
+  const ReviewEligibility({
+    required this.result,
+    this.booking,
+  });
+
+  bool get canReview => result == ReviewActionResult.success && booking != null;
+}
+
+class TravelerReview {
+  static const Object _unset = Object();
+
+  final int id;
+  final String? bookingId;
+  final String bookingCode;
+  final String authorUserId;
+  final String authorName;
+  final int placeId;
+  final String placeName;
+  final int ratingOverall;
+  final int? ratingCleanliness;
+  final int? ratingService;
+  final int? ratingLocation;
+  final int? ratingValue;
+  final int? ratingFacilities;
+  final String title;
+  final String content;
+  final ReviewStatus status;
+  final int helpfulCount;
+  final int reportedCount;
+  final DateTime? approvedAt;
+  final DateTime? rejectedAt;
+  final String rejectReason;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  const TravelerReview({
+    required this.id,
+    this.bookingId,
+    this.bookingCode = '',
+    required this.authorUserId,
+    required this.authorName,
+    required this.placeId,
+    required this.placeName,
+    required this.ratingOverall,
+    this.ratingCleanliness,
+    this.ratingService,
+    this.ratingLocation,
+    this.ratingValue,
+    this.ratingFacilities,
+    this.title = '',
+    this.content = '',
+    this.status = ReviewStatus.pending,
+    this.helpfulCount = 0,
+    this.reportedCount = 0,
+    this.approvedAt,
+    this.rejectedAt,
+    this.rejectReason = '',
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  bool get isPublic => status.isPublic;
+  bool get hasVerifiedBooking => bookingCode.trim().isNotEmpty;
+
+  int? ratingFor(ReviewRatingCategory category) {
+    switch (category) {
+      case ReviewRatingCategory.cleanliness:
+        return ratingCleanliness;
+      case ReviewRatingCategory.service:
+        return ratingService;
+      case ReviewRatingCategory.location:
+        return ratingLocation;
+      case ReviewRatingCategory.value:
+        return ratingValue;
+      case ReviewRatingCategory.facilities:
+        return ratingFacilities;
+    }
+  }
+
+  TravelerReview copyWith({
+    int? id,
+    Object? bookingId = _unset,
+    String? bookingCode,
+    String? authorUserId,
+    String? authorName,
+    int? placeId,
+    String? placeName,
+    int? ratingOverall,
+    Object? ratingCleanliness = _unset,
+    Object? ratingService = _unset,
+    Object? ratingLocation = _unset,
+    Object? ratingValue = _unset,
+    Object? ratingFacilities = _unset,
+    String? title,
+    String? content,
+    ReviewStatus? status,
+    int? helpfulCount,
+    int? reportedCount,
+    Object? approvedAt = _unset,
+    Object? rejectedAt = _unset,
+    String? rejectReason,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) =>
+      TravelerReview(
+        id: id ?? this.id,
+        bookingId: identical(bookingId, _unset)
+            ? this.bookingId
+            : bookingId as String?,
+        bookingCode: bookingCode ?? this.bookingCode,
+        authorUserId: authorUserId ?? this.authorUserId,
+        authorName: authorName ?? this.authorName,
+        placeId: placeId ?? this.placeId,
+        placeName: placeName ?? this.placeName,
+        ratingOverall: ratingOverall ?? this.ratingOverall,
+        ratingCleanliness: identical(ratingCleanliness, _unset)
+            ? this.ratingCleanliness
+            : ratingCleanliness as int?,
+        ratingService: identical(ratingService, _unset)
+            ? this.ratingService
+            : ratingService as int?,
+        ratingLocation: identical(ratingLocation, _unset)
+            ? this.ratingLocation
+            : ratingLocation as int?,
+        ratingValue: identical(ratingValue, _unset)
+            ? this.ratingValue
+            : ratingValue as int?,
+        ratingFacilities: identical(ratingFacilities, _unset)
+            ? this.ratingFacilities
+            : ratingFacilities as int?,
+        title: title ?? this.title,
+        content: content ?? this.content,
+        status: status ?? this.status,
+        helpfulCount: helpfulCount ?? this.helpfulCount,
+        reportedCount: reportedCount ?? this.reportedCount,
+        approvedAt: identical(approvedAt, _unset)
+            ? this.approvedAt
+            : approvedAt as DateTime?,
+        rejectedAt: identical(rejectedAt, _unset)
+            ? this.rejectedAt
+            : rejectedAt as DateTime?,
+        rejectReason: rejectReason ?? this.rejectReason,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
+}
+
+class PlaceReviewSummary {
+  final int placeId;
+  final int total;
+  final double? average;
+  final Map<int, int> distribution;
+  final Map<ReviewRatingCategory, double> categoryAverages;
+  final int verifiedCount;
+  final List<TravelerReview> preview;
+
+  const PlaceReviewSummary({
+    required this.placeId,
+    required this.total,
+    required this.average,
+    required this.distribution,
+    required this.categoryAverages,
+    required this.verifiedCount,
+    required this.preview,
+  });
+}
+
 enum RewardActionResult {
   success,
   unavailable,

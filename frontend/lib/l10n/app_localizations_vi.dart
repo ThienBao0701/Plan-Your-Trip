@@ -3632,4 +3632,305 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get reminderNoDeliveryNotice =>
       'Đây chỉ là bản ghi nhắc việc trong ứng dụng. UI-9 không lập lịch push, email, SMS hay thông báo hệ điều hành.';
+
+  @override
+  String get reviewsTitle => 'Đánh giá';
+
+  @override
+  String get reviewsSubtitle =>
+      'Duyệt tóm tắt đánh giá demo cục bộ theo hợp đồng đánh giá khách hàng đã commit.';
+
+  @override
+  String get reviewsRealUnavailableTitle => 'Đánh giá chưa được kết nối';
+
+  @override
+  String get reviewsRealUnavailableMessage =>
+      'API đánh giá chưa được nối trong giai đoạn UI này. Phiên thật không hiển thị dữ liệu đánh giá cục bộ.';
+
+  @override
+  String get reviewSummaryTitle => 'Niềm tin du khách';
+
+  @override
+  String reviewSummarySemantic(String place) {
+    return 'Tóm tắt đánh giá cho $place';
+  }
+
+  @override
+  String get reviewPublicVisibilityNotice =>
+      'Danh sách công khai chỉ dùng tóm tắt đánh giá đã duyệt và đã được lọc an toàn.';
+
+  @override
+  String get reviewNoReviewsTitle => 'Chưa có đánh giá đã duyệt';
+
+  @override
+  String get reviewNoReviewsMessage =>
+      'Đánh giá demo cục bộ đã duyệt sẽ xuất hiện ở đây mà không lộ chi tiết đặt phòng.';
+
+  @override
+  String get reviewSeeAllAction => 'Xem tất cả đánh giá';
+
+  @override
+  String get reviewWriteAction => 'Viết đánh giá';
+
+  @override
+  String reviewWriteSemantic(String place) {
+    return 'Viết đánh giá cho $place';
+  }
+
+  @override
+  String reviewAggregateAverage(String average) {
+    return 'Trung bình $average';
+  }
+
+  @override
+  String reviewRatingSemantic(String rating) {
+    return 'Điểm trung bình $rating trên 5';
+  }
+
+  @override
+  String reviewRatingOutOfFive(int rating) {
+    return '$rating trên 5';
+  }
+
+  @override
+  String reviewCountExact(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count đánh giá đã duyệt',
+      one: '1 đánh giá đã duyệt',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String reviewVerifiedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count kỳ lưu trú xác thực',
+      one: '1 kỳ lưu trú xác thực',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reviewDistributionSemantic => 'Phân bố điểm đánh giá';
+
+  @override
+  String reviewStars(int rating) {
+    return 'Điểm $rating';
+  }
+
+  @override
+  String reviewCategoryAverage(String category, String average) {
+    return '$category: $average';
+  }
+
+  @override
+  String get reviewCategoryCleanliness => 'Sạch sẽ';
+
+  @override
+  String get reviewCategoryService => 'Dịch vụ';
+
+  @override
+  String get reviewCategoryLocation => 'Vị trí';
+
+  @override
+  String get reviewCategoryValue => 'Giá trị';
+
+  @override
+  String get reviewCategoryFacilities => 'Tiện nghi';
+
+  @override
+  String get reviewFiltersTitle => 'Bộ điều khiển đánh giá';
+
+  @override
+  String get reviewSortLabel => 'Sắp xếp';
+
+  @override
+  String get reviewSortNewest => 'Mới nhất';
+
+  @override
+  String get reviewSortOldest => 'Cũ nhất';
+
+  @override
+  String get reviewSortHighest => 'Điểm cao nhất';
+
+  @override
+  String get reviewSortLowest => 'Điểm thấp nhất';
+
+  @override
+  String get reviewSortHelpful => 'Hữu ích nhất';
+
+  @override
+  String get reviewFilterRating => 'Điểm';
+
+  @override
+  String get reviewFilterVerifiedOnly => 'Chỉ kỳ lưu trú xác thực';
+
+  @override
+  String get reviewFilteredEmptyTitle => 'Không có đánh giá phù hợp';
+
+  @override
+  String get reviewFilteredEmptyMessage =>
+      'Điều chỉnh bộ lọc cục bộ để xem tóm tắt đánh giá demo đã duyệt.';
+
+  @override
+  String get reviewDetailTitle => 'Chi tiết đánh giá';
+
+  @override
+  String get reviewNotFoundTitle => 'Không có đánh giá';
+
+  @override
+  String get reviewNotFoundMessage =>
+      'Đánh giá này không còn trong trạng thái demo cục bộ.';
+
+  @override
+  String reviewCardSemantic(String place, int rating) {
+    return 'Đánh giá cho $place, $rating trên 5';
+  }
+
+  @override
+  String get reviewVerifiedStay => 'Lưu trú xác thực';
+
+  @override
+  String get reviewUntitled => 'Đánh giá chưa có tiêu đề';
+
+  @override
+  String reviewAuthorLine(String author) {
+    return 'Bởi $author';
+  }
+
+  @override
+  String get reviewPublicSummaryOnly =>
+      'Hợp đồng backend công khai chỉ trả tóm tắt đã lọc an toàn. Nội dung đầy đủ chỉ hiển thị trong phần đánh giá của tác giả.';
+
+  @override
+  String get reviewUnsupportedActionsNotice =>
+      'Hợp đồng đánh giá người dùng đã commit chưa có sửa/xóa phía khách hàng, bình chọn hữu ích, báo cáo, tải ảnh hoặc phản hồi từ đối tác.';
+
+  @override
+  String get reviewDetailMetadataTitle => 'Siêu dữ liệu đánh giá';
+
+  @override
+  String get reviewLinkedBookingLabel => 'Đặt phòng liên kết';
+
+  @override
+  String get reviewCreatedAtLabel => 'Đã gửi';
+
+  @override
+  String get reviewApprovedAtLabel => 'Đã duyệt';
+
+  @override
+  String get reviewRejectedAtLabel => 'Đã từ chối';
+
+  @override
+  String get reviewRejectReasonLabel => 'Lý do từ chối an toàn';
+
+  @override
+  String get reviewHelpfulCountLabel => 'Lượt hữu ích';
+
+  @override
+  String get reviewReportedCountLabel => 'Lượt báo cáo';
+
+  @override
+  String get reviewWriteTitle => 'Viết đánh giá';
+
+  @override
+  String get reviewIneligibleTitle => 'Chưa thể đánh giá';
+
+  @override
+  String get reviewBackendCreateNotice =>
+      'Đánh giá demo cục bộ ánh xạ tới tuyến đánh giá khách hàng theo đặt phòng và bắt đầu ở trạng thái Chờ duyệt. Đánh giá không được gửi lên backend.';
+
+  @override
+  String get reviewOverallRatingLabel => 'Điểm tổng thể';
+
+  @override
+  String get reviewTitleLabel => 'Tiêu đề';
+
+  @override
+  String get reviewTitleHelper => 'Không bắt buộc. Tối đa 200 ký tự.';
+
+  @override
+  String get reviewContentLabel => 'Nội dung đánh giá';
+
+  @override
+  String get reviewContentHelper => 'Không bắt buộc. Tối đa 5000 ký tự.';
+
+  @override
+  String get reviewCategoryRatingsTitle => 'Điểm hạng mục tùy chọn';
+
+  @override
+  String get reviewCategorySkipped => 'Không chấm';
+
+  @override
+  String get reviewSubmitAction => 'Gửi đánh giá demo cục bộ';
+
+  @override
+  String get reviewSubmittedMessage =>
+      'Đã gửi đánh giá demo cục bộ ở trạng thái Chờ duyệt.';
+
+  @override
+  String get reviewUnavailableMessage =>
+      'Tích hợp đánh giá chưa bật cho phiên thật trong giai đoạn UI này.';
+
+  @override
+  String get reviewIneligibleCompletedOnly =>
+      'Chỉ có đặt phòng demo cục bộ đã hoàn tất và thuộc về bạn mới có thể đánh giá.';
+
+  @override
+  String get reviewDuplicateMessage => 'Đặt phòng này đã có đánh giá.';
+
+  @override
+  String get reviewInvalidRatingMessage => 'Điểm đánh giá phải từ 1 đến 5.';
+
+  @override
+  String get reviewTitleTooLongMessage => 'Tiêu đề đánh giá tối đa 200 ký tự.';
+
+  @override
+  String get reviewContentTooLongMessage =>
+      'Nội dung đánh giá tối đa 5000 ký tự.';
+
+  @override
+  String get myReviewsTitle => 'Đánh giá của tôi';
+
+  @override
+  String get myReviewsSubtitle =>
+      'Lịch sử đánh giá demo cục bộ của bạn. Trạng thái bám theo trạng thái đánh giá backend đã commit.';
+
+  @override
+  String get myReviewsRealEmptyTitle => 'Đánh giá của tôi chưa được kết nối';
+
+  @override
+  String get myReviewsRealEmptyMessage =>
+      'Phiên thật không hiển thị lịch sử đánh giá seed cho đến khi API đánh giá khách hàng được nối.';
+
+  @override
+  String get myReviewsEmptyTitle => 'Chưa có đánh giá cục bộ';
+
+  @override
+  String get myReviewsEmptyMessage =>
+      'Mỗi đặt phòng demo đã hoàn tất có thể tạo một đánh giá cục bộ ở trạng thái chờ duyệt.';
+
+  @override
+  String reviewSectionHeader(String title, int count) {
+    return '$title ($count)';
+  }
+
+  @override
+  String get reviewStatusPending => 'Chờ duyệt';
+
+  @override
+  String get reviewStatusApproved => 'Đã duyệt';
+
+  @override
+  String get reviewStatusRejected => 'Đã từ chối';
+
+  @override
+  String get reviewStatusHidden => 'Đã ẩn';
+
+  @override
+  String get reviewStatusReported => 'Đã báo cáo';
 }

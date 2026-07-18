@@ -11,6 +11,7 @@ import '../../shared/widgets/glass_widgets.dart';
 import '../auth/login_screen.dart';
 import '../bookings/my_bookings_screen.dart';
 import '../rewards/rewards_screen.dart';
+import '../reviews/reviews_screen.dart';
 import '../wallet/travel_wallet_screen.dart';
 import 'notifications_screen.dart';
 import 'saved_places_screen.dart';
@@ -185,6 +186,15 @@ class ProfileScreen extends StatelessWidget {
           onTap: () => Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const MyBookingsScreen()),
+          ),
+        ),
+        _ProfileNavCard(
+          key: const Key('profile-my-reviews'),
+          icon: Icons.rate_review_rounded,
+          title: l10n.myReviewsTitle,
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const MyReviewsScreen()),
           ),
         ),
         _ProfileNavCard(

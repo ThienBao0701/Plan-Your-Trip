@@ -6626,6 +6626,504 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'These are in-app reminder records only. UI-9 does not schedule push, email, SMS, or OS notifications.'**
   String get reminderNoDeliveryNotice;
+
+  /// No description provided for @reviewsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviews'**
+  String get reviewsTitle;
+
+  /// No description provided for @reviewsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse local demo review summaries shaped by the committed customer review contract.'**
+  String get reviewsSubtitle;
+
+  /// No description provided for @reviewsRealUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviews are not connected yet'**
+  String get reviewsRealUnavailableTitle;
+
+  /// No description provided for @reviewsRealUnavailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Review APIs are not wired in this UI phase. No local review data is shown for real sessions.'**
+  String get reviewsRealUnavailableMessage;
+
+  /// No description provided for @reviewSummaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Traveler trust'**
+  String get reviewSummaryTitle;
+
+  /// No description provided for @reviewSummarySemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Review summary for {place}'**
+  String reviewSummarySemantic(String place);
+
+  /// No description provided for @reviewPublicVisibilityNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Public lists use approved, sanitized review summaries only.'**
+  String get reviewPublicVisibilityNotice;
+
+  /// No description provided for @reviewNoReviewsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No approved reviews yet'**
+  String get reviewNoReviewsTitle;
+
+  /// No description provided for @reviewNoReviewsMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved local demo reviews will appear here without exposing booking details.'**
+  String get reviewNoReviewsMessage;
+
+  /// No description provided for @reviewSeeAllAction.
+  ///
+  /// In en, this message translates to:
+  /// **'See all reviews'**
+  String get reviewSeeAllAction;
+
+  /// No description provided for @reviewWriteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Write review'**
+  String get reviewWriteAction;
+
+  /// No description provided for @reviewWriteSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a review for {place}'**
+  String reviewWriteSemantic(String place);
+
+  /// No description provided for @reviewAggregateAverage.
+  ///
+  /// In en, this message translates to:
+  /// **'{average} average'**
+  String reviewAggregateAverage(String average);
+
+  /// No description provided for @reviewRatingSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Average rating {rating} out of 5'**
+  String reviewRatingSemantic(String rating);
+
+  /// No description provided for @reviewRatingOutOfFive.
+  ///
+  /// In en, this message translates to:
+  /// **'{rating} out of 5'**
+  String reviewRatingOutOfFive(int rating);
+
+  /// No description provided for @reviewCountExact.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 approved review} other{{count} approved reviews}}'**
+  String reviewCountExact(int count);
+
+  /// No description provided for @reviewVerifiedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 verified stay} other{{count} verified stays}}'**
+  String reviewVerifiedCount(int count);
+
+  /// No description provided for @reviewDistributionSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating distribution'**
+  String get reviewDistributionSemantic;
+
+  /// No description provided for @reviewStars.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating {rating}'**
+  String reviewStars(int rating);
+
+  /// No description provided for @reviewCategoryAverage.
+  ///
+  /// In en, this message translates to:
+  /// **'{category}: {average}'**
+  String reviewCategoryAverage(String category, String average);
+
+  /// No description provided for @reviewCategoryCleanliness.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleanliness'**
+  String get reviewCategoryCleanliness;
+
+  /// No description provided for @reviewCategoryService.
+  ///
+  /// In en, this message translates to:
+  /// **'Service'**
+  String get reviewCategoryService;
+
+  /// No description provided for @reviewCategoryLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get reviewCategoryLocation;
+
+  /// No description provided for @reviewCategoryValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Value'**
+  String get reviewCategoryValue;
+
+  /// No description provided for @reviewCategoryFacilities.
+  ///
+  /// In en, this message translates to:
+  /// **'Facilities'**
+  String get reviewCategoryFacilities;
+
+  /// No description provided for @reviewFiltersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review controls'**
+  String get reviewFiltersTitle;
+
+  /// No description provided for @reviewSortLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort'**
+  String get reviewSortLabel;
+
+  /// No description provided for @reviewSortNewest.
+  ///
+  /// In en, this message translates to:
+  /// **'Newest'**
+  String get reviewSortNewest;
+
+  /// No description provided for @reviewSortOldest.
+  ///
+  /// In en, this message translates to:
+  /// **'Oldest'**
+  String get reviewSortOldest;
+
+  /// No description provided for @reviewSortHighest.
+  ///
+  /// In en, this message translates to:
+  /// **'Highest rating'**
+  String get reviewSortHighest;
+
+  /// No description provided for @reviewSortLowest.
+  ///
+  /// In en, this message translates to:
+  /// **'Lowest rating'**
+  String get reviewSortLowest;
+
+  /// No description provided for @reviewSortHelpful.
+  ///
+  /// In en, this message translates to:
+  /// **'Most helpful'**
+  String get reviewSortHelpful;
+
+  /// No description provided for @reviewFilterRating.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating'**
+  String get reviewFilterRating;
+
+  /// No description provided for @reviewFilterVerifiedOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified stays only'**
+  String get reviewFilterVerifiedOnly;
+
+  /// No description provided for @reviewFilteredEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No reviews match'**
+  String get reviewFilteredEmptyTitle;
+
+  /// No description provided for @reviewFilteredEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust the local filters to see approved demo review summaries.'**
+  String get reviewFilteredEmptyMessage;
+
+  /// No description provided for @reviewDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review detail'**
+  String get reviewDetailTitle;
+
+  /// No description provided for @reviewNotFoundTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review unavailable'**
+  String get reviewNotFoundTitle;
+
+  /// No description provided for @reviewNotFoundMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This review is no longer available in local demo state.'**
+  String get reviewNotFoundMessage;
+
+  /// No description provided for @reviewCardSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Review for {place}, {rating} out of 5'**
+  String reviewCardSemantic(String place, int rating);
+
+  /// No description provided for @reviewVerifiedStay.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified stay'**
+  String get reviewVerifiedStay;
+
+  /// No description provided for @reviewUntitled.
+  ///
+  /// In en, this message translates to:
+  /// **'Untitled review'**
+  String get reviewUntitled;
+
+  /// No description provided for @reviewAuthorLine.
+  ///
+  /// In en, this message translates to:
+  /// **'By {author}'**
+  String reviewAuthorLine(String author);
+
+  /// No description provided for @reviewPublicSummaryOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'The public backend contract exposes sanitized summaries only. Full review text is shown only in the author\'s review view.'**
+  String get reviewPublicSummaryOnly;
+
+  /// No description provided for @reviewUnsupportedActionsNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer edit/delete, helpful voting, reporting, media upload, and partner responses are not exposed by the committed user review contract.'**
+  String get reviewUnsupportedActionsNotice;
+
+  /// No description provided for @reviewDetailMetadataTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review metadata'**
+  String get reviewDetailMetadataTitle;
+
+  /// No description provided for @reviewLinkedBookingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked booking'**
+  String get reviewLinkedBookingLabel;
+
+  /// No description provided for @reviewCreatedAtLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitted'**
+  String get reviewCreatedAtLabel;
+
+  /// No description provided for @reviewApprovedAtLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved'**
+  String get reviewApprovedAtLabel;
+
+  /// No description provided for @reviewRejectedAtLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get reviewRejectedAtLabel;
+
+  /// No description provided for @reviewRejectReasonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Safe rejection reason'**
+  String get reviewRejectReasonLabel;
+
+  /// No description provided for @reviewHelpfulCountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Helpful count'**
+  String get reviewHelpfulCountLabel;
+
+  /// No description provided for @reviewReportedCountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reported count'**
+  String get reviewReportedCountLabel;
+
+  /// No description provided for @reviewWriteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a review'**
+  String get reviewWriteTitle;
+
+  /// No description provided for @reviewIneligibleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review not available'**
+  String get reviewIneligibleTitle;
+
+  /// No description provided for @reviewBackendCreateNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'A local demo review maps to the booking-scoped customer review route and starts as Pending. It is not sent to the backend.'**
+  String get reviewBackendCreateNotice;
+
+  /// No description provided for @reviewOverallRatingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Overall rating'**
+  String get reviewOverallRatingLabel;
+
+  /// No description provided for @reviewTitleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get reviewTitleLabel;
+
+  /// No description provided for @reviewTitleHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional. Maximum 200 characters.'**
+  String get reviewTitleHelper;
+
+  /// No description provided for @reviewContentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Review text'**
+  String get reviewContentLabel;
+
+  /// No description provided for @reviewContentHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional. Maximum 5000 characters.'**
+  String get reviewContentHelper;
+
+  /// No description provided for @reviewCategoryRatingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional category ratings'**
+  String get reviewCategoryRatingsTitle;
+
+  /// No description provided for @reviewCategorySkipped.
+  ///
+  /// In en, this message translates to:
+  /// **'Not rated'**
+  String get reviewCategorySkipped;
+
+  /// No description provided for @reviewSubmitAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit local demo review'**
+  String get reviewSubmitAction;
+
+  /// No description provided for @reviewSubmittedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Local demo review submitted as Pending.'**
+  String get reviewSubmittedMessage;
+
+  /// No description provided for @reviewUnavailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Review integration is not enabled for real sessions in this UI phase.'**
+  String get reviewUnavailableMessage;
+
+  /// No description provided for @reviewIneligibleCompletedOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Only completed local demo bookings owned by you can be reviewed.'**
+  String get reviewIneligibleCompletedOnly;
+
+  /// No description provided for @reviewDuplicateMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'A review already exists for this booking.'**
+  String get reviewDuplicateMessage;
+
+  /// No description provided for @reviewInvalidRatingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Ratings must be between 1 and 5.'**
+  String get reviewInvalidRatingMessage;
+
+  /// No description provided for @reviewTitleTooLongMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Review title must be 200 characters or fewer.'**
+  String get reviewTitleTooLongMessage;
+
+  /// No description provided for @reviewContentTooLongMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Review text must be 5000 characters or fewer.'**
+  String get reviewContentTooLongMessage;
+
+  /// No description provided for @myReviewsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My Reviews'**
+  String get myReviewsTitle;
+
+  /// No description provided for @myReviewsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your local demo review history. Statuses mirror the committed backend review statuses.'**
+  String get myReviewsSubtitle;
+
+  /// No description provided for @myReviewsRealEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My Reviews is not connected yet'**
+  String get myReviewsRealEmptyTitle;
+
+  /// No description provided for @myReviewsRealEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Real sessions do not show seeded review history until the customer review API is wired.'**
+  String get myReviewsRealEmptyMessage;
+
+  /// No description provided for @myReviewsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No local reviews yet'**
+  String get myReviewsEmptyTitle;
+
+  /// No description provided for @myReviewsEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed demo bookings can create one local pending review each.'**
+  String get myReviewsEmptyMessage;
+
+  /// No description provided for @reviewSectionHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'{title} ({count})'**
+  String reviewSectionHeader(String title, int count);
+
+  /// No description provided for @reviewStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get reviewStatusPending;
+
+  /// No description provided for @reviewStatusApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved'**
+  String get reviewStatusApproved;
+
+  /// No description provided for @reviewStatusRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get reviewStatusRejected;
+
+  /// No description provided for @reviewStatusHidden.
+  ///
+  /// In en, this message translates to:
+  /// **'Hidden'**
+  String get reviewStatusHidden;
+
+  /// No description provided for @reviewStatusReported.
+  ///
+  /// In en, this message translates to:
+  /// **'Reported'**
+  String get reviewStatusReported;
 }
 
 class _AppLocalizationsDelegate

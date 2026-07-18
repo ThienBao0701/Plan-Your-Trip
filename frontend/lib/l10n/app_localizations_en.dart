@@ -3747,4 +3747,307 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get reminderNoDeliveryNotice =>
       'These are in-app reminder records only. UI-9 does not schedule push, email, SMS, or OS notifications.';
+
+  @override
+  String get reviewsTitle => 'Reviews';
+
+  @override
+  String get reviewsSubtitle =>
+      'Browse local demo review summaries shaped by the committed customer review contract.';
+
+  @override
+  String get reviewsRealUnavailableTitle => 'Reviews are not connected yet';
+
+  @override
+  String get reviewsRealUnavailableMessage =>
+      'Review APIs are not wired in this UI phase. No local review data is shown for real sessions.';
+
+  @override
+  String get reviewSummaryTitle => 'Traveler trust';
+
+  @override
+  String reviewSummarySemantic(String place) {
+    return 'Review summary for $place';
+  }
+
+  @override
+  String get reviewPublicVisibilityNotice =>
+      'Public lists use approved, sanitized review summaries only.';
+
+  @override
+  String get reviewNoReviewsTitle => 'No approved reviews yet';
+
+  @override
+  String get reviewNoReviewsMessage =>
+      'Approved local demo reviews will appear here without exposing booking details.';
+
+  @override
+  String get reviewSeeAllAction => 'See all reviews';
+
+  @override
+  String get reviewWriteAction => 'Write review';
+
+  @override
+  String reviewWriteSemantic(String place) {
+    return 'Write a review for $place';
+  }
+
+  @override
+  String reviewAggregateAverage(String average) {
+    return '$average average';
+  }
+
+  @override
+  String reviewRatingSemantic(String rating) {
+    return 'Average rating $rating out of 5';
+  }
+
+  @override
+  String reviewRatingOutOfFive(int rating) {
+    return '$rating out of 5';
+  }
+
+  @override
+  String reviewCountExact(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count approved reviews',
+      one: '1 approved review',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String reviewVerifiedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count verified stays',
+      one: '1 verified stay',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reviewDistributionSemantic => 'Rating distribution';
+
+  @override
+  String reviewStars(int rating) {
+    return 'Rating $rating';
+  }
+
+  @override
+  String reviewCategoryAverage(String category, String average) {
+    return '$category: $average';
+  }
+
+  @override
+  String get reviewCategoryCleanliness => 'Cleanliness';
+
+  @override
+  String get reviewCategoryService => 'Service';
+
+  @override
+  String get reviewCategoryLocation => 'Location';
+
+  @override
+  String get reviewCategoryValue => 'Value';
+
+  @override
+  String get reviewCategoryFacilities => 'Facilities';
+
+  @override
+  String get reviewFiltersTitle => 'Review controls';
+
+  @override
+  String get reviewSortLabel => 'Sort';
+
+  @override
+  String get reviewSortNewest => 'Newest';
+
+  @override
+  String get reviewSortOldest => 'Oldest';
+
+  @override
+  String get reviewSortHighest => 'Highest rating';
+
+  @override
+  String get reviewSortLowest => 'Lowest rating';
+
+  @override
+  String get reviewSortHelpful => 'Most helpful';
+
+  @override
+  String get reviewFilterRating => 'Rating';
+
+  @override
+  String get reviewFilterVerifiedOnly => 'Verified stays only';
+
+  @override
+  String get reviewFilteredEmptyTitle => 'No reviews match';
+
+  @override
+  String get reviewFilteredEmptyMessage =>
+      'Adjust the local filters to see approved demo review summaries.';
+
+  @override
+  String get reviewDetailTitle => 'Review detail';
+
+  @override
+  String get reviewNotFoundTitle => 'Review unavailable';
+
+  @override
+  String get reviewNotFoundMessage =>
+      'This review is no longer available in local demo state.';
+
+  @override
+  String reviewCardSemantic(String place, int rating) {
+    return 'Review for $place, $rating out of 5';
+  }
+
+  @override
+  String get reviewVerifiedStay => 'Verified stay';
+
+  @override
+  String get reviewUntitled => 'Untitled review';
+
+  @override
+  String reviewAuthorLine(String author) {
+    return 'By $author';
+  }
+
+  @override
+  String get reviewPublicSummaryOnly =>
+      'The public backend contract exposes sanitized summaries only. Full review text is shown only in the author\'s review view.';
+
+  @override
+  String get reviewUnsupportedActionsNotice =>
+      'Customer edit/delete, helpful voting, reporting, media upload, and partner responses are not exposed by the committed user review contract.';
+
+  @override
+  String get reviewDetailMetadataTitle => 'Review metadata';
+
+  @override
+  String get reviewLinkedBookingLabel => 'Linked booking';
+
+  @override
+  String get reviewCreatedAtLabel => 'Submitted';
+
+  @override
+  String get reviewApprovedAtLabel => 'Approved';
+
+  @override
+  String get reviewRejectedAtLabel => 'Rejected';
+
+  @override
+  String get reviewRejectReasonLabel => 'Safe rejection reason';
+
+  @override
+  String get reviewHelpfulCountLabel => 'Helpful count';
+
+  @override
+  String get reviewReportedCountLabel => 'Reported count';
+
+  @override
+  String get reviewWriteTitle => 'Write a review';
+
+  @override
+  String get reviewIneligibleTitle => 'Review not available';
+
+  @override
+  String get reviewBackendCreateNotice =>
+      'A local demo review maps to the booking-scoped customer review route and starts as Pending. It is not sent to the backend.';
+
+  @override
+  String get reviewOverallRatingLabel => 'Overall rating';
+
+  @override
+  String get reviewTitleLabel => 'Title';
+
+  @override
+  String get reviewTitleHelper => 'Optional. Maximum 200 characters.';
+
+  @override
+  String get reviewContentLabel => 'Review text';
+
+  @override
+  String get reviewContentHelper => 'Optional. Maximum 5000 characters.';
+
+  @override
+  String get reviewCategoryRatingsTitle => 'Optional category ratings';
+
+  @override
+  String get reviewCategorySkipped => 'Not rated';
+
+  @override
+  String get reviewSubmitAction => 'Submit local demo review';
+
+  @override
+  String get reviewSubmittedMessage =>
+      'Local demo review submitted as Pending.';
+
+  @override
+  String get reviewUnavailableMessage =>
+      'Review integration is not enabled for real sessions in this UI phase.';
+
+  @override
+  String get reviewIneligibleCompletedOnly =>
+      'Only completed local demo bookings owned by you can be reviewed.';
+
+  @override
+  String get reviewDuplicateMessage =>
+      'A review already exists for this booking.';
+
+  @override
+  String get reviewInvalidRatingMessage => 'Ratings must be between 1 and 5.';
+
+  @override
+  String get reviewTitleTooLongMessage =>
+      'Review title must be 200 characters or fewer.';
+
+  @override
+  String get reviewContentTooLongMessage =>
+      'Review text must be 5000 characters or fewer.';
+
+  @override
+  String get myReviewsTitle => 'My Reviews';
+
+  @override
+  String get myReviewsSubtitle =>
+      'Your local demo review history. Statuses mirror the committed backend review statuses.';
+
+  @override
+  String get myReviewsRealEmptyTitle => 'My Reviews is not connected yet';
+
+  @override
+  String get myReviewsRealEmptyMessage =>
+      'Real sessions do not show seeded review history until the customer review API is wired.';
+
+  @override
+  String get myReviewsEmptyTitle => 'No local reviews yet';
+
+  @override
+  String get myReviewsEmptyMessage =>
+      'Completed demo bookings can create one local pending review each.';
+
+  @override
+  String reviewSectionHeader(String title, int count) {
+    return '$title ($count)';
+  }
+
+  @override
+  String get reviewStatusPending => 'Pending';
+
+  @override
+  String get reviewStatusApproved => 'Approved';
+
+  @override
+  String get reviewStatusRejected => 'Rejected';
+
+  @override
+  String get reviewStatusHidden => 'Hidden';
+
+  @override
+  String get reviewStatusReported => 'Reported';
 }
