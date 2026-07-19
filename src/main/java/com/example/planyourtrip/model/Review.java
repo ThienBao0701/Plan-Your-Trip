@@ -72,6 +72,24 @@ public class Review {
     @Column(columnDefinition = "TEXT")
     private String rejectReason;
 
+    // ── Phase 7.44 — Partner reply (additive; one reply per review, stored in-place) ──
+    // A single authorized partner may post exactly one current reply to this review;
+    // repeated PUTs update these same fields rather than creating a new row.
+
+    @Column(columnDefinition = "TEXT")
+    private String partnerReply;
+
+    /** Set once, when the first reply is created; never changed on subsequent edits. */
+    private Instant partnerRepliedAt;
+
+    /** Bumped on every reply save, including edits. */
+    private Instant partnerReplyUpdatedAt;
+
+    /** Which partner authored the reply — used to derive the public display (business) name. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "partner_replied_by_profile_id")
+    private PartnerProfile partnerRepliedBy;
+
     @PrePersist
     void onCreate() { createdAt = updatedAt = Instant.now(); }
 

@@ -18,17 +18,20 @@ public class ReviewService {
     private final BookingRepository bookingRepo;
     private final PlaceRepository placeRepo;
     private final UserRepository userRepo;
+    private final PartnerProfileRepository partnerProfileRepo;
     private final NotificationService notificationService;
 
     public ReviewService(ReviewRepository reviewRepo,
                           BookingRepository bookingRepo,
                           PlaceRepository placeRepo,
                           UserRepository userRepo,
+                          PartnerProfileRepository partnerProfileRepo,
                           NotificationService notificationService) {
         this.reviewRepo = reviewRepo;
         this.bookingRepo = bookingRepo;
         this.placeRepo = placeRepo;
         this.userRepo = userRepo;
+        this.partnerProfileRepo = partnerProfileRepo;
         this.notificationService = notificationService;
     }
 
@@ -166,6 +169,67 @@ public class ReviewService {
         return toResponse(review);
     }
 
+    /**
+     * Phase 7.44 — an authorized partner posts or updates the single reply to a review
+     * for a hotel they own. Additive on the existing {@link Review} row (no new entity).
+     *
+     * <ul>
+     *   <li>Caller must have an APPROVED {@link PartnerProfile} (same
+     *       {@code myApprovedProfileOrThrow} convention as the other partner services);
+     *       an admin/anyone without an approved profile → 404 (no cross-partner leak).</li>
+     *   <li>The review's place must be owned by that profile; otherwise a uniform 404
+     *       (same status as an unknown review — no existence leak across partners).</li>
+     *   <li>Reply is allowed ONLY on the publicly-visible status — APPROVED — because that
+     *       is the exact set {@code getPlaceReviews} exposes. Any other status → 422
+     *       (matching the {@code UNPROCESSABLE_ENTITY} convention used elsewhere here for
+     *       invalid-state operations).</li>
+     *   <li>One reply per review: the first PUT sets {@code partnerRepliedAt}; every PUT
+     *       (create or edit) bumps {@code partnerReplyUpdatedAt}. The customer is notified
+     *       only on the FIRST reply.</li>
+     * </ul>
+     */
+    @Transactional
+    public ReviewResponse partnerReply(Long userId, Long reviewId, PartnerReplyRequest req) {
+        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        Review review = reviewOrThrow(reviewId);
+
+        PartnerProfile owner = review.getPlace().getOwner();
+        if (owner == null || !owner.getId().equals(profile.getId()))
+            throw new ApiException(HttpStatus.NOT_FOUND, "Review not found: " + reviewId);
+
+        if (review.getStatus() != ReviewStatus.APPROVED)
+            throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,
+                "Only published (approved) reviews can be replied to");
+
+        boolean firstReply = review.getPartnerRepliedAt() == null;
+        Instant now = Instant.now();
+
+        review.setPartnerReply(req.content().trim());
+        if (firstReply) review.setPartnerRepliedAt(now);
+        review.setPartnerReplyUpdatedAt(now);
+        review.setPartnerRepliedBy(profile);
+        review = reviewRepo.save(review);
+
+        // Notify the review author ONLY on the first reply (idempotent on edits).
+        if (firstReply) {
+            notificationService.create(review.getUser().getId(), NotificationType.REVIEW, Priority.NORMAL,
+                "Hotel replied to your review",
+                review.getPlace().getName() + " replied to your review.",
+                RelatedEntityType.HOTEL, review.getId());
+        }
+
+        return toResponse(review);
+    }
+
+    // Same APPROVED-profile ownership convention as PartnerBookingService / PartnerPricingService.
+    private PartnerProfile myApprovedProfileOrThrow(Long userId) {
+        PartnerProfile profile = partnerProfileRepo.findByUserId(userId)
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Partner profile not found"));
+        if (profile.getVerificationStatus() != PartnerVerificationStatus.APPROVED)
+            throw new ApiException(HttpStatus.FORBIDDEN, "Partner profile is not approved");
+        return profile;
+    }
+
     @Transactional
     public void recalculatePlaceRating(Long placeId) {
         Place place = placeRepo.findById(placeId)
@@ -206,7 +270,8 @@ public class ReviewService {
             r.getStatus().name(),
             r.getHelpfulCount(), r.getReportedCount(),
             r.getApprovedAt(), r.getRejectedAt(), r.getRejectReason(),
-            r.getCreatedAt(), r.getUpdatedAt()
+            r.getCreatedAt(), r.getUpdatedAt(),
+            toReplyInfo(r)
         );
     }
 
@@ -216,7 +281,20 @@ public class ReviewService {
             r.getPlace().getId(), r.getPlace().getName(),
             r.getUser().getId(), r.getUser().getFullName(),
             r.getRatingOverall(), r.getTitle(),
-            r.getStatus().name(), r.getCreatedAt()
+            r.getStatus().name(), r.getCreatedAt(),
+            toReplyInfo(r)
         );
+    }
+
+    /** Safe reply projection: null when the review has no partner reply. */
+    private PartnerReplyInfo toReplyInfo(Review r) {
+        if (r.getPartnerRepliedAt() == null) return null;
+        String displayName = r.getPartnerRepliedBy() != null
+            ? r.getPartnerRepliedBy().getBusinessName() : null;
+        return new PartnerReplyInfo(
+            r.getPartnerReply(),
+            r.getPartnerRepliedAt(),
+            r.getPartnerReplyUpdatedAt(),
+            displayName);
     }
 }
