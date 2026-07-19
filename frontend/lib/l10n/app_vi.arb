@@ -1964,7 +1964,97 @@
     }
   },
   "reviewPublicSummaryOnly": "Hợp đồng backend công khai chỉ trả tóm tắt đã lọc an toàn. Nội dung đầy đủ chỉ hiển thị trong phần đánh giá của tác giả.",
-  "reviewUnsupportedActionsNotice": "Hợp đồng đánh giá người dùng đã commit chưa có sửa/xóa phía khách hàng, bình chọn hữu ích, báo cáo, tải ảnh hoặc phản hồi từ đối tác.",
+  "reviewUnsupportedActionsNotice": "Giai đoạn ứng dụng người dùng cục bộ này chưa có sửa/xóa phía khách hàng, bình chọn hữu ích, báo cáo, tải lên/xóa media hoặc chỉnh sửa phản hồi từ đối tác.",
+  "reviewMediaTitle": "Media đánh giá",
+  "reviewMediaCount": "{count, plural, =1{1 mục media} other{{count} mục media}}",
+  "@reviewMediaCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewMediaCountSemantic": "{count, plural, =1{1 media đánh giá} other{{count} media đánh giá}}",
+  "@reviewMediaCountSemantic": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewMoreMediaCount": "+{count} mục nữa",
+  "@reviewMoreMediaCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewMediaGallerySemantic": "Thư viện media đánh giá có {count} mục",
+  "@reviewMediaGallerySemantic": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewMediaItemSemantic": "Media đánh giá {index} trên {total}, {type}, {description}",
+  "@reviewMediaItemSemantic": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "type": {
+        "type": "String"
+      },
+      "description": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewMediaIndex": "{index} trên {total}",
+  "@reviewMediaIndex": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewMediaTypePhoto": "Ảnh",
+  "reviewMediaTypeVideo": "Video",
+  "reviewMediaTypeDocument": "Tài liệu",
+  "reviewCoverMedia": "Ảnh bìa",
+  "reviewMediaUnavailable": "Media không khả dụng",
+  "reviewImageUnavailable": "Ảnh không khả dụng",
+  "reviewVideoPreviewUnavailable": "Chưa có xem trước video",
+  "reviewUnsupportedMedia": "Media chưa hỗ trợ",
+  "reviewPartnerResponseTitle": "Phản hồi từ nơi lưu trú",
+  "reviewPropertyResponseIndicator": "Có phản hồi",
+  "reviewPartnerResponseSemantic": "Phản hồi của nơi lưu trú cho {review}",
+  "@reviewPartnerResponseSemantic": {
+    "placeholders": {
+      "review": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewRespondedOn": "Đã phản hồi vào {date}",
+  "@reviewRespondedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewMediaAttachmentTitle": "Media đánh giá",
+  "reviewMediaAttachmentUnavailable": "Đính kèm ảnh và video sẽ có khi API media đánh giá được kết nối.",
+  "reviewUploadRequiresBackend": "Demo cục bộ này chỉ gửi đánh giá dạng văn bản; không tải tệp lên hoặc nhận URL media nhập tay.",
   "reviewDetailMetadataTitle": "Siêu dữ liệu đánh giá",
   "reviewLinkedBookingLabel": "Đặt phòng liên kết",
   "reviewCreatedAtLabel": "Đã gửi",

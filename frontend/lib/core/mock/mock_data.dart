@@ -1479,6 +1479,56 @@ class MockData {
       status: ReviewStatus.approved,
       helpfulCount: 12,
       approvedAt: DateTime(2026, 7, 8, 10),
+      media: [
+        ReviewMediaItem(
+          id: 'review-media-1a',
+          url: places[0].imageUrl,
+          thumbnailUrl: places[0].imageUrl,
+          mediaType: ReviewMediaType.image,
+          sortOrder: 1,
+          cover: true,
+          altText: 'Valley Deluxe King room view',
+        ),
+        const ReviewMediaItem(
+          id: 'review-media-1b',
+          url:
+              'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=900&q=80',
+          thumbnailUrl:
+              'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=300&q=70',
+          mediaType: ReviewMediaType.image,
+          sortOrder: 2,
+          altText: 'Family garden suite preview',
+        ),
+        const ReviewMediaItem(
+          id: 'review-media-1c',
+          url: 'https://media.example.com/reviews/villa-morning.mp4',
+          mediaType: ReviewMediaType.video,
+          sortOrder: 3,
+          altText: 'Short morning clip from the villa',
+        ),
+        const ReviewMediaItem(
+          id: 'review-media-1-hidden',
+          url: 'https://media.example.com/reviews/inactive-villa.jpg',
+          mediaType: ReviewMediaType.image,
+          sortOrder: 4,
+          active: false,
+          altText: 'Inactive review media',
+        ),
+        const ReviewMediaItem(
+          id: 'review-media-1-unsafe',
+          url: 'https://demo:secret@media.example.com/private-villa.jpg',
+          mediaType: ReviewMediaType.image,
+          sortOrder: 5,
+          altText: 'Unsafe credential-bearing media',
+        ),
+      ],
+      partnerReply: PartnerReviewReply(
+        content:
+            'Thank you for staying with us. We are glad the quiet mornings helped your Da Lat plans.',
+        repliedAt: DateTime(2026, 7, 9, 7),
+        updatedAt: DateTime(2026, 7, 9, 7),
+        partnerDisplayName: 'Mây Lang Thang Villa host',
+      ),
       createdAt: DateTime(2026, 7, 6, 18),
       updatedAt: DateTime(2026, 7, 8, 10),
     ),
@@ -1502,6 +1552,25 @@ class MockData {
       status: ReviewStatus.approved,
       helpfulCount: 7,
       approvedAt: DateTime(2026, 7, 9, 9),
+      media: const [
+        ReviewMediaItem(
+          id: 'review-media-2a',
+          url:
+              'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=900&q=80',
+          thumbnailUrl:
+              'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=300&q=70',
+          mediaType: ReviewMediaType.image,
+          sortOrder: 1,
+          altText: 'Breakfast table beside the villa garden',
+        ),
+      ],
+      partnerReply: PartnerReviewReply(
+        content:
+            'Our team appreciates the note about breakfast pacing and will keep that setup for future guests.',
+        repliedAt: DateTime(2026, 7, 10, 8),
+        updatedAt: DateTime(2026, 7, 10, 8),
+        partnerDisplayName: 'Property team',
+      ),
       createdAt: DateTime(2026, 7, 7, 16),
       updatedAt: DateTime(2026, 7, 9, 9),
     ),
@@ -1523,6 +1592,16 @@ class MockData {
       content:
           'Created locally as a pending review and intentionally hidden from public lists.',
       status: ReviewStatus.pending,
+      media: [
+        ReviewMediaItem(
+          id: 'review-media-3a',
+          url: places[5].imageUrl,
+          thumbnailUrl: places[5].imageUrl,
+          mediaType: ReviewMediaType.image,
+          sortOrder: 1,
+          altText: 'Pending resort image visible only to the author',
+        ),
+      ],
       createdAt: DateTime(2026, 7, 12, 19),
       updatedAt: DateTime(2026, 7, 12, 19),
     ),

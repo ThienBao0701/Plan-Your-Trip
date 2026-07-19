@@ -647,6 +647,25 @@ enum ReviewSort {
   mostHelpful,
 }
 
+enum ReviewMediaType {
+  image,
+  video,
+  document,
+}
+
+extension ReviewMediaTypeData on ReviewMediaType {
+  String get code {
+    switch (this) {
+      case ReviewMediaType.image:
+        return 'IMAGE';
+      case ReviewMediaType.video:
+        return 'VIDEO';
+      case ReviewMediaType.document:
+        return 'DOCUMENT';
+    }
+  }
+}
+
 enum ReviewActionResult {
   success,
   unavailable,
@@ -669,6 +688,96 @@ class ReviewEligibility {
   });
 
   bool get canReview => result == ReviewActionResult.success && booking != null;
+}
+
+class ReviewMediaItem {
+  final String id;
+  final String url;
+  final String thumbnailUrl;
+  final ReviewMediaType mediaType;
+  final int sortOrder;
+  final bool cover;
+  final bool active;
+  final String altText;
+
+  const ReviewMediaItem({
+    required this.id,
+    required this.url,
+    this.thumbnailUrl = '',
+    required this.mediaType,
+    this.sortOrder = 0,
+    this.cover = false,
+    this.active = true,
+    this.altText = '',
+  });
+
+  bool get hasSafeUrl => isSafeReviewMediaUrl(url);
+  bool get hasSafeThumbnailUrl => isSafeReviewMediaUrl(thumbnailUrl);
+  bool get isVisible => active && hasSafeUrl;
+
+  String get presentationUrl {
+    if (!hasSafeUrl) return '';
+    if (mediaType == ReviewMediaType.image && hasSafeThumbnailUrl) {
+      return thumbnailUrl.trim();
+    }
+    return url.trim();
+  }
+
+  ReviewMediaItem copyWith({
+    String? id,
+    String? url,
+    String? thumbnailUrl,
+    ReviewMediaType? mediaType,
+    int? sortOrder,
+    bool? cover,
+    bool? active,
+    String? altText,
+  }) =>
+      ReviewMediaItem(
+        id: id ?? this.id,
+        url: url ?? this.url,
+        thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
+        mediaType: mediaType ?? this.mediaType,
+        sortOrder: sortOrder ?? this.sortOrder,
+        cover: cover ?? this.cover,
+        active: active ?? this.active,
+        altText: altText ?? this.altText,
+      );
+}
+
+class PartnerReviewReply {
+  static const Object _unset = Object();
+
+  final String content;
+  final DateTime? repliedAt;
+  final DateTime? updatedAt;
+  final String partnerDisplayName;
+
+  const PartnerReviewReply({
+    required this.content,
+    this.repliedAt,
+    this.updatedAt,
+    this.partnerDisplayName = '',
+  });
+
+  bool get isVisible => content.trim().isNotEmpty;
+
+  PartnerReviewReply copyWith({
+    String? content,
+    Object? repliedAt = _unset,
+    Object? updatedAt = _unset,
+    String? partnerDisplayName,
+  }) =>
+      PartnerReviewReply(
+        content: content ?? this.content,
+        repliedAt: identical(repliedAt, _unset)
+            ? this.repliedAt
+            : repliedAt as DateTime?,
+        updatedAt: identical(updatedAt, _unset)
+            ? this.updatedAt
+            : updatedAt as DateTime?,
+        partnerDisplayName: partnerDisplayName ?? this.partnerDisplayName,
+      );
 }
 
 class TravelerReview {
@@ -695,10 +804,12 @@ class TravelerReview {
   final DateTime? approvedAt;
   final DateTime? rejectedAt;
   final String rejectReason;
+  final List<ReviewMediaItem> _media;
+  final PartnerReviewReply? partnerReply;
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  const TravelerReview({
+  TravelerReview({
     required this.id,
     this.bookingId,
     this.bookingCode = '',
@@ -720,12 +831,25 @@ class TravelerReview {
     this.approvedAt,
     this.rejectedAt,
     this.rejectReason = '',
+    List<ReviewMediaItem> media = const <ReviewMediaItem>[],
+    this.partnerReply,
     required this.createdAt,
     required this.updatedAt,
-  });
+  }) : _media = List.unmodifiable(media);
 
   bool get isPublic => status.isPublic;
   bool get hasVerifiedBooking => bookingCode.trim().isNotEmpty;
+  bool get hasPartnerReply => partnerReply?.isVisible == true;
+  List<ReviewMediaItem> get media => List.unmodifiable(_media);
+
+  List<ReviewMediaItem> get visibleMedia {
+    final items = _media.where((item) => item.isVisible).toList();
+    items.sort((a, b) {
+      final order = a.sortOrder.compareTo(b.sortOrder);
+      return order == 0 ? a.id.compareTo(b.id) : order;
+    });
+    return items;
+  }
 
   int? ratingFor(ReviewRatingCategory category) {
     switch (category) {
@@ -764,6 +888,8 @@ class TravelerReview {
     Object? approvedAt = _unset,
     Object? rejectedAt = _unset,
     String? rejectReason,
+    List<ReviewMediaItem>? media,
+    Object? partnerReply = _unset,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) =>
@@ -805,6 +931,10 @@ class TravelerReview {
             ? this.rejectedAt
             : rejectedAt as DateTime?,
         rejectReason: rejectReason ?? this.rejectReason,
+        media: media ?? this.media,
+        partnerReply: identical(partnerReply, _unset)
+            ? this.partnerReply
+            : partnerReply as PartnerReviewReply?,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
       );
@@ -2522,12 +2652,15 @@ bool isSafeDocumentMediaUrl(String value) {
   final trimmed = value.trim();
   if (trimmed.isEmpty) return false;
   final uri = Uri.tryParse(trimmed);
+  final scheme = uri?.scheme.toLowerCase();
   return uri != null &&
-      (uri.scheme == 'http' || uri.scheme == 'https') &&
+      (scheme == 'http' || scheme == 'https') &&
       uri.hasAuthority &&
       uri.host.trim().isNotEmpty &&
       uri.userInfo.isEmpty;
 }
+
+bool isSafeReviewMediaUrl(String value) => isSafeDocumentMediaUrl(value);
 
 class Trip {
   final int id;

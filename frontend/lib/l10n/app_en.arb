@@ -1964,7 +1964,97 @@
     }
   },
   "reviewPublicSummaryOnly": "The public backend contract exposes sanitized summaries only. Full review text is shown only in the author's review view.",
-  "reviewUnsupportedActionsNotice": "Customer edit/delete, helpful voting, reporting, media upload, and partner responses are not exposed by the committed user review contract.",
+  "reviewUnsupportedActionsNotice": "Customer edit/delete, helpful voting, reporting, media upload/delete, and partner-response mutation are not available in this local user app phase.",
+  "reviewMediaTitle": "Review media",
+  "reviewMediaCount": "{count, plural, =1{1 media item} other{{count} media items}}",
+  "@reviewMediaCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewMediaCountSemantic": "{count, plural, =1{1 review media item} other{{count} review media items}}",
+  "@reviewMediaCountSemantic": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewMoreMediaCount": "+{count} more",
+  "@reviewMoreMediaCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewMediaGallerySemantic": "Review media gallery with {count} items",
+  "@reviewMediaGallerySemantic": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewMediaItemSemantic": "Review media {index} of {total}, {type}, {description}",
+  "@reviewMediaItemSemantic": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "type": {
+        "type": "String"
+      },
+      "description": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewMediaIndex": "{index} of {total}",
+  "@reviewMediaIndex": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewMediaTypePhoto": "Photo",
+  "reviewMediaTypeVideo": "Video",
+  "reviewMediaTypeDocument": "Document",
+  "reviewCoverMedia": "Cover image",
+  "reviewMediaUnavailable": "Media unavailable",
+  "reviewImageUnavailable": "Image unavailable",
+  "reviewVideoPreviewUnavailable": "Video preview unavailable",
+  "reviewUnsupportedMedia": "Unsupported media",
+  "reviewPartnerResponseTitle": "Response from the property",
+  "reviewPropertyResponseIndicator": "Property response",
+  "reviewPartnerResponseSemantic": "Property response for {review}",
+  "@reviewPartnerResponseSemantic": {
+    "placeholders": {
+      "review": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewRespondedOn": "Responded on {date}",
+  "@reviewRespondedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewMediaAttachmentTitle": "Review media",
+  "reviewMediaAttachmentUnavailable": "Photo and video attachments will be available when the review media API is connected.",
+  "reviewUploadRequiresBackend": "This local demo submits text-only reviews; it does not upload files or accept typed media URLs.",
   "reviewDetailMetadataTitle": "Review metadata",
   "reviewLinkedBookingLabel": "Linked booking",
   "reviewCreatedAtLabel": "Submitted",

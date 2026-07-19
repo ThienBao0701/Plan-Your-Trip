@@ -6894,8 +6894,141 @@ abstract class AppLocalizations {
   /// No description provided for @reviewUnsupportedActionsNotice.
   ///
   /// In en, this message translates to:
-  /// **'Customer edit/delete, helpful voting, reporting, media upload, and partner responses are not exposed by the committed user review contract.'**
+  /// **'Customer edit/delete, helpful voting, reporting, media upload/delete, and partner-response mutation are not available in this local user app phase.'**
   String get reviewUnsupportedActionsNotice;
+
+  /// No description provided for @reviewMediaTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review media'**
+  String get reviewMediaTitle;
+
+  /// No description provided for @reviewMediaCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 media item} other{{count} media items}}'**
+  String reviewMediaCount(int count);
+
+  /// No description provided for @reviewMediaCountSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 review media item} other{{count} review media items}}'**
+  String reviewMediaCountSemantic(int count);
+
+  /// No description provided for @reviewMoreMediaCount.
+  ///
+  /// In en, this message translates to:
+  /// **'+{count} more'**
+  String reviewMoreMediaCount(int count);
+
+  /// No description provided for @reviewMediaGallerySemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Review media gallery with {count} items'**
+  String reviewMediaGallerySemantic(int count);
+
+  /// No description provided for @reviewMediaItemSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Review media {index} of {total}, {type}, {description}'**
+  String reviewMediaItemSemantic(
+      int index, int total, String type, String description);
+
+  /// No description provided for @reviewMediaIndex.
+  ///
+  /// In en, this message translates to:
+  /// **'{index} of {total}'**
+  String reviewMediaIndex(int index, int total);
+
+  /// No description provided for @reviewMediaTypePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo'**
+  String get reviewMediaTypePhoto;
+
+  /// No description provided for @reviewMediaTypeVideo.
+  ///
+  /// In en, this message translates to:
+  /// **'Video'**
+  String get reviewMediaTypeVideo;
+
+  /// No description provided for @reviewMediaTypeDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'Document'**
+  String get reviewMediaTypeDocument;
+
+  /// No description provided for @reviewCoverMedia.
+  ///
+  /// In en, this message translates to:
+  /// **'Cover image'**
+  String get reviewCoverMedia;
+
+  /// No description provided for @reviewMediaUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Media unavailable'**
+  String get reviewMediaUnavailable;
+
+  /// No description provided for @reviewImageUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Image unavailable'**
+  String get reviewImageUnavailable;
+
+  /// No description provided for @reviewVideoPreviewUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Video preview unavailable'**
+  String get reviewVideoPreviewUnavailable;
+
+  /// No description provided for @reviewUnsupportedMedia.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsupported media'**
+  String get reviewUnsupportedMedia;
+
+  /// No description provided for @reviewPartnerResponseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Response from the property'**
+  String get reviewPartnerResponseTitle;
+
+  /// No description provided for @reviewPropertyResponseIndicator.
+  ///
+  /// In en, this message translates to:
+  /// **'Property response'**
+  String get reviewPropertyResponseIndicator;
+
+  /// No description provided for @reviewPartnerResponseSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Property response for {review}'**
+  String reviewPartnerResponseSemantic(String review);
+
+  /// No description provided for @reviewRespondedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Responded on {date}'**
+  String reviewRespondedOn(String date);
+
+  /// No description provided for @reviewMediaAttachmentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review media'**
+  String get reviewMediaAttachmentTitle;
+
+  /// No description provided for @reviewMediaAttachmentUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo and video attachments will be available when the review media API is connected.'**
+  String get reviewMediaAttachmentUnavailable;
+
+  /// No description provided for @reviewUploadRequiresBackend.
+  ///
+  /// In en, this message translates to:
+  /// **'This local demo submits text-only reviews; it does not upload files or accept typed media URLs.'**
+  String get reviewUploadRequiresBackend;
 
   /// No description provided for @reviewDetailMetadataTitle.
   ///

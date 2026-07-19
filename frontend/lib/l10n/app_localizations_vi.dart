@@ -3808,7 +3808,104 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get reviewUnsupportedActionsNotice =>
-      'Hợp đồng đánh giá người dùng đã commit chưa có sửa/xóa phía khách hàng, bình chọn hữu ích, báo cáo, tải ảnh hoặc phản hồi từ đối tác.';
+      'Giai đoạn ứng dụng người dùng cục bộ này chưa có sửa/xóa phía khách hàng, bình chọn hữu ích, báo cáo, tải lên/xóa media hoặc chỉnh sửa phản hồi từ đối tác.';
+
+  @override
+  String get reviewMediaTitle => 'Media đánh giá';
+
+  @override
+  String reviewMediaCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mục media',
+      one: '1 mục media',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String reviewMediaCountSemantic(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count media đánh giá',
+      one: '1 media đánh giá',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String reviewMoreMediaCount(int count) {
+    return '+$count mục nữa';
+  }
+
+  @override
+  String reviewMediaGallerySemantic(int count) {
+    return 'Thư viện media đánh giá có $count mục';
+  }
+
+  @override
+  String reviewMediaItemSemantic(
+      int index, int total, String type, String description) {
+    return 'Media đánh giá $index trên $total, $type, $description';
+  }
+
+  @override
+  String reviewMediaIndex(int index, int total) {
+    return '$index trên $total';
+  }
+
+  @override
+  String get reviewMediaTypePhoto => 'Ảnh';
+
+  @override
+  String get reviewMediaTypeVideo => 'Video';
+
+  @override
+  String get reviewMediaTypeDocument => 'Tài liệu';
+
+  @override
+  String get reviewCoverMedia => 'Ảnh bìa';
+
+  @override
+  String get reviewMediaUnavailable => 'Media không khả dụng';
+
+  @override
+  String get reviewImageUnavailable => 'Ảnh không khả dụng';
+
+  @override
+  String get reviewVideoPreviewUnavailable => 'Chưa có xem trước video';
+
+  @override
+  String get reviewUnsupportedMedia => 'Media chưa hỗ trợ';
+
+  @override
+  String get reviewPartnerResponseTitle => 'Phản hồi từ nơi lưu trú';
+
+  @override
+  String get reviewPropertyResponseIndicator => 'Có phản hồi';
+
+  @override
+  String reviewPartnerResponseSemantic(String review) {
+    return 'Phản hồi của nơi lưu trú cho $review';
+  }
+
+  @override
+  String reviewRespondedOn(String date) {
+    return 'Đã phản hồi vào $date';
+  }
+
+  @override
+  String get reviewMediaAttachmentTitle => 'Media đánh giá';
+
+  @override
+  String get reviewMediaAttachmentUnavailable =>
+      'Đính kèm ảnh và video sẽ có khi API media đánh giá được kết nối.';
+
+  @override
+  String get reviewUploadRequiresBackend =>
+      'Demo cục bộ này chỉ gửi đánh giá dạng văn bản; không tải tệp lên hoặc nhận URL media nhập tay.';
 
   @override
   String get reviewDetailMetadataTitle => 'Siêu dữ liệu đánh giá';

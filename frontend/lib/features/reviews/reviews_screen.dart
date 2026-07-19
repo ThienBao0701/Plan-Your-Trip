@@ -364,6 +364,8 @@ class ReviewDetailScreen extends StatelessWidget {
     final review = app.reviewById(reviewId);
     final canShowFull = review != null &&
         (authorView || review.authorUserId == app.currentDemoUser.id);
+    final canShowTrustedMedia =
+        review != null && (review.isPublic || canShowFull);
     return Scaffold(
       appBar: OceanGlassAppBar(
         leading: IconButton(
@@ -467,6 +469,19 @@ class ReviewDetailScreen extends StatelessWidget {
                               ],
                             ),
                           ),
+                          if (canShowFull && _hasCategoryRatings(review)) ...[
+                            const SizedBox(height: AppSpacing.md),
+                            _CategoryRatingsCard(review: review),
+                          ],
+                          if (canShowTrustedMedia &&
+                              review.visibleMedia.isNotEmpty) ...[
+                            const SizedBox(height: AppSpacing.md),
+                            ReviewMediaGallery(review: review),
+                          ],
+                          if (review.hasPartnerReply) ...[
+                            const SizedBox(height: AppSpacing.md),
+                            _PartnerResponseCard(review: review),
+                          ],
                           if (canShowFull) ...[
                             const SizedBox(height: AppSpacing.md),
                             _FullReviewMetadata(review: review),
@@ -662,6 +677,30 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                                           setState(() => _facilities = value),
                                     ),
                                   ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          OceanGlassCard(
+                            key: const Key('review-media-boundary'),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  l10n.reviewMediaAttachmentTitle,
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium,
+                                ),
+                                const SizedBox(height: AppSpacing.xs),
+                                Text(
+                                  l10n.reviewMediaAttachmentUnavailable,
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                                const SizedBox(height: AppSpacing.xs),
+                                Text(
+                                  l10n.reviewUploadRequiresBackend,
+                                  style: Theme.of(context).textTheme.bodySmall,
                                 ),
                               ],
                             ),
@@ -921,6 +960,7 @@ class _ReviewCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final date = DateFormat.yMMMd(Localizations.localeOf(context).toString());
+    final media = review.visibleMedia;
     return OceanGlassCard(
       key: Key('review-card-${review.id}'),
       onTap: onTap,
@@ -965,6 +1005,19 @@ class _ReviewCard extends StatelessWidget {
                 icon: Icons.calendar_month_rounded,
                 color: AppColors.turquoise600,
               ),
+              if (media.isNotEmpty)
+                OceanStatusPill(
+                  label: l10n.reviewMediaCount(media.length),
+                  icon: Icons.photo_library_rounded,
+                  color: AppColors.ocean,
+                  semanticLabel: l10n.reviewMediaCountSemantic(media.length),
+                ),
+              if (review.hasPartnerReply)
+                OceanStatusPill(
+                  label: l10n.reviewPropertyResponseIndicator,
+                  icon: Icons.reply_rounded,
+                  color: AppColors.success,
+                ),
               if (!publicSummary && review.hasVerifiedBooking)
                 OceanStatusPill(
                   label: l10n.reviewVerifiedStay,
@@ -973,6 +1026,10 @@ class _ReviewCard extends StatelessWidget {
                 ),
             ],
           ),
+          if (media.isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.sm),
+            _ReviewMediaStrip(review: review),
+          ],
           if (!publicSummary && review.content.isNotEmpty) ...[
             const SizedBox(height: AppSpacing.sm),
             Text(
@@ -982,6 +1039,368 @@ class _ReviewCard extends StatelessWidget {
               style: Theme.of(context).textTheme.bodyMedium,
             ),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+class _ReviewMediaStrip extends StatelessWidget {
+  final TravelerReview review;
+
+  const _ReviewMediaStrip({required this.review});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final media = review.visibleMedia;
+    final visible = media.take(3).toList();
+    return Semantics(
+      label: l10n.reviewMediaCountSemantic(media.length),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            for (var index = 0; index < visible.length; index++)
+              Padding(
+                padding: const EdgeInsets.only(right: AppSpacing.sm),
+                child: SizedBox(
+                  width: 128,
+                  child: _ReviewMediaTile(
+                    item: visible[index],
+                    index: index,
+                    total: media.length,
+                    compact: true,
+                  ),
+                ),
+              ),
+            if (media.length > visible.length)
+              OceanGlassSurface(
+                blur: 0,
+                color: AppColors.paleCyan,
+                child: Text(
+                    l10n.reviewMoreMediaCount(media.length - visible.length)),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ReviewMediaGallery extends StatelessWidget {
+  final TravelerReview review;
+
+  const ReviewMediaGallery({super.key, required this.review});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final media = review.visibleMedia;
+    if (media.isEmpty) return const SizedBox.shrink();
+    return OceanGlassCard(
+      key: Key('review-media-gallery-${review.id}'),
+      semanticLabel: l10n.reviewMediaGallerySemantic(media.length),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Wrap(
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.xs,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Text(
+                l10n.reviewMediaTitle,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              OceanStatusPill(
+                label: l10n.reviewMediaCount(media.length),
+                icon: Icons.photo_library_rounded,
+                color: AppColors.ocean,
+                semanticLabel: l10n.reviewMediaCountSemantic(media.length),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final maxWidth = constraints.maxWidth.isFinite
+                  ? constraints.maxWidth
+                  : AppBreakpoints.maxContentWidth;
+              final columns = maxWidth >= 720 ? 2 : 1;
+              final itemWidth =
+                  (maxWidth - (columns - 1) * AppSpacing.sm) / columns;
+              return Wrap(
+                spacing: AppSpacing.sm,
+                runSpacing: AppSpacing.md,
+                children: [
+                  for (var index = 0; index < media.length; index++)
+                    SizedBox(
+                      width: itemWidth,
+                      child: _ReviewMediaTile(
+                        item: media[index],
+                        index: index,
+                        total: media.length,
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ReviewMediaTile extends StatelessWidget {
+  final ReviewMediaItem item;
+  final int index;
+  final int total;
+  final bool compact;
+
+  const _ReviewMediaTile({
+    required this.item,
+    required this.index,
+    required this.total,
+    this.compact = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final typeLabel = reviewMediaTypeLabel(l10n, item.mediaType);
+    final description = item.altText.trim().isEmpty
+        ? l10n.reviewMediaUnavailable
+        : item.altText;
+    return Semantics(
+      label: l10n.reviewMediaItemSemantic(
+        index + 1,
+        total,
+        typeLabel,
+        description,
+      ),
+      image: item.mediaType == ReviewMediaType.image,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(AppRadii.md),
+            child: AspectRatio(
+              aspectRatio: compact ? 4 / 3 : 16 / 9,
+              child: _mediaPreview(context, item),
+            ),
+          ),
+          if (!compact) ...[
+            const SizedBox(height: AppSpacing.xs),
+            Wrap(
+              spacing: AppSpacing.xs,
+              runSpacing: AppSpacing.xs,
+              children: [
+                OceanStatusPill(
+                  label: l10n.reviewMediaIndex(index + 1, total),
+                  icon: Icons.collections_rounded,
+                  color: AppColors.turquoise600,
+                ),
+                OceanStatusPill(
+                  label: typeLabel,
+                  icon: item.mediaType == ReviewMediaType.video
+                      ? Icons.videocam_rounded
+                      : Icons.image_rounded,
+                  color: AppColors.ocean,
+                ),
+                if (item.cover && item.mediaType == ReviewMediaType.image)
+                  OceanStatusPill(
+                    label: l10n.reviewCoverMedia,
+                    icon: Icons.star_rounded,
+                    color: AppColors.success,
+                  ),
+              ],
+            ),
+            if (item.altText.trim().isNotEmpty) ...[
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                item.altText,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ],
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _mediaPreview(BuildContext context, ReviewMediaItem item) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (item.mediaType) {
+      case ReviewMediaType.image:
+        final url = item.presentationUrl;
+        if (url.isEmpty) {
+          return _MediaFallback(
+            icon: Icons.broken_image_rounded,
+            label: l10n.reviewImageUnavailable,
+            compact: compact,
+          );
+        }
+        return Image.network(
+          url,
+          fit: BoxFit.cover,
+          semanticLabel: item.altText.trim().isEmpty
+              ? l10n.reviewImageUnavailable
+              : item.altText,
+          errorBuilder: (_, __, ___) => _MediaFallback(
+            icon: Icons.broken_image_rounded,
+            label: l10n.reviewImageUnavailable,
+            compact: compact,
+          ),
+        );
+      case ReviewMediaType.video:
+        return _MediaFallback(
+          icon: Icons.videocam_rounded,
+          label: l10n.reviewVideoPreviewUnavailable,
+          compact: compact,
+        );
+      case ReviewMediaType.document:
+        return _MediaFallback(
+          icon: Icons.insert_drive_file_rounded,
+          label: l10n.reviewUnsupportedMedia,
+          compact: compact,
+        );
+    }
+  }
+}
+
+class _MediaFallback extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool compact;
+
+  const _MediaFallback({
+    required this.icon,
+    required this.label,
+    this.compact = false,
+  });
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+        builder: (context, constraints) {
+          final compactLayout = compact || constraints.maxHeight < 88;
+          return Container(
+            color: AppColors.mist,
+            alignment: Alignment.center,
+            padding:
+                EdgeInsets.all(compactLayout ? AppSpacing.xs : AppSpacing.md),
+            child: compactLayout
+                ? Icon(icon, color: AppColors.ocean, size: 22)
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(icon, color: AppColors.ocean),
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(
+                        label,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
+          );
+        },
+      );
+}
+
+class _PartnerResponseCard extends StatelessWidget {
+  final TravelerReview review;
+
+  const _PartnerResponseCard({required this.review});
+
+  @override
+  Widget build(BuildContext context) {
+    final reply = review.partnerReply;
+    if (reply == null || !reply.isVisible) return const SizedBox.shrink();
+    final l10n = AppLocalizations.of(context)!;
+    final date = DateFormat.yMMMd(Localizations.localeOf(context).toString());
+    return OceanGlassCard(
+      key: Key('review-partner-response-${review.id}'),
+      semanticLabel: l10n.reviewPartnerResponseSemantic(
+        review.title.isEmpty ? review.placeName : review.title,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(Icons.reply_rounded, color: AppColors.success),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.reviewPartnerResponseTitle,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    if (reply.partnerDisplayName.trim().isNotEmpty)
+                      Text(
+                        reply.partnerDisplayName,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Text(reply.content, style: Theme.of(context).textTheme.bodyLarge),
+          if (reply.repliedAt != null) ...[
+            const SizedBox(height: AppSpacing.sm),
+            OceanStatusPill(
+              label: l10n.reviewRespondedOn(date.format(reply.repliedAt!)),
+              icon: Icons.schedule_rounded,
+              color: AppColors.turquoise600,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _CategoryRatingsCard extends StatelessWidget {
+  final TravelerReview review;
+
+  const _CategoryRatingsCard({required this.review});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return OceanGlassCard(
+      key: Key('review-category-ratings-${review.id}'),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.reviewCategoryRatingsTitle,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Wrap(
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
+            children: [
+              for (final category in ReviewRatingCategory.values)
+                if (review.ratingFor(category) != null)
+                  OceanStatusPill(
+                    label: l10n.reviewCategoryAverage(
+                      reviewCategoryLabel(l10n, category),
+                      review.ratingFor(category)!.toString(),
+                    ),
+                    icon: Icons.star_half_rounded,
+                    color: AppColors.ocean,
+                  ),
+            ],
+          ),
         ],
       ),
     );
@@ -1188,6 +1607,9 @@ class _OptionalRatingDropdown extends StatelessWidget {
   }
 }
 
+bool _hasCategoryRatings(TravelerReview review) => ReviewRatingCategory.values
+    .any((category) => review.ratingFor(category) != null);
+
 String reviewStatusLabel(AppLocalizations l10n, ReviewStatus status) {
   switch (status) {
     case ReviewStatus.pending:
@@ -1200,6 +1622,20 @@ String reviewStatusLabel(AppLocalizations l10n, ReviewStatus status) {
       return l10n.reviewStatusHidden;
     case ReviewStatus.reported:
       return l10n.reviewStatusReported;
+  }
+}
+
+String reviewMediaTypeLabel(
+  AppLocalizations l10n,
+  ReviewMediaType type,
+) {
+  switch (type) {
+    case ReviewMediaType.image:
+      return l10n.reviewMediaTypePhoto;
+    case ReviewMediaType.video:
+      return l10n.reviewMediaTypeVideo;
+    case ReviewMediaType.document:
+      return l10n.reviewMediaTypeDocument;
   }
 }
 

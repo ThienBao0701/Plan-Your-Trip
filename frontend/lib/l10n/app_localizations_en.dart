@@ -3923,7 +3923,104 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reviewUnsupportedActionsNotice =>
-      'Customer edit/delete, helpful voting, reporting, media upload, and partner responses are not exposed by the committed user review contract.';
+      'Customer edit/delete, helpful voting, reporting, media upload/delete, and partner-response mutation are not available in this local user app phase.';
+
+  @override
+  String get reviewMediaTitle => 'Review media';
+
+  @override
+  String reviewMediaCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count media items',
+      one: '1 media item',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String reviewMediaCountSemantic(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count review media items',
+      one: '1 review media item',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String reviewMoreMediaCount(int count) {
+    return '+$count more';
+  }
+
+  @override
+  String reviewMediaGallerySemantic(int count) {
+    return 'Review media gallery with $count items';
+  }
+
+  @override
+  String reviewMediaItemSemantic(
+      int index, int total, String type, String description) {
+    return 'Review media $index of $total, $type, $description';
+  }
+
+  @override
+  String reviewMediaIndex(int index, int total) {
+    return '$index of $total';
+  }
+
+  @override
+  String get reviewMediaTypePhoto => 'Photo';
+
+  @override
+  String get reviewMediaTypeVideo => 'Video';
+
+  @override
+  String get reviewMediaTypeDocument => 'Document';
+
+  @override
+  String get reviewCoverMedia => 'Cover image';
+
+  @override
+  String get reviewMediaUnavailable => 'Media unavailable';
+
+  @override
+  String get reviewImageUnavailable => 'Image unavailable';
+
+  @override
+  String get reviewVideoPreviewUnavailable => 'Video preview unavailable';
+
+  @override
+  String get reviewUnsupportedMedia => 'Unsupported media';
+
+  @override
+  String get reviewPartnerResponseTitle => 'Response from the property';
+
+  @override
+  String get reviewPropertyResponseIndicator => 'Property response';
+
+  @override
+  String reviewPartnerResponseSemantic(String review) {
+    return 'Property response for $review';
+  }
+
+  @override
+  String reviewRespondedOn(String date) {
+    return 'Responded on $date';
+  }
+
+  @override
+  String get reviewMediaAttachmentTitle => 'Review media';
+
+  @override
+  String get reviewMediaAttachmentUnavailable =>
+      'Photo and video attachments will be available when the review media API is connected.';
+
+  @override
+  String get reviewUploadRequiresBackend =>
+      'This local demo submits text-only reviews; it does not upload files or accept typed media URLs.';
 
   @override
   String get reviewDetailMetadataTitle => 'Review metadata';
