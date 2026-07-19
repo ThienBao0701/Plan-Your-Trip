@@ -207,6 +207,126 @@ void main() {
     );
   });
 
+  test('fresh demo state seeds exactly one completed reviewable booking', () {
+    expect(MockData.buildDemoBookings(sourcePlaces: const <Place>[]), isEmpty);
+    final app = demoState();
+    final booking = app.demoBookings.single;
+    final summaryBefore = app.reviewSummaryForPlace(booking.hotel.id);
+    final totalBefore = booking.quote.finalQuotedPrice;
+    final currencyBefore = booking.quote.currency;
+    final statusBefore = booking.status;
+    final placeBefore = booking.hotel.id;
+
+    expect(booking.code, MockData.demoReviewBookingCode);
+    expect(booking.status, BookingStatus.completed);
+    expect(booking.hotel.id, MockData.places.first.id);
+    expect(booking.room.id, 101);
+    expect(booking.ratePlan.ratePlanId, 1001);
+    expect(booking.hotel.effectiveCategorySlug, 'accommodation');
+    expect(booking.criteria.checkIn, DateTime(2026, 6, 10));
+    expect(booking.criteria.checkOut, DateTime(2026, 6, 12));
+    expect(booking.criteria.checkOut.isBefore(fixedNow), isTrue);
+    expect(booking.criteria.adults, greaterThan(0));
+    expect(booking.criteria.adults, lessThanOrEqualTo(booking.room.maxAdults));
+    expect(booking.criteria.guests, lessThanOrEqualTo(booking.room.maxGuests));
+    expect(booking.quote.currency, 'VND');
+    expect(booking.quote.finalQuotedPrice, 2500000);
+    expect(booking.quote.finalQuotedPrice!.isFinite, isTrue);
+    expect(booking.quote.finalQuotedPrice, greaterThan(0));
+    expect(booking.quote.staySubtotal, booking.quote.finalQuotedPrice);
+    expect(booking.quote.totalBeforeCustomerBenefits,
+        booking.quote.finalQuotedPrice);
+    expect(
+      app.reviews.any((review) => review.bookingCode == booking.code),
+      isFalse,
+    );
+    expect(app.reviewEligibilityForBooking(booking).canReview, isTrue);
+
+    expect(
+        bookingInSection(booking, BookingSection.all, today: fixedNow), isTrue);
+    expect(bookingInSection(booking, BookingSection.history, today: fixedNow),
+        isTrue);
+    expect(bookingInSection(booking, BookingSection.upcoming, today: fixedNow),
+        isFalse);
+    expect(bookingInSection(booking, BookingSection.active, today: fixedNow),
+        isFalse);
+
+    expect(
+      app.createDemoReviewForBooking(
+        bookingCode: booking.code,
+        ratingOverall: 5,
+        title: 'Fresh demo booking',
+        content:
+            'The seeded booking makes the local write-review flow visible.',
+      ),
+      ReviewActionResult.success,
+    );
+
+    final created = app.myReviews().firstWhere(
+          (review) => review.bookingCode == booking.code,
+        );
+    expect(created.status, ReviewStatus.pending);
+    expect(created.placeId, placeBefore);
+    expect(created.authorUserId, app.currentDemoUser.id);
+    expect(created.hasVerifiedBooking, isTrue);
+    expect(
+        app.reviewSummaryForPlace(booking.hotel.id).total, summaryBefore.total);
+    expect(app.reviewSummaryForPlace(booking.hotel.id).average,
+        summaryBefore.average);
+    expect(
+      app.createDemoReviewForBooking(
+        bookingCode: booking.code,
+        ratingOverall: 5,
+      ),
+      ReviewActionResult.duplicate,
+    );
+    expect(
+      app.reviews.where((review) => review.bookingCode == booking.code),
+      hasLength(1),
+    );
+
+    final preserved = app.demoBookings.singleWhere(
+      (item) => item.code == booking.code,
+    );
+    expect(preserved.status, statusBefore);
+    expect(preserved.quote.finalQuotedPrice, totalBefore);
+    expect(preserved.quote.currency, currencyBefore);
+    expect(preserved.hotel.id, placeBefore);
+  });
+
+  test('seeded demo booking stays isolated from real and reset states',
+      () async {
+    final real = realState();
+    expect(real.demoBookings, isEmpty);
+    expect(
+      real.createDemoReviewForBooking(
+        bookingCode: MockData.demoReviewBookingCode,
+        ratingOverall: 5,
+      ),
+      ReviewActionResult.unavailable,
+    );
+
+    final app = demoState();
+    expect(
+      app.demoBookings
+          .where((booking) => booking.code == MockData.demoReviewBookingCode),
+      hasLength(1),
+    );
+    await app.logout();
+    expect(
+      app.demoBookings
+          .where((booking) => booking.code == MockData.demoReviewBookingCode),
+      hasLength(1),
+    );
+
+    final nextSession = demoState();
+    expect(
+      nextSession.demoBookings
+          .where((booking) => booking.code == MockData.demoReviewBookingCode),
+      hasLength(1),
+    );
+  });
+
   test('ineligible and real-mode review creation cannot mutate state', () {
     final confirmed = completedBooking().copyWith(
       code: 'PYT-DEMO-9100',
@@ -270,6 +390,101 @@ void main() {
       ReviewActionResult.invalidRating,
     );
     expect(app.reviews.length, MockData.reviews.length);
+  });
+
+  testWidgets('fresh Demo Mode My Bookings exposes sample review flow',
+      (tester) async {
+    final app = demoState();
+
+    await pumpSize(
+      tester,
+      MyBookingsScreen(today: fixedNow),
+      const Size(900, 1400),
+      app: app,
+    );
+
+    final card =
+        find.byKey(const Key('booking-card-${MockData.demoReviewBookingCode}'));
+    expect(card, findsOneWidget);
+
+    await tester.tap(find.text('History'));
+    await tester.pumpAndSettle();
+    expect(card, findsOneWidget);
+
+    await tester.tap(find.text('Upcoming'));
+    await tester.pumpAndSettle();
+    expect(card, findsNothing);
+
+    await tester.tap(find.text('Active'));
+    await tester.pumpAndSettle();
+    expect(card, findsNothing);
+
+    await tester.tap(find.text('All'));
+    await tester.pumpAndSettle();
+    await tester.tap(card);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('booking-detail-write-review')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('write-review-screen')), findsOneWidget);
+
+    await tester.enterText(
+      find.byKey(const Key('review-title-field')),
+      'Seeded demo stay',
+    );
+    await tester.enterText(
+      find.byKey(const Key('review-content-field')),
+      'This pending review is created from the fresh demo booking.',
+    );
+    await tester.tap(find.byKey(const Key('review-submit-action')));
+    await tester.pumpAndSettle();
+
+    expect(
+      app.reviews.where(
+          (review) => review.bookingCode == MockData.demoReviewBookingCode),
+      hasLength(1),
+    );
+    expect(
+      app.reviewEligibilityForBooking(app.demoBookings.single).result,
+      ReviewActionResult.duplicate,
+    );
+  });
+
+  testWidgets(
+      'narrow Demo Mode My Bookings shows seeded booking without overflow',
+      (tester) async {
+    final app = demoState();
+
+    await pumpSize(
+      tester,
+      MyBookingsScreen(today: fixedNow),
+      const Size(430, 932),
+      app: app,
+    );
+
+    expect(
+      find.byKey(const Key('booking-card-${MockData.demoReviewBookingCode}')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'wide Demo Mode My Bookings shows seeded booking without overflow',
+      (tester) async {
+    final app = demoState();
+
+    await pumpSize(
+      tester,
+      MyBookingsScreen(today: fixedNow),
+      const Size(1440, 900),
+      app: app,
+    );
+
+    expect(
+      find.byKey(const Key('booking-card-${MockData.demoReviewBookingCode}')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('Place Detail shows review summary and public list is sanitized',

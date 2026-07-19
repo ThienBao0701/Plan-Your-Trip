@@ -40,11 +40,11 @@ void main() {
     )
       ..demoMode = demoMode
       ..email = demoMode ? MockData.demoEmail : 'real@example.com';
+    app.demoBookings = [];
     if (!demoMode) {
       app.trips = [];
       app.timeline = [];
       app.expenses = [];
-      app.demoBookings = [];
     }
     return app;
   }

@@ -38,7 +38,7 @@ class AppState extends ChangeNotifier {
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
-  List<DemoBooking> demoBookings = [];
+  List<DemoBooking> demoBookings = List.from(MockData.demoBookings);
   TravelCreditAccount? travelCreditAccount = MockData.travelCreditAccount;
   List<TravelCreditTransaction> travelCreditTransactions =
       List.from(MockData.travelCreditTransactions);
@@ -114,7 +114,7 @@ class AppState extends ChangeNotifier {
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
-    demoBookings = [];
+    demoBookings = List.from(MockData.demoBookings);
     travelWalletItems = List.from(MockData.travelWalletItems);
     tripDocuments = List.from(MockData.tripDocuments);
     tripCollaborators = List.from(MockData.tripCollaborators);
@@ -133,7 +133,7 @@ class AppState extends ChangeNotifier {
       trips = List.from(MockData.trips);
       timeline = List.from(MockData.timeline);
       expenses = List.from(MockData.expenses);
-      demoBookings = [];
+      demoBookings = List.from(MockData.demoBookings);
       travelWalletItems = List.from(MockData.travelWalletItems);
       tripDocuments = List.from(MockData.tripDocuments);
       tripCollaborators = List.from(MockData.tripCollaborators);

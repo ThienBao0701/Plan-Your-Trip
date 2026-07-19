@@ -591,6 +591,101 @@ class MockData {
         isFeatured: false),
   ];
 
+  static const demoReviewBookingCode = 'PYT-DEMO-8801';
+  static const _demoReviewPlaceId = 1;
+  static const _demoReviewRoomId = 101;
+  static const _demoReviewRatePlanId = 1001;
+
+  static final demoBookings = buildDemoBookings();
+
+  static List<DemoBooking> buildDemoBookings({List<Place>? sourcePlaces}) {
+    final availablePlaces = sourcePlaces ?? places;
+    final hotel = _firstWhereOrNull(
+      availablePlaces,
+      (place) => place.id == _demoReviewPlaceId && place.hotelDetail != null,
+    );
+    final room = _firstWhereOrNull(
+      hotel?.hotelDetail?.rooms ?? const <HotelRoom>[],
+      (room) => room.id == _demoReviewRoomId,
+    );
+    final ratePlan = _firstWhereOrNull(
+      room?.ratePlans ?? const <HotelRatePlan>[],
+      (plan) =>
+          plan.ratePlanId == _demoReviewRatePlanId &&
+          plan.finalNightlyRate != null &&
+          plan.finalNightlyRate! > 0,
+    );
+    if (hotel == null || room == null || ratePlan == null) {
+      return const <DemoBooking>[];
+    }
+
+    final checkIn = DateTime(2026, 6, 10);
+    final checkOut = DateTime(2026, 6, 12);
+    final createdAt = DateTime(2026, 5, 20, 9);
+    final criteria = HotelStayCriteria(
+      destination: hotel.city,
+      checkIn: checkIn,
+      checkOut: checkOut,
+      adults: 2,
+      children: 0,
+      tripId: 1,
+    );
+    final nightlyRate = ratePlan.finalNightlyRate!;
+    final stayTotal = nightlyRate * criteria.nights;
+
+    return [
+      DemoBooking(
+        code: demoReviewBookingCode,
+        hotel: hotel,
+        room: room,
+        ratePlan: ratePlan,
+        quote: HotelPricingQuote(
+          roomId: room.id,
+          roomName: room.roomName,
+          roomCode: room.roomCode,
+          placeId: hotel.id,
+          hotelId: hotel.id,
+          checkIn: criteria.checkIn,
+          checkOut: criteria.checkOut,
+          nights: criteria.nights,
+          adults: criteria.adults,
+          children: criteria.children,
+          extraBeds: criteria.extraBeds,
+          selectedRatePlanId: ratePlan.ratePlanId,
+          selectedRatePlanCode: ratePlan.code,
+          selectedRatePlanName: ratePlan.rateName,
+          mealPlanType: ratePlan.mealPlan,
+          cancellationPolicyType: ratePlan.cancellationPolicyType,
+          refundable: ratePlan.refundable,
+          baseNightlyRate: ratePlan.baseNightlyRate,
+          finalNightlyRate: nightlyRate,
+          staySubtotal: stayTotal,
+          totalBeforeCustomerBenefits: stayTotal,
+          finalQuotedPrice: stayTotal,
+          currency: 'VND',
+          inventoryAvailable: true,
+          availableRooms: room.availableQuantity,
+          quoteGeneratedAt: createdAt,
+          quoteExpiresAt: createdAt.add(const Duration(minutes: 15)),
+          warnings: const ['Local preview quote. No inventory is reserved.'],
+        ),
+        criteria: criteria,
+        status: BookingStatus.completed,
+        createdAt: createdAt,
+      ),
+    ];
+  }
+
+  static T? _firstWhereOrNull<T>(
+    Iterable<T> items,
+    bool Function(T item) test,
+  ) {
+    for (final item in items) {
+      if (test(item)) return item;
+    }
+    return null;
+  }
+
   static final travelCreditAccount = TravelCreditAccount(
     id: 'tc-demo-account',
     userId: 'demo-user',
