@@ -1,5 +1,8 @@
 package com.example.planyourtrip.service;
 
+import com.example.planyourtrip.dto.MediaDto.MediaAssetRequest;
+import com.example.planyourtrip.dto.MediaDto.MediaAssetResponse;
+import com.example.planyourtrip.dto.MediaDto.ReviewMediaRequest;
 import com.example.planyourtrip.dto.ReviewDto.*;
 import com.example.planyourtrip.exception.ApiException;
 import com.example.planyourtrip.model.*;
@@ -10,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ReviewService {
@@ -20,19 +25,25 @@ public class ReviewService {
     private final UserRepository userRepo;
     private final PartnerProfileRepository partnerProfileRepo;
     private final NotificationService notificationService;
+    private final MediaAssetService mediaAssetService;
+    private final MediaAssetRepository mediaAssetRepo;
 
     public ReviewService(ReviewRepository reviewRepo,
                           BookingRepository bookingRepo,
                           PlaceRepository placeRepo,
                           UserRepository userRepo,
                           PartnerProfileRepository partnerProfileRepo,
-                          NotificationService notificationService) {
+                          NotificationService notificationService,
+                          MediaAssetService mediaAssetService,
+                          MediaAssetRepository mediaAssetRepo) {
         this.reviewRepo = reviewRepo;
         this.bookingRepo = bookingRepo;
         this.placeRepo = placeRepo;
         this.userRepo = userRepo;
         this.partnerProfileRepo = partnerProfileRepo;
         this.notificationService = notificationService;
+        this.mediaAssetService = mediaAssetService;
+        this.mediaAssetRepo = mediaAssetRepo;
     }
 
     /** Body-based create route: {@code POST /api/reviews} (bookingId in the payload). */
@@ -117,20 +128,69 @@ public class ReviewService {
 
     @Transactional(readOnly = true)
     public List<ReviewSummaryResponse> getMyReviews(Long userId) {
-        return reviewRepo.findByUserIdOrderByCreatedAtDesc(userId)
-            .stream().map(this::toSummary).toList();
+        List<Review> reviews = reviewRepo.findByUserIdOrderByCreatedAtDesc(userId);
+        Map<Long, List<ReviewMediaItem>> media = loadMediaBatch(reviews);
+        return reviews.stream()
+            .map(r -> toSummary(r, media.getOrDefault(r.getId(), List.of())))
+            .toList();
     }
 
     @Transactional(readOnly = true)
     public List<ReviewSummaryResponse> getPlaceReviews(Long placeId) {
-        return reviewRepo.findByPlaceIdAndStatusOrderByCreatedAtDesc(placeId, ReviewStatus.APPROVED)
-            .stream().map(this::toSummary).toList();
+        List<Review> reviews = reviewRepo.findByPlaceIdAndStatusOrderByCreatedAtDesc(placeId, ReviewStatus.APPROVED);
+        Map<Long, List<ReviewMediaItem>> media = loadMediaBatch(reviews);
+        return reviews.stream()
+            .map(r -> toSummary(r, media.getOrDefault(r.getId(), List.of())))
+            .toList();
     }
 
     @Transactional(readOnly = true)
     public List<ReviewResponse> adminListReviews() {
-        return reviewRepo.findAllByOrderByCreatedAtDesc()
-            .stream().map(this::toResponse).toList();
+        List<Review> reviews = reviewRepo.findAllByOrderByCreatedAtDesc();
+        Map<Long, List<ReviewMediaItem>> media = loadMediaBatch(reviews);
+        return reviews.stream()
+            .map(r -> toResponse(r, media.getOrDefault(r.getId(), List.of())))
+            .toList();
+    }
+
+    // ── Phase 7.45 — customer review-media management (reuses MediaAssetService) ──
+
+    /**
+     * Attach media to a review the caller owns. The registration reuses
+     * {@link MediaAssetService#create} verbatim (same validation: url required,
+     * mediaType required, cover-only-IMAGE). {@code ownerType}/{@code ownerId} are
+     * FORCED to REVIEW / the path reviewId — never taken from the client.
+     * Wrong owner → 403, matching the existing review ownership convention.
+     */
+    @Transactional
+    public MediaAssetResponse addReviewMedia(Long userId, Long reviewId, ReviewMediaRequest req) {
+        Review review = reviewOrThrow(reviewId);
+        requireOwner(userId, review);
+        MediaAssetRequest full = new MediaAssetRequest(
+            MediaOwnerType.REVIEW, reviewId,
+            req.url(), req.thumbnailUrl(), req.mediaType(),
+            req.altText(), req.sortOrder(), req.cover());
+        return mediaAssetService.create(full, userId);
+    }
+
+    /**
+     * Soft-delete (deactivate) one media asset attached to a review the caller owns.
+     * Reuses {@link MediaAssetService#deactivate} — the same soft-delete the admin
+     * media surface uses. The media must belong to THIS review (ownerType=REVIEW,
+     * ownerId=reviewId) else 404; wrong review owner → 403.
+     */
+    @Transactional
+    public MediaAssetResponse deleteReviewMedia(Long userId, Long reviewId, Long mediaId) {
+        Review review = reviewOrThrow(reviewId);
+        requireOwner(userId, review);
+        if (!mediaAssetRepo.existsByOwnerTypeAndOwnerIdAndId(MediaOwnerType.REVIEW, reviewId, mediaId))
+            throw new ApiException(HttpStatus.NOT_FOUND, "Media asset not found: " + mediaId);
+        return mediaAssetService.deactivate(mediaId);
+    }
+
+    private void requireOwner(Long userId, Review review) {
+        if (!review.getUser().getId().equals(userId))
+            throw new ApiException(HttpStatus.FORBIDDEN, "Access denied: review belongs to another user");
     }
 
     @Transactional
@@ -259,6 +319,10 @@ public class ReviewService {
     }
 
     private ReviewResponse toResponse(Review r) {
+        return toResponse(r, loadMedia(r.getId()));
+    }
+
+    private ReviewResponse toResponse(Review r, List<ReviewMediaItem> media) {
         return new ReviewResponse(
             r.getId(),
             r.getBooking().getId(), r.getBooking().getBookingCode(),
@@ -271,19 +335,54 @@ public class ReviewService {
             r.getHelpfulCount(), r.getReportedCount(),
             r.getApprovedAt(), r.getRejectedAt(), r.getRejectReason(),
             r.getCreatedAt(), r.getUpdatedAt(),
-            toReplyInfo(r)
+            toReplyInfo(r),
+            media
         );
     }
 
     private ReviewSummaryResponse toSummary(Review r) {
+        return toSummary(r, loadMedia(r.getId()));
+    }
+
+    private ReviewSummaryResponse toSummary(Review r, List<ReviewMediaItem> media) {
         return new ReviewSummaryResponse(
             r.getId(),
             r.getPlace().getId(), r.getPlace().getName(),
             r.getUser().getId(), r.getUser().getFullName(),
             r.getRatingOverall(), r.getTitle(),
             r.getStatus().name(), r.getCreatedAt(),
-            toReplyInfo(r)
+            toReplyInfo(r),
+            media
         );
+    }
+
+    // ── Phase 7.45 — review media read projection (ownerType=REVIEW) ─────────────
+
+    /** Active media for ONE review, ordered by (sortOrder, id). Used by single-review reads. */
+    private List<ReviewMediaItem> loadMedia(Long reviewId) {
+        return mediaAssetRepo
+            .findByOwnerTypeAndOwnerIdAndActiveTrueOrderBySortOrderAscIdAsc(MediaOwnerType.REVIEW, reviewId)
+            .stream().map(this::toMediaItem).toList();
+    }
+
+    /**
+     * Batch load of active media for many reviews — ONE query — grouped by reviewId,
+     * so list endpoints avoid an N+1 media lookup per review.
+     */
+    private Map<Long, List<ReviewMediaItem>> loadMediaBatch(List<Review> reviews) {
+        if (reviews.isEmpty()) return Map.of();
+        List<Long> ids = reviews.stream().map(Review::getId).toList();
+        return mediaAssetRepo
+            .findByOwnerTypeAndOwnerIdInAndActiveTrueOrderBySortOrderAscIdAsc(MediaOwnerType.REVIEW, ids)
+            .stream()
+            .collect(Collectors.groupingBy(MediaAsset::getOwnerId,
+                Collectors.mapping(this::toMediaItem, Collectors.toList())));
+    }
+
+    private ReviewMediaItem toMediaItem(MediaAsset a) {
+        return new ReviewMediaItem(
+            a.getId(), a.getUrl(), a.getThumbnailUrl(),
+            a.getMediaType(), a.getSortOrder(), a.isCover(), a.getAltText());
     }
 
     /** Safe reply projection: null when the review has no partner reply. */

@@ -1,5 +1,7 @@
 package com.example.planyourtrip.controller;
 
+import com.example.planyourtrip.dto.MediaDto.MediaAssetResponse;
+import com.example.planyourtrip.dto.MediaDto.ReviewMediaRequest;
 import com.example.planyourtrip.dto.ReviewDto.*;
 import com.example.planyourtrip.security.AuthUser;
 import com.example.planyourtrip.service.ReviewService;
@@ -50,5 +52,24 @@ public class ReviewController {
     @Operation(summary = "List approved reviews for a place (public)")
     public List<ReviewSummaryResponse> getPlaceReviews(@PathVariable Long placeId) {
         return service.getPlaceReviews(placeId);
+    }
+
+    // ── Phase 7.45 — customer manages media on their OWN review ─────────────────
+    // Review-scoped, owner-gated conveniences over the same MediaAssetService the
+    // admin media surface uses; ownerType/ownerId are forced server-side.
+
+    @PostMapping("/api/me/reviews/{reviewId}/media")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Attach media to your own review (owner only)")
+    public MediaAssetResponse addMedia(@AuthUser Long uid, @PathVariable Long reviewId,
+                                       @RequestBody @Valid ReviewMediaRequest req) {
+        return service.addReviewMedia(uid, reviewId, req);
+    }
+
+    @DeleteMapping("/api/me/reviews/{reviewId}/media/{mediaId}")
+    @Operation(summary = "Remove (soft-delete) media from your own review (owner only)")
+    public MediaAssetResponse deleteMedia(@AuthUser Long uid, @PathVariable Long reviewId,
+                                          @PathVariable Long mediaId) {
+        return service.deleteReviewMedia(uid, reviewId, mediaId);
     }
 }

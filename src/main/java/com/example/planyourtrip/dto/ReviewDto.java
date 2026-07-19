@@ -1,5 +1,6 @@
 package com.example.planyourtrip.dto;
 
+import com.example.planyourtrip.model.MediaType;
 import com.example.planyourtrip.model.ReviewStatus;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -8,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.time.Instant;
+import java.util.List;
 
 public class ReviewDto {
 
@@ -63,7 +65,8 @@ public class ReviewDto {
         String rejectReason,
         Instant createdAt,
         Instant updatedAt,
-        PartnerReplyInfo partnerReply
+        PartnerReplyInfo partnerReply,
+        List<ReviewMediaItem> media
     ) {}
 
     public record ReviewSummaryResponse(
@@ -76,7 +79,24 @@ public class ReviewDto {
         String title,
         String status,
         Instant createdAt,
-        PartnerReplyInfo partnerReply
+        PartnerReplyInfo partnerReply,
+        List<ReviewMediaItem> media
+    ) {}
+
+    /**
+     * Phase 7.45 — safe, public projection of a review's attached {@code MediaAsset}
+     * (ownerType=REVIEW). Exposes ONLY display fields; no {@code uploadedBy}/{@code active}
+     * or other internal columns leak into review read models. Always a (possibly empty)
+     * list on the parent, never null.
+     */
+    public record ReviewMediaItem(
+        Long id,
+        String url,
+        String thumbnailUrl,
+        MediaType mediaType,
+        int sortOrder,
+        boolean cover,
+        String altText
     ) {}
 
     /**
