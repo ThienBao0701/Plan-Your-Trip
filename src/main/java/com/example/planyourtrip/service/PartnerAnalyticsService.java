@@ -14,6 +14,7 @@ import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -262,8 +264,7 @@ public class PartnerAnalyticsService {
 
         List<Review> reviews = hotelIds.isEmpty() ? List.of() : reviewRepo.findByPlaceIdIn(hotelIds);
         List<Review> approved = reviews.stream().filter(r -> r.getStatus() == ReviewStatus.APPROVED).toList();
-        double avgRating = approved.isEmpty() ? 0.0 :
-            approved.stream().mapToInt(Review::getRatingOverall).average().orElse(0.0);
+        double avgRating = avgOverall(approved);
 
         long pending = reviews.stream().filter(r -> r.getStatus() == ReviewStatus.PENDING).count();
         long rejected = reviews.stream().filter(r -> r.getStatus() == ReviewStatus.REJECTED).count();
@@ -277,6 +278,92 @@ public class PartnerAnalyticsService {
 
         return new ReviewAnalyticsResponse(round2(avgRating), reviews.size(), pending, approved.size(),
             rejected, latest);
+    }
+
+    /**
+     * Phase 7.46 — detailed READ-ONLY review analytics for a SINGLE owned place.
+     *
+     * <p>Distinct from {@link #getReviewAnalytics} (a cross-owned-hotels summary): this drills into
+     * one {@code placeId} the caller must own — an unknown place OR a place owned by someone else both
+     * return a uniform 404 via {@link #resolveHotelScope} (no cross-partner leak). Reuses the shared
+     * {@link #avgOverall} averaging + {@link #round2} rounding; adds category averages, a star
+     * distribution and reply-rate. Population of every metric is documented on
+     * {@code PlaceReviewAnalyticsResponse}. Nothing here mutates state.
+     */
+    public PlaceReviewAnalyticsResponse getPlaceReviewAnalytics(Long userId, Long placeId,
+                                                                LocalDate from, LocalDate to) {
+        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        resolveHotelScope(profile.getId(), placeId); // 404 if unknown or not owned (uniform, no leak)
+        LocalDate[] range = resolveRange(from, to);
+
+        Place place = places.findById(placeId)
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Place not found: " + placeId));
+
+        List<Review> reviews = reviewRepo.findByPlaceIdIn(List.of(placeId));
+        List<Review> approved = reviews.stream().filter(r -> r.getStatus() == ReviewStatus.APPROVED).toList();
+
+        long total = reviews.size();
+        long partnerReplyCount = reviews.stream().filter(r -> r.getPartnerRepliedAt() != null).count();
+        double partnerReplyRate = total == 0 ? 0.0 : round2(partnerReplyCount * 100.0 / total);
+
+        Map<Integer, Long> starDistribution = new LinkedHashMap<>();
+        for (int star = 1; star <= 5; star++) {
+            final int s = star;
+            starDistribution.put(star, approved.stream().filter(r -> r.getRatingOverall() == s).count());
+        }
+
+        Instant latestReviewAt = reviews.stream()
+            .map(Review::getCreatedAt).filter(Objects::nonNull)
+            .max(Comparator.naturalOrder()).orElse(null);
+
+        List<Review> inRange = reviews.stream().filter(r -> createdInRange(r, range[0], range[1])).toList();
+        List<Review> approvedInRange = inRange.stream()
+            .filter(r -> r.getStatus() == ReviewStatus.APPROVED).toList();
+
+        return new PlaceReviewAnalyticsResponse(
+            place.getId(), place.getName(),
+            total,
+            countStatus(reviews, ReviewStatus.APPROVED),
+            countStatus(reviews, ReviewStatus.PENDING),
+            countStatus(reviews, ReviewStatus.REJECTED),
+            countStatus(reviews, ReviewStatus.HIDDEN),
+            countStatus(reviews, ReviewStatus.REPORTED),
+            round2(avgOverall(approved)),
+            round2(avgCategory(approved, Review::getRatingCleanliness)),
+            round2(avgCategory(approved, Review::getRatingService)),
+            round2(avgCategory(approved, Review::getRatingLocation)),
+            round2(avgCategory(approved, Review::getRatingValue)),
+            round2(avgCategory(approved, Review::getRatingFacilities)),
+            starDistribution,
+            partnerReplyCount,
+            partnerReplyRate,
+            latestReviewAt,
+            inRange.size(),
+            round2(avgOverall(approvedInRange))
+        );
+    }
+
+    // Shared review-metric helpers (reused by getReviewAnalytics + getPlaceReviewAnalytics) ──
+
+    private long countStatus(List<Review> reviews, ReviewStatus status) {
+        return reviews.stream().filter(r -> r.getStatus() == status).count();
+    }
+
+    /** Mean overall rating over the given reviews; 0.0 when the list is empty (never divides by zero). */
+    private double avgOverall(List<Review> reviews) {
+        return reviews.isEmpty() ? 0.0 : reviews.stream().mapToInt(Review::getRatingOverall).average().orElse(0.0);
+    }
+
+    /** Mean of one nullable category rating, ignoring reviews that left it null; 0.0 when none present. */
+    private double avgCategory(List<Review> reviews, Function<Review, Integer> extractor) {
+        return reviews.stream().map(extractor).filter(Objects::nonNull)
+            .mapToInt(Integer::intValue).average().orElse(0.0);
+    }
+
+    private boolean createdInRange(Review r, LocalDate from, LocalDate to) {
+        if (r.getCreatedAt() == null) return false;
+        LocalDate d = LocalDate.ofInstant(r.getCreatedAt(), ZoneId.systemDefault());
+        return !d.isBefore(from) && !d.isAfter(to);
     }
 
     // ── Messages ─────────────────────────────────────────────────────────────

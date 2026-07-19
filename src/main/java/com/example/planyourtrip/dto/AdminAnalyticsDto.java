@@ -3,8 +3,10 @@ package com.example.planyourtrip.dto;
 import com.example.planyourtrip.dto.PartnerAnalyticsDto.MetricBreakdown;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Read-only platform-wide analytics for the platform ADMIN.
@@ -43,5 +45,40 @@ public class AdminAnalyticsDto {
         long totalPartners,
         long bookingsInRange,
         BigDecimal revenueInRange
+    ) {}
+
+    /**
+     * Phase 7.46 — platform-wide ADMIN review-analytics overview (read-only, un-scoped).
+     * Computed from additive aggregate queries on {@code ReviewRepository} (no row loading). Populations:
+     *
+     * <ul>
+     *   <li>totalReviews: all reviews on the platform.</li>
+     *   <li>statusBreakdown: one {@link MetricBreakdown} per {@code ReviewStatus} (all 5, 0-filled).</li>
+     *   <li>ratingDistribution: map 1..5 → count of APPROVED reviews with that overall rating (0-filled).</li>
+     *   <li>averageOverallRating + category averages: over APPROVED reviews; 0.0 when there are none.</li>
+     *   <li>partnerReplyRate: percentage 0–100 = reviews-with-a-reply / totalReviews * 100; 0.0 when none.</li>
+     *   <li>reviewedPlaces: distinct places with ≥1 review (any status).</li>
+     *   <li>latestReviewAt: newest createdAt across the platform; null when there are none.</li>
+     *   <li>reviewsInRange: count of ALL reviews created within [from, to].</li>
+     *   <li>averageRatingInRange: mean overall of APPROVED reviews created within [from, to]; 0.0 when none.</li>
+     * </ul>
+     */
+    public record AdminReviewAnalyticsOverviewResponse(
+        LocalDate from,
+        LocalDate to,
+        long totalReviews,
+        List<MetricBreakdown> statusBreakdown,
+        Map<Integer, Long> ratingDistribution,
+        double averageOverallRating,
+        double averageCleanliness,
+        double averageService,
+        double averageLocation,
+        double averageValue,
+        double averageFacilities,
+        double partnerReplyRate,
+        long reviewedPlaces,
+        Instant latestReviewAt,
+        long reviewsInRange,
+        double averageRatingInRange
     ) {}
 }
