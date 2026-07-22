@@ -21,6 +21,7 @@ class SecureCheckoutScreen extends StatefulWidget {
   final HotelStayCriteria criteria;
   final HotelPricingQuote quote;
   final String specialRequest;
+  final String? existingBookingCode;
 
   const SecureCheckoutScreen({
     super.key,
@@ -30,6 +31,7 @@ class SecureCheckoutScreen extends StatefulWidget {
     required this.criteria,
     required this.quote,
     this.specialRequest = '',
+    this.existingBookingCode,
   });
 
   @override
@@ -132,16 +134,22 @@ class _SecureCheckoutScreenState extends State<SecureCheckoutScreen> {
     setState(() => _submitting = true);
     await Future<void>.delayed(Duration.zero);
     if (!mounted) return;
-    final result = app.startDemoCheckout(
-      hotel: widget.hotel,
-      room: widget.room,
-      ratePlan: widget.ratePlan,
-      quote: widget.quote,
-      criteria: widget.criteria,
-      specialRequest: widget.specialRequest,
-      provider: _provider,
-      idempotencyKey: _checkoutIdempotencyKey(app),
-    );
+    final result = widget.existingBookingCode == null
+        ? app.startDemoCheckout(
+            hotel: widget.hotel,
+            room: widget.room,
+            ratePlan: widget.ratePlan,
+            quote: widget.quote,
+            criteria: widget.criteria,
+            specialRequest: widget.specialRequest,
+            provider: _provider,
+            idempotencyKey: _checkoutIdempotencyKey(app),
+          )
+        : app.startDemoPaymentForExistingBooking(
+            bookingCode: widget.existingBookingCode!,
+            provider: _provider,
+            idempotencyKey: _checkoutIdempotencyKey(app),
+          );
     if (!mounted) return;
     setState(() => _submitting = false);
     final booking = result.booking;
@@ -172,6 +180,7 @@ class _SecureCheckoutScreenState extends State<SecureCheckoutScreen> {
   String _checkoutIdempotencyKey(AppState app) {
     return _idempotencyKey ??= [
       'checkout',
+      widget.existingBookingCode ?? 'new',
       app.demoBookings.length,
       widget.hotel.id,
       widget.room.id,

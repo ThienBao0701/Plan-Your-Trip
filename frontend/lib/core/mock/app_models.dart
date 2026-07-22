@@ -758,11 +758,13 @@ class DemoBooking {
   final BookingPaymentStatus? paymentStatus;
   final DateTime createdAt;
   final DateTime? confirmedAt;
+  final DateTime? updatedAt;
   final DateTime? cancelledAt;
   final DateTime? actualCheckInAt;
   final DateTime? actualCheckOutAt;
   final DateTime? completedAt;
   final DateTime? archivedAt;
+  final DateTime? modifiedAt;
   final DateTime? lastStatusChangedAt;
   final DateTime? paidAt;
   final DateTime? refundedAt;
@@ -782,11 +784,13 @@ class DemoBooking {
     this.paymentStatus,
     required this.createdAt,
     this.confirmedAt,
+    this.updatedAt,
     this.cancelledAt,
     this.actualCheckInAt,
     this.actualCheckOutAt,
     this.completedAt,
     this.archivedAt,
+    this.modifiedAt,
     this.lastStatusChangedAt,
     this.paidAt,
     this.refundedAt,
@@ -807,11 +811,13 @@ class DemoBooking {
     Object? paymentStatus = _unset,
     DateTime? createdAt,
     Object? confirmedAt = _unset,
+    Object? updatedAt = _unset,
     Object? cancelledAt = _unset,
     Object? actualCheckInAt = _unset,
     Object? actualCheckOutAt = _unset,
     Object? completedAt = _unset,
     Object? archivedAt = _unset,
+    Object? modifiedAt = _unset,
     Object? lastStatusChangedAt = _unset,
     Object? paidAt = _unset,
     Object? refundedAt = _unset,
@@ -835,6 +841,9 @@ class DemoBooking {
         confirmedAt: identical(confirmedAt, _unset)
             ? this.confirmedAt
             : confirmedAt as DateTime?,
+        updatedAt: identical(updatedAt, _unset)
+            ? this.updatedAt
+            : updatedAt as DateTime?,
         cancelledAt: identical(cancelledAt, _unset)
             ? this.cancelledAt
             : cancelledAt as DateTime?,
@@ -850,6 +859,9 @@ class DemoBooking {
         archivedAt: identical(archivedAt, _unset)
             ? this.archivedAt
             : archivedAt as DateTime?,
+        modifiedAt: identical(modifiedAt, _unset)
+            ? this.modifiedAt
+            : modifiedAt as DateTime?,
         lastStatusChangedAt: identical(lastStatusChangedAt, _unset)
             ? this.lastStatusChangedAt
             : lastStatusChangedAt as DateTime?,
@@ -864,6 +876,9 @@ class DemoBooking {
       );
 
   static const Object _unset = Object();
+
+  DateTime get modificationVersion =>
+      updatedAt ?? modifiedAt ?? lastStatusChangedAt ?? createdAt;
 }
 
 enum BookingCancellationResult {
@@ -888,6 +903,72 @@ class BookingCancellationEligibility {
 
   bool get canCancel =>
       result == BookingCancellationResult.eligible && booking != null;
+}
+
+enum BookingModificationResult {
+  available,
+  unavailable,
+  notFound,
+  forbidden,
+  onlyPending,
+  activePaymentStarted,
+  roomRateUnavailable,
+  stayStarted,
+  invalidDates,
+  invalidGuests,
+  capacityExceeded,
+  quoteUnavailable,
+  noChanges,
+  stale,
+}
+
+class BookingModificationEligibility {
+  final BookingModificationResult result;
+  final DemoBooking? booking;
+
+  const BookingModificationEligibility({
+    required this.result,
+    this.booking,
+  });
+
+  bool get canModify =>
+      result == BookingModificationResult.available && booking != null;
+}
+
+class BookingModificationDraft {
+  static const backendRequestFields = <String>[
+    'checkIn',
+    'checkOut',
+    'adults',
+    'children',
+    'extraBeds',
+    'ratePlanId',
+  ];
+
+  final DateTime checkIn;
+  final DateTime checkOut;
+  final int adults;
+  final int children;
+  final int extraBeds;
+  final int? ratePlanId;
+
+  const BookingModificationDraft({
+    required this.checkIn,
+    required this.checkOut,
+    required this.adults,
+    required this.children,
+    this.extraBeds = 0,
+    this.ratePlanId,
+  });
+
+  bool changes(DemoBooking booking) {
+    return dateOnly(checkIn) != dateOnly(booking.criteria.checkIn) ||
+        dateOnly(checkOut) != dateOnly(booking.criteria.checkOut) ||
+        adults != booking.criteria.adults ||
+        children != booking.criteria.children ||
+        extraBeds != booking.criteria.extraBeds ||
+        ratePlanId != booking.ratePlan.ratePlanId;
+  }
 }
 
 class BookingTimelineEvent {

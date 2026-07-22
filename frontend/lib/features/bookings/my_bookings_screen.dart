@@ -15,6 +15,7 @@ import '../payments/secure_checkout_screen.dart';
 import '../places/place_detail_screen.dart';
 import '../reviews/reviews_screen.dart';
 import '../timeline/timeline_screen.dart';
+import 'modify_booking_screen.dart';
 
 class MyBookingsScreen extends StatefulWidget {
   final DateTime? today;
@@ -319,12 +320,16 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                             onWriteReview: () => _openWriteReview(booking),
                             onViewReview: (review) => _openReview(review),
                             onCancel: () => _confirmCancel(booking),
+                            onModify: () => _openModify(booking),
                             onOpenPayment: paymentAttempt == null
                                 ? null
                                 : () => _openPaymentStatus(
                                       booking,
                                       paymentAttempt,
                                     ),
+                            onStartCheckout: paymentAttempt == null
+                                ? () => _openCheckoutForBooking(booking)
+                                : null,
                             onRetryPayment: paymentAttempt == null
                                 ? null
                                 : () => _retryPayment(booking),
@@ -476,6 +481,41 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
     );
   }
 
+  Future<void> _openModify(DemoBooking booking) async {
+    final l10n = AppLocalizations.of(context)!;
+    final changed = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ModifyBookingScreen(
+          bookingCode: booking.code,
+          today: widget.today,
+        ),
+      ),
+    );
+    if (!mounted) return;
+    if (changed == true) {
+      setState(() {});
+      _showSnack(l10n.bookingModifySuccessMessage);
+    }
+  }
+
+  void _openCheckoutForBooking(DemoBooking booking) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => SecureCheckoutScreen(
+          hotel: booking.hotel,
+          room: booking.room,
+          ratePlan: booking.ratePlan,
+          criteria: booking.criteria,
+          quote: booking.quote,
+          specialRequest: booking.specialRequest,
+          existingBookingCode: booking.code,
+        ),
+      ),
+    );
+  }
+
   Future<void> _retryPayment(DemoBooking booking) async {
     if (_paymentWorking) return;
     final app = AppScope.of(context);
@@ -527,7 +567,9 @@ class _BookingDetailContent extends StatelessWidget {
   final VoidCallback onWriteReview;
   final ValueChanged<TravelerReview> onViewReview;
   final VoidCallback onCancel;
+  final VoidCallback onModify;
   final VoidCallback? onOpenPayment;
+  final VoidCallback? onStartCheckout;
   final VoidCallback? onRetryPayment;
   final VoidCallback onViewPlace;
 
@@ -543,7 +585,9 @@ class _BookingDetailContent extends StatelessWidget {
     required this.onWriteReview,
     required this.onViewReview,
     required this.onCancel,
+    required this.onModify,
     required this.onOpenPayment,
+    required this.onStartCheckout,
     required this.onRetryPayment,
     required this.onViewPlace,
   });
@@ -555,6 +599,8 @@ class _BookingDetailContent extends StatelessWidget {
     final date = DateFormat.yMMMd(Localizations.localeOf(context).toString());
     final total = booking.quote.finalQuotedPrice;
     final eligibility = app.cancellationEligibilityForBooking(booking);
+    final modificationEligibility =
+        app.modificationEligibilityForBooking(booking);
     final review = _currentUserReview(app, booking);
     final reviewEligibility = app.reviewEligibilityForBooking(booking);
     final cancellationDeadline = booking.quote.cancellationDeadline;
@@ -621,6 +667,7 @@ class _BookingDetailContent extends StatelessWidget {
         _BookingActionsCard(
           booking: booking,
           eligibility: eligibility,
+          modificationEligibility: modificationEligibility,
           reviewEligibility: reviewEligibility,
           review: review,
           addingToTrip: addingToTrip,
@@ -633,7 +680,9 @@ class _BookingDetailContent extends StatelessWidget {
           onWriteReview: onWriteReview,
           onViewReview: onViewReview,
           onCancel: onCancel,
+          onModify: onModify,
           onOpenPayment: onOpenPayment,
+          onStartCheckout: onStartCheckout,
           onRetryPayment: onRetryPayment,
           onViewPlace: onViewPlace,
         ),
@@ -903,6 +952,7 @@ class _BookingActionsCard extends StatelessWidget {
   final DemoBooking booking;
   final DemoPaymentAttempt? paymentAttempt;
   final BookingCancellationEligibility eligibility;
+  final BookingModificationEligibility modificationEligibility;
   final ReviewEligibility reviewEligibility;
   final TravelerReview? review;
   final bool addingToTrip;
@@ -914,7 +964,9 @@ class _BookingActionsCard extends StatelessWidget {
   final VoidCallback onWriteReview;
   final ValueChanged<TravelerReview> onViewReview;
   final VoidCallback onCancel;
+  final VoidCallback onModify;
   final VoidCallback? onOpenPayment;
+  final VoidCallback? onStartCheckout;
   final VoidCallback? onRetryPayment;
   final VoidCallback onViewPlace;
 
@@ -922,6 +974,7 @@ class _BookingActionsCard extends StatelessWidget {
     required this.booking,
     required this.paymentAttempt,
     required this.eligibility,
+    required this.modificationEligibility,
     required this.reviewEligibility,
     required this.review,
     required this.addingToTrip,
@@ -933,7 +986,9 @@ class _BookingActionsCard extends StatelessWidget {
     required this.onWriteReview,
     required this.onViewReview,
     required this.onCancel,
+    required this.onModify,
     required this.onOpenPayment,
+    required this.onStartCheckout,
     required this.onRetryPayment,
     required this.onViewPlace,
   });
@@ -1011,6 +1066,15 @@ class _BookingActionsCard extends StatelessWidget {
                 fullWidth: false,
                 onPressed: cancelling ? null : onCancel,
               ),
+            if (modificationEligibility.canModify)
+              OceanSecondaryButton(
+                key: const Key('booking-detail-modify'),
+                label: l10n.bookingModifyAction,
+                icon: Icons.edit_calendar_rounded,
+                semanticLabel: l10n.bookingModifySemantic,
+                fullWidth: false,
+                onPressed: onModify,
+              ),
             if (paymentAction != null)
               OceanSecondaryButton(
                 key: const Key('booking-detail-payment-action'),
@@ -1039,6 +1103,20 @@ class _BookingActionsCard extends StatelessWidget {
             ),
           ),
         ],
+        if (!modificationEligibility.canModify) ...[
+          const SizedBox(height: AppSpacing.md),
+          OceanGlassSurface(
+            blur: 0,
+            color: AppColors.paleCyan,
+            child: Text(
+              bookingModificationResultMessage(
+                l10n,
+                modificationEligibility.result,
+              ),
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ),
+        ],
         const SizedBox(height: AppSpacing.md),
         OceanGlassSurface(
           blur: 0,
@@ -1056,7 +1134,16 @@ class _BookingActionsCard extends StatelessWidget {
     AppLocalizations l10n,
   ) {
     final attempt = paymentAttempt;
-    if (attempt == null) return null;
+    if (attempt == null) {
+      if (booking.status == BookingStatus.pending && onStartCheckout != null) {
+        return (
+          label: l10n.paymentContinueAction,
+          icon: Icons.lock_rounded,
+          onPressed: onStartCheckout!,
+        );
+      }
+      return null;
+    }
     if (attempt.isPending && onOpenPayment != null) {
       return (
         label: l10n.paymentContinueAction,
@@ -1457,6 +1544,8 @@ String bookingTimelineEventLabel(AppLocalizations l10n, String code) {
       return l10n.bookingTimelinePaid;
     case 'CONFIRMED':
       return l10n.bookingTimelineConfirmed;
+    case 'MODIFIED':
+      return l10n.bookingTimelineModified;
     case 'CHECKED_IN':
       return l10n.bookingTimelineCheckedIn;
     case 'CHECKED_OUT':
@@ -1547,6 +1636,8 @@ IconData _timelineIcon(String code) {
       return Icons.payments_rounded;
     case 'CONFIRMED':
       return Icons.verified_rounded;
+    case 'MODIFIED':
+      return Icons.edit_calendar_rounded;
     case 'CHECKED_IN':
       return Icons.login_rounded;
     case 'CHECKED_OUT':

@@ -2448,7 +2448,192 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get bookingUnsupportedMessage =>
-      'Đổi lịch, chỉnh sửa đặt phòng, tải hóa đơn, hoàn tiền và nhắn tin với chỗ ở cần tích hợp backend và không được mô phỏng cục bộ.';
+      'Thay đổi đặt phòng đã ổn định, đổi lịch, tải hóa đơn, hoàn tiền và nhắn tin với chỗ ở cần tích hợp backend và không được mô phỏng cục bộ.';
+
+  @override
+  String get bookingModifyAction => 'Sửa đặt phòng';
+
+  @override
+  String get bookingModifyTitle => 'Sửa đặt phòng';
+
+  @override
+  String get bookingModifySemantic => 'Sửa đặt phòng demo đang chờ này';
+
+  @override
+  String get bookingModifyIntro =>
+      'Chỉ đặt phòng demo đang chờ mới có thể đổi cục bộ. Đặt phòng đã xác nhận, đã thanh toán, đã nhận phòng, hoàn tất, hủy, hoàn tiền, lưu trữ và vắng mặt sẽ bị khóa.';
+
+  @override
+  String get bookingModifyAvailableLabel => 'Có thể đổi khi đang chờ';
+
+  @override
+  String get bookingModifyUnavailableLabel => 'Không thể đổi';
+
+  @override
+  String get bookingModifyDemoLabel => 'Chế độ Demo cục bộ';
+
+  @override
+  String get bookingModifyDemoBoundary =>
+      'Thao tác này chỉ cập nhật dữ liệu trình bày cục bộ xác định và không khẳng định tình trạng phòng trực tiếp.';
+
+  @override
+  String get bookingModifyEditTitle => 'Sửa trường được hỗ trợ';
+
+  @override
+  String get bookingModifyEditableFields =>
+      'Các trường backend hỗ trợ trong UI này là ngày nhận phòng, ngày trả phòng, người lớn, trẻ em, giường phụ và gói giá. Khách sạn, phòng, số phòng và ưu đãi giữ nguyên.';
+
+  @override
+  String get bookingModifyReviewTitle => 'Xem lại thay đổi';
+
+  @override
+  String get bookingModifyReviewInstruction =>
+      'Xem lại giá trị hiện tại và đề xuất trước khi xác nhận. Đặt phòng gốc không đổi cho đến khi xác nhận thành công.';
+
+  @override
+  String get bookingModifyCurrentLabel => 'Hiện tại';
+
+  @override
+  String get bookingModifyProposedLabel => 'Đề xuất';
+
+  @override
+  String get bookingModifyUnchangedLabel => 'Không đổi';
+
+  @override
+  String get bookingModifyChangedLabel => 'Đã đổi';
+
+  @override
+  String get bookingModifyCheckInLabel => 'Ngày nhận phòng';
+
+  @override
+  String get bookingModifyCheckOutLabel => 'Ngày trả phòng';
+
+  @override
+  String get bookingModifyAdultsLabel => 'Người lớn';
+
+  @override
+  String get bookingModifyChildrenLabel => 'Trẻ em';
+
+  @override
+  String get bookingModifyExtraBedsLabel => 'Giường phụ';
+
+  @override
+  String get bookingModifyRatePlanLabel => 'Gói giá';
+
+  @override
+  String get bookingModifyRatePlanHelper =>
+      'Chỉ có thể chọn gói giá đủ điều kiện trong cùng phòng.';
+
+  @override
+  String get bookingModifyDateHelp => 'Dùng YYYY-MM-DD.';
+
+  @override
+  String get bookingModifyRequiredField => 'Trường này là bắt buộc.';
+
+  @override
+  String get bookingModifyRoomUnchanged => 'Cùng phòng';
+
+  @override
+  String get bookingModifyRoomCountUnchanged =>
+      'Phòng và số phòng không thể sửa trong hợp đồng chỉnh sửa backend.';
+
+  @override
+  String get bookingModifyContinueReviewAction => 'Xem lại thay đổi';
+
+  @override
+  String get bookingModifyConfirmAction => 'Xác nhận thay đổi';
+
+  @override
+  String get bookingModifyBackToEditAction => 'Quay lại sửa';
+
+  @override
+  String get bookingModifySuccessMessage => 'Đã sửa đặt phòng demo cục bộ.';
+
+  @override
+  String get bookingModifyUnavailableReal =>
+      'Sửa đặt phòng thật cần tích hợp API backend.';
+
+  @override
+  String get bookingModifyUnavailableNotFound =>
+      'Đặt phòng này không còn khả dụng.';
+
+  @override
+  String get bookingModifyUnavailableForbidden =>
+      'Đặt phòng này thuộc về khách khác.';
+
+  @override
+  String get bookingModifyUnavailableOnlyPending =>
+      'Chỉ đặt phòng đang chờ mới có thể đổi.';
+
+  @override
+  String get bookingModifyUnavailablePaymentStarted =>
+      'Đặt phòng cục bộ này đã có lượt thanh toán nên ảnh chụp lưu trú bị khóa để an toàn cho UI.';
+
+  @override
+  String get bookingModifyUnavailableRoomRate =>
+      'Ảnh chụp phòng hoặc gói giá không còn khả dụng.';
+
+  @override
+  String get bookingModifyUnavailableStarted => 'Kỳ lưu trú này đã bắt đầu.';
+
+  @override
+  String get bookingModifyInvalidDates =>
+      'Chọn ngày nhận phòng trong tương lai và ngày trả phòng sau ngày nhận phòng.';
+
+  @override
+  String get bookingModifyInvalidGuests =>
+      'Số lượng khách phải hợp lệ và không âm.';
+
+  @override
+  String get bookingModifyCapacityExceeded =>
+      'Số lượng khách vượt quá sức chứa của phòng.';
+
+  @override
+  String get bookingModifyQuoteUnavailable =>
+      'Không có báo giá sửa đổi cục bộ an toàn cho các giá trị này.';
+
+  @override
+  String get bookingModifyNoChanges =>
+      'Hãy thay đổi ít nhất một trường được hỗ trợ trước khi xem lại.';
+
+  @override
+  String get bookingModifyStale =>
+      'Đặt phòng này đã thay đổi trong lúc bạn chỉnh sửa. Mở lại biểu mẫu và xem giá trị mới nhất.';
+
+  @override
+  String get bookingModifyBoundariesTitle => 'Ranh giới chỉnh sửa';
+
+  @override
+  String get bookingModifyPriceBoundaryLabel => 'Ảnh hưởng giá';
+
+  @override
+  String get bookingModifyPriceBoundary =>
+      'Tổng mới là ước tính demo cục bộ xác định theo cấu trúc tổng toàn kỳ lưu trú chuẩn của backend. Đây không phải báo giá backend trực tiếp.';
+
+  @override
+  String get bookingModifyAvailabilityBoundaryLabel => 'Tình trạng phòng';
+
+  @override
+  String get bookingModifyAvailabilityBoundary =>
+      'Chế độ Demo cục bộ không trừ tồn kho hoặc tạo giữ phòng mới. Tình trạng phòng trực tiếp vẫn do backend xử lý.';
+
+  @override
+  String get bookingModifyPaymentBoundaryLabel => 'Thanh toán';
+
+  @override
+  String get bookingModifyPaymentBoundary =>
+      'Chỉnh sửa không đánh dấu thanh toán đã trả, thất bại, hủy hoặc hoàn tiền và không tạo lượt thanh toán.';
+
+  @override
+  String get bookingModifySnapshotBoundary =>
+      'Không có tóm tắt chính sách an toàn cho khách ở ảnh chụp gói giá này.';
+
+  @override
+  String get bookingModifyLiveRepricingTitle => 'Báo giá backend trực tiếp';
+
+  @override
+  String get bookingModifyLiveRepricingUnavailable =>
+      'Định giá lại trực tiếp và kiểm tra tồn kho có điều chỉnh trùng ngày được hiển thị như ranh giới tích hợp trung thực cho đến khi kết nối mạng được nối.';
 
   @override
   String get bookingCancelAction => 'Hủy đặt phòng';
@@ -2555,6 +2740,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get bookingTimelineConfirmed => 'Đã xác nhận đặt phòng';
+
+  @override
+  String get bookingTimelineModified => 'Đã sửa đặt phòng';
 
   @override
   String get bookingTimelineCheckedIn => 'Khách đã nhận phòng';

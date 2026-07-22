@@ -559,6 +559,7 @@ class AppState extends ChangeNotifier {
       status: BookingStatus.pending,
       paymentStatus: BookingPaymentStatus.pending,
       createdAt: timestamp,
+      updatedAt: timestamp,
       lastStatusChangedAt: timestamp,
     );
     final attempt = _buildPaymentAttempt(
@@ -574,6 +575,89 @@ class AppState extends ChangeNotifier {
     return DemoCheckoutResult(
       result: DemoPaymentActionResult.success,
       booking: booking,
+      attempt: attempt,
+    );
+  }
+
+  DemoCheckoutResult startDemoPaymentForExistingBooking({
+    required String bookingCode,
+    required CheckoutPaymentProvider provider,
+    required String idempotencyKey,
+  }) {
+    if (!demoMode) {
+      return const DemoCheckoutResult(
+        result: DemoPaymentActionResult.unavailable,
+      );
+    }
+    final booking = demoBookingByCode(bookingCode);
+    if (booking == null) {
+      return const DemoCheckoutResult(
+        result: DemoPaymentActionResult.bookingUnavailable,
+      );
+    }
+    if (booking.status != BookingStatus.pending) {
+      return DemoCheckoutResult(
+        result: DemoPaymentActionResult.invalidState,
+        booking: booking,
+      );
+    }
+    final normalizedKey = idempotencyKey.trim();
+    if (normalizedKey.isNotEmpty) {
+      final existingAttempt = _firstWhereOrNull(
+        demoPaymentAttempts,
+        (item) => item.idempotencyKey == normalizedKey,
+      );
+      if (existingAttempt != null) {
+        return DemoCheckoutResult(
+          result: DemoPaymentActionResult.duplicate,
+          booking: demoBookingByCode(existingAttempt.bookingCode),
+          attempt: existingAttempt,
+        );
+      }
+    }
+    final latest = latestPaymentAttemptForBooking(bookingCode);
+    if (latest != null) {
+      return DemoCheckoutResult(
+        result: DemoPaymentActionResult.invalidState,
+        booking: booking,
+        attempt: latest,
+      );
+    }
+    final amount = booking.quote.finalQuotedPrice;
+    if (amount == null ||
+        !amount.isFinite ||
+        amount <= 0 ||
+        booking.quote.currency.trim().isEmpty) {
+      return DemoCheckoutResult(
+        result: DemoPaymentActionResult.quoteUnavailable,
+        booking: booking,
+      );
+    }
+    if (!provider.hasCustomerSessionGateway) {
+      return DemoCheckoutResult(
+        result: DemoPaymentActionResult.unavailable,
+        booking: booking,
+      );
+    }
+
+    final timestamp = now().toUtc();
+    final attempt = _buildPaymentAttempt(
+      booking: booking,
+      provider: provider,
+      sequence: 1,
+      timestamp: timestamp,
+      idempotencyKey: normalizedKey,
+    );
+    final updatedBooking = booking.copyWith(
+      paymentStatus: BookingPaymentStatus.pending,
+      updatedAt: timestamp,
+    );
+    _replaceDemoBooking(updatedBooking);
+    demoPaymentAttempts = [...demoPaymentAttempts, attempt];
+    notifyListeners();
+    return DemoCheckoutResult(
+      result: DemoPaymentActionResult.success,
+      booking: updatedBooking,
       attempt: attempt,
     );
   }
@@ -604,6 +688,7 @@ class AppState extends ChangeNotifier {
       paymentStatus: BookingPaymentStatus.paid,
       confirmedAt: booking.confirmedAt ?? timestamp,
       paidAt: timestamp,
+      updatedAt: timestamp,
       lastStatusChangedAt: timestamp,
     );
     _replacePaymentAttempt(index, updatedAttempt);
@@ -639,6 +724,7 @@ class AppState extends ChangeNotifier {
     );
     final updatedBooking = booking.copyWith(
       paymentStatus: BookingPaymentStatus.failed,
+      updatedAt: timestamp,
       lastStatusChangedAt: booking.lastStatusChangedAt,
     );
     _replacePaymentAttempt(index, updatedAttempt);
@@ -668,6 +754,7 @@ class AppState extends ChangeNotifier {
     );
     final updatedBooking = booking.copyWith(
       paymentStatus: BookingPaymentStatus.failed,
+      updatedAt: timestamp,
       lastStatusChangedAt: booking.lastStatusChangedAt,
     );
     _replacePaymentAttempt(index, updatedAttempt);
@@ -726,6 +813,7 @@ class AppState extends ChangeNotifier {
     );
     final updatedBooking = booking.copyWith(
       paymentStatus: BookingPaymentStatus.pending,
+      updatedAt: timestamp,
     );
     demoPaymentAttempts = [...demoPaymentAttempts, attempt];
     _replaceDemoBooking(updatedBooking);
@@ -735,6 +823,134 @@ class AppState extends ChangeNotifier {
       booking: updatedBooking,
       attempt: attempt,
     );
+  }
+
+  BookingModificationEligibility modificationEligibilityForBooking(
+    DemoBooking booking,
+  ) {
+    if (!demoMode) {
+      return const BookingModificationEligibility(
+        result: BookingModificationResult.unavailable,
+      );
+    }
+    final current = demoBookingByCode(booking.code);
+    if (current == null) {
+      return const BookingModificationEligibility(
+        result: BookingModificationResult.notFound,
+      );
+    }
+    if (current.ownerUserId != currentDemoUser.id) {
+      return BookingModificationEligibility(
+        result: BookingModificationResult.forbidden,
+        booking: current,
+      );
+    }
+    if (current.status != BookingStatus.pending) {
+      return BookingModificationEligibility(
+        result: BookingModificationResult.onlyPending,
+        booking: current,
+      );
+    }
+    if (!_bookingReferencesAvailable(current)) {
+      return BookingModificationEligibility(
+        result: BookingModificationResult.roomRateUnavailable,
+        booking: current,
+      );
+    }
+    final checkIn = dateOnly(current.criteria.checkIn);
+    if (checkIn.isBefore(dateOnly(now()))) {
+      return BookingModificationEligibility(
+        result: BookingModificationResult.stayStarted,
+        booking: current,
+      );
+    }
+    if (latestPaymentAttemptForBooking(current.code) != null) {
+      return BookingModificationEligibility(
+        result: BookingModificationResult.activePaymentStarted,
+        booking: current,
+      );
+    }
+    return BookingModificationEligibility(
+      result: BookingModificationResult.available,
+      booking: current,
+    );
+  }
+
+  BookingModificationResult modifyDemoBooking({
+    required String bookingCode,
+    required DateTime expectedVersion,
+    required BookingModificationDraft draft,
+    required HotelRatePlan ratePlan,
+    required HotelPricingQuote proposedQuote,
+  }) {
+    final booking = demoBookingByCode(bookingCode);
+    final eligibility = booking == null
+        ? const BookingModificationEligibility(
+            result: BookingModificationResult.notFound,
+          )
+        : modificationEligibilityForBooking(booking);
+    if (!eligibility.canModify || eligibility.booking == null) {
+      return eligibility.result;
+    }
+    final current = eligibility.booking!;
+    if (!current.modificationVersion
+        .toUtc()
+        .isAtSameMomentAs(expectedVersion.toUtc())) {
+      return BookingModificationResult.stale;
+    }
+    if (!draft.changes(current)) {
+      return BookingModificationResult.noChanges;
+    }
+
+    final newCheckIn = dateOnly(draft.checkIn);
+    final newCheckOut = dateOnly(draft.checkOut);
+    if (newCheckIn.isBefore(dateOnly(now())) ||
+        !newCheckOut.isAfter(newCheckIn)) {
+      return BookingModificationResult.invalidDates;
+    }
+    if (draft.adults < 1 || draft.children < 0 || draft.extraBeds < 0) {
+      return BookingModificationResult.invalidGuests;
+    }
+    if (draft.adults > current.room.maxAdults ||
+        draft.children > current.room.maxChildren ||
+        draft.adults + draft.children > current.room.maxGuests) {
+      return BookingModificationResult.capacityExceeded;
+    }
+    final supportedRatePlan = _ratePlanForBooking(current, ratePlan.ratePlanId);
+    if (supportedRatePlan == null ||
+        !supportedRatePlan.eligible ||
+        supportedRatePlan.ratePlanId != ratePlan.ratePlanId) {
+      return BookingModificationResult.roomRateUnavailable;
+    }
+    final amount = proposedQuote.finalQuotedPrice;
+    if (amount == null ||
+        !amount.isFinite ||
+        amount < 0 ||
+        proposedQuote.currency.trim().isEmpty ||
+        proposedQuote.currency != current.quote.currency ||
+        proposedQuote.selectedRatePlanId != ratePlan.ratePlanId ||
+        !proposedQuote.inventoryAvailable) {
+      return BookingModificationResult.quoteUnavailable;
+    }
+
+    final timestamp = now().toUtc();
+    final criteria = current.criteria.copyWith(
+      checkIn: newCheckIn,
+      checkOut: newCheckOut,
+      adults: draft.adults,
+      children: draft.children,
+      extraBeds: draft.extraBeds,
+    );
+    final updated = current.copyWith(
+      ratePlan: supportedRatePlan,
+      quote: proposedQuote,
+      criteria: criteria,
+      modifiedAt: timestamp,
+      updatedAt: timestamp,
+    );
+    _replaceDemoBooking(updated);
+    notifyListeners();
+    return BookingModificationResult.available;
   }
 
   BookingCancellationEligibility cancellationEligibilityForBooking(
@@ -806,6 +1022,7 @@ class AppState extends ChangeNotifier {
     final updated = current.copyWith(
       status: BookingStatus.cancelled,
       cancelledAt: timestamp,
+      updatedAt: timestamp,
       lastStatusChangedAt: timestamp,
       cancellationReason:
           safeReason == null || safeReason.isEmpty ? null : safeReason,
@@ -889,6 +1106,35 @@ class AppState extends ChangeNotifier {
       for (final item in demoBookings)
         item.code == booking.code ? booking : item,
     ];
+  }
+
+  bool _bookingReferencesAvailable(DemoBooking booking) {
+    final hotel = _firstWhereOrNull(
+      places,
+      (place) => place.id == booking.hotel.id && place.hotelDetail != null,
+    );
+    if (hotel == null) return false;
+    final room = _firstWhereOrNull(
+      hotel.hotelDetail?.rooms ?? const <HotelRoom>[],
+      (item) => item.id == booking.room.id && item.active,
+    );
+    if (room == null) return false;
+    return _ratePlanForBooking(booking, booking.ratePlan.ratePlanId) != null;
+  }
+
+  HotelRatePlan? _ratePlanForBooking(DemoBooking booking, int ratePlanId) {
+    final hotel = _firstWhereOrNull(
+      places,
+      (place) => place.id == booking.hotel.id && place.hotelDetail != null,
+    );
+    final room = _firstWhereOrNull(
+      hotel?.hotelDetail?.rooms ?? const <HotelRoom>[],
+      (item) => item.id == booking.room.id && item.active,
+    );
+    return _firstWhereOrNull(
+      room?.ratePlans ?? const <HotelRatePlan>[],
+      (item) => item.ratePlanId == ratePlanId,
+    );
   }
 
   // ── Reviews and traveler trust ──────────────────────────────────────────

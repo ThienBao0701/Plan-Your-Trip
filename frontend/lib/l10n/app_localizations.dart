@@ -4482,8 +4482,332 @@ abstract class AppLocalizations {
   /// No description provided for @bookingUnsupportedMessage.
   ///
   /// In en, this message translates to:
-  /// **'Modification, rescheduling, invoice downloads, refunds, and property messaging require backend integration and are not simulated locally.'**
+  /// **'Settled-booking changes, rescheduling, invoice downloads, refunds, and property messaging require backend integration and are not simulated locally.'**
   String get bookingUnsupportedMessage;
+
+  /// No description provided for @bookingModifyAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Modify booking'**
+  String get bookingModifyAction;
+
+  /// No description provided for @bookingModifyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Modify booking'**
+  String get bookingModifyTitle;
+
+  /// No description provided for @bookingModifySemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Modify this pending demo booking'**
+  String get bookingModifySemantic;
+
+  /// No description provided for @bookingModifyIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Only pending demo bookings can be changed locally. Confirmed, paid, checked-in, completed, cancelled, refunded, archived, and no-show bookings stay locked.'**
+  String get bookingModifyIntro;
+
+  /// No description provided for @bookingModifyAvailableLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending changes available'**
+  String get bookingModifyAvailableLabel;
+
+  /// No description provided for @bookingModifyUnavailableLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes unavailable'**
+  String get bookingModifyUnavailableLabel;
+
+  /// No description provided for @bookingModifyDemoLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Local Demo Mode'**
+  String get bookingModifyDemoLabel;
+
+  /// No description provided for @bookingModifyDemoBoundary.
+  ///
+  /// In en, this message translates to:
+  /// **'This updates only deterministic local presentation data and never claims live availability.'**
+  String get bookingModifyDemoBoundary;
+
+  /// No description provided for @bookingModifyEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit supported fields'**
+  String get bookingModifyEditTitle;
+
+  /// No description provided for @bookingModifyEditableFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Backend-supported fields in this UI phase are check-in, check-out, adults, children, extra beds, and rate plan. Hotel, room, room count, and benefits stay unchanged.'**
+  String get bookingModifyEditableFields;
+
+  /// No description provided for @bookingModifyReviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review changes'**
+  String get bookingModifyReviewTitle;
+
+  /// No description provided for @bookingModifyReviewInstruction.
+  ///
+  /// In en, this message translates to:
+  /// **'Review the current and proposed values before confirming. The original booking is unchanged until confirmation succeeds.'**
+  String get bookingModifyReviewInstruction;
+
+  /// No description provided for @bookingModifyCurrentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get bookingModifyCurrentLabel;
+
+  /// No description provided for @bookingModifyProposedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Proposed'**
+  String get bookingModifyProposedLabel;
+
+  /// No description provided for @bookingModifyUnchangedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Unchanged'**
+  String get bookingModifyUnchangedLabel;
+
+  /// No description provided for @bookingModifyChangedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Changed'**
+  String get bookingModifyChangedLabel;
+
+  /// No description provided for @bookingModifyCheckInLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in date'**
+  String get bookingModifyCheckInLabel;
+
+  /// No description provided for @bookingModifyCheckOutLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-out date'**
+  String get bookingModifyCheckOutLabel;
+
+  /// No description provided for @bookingModifyAdultsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Adults'**
+  String get bookingModifyAdultsLabel;
+
+  /// No description provided for @bookingModifyChildrenLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Children'**
+  String get bookingModifyChildrenLabel;
+
+  /// No description provided for @bookingModifyExtraBedsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Extra beds'**
+  String get bookingModifyExtraBedsLabel;
+
+  /// No description provided for @bookingModifyRatePlanLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate plan'**
+  String get bookingModifyRatePlanLabel;
+
+  /// No description provided for @bookingModifyRatePlanHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Only eligible rate plans on the same room can be selected.'**
+  String get bookingModifyRatePlanHelper;
+
+  /// No description provided for @bookingModifyDateHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Use YYYY-MM-DD.'**
+  String get bookingModifyDateHelp;
+
+  /// No description provided for @bookingModifyRequiredField.
+  ///
+  /// In en, this message translates to:
+  /// **'This field is required.'**
+  String get bookingModifyRequiredField;
+
+  /// No description provided for @bookingModifyRoomUnchanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Same room'**
+  String get bookingModifyRoomUnchanged;
+
+  /// No description provided for @bookingModifyRoomCountUnchanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Room and room count are not editable in the backend modification contract.'**
+  String get bookingModifyRoomCountUnchanged;
+
+  /// No description provided for @bookingModifyContinueReviewAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Review changes'**
+  String get bookingModifyContinueReviewAction;
+
+  /// No description provided for @bookingModifyConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm changes'**
+  String get bookingModifyConfirmAction;
+
+  /// No description provided for @bookingModifyBackToEditAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to edit'**
+  String get bookingModifyBackToEditAction;
+
+  /// No description provided for @bookingModifySuccessMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo booking modified locally.'**
+  String get bookingModifySuccessMessage;
+
+  /// No description provided for @bookingModifyUnavailableReal.
+  ///
+  /// In en, this message translates to:
+  /// **'Real booking modification requires backend API integration.'**
+  String get bookingModifyUnavailableReal;
+
+  /// No description provided for @bookingModifyUnavailableNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This booking is no longer available.'**
+  String get bookingModifyUnavailableNotFound;
+
+  /// No description provided for @bookingModifyUnavailableForbidden.
+  ///
+  /// In en, this message translates to:
+  /// **'This booking belongs to another traveler.'**
+  String get bookingModifyUnavailableForbidden;
+
+  /// No description provided for @bookingModifyUnavailableOnlyPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Only pending bookings can be changed.'**
+  String get bookingModifyUnavailableOnlyPending;
+
+  /// No description provided for @bookingModifyUnavailablePaymentStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'This local booking already has a payment attempt, so its stay snapshot is locked for UI safety.'**
+  String get bookingModifyUnavailablePaymentStarted;
+
+  /// No description provided for @bookingModifyUnavailableRoomRate.
+  ///
+  /// In en, this message translates to:
+  /// **'The room or rate-plan snapshot is no longer available.'**
+  String get bookingModifyUnavailableRoomRate;
+
+  /// No description provided for @bookingModifyUnavailableStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'This stay has already started.'**
+  String get bookingModifyUnavailableStarted;
+
+  /// No description provided for @bookingModifyInvalidDates.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a future check-in date and a check-out date after check-in.'**
+  String get bookingModifyInvalidDates;
+
+  /// No description provided for @bookingModifyInvalidGuests.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest counts must be valid and nonnegative.'**
+  String get bookingModifyInvalidGuests;
+
+  /// No description provided for @bookingModifyCapacityExceeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest counts exceed this room\'s capacity.'**
+  String get bookingModifyCapacityExceeded;
+
+  /// No description provided for @bookingModifyQuoteUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'A safe local modification quote is unavailable for these values.'**
+  String get bookingModifyQuoteUnavailable;
+
+  /// No description provided for @bookingModifyNoChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Change at least one supported field before review.'**
+  String get bookingModifyNoChanges;
+
+  /// No description provided for @bookingModifyStale.
+  ///
+  /// In en, this message translates to:
+  /// **'This booking changed while you were editing. Reopen the form and review the latest values.'**
+  String get bookingModifyStale;
+
+  /// No description provided for @bookingModifyBoundariesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Modification boundaries'**
+  String get bookingModifyBoundariesTitle;
+
+  /// No description provided for @bookingModifyPriceBoundaryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Price impact'**
+  String get bookingModifyPriceBoundaryLabel;
+
+  /// No description provided for @bookingModifyPriceBoundary.
+  ///
+  /// In en, this message translates to:
+  /// **'The new total is a deterministic local demo estimate shaped like the backend canonical whole-stay total. It is not a live backend quote.'**
+  String get bookingModifyPriceBoundary;
+
+  /// No description provided for @bookingModifyAvailabilityBoundaryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Availability'**
+  String get bookingModifyAvailabilityBoundaryLabel;
+
+  /// No description provided for @bookingModifyAvailabilityBoundary.
+  ///
+  /// In en, this message translates to:
+  /// **'Local Demo Mode does not decrement inventory or create a new hold. Live availability remains a backend responsibility.'**
+  String get bookingModifyAvailabilityBoundary;
+
+  /// No description provided for @bookingModifyPaymentBoundaryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment'**
+  String get bookingModifyPaymentBoundaryLabel;
+
+  /// No description provided for @bookingModifyPaymentBoundary.
+  ///
+  /// In en, this message translates to:
+  /// **'Modification does not mark payment paid, failed, cancelled, or refunded and does not create a payment attempt.'**
+  String get bookingModifyPaymentBoundary;
+
+  /// No description provided for @bookingModifySnapshotBoundary.
+  ///
+  /// In en, this message translates to:
+  /// **'No customer-safe policy summary is available for this rate snapshot.'**
+  String get bookingModifySnapshotBoundary;
+
+  /// No description provided for @bookingModifyLiveRepricingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Live backend quote'**
+  String get bookingModifyLiveRepricingTitle;
+
+  /// No description provided for @bookingModifyLiveRepricingUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Live repricing and overlap-adjusted inventory checks are shown as an honest integration boundary until networking is connected.'**
+  String get bookingModifyLiveRepricingUnavailable;
 
   /// No description provided for @bookingCancelAction.
   ///
@@ -4676,6 +5000,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Booking confirmed'**
   String get bookingTimelineConfirmed;
+
+  /// No description provided for @bookingTimelineModified.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking modified'**
+  String get bookingTimelineModified;
 
   /// No description provided for @bookingTimelineCheckedIn.
   ///

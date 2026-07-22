@@ -593,6 +593,7 @@ class MockData {
 
   static const demoReviewBookingCode = 'PYT-DEMO-8801';
   static const demoCancellationBookingCode = 'PYT-DEMO-9901';
+  static const demoModificationBookingCode = 'PYT-DEMO-1401';
   static const _demoReviewPlaceId = 1;
   static const _demoReviewRoomId = 101;
   static const _demoReviewRatePlanId = 1001;
@@ -768,6 +769,66 @@ class MockData {
         ),
       );
     }
+    final modificationCheckIn = DateTime(2026, 8, 12);
+    final modificationCheckOut = DateTime(2026, 8, 14);
+    final modificationCreatedAt = DateTime(2026, 7, 18, 9, 30);
+    final modificationCriteria = HotelStayCriteria(
+      destination: hotel.city,
+      checkIn: modificationCheckIn,
+      checkOut: modificationCheckOut,
+      adults: 2,
+      children: 0,
+      tripId: 1,
+    );
+    final modificationNightlyRate = ratePlan.finalNightlyRate!;
+    final modificationStayTotal =
+        modificationNightlyRate * modificationCriteria.nights;
+    demoBookings.add(
+      DemoBooking(
+        code: demoModificationBookingCode,
+        ownerUserId: 'demo-owner',
+        hotel: hotel,
+        room: room,
+        ratePlan: ratePlan,
+        quote: HotelPricingQuote(
+          roomId: room.id,
+          roomName: room.roomName,
+          roomCode: room.roomCode,
+          placeId: hotel.id,
+          hotelId: hotel.id,
+          checkIn: modificationCriteria.checkIn,
+          checkOut: modificationCriteria.checkOut,
+          nights: modificationCriteria.nights,
+          adults: modificationCriteria.adults,
+          children: modificationCriteria.children,
+          extraBeds: modificationCriteria.extraBeds,
+          selectedRatePlanId: ratePlan.ratePlanId,
+          selectedRatePlanCode: ratePlan.code,
+          selectedRatePlanName: ratePlan.rateName,
+          mealPlanType: ratePlan.mealPlan,
+          cancellationPolicyType: ratePlan.cancellationPolicyType,
+          refundable: ratePlan.refundable,
+          cancellationDeadline: DateTime(2026, 8, 10, 14),
+          baseNightlyRate: ratePlan.baseNightlyRate,
+          finalNightlyRate: modificationNightlyRate,
+          staySubtotal: modificationStayTotal,
+          totalBeforeCustomerBenefits: modificationStayTotal,
+          finalQuotedPrice: modificationStayTotal,
+          currency: 'VND',
+          inventoryAvailable: true,
+          availableRooms: room.availableQuantity,
+          quoteGeneratedAt: modificationCreatedAt,
+          quoteExpiresAt:
+              modificationCreatedAt.add(const Duration(minutes: 15)),
+          warnings: const ['Local preview quote. No inventory is reserved.'],
+        ),
+        criteria: modificationCriteria,
+        status: BookingStatus.pending,
+        createdAt: modificationCreatedAt,
+        updatedAt: modificationCreatedAt,
+        lastStatusChangedAt: modificationCreatedAt,
+      ),
+    );
     return demoBookings;
   }
 

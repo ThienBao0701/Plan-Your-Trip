@@ -2564,7 +2564,193 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bookingUnsupportedMessage =>
-      'Modification, rescheduling, invoice downloads, refunds, and property messaging require backend integration and are not simulated locally.';
+      'Settled-booking changes, rescheduling, invoice downloads, refunds, and property messaging require backend integration and are not simulated locally.';
+
+  @override
+  String get bookingModifyAction => 'Modify booking';
+
+  @override
+  String get bookingModifyTitle => 'Modify booking';
+
+  @override
+  String get bookingModifySemantic => 'Modify this pending demo booking';
+
+  @override
+  String get bookingModifyIntro =>
+      'Only pending demo bookings can be changed locally. Confirmed, paid, checked-in, completed, cancelled, refunded, archived, and no-show bookings stay locked.';
+
+  @override
+  String get bookingModifyAvailableLabel => 'Pending changes available';
+
+  @override
+  String get bookingModifyUnavailableLabel => 'Changes unavailable';
+
+  @override
+  String get bookingModifyDemoLabel => 'Local Demo Mode';
+
+  @override
+  String get bookingModifyDemoBoundary =>
+      'This updates only deterministic local presentation data and never claims live availability.';
+
+  @override
+  String get bookingModifyEditTitle => 'Edit supported fields';
+
+  @override
+  String get bookingModifyEditableFields =>
+      'Backend-supported fields in this UI phase are check-in, check-out, adults, children, extra beds, and rate plan. Hotel, room, room count, and benefits stay unchanged.';
+
+  @override
+  String get bookingModifyReviewTitle => 'Review changes';
+
+  @override
+  String get bookingModifyReviewInstruction =>
+      'Review the current and proposed values before confirming. The original booking is unchanged until confirmation succeeds.';
+
+  @override
+  String get bookingModifyCurrentLabel => 'Current';
+
+  @override
+  String get bookingModifyProposedLabel => 'Proposed';
+
+  @override
+  String get bookingModifyUnchangedLabel => 'Unchanged';
+
+  @override
+  String get bookingModifyChangedLabel => 'Changed';
+
+  @override
+  String get bookingModifyCheckInLabel => 'Check-in date';
+
+  @override
+  String get bookingModifyCheckOutLabel => 'Check-out date';
+
+  @override
+  String get bookingModifyAdultsLabel => 'Adults';
+
+  @override
+  String get bookingModifyChildrenLabel => 'Children';
+
+  @override
+  String get bookingModifyExtraBedsLabel => 'Extra beds';
+
+  @override
+  String get bookingModifyRatePlanLabel => 'Rate plan';
+
+  @override
+  String get bookingModifyRatePlanHelper =>
+      'Only eligible rate plans on the same room can be selected.';
+
+  @override
+  String get bookingModifyDateHelp => 'Use YYYY-MM-DD.';
+
+  @override
+  String get bookingModifyRequiredField => 'This field is required.';
+
+  @override
+  String get bookingModifyRoomUnchanged => 'Same room';
+
+  @override
+  String get bookingModifyRoomCountUnchanged =>
+      'Room and room count are not editable in the backend modification contract.';
+
+  @override
+  String get bookingModifyContinueReviewAction => 'Review changes';
+
+  @override
+  String get bookingModifyConfirmAction => 'Confirm changes';
+
+  @override
+  String get bookingModifyBackToEditAction => 'Back to edit';
+
+  @override
+  String get bookingModifySuccessMessage => 'Demo booking modified locally.';
+
+  @override
+  String get bookingModifyUnavailableReal =>
+      'Real booking modification requires backend API integration.';
+
+  @override
+  String get bookingModifyUnavailableNotFound =>
+      'This booking is no longer available.';
+
+  @override
+  String get bookingModifyUnavailableForbidden =>
+      'This booking belongs to another traveler.';
+
+  @override
+  String get bookingModifyUnavailableOnlyPending =>
+      'Only pending bookings can be changed.';
+
+  @override
+  String get bookingModifyUnavailablePaymentStarted =>
+      'This local booking already has a payment attempt, so its stay snapshot is locked for UI safety.';
+
+  @override
+  String get bookingModifyUnavailableRoomRate =>
+      'The room or rate-plan snapshot is no longer available.';
+
+  @override
+  String get bookingModifyUnavailableStarted =>
+      'This stay has already started.';
+
+  @override
+  String get bookingModifyInvalidDates =>
+      'Choose a future check-in date and a check-out date after check-in.';
+
+  @override
+  String get bookingModifyInvalidGuests =>
+      'Guest counts must be valid and nonnegative.';
+
+  @override
+  String get bookingModifyCapacityExceeded =>
+      'Guest counts exceed this room\'s capacity.';
+
+  @override
+  String get bookingModifyQuoteUnavailable =>
+      'A safe local modification quote is unavailable for these values.';
+
+  @override
+  String get bookingModifyNoChanges =>
+      'Change at least one supported field before review.';
+
+  @override
+  String get bookingModifyStale =>
+      'This booking changed while you were editing. Reopen the form and review the latest values.';
+
+  @override
+  String get bookingModifyBoundariesTitle => 'Modification boundaries';
+
+  @override
+  String get bookingModifyPriceBoundaryLabel => 'Price impact';
+
+  @override
+  String get bookingModifyPriceBoundary =>
+      'The new total is a deterministic local demo estimate shaped like the backend canonical whole-stay total. It is not a live backend quote.';
+
+  @override
+  String get bookingModifyAvailabilityBoundaryLabel => 'Availability';
+
+  @override
+  String get bookingModifyAvailabilityBoundary =>
+      'Local Demo Mode does not decrement inventory or create a new hold. Live availability remains a backend responsibility.';
+
+  @override
+  String get bookingModifyPaymentBoundaryLabel => 'Payment';
+
+  @override
+  String get bookingModifyPaymentBoundary =>
+      'Modification does not mark payment paid, failed, cancelled, or refunded and does not create a payment attempt.';
+
+  @override
+  String get bookingModifySnapshotBoundary =>
+      'No customer-safe policy summary is available for this rate snapshot.';
+
+  @override
+  String get bookingModifyLiveRepricingTitle => 'Live backend quote';
+
+  @override
+  String get bookingModifyLiveRepricingUnavailable =>
+      'Live repricing and overlap-adjusted inventory checks are shown as an honest integration boundary until networking is connected.';
 
   @override
   String get bookingCancelAction => 'Cancel booking';
@@ -2671,6 +2857,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bookingTimelineConfirmed => 'Booking confirmed';
+
+  @override
+  String get bookingTimelineModified => 'Booking modified';
 
   @override
   String get bookingTimelineCheckedIn => 'Guest checked in';

@@ -250,6 +250,12 @@ List<BookingTimelineEvent> bookingTimelineFor(DemoBooking booking) {
       occurredAt: booking.confirmedAt!,
     ));
   }
+  if (booking.modifiedAt != null) {
+    events.add(BookingTimelineEvent(
+      code: 'MODIFIED',
+      occurredAt: booking.modifiedAt!,
+    ));
+  }
   if (booking.actualCheckInAt != null) {
     events.add(BookingTimelineEvent(
       code: 'CHECKED_IN',
