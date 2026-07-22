@@ -408,7 +408,9 @@ void main() {
   testWidgets('composer explains media attachment boundary without fake upload',
       (tester) async {
     final app = demoState();
-    final booking = app.demoBookings.single;
+    final booking = app.demoBookings.singleWhere(
+      (booking) => booking.code == MockData.demoReviewBookingCode,
+    );
     final summaryBefore = app.reviewSummaryForPlace(booking.hotel.id);
 
     await pumpSize(

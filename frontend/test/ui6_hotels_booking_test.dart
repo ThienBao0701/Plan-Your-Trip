@@ -211,7 +211,7 @@ void main() {
 
   test('booking sections are derived from dates and status', () {
     final upcoming = bookingFixture();
-    final active = bookingFixture().copyWith(
+    final active = bookingFixture(status: BookingStatus.checkedIn).copyWith(
       criteria: HotelStayCriteria(
         destination: 'Da Lat',
         checkIn: today,
@@ -220,7 +220,7 @@ void main() {
         tripId: 1,
       ),
     );
-    final history = bookingFixture().copyWith(
+    final history = bookingFixture(status: BookingStatus.completed).copyWith(
       criteria: HotelStayCriteria(
         destination: 'Da Lat',
         checkIn: today.subtract(const Duration(days: 5)),

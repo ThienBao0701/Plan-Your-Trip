@@ -240,9 +240,32 @@ extension BookingStatusData on BookingStatus {
   }
 
   bool get canCancel =>
-      this == BookingStatus.pending ||
-      this == BookingStatus.confirmed ||
-      this == BookingStatus.checkInReady;
+      this == BookingStatus.pending || this == BookingStatus.confirmed;
+}
+
+enum BookingPaymentStatus {
+  pending,
+  paid,
+  failed,
+  cancelled,
+  refunded,
+}
+
+extension BookingPaymentStatusData on BookingPaymentStatus {
+  String get code {
+    switch (this) {
+      case BookingPaymentStatus.pending:
+        return 'PENDING';
+      case BookingPaymentStatus.paid:
+        return 'PAID';
+      case BookingPaymentStatus.failed:
+        return 'FAILED';
+      case BookingPaymentStatus.cancelled:
+        return 'CANCELLED';
+      case BookingPaymentStatus.refunded:
+        return 'REFUNDED';
+    }
+  }
 }
 
 class HotelDetail {
@@ -530,6 +553,7 @@ class HotelPricingQuote {
 
 class DemoBooking {
   final String code;
+  final String ownerUserId;
   final Place hotel;
   final HotelRoom room;
   final HotelRatePlan ratePlan;
@@ -537,12 +561,23 @@ class DemoBooking {
   final HotelStayCriteria criteria;
   final String specialRequest;
   final BookingStatus status;
+  final BookingPaymentStatus? paymentStatus;
   final DateTime createdAt;
+  final DateTime? confirmedAt;
+  final DateTime? cancelledAt;
+  final DateTime? actualCheckInAt;
+  final DateTime? actualCheckOutAt;
+  final DateTime? completedAt;
+  final DateTime? archivedAt;
+  final DateTime? lastStatusChangedAt;
+  final DateTime? paidAt;
+  final DateTime? refundedAt;
   final String? cancellationReason;
   final bool itineraryAdded;
 
   const DemoBooking({
     required this.code,
+    this.ownerUserId = 'demo-owner',
     required this.hotel,
     required this.room,
     required this.ratePlan,
@@ -550,13 +585,24 @@ class DemoBooking {
     required this.criteria,
     this.specialRequest = '',
     this.status = BookingStatus.confirmed,
+    this.paymentStatus,
     required this.createdAt,
+    this.confirmedAt,
+    this.cancelledAt,
+    this.actualCheckInAt,
+    this.actualCheckOutAt,
+    this.completedAt,
+    this.archivedAt,
+    this.lastStatusChangedAt,
+    this.paidAt,
+    this.refundedAt,
     this.cancellationReason,
     this.itineraryAdded = false,
   });
 
   DemoBooking copyWith({
     String? code,
+    String? ownerUserId,
     Place? hotel,
     HotelRoom? room,
     HotelRatePlan? ratePlan,
@@ -564,12 +610,23 @@ class DemoBooking {
     HotelStayCriteria? criteria,
     String? specialRequest,
     BookingStatus? status,
+    Object? paymentStatus = _unset,
     DateTime? createdAt,
+    Object? confirmedAt = _unset,
+    Object? cancelledAt = _unset,
+    Object? actualCheckInAt = _unset,
+    Object? actualCheckOutAt = _unset,
+    Object? completedAt = _unset,
+    Object? archivedAt = _unset,
+    Object? lastStatusChangedAt = _unset,
+    Object? paidAt = _unset,
+    Object? refundedAt = _unset,
     Object? cancellationReason = _unset,
     bool? itineraryAdded,
   }) =>
       DemoBooking(
         code: code ?? this.code,
+        ownerUserId: ownerUserId ?? this.ownerUserId,
         hotel: hotel ?? this.hotel,
         room: room ?? this.room,
         ratePlan: ratePlan ?? this.ratePlan,
@@ -577,7 +634,35 @@ class DemoBooking {
         criteria: criteria ?? this.criteria,
         specialRequest: specialRequest ?? this.specialRequest,
         status: status ?? this.status,
+        paymentStatus: identical(paymentStatus, _unset)
+            ? this.paymentStatus
+            : paymentStatus as BookingPaymentStatus?,
         createdAt: createdAt ?? this.createdAt,
+        confirmedAt: identical(confirmedAt, _unset)
+            ? this.confirmedAt
+            : confirmedAt as DateTime?,
+        cancelledAt: identical(cancelledAt, _unset)
+            ? this.cancelledAt
+            : cancelledAt as DateTime?,
+        actualCheckInAt: identical(actualCheckInAt, _unset)
+            ? this.actualCheckInAt
+            : actualCheckInAt as DateTime?,
+        actualCheckOutAt: identical(actualCheckOutAt, _unset)
+            ? this.actualCheckOutAt
+            : actualCheckOutAt as DateTime?,
+        completedAt: identical(completedAt, _unset)
+            ? this.completedAt
+            : completedAt as DateTime?,
+        archivedAt: identical(archivedAt, _unset)
+            ? this.archivedAt
+            : archivedAt as DateTime?,
+        lastStatusChangedAt: identical(lastStatusChangedAt, _unset)
+            ? this.lastStatusChangedAt
+            : lastStatusChangedAt as DateTime?,
+        paidAt: identical(paidAt, _unset) ? this.paidAt : paidAt as DateTime?,
+        refundedAt: identical(refundedAt, _unset)
+            ? this.refundedAt
+            : refundedAt as DateTime?,
         cancellationReason: identical(cancellationReason, _unset)
             ? this.cancellationReason
             : cancellationReason as String?,
@@ -585,6 +670,40 @@ class DemoBooking {
       );
 
   static const Object _unset = Object();
+}
+
+enum BookingCancellationResult {
+  eligible,
+  unavailable,
+  notFound,
+  forbidden,
+  alreadyCancelled,
+  completed,
+  checkInStarted,
+  unsupportedStatus,
+}
+
+class BookingCancellationEligibility {
+  final BookingCancellationResult result;
+  final DemoBooking? booking;
+
+  const BookingCancellationEligibility({
+    required this.result,
+    this.booking,
+  });
+
+  bool get canCancel =>
+      result == BookingCancellationResult.eligible && booking != null;
+}
+
+class BookingTimelineEvent {
+  final String code;
+  final DateTime occurredAt;
+
+  const BookingTimelineEvent({
+    required this.code,
+    required this.occurredAt,
+  });
 }
 
 enum ReviewStatus {

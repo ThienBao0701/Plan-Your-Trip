@@ -3453,6 +3453,12 @@ abstract class AppLocalizations {
   /// **'Free cancellation'**
   String get cancellationFree;
 
+  /// No description provided for @cancellationFreeDeadlinePassed.
+  ///
+  /// In en, this message translates to:
+  /// **'Free-cancellation window passed'**
+  String get cancellationFreeDeadlinePassed;
+
   /// No description provided for @cancellationPartial.
   ///
   /// In en, this message translates to:
@@ -3636,7 +3642,7 @@ abstract class AppLocalizations {
   /// No description provided for @bookingConfirmationLocalOnly.
   ///
   /// In en, this message translates to:
-  /// **'This booking exists only in local demo state. It is not paid, synced, or holding inventory.'**
+  /// **'This booking is local demo presentation data. It is not synced with the backend and does not hold inventory.'**
   String get bookingConfirmationLocalOnly;
 
   /// No description provided for @bookingAddItineraryAction.
@@ -3696,7 +3702,7 @@ abstract class AppLocalizations {
   /// No description provided for @myBookingsDemoLocalOnly.
   ///
   /// In en, this message translates to:
-  /// **'Only local demo bookings appear here. Real booking endpoints are not connected in UI-6.'**
+  /// **'Only local demo bookings appear here. Real booking management is not connected yet.'**
   String get myBookingsDemoLocalOnly;
 
   /// No description provided for @myBookingsRealEmptyTitle.
@@ -3720,20 +3726,38 @@ abstract class AppLocalizations {
   /// No description provided for @myBookingsEmptyMessage.
   ///
   /// In en, this message translates to:
-  /// **'Demo bookings will appear here after confirmation.'**
+  /// **'Demo bookings appear here after confirmation or from the seeded local stay examples.'**
   String get myBookingsEmptyMessage;
 
   /// No description provided for @myBookingCardSemantic.
   ///
   /// In en, this message translates to:
-  /// **'Booking card {code}'**
-  String myBookingCardSemantic(String code);
+  /// **'Booking card'**
+  String get myBookingCardSemantic;
 
   /// No description provided for @bookingDetailsTitle.
   ///
   /// In en, this message translates to:
   /// **'Booking details'**
   String get bookingDetailsTitle;
+
+  /// No description provided for @bookingDetailMissingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking unavailable'**
+  String get bookingDetailMissingTitle;
+
+  /// No description provided for @bookingDetailMissingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This local booking is no longer available.'**
+  String get bookingDetailMissingMessage;
+
+  /// No description provided for @bookingDetailSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking detail'**
+  String get bookingDetailSemantic;
 
   /// No description provided for @bookingPaymentUnavailableAction.
   ///
@@ -3746,6 +3770,240 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Payment actions are not connected in this UI phase.'**
   String get bookingPaymentUnavailable;
+
+  /// No description provided for @bookingStayOverviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay overview'**
+  String get bookingStayOverviewTitle;
+
+  /// No description provided for @bookingSnapshotTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Room and rate snapshot'**
+  String get bookingSnapshotTitle;
+
+  /// No description provided for @bookingPolicyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancellation policy'**
+  String get bookingPolicyTitle;
+
+  /// No description provided for @bookingTimelineTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Status timeline'**
+  String get bookingTimelineTitle;
+
+  /// No description provided for @bookingActionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking actions'**
+  String get bookingActionsTitle;
+
+  /// No description provided for @bookingCodeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking code'**
+  String get bookingCodeLabel;
+
+  /// No description provided for @bookingCodeSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Local booking reference'**
+  String get bookingCodeSemantic;
+
+  /// No description provided for @bookingDatesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay dates'**
+  String get bookingDatesLabel;
+
+  /// No description provided for @bookingNightsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Nights'**
+  String get bookingNightsLabel;
+
+  /// No description provided for @bookingGuestsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Guests'**
+  String get bookingGuestsLabel;
+
+  /// No description provided for @bookingRoomsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Rooms'**
+  String get bookingRoomsLabel;
+
+  /// No description provided for @bookingRoomsValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 room} other{{count} rooms}}'**
+  String bookingRoomsValue(int count);
+
+  /// No description provided for @bookingCreatedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Created'**
+  String get bookingCreatedLabel;
+
+  /// No description provided for @bookingConfirmedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed'**
+  String get bookingConfirmedLabel;
+
+  /// No description provided for @bookingCancelledAtLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get bookingCancelledAtLabel;
+
+  /// No description provided for @bookingCancellationReasonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancellation reason'**
+  String get bookingCancellationReasonLabel;
+
+  /// No description provided for @bookingRoomLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Room'**
+  String get bookingRoomLabel;
+
+  /// No description provided for @bookingRoomCodeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Room code'**
+  String get bookingRoomCodeLabel;
+
+  /// No description provided for @bookingRatePlanLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate plan'**
+  String get bookingRatePlanLabel;
+
+  /// No description provided for @bookingMealPlanLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Meal plan'**
+  String get bookingMealPlanLabel;
+
+  /// No description provided for @bookingTotalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get bookingTotalLabel;
+
+  /// No description provided for @bookingPaymentStatusLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment status'**
+  String get bookingPaymentStatusLabel;
+
+  /// No description provided for @bookingPaymentStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment pending'**
+  String get bookingPaymentStatusPending;
+
+  /// No description provided for @bookingPaymentStatusPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid'**
+  String get bookingPaymentStatusPaid;
+
+  /// No description provided for @bookingPaymentStatusFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment failed'**
+  String get bookingPaymentStatusFailed;
+
+  /// No description provided for @bookingPaymentStatusCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment cancelled'**
+  String get bookingPaymentStatusCancelled;
+
+  /// No description provided for @bookingPaymentStatusRefunded.
+  ///
+  /// In en, this message translates to:
+  /// **'Refunded'**
+  String get bookingPaymentStatusRefunded;
+
+  /// No description provided for @bookingCancellationPolicyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Policy type'**
+  String get bookingCancellationPolicyLabel;
+
+  /// No description provided for @bookingPolicySummaryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Policy summary'**
+  String get bookingPolicySummaryLabel;
+
+  /// No description provided for @bookingCancellationDeadlineLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Deadline'**
+  String get bookingCancellationDeadlineLabel;
+
+  /// No description provided for @bookingCancellationDeadlineValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancellation deadline: {date}'**
+  String bookingCancellationDeadlineValue(String date);
+
+  /// No description provided for @bookingRefundableLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Refundability'**
+  String get bookingRefundableLabel;
+
+  /// No description provided for @bookingRefundableYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Refundable'**
+  String get bookingRefundableYes;
+
+  /// No description provided for @bookingRefundableNo.
+  ///
+  /// In en, this message translates to:
+  /// **'Non-refundable'**
+  String get bookingRefundableNo;
+
+  /// No description provided for @bookingCancellationDeadlinePassedPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'The free-cancellation window has passed. Cancellation can still be requested for eligible booking statuses, but the backend policy preview treats this as a full-penalty cancellation.'**
+  String get bookingCancellationDeadlinePassedPolicy;
+
+  /// No description provided for @bookingRefundBoundary.
+  ///
+  /// In en, this message translates to:
+  /// **'Refund calculation and payout are not simulated in local Demo Mode.'**
+  String get bookingRefundBoundary;
+
+  /// No description provided for @bookingViewReviewAction.
+  ///
+  /// In en, this message translates to:
+  /// **'View review'**
+  String get bookingViewReviewAction;
+
+  /// No description provided for @bookingViewPlaceAction.
+  ///
+  /// In en, this message translates to:
+  /// **'View hotel'**
+  String get bookingViewPlaceAction;
+
+  /// No description provided for @bookingUnsupportedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Modification, rescheduling, invoice downloads, refunds, and property messaging require backend integration and are not simulated locally.'**
+  String get bookingUnsupportedMessage;
 
   /// No description provided for @bookingCancelAction.
   ///
@@ -3765,17 +4023,71 @@ abstract class AppLocalizations {
   /// **'Cancel demo booking?'**
   String get bookingCancelConfirmTitle;
 
+  /// No description provided for @bookingCancelConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel local booking {code}? The stay remains in history and no backend request is sent.'**
+  String bookingCancelConfirmMessage(String code);
+
   /// No description provided for @bookingCancelReasonLabel.
   ///
   /// In en, this message translates to:
   /// **'Cancellation reason'**
   String get bookingCancelReasonLabel;
 
+  /// No description provided for @bookingCancelReasonHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional local note. The backend contract does not require a reason.'**
+  String get bookingCancelReasonHelper;
+
+  /// No description provided for @bookingCancellationLocalWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'This changes only local Demo Mode presentation data.'**
+  String get bookingCancellationLocalWarning;
+
   /// No description provided for @bookingCancelledMessage.
   ///
   /// In en, this message translates to:
   /// **'Demo booking cancelled locally.'**
   String get bookingCancelledMessage;
+
+  /// No description provided for @bookingCancellationUnavailableReal.
+  ///
+  /// In en, this message translates to:
+  /// **'Real booking cancellation requires backend integration.'**
+  String get bookingCancellationUnavailableReal;
+
+  /// No description provided for @bookingCancellationUnavailableForbidden.
+  ///
+  /// In en, this message translates to:
+  /// **'This booking belongs to another traveler.'**
+  String get bookingCancellationUnavailableForbidden;
+
+  /// No description provided for @bookingCancellationUnavailableAlready.
+  ///
+  /// In en, this message translates to:
+  /// **'This booking is already cancelled.'**
+  String get bookingCancellationUnavailableAlready;
+
+  /// No description provided for @bookingCancellationUnavailableCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed and historical stays cannot be cancelled.'**
+  String get bookingCancellationUnavailableCompleted;
+
+  /// No description provided for @bookingCancellationUnavailableStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in has started, so customer cancellation is unavailable.'**
+  String get bookingCancellationUnavailableStarted;
+
+  /// No description provided for @bookingCancellationUnavailableGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancellation is unavailable for this booking status.'**
+  String get bookingCancellationUnavailableGeneric;
 
   /// No description provided for @bookingSectionAll.
   ///
@@ -3866,6 +4178,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No-show'**
   String get bookingStatusNoShow;
+
+  /// No description provided for @bookingTimelineCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking created'**
+  String get bookingTimelineCreated;
+
+  /// No description provided for @bookingTimelinePaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment completed'**
+  String get bookingTimelinePaid;
+
+  /// No description provided for @bookingTimelineConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking confirmed'**
+  String get bookingTimelineConfirmed;
+
+  /// No description provided for @bookingTimelineCheckedIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest checked in'**
+  String get bookingTimelineCheckedIn;
+
+  /// No description provided for @bookingTimelineCheckedOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest checked out'**
+  String get bookingTimelineCheckedOut;
+
+  /// No description provided for @bookingTimelineCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay completed'**
+  String get bookingTimelineCompleted;
+
+  /// No description provided for @bookingTimelineCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking cancelled'**
+  String get bookingTimelineCancelled;
+
+  /// No description provided for @bookingTimelineArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking archived'**
+  String get bookingTimelineArchived;
+
+  /// No description provided for @bookingTimelineRefunded.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment refunded'**
+  String get bookingTimelineRefunded;
+
+  /// No description provided for @bookingTimelineUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Status updated'**
+  String get bookingTimelineUnknown;
 
   /// No description provided for @rewardsTitle.
   ///

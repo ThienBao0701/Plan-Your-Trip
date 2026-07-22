@@ -1994,6 +1994,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cancellationFree => 'Free cancellation';
 
   @override
+  String get cancellationFreeDeadlinePassed =>
+      'Free-cancellation window passed';
+
+  @override
   String get cancellationPartial => 'Partially refundable';
 
   @override
@@ -2099,7 +2103,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bookingConfirmationLocalOnly =>
-      'This booking exists only in local demo state. It is not paid, synced, or holding inventory.';
+      'This booking is local demo presentation data. It is not synced with the backend and does not hold inventory.';
 
   @override
   String get bookingAddItineraryAction => 'Add to itinerary';
@@ -2134,7 +2138,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get myBookingsDemoLocalOnly =>
-      'Only local demo bookings appear here. Real booking endpoints are not connected in UI-6.';
+      'Only local demo bookings appear here. Real booking management is not connected yet.';
 
   @override
   String get myBookingsRealEmptyTitle => 'Bookings not connected';
@@ -2148,15 +2152,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get myBookingsEmptyMessage =>
-      'Demo bookings will appear here after confirmation.';
+      'Demo bookings appear here after confirmation or from the seeded local stay examples.';
 
   @override
-  String myBookingCardSemantic(String code) {
-    return 'Booking card $code';
-  }
+  String get myBookingCardSemantic => 'Booking card';
 
   @override
   String get bookingDetailsTitle => 'Booking details';
+
+  @override
+  String get bookingDetailMissingTitle => 'Booking unavailable';
+
+  @override
+  String get bookingDetailMissingMessage =>
+      'This local booking is no longer available.';
+
+  @override
+  String get bookingDetailSemantic => 'Booking detail';
 
   @override
   String get bookingPaymentUnavailableAction => 'Payment unavailable';
@@ -2164,6 +2176,136 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get bookingPaymentUnavailable =>
       'Payment actions are not connected in this UI phase.';
+
+  @override
+  String get bookingStayOverviewTitle => 'Stay overview';
+
+  @override
+  String get bookingSnapshotTitle => 'Room and rate snapshot';
+
+  @override
+  String get bookingPolicyTitle => 'Cancellation policy';
+
+  @override
+  String get bookingTimelineTitle => 'Status timeline';
+
+  @override
+  String get bookingActionsTitle => 'Booking actions';
+
+  @override
+  String get bookingCodeLabel => 'Booking code';
+
+  @override
+  String get bookingCodeSemantic => 'Local booking reference';
+
+  @override
+  String get bookingDatesLabel => 'Stay dates';
+
+  @override
+  String get bookingNightsLabel => 'Nights';
+
+  @override
+  String get bookingGuestsLabel => 'Guests';
+
+  @override
+  String get bookingRoomsLabel => 'Rooms';
+
+  @override
+  String bookingRoomsValue(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count rooms',
+      one: '1 room',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get bookingCreatedLabel => 'Created';
+
+  @override
+  String get bookingConfirmedLabel => 'Confirmed';
+
+  @override
+  String get bookingCancelledAtLabel => 'Cancelled';
+
+  @override
+  String get bookingCancellationReasonLabel => 'Cancellation reason';
+
+  @override
+  String get bookingRoomLabel => 'Room';
+
+  @override
+  String get bookingRoomCodeLabel => 'Room code';
+
+  @override
+  String get bookingRatePlanLabel => 'Rate plan';
+
+  @override
+  String get bookingMealPlanLabel => 'Meal plan';
+
+  @override
+  String get bookingTotalLabel => 'Total';
+
+  @override
+  String get bookingPaymentStatusLabel => 'Payment status';
+
+  @override
+  String get bookingPaymentStatusPending => 'Payment pending';
+
+  @override
+  String get bookingPaymentStatusPaid => 'Paid';
+
+  @override
+  String get bookingPaymentStatusFailed => 'Payment failed';
+
+  @override
+  String get bookingPaymentStatusCancelled => 'Payment cancelled';
+
+  @override
+  String get bookingPaymentStatusRefunded => 'Refunded';
+
+  @override
+  String get bookingCancellationPolicyLabel => 'Policy type';
+
+  @override
+  String get bookingPolicySummaryLabel => 'Policy summary';
+
+  @override
+  String get bookingCancellationDeadlineLabel => 'Deadline';
+
+  @override
+  String bookingCancellationDeadlineValue(String date) {
+    return 'Cancellation deadline: $date';
+  }
+
+  @override
+  String get bookingRefundableLabel => 'Refundability';
+
+  @override
+  String get bookingRefundableYes => 'Refundable';
+
+  @override
+  String get bookingRefundableNo => 'Non-refundable';
+
+  @override
+  String get bookingCancellationDeadlinePassedPolicy =>
+      'The free-cancellation window has passed. Cancellation can still be requested for eligible booking statuses, but the backend policy preview treats this as a full-penalty cancellation.';
+
+  @override
+  String get bookingRefundBoundary =>
+      'Refund calculation and payout are not simulated in local Demo Mode.';
+
+  @override
+  String get bookingViewReviewAction => 'View review';
+
+  @override
+  String get bookingViewPlaceAction => 'View hotel';
+
+  @override
+  String get bookingUnsupportedMessage =>
+      'Modification, rescheduling, invoice downloads, refunds, and property messaging require backend integration and are not simulated locally.';
 
   @override
   String get bookingCancelAction => 'Cancel booking';
@@ -2175,10 +2317,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bookingCancelConfirmTitle => 'Cancel demo booking?';
 
   @override
+  String bookingCancelConfirmMessage(String code) {
+    return 'Cancel local booking $code? The stay remains in history and no backend request is sent.';
+  }
+
+  @override
   String get bookingCancelReasonLabel => 'Cancellation reason';
 
   @override
+  String get bookingCancelReasonHelper =>
+      'Optional local note. The backend contract does not require a reason.';
+
+  @override
+  String get bookingCancellationLocalWarning =>
+      'This changes only local Demo Mode presentation data.';
+
+  @override
   String get bookingCancelledMessage => 'Demo booking cancelled locally.';
+
+  @override
+  String get bookingCancellationUnavailableReal =>
+      'Real booking cancellation requires backend integration.';
+
+  @override
+  String get bookingCancellationUnavailableForbidden =>
+      'This booking belongs to another traveler.';
+
+  @override
+  String get bookingCancellationUnavailableAlready =>
+      'This booking is already cancelled.';
+
+  @override
+  String get bookingCancellationUnavailableCompleted =>
+      'Completed and historical stays cannot be cancelled.';
+
+  @override
+  String get bookingCancellationUnavailableStarted =>
+      'Check-in has started, so customer cancellation is unavailable.';
+
+  @override
+  String get bookingCancellationUnavailableGeneric =>
+      'Cancellation is unavailable for this booking status.';
 
   @override
   String get bookingSectionAll => 'All';
@@ -2224,6 +2403,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bookingStatusNoShow => 'No-show';
+
+  @override
+  String get bookingTimelineCreated => 'Booking created';
+
+  @override
+  String get bookingTimelinePaid => 'Payment completed';
+
+  @override
+  String get bookingTimelineConfirmed => 'Booking confirmed';
+
+  @override
+  String get bookingTimelineCheckedIn => 'Guest checked in';
+
+  @override
+  String get bookingTimelineCheckedOut => 'Guest checked out';
+
+  @override
+  String get bookingTimelineCompleted => 'Stay completed';
+
+  @override
+  String get bookingTimelineCancelled => 'Booking cancelled';
+
+  @override
+  String get bookingTimelineArchived => 'Booking archived';
+
+  @override
+  String get bookingTimelineRefunded => 'Payment refunded';
+
+  @override
+  String get bookingTimelineUnknown => 'Status updated';
 
   @override
   String get rewardsTitle => 'Rewards & Benefits';

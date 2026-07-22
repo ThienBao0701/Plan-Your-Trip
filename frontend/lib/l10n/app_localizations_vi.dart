@@ -1880,6 +1880,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get cancellationFree => 'Hủy miễn phí';
 
   @override
+  String get cancellationFreeDeadlinePassed => 'Đã qua thời hạn hủy miễn phí';
+
+  @override
   String get cancellationPartial => 'Hoàn tiền một phần';
 
   @override
@@ -1983,7 +1986,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get bookingConfirmationLocalOnly =>
-      'Đặt phòng này chỉ tồn tại trong trạng thái demo cục bộ. Chưa thanh toán, chưa đồng bộ và không giữ phòng.';
+      'Đặt phòng này là dữ liệu trình bày demo cục bộ. Dữ liệu không đồng bộ với backend và không giữ phòng.';
 
   @override
   String get bookingAddItineraryAction => 'Thêm vào lịch trình';
@@ -2018,7 +2021,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get myBookingsDemoLocalOnly =>
-      'Chỉ đặt phòng demo cục bộ xuất hiện tại đây. Endpoint đặt phòng thật chưa được kết nối trong UI-6.';
+      'Chỉ đặt phòng demo cục bộ xuất hiện tại đây. Quản lý đặt phòng thật chưa được kết nối.';
 
   @override
   String get myBookingsRealEmptyTitle => 'Chưa kết nối đặt phòng';
@@ -2032,15 +2035,23 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get myBookingsEmptyMessage =>
-      'Đặt phòng demo sẽ xuất hiện sau khi xác nhận.';
+      'Đặt phòng demo xuất hiện sau khi xác nhận hoặc từ ví dụ lưu trú cục bộ đã gieo sẵn.';
 
   @override
-  String myBookingCardSemantic(String code) {
-    return 'Thẻ đặt phòng $code';
-  }
+  String get myBookingCardSemantic => 'Thẻ đặt phòng';
 
   @override
   String get bookingDetailsTitle => 'Chi tiết đặt phòng';
+
+  @override
+  String get bookingDetailMissingTitle => 'Không có đặt phòng';
+
+  @override
+  String get bookingDetailMissingMessage =>
+      'Đặt phòng cục bộ này không còn khả dụng.';
+
+  @override
+  String get bookingDetailSemantic => 'Chi tiết đặt phòng';
 
   @override
   String get bookingPaymentUnavailableAction => 'Chưa có thanh toán';
@@ -2048,6 +2059,136 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get bookingPaymentUnavailable =>
       'Hành động thanh toán chưa được kết nối trong UI này.';
+
+  @override
+  String get bookingStayOverviewTitle => 'Tóm tắt lưu trú';
+
+  @override
+  String get bookingSnapshotTitle => 'Ảnh chụp phòng và gói giá';
+
+  @override
+  String get bookingPolicyTitle => 'Chính sách hủy';
+
+  @override
+  String get bookingTimelineTitle => 'Dòng thời gian trạng thái';
+
+  @override
+  String get bookingActionsTitle => 'Hành động đặt phòng';
+
+  @override
+  String get bookingCodeLabel => 'Mã đặt phòng';
+
+  @override
+  String get bookingCodeSemantic => 'Tham chiếu đặt phòng cục bộ';
+
+  @override
+  String get bookingDatesLabel => 'Ngày lưu trú';
+
+  @override
+  String get bookingNightsLabel => 'Số đêm';
+
+  @override
+  String get bookingGuestsLabel => 'Khách';
+
+  @override
+  String get bookingRoomsLabel => 'Phòng';
+
+  @override
+  String bookingRoomsValue(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count phòng',
+      one: '1 phòng',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get bookingCreatedLabel => 'Đã tạo';
+
+  @override
+  String get bookingConfirmedLabel => 'Đã xác nhận';
+
+  @override
+  String get bookingCancelledAtLabel => 'Đã hủy';
+
+  @override
+  String get bookingCancellationReasonLabel => 'Lý do hủy';
+
+  @override
+  String get bookingRoomLabel => 'Phòng';
+
+  @override
+  String get bookingRoomCodeLabel => 'Mã phòng';
+
+  @override
+  String get bookingRatePlanLabel => 'Gói giá';
+
+  @override
+  String get bookingMealPlanLabel => 'Gói bữa ăn';
+
+  @override
+  String get bookingTotalLabel => 'Tổng';
+
+  @override
+  String get bookingPaymentStatusLabel => 'Trạng thái thanh toán';
+
+  @override
+  String get bookingPaymentStatusPending => 'Đang chờ thanh toán';
+
+  @override
+  String get bookingPaymentStatusPaid => 'Đã thanh toán';
+
+  @override
+  String get bookingPaymentStatusFailed => 'Thanh toán thất bại';
+
+  @override
+  String get bookingPaymentStatusCancelled => 'Đã hủy thanh toán';
+
+  @override
+  String get bookingPaymentStatusRefunded => 'Đã hoàn tiền';
+
+  @override
+  String get bookingCancellationPolicyLabel => 'Loại chính sách';
+
+  @override
+  String get bookingPolicySummaryLabel => 'Tóm tắt chính sách';
+
+  @override
+  String get bookingCancellationDeadlineLabel => 'Hạn hủy';
+
+  @override
+  String bookingCancellationDeadlineValue(String date) {
+    return 'Hạn hủy: $date';
+  }
+
+  @override
+  String get bookingRefundableLabel => 'Khả năng hoàn tiền';
+
+  @override
+  String get bookingRefundableYes => 'Có thể hoàn tiền';
+
+  @override
+  String get bookingRefundableNo => 'Không hoàn tiền';
+
+  @override
+  String get bookingCancellationDeadlinePassedPolicy =>
+      'Thời hạn hủy miễn phí đã qua. Bạn vẫn có thể yêu cầu hủy với các trạng thái đặt phòng đủ điều kiện, nhưng bản xem trước chính sách backend xem đây là hủy với phí phạt toàn phần.';
+
+  @override
+  String get bookingRefundBoundary =>
+      'Tính toán và chi trả hoàn tiền không được mô phỏng trong Chế độ Demo cục bộ.';
+
+  @override
+  String get bookingViewReviewAction => 'Xem đánh giá';
+
+  @override
+  String get bookingViewPlaceAction => 'Xem khách sạn';
+
+  @override
+  String get bookingUnsupportedMessage =>
+      'Đổi lịch, chỉnh sửa đặt phòng, tải hóa đơn, hoàn tiền và nhắn tin với chỗ ở cần tích hợp backend và không được mô phỏng cục bộ.';
 
   @override
   String get bookingCancelAction => 'Hủy đặt phòng';
@@ -2059,10 +2200,47 @@ class AppLocalizationsVi extends AppLocalizations {
   String get bookingCancelConfirmTitle => 'Hủy đặt phòng demo?';
 
   @override
+  String bookingCancelConfirmMessage(String code) {
+    return 'Hủy đặt phòng cục bộ $code? Kỳ lưu trú vẫn nằm trong lịch sử và không gửi yêu cầu backend.';
+  }
+
+  @override
   String get bookingCancelReasonLabel => 'Lý do hủy';
 
   @override
+  String get bookingCancelReasonHelper =>
+      'Ghi chú cục bộ tùy chọn. Hợp đồng backend không bắt buộc lý do.';
+
+  @override
+  String get bookingCancellationLocalWarning =>
+      'Thao tác này chỉ thay đổi dữ liệu trình bày Chế độ Demo cục bộ.';
+
+  @override
   String get bookingCancelledMessage => 'Đã hủy đặt phòng demo cục bộ.';
+
+  @override
+  String get bookingCancellationUnavailableReal =>
+      'Hủy đặt phòng thật cần tích hợp backend.';
+
+  @override
+  String get bookingCancellationUnavailableForbidden =>
+      'Đặt phòng này thuộc về khách khác.';
+
+  @override
+  String get bookingCancellationUnavailableAlready =>
+      'Đặt phòng này đã bị hủy.';
+
+  @override
+  String get bookingCancellationUnavailableCompleted =>
+      'Kỳ lưu trú đã hoàn tất hoặc thuộc lịch sử không thể hủy.';
+
+  @override
+  String get bookingCancellationUnavailableStarted =>
+      'Quá trình nhận phòng đã bắt đầu nên khách không thể hủy.';
+
+  @override
+  String get bookingCancellationUnavailableGeneric =>
+      'Không thể hủy với trạng thái đặt phòng này.';
 
   @override
   String get bookingSectionAll => 'Tất cả';
@@ -2108,6 +2286,36 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get bookingStatusNoShow => 'Không đến';
+
+  @override
+  String get bookingTimelineCreated => 'Đã tạo đặt phòng';
+
+  @override
+  String get bookingTimelinePaid => 'Đã hoàn tất thanh toán';
+
+  @override
+  String get bookingTimelineConfirmed => 'Đã xác nhận đặt phòng';
+
+  @override
+  String get bookingTimelineCheckedIn => 'Khách đã nhận phòng';
+
+  @override
+  String get bookingTimelineCheckedOut => 'Khách đã trả phòng';
+
+  @override
+  String get bookingTimelineCompleted => 'Kỳ lưu trú hoàn tất';
+
+  @override
+  String get bookingTimelineCancelled => 'Đã hủy đặt phòng';
+
+  @override
+  String get bookingTimelineArchived => 'Đã lưu trữ đặt phòng';
+
+  @override
+  String get bookingTimelineRefunded => 'Đã hoàn tiền thanh toán';
+
+  @override
+  String get bookingTimelineUnknown => 'Đã cập nhật trạng thái';
 
   @override
   String get rewardsTitle => 'Ưu đãi & quyền lợi';

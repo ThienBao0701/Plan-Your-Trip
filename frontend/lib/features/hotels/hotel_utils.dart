@@ -212,26 +212,86 @@ bool bookingInSection(
   required DateTime today,
 }) {
   if (section == BookingSection.all) return true;
-  if (booking.status == BookingStatus.cancelled) {
-    return section == BookingSection.cancelled;
-  }
   final current = hotelDateOnly(today);
   final checkIn = hotelDateOnly(booking.criteria.checkIn);
-  final checkOut = hotelDateOnly(booking.criteria.checkOut);
   switch (section) {
     case BookingSection.upcoming:
-      return checkIn.isAfter(current);
+      return (booking.status == BookingStatus.pending ||
+              booking.status == BookingStatus.confirmed ||
+              booking.status == BookingStatus.checkInReady) &&
+          !checkIn.isBefore(current);
     case BookingSection.active:
-      return !current.isBefore(checkIn) && current.isBefore(checkOut);
+      return booking.status == BookingStatus.checkedIn;
     case BookingSection.history:
-      return !checkOut.isAfter(current) ||
+      return booking.status == BookingStatus.checkedOut ||
           booking.status == BookingStatus.completed ||
-          booking.status == BookingStatus.checkedOut;
+          booking.status == BookingStatus.cancelled ||
+          booking.status == BookingStatus.refunded ||
+          booking.status == BookingStatus.archived ||
+          booking.status == BookingStatus.noShow;
     case BookingSection.cancelled:
-      return false;
+      return booking.status == BookingStatus.cancelled;
     case BookingSection.all:
       return true;
   }
+}
+
+List<BookingTimelineEvent> bookingTimelineFor(DemoBooking booking) {
+  final events = <BookingTimelineEvent>[
+    BookingTimelineEvent(code: 'CREATED', occurredAt: booking.createdAt),
+  ];
+  if (booking.paidAt != null &&
+      booking.paymentStatus == BookingPaymentStatus.paid) {
+    events.add(BookingTimelineEvent(code: 'PAID', occurredAt: booking.paidAt!));
+  }
+  if (booking.confirmedAt != null) {
+    events.add(BookingTimelineEvent(
+      code: 'CONFIRMED',
+      occurredAt: booking.confirmedAt!,
+    ));
+  }
+  if (booking.actualCheckInAt != null) {
+    events.add(BookingTimelineEvent(
+      code: 'CHECKED_IN',
+      occurredAt: booking.actualCheckInAt!,
+    ));
+  }
+  if (booking.actualCheckOutAt != null) {
+    events.add(BookingTimelineEvent(
+      code: 'CHECKED_OUT',
+      occurredAt: booking.actualCheckOutAt!,
+    ));
+  }
+  if (booking.completedAt != null) {
+    events.add(BookingTimelineEvent(
+      code: 'COMPLETED',
+      occurredAt: booking.completedAt!,
+    ));
+  }
+  if (booking.cancelledAt != null) {
+    events.add(BookingTimelineEvent(
+      code: 'CANCELLED',
+      occurredAt: booking.cancelledAt!,
+    ));
+  }
+  if (booking.archivedAt != null) {
+    events.add(BookingTimelineEvent(
+      code: 'ARCHIVED',
+      occurredAt: booking.archivedAt!,
+    ));
+  }
+  if (booking.refundedAt != null &&
+      booking.paymentStatus == BookingPaymentStatus.refunded) {
+    events.add(BookingTimelineEvent(
+      code: 'REFUNDED',
+      occurredAt: booking.refundedAt!,
+    ));
+  }
+  events.sort((a, b) {
+    final time = a.occurredAt.compareTo(b.occurredAt);
+    return time == 0 ? a.code.compareTo(b.code) : time;
+  });
+  return events;
 }
 
 bool itineraryAlreadyHasBooking(

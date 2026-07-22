@@ -474,20 +474,93 @@ class AppState extends ChangeNotifier {
     return true;
   }
 
-  bool cancelDemoBooking(String code, {String? reason}) {
-    if (!demoMode) return false;
-    final index = demoBookings.indexWhere((item) => item.code == code);
-    if (index < 0 || !demoBookings[index].status.canCancel) return false;
-    final updated = demoBookings[index].copyWith(
+  DemoBooking? demoBookingByCode(String code) =>
+      _firstWhereOrNull(demoBookings, (item) => item.code == code);
+
+  BookingCancellationEligibility cancellationEligibilityForBooking(
+    DemoBooking booking,
+  ) {
+    if (!demoMode) {
+      return const BookingCancellationEligibility(
+        result: BookingCancellationResult.unavailable,
+      );
+    }
+    final current = demoBookingByCode(booking.code);
+    if (current == null) {
+      return const BookingCancellationEligibility(
+        result: BookingCancellationResult.notFound,
+      );
+    }
+    if (current.ownerUserId != currentDemoUser.id) {
+      return BookingCancellationEligibility(
+        result: BookingCancellationResult.forbidden,
+        booking: current,
+      );
+    }
+    switch (current.status) {
+      case BookingStatus.pending:
+      case BookingStatus.confirmed:
+        return BookingCancellationEligibility(
+          result: BookingCancellationResult.eligible,
+          booking: current,
+        );
+      case BookingStatus.cancelled:
+        return BookingCancellationEligibility(
+          result: BookingCancellationResult.alreadyCancelled,
+          booking: current,
+        );
+      case BookingStatus.checkInReady:
+      case BookingStatus.checkedIn:
+        return BookingCancellationEligibility(
+          result: BookingCancellationResult.checkInStarted,
+          booking: current,
+        );
+      case BookingStatus.checkedOut:
+      case BookingStatus.completed:
+      case BookingStatus.refunded:
+      case BookingStatus.archived:
+      case BookingStatus.noShow:
+        return BookingCancellationEligibility(
+          result: BookingCancellationResult.completed,
+          booking: current,
+        );
+    }
+  }
+
+  BookingCancellationResult cancelDemoBookingWithResult(
+    String code, {
+    String? reason,
+  }) {
+    final booking = demoBookingByCode(code);
+    final eligibility = booking == null
+        ? const BookingCancellationEligibility(
+            result: BookingCancellationResult.notFound,
+          )
+        : cancellationEligibilityForBooking(booking);
+    if (!eligibility.canCancel || eligibility.booking == null) {
+      return eligibility.result;
+    }
+    final current = eligibility.booking!;
+    final timestamp = now().toUtc();
+    final safeReason = reason?.trim();
+    final updated = current.copyWith(
       status: BookingStatus.cancelled,
-      cancellationReason: reason?.trim().isEmpty == true ? null : reason,
+      cancelledAt: timestamp,
+      lastStatusChangedAt: timestamp,
+      cancellationReason:
+          safeReason == null || safeReason.isEmpty ? null : safeReason,
     );
     demoBookings = [
-      for (var i = 0; i < demoBookings.length; i++)
-        i == index ? updated : demoBookings[i],
+      for (final item in demoBookings)
+        item.code == current.code ? updated : item,
     ];
     notifyListeners();
-    return true;
+    return BookingCancellationResult.eligible;
+  }
+
+  bool cancelDemoBooking(String code, {String? reason}) {
+    return cancelDemoBookingWithResult(code, reason: reason) ==
+        BookingCancellationResult.eligible;
   }
 
   bool markDemoBookingItineraryAdded(String code) {

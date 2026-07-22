@@ -207,10 +207,17 @@ void main() {
     );
   });
 
-  test('fresh demo state seeds exactly one completed reviewable booking', () {
+  test('fresh demo state seeds the completed reviewable booking safely', () {
     expect(MockData.buildDemoBookings(sourcePlaces: const <Place>[]), isEmpty);
     final app = demoState();
-    final booking = app.demoBookings.single;
+    expect(
+      app.demoBookings
+          .where((booking) => booking.code == MockData.demoReviewBookingCode),
+      hasLength(1),
+    );
+    final booking = app.demoBookings.singleWhere(
+      (booking) => booking.code == MockData.demoReviewBookingCode,
+    );
     final summaryBefore = app.reviewSummaryForPlace(booking.hotel.id);
     final totalBefore = booking.quote.finalQuotedPrice;
     final currencyBefore = booking.quote.currency;
@@ -444,7 +451,13 @@ void main() {
       hasLength(1),
     );
     expect(
-      app.reviewEligibilityForBooking(app.demoBookings.single).result,
+      app
+          .reviewEligibilityForBooking(
+            app.demoBookings.singleWhere(
+              (booking) => booking.code == MockData.demoReviewBookingCode,
+            ),
+          )
+          .result,
       ReviewActionResult.duplicate,
     );
   });

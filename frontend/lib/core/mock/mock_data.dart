@@ -592,9 +592,13 @@ class MockData {
   ];
 
   static const demoReviewBookingCode = 'PYT-DEMO-8801';
+  static const demoCancellationBookingCode = 'PYT-DEMO-9901';
   static const _demoReviewPlaceId = 1;
   static const _demoReviewRoomId = 101;
   static const _demoReviewRatePlanId = 1001;
+  static const _demoCancellationPlaceId = 6;
+  static const _demoCancellationRoomId = 601;
+  static const _demoCancellationRatePlanId = 6001;
 
   static final demoBookings = buildDemoBookings();
 
@@ -612,6 +616,22 @@ class MockData {
       room?.ratePlans ?? const <HotelRatePlan>[],
       (plan) =>
           plan.ratePlanId == _demoReviewRatePlanId &&
+          plan.finalNightlyRate != null &&
+          plan.finalNightlyRate! > 0,
+    );
+    final cancellationHotel = _firstWhereOrNull(
+      availablePlaces,
+      (place) =>
+          place.id == _demoCancellationPlaceId && place.hotelDetail != null,
+    );
+    final cancellationRoom = _firstWhereOrNull(
+      cancellationHotel?.hotelDetail?.rooms ?? const <HotelRoom>[],
+      (room) => room.id == _demoCancellationRoomId,
+    );
+    final cancellationRatePlan = _firstWhereOrNull(
+      cancellationRoom?.ratePlans ?? const <HotelRatePlan>[],
+      (plan) =>
+          plan.ratePlanId == _demoCancellationRatePlanId &&
           plan.finalNightlyRate != null &&
           plan.finalNightlyRate! > 0,
     );
@@ -633,9 +653,10 @@ class MockData {
     final nightlyRate = ratePlan.finalNightlyRate!;
     final stayTotal = nightlyRate * criteria.nights;
 
-    return [
+    final demoBookings = <DemoBooking>[
       DemoBooking(
         code: demoReviewBookingCode,
+        ownerUserId: 'demo-owner',
         hotel: hotel,
         room: room,
         ratePlan: ratePlan,
@@ -671,9 +692,82 @@ class MockData {
         ),
         criteria: criteria,
         status: BookingStatus.completed,
+        paymentStatus: BookingPaymentStatus.paid,
         createdAt: createdAt,
+        confirmedAt: DateTime(2026, 5, 20, 9, 5),
+        paidAt: DateTime(2026, 5, 20, 9, 10),
+        actualCheckInAt: DateTime(2026, 6, 10, 14),
+        actualCheckOutAt: DateTime(2026, 6, 12, 11, 30),
+        completedAt: DateTime(2026, 6, 12, 12),
+        lastStatusChangedAt: DateTime(2026, 6, 12, 12),
       ),
     ];
+    if (cancellationHotel != null &&
+        cancellationRoom != null &&
+        cancellationRatePlan != null) {
+      final cancellationCheckIn = DateTime(2026, 9, 5);
+      final cancellationCheckOut = DateTime(2026, 9, 6);
+      final cancellationCreatedAt = DateTime(2026, 7, 1, 10);
+      final cancellationCriteria = HotelStayCriteria(
+        destination: cancellationHotel.city,
+        checkIn: cancellationCheckIn,
+        checkOut: cancellationCheckOut,
+        adults: 2,
+        children: 0,
+        tripId: 2,
+      );
+      final nightlyRate = cancellationRatePlan.finalNightlyRate!;
+      final stayTotal = nightlyRate * cancellationCriteria.nights;
+      demoBookings.add(
+        DemoBooking(
+          code: demoCancellationBookingCode,
+          ownerUserId: 'demo-owner',
+          hotel: cancellationHotel,
+          room: cancellationRoom,
+          ratePlan: cancellationRatePlan,
+          quote: HotelPricingQuote(
+            roomId: cancellationRoom.id,
+            roomName: cancellationRoom.roomName,
+            roomCode: cancellationRoom.roomCode,
+            placeId: cancellationHotel.id,
+            hotelId: cancellationHotel.id,
+            checkIn: cancellationCriteria.checkIn,
+            checkOut: cancellationCriteria.checkOut,
+            nights: cancellationCriteria.nights,
+            adults: cancellationCriteria.adults,
+            children: cancellationCriteria.children,
+            extraBeds: cancellationCriteria.extraBeds,
+            selectedRatePlanId: cancellationRatePlan.ratePlanId,
+            selectedRatePlanCode: cancellationRatePlan.code,
+            selectedRatePlanName: cancellationRatePlan.rateName,
+            mealPlanType: cancellationRatePlan.mealPlan,
+            cancellationPolicyType: cancellationRatePlan.cancellationPolicyType,
+            refundable: cancellationRatePlan.refundable,
+            cancellationDeadline: DateTime(2026, 8, 31, 15),
+            baseNightlyRate: cancellationRatePlan.baseNightlyRate,
+            finalNightlyRate: nightlyRate,
+            staySubtotal: stayTotal,
+            totalBeforeCustomerBenefits: stayTotal,
+            finalQuotedPrice: stayTotal,
+            currency: 'VND',
+            inventoryAvailable: true,
+            availableRooms: cancellationRoom.availableQuantity,
+            quoteGeneratedAt: cancellationCreatedAt,
+            quoteExpiresAt:
+                cancellationCreatedAt.add(const Duration(minutes: 15)),
+            warnings: const ['Local preview quote. No inventory is reserved.'],
+          ),
+          criteria: cancellationCriteria,
+          status: BookingStatus.confirmed,
+          paymentStatus: BookingPaymentStatus.paid,
+          createdAt: cancellationCreatedAt,
+          confirmedAt: DateTime(2026, 7, 1, 10, 5),
+          paidAt: DateTime(2026, 7, 1, 10, 8),
+          lastStatusChangedAt: DateTime(2026, 7, 1, 10, 5),
+        ),
+      );
+    }
+    return demoBookings;
   }
 
   static T? _firstWhereOrNull<T>(
