@@ -2078,17 +2078,273 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bookingTermsAcknowledgement =>
-      'I understand this UI does not collect payment or reserve inventory.';
+      'I understand checkout does not collect card details or reserve real inventory in this UI phase.';
 
   @override
   String get bookingConfirmAction => 'Confirm demo booking';
 
   @override
-  String get bookingConfirmSemantic => 'Confirm this demo booking';
+  String get bookingConfirmSemantic => 'Continue to secure checkout';
 
   @override
   String get bookingDuplicatePrevented =>
       'Duplicate booking creation was blocked.';
+
+  @override
+  String get checkoutTitle => 'Secure checkout';
+
+  @override
+  String get checkoutContinueAction => 'Continue to secure checkout';
+
+  @override
+  String get checkoutSecureTitle => 'Secure checkout';
+
+  @override
+  String get checkoutSemantic => 'Secure booking checkout';
+
+  @override
+  String get checkoutRealModeLabel => 'Real account';
+
+  @override
+  String get checkoutSecureBoundaryPill => 'No card fields';
+
+  @override
+  String get checkoutWholeStayTotal => 'Whole-stay total';
+
+  @override
+  String get checkoutStaySnapshotTitle => 'Stay snapshot';
+
+  @override
+  String get checkoutProviderTitle => 'Payment provider';
+
+  @override
+  String get checkoutProviderHelper =>
+      'Backend contracts expose hosted provider sessions. UI-13 does not open an external gateway or collect credentials.';
+
+  @override
+  String get checkoutMockProviderSubtitle =>
+      'Local demo provider for presentation only.';
+
+  @override
+  String get checkoutHostedProviderSubtitle =>
+      'Hosted provider handoff is proven by backend contracts but not opened in this UI phase.';
+
+  @override
+  String get checkoutSecurityTitle => 'Payment security';
+
+  @override
+  String get checkoutDemoSecurityBoundary =>
+      'Demo Mode can create a local payment attempt for presentation. No money is charged and no gateway callback is sent.';
+
+  @override
+  String get checkoutRealUnavailableMessage =>
+      'Real checkout requires API/repository integration and hosted-provider handoff wiring. This UI will not simulate success.';
+
+  @override
+  String get checkoutNoSensitiveFields =>
+      'This app does not ask for card number, expiry, CVV, PIN, bank password, OTP, payment token, or gateway secret.';
+
+  @override
+  String get checkoutBenefitsBoundaryTitle => 'Rewards and wallet';
+
+  @override
+  String get checkoutBenefitsReadOnlyDemo =>
+      'Travel credits, loyalty, coupons, gift cards, and wallet items are read-only here unless a backend checkout contract explicitly applies them.';
+
+  @override
+  String get checkoutBenefitsReadOnlyReal =>
+      'Rewards and wallet balances are not connected to real checkout in this UI phase.';
+
+  @override
+  String get checkoutCreateDemoPaymentAction =>
+      'Create demo booking and payment';
+
+  @override
+  String get checkoutRealUnavailableAction => 'Real payment unavailable';
+
+  @override
+  String get checkoutSubmitSemantic =>
+      'Create a local demo booking and payment attempt';
+
+  @override
+  String get paymentStatusTitle => 'Payment status';
+
+  @override
+  String get paymentRealUnavailableTitle => 'Payment not connected';
+
+  @override
+  String get paymentRealUnavailableMessage =>
+      'Real payment status requires the backend API/repository integration. No local success is simulated for real accounts.';
+
+  @override
+  String get paymentMissingTitle => 'Payment unavailable';
+
+  @override
+  String get paymentMissingMessage =>
+      'This local payment attempt is no longer available.';
+
+  @override
+  String get paymentDemoFailureReason => 'Demo provider declined the payment.';
+
+  @override
+  String get paymentStatusSemantic => 'Payment status detail';
+
+  @override
+  String get paymentDemoLocalOnly =>
+      'This payment status is local Demo Mode presentation data and is not a real charge.';
+
+  @override
+  String get paymentDetailsTitle => 'Payment details';
+
+  @override
+  String get paymentProviderLabel => 'Provider';
+
+  @override
+  String get paymentSessionStatusLabel => 'Gateway session';
+
+  @override
+  String get paymentAmountLabel => 'Amount';
+
+  @override
+  String get paymentCreatedLabel => 'Payment created';
+
+  @override
+  String get paymentHoldExpiresLabel => 'Hold expires';
+
+  @override
+  String get paymentPaidAtLabel => 'Paid at';
+
+  @override
+  String get paymentFailedAtLabel => 'Failed at';
+
+  @override
+  String get paymentCancelledAtLabel => 'Cancelled at';
+
+  @override
+  String get paymentRefundedAtLabel => 'Refunded at';
+
+  @override
+  String get paymentReferenceLabel => 'Provider reference';
+
+  @override
+  String get paymentMaskedReferenceSemantic => 'Masked provider reference';
+
+  @override
+  String get paymentFailureReasonLabel => 'Failure reason';
+
+  @override
+  String get paymentNoRefundInference =>
+      'Cancellation and payment status are separate. A cancelled booking is not shown as refunded unless a refund status is present.';
+
+  @override
+  String get paymentActionsTitle => 'Payment actions';
+
+  @override
+  String get paymentCompleteDemoAction => 'Complete demo payment';
+
+  @override
+  String get paymentCompleteDemoSemantic => 'Complete this local demo payment';
+
+  @override
+  String get paymentFailDemoAction => 'Fail demo payment';
+
+  @override
+  String get paymentCancelDemoAction => 'Cancel payment session';
+
+  @override
+  String get paymentRetryAction => 'Retry payment';
+
+  @override
+  String get paymentContinueAction => 'Continue payment';
+
+  @override
+  String get paymentStatusAction => 'Payment status';
+
+  @override
+  String get paymentContinueConfirmationAction => 'Continue to confirmation';
+
+  @override
+  String get paymentPendingBoundary =>
+      'Pending demo payments can be completed, failed, or cancelled locally. Real provider callbacks are not simulated.';
+
+  @override
+  String get paymentTerminalBoundary =>
+      'Terminal payment states are shown as immutable snapshots. Retry is available only when backend rules allow a new attempt.';
+
+  @override
+  String get paymentProviderMock => 'Mock provider';
+
+  @override
+  String get paymentProviderVnpay => 'VNPay';
+
+  @override
+  String get paymentProviderPayos => 'PayOS';
+
+  @override
+  String get paymentProviderMomo => 'MoMo';
+
+  @override
+  String get paymentProviderStripe => 'Stripe';
+
+  @override
+  String get paymentProviderApplePay => 'Apple Pay';
+
+  @override
+  String get paymentProviderGooglePay => 'Google Pay';
+
+  @override
+  String get paymentProviderManual => 'Manual';
+
+  @override
+  String get paymentSessionStatusNew => 'New';
+
+  @override
+  String get paymentSessionStatusPending => 'Pending';
+
+  @override
+  String get paymentSessionStatusAuthorized => 'Authorized';
+
+  @override
+  String get paymentSessionStatusCaptured => 'Captured';
+
+  @override
+  String get paymentSessionStatusFailed => 'Failed';
+
+  @override
+  String get paymentSessionStatusCancelled => 'Cancelled';
+
+  @override
+  String get paymentSessionStatusExpired => 'Expired';
+
+  @override
+  String get paymentResultSuccessTitle => 'Payment completed';
+
+  @override
+  String get paymentResultPendingTitle => 'Payment pending';
+
+  @override
+  String get paymentResultFailedTitle => 'Payment failed';
+
+  @override
+  String get paymentResultCancelledTitle => 'Payment cancelled';
+
+  @override
+  String get paymentResultExpiredTitle => 'Payment expired';
+
+  @override
+  String get paymentActionSuccess => 'Payment state updated.';
+
+  @override
+  String get paymentActionUnavailable =>
+      'Payment action is unavailable for this account.';
+
+  @override
+  String get paymentDuplicatePrevented =>
+      'Duplicate checkout submission was blocked.';
+
+  @override
+  String get paymentActionInvalidState =>
+      'This payment state cannot perform that action.';
 
   @override
   String get bookingConfirmationTitle => 'Demo booking confirmed';
@@ -2232,6 +2488,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bookingCancellationReasonLabel => 'Cancellation reason';
+
+  @override
+  String get bookingHotelLabel => 'Hotel';
 
   @override
   String get bookingRoomLabel => 'Room';

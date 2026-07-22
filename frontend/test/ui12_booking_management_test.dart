@@ -41,6 +41,7 @@ void main() {
     ..packingItems = []
     ..tripReminders = []
     ..reviews = []
+    ..demoPaymentAttempts = []
     ..publicTripIds = {};
 
   Widget harness({

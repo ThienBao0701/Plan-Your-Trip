@@ -41,6 +41,7 @@ void main() {
       ..demoMode = demoMode
       ..email = demoMode ? MockData.demoEmail : 'real@example.com';
     app.demoBookings = [];
+    app.demoPaymentAttempts = [];
     if (!demoMode) {
       app.trips = [];
       app.timeline = [];
@@ -94,6 +95,17 @@ void main() {
       locale: locale,
       textScaleFactor: textScaleFactor,
     ));
+    await tester.pumpAndSettle();
+  }
+
+  Future<void> scrollToAndTap(WidgetTester tester, Finder finder) async {
+    await tester.scrollUntilVisible(
+      finder,
+      900,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(finder);
     await tester.pumpAndSettle();
   }
 
@@ -455,7 +467,8 @@ void main() {
         findsOneWidget);
   });
 
-  testWidgets('real mode cannot create a fake booking', (tester) async {
+  testWidgets('real mode shows checkout unavailable without fake booking',
+      (tester) async {
     ignoreNetworkImageErrors();
     final fixture = quoteFixture();
     final app = testState(demoMode: false);
@@ -479,11 +492,18 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(app.demoBookings, isEmpty);
-    expect(find.text('Online booking is not connected yet for real accounts.'),
+    expect(find.byKey(const Key('secure-checkout-screen')), findsOneWidget);
+    expect(
+        find.textContaining(
+            'Real checkout requires API/repository integration'),
         findsWidgets);
+    final submit = tester.widget<OceanPrimaryButton>(
+      find.byKey(const Key('checkout-submit')),
+    );
+    expect(submit.onPressed, isNull);
   });
 
-  testWidgets('demo confirm creates exactly one clearly local booking',
+  testWidgets('demo checkout creates one pending attempt then confirms on pay',
       (tester) async {
     ignoreNetworkImageErrors();
     final fixture = quoteFixture();
@@ -505,12 +525,26 @@ void main() {
     await tester.tap(find.byKey(const Key('booking-terms-checkbox')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('booking-confirm')));
-    await tester.tap(find.byKey(const Key('booking-confirm')),
-        warnIfMissed: false);
     await tester.pumpAndSettle();
+    expect(find.byKey(const Key('secure-checkout-screen')), findsOneWidget);
+
+    await scrollToAndTap(tester, find.byKey(const Key('checkout-submit')));
 
     expect(app.demoBookings.length, 1);
     expect(app.demoBookings.single.code, 'DEMO-01');
+    expect(app.demoBookings.single.status, BookingStatus.pending);
+    expect(app.demoPaymentAttempts.length, 1);
+    expect(app.demoPaymentAttempts.single.paymentStatus,
+        BookingPaymentStatus.pending);
+    expect(find.byKey(const Key('payment-status-screen')), findsOneWidget);
+
+    await scrollToAndTap(
+        tester, find.byKey(const Key('payment-complete-demo')));
+    expect(app.demoBookings.single.status, BookingStatus.confirmed);
+    expect(app.demoBookings.single.paymentStatus, BookingPaymentStatus.paid);
+
+    await scrollToAndTap(
+        tester, find.byKey(const Key('payment-open-confirmation')));
     expect(find.text('Local demo booking'), findsOneWidget);
   });
 

@@ -67,6 +67,7 @@ void main() {
     ..timeline = []
     ..expenses = []
     ..demoBookings = []
+    ..demoPaymentAttempts = []
     ..travelCreditAccount = null
     ..travelCreditTransactions = []
     ..loyaltyAccount = null

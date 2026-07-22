@@ -66,6 +66,8 @@ class AppState extends ChangeNotifier {
   List<PackingItem> packingItems = List.from(MockData.packingItems);
   List<TripReminder> tripReminders = List.from(MockData.tripReminders);
   List<TravelerReview> reviews = List.from(MockData.reviews);
+  List<DemoPaymentAttempt> demoPaymentAttempts =
+      List.from(MockData.demoPaymentAttempts);
   Set<int> publicTripIds = Set<int>.from(MockData.publicTripIds);
   List<Category> get categories => MockData.categories;
 
@@ -123,6 +125,7 @@ class AppState extends ChangeNotifier {
     packingItems = List.from(MockData.packingItems);
     tripReminders = List.from(MockData.tripReminders);
     reviews = List.from(MockData.reviews);
+    demoPaymentAttempts = List.from(MockData.demoPaymentAttempts);
     publicTripIds = Set<int>.from(MockData.publicTripIds);
     _applyRewardDataMode();
     notifyListeners();
@@ -142,6 +145,7 @@ class AppState extends ChangeNotifier {
       packingItems = List.from(MockData.packingItems);
       tripReminders = List.from(MockData.tripReminders);
       reviews = List.from(MockData.reviews);
+      demoPaymentAttempts = List.from(MockData.demoPaymentAttempts);
       publicTripIds = Set<int>.from(MockData.publicTripIds);
       _applyRewardDataMode();
       return;
@@ -158,6 +162,7 @@ class AppState extends ChangeNotifier {
     packingItems = [];
     tripReminders = [];
     reviews = [];
+    demoPaymentAttempts = [];
     publicTripIds = {};
     _applyRewardDataMode();
   }
@@ -477,6 +482,261 @@ class AppState extends ChangeNotifier {
   DemoBooking? demoBookingByCode(String code) =>
       _firstWhereOrNull(demoBookings, (item) => item.code == code);
 
+  DemoPaymentAttempt? paymentAttemptById(String id) =>
+      _firstWhereOrNull(demoPaymentAttempts, (item) => item.id == id);
+
+  DemoPaymentAttempt? latestPaymentAttemptForBooking(String bookingCode) {
+    final attempts = demoPaymentAttempts
+        .where((item) => item.bookingCode == bookingCode)
+        .toList()
+      ..sort((a, b) {
+        final created = b.createdAt.compareTo(a.createdAt);
+        return created == 0 ? b.id.compareTo(a.id) : created;
+      });
+    return attempts.isEmpty ? null : attempts.first;
+  }
+
+  DemoCheckoutResult startDemoCheckout({
+    required Place hotel,
+    required HotelRoom room,
+    required HotelRatePlan ratePlan,
+    required HotelPricingQuote quote,
+    required HotelStayCriteria criteria,
+    required String specialRequest,
+    required CheckoutPaymentProvider provider,
+    required String idempotencyKey,
+  }) {
+    if (!demoMode) {
+      return const DemoCheckoutResult(
+        result: DemoPaymentActionResult.unavailable,
+      );
+    }
+    final normalizedKey = idempotencyKey.trim();
+    if (normalizedKey.isNotEmpty) {
+      final existingAttempt = _firstWhereOrNull(
+        demoPaymentAttempts,
+        (item) => item.idempotencyKey == normalizedKey,
+      );
+      if (existingAttempt != null) {
+        return DemoCheckoutResult(
+          result: DemoPaymentActionResult.duplicate,
+          booking: demoBookingByCode(existingAttempt.bookingCode),
+          attempt: existingAttempt,
+        );
+      }
+    }
+    final amount = quote.finalQuotedPrice;
+    if (amount == null ||
+        !amount.isFinite ||
+        amount <= 0 ||
+        quote.currency.trim().isEmpty) {
+      return const DemoCheckoutResult(
+        result: DemoPaymentActionResult.quoteUnavailable,
+      );
+    }
+    if (!provider.hasCustomerSessionGateway) {
+      return const DemoCheckoutResult(
+        result: DemoPaymentActionResult.unavailable,
+      );
+    }
+
+    final timestamp = now().toUtc();
+    final code = nextDemoBookingCode();
+    if (demoBookings.any((item) => item.code == code)) {
+      return const DemoCheckoutResult(
+        result: DemoPaymentActionResult.duplicate,
+      );
+    }
+    final booking = DemoBooking(
+      code: code,
+      ownerUserId: currentDemoUser.id,
+      hotel: hotel,
+      room: room,
+      ratePlan: ratePlan,
+      quote: quote,
+      criteria: criteria,
+      specialRequest: specialRequest.trim(),
+      status: BookingStatus.pending,
+      paymentStatus: BookingPaymentStatus.pending,
+      createdAt: timestamp,
+      lastStatusChangedAt: timestamp,
+    );
+    final attempt = _buildPaymentAttempt(
+      booking: booking,
+      provider: provider,
+      sequence: 1,
+      timestamp: timestamp,
+      idempotencyKey: normalizedKey,
+    );
+    demoBookings = [...demoBookings, booking];
+    demoPaymentAttempts = [...demoPaymentAttempts, attempt];
+    notifyListeners();
+    return DemoCheckoutResult(
+      result: DemoPaymentActionResult.success,
+      booking: booking,
+      attempt: attempt,
+    );
+  }
+
+  DemoPaymentActionResult completeDemoPayment(String attemptId) {
+    if (!demoMode) return DemoPaymentActionResult.unavailable;
+    final index =
+        demoPaymentAttempts.indexWhere((item) => item.id == attemptId);
+    if (index < 0) return DemoPaymentActionResult.notFound;
+    final attempt = demoPaymentAttempts[index];
+    if (attempt.isSuccessful) return DemoPaymentActionResult.success;
+    if (!attempt.isPending) return DemoPaymentActionResult.invalidState;
+    final booking = demoBookingByCode(attempt.bookingCode);
+    if (booking == null) return DemoPaymentActionResult.bookingUnavailable;
+    if (booking.status == BookingStatus.cancelled) {
+      return DemoPaymentActionResult.invalidState;
+    }
+    final timestamp = now().toUtc();
+    final updatedAttempt = attempt.copyWith(
+      paymentStatus: BookingPaymentStatus.paid,
+      sessionStatus: PaymentSessionStatus.captured,
+      safeProviderReference: '${attempt.provider.code}-${attempt.sessionId}',
+      paidAt: timestamp,
+      updatedAt: timestamp,
+    );
+    final updatedBooking = booking.copyWith(
+      status: BookingStatus.confirmed,
+      paymentStatus: BookingPaymentStatus.paid,
+      confirmedAt: booking.confirmedAt ?? timestamp,
+      paidAt: timestamp,
+      lastStatusChangedAt: timestamp,
+    );
+    _replacePaymentAttempt(index, updatedAttempt);
+    _replaceDemoBooking(updatedBooking);
+    notifyListeners();
+    return DemoPaymentActionResult.success;
+  }
+
+  DemoPaymentActionResult failDemoPayment(
+    String attemptId, {
+    String? reason,
+  }) {
+    if (!demoMode) return DemoPaymentActionResult.unavailable;
+    final index =
+        demoPaymentAttempts.indexWhere((item) => item.id == attemptId);
+    if (index < 0) return DemoPaymentActionResult.notFound;
+    final attempt = demoPaymentAttempts[index];
+    if (attempt.sessionStatus == PaymentSessionStatus.failed) {
+      return DemoPaymentActionResult.success;
+    }
+    if (!attempt.isPending) return DemoPaymentActionResult.invalidState;
+    final booking = demoBookingByCode(attempt.bookingCode);
+    if (booking == null) return DemoPaymentActionResult.bookingUnavailable;
+    final timestamp = now().toUtc();
+    final safeReason = reason?.trim();
+    final updatedAttempt = attempt.copyWith(
+      paymentStatus: BookingPaymentStatus.failed,
+      sessionStatus: PaymentSessionStatus.failed,
+      failureReason:
+          safeReason == null || safeReason.isEmpty ? null : safeReason,
+      failedAt: timestamp,
+      updatedAt: timestamp,
+    );
+    final updatedBooking = booking.copyWith(
+      paymentStatus: BookingPaymentStatus.failed,
+      lastStatusChangedAt: booking.lastStatusChangedAt,
+    );
+    _replacePaymentAttempt(index, updatedAttempt);
+    _replaceDemoBooking(updatedBooking);
+    notifyListeners();
+    return DemoPaymentActionResult.success;
+  }
+
+  DemoPaymentActionResult cancelDemoPaymentAttempt(String attemptId) {
+    if (!demoMode) return DemoPaymentActionResult.unavailable;
+    final index =
+        demoPaymentAttempts.indexWhere((item) => item.id == attemptId);
+    if (index < 0) return DemoPaymentActionResult.notFound;
+    final attempt = demoPaymentAttempts[index];
+    if (attempt.sessionStatus == PaymentSessionStatus.cancelled) {
+      return DemoPaymentActionResult.success;
+    }
+    if (!attempt.isPending) return DemoPaymentActionResult.invalidState;
+    final booking = demoBookingByCode(attempt.bookingCode);
+    if (booking == null) return DemoPaymentActionResult.bookingUnavailable;
+    final timestamp = now().toUtc();
+    final updatedAttempt = attempt.copyWith(
+      paymentStatus: BookingPaymentStatus.failed,
+      sessionStatus: PaymentSessionStatus.cancelled,
+      cancelledAt: timestamp,
+      updatedAt: timestamp,
+    );
+    final updatedBooking = booking.copyWith(
+      paymentStatus: BookingPaymentStatus.failed,
+      lastStatusChangedAt: booking.lastStatusChangedAt,
+    );
+    _replacePaymentAttempt(index, updatedAttempt);
+    _replaceDemoBooking(updatedBooking);
+    notifyListeners();
+    return DemoPaymentActionResult.success;
+  }
+
+  DemoCheckoutResult retryDemoPayment(String bookingCode) {
+    if (!demoMode) {
+      return const DemoCheckoutResult(
+        result: DemoPaymentActionResult.unavailable,
+      );
+    }
+    final booking = demoBookingByCode(bookingCode);
+    if (booking == null) {
+      return const DemoCheckoutResult(
+        result: DemoPaymentActionResult.bookingUnavailable,
+      );
+    }
+    if (booking.status == BookingStatus.cancelled ||
+        demoPaymentAttempts.any((item) =>
+            item.bookingCode == bookingCode &&
+            item.paymentStatus == BookingPaymentStatus.paid)) {
+      return DemoCheckoutResult(
+        result: DemoPaymentActionResult.invalidState,
+        booking: booking,
+      );
+    }
+    final latest = latestPaymentAttemptForBooking(bookingCode);
+    if (latest != null && !latest.canRetry) {
+      return DemoCheckoutResult(
+        result: DemoPaymentActionResult.invalidState,
+        booking: booking,
+        attempt: latest,
+      );
+    }
+    final amount = booking.quote.finalQuotedPrice;
+    if (amount == null || !amount.isFinite || amount <= 0) {
+      return DemoCheckoutResult(
+        result: DemoPaymentActionResult.quoteUnavailable,
+        booking: booking,
+      );
+    }
+    final sequence = demoPaymentAttempts
+            .where((item) => item.bookingCode == bookingCode)
+            .length +
+        1;
+    final timestamp = now().toUtc();
+    final attempt = _buildPaymentAttempt(
+      booking: booking,
+      provider: latest?.provider ?? CheckoutPaymentProvider.mock,
+      sequence: sequence,
+      timestamp: timestamp,
+      idempotencyKey: 'retry-$bookingCode-$sequence',
+    );
+    final updatedBooking = booking.copyWith(
+      paymentStatus: BookingPaymentStatus.pending,
+    );
+    demoPaymentAttempts = [...demoPaymentAttempts, attempt];
+    _replaceDemoBooking(updatedBooking);
+    notifyListeners();
+    return DemoCheckoutResult(
+      result: DemoPaymentActionResult.success,
+      booking: updatedBooking,
+      attempt: attempt,
+    );
+  }
+
   BookingCancellationEligibility cancellationEligibilityForBooking(
     DemoBooking booking,
   ) {
@@ -575,6 +835,60 @@ class AppState extends ChangeNotifier {
     ];
     notifyListeners();
     return true;
+  }
+
+  DemoPaymentAttempt _buildPaymentAttempt({
+    required DemoBooking booking,
+    required CheckoutPaymentProvider provider,
+    required int sequence,
+    required DateTime timestamp,
+    required String idempotencyKey,
+  }) {
+    final safeCode =
+        booking.code.replaceAll(RegExp('[^A-Za-z0-9]'), '').toUpperCase();
+    final suffix = sequence.toString().padLeft(2, '0');
+    final sessionId = 'PS-$safeCode-$suffix';
+    final paymentCode = 'PAY-$safeCode-$suffix';
+    return DemoPaymentAttempt(
+      id: paymentCode,
+      sessionId: sessionId,
+      bookingCode: booking.code,
+      provider: provider,
+      paymentMethod: provider.settlementMethod,
+      amount: booking.quote.finalQuotedPrice ?? 0,
+      currency: booking.quote.currency,
+      paymentStatus: BookingPaymentStatus.pending,
+      sessionStatus: PaymentSessionStatus.pending,
+      checkoutUrl: _checkoutUrlForProvider(provider, sessionId),
+      expiresAt: timestamp.add(const Duration(minutes: 30)),
+      createdAt: timestamp,
+      updatedAt: timestamp,
+      idempotencyKey: idempotencyKey,
+    );
+  }
+
+  String _checkoutUrlForProvider(
+    CheckoutPaymentProvider provider,
+    String sessionId,
+  ) {
+    if (provider == CheckoutPaymentProvider.mock) {
+      return 'https://mock-gateway.planyourtrip.local/checkout/$sessionId';
+    }
+    return 'https://sandbox.example.test/checkout/$sessionId';
+  }
+
+  void _replacePaymentAttempt(int index, DemoPaymentAttempt attempt) {
+    demoPaymentAttempts = [
+      for (var i = 0; i < demoPaymentAttempts.length; i++)
+        i == index ? attempt : demoPaymentAttempts[i],
+    ];
+  }
+
+  void _replaceDemoBooking(DemoBooking booking) {
+    demoBookings = [
+      for (final item in demoBookings)
+        item.code == booking.code ? booking : item,
+    ];
   }
 
   // ── Reviews and traveler trust ──────────────────────────────────────────

@@ -601,6 +601,7 @@ class MockData {
   static const _demoCancellationRatePlanId = 6001;
 
   static final demoBookings = buildDemoBookings();
+  static final demoPaymentAttempts = buildDemoPaymentAttempts();
 
   static List<DemoBooking> buildDemoBookings({List<Place>? sourcePlaces}) {
     final availablePlaces = sourcePlaces ?? places;
@@ -768,6 +769,56 @@ class MockData {
       );
     }
     return demoBookings;
+  }
+
+  static List<DemoPaymentAttempt> buildDemoPaymentAttempts({
+    List<DemoBooking>? bookings,
+  }) {
+    final source = bookings ?? demoBookings;
+    DemoPaymentAttempt? paidAttemptFor(
+      String code,
+      String paymentCode,
+      String sessionId,
+    ) {
+      final booking = _firstWhereOrNull(source, (item) => item.code == code);
+      final total = booking?.quote.finalQuotedPrice;
+      final paidAt = booking?.paidAt;
+      if (booking == null || total == null || total < 0 || paidAt == null) {
+        return null;
+      }
+      return DemoPaymentAttempt(
+        id: paymentCode,
+        sessionId: sessionId,
+        bookingCode: booking.code,
+        provider: CheckoutPaymentProvider.mock,
+        paymentMethod: CheckoutPaymentMethod.mock,
+        amount: total,
+        currency: booking.quote.currency,
+        paymentStatus: BookingPaymentStatus.paid,
+        sessionStatus: PaymentSessionStatus.captured,
+        checkoutUrl:
+            'https://mock-gateway.planyourtrip.local/checkout/$sessionId',
+        safeProviderReference: 'MOCK-$sessionId',
+        expiresAt: booking.createdAt.add(const Duration(minutes: 30)),
+        createdAt: booking.createdAt,
+        updatedAt: paidAt,
+        paidAt: paidAt,
+        idempotencyKey: 'seed-${booking.code}',
+      );
+    }
+
+    return [
+      paidAttemptFor(
+        demoReviewBookingCode,
+        'PAY-DEMO-8801',
+        'PS-DEMO-8801',
+      ),
+      paidAttemptFor(
+        demoCancellationBookingCode,
+        'PAY-DEMO-9901',
+        'PS-DEMO-9901',
+      ),
+    ].whereType<DemoPaymentAttempt>().toList();
   }
 
   static T? _firstWhereOrNull<T>(

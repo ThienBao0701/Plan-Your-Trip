@@ -11,6 +11,7 @@ import '../../shared/widgets/add_to_trip_sheet.dart';
 import '../../shared/widgets/glass_widgets.dart';
 import '../expenses/expenses_screen.dart';
 import '../hotels/hotel_utils.dart';
+import '../payments/secure_checkout_screen.dart';
 import '../places/place_detail_screen.dart';
 import '../reviews/reviews_screen.dart';
 import '../timeline/timeline_screen.dart';
@@ -226,6 +227,15 @@ class _BookingCard extends StatelessWidget {
                   icon: Icons.payments_rounded,
                   color: AppColors.success,
                 ),
+              if (booking.paymentStatus != null)
+                OceanStatusPill(
+                  label: bookingPaymentStatusLabel(
+                    l10n,
+                    booking.paymentStatus!,
+                  ),
+                  icon: Icons.account_balance_wallet_rounded,
+                  color: _paymentStatusColor(booking.paymentStatus!),
+                ),
             ],
           ),
         ],
@@ -254,12 +264,16 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
   bool _addingToTrip = false;
   bool _savingToWallet = false;
   bool _cancelling = false;
+  bool _paymentWorking = false;
 
   @override
   Widget build(BuildContext context) {
     final app = AppScope.of(context);
     final l10n = AppLocalizations.of(context)!;
     final booking = app.demoBookingByCode(widget.bookingCode);
+    final paymentAttempt = booking == null
+        ? null
+        : app.latestPaymentAttemptForBooking(booking.code);
     return Scaffold(
       appBar: OceanGlassAppBar(
         leading: IconButton(
@@ -295,14 +309,25 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                           )
                         : _BookingDetailContent(
                             booking: booking,
+                            paymentAttempt: paymentAttempt,
                             addingToTrip: _addingToTrip,
                             savingToWallet: _savingToWallet,
                             cancelling: _cancelling,
+                            paymentWorking: _paymentWorking,
                             onAddToTrip: () => _addToItinerary(booking),
                             onSaveWallet: () => _saveBookingToWallet(booking),
                             onWriteReview: () => _openWriteReview(booking),
                             onViewReview: (review) => _openReview(review),
                             onCancel: () => _confirmCancel(booking),
+                            onOpenPayment: paymentAttempt == null
+                                ? null
+                                : () => _openPaymentStatus(
+                                      booking,
+                                      paymentAttempt,
+                                    ),
+                            onRetryPayment: paymentAttempt == null
+                                ? null
+                                : () => _retryPayment(booking),
                             onViewPlace: () => _openPlace(booking),
                           ),
               ),
@@ -436,6 +461,36 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
     );
   }
 
+  void _openPaymentStatus(
+    DemoBooking booking,
+    DemoPaymentAttempt attempt,
+  ) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PaymentStatusScreen(
+          bookingCode: booking.code,
+          attemptId: attempt.id,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _retryPayment(DemoBooking booking) async {
+    if (_paymentWorking) return;
+    final app = AppScope.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    setState(() => _paymentWorking = true);
+    final result = app.retryDemoPayment(booking.code);
+    if (!mounted) return;
+    setState(() => _paymentWorking = false);
+    if (result.attempt != null) {
+      _openPaymentStatus(result.booking ?? booking, result.attempt!);
+      return;
+    }
+    _showSnack(paymentActionResultMessage(l10n, result.result));
+  }
+
   Future<void> _confirmCancel(DemoBooking booking) async {
     if (_cancelling) return;
     final reason = await showDialog<String?>(
@@ -462,26 +517,34 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
 
 class _BookingDetailContent extends StatelessWidget {
   final DemoBooking booking;
+  final DemoPaymentAttempt? paymentAttempt;
   final bool addingToTrip;
   final bool savingToWallet;
   final bool cancelling;
+  final bool paymentWorking;
   final VoidCallback onAddToTrip;
   final VoidCallback onSaveWallet;
   final VoidCallback onWriteReview;
   final ValueChanged<TravelerReview> onViewReview;
   final VoidCallback onCancel;
+  final VoidCallback? onOpenPayment;
+  final VoidCallback? onRetryPayment;
   final VoidCallback onViewPlace;
 
   const _BookingDetailContent({
     required this.booking,
+    required this.paymentAttempt,
     required this.addingToTrip,
     required this.savingToWallet,
     required this.cancelling,
+    required this.paymentWorking,
     required this.onAddToTrip,
     required this.onSaveWallet,
     required this.onWriteReview,
     required this.onViewReview,
     required this.onCancel,
+    required this.onOpenPayment,
+    required this.onRetryPayment,
     required this.onViewPlace,
   });
 
@@ -563,11 +626,15 @@ class _BookingDetailContent extends StatelessWidget {
           addingToTrip: addingToTrip,
           savingToWallet: savingToWallet,
           cancelling: cancelling,
+          paymentWorking: paymentWorking,
+          paymentAttempt: paymentAttempt,
           onAddToTrip: onAddToTrip,
           onSaveWallet: onSaveWallet,
           onWriteReview: onWriteReview,
           onViewReview: onViewReview,
           onCancel: onCancel,
+          onOpenPayment: onOpenPayment,
+          onRetryPayment: onRetryPayment,
           onViewPlace: onViewPlace,
         ),
         const SizedBox(height: AppSpacing.md),
@@ -734,6 +801,91 @@ class _BookingDetailContent extends StatelessWidget {
           ],
         ),
         const SizedBox(height: AppSpacing.md),
+        if (paymentAttempt != null) ...[
+          _BookingSectionCard(
+            title: l10n.paymentDetailsTitle,
+            icon: Icons.payments_rounded,
+            children: [
+              _DetailRow(
+                icon: Icons.account_balance_wallet_rounded,
+                label: l10n.paymentProviderLabel,
+                value: paymentProviderLabel(l10n, paymentAttempt!.provider),
+              ),
+              _DetailRow(
+                icon: Icons.sync_rounded,
+                label: l10n.paymentSessionStatusLabel,
+                value: paymentSessionStatusLabel(
+                  l10n,
+                  paymentAttempt!.sessionStatus,
+                ),
+              ),
+              if (paymentAttempt!.paymentStatus != null)
+                _DetailRow(
+                  icon: Icons.price_check_rounded,
+                  label: l10n.bookingPaymentStatusLabel,
+                  value: bookingPaymentStatusLabel(
+                    l10n,
+                    paymentAttempt!.paymentStatus!,
+                  ),
+                ),
+              if (paymentAttempt!.amountIsSafe)
+                _DetailRow(
+                  icon: Icons.receipt_long_rounded,
+                  label: l10n.paymentAmountLabel,
+                  value: formatMoney(
+                    context,
+                    paymentAttempt!.amount,
+                    paymentAttempt!.currency,
+                  ),
+                ),
+              _DetailRow(
+                icon: Icons.schedule_rounded,
+                label: l10n.paymentCreatedLabel,
+                value: _formatDateTime(context, paymentAttempt!.createdAt),
+              ),
+              if (paymentAttempt!.expiresAt != null &&
+                  paymentAttempt!.isPending)
+                _DetailRow(
+                  icon: Icons.timer_rounded,
+                  label: l10n.paymentHoldExpiresLabel,
+                  value: _formatDateTime(context, paymentAttempt!.expiresAt!),
+                ),
+              if (paymentAttempt!.paidAt != null)
+                _DetailRow(
+                  icon: Icons.check_circle_rounded,
+                  label: l10n.paymentPaidAtLabel,
+                  value: _formatDateTime(context, paymentAttempt!.paidAt!),
+                ),
+              if (paymentAttempt!.failedAt != null)
+                _DetailRow(
+                  icon: Icons.error_rounded,
+                  label: l10n.paymentFailedAtLabel,
+                  value: _formatDateTime(context, paymentAttempt!.failedAt!),
+                ),
+              if (paymentAttempt!.cancelledAt != null)
+                _DetailRow(
+                  icon: Icons.cancel_rounded,
+                  label: l10n.paymentCancelledAtLabel,
+                  value: _formatDateTime(context, paymentAttempt!.cancelledAt!),
+                ),
+              if (paymentAttempt!.failureReason != null)
+                _DetailRow(
+                  icon: Icons.info_rounded,
+                  label: l10n.paymentFailureReasonLabel,
+                  value: paymentAttempt!.failureReason!,
+                ),
+              OceanGlassSurface(
+                blur: 0,
+                color: AppColors.paleCyan,
+                child: Text(
+                  l10n.paymentNoRefundInference,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+        ],
         _StatusTimelineCard(booking: booking),
       ],
     );
@@ -749,32 +901,40 @@ class _BookingDetailContent extends StatelessWidget {
 
 class _BookingActionsCard extends StatelessWidget {
   final DemoBooking booking;
+  final DemoPaymentAttempt? paymentAttempt;
   final BookingCancellationEligibility eligibility;
   final ReviewEligibility reviewEligibility;
   final TravelerReview? review;
   final bool addingToTrip;
   final bool savingToWallet;
   final bool cancelling;
+  final bool paymentWorking;
   final VoidCallback onAddToTrip;
   final VoidCallback onSaveWallet;
   final VoidCallback onWriteReview;
   final ValueChanged<TravelerReview> onViewReview;
   final VoidCallback onCancel;
+  final VoidCallback? onOpenPayment;
+  final VoidCallback? onRetryPayment;
   final VoidCallback onViewPlace;
 
   const _BookingActionsCard({
     required this.booking,
+    required this.paymentAttempt,
     required this.eligibility,
     required this.reviewEligibility,
     required this.review,
     required this.addingToTrip,
     required this.savingToWallet,
     required this.cancelling,
+    required this.paymentWorking,
     required this.onAddToTrip,
     required this.onSaveWallet,
     required this.onWriteReview,
     required this.onViewReview,
     required this.onCancel,
+    required this.onOpenPayment,
+    required this.onRetryPayment,
     required this.onViewPlace,
   });
 
@@ -782,6 +942,7 @@ class _BookingActionsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final app = AppScope.of(context);
     final l10n = AppLocalizations.of(context)!;
+    final paymentAction = _paymentAction(l10n);
     return _BookingSectionCard(
       title: l10n.bookingActionsTitle,
       icon: Icons.touch_app_rounded,
@@ -850,6 +1011,14 @@ class _BookingActionsCard extends StatelessWidget {
                 fullWidth: false,
                 onPressed: cancelling ? null : onCancel,
               ),
+            if (paymentAction != null)
+              OceanSecondaryButton(
+                key: const Key('booking-detail-payment-action'),
+                label: paymentAction.label,
+                icon: paymentAction.icon,
+                fullWidth: false,
+                onPressed: paymentWorking ? null : paymentAction.onPressed,
+              ),
             OceanSecondaryButton(
               key: const Key('booking-detail-view-place'),
               label: l10n.bookingViewPlaceAction,
@@ -881,6 +1050,37 @@ class _BookingActionsCard extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  ({String label, IconData icon, VoidCallback onPressed})? _paymentAction(
+    AppLocalizations l10n,
+  ) {
+    final attempt = paymentAttempt;
+    if (attempt == null) return null;
+    if (attempt.isPending && onOpenPayment != null) {
+      return (
+        label: l10n.paymentContinueAction,
+        icon: Icons.hourglass_top_rounded,
+        onPressed: onOpenPayment!,
+      );
+    }
+    if (attempt.canRetry &&
+        booking.status == BookingStatus.pending &&
+        onRetryPayment != null) {
+      return (
+        label: l10n.paymentRetryAction,
+        icon: Icons.refresh_rounded,
+        onPressed: onRetryPayment!,
+      );
+    }
+    if (onOpenPayment != null) {
+      return (
+        label: l10n.paymentStatusAction,
+        icon: Icons.payments_rounded,
+        onPressed: onOpenPayment!,
+      );
+    }
+    return null;
   }
 }
 
@@ -1322,6 +1522,19 @@ Color _bookingStatusColor(BookingStatus status) {
     case BookingStatus.checkedIn:
     case BookingStatus.archived:
       return AppColors.ocean;
+  }
+}
+
+Color _paymentStatusColor(BookingPaymentStatus status) {
+  switch (status) {
+    case BookingPaymentStatus.paid:
+    case BookingPaymentStatus.refunded:
+      return AppColors.success;
+    case BookingPaymentStatus.failed:
+    case BookingPaymentStatus.cancelled:
+      return AppColors.danger;
+    case BookingPaymentStatus.pending:
+      return AppColors.warning;
   }
 }
 

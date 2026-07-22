@@ -268,6 +268,200 @@ extension BookingPaymentStatusData on BookingPaymentStatus {
   }
 }
 
+BookingStatus? bookingStatusFromWire(String? value) {
+  final normalized = value?.trim().toUpperCase();
+  if (normalized == null || normalized.isEmpty) return null;
+  for (final status in BookingStatus.values) {
+    if (status.code == normalized) return status;
+  }
+  return null;
+}
+
+BookingPaymentStatus? bookingPaymentStatusFromWire(String? value) {
+  final normalized = value?.trim().toUpperCase();
+  if (normalized == null || normalized.isEmpty) return null;
+  for (final status in BookingPaymentStatus.values) {
+    if (status.code == normalized) return status;
+  }
+  return null;
+}
+
+enum CheckoutPaymentMethod {
+  mock,
+  cash,
+  card,
+  bankTransfer,
+  vnpay,
+  momo,
+  stripe,
+  payos,
+}
+
+extension CheckoutPaymentMethodData on CheckoutPaymentMethod {
+  String get code {
+    switch (this) {
+      case CheckoutPaymentMethod.mock:
+        return 'MOCK';
+      case CheckoutPaymentMethod.cash:
+        return 'CASH';
+      case CheckoutPaymentMethod.card:
+        return 'CARD';
+      case CheckoutPaymentMethod.bankTransfer:
+        return 'BANK_TRANSFER';
+      case CheckoutPaymentMethod.vnpay:
+        return 'VNPAY';
+      case CheckoutPaymentMethod.momo:
+        return 'MOMO';
+      case CheckoutPaymentMethod.stripe:
+        return 'STRIPE';
+      case CheckoutPaymentMethod.payos:
+        return 'PAYOS';
+    }
+  }
+}
+
+CheckoutPaymentMethod? checkoutPaymentMethodFromWire(String? value) {
+  final normalized = value?.trim().toUpperCase();
+  if (normalized == null || normalized.isEmpty) return null;
+  for (final method in CheckoutPaymentMethod.values) {
+    if (method.code == normalized) return method;
+  }
+  return null;
+}
+
+enum CheckoutPaymentProvider {
+  mock,
+  vnpay,
+  payos,
+  momo,
+  stripe,
+  applePay,
+  googlePay,
+  manual,
+}
+
+extension CheckoutPaymentProviderData on CheckoutPaymentProvider {
+  String get code {
+    switch (this) {
+      case CheckoutPaymentProvider.mock:
+        return 'MOCK';
+      case CheckoutPaymentProvider.vnpay:
+        return 'VNPAY';
+      case CheckoutPaymentProvider.payos:
+        return 'PAYOS';
+      case CheckoutPaymentProvider.momo:
+        return 'MOMO';
+      case CheckoutPaymentProvider.stripe:
+        return 'STRIPE';
+      case CheckoutPaymentProvider.applePay:
+        return 'APPLE_PAY';
+      case CheckoutPaymentProvider.googlePay:
+        return 'GOOGLE_PAY';
+      case CheckoutPaymentProvider.manual:
+        return 'MANUAL';
+    }
+  }
+
+  CheckoutPaymentMethod get settlementMethod {
+    switch (this) {
+      case CheckoutPaymentProvider.vnpay:
+        return CheckoutPaymentMethod.vnpay;
+      case CheckoutPaymentProvider.momo:
+        return CheckoutPaymentMethod.momo;
+      case CheckoutPaymentProvider.stripe:
+        return CheckoutPaymentMethod.stripe;
+      case CheckoutPaymentProvider.payos:
+        return CheckoutPaymentMethod.payos;
+      case CheckoutPaymentProvider.manual:
+        return CheckoutPaymentMethod.bankTransfer;
+      case CheckoutPaymentProvider.mock:
+      case CheckoutPaymentProvider.applePay:
+      case CheckoutPaymentProvider.googlePay:
+        return CheckoutPaymentMethod.mock;
+    }
+  }
+
+  bool get hasCustomerSessionGateway {
+    switch (this) {
+      case CheckoutPaymentProvider.mock:
+      case CheckoutPaymentProvider.vnpay:
+      case CheckoutPaymentProvider.payos:
+      case CheckoutPaymentProvider.momo:
+      case CheckoutPaymentProvider.stripe:
+        return true;
+      case CheckoutPaymentProvider.applePay:
+      case CheckoutPaymentProvider.googlePay:
+      case CheckoutPaymentProvider.manual:
+        return false;
+    }
+  }
+}
+
+enum PaymentSessionStatus {
+  newSession,
+  pending,
+  authorized,
+  captured,
+  failed,
+  cancelled,
+  expired,
+}
+
+extension PaymentSessionStatusData on PaymentSessionStatus {
+  String get code {
+    switch (this) {
+      case PaymentSessionStatus.newSession:
+        return 'NEW';
+      case PaymentSessionStatus.pending:
+        return 'PENDING';
+      case PaymentSessionStatus.authorized:
+        return 'AUTHORIZED';
+      case PaymentSessionStatus.captured:
+        return 'CAPTURED';
+      case PaymentSessionStatus.failed:
+        return 'FAILED';
+      case PaymentSessionStatus.cancelled:
+        return 'CANCELLED';
+      case PaymentSessionStatus.expired:
+        return 'EXPIRED';
+    }
+  }
+
+  bool get isTerminal =>
+      this == PaymentSessionStatus.captured ||
+      this == PaymentSessionStatus.failed ||
+      this == PaymentSessionStatus.cancelled ||
+      this == PaymentSessionStatus.expired;
+}
+
+CheckoutPaymentProvider? checkoutPaymentProviderFromWire(String? value) {
+  final normalized = value?.trim().toUpperCase();
+  if (normalized == null || normalized.isEmpty) return null;
+  for (final provider in CheckoutPaymentProvider.values) {
+    if (provider.code == normalized) return provider;
+  }
+  return null;
+}
+
+PaymentSessionStatus? paymentSessionStatusFromWire(String? value) {
+  final normalized = value?.trim().toUpperCase();
+  if (normalized == null || normalized.isEmpty) return null;
+  for (final status in PaymentSessionStatus.values) {
+    if (status.code == normalized) return status;
+  }
+  return null;
+}
+
+enum DemoPaymentActionResult {
+  success,
+  unavailable,
+  notFound,
+  duplicate,
+  invalidState,
+  quoteUnavailable,
+  bookingUnavailable,
+}
+
 class HotelDetail {
   final int? starRating;
   final String? checkInTime;
@@ -704,6 +898,152 @@ class BookingTimelineEvent {
     required this.code,
     required this.occurredAt,
   });
+}
+
+class DemoPaymentAttempt {
+  static const Object _unset = Object();
+
+  final String id;
+  final String sessionId;
+  final String bookingCode;
+  final CheckoutPaymentProvider provider;
+  final CheckoutPaymentMethod paymentMethod;
+  final double amount;
+  final String currency;
+  final BookingPaymentStatus? paymentStatus;
+  final PaymentSessionStatus sessionStatus;
+  final String checkoutUrl;
+  final String? safeProviderReference;
+  final String? failureReason;
+  final DateTime? expiresAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? paidAt;
+  final DateTime? failedAt;
+  final DateTime? cancelledAt;
+  final DateTime? refundedAt;
+  final String idempotencyKey;
+  final bool demoOnly;
+
+  const DemoPaymentAttempt({
+    required this.id,
+    required this.sessionId,
+    required this.bookingCode,
+    required this.provider,
+    required this.paymentMethod,
+    required this.amount,
+    required this.currency,
+    this.paymentStatus,
+    this.sessionStatus = PaymentSessionStatus.pending,
+    this.checkoutUrl = '',
+    this.safeProviderReference,
+    this.failureReason,
+    this.expiresAt,
+    required this.createdAt,
+    required this.updatedAt,
+    this.paidAt,
+    this.failedAt,
+    this.cancelledAt,
+    this.refundedAt,
+    this.idempotencyKey = '',
+    this.demoOnly = true,
+  });
+
+  bool get amountIsSafe =>
+      amount.isFinite && amount >= 0 && currency.isNotEmpty;
+
+  bool get isSuccessful =>
+      paymentStatus == BookingPaymentStatus.paid ||
+      sessionStatus == PaymentSessionStatus.captured;
+
+  bool get isPending =>
+      sessionStatus == PaymentSessionStatus.newSession ||
+      sessionStatus == PaymentSessionStatus.pending ||
+      sessionStatus == PaymentSessionStatus.authorized;
+
+  bool get canRetry =>
+      sessionStatus == PaymentSessionStatus.failed ||
+      sessionStatus == PaymentSessionStatus.cancelled ||
+      sessionStatus == PaymentSessionStatus.expired ||
+      paymentStatus == BookingPaymentStatus.failed ||
+      paymentStatus == BookingPaymentStatus.cancelled;
+
+  DemoPaymentAttempt copyWith({
+    String? id,
+    String? sessionId,
+    String? bookingCode,
+    CheckoutPaymentProvider? provider,
+    CheckoutPaymentMethod? paymentMethod,
+    double? amount,
+    String? currency,
+    Object? paymentStatus = _unset,
+    PaymentSessionStatus? sessionStatus,
+    String? checkoutUrl,
+    Object? safeProviderReference = _unset,
+    Object? failureReason = _unset,
+    Object? expiresAt = _unset,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Object? paidAt = _unset,
+    Object? failedAt = _unset,
+    Object? cancelledAt = _unset,
+    Object? refundedAt = _unset,
+    String? idempotencyKey,
+    bool? demoOnly,
+  }) =>
+      DemoPaymentAttempt(
+        id: id ?? this.id,
+        sessionId: sessionId ?? this.sessionId,
+        bookingCode: bookingCode ?? this.bookingCode,
+        provider: provider ?? this.provider,
+        paymentMethod: paymentMethod ?? this.paymentMethod,
+        amount: amount ?? this.amount,
+        currency: currency ?? this.currency,
+        paymentStatus: identical(paymentStatus, _unset)
+            ? this.paymentStatus
+            : paymentStatus as BookingPaymentStatus?,
+        sessionStatus: sessionStatus ?? this.sessionStatus,
+        checkoutUrl: checkoutUrl ?? this.checkoutUrl,
+        safeProviderReference: identical(safeProviderReference, _unset)
+            ? this.safeProviderReference
+            : safeProviderReference as String?,
+        failureReason: identical(failureReason, _unset)
+            ? this.failureReason
+            : failureReason as String?,
+        expiresAt: identical(expiresAt, _unset)
+            ? this.expiresAt
+            : expiresAt as DateTime?,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+        paidAt: identical(paidAt, _unset) ? this.paidAt : paidAt as DateTime?,
+        failedAt:
+            identical(failedAt, _unset) ? this.failedAt : failedAt as DateTime?,
+        cancelledAt: identical(cancelledAt, _unset)
+            ? this.cancelledAt
+            : cancelledAt as DateTime?,
+        refundedAt: identical(refundedAt, _unset)
+            ? this.refundedAt
+            : refundedAt as DateTime?,
+        idempotencyKey: idempotencyKey ?? this.idempotencyKey,
+        demoOnly: demoOnly ?? this.demoOnly,
+      );
+}
+
+class DemoCheckoutResult {
+  final DemoPaymentActionResult result;
+  final DemoBooking? booking;
+  final DemoPaymentAttempt? attempt;
+
+  const DemoCheckoutResult({
+    required this.result,
+    this.booking,
+    this.attempt,
+  });
+
+  bool get created =>
+      result == DemoPaymentActionResult.success &&
+      booking != null &&
+      attempt != null;
 }
 
 enum ReviewStatus {

@@ -1962,16 +1962,273 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get bookingTermsAcknowledgement =>
-      'Tôi hiểu UI này không thu thanh toán hoặc giữ phòng.';
+      'Tôi hiểu bước thanh toán không thu thông tin thẻ và không giữ phòng thật trong UI này.';
 
   @override
   String get bookingConfirmAction => 'Xác nhận đặt phòng demo';
 
   @override
-  String get bookingConfirmSemantic => 'Xác nhận đặt phòng demo này';
+  String get bookingConfirmSemantic => 'Tiếp tục đến thanh toán an toàn';
 
   @override
   String get bookingDuplicatePrevented => 'Đã chặn tạo đặt phòng trùng.';
+
+  @override
+  String get checkoutTitle => 'Thanh toán an toàn';
+
+  @override
+  String get checkoutContinueAction => 'Tiếp tục đến thanh toán an toàn';
+
+  @override
+  String get checkoutSecureTitle => 'Thanh toán an toàn';
+
+  @override
+  String get checkoutSemantic => 'Thanh toán đặt phòng an toàn';
+
+  @override
+  String get checkoutRealModeLabel => 'Tài khoản thật';
+
+  @override
+  String get checkoutSecureBoundaryPill => 'Không nhập thẻ';
+
+  @override
+  String get checkoutWholeStayTotal => 'Tổng toàn bộ kỳ lưu trú';
+
+  @override
+  String get checkoutStaySnapshotTitle => 'Ảnh chụp lưu trú';
+
+  @override
+  String get checkoutProviderTitle => 'Nhà cung cấp thanh toán';
+
+  @override
+  String get checkoutProviderHelper =>
+      'Backend có hợp đồng phiên thanh toán qua nhà cung cấp. UI-13 không mở cổng ngoài và không thu thông tin đăng nhập/thẻ.';
+
+  @override
+  String get checkoutMockProviderSubtitle =>
+      'Nhà cung cấp demo cục bộ chỉ để trình bày.';
+
+  @override
+  String get checkoutHostedProviderSubtitle =>
+      'Backend đã chứng minh luồng chuyển sang nhà cung cấp, nhưng UI này chưa mở cổng ngoài.';
+
+  @override
+  String get checkoutSecurityTitle => 'Bảo mật thanh toán';
+
+  @override
+  String get checkoutDemoSecurityBoundary =>
+      'Chế độ Demo có thể tạo lượt thanh toán cục bộ để trình bày. Không trừ tiền và không gửi callback đến cổng thanh toán.';
+
+  @override
+  String get checkoutRealUnavailableMessage =>
+      'Thanh toán thật cần tích hợp API/repository và luồng chuyển sang nhà cung cấp. UI này không mô phỏng thành công.';
+
+  @override
+  String get checkoutNoSensitiveFields =>
+      'Ứng dụng không yêu cầu số thẻ, ngày hết hạn, CVV, PIN, mật khẩu ngân hàng, OTP, token thanh toán hoặc bí mật cổng thanh toán.';
+
+  @override
+  String get checkoutBenefitsBoundaryTitle => 'Ưu đãi và ví';
+
+  @override
+  String get checkoutBenefitsReadOnlyDemo =>
+      'Travel credit, điểm, mã giảm giá, thẻ quà tặng và ví chỉ để xem tại đây trừ khi backend có hợp đồng checkout áp dụng chúng.';
+
+  @override
+  String get checkoutBenefitsReadOnlyReal =>
+      'Ưu đãi và số dư ví chưa được kết nối với thanh toán thật trong UI này.';
+
+  @override
+  String get checkoutCreateDemoPaymentAction =>
+      'Tạo đặt phòng và thanh toán demo';
+
+  @override
+  String get checkoutRealUnavailableAction => 'Chưa có thanh toán thật';
+
+  @override
+  String get checkoutSubmitSemantic =>
+      'Tạo đặt phòng và lượt thanh toán demo cục bộ';
+
+  @override
+  String get paymentStatusTitle => 'Trạng thái thanh toán';
+
+  @override
+  String get paymentRealUnavailableTitle => 'Chưa kết nối thanh toán';
+
+  @override
+  String get paymentRealUnavailableMessage =>
+      'Trạng thái thanh toán thật cần tích hợp API/repository backend. Tài khoản thật không được mô phỏng thành công cục bộ.';
+
+  @override
+  String get paymentMissingTitle => 'Không có thanh toán';
+
+  @override
+  String get paymentMissingMessage =>
+      'Lượt thanh toán cục bộ này không còn khả dụng.';
+
+  @override
+  String get paymentDemoFailureReason =>
+      'Nhà cung cấp demo từ chối thanh toán.';
+
+  @override
+  String get paymentStatusSemantic => 'Chi tiết trạng thái thanh toán';
+
+  @override
+  String get paymentDemoLocalOnly =>
+      'Trạng thái thanh toán này là dữ liệu trình bày Demo cục bộ và không phải giao dịch thật.';
+
+  @override
+  String get paymentDetailsTitle => 'Chi tiết thanh toán';
+
+  @override
+  String get paymentProviderLabel => 'Nhà cung cấp';
+
+  @override
+  String get paymentSessionStatusLabel => 'Phiên cổng thanh toán';
+
+  @override
+  String get paymentAmountLabel => 'Số tiền';
+
+  @override
+  String get paymentCreatedLabel => 'Đã tạo thanh toán';
+
+  @override
+  String get paymentHoldExpiresLabel => 'Giữ phòng hết hạn';
+
+  @override
+  String get paymentPaidAtLabel => 'Đã thanh toán lúc';
+
+  @override
+  String get paymentFailedAtLabel => 'Thất bại lúc';
+
+  @override
+  String get paymentCancelledAtLabel => 'Đã hủy lúc';
+
+  @override
+  String get paymentRefundedAtLabel => 'Đã hoàn lúc';
+
+  @override
+  String get paymentReferenceLabel => 'Tham chiếu nhà cung cấp';
+
+  @override
+  String get paymentMaskedReferenceSemantic => 'Tham chiếu nhà cung cấp đã che';
+
+  @override
+  String get paymentFailureReasonLabel => 'Lý do thất bại';
+
+  @override
+  String get paymentNoRefundInference =>
+      'Trạng thái hủy đặt phòng và thanh toán tách biệt. Đặt phòng đã hủy không được xem là đã hoàn tiền nếu không có trạng thái hoàn tiền.';
+
+  @override
+  String get paymentActionsTitle => 'Hành động thanh toán';
+
+  @override
+  String get paymentCompleteDemoAction => 'Hoàn tất thanh toán demo';
+
+  @override
+  String get paymentCompleteDemoSemantic =>
+      'Hoàn tất thanh toán demo cục bộ này';
+
+  @override
+  String get paymentFailDemoAction => 'Cho thanh toán demo thất bại';
+
+  @override
+  String get paymentCancelDemoAction => 'Hủy phiên thanh toán';
+
+  @override
+  String get paymentRetryAction => 'Thử thanh toán lại';
+
+  @override
+  String get paymentContinueAction => 'Tiếp tục thanh toán';
+
+  @override
+  String get paymentStatusAction => 'Trạng thái thanh toán';
+
+  @override
+  String get paymentContinueConfirmationAction => 'Tiếp tục đến xác nhận';
+
+  @override
+  String get paymentPendingBoundary =>
+      'Thanh toán demo đang chờ có thể hoàn tất, thất bại hoặc hủy cục bộ. Callback nhà cung cấp thật không được mô phỏng.';
+
+  @override
+  String get paymentTerminalBoundary =>
+      'Trạng thái thanh toán cuối được hiển thị như ảnh chụp bất biến. Chỉ được thử lại khi quy tắc backend cho phép lượt mới.';
+
+  @override
+  String get paymentProviderMock => 'Nhà cung cấp Mock';
+
+  @override
+  String get paymentProviderVnpay => 'VNPay';
+
+  @override
+  String get paymentProviderPayos => 'PayOS';
+
+  @override
+  String get paymentProviderMomo => 'MoMo';
+
+  @override
+  String get paymentProviderStripe => 'Stripe';
+
+  @override
+  String get paymentProviderApplePay => 'Apple Pay';
+
+  @override
+  String get paymentProviderGooglePay => 'Google Pay';
+
+  @override
+  String get paymentProviderManual => 'Thủ công';
+
+  @override
+  String get paymentSessionStatusNew => 'Mới';
+
+  @override
+  String get paymentSessionStatusPending => 'Đang chờ';
+
+  @override
+  String get paymentSessionStatusAuthorized => 'Đã ủy quyền';
+
+  @override
+  String get paymentSessionStatusCaptured => 'Đã thu tiền';
+
+  @override
+  String get paymentSessionStatusFailed => 'Thất bại';
+
+  @override
+  String get paymentSessionStatusCancelled => 'Đã hủy';
+
+  @override
+  String get paymentSessionStatusExpired => 'Hết hạn';
+
+  @override
+  String get paymentResultSuccessTitle => 'Đã hoàn tất thanh toán';
+
+  @override
+  String get paymentResultPendingTitle => 'Đang chờ thanh toán';
+
+  @override
+  String get paymentResultFailedTitle => 'Thanh toán thất bại';
+
+  @override
+  String get paymentResultCancelledTitle => 'Đã hủy thanh toán';
+
+  @override
+  String get paymentResultExpiredTitle => 'Thanh toán hết hạn';
+
+  @override
+  String get paymentActionSuccess => 'Đã cập nhật trạng thái thanh toán.';
+
+  @override
+  String get paymentActionUnavailable =>
+      'Hành động thanh toán không khả dụng cho tài khoản này.';
+
+  @override
+  String get paymentDuplicatePrevented => 'Đã chặn gửi checkout trùng.';
+
+  @override
+  String get paymentActionInvalidState =>
+      'Trạng thái thanh toán này không thể thực hiện hành động đó.';
 
   @override
   String get bookingConfirmationTitle => 'Đã xác nhận đặt phòng demo';
@@ -2115,6 +2372,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get bookingCancellationReasonLabel => 'Lý do hủy';
+
+  @override
+  String get bookingHotelLabel => 'Khách sạn';
 
   @override
   String get bookingRoomLabel => 'Phòng';

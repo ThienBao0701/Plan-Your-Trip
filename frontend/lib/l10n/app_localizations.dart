@@ -3600,7 +3600,7 @@ abstract class AppLocalizations {
   /// No description provided for @bookingTermsAcknowledgement.
   ///
   /// In en, this message translates to:
-  /// **'I understand this UI does not collect payment or reserve inventory.'**
+  /// **'I understand checkout does not collect card details or reserve real inventory in this UI phase.'**
   String get bookingTermsAcknowledgement;
 
   /// No description provided for @bookingConfirmAction.
@@ -3612,7 +3612,7 @@ abstract class AppLocalizations {
   /// No description provided for @bookingConfirmSemantic.
   ///
   /// In en, this message translates to:
-  /// **'Confirm this demo booking'**
+  /// **'Continue to secure checkout'**
   String get bookingConfirmSemantic;
 
   /// No description provided for @bookingDuplicatePrevented.
@@ -3620,6 +3620,480 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Duplicate booking creation was blocked.'**
   String get bookingDuplicatePrevented;
+
+  /// No description provided for @checkoutTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Secure checkout'**
+  String get checkoutTitle;
+
+  /// No description provided for @checkoutContinueAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to secure checkout'**
+  String get checkoutContinueAction;
+
+  /// No description provided for @checkoutSecureTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Secure checkout'**
+  String get checkoutSecureTitle;
+
+  /// No description provided for @checkoutSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Secure booking checkout'**
+  String get checkoutSemantic;
+
+  /// No description provided for @checkoutRealModeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Real account'**
+  String get checkoutRealModeLabel;
+
+  /// No description provided for @checkoutSecureBoundaryPill.
+  ///
+  /// In en, this message translates to:
+  /// **'No card fields'**
+  String get checkoutSecureBoundaryPill;
+
+  /// No description provided for @checkoutWholeStayTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Whole-stay total'**
+  String get checkoutWholeStayTotal;
+
+  /// No description provided for @checkoutStaySnapshotTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay snapshot'**
+  String get checkoutStaySnapshotTitle;
+
+  /// No description provided for @checkoutProviderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment provider'**
+  String get checkoutProviderTitle;
+
+  /// No description provided for @checkoutProviderHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Backend contracts expose hosted provider sessions. UI-13 does not open an external gateway or collect credentials.'**
+  String get checkoutProviderHelper;
+
+  /// No description provided for @checkoutMockProviderSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Local demo provider for presentation only.'**
+  String get checkoutMockProviderSubtitle;
+
+  /// No description provided for @checkoutHostedProviderSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hosted provider handoff is proven by backend contracts but not opened in this UI phase.'**
+  String get checkoutHostedProviderSubtitle;
+
+  /// No description provided for @checkoutSecurityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment security'**
+  String get checkoutSecurityTitle;
+
+  /// No description provided for @checkoutDemoSecurityBoundary.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo Mode can create a local payment attempt for presentation. No money is charged and no gateway callback is sent.'**
+  String get checkoutDemoSecurityBoundary;
+
+  /// No description provided for @checkoutRealUnavailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Real checkout requires API/repository integration and hosted-provider handoff wiring. This UI will not simulate success.'**
+  String get checkoutRealUnavailableMessage;
+
+  /// No description provided for @checkoutNoSensitiveFields.
+  ///
+  /// In en, this message translates to:
+  /// **'This app does not ask for card number, expiry, CVV, PIN, bank password, OTP, payment token, or gateway secret.'**
+  String get checkoutNoSensitiveFields;
+
+  /// No description provided for @checkoutBenefitsBoundaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rewards and wallet'**
+  String get checkoutBenefitsBoundaryTitle;
+
+  /// No description provided for @checkoutBenefitsReadOnlyDemo.
+  ///
+  /// In en, this message translates to:
+  /// **'Travel credits, loyalty, coupons, gift cards, and wallet items are read-only here unless a backend checkout contract explicitly applies them.'**
+  String get checkoutBenefitsReadOnlyDemo;
+
+  /// No description provided for @checkoutBenefitsReadOnlyReal.
+  ///
+  /// In en, this message translates to:
+  /// **'Rewards and wallet balances are not connected to real checkout in this UI phase.'**
+  String get checkoutBenefitsReadOnlyReal;
+
+  /// No description provided for @checkoutCreateDemoPaymentAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Create demo booking and payment'**
+  String get checkoutCreateDemoPaymentAction;
+
+  /// No description provided for @checkoutRealUnavailableAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Real payment unavailable'**
+  String get checkoutRealUnavailableAction;
+
+  /// No description provided for @checkoutSubmitSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a local demo booking and payment attempt'**
+  String get checkoutSubmitSemantic;
+
+  /// No description provided for @paymentStatusTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment status'**
+  String get paymentStatusTitle;
+
+  /// No description provided for @paymentRealUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment not connected'**
+  String get paymentRealUnavailableTitle;
+
+  /// No description provided for @paymentRealUnavailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Real payment status requires the backend API/repository integration. No local success is simulated for real accounts.'**
+  String get paymentRealUnavailableMessage;
+
+  /// No description provided for @paymentMissingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment unavailable'**
+  String get paymentMissingTitle;
+
+  /// No description provided for @paymentMissingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This local payment attempt is no longer available.'**
+  String get paymentMissingMessage;
+
+  /// No description provided for @paymentDemoFailureReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo provider declined the payment.'**
+  String get paymentDemoFailureReason;
+
+  /// No description provided for @paymentStatusSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment status detail'**
+  String get paymentStatusSemantic;
+
+  /// No description provided for @paymentDemoLocalOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'This payment status is local Demo Mode presentation data and is not a real charge.'**
+  String get paymentDemoLocalOnly;
+
+  /// No description provided for @paymentDetailsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment details'**
+  String get paymentDetailsTitle;
+
+  /// No description provided for @paymentProviderLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Provider'**
+  String get paymentProviderLabel;
+
+  /// No description provided for @paymentSessionStatusLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Gateway session'**
+  String get paymentSessionStatusLabel;
+
+  /// No description provided for @paymentAmountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get paymentAmountLabel;
+
+  /// No description provided for @paymentCreatedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment created'**
+  String get paymentCreatedLabel;
+
+  /// No description provided for @paymentHoldExpiresLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold expires'**
+  String get paymentHoldExpiresLabel;
+
+  /// No description provided for @paymentPaidAtLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid at'**
+  String get paymentPaidAtLabel;
+
+  /// No description provided for @paymentFailedAtLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed at'**
+  String get paymentFailedAtLabel;
+
+  /// No description provided for @paymentCancelledAtLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled at'**
+  String get paymentCancelledAtLabel;
+
+  /// No description provided for @paymentRefundedAtLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Refunded at'**
+  String get paymentRefundedAtLabel;
+
+  /// No description provided for @paymentReferenceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Provider reference'**
+  String get paymentReferenceLabel;
+
+  /// No description provided for @paymentMaskedReferenceSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Masked provider reference'**
+  String get paymentMaskedReferenceSemantic;
+
+  /// No description provided for @paymentFailureReasonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Failure reason'**
+  String get paymentFailureReasonLabel;
+
+  /// No description provided for @paymentNoRefundInference.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancellation and payment status are separate. A cancelled booking is not shown as refunded unless a refund status is present.'**
+  String get paymentNoRefundInference;
+
+  /// No description provided for @paymentActionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment actions'**
+  String get paymentActionsTitle;
+
+  /// No description provided for @paymentCompleteDemoAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete demo payment'**
+  String get paymentCompleteDemoAction;
+
+  /// No description provided for @paymentCompleteDemoSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete this local demo payment'**
+  String get paymentCompleteDemoSemantic;
+
+  /// No description provided for @paymentFailDemoAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Fail demo payment'**
+  String get paymentFailDemoAction;
+
+  /// No description provided for @paymentCancelDemoAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel payment session'**
+  String get paymentCancelDemoAction;
+
+  /// No description provided for @paymentRetryAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry payment'**
+  String get paymentRetryAction;
+
+  /// No description provided for @paymentContinueAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue payment'**
+  String get paymentContinueAction;
+
+  /// No description provided for @paymentStatusAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment status'**
+  String get paymentStatusAction;
+
+  /// No description provided for @paymentContinueConfirmationAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to confirmation'**
+  String get paymentContinueConfirmationAction;
+
+  /// No description provided for @paymentPendingBoundary.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending demo payments can be completed, failed, or cancelled locally. Real provider callbacks are not simulated.'**
+  String get paymentPendingBoundary;
+
+  /// No description provided for @paymentTerminalBoundary.
+  ///
+  /// In en, this message translates to:
+  /// **'Terminal payment states are shown as immutable snapshots. Retry is available only when backend rules allow a new attempt.'**
+  String get paymentTerminalBoundary;
+
+  /// No description provided for @paymentProviderMock.
+  ///
+  /// In en, this message translates to:
+  /// **'Mock provider'**
+  String get paymentProviderMock;
+
+  /// No description provided for @paymentProviderVnpay.
+  ///
+  /// In en, this message translates to:
+  /// **'VNPay'**
+  String get paymentProviderVnpay;
+
+  /// No description provided for @paymentProviderPayos.
+  ///
+  /// In en, this message translates to:
+  /// **'PayOS'**
+  String get paymentProviderPayos;
+
+  /// No description provided for @paymentProviderMomo.
+  ///
+  /// In en, this message translates to:
+  /// **'MoMo'**
+  String get paymentProviderMomo;
+
+  /// No description provided for @paymentProviderStripe.
+  ///
+  /// In en, this message translates to:
+  /// **'Stripe'**
+  String get paymentProviderStripe;
+
+  /// No description provided for @paymentProviderApplePay.
+  ///
+  /// In en, this message translates to:
+  /// **'Apple Pay'**
+  String get paymentProviderApplePay;
+
+  /// No description provided for @paymentProviderGooglePay.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Pay'**
+  String get paymentProviderGooglePay;
+
+  /// No description provided for @paymentProviderManual.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual'**
+  String get paymentProviderManual;
+
+  /// No description provided for @paymentSessionStatusNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get paymentSessionStatusNew;
+
+  /// No description provided for @paymentSessionStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get paymentSessionStatusPending;
+
+  /// No description provided for @paymentSessionStatusAuthorized.
+  ///
+  /// In en, this message translates to:
+  /// **'Authorized'**
+  String get paymentSessionStatusAuthorized;
+
+  /// No description provided for @paymentSessionStatusCaptured.
+  ///
+  /// In en, this message translates to:
+  /// **'Captured'**
+  String get paymentSessionStatusCaptured;
+
+  /// No description provided for @paymentSessionStatusFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed'**
+  String get paymentSessionStatusFailed;
+
+  /// No description provided for @paymentSessionStatusCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get paymentSessionStatusCancelled;
+
+  /// No description provided for @paymentSessionStatusExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get paymentSessionStatusExpired;
+
+  /// No description provided for @paymentResultSuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment completed'**
+  String get paymentResultSuccessTitle;
+
+  /// No description provided for @paymentResultPendingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment pending'**
+  String get paymentResultPendingTitle;
+
+  /// No description provided for @paymentResultFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment failed'**
+  String get paymentResultFailedTitle;
+
+  /// No description provided for @paymentResultCancelledTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment cancelled'**
+  String get paymentResultCancelledTitle;
+
+  /// No description provided for @paymentResultExpiredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment expired'**
+  String get paymentResultExpiredTitle;
+
+  /// No description provided for @paymentActionSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment state updated.'**
+  String get paymentActionSuccess;
+
+  /// No description provided for @paymentActionUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment action is unavailable for this account.'**
+  String get paymentActionUnavailable;
+
+  /// No description provided for @paymentDuplicatePrevented.
+  ///
+  /// In en, this message translates to:
+  /// **'Duplicate checkout submission was blocked.'**
+  String get paymentDuplicatePrevented;
+
+  /// No description provided for @paymentActionInvalidState.
+  ///
+  /// In en, this message translates to:
+  /// **'This payment state cannot perform that action.'**
+  String get paymentActionInvalidState;
 
   /// No description provided for @bookingConfirmationTitle.
   ///
@@ -3866,6 +4340,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cancellation reason'**
   String get bookingCancellationReasonLabel;
+
+  /// No description provided for @bookingHotelLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Hotel'**
+  String get bookingHotelLabel;
 
   /// No description provided for @bookingRoomLabel.
   ///

@@ -9,7 +9,7 @@ import '../../design/app_spacing.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/glass_widgets.dart';
 import '../expenses/expenses_screen.dart';
-import 'hotel_booking_confirmation_screen.dart';
+import '../payments/secure_checkout_screen.dart';
 import 'hotel_room_selection_screen.dart';
 import 'hotel_utils.dart';
 
@@ -37,8 +37,6 @@ class HotelBookingReviewScreen extends StatefulWidget {
 class _HotelBookingReviewScreenState extends State<HotelBookingReviewScreen> {
   final _specialRequest = TextEditingController();
   bool _termsAccepted = false;
-  bool _confirming = false;
-  bool _created = false;
 
   @override
   void dispose() {
@@ -133,13 +131,11 @@ class _HotelBookingReviewScreenState extends State<HotelBookingReviewScreen> {
                     const SizedBox(height: AppSpacing.lg),
                     OceanPrimaryButton(
                       key: const Key('booking-confirm'),
-                      label: l10n.bookingConfirmAction,
-                      icon: Icons.verified_rounded,
+                      label: l10n.checkoutContinueAction,
+                      icon: Icons.lock_rounded,
                       semanticLabel: l10n.bookingConfirmSemantic,
                       onPressed:
-                          blocked || !_termsAccepted || _confirming || _created
-                              ? null
-                              : _confirm,
+                          blocked || !_termsAccepted ? null : _openCheckout,
                     ),
                   ],
                 ),
@@ -151,45 +147,18 @@ class _HotelBookingReviewScreenState extends State<HotelBookingReviewScreen> {
     );
   }
 
-  Future<void> _confirm() async {
-    if (_confirming || _created) return;
-    final app = AppScope.of(context);
-    final l10n = AppLocalizations.of(context)!;
-    setState(() => _confirming = true);
-    await Future<void>.delayed(Duration.zero);
-    if (!mounted) return;
-    if (!app.demoMode) {
-      setState(() => _confirming = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.bookingRealUnavailableMessage)),
-      );
-      return;
-    }
-    final booking = DemoBooking(
-      code: app.nextDemoBookingCode(),
-      hotel: widget.hotel,
-      room: widget.room,
-      ratePlan: widget.ratePlan,
-      quote: widget.quote,
-      criteria: widget.criteria,
-      specialRequest: _specialRequest.text.trim(),
-      status: BookingStatus.confirmed,
-      createdAt: app.now(),
-    );
-    final created = app.addDemoBooking(booking);
-    if (!mounted) return;
-    if (!created) {
-      setState(() => _confirming = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.bookingDuplicatePrevented)),
-      );
-      return;
-    }
-    _created = true;
-    Navigator.pushReplacement(
+  void _openCheckout() {
+    Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => HotelBookingConfirmationScreen(booking: booking),
+        builder: (_) => SecureCheckoutScreen(
+          hotel: widget.hotel,
+          room: widget.room,
+          ratePlan: widget.ratePlan,
+          criteria: widget.criteria,
+          quote: widget.quote,
+          specialRequest: _specialRequest.text.trim(),
+        ),
       ),
     );
   }
