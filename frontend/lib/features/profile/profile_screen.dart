@@ -26,6 +26,7 @@ class ProfileScreen extends StatelessWidget {
     final app = AppScope.of(context);
     final l10n = AppLocalizations.of(context)!;
     final isDemo = app.demoMode;
+    final unreadNotifications = isDemo ? app.unreadNotificationCount : 0;
     return ListView(
       key: const PageStorageKey('profile-scroll'),
       padding: const EdgeInsets.fromLTRB(20, 18, 20, 120),
@@ -113,7 +114,7 @@ class ProfileScreen extends StatelessWidget {
               const _StatDivider(),
               _ProfileStat(
                 icon: Icons.notifications_rounded,
-                value: isDemo ? '4' : '-',
+                value: isDemo ? '$unreadNotifications' : '-',
                 label: l10n.profileNotificationsStat,
               ),
             ],
@@ -175,6 +176,9 @@ class ProfileScreen extends StatelessWidget {
         _ProfileNavCard(
           icon: Icons.notifications_rounded,
           title: l10n.profileNotifications,
+          badgeCount: unreadNotifications,
+          badgeSemanticLabel:
+              l10n.profileNotificationsUnreadBadge(unreadNotifications),
           onTap: () => Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const NotificationsScreen()),
@@ -348,12 +352,16 @@ class _StatDivider extends StatelessWidget {
 class _ProfileNavCard extends StatelessWidget {
   final IconData icon;
   final String title;
+  final int badgeCount;
+  final String? badgeSemanticLabel;
   final VoidCallback onTap;
 
   const _ProfileNavCard({
     super.key,
     required this.icon,
     required this.title,
+    this.badgeCount = 0,
+    this.badgeSemanticLabel,
     required this.onTap,
   });
 
@@ -381,6 +389,16 @@ class _ProfileNavCard extends StatelessWidget {
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
+              if (badgeCount > 0) ...[
+                const SizedBox(width: AppSpacing.sm),
+                OceanStatusPill(
+                  label: '$badgeCount',
+                  icon: Icons.mark_email_unread_rounded,
+                  color: AppColors.coral,
+                  semanticLabel: badgeSemanticLabel,
+                ),
+              ],
+              const SizedBox(width: AppSpacing.sm),
               const Icon(Icons.chevron_right_rounded,
                   color: AppColors.textSecondary),
             ],

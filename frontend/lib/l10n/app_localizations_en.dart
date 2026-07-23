@@ -838,6 +838,318 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notificationBudgetDate => '12 Jul';
 
   @override
+  String get notificationCenterSubtitle =>
+      'A local in-app activity stream for bookings, payments, trips, reviews, rewards, wallet documents, and account notices.';
+
+  @override
+  String get notificationCenterSemantic => 'Notification and activity center';
+
+  @override
+  String get notificationRealBoundary =>
+      'Real accounts will use the committed in-app notification API when the frontend repository layer is connected. Push delivery, device tokens, and external notification permissions are not connected in this UI phase.';
+
+  @override
+  String get notificationDemoModeLabel => 'Local Demo Mode';
+
+  @override
+  String get notificationPreferenceBoundary =>
+      'Notification toggles are local device preferences only. They do not register push tokens or sync server preferences.';
+
+  @override
+  String notificationUnreadCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count unread',
+      one: '1 unread',
+      zero: '0 unread',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String notificationUnreadCountSemantic(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count unread notifications',
+      one: '1 unread notification',
+      zero: 'No unread notifications',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String notificationTotalCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count notices',
+      one: '1 notice',
+      zero: '0 notices',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get notificationMarkAllReadSemantic =>
+      'Mark all demo notifications as read';
+
+  @override
+  String notificationMarkAllReadResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Marked $count notifications as read.',
+      one: 'Marked 1 notification as read.',
+      zero: 'No unread notifications changed.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get notificationFilterSemantic => 'Notification filters';
+
+  @override
+  String get notificationFilterAll => 'All';
+
+  @override
+  String get notificationFilterUnread => 'Unread';
+
+  @override
+  String get notificationFilterBookings => 'Bookings';
+
+  @override
+  String get notificationFilterPayments => 'Payments';
+
+  @override
+  String get notificationFilterTrips => 'Trips';
+
+  @override
+  String get notificationFilterReviews => 'Reviews';
+
+  @override
+  String get notificationFilterRewards => 'Rewards';
+
+  @override
+  String get notificationFilterWallet => 'Wallet';
+
+  @override
+  String get notificationFilterSystem => 'System';
+
+  @override
+  String get notificationFilterEmptyMessage =>
+      'No notifications match this filter.';
+
+  @override
+  String get notificationReadLabel => 'Read';
+
+  @override
+  String get notificationUnreadLabel => 'Unread';
+
+  @override
+  String notificationCardSemantic(
+      String readState, String type, String title, String time) {
+    return '$readState. $type notification. $title. $time.';
+  }
+
+  @override
+  String get notificationMissingTitle => 'Notification unavailable';
+
+  @override
+  String get notificationMissingMessage =>
+      'This local notification is no longer available.';
+
+  @override
+  String get notificationCreatedAtLabel => 'Created';
+
+  @override
+  String get notificationReadAtLabel => 'Read at';
+
+  @override
+  String get notificationPrivacyNote =>
+      'Private booking and payment references are masked or omitted in this activity view.';
+
+  @override
+  String get notificationOpenTargetSemantic => 'Open notification target';
+
+  @override
+  String get notificationDeleteAction => 'Delete notification';
+
+  @override
+  String get notificationDeleteSemantic => 'Delete this demo notification';
+
+  @override
+  String get notificationDeleteConfirmTitle => 'Delete notification?';
+
+  @override
+  String get notificationDeleteConfirmMessage =>
+      'Delete this local demo notification? The linked booking, payment, trip, review, reward, or wallet item will not be deleted.';
+
+  @override
+  String get notificationDeleteConfirmAction => 'Delete notification';
+
+  @override
+  String get notificationDeletedMessage =>
+      'Notification deleted from local demo data.';
+
+  @override
+  String get notificationTargetUnavailable =>
+      'This notification has no linked screen.';
+
+  @override
+  String get notificationTargetMissing =>
+      'The linked item is no longer available in local demo data.';
+
+  @override
+  String get notificationNoTargetAction => 'No linked screen';
+
+  @override
+  String get notificationOpenBooking => 'View booking';
+
+  @override
+  String get notificationOpenPayment => 'View payment status';
+
+  @override
+  String get notificationOpenTrip => 'View trip';
+
+  @override
+  String get notificationOpenTripCompanion => 'View companions';
+
+  @override
+  String get notificationOpenTripDocuments => 'View trip documents';
+
+  @override
+  String get notificationOpenReview => 'View review';
+
+  @override
+  String get notificationOpenRewards => 'View rewards';
+
+  @override
+  String get notificationOpenWallet => 'View travel wallet';
+
+  @override
+  String get notificationTypeBooking => 'Booking';
+
+  @override
+  String get notificationTypePayment => 'Payment';
+
+  @override
+  String get notificationTypeReservation => 'Reservation';
+
+  @override
+  String get notificationTypeSystem => 'System';
+
+  @override
+  String get notificationTypePromotion => 'Promotion';
+
+  @override
+  String get notificationTypeReview => 'Review';
+
+  @override
+  String get notificationTypePartner => 'Partner';
+
+  @override
+  String get notificationTypeAdmin => 'Admin';
+
+  @override
+  String get notificationTypeMessage => 'Message';
+
+  @override
+  String get notificationTypeTrip => 'Trip';
+
+  @override
+  String get notificationPriorityLow => 'Low';
+
+  @override
+  String get notificationPriorityNormal => 'Normal';
+
+  @override
+  String get notificationPriorityHigh => 'High';
+
+  @override
+  String get notificationPriorityUrgent => 'Urgent';
+
+  @override
+  String get notificationDemoBookingModifiedTitle => 'Booking changes saved';
+
+  @override
+  String get notificationDemoBookingModifiedMessage =>
+      'Your pending Da Lat stay keeps the same booking code while the local modification preview updates its stay snapshot.';
+
+  @override
+  String get notificationDemoPaymentSuccessTitle => 'Demo payment completed';
+
+  @override
+  String get notificationDemoPaymentSuccessMessage =>
+      'The local checkout preview recorded a paid MOCK payment. No real charge was made.';
+
+  @override
+  String get notificationDemoPaymentFailedTitle =>
+      'Demo payment needs attention';
+
+  @override
+  String get notificationDemoPaymentFailedMessage =>
+      'A local payment preview did not complete. Review the booking before trying another demo checkout action.';
+
+  @override
+  String get notificationDemoTripCollaborationTitle =>
+      'Trip collaboration updated';
+
+  @override
+  String get notificationDemoTripCollaborationMessage =>
+      'Your Da Lat trip companion list has a local collaboration update ready to review.';
+
+  @override
+  String get notificationDemoItineraryReminderTitle =>
+      'Itinerary reminder delivered';
+
+  @override
+  String get notificationDemoItineraryReminderMessage =>
+      'The UI-9 reminder remains a trip reminder record; this is only the delivered in-app notification copy.';
+
+  @override
+  String get notificationDemoReviewReplyTitle =>
+      'Property replied to your review';
+
+  @override
+  String get notificationDemoReviewReplyMessage =>
+      'The villa host response is available in your review detail without exposing moderation internals.';
+
+  @override
+  String get notificationDemoRewardTitle => 'Benefit update available';
+
+  @override
+  String get notificationDemoRewardMessage =>
+      'A local rewards and benefits notice is ready in the rewards hub.';
+
+  @override
+  String get notificationDemoWalletTitle => 'Wallet document notice';
+
+  @override
+  String get notificationDemoWalletMessage =>
+      'A masked travel document note is available in your Travel Wallet.';
+
+  @override
+  String get notificationDemoSystemTitle => 'Account notice';
+
+  @override
+  String get notificationDemoSystemMessage =>
+      'Local demo account activity is shown here without push registration or device-token storage.';
+
+  @override
+  String profileNotificationsUnreadBadge(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count unread notifications',
+      one: '1 unread notification',
+      zero: 'No unread notifications',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get exploreHeroTitle => 'Where will you wander?';
 
   @override

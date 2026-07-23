@@ -379,6 +379,137 @@
   "notificationBudgetMessage": "Bạn đã dùng 62% ngân sách demo dự kiến.",
   "notificationYesterday": "Hôm qua",
   "notificationBudgetDate": "12 Th7",
+  "notificationCenterSubtitle": "Luồng hoạt động trong ứng dụng cục bộ cho booking, thanh toán, chuyến đi, đánh giá, ưu đãi, ví du lịch, tài liệu và thông báo tài khoản.",
+  "notificationCenterSemantic": "Trung tâm thông báo và hoạt động",
+  "notificationRealBoundary": "Tài khoản thật sẽ dùng API thông báo trong ứng dụng đã commit khi lớp repository frontend được kết nối. Push, token thiết bị và quyền thông báo ngoài hệ thống chưa được kết nối trong giai đoạn UI này.",
+  "notificationDemoModeLabel": "Demo cục bộ",
+  "notificationPreferenceBoundary": "Các công tắc thông báo chỉ là tùy chọn cục bộ trên thiết bị. Chúng không đăng ký token push hoặc đồng bộ tùy chọn máy chủ.",
+  "notificationUnreadCount": "{count, plural, =0{0 chưa đọc} =1{1 chưa đọc} other{{count} chưa đọc}}",
+  "@notificationUnreadCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationUnreadCountSemantic": "{count, plural, =0{Không có thông báo chưa đọc} =1{1 thông báo chưa đọc} other{{count} thông báo chưa đọc}}",
+  "@notificationUnreadCountSemantic": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationTotalCount": "{count, plural, =0{0 thông báo} =1{1 thông báo} other{{count} thông báo}}",
+  "@notificationTotalCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationMarkAllReadSemantic": "Đánh dấu tất cả thông báo demo là đã đọc",
+  "notificationMarkAllReadResult": "{count, plural, =0{Không có thông báo chưa đọc nào thay đổi.} =1{Đã đánh dấu 1 thông báo là đã đọc.} other{Đã đánh dấu {count} thông báo là đã đọc.}}",
+  "@notificationMarkAllReadResult": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationFilterSemantic": "Bộ lọc thông báo",
+  "notificationFilterAll": "Tất cả",
+  "notificationFilterUnread": "Chưa đọc",
+  "notificationFilterBookings": "Booking",
+  "notificationFilterPayments": "Thanh toán",
+  "notificationFilterTrips": "Chuyến đi",
+  "notificationFilterReviews": "Đánh giá",
+  "notificationFilterRewards": "Ưu đãi",
+  "notificationFilterWallet": "Ví",
+  "notificationFilterSystem": "Hệ thống",
+  "notificationFilterEmptyMessage": "Không có thông báo phù hợp bộ lọc này.",
+  "notificationReadLabel": "Đã đọc",
+  "notificationUnreadLabel": "Chưa đọc",
+  "notificationCardSemantic": "{readState}. Thông báo {type}. {title}. {time}.",
+  "@notificationCardSemantic": {
+    "placeholders": {
+      "readState": {
+        "type": "String"
+      },
+      "type": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationMissingTitle": "Thông báo không khả dụng",
+  "notificationMissingMessage": "Thông báo cục bộ này không còn khả dụng.",
+  "notificationCreatedAtLabel": "Tạo lúc",
+  "notificationReadAtLabel": "Đọc lúc",
+  "notificationPrivacyNote": "Mã booking và tham chiếu thanh toán riêng tư được che bớt hoặc bỏ qua trong chế độ xem hoạt động này.",
+  "notificationOpenTargetSemantic": "Mở mục được liên kết với thông báo",
+  "notificationDeleteAction": "Xóa thông báo",
+  "notificationDeleteSemantic": "Xóa thông báo demo này",
+  "notificationDeleteConfirmTitle": "Xóa thông báo?",
+  "notificationDeleteConfirmMessage": "Xóa thông báo demo cục bộ này? Booking, thanh toán, chuyến đi, đánh giá, ưu đãi hoặc mục ví được liên kết sẽ không bị xóa.",
+  "notificationDeleteConfirmAction": "Xóa thông báo",
+  "notificationDeletedMessage": "Đã xóa thông báo khỏi dữ liệu demo cục bộ.",
+  "notificationTargetUnavailable": "Thông báo này không có màn hình liên kết.",
+  "notificationTargetMissing": "Mục liên kết không còn trong dữ liệu demo cục bộ.",
+  "notificationNoTargetAction": "Không có màn hình liên kết",
+  "notificationOpenBooking": "Xem booking",
+  "notificationOpenPayment": "Xem trạng thái thanh toán",
+  "notificationOpenTrip": "Xem chuyến đi",
+  "notificationOpenTripCompanion": "Xem người đồng hành",
+  "notificationOpenTripDocuments": "Xem tài liệu chuyến đi",
+  "notificationOpenReview": "Xem đánh giá",
+  "notificationOpenRewards": "Xem ưu đãi",
+  "notificationOpenWallet": "Xem ví du lịch",
+  "notificationTypeBooking": "Booking",
+  "notificationTypePayment": "Thanh toán",
+  "notificationTypeReservation": "Giữ chỗ",
+  "notificationTypeSystem": "Hệ thống",
+  "notificationTypePromotion": "Khuyến mãi",
+  "notificationTypeReview": "Đánh giá",
+  "notificationTypePartner": "Đối tác",
+  "notificationTypeAdmin": "Quản trị",
+  "notificationTypeMessage": "Tin nhắn",
+  "notificationTypeTrip": "Chuyến đi",
+  "notificationPriorityLow": "Thấp",
+  "notificationPriorityNormal": "Bình thường",
+  "notificationPriorityHigh": "Cao",
+  "notificationPriorityUrgent": "Khẩn cấp",
+  "notificationDemoBookingModifiedTitle": "Đã lưu thay đổi booking",
+  "notificationDemoBookingModifiedMessage": "Chỗ ở Đà Lạt đang chờ xác nhận vẫn giữ nguyên mã booking trong khi bản xem trước sửa đổi cục bộ cập nhật snapshot lưu trú.",
+  "notificationDemoPaymentSuccessTitle": "Thanh toán demo hoàn tất",
+  "notificationDemoPaymentSuccessMessage": "Bản xem trước checkout cục bộ đã ghi nhận thanh toán MOCK đã trả. Không có khoản phí thật nào được thực hiện.",
+  "notificationDemoPaymentFailedTitle": "Thanh toán demo cần xem lại",
+  "notificationDemoPaymentFailedMessage": "Một bản xem trước thanh toán cục bộ chưa hoàn tất. Hãy xem lại booking trước khi thử hành động checkout demo khác.",
+  "notificationDemoTripCollaborationTitle": "Cập nhật cộng tác chuyến đi",
+  "notificationDemoTripCollaborationMessage": "Danh sách người đồng hành chuyến Đà Lạt có cập nhật cộng tác cục bộ để bạn xem.",
+  "notificationDemoItineraryReminderTitle": "Đã gửi nhắc lịch trình",
+  "notificationDemoItineraryReminderMessage": "Nhắc lịch UI-9 vẫn là bản ghi nhắc chuyến đi; đây chỉ là bản sao thông báo trong ứng dụng đã gửi.",
+  "notificationDemoReviewReplyTitle": "Khách sạn đã phản hồi đánh giá",
+  "notificationDemoReviewReplyMessage": "Phản hồi của chủ villa đã có trong chi tiết đánh giá mà không lộ dữ liệu kiểm duyệt nội bộ.",
+  "notificationDemoRewardTitle": "Có cập nhật quyền lợi",
+  "notificationDemoRewardMessage": "Thông báo ưu đãi và quyền lợi cục bộ đã sẵn sàng trong trung tâm ưu đãi.",
+  "notificationDemoWalletTitle": "Thông báo tài liệu ví",
+  "notificationDemoWalletMessage": "Ghi chú tài liệu du lịch đã che bớt đang có trong Ví du lịch.",
+  "notificationDemoSystemTitle": "Thông báo tài khoản",
+  "notificationDemoSystemMessage": "Hoạt động tài khoản demo cục bộ được hiển thị tại đây mà không đăng ký push hoặc lưu token thiết bị.",
+  "profileNotificationsUnreadBadge": "{count, plural, =0{Không có thông báo chưa đọc} =1{1 thông báo chưa đọc} other{{count} thông báo chưa đọc}}",
+  "@profileNotificationsUnreadBadge": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "exploreHeroTitle": "Bạn muốn đi đâu?",
   "exploreHeroSubtitle": "Địa điểm gợi ý là dữ liệu xem trước cục bộ. Chuyến đi cá nhân vẫn ở cục bộ cho đến khi có backend.",
   "exploreSearchHint": "Tìm thành phố, địa điểm, quán cà phê, khách sạn...",

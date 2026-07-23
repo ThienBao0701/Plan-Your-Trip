@@ -452,6 +452,284 @@ PaymentSessionStatus? paymentSessionStatusFromWire(String? value) {
   return null;
 }
 
+enum UserNotificationType {
+  booking,
+  payment,
+  reservation,
+  system,
+  promotion,
+  review,
+  partner,
+  admin,
+  message,
+  trip,
+}
+
+extension UserNotificationTypeData on UserNotificationType {
+  String get code {
+    switch (this) {
+      case UserNotificationType.booking:
+        return 'BOOKING';
+      case UserNotificationType.payment:
+        return 'PAYMENT';
+      case UserNotificationType.reservation:
+        return 'RESERVATION';
+      case UserNotificationType.system:
+        return 'SYSTEM';
+      case UserNotificationType.promotion:
+        return 'PROMOTION';
+      case UserNotificationType.review:
+        return 'REVIEW';
+      case UserNotificationType.partner:
+        return 'PARTNER';
+      case UserNotificationType.admin:
+        return 'ADMIN';
+      case UserNotificationType.message:
+        return 'MESSAGE';
+      case UserNotificationType.trip:
+        return 'TRIP';
+    }
+  }
+}
+
+UserNotificationType? userNotificationTypeFromWire(String? value) {
+  final normalized = value?.trim().toUpperCase();
+  if (normalized == null || normalized.isEmpty) return null;
+  for (final type in UserNotificationType.values) {
+    if (type.code == normalized) return type;
+  }
+  return null;
+}
+
+enum UserNotificationPriority { low, normal, high, urgent }
+
+extension UserNotificationPriorityData on UserNotificationPriority {
+  String get code {
+    switch (this) {
+      case UserNotificationPriority.low:
+        return 'LOW';
+      case UserNotificationPriority.normal:
+        return 'NORMAL';
+      case UserNotificationPriority.high:
+        return 'HIGH';
+      case UserNotificationPriority.urgent:
+        return 'URGENT';
+    }
+  }
+}
+
+UserNotificationPriority? userNotificationPriorityFromWire(String? value) {
+  final normalized = value?.trim().toUpperCase();
+  if (normalized == null || normalized.isEmpty) return null;
+  for (final priority in UserNotificationPriority.values) {
+    if (priority.code == normalized) return priority;
+  }
+  return null;
+}
+
+enum UserNotificationRelatedEntityType {
+  booking,
+  payment,
+  hotel,
+  room,
+  promotion,
+  system,
+  partner,
+  message,
+  trip,
+}
+
+extension UserNotificationRelatedEntityTypeData
+    on UserNotificationRelatedEntityType {
+  String get code {
+    switch (this) {
+      case UserNotificationRelatedEntityType.booking:
+        return 'BOOKING';
+      case UserNotificationRelatedEntityType.payment:
+        return 'PAYMENT';
+      case UserNotificationRelatedEntityType.hotel:
+        return 'HOTEL';
+      case UserNotificationRelatedEntityType.room:
+        return 'ROOM';
+      case UserNotificationRelatedEntityType.promotion:
+        return 'PROMOTION';
+      case UserNotificationRelatedEntityType.system:
+        return 'SYSTEM';
+      case UserNotificationRelatedEntityType.partner:
+        return 'PARTNER';
+      case UserNotificationRelatedEntityType.message:
+        return 'MESSAGE';
+      case UserNotificationRelatedEntityType.trip:
+        return 'TRIP';
+    }
+  }
+}
+
+UserNotificationRelatedEntityType? userNotificationRelatedEntityTypeFromWire(
+  String? value,
+) {
+  final normalized = value?.trim().toUpperCase();
+  if (normalized == null || normalized.isEmpty) return null;
+  for (final type in UserNotificationRelatedEntityType.values) {
+    if (type.code == normalized) return type;
+  }
+  return null;
+}
+
+enum NotificationTargetKind {
+  none,
+  booking,
+  payment,
+  trip,
+  tripCompanion,
+  tripDocument,
+  review,
+  rewards,
+  wallet,
+}
+
+enum DemoNotificationTemplate {
+  bookingModified,
+  paymentSuccessful,
+  paymentFailed,
+  tripCollaboration,
+  itineraryReminder,
+  reviewReply,
+  rewardUnlocked,
+  walletDocument,
+  systemAccount,
+}
+
+class NotificationTarget {
+  final NotificationTargetKind kind;
+  final String? bookingCode;
+  final String? paymentAttemptId;
+  final int? tripId;
+  final String? tripDocumentId;
+  final int? reviewId;
+  final String? walletItemId;
+
+  const NotificationTarget._({
+    required this.kind,
+    this.bookingCode,
+    this.paymentAttemptId,
+    this.tripId,
+    this.tripDocumentId,
+    this.reviewId,
+    this.walletItemId,
+  });
+
+  const NotificationTarget.none() : this._(kind: NotificationTargetKind.none);
+
+  const NotificationTarget.booking(String code)
+      : this._(kind: NotificationTargetKind.booking, bookingCode: code);
+
+  const NotificationTarget.payment({
+    required String bookingCode,
+    required String attemptId,
+  }) : this._(
+          kind: NotificationTargetKind.payment,
+          bookingCode: bookingCode,
+          paymentAttemptId: attemptId,
+        );
+
+  const NotificationTarget.trip(int id)
+      : this._(kind: NotificationTargetKind.trip, tripId: id);
+
+  const NotificationTarget.tripCompanion(int id)
+      : this._(kind: NotificationTargetKind.tripCompanion, tripId: id);
+
+  const NotificationTarget.tripDocument({
+    required int tripId,
+    required String documentId,
+  }) : this._(
+          kind: NotificationTargetKind.tripDocument,
+          tripId: tripId,
+          tripDocumentId: documentId,
+        );
+
+  const NotificationTarget.review(int id)
+      : this._(kind: NotificationTargetKind.review, reviewId: id);
+
+  const NotificationTarget.rewards()
+      : this._(kind: NotificationTargetKind.rewards);
+
+  const NotificationTarget.wallet(String itemId)
+      : this._(kind: NotificationTargetKind.wallet, walletItemId: itemId);
+
+  bool get hasAction => kind != NotificationTargetKind.none;
+}
+
+class UserNotification {
+  static const Object _unset = Object();
+
+  final String id;
+  final int? backendId;
+  final UserNotificationType type;
+  final UserNotificationPriority priority;
+  final UserNotificationRelatedEntityType? relatedEntityType;
+  final String? relatedEntityId;
+  final DemoNotificationTemplate template;
+  final NotificationTarget target;
+  final DateTime createdAt;
+  final DateTime? readAt;
+  final bool demoOnly;
+
+  const UserNotification({
+    required this.id,
+    this.backendId,
+    required this.type,
+    this.priority = UserNotificationPriority.normal,
+    this.relatedEntityType,
+    this.relatedEntityId,
+    required this.template,
+    this.target = const NotificationTarget.none(),
+    required this.createdAt,
+    this.readAt,
+    this.demoOnly = true,
+  });
+
+  bool get read => readAt != null;
+
+  UserNotification copyWith({
+    String? id,
+    Object? backendId = _unset,
+    UserNotificationType? type,
+    UserNotificationPriority? priority,
+    Object? relatedEntityType = _unset,
+    Object? relatedEntityId = _unset,
+    DemoNotificationTemplate? template,
+    NotificationTarget? target,
+    DateTime? createdAt,
+    Object? readAt = _unset,
+    bool? demoOnly,
+  }) =>
+      UserNotification(
+        id: id ?? this.id,
+        backendId:
+            identical(backendId, _unset) ? this.backendId : backendId as int?,
+        type: type ?? this.type,
+        priority: priority ?? this.priority,
+        relatedEntityType: identical(relatedEntityType, _unset)
+            ? this.relatedEntityType
+            : relatedEntityType as UserNotificationRelatedEntityType?,
+        relatedEntityId: identical(relatedEntityId, _unset)
+            ? this.relatedEntityId
+            : relatedEntityId as String?,
+        template: template ?? this.template,
+        target: target ?? this.target,
+        createdAt: createdAt ?? this.createdAt,
+        readAt: identical(readAt, _unset) ? this.readAt : readAt as DateTime?,
+        demoOnly: demoOnly ?? this.demoOnly,
+      );
+}
+
+enum NotificationActionResult {
+  success,
+  unavailable,
+  notFound,
+}
+
 enum DemoPaymentActionResult {
   success,
   unavailable,

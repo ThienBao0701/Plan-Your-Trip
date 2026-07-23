@@ -820,6 +820,318 @@ class AppLocalizationsVi extends AppLocalizations {
   String get notificationBudgetDate => '12 Th7';
 
   @override
+  String get notificationCenterSubtitle =>
+      'Luồng hoạt động trong ứng dụng cục bộ cho booking, thanh toán, chuyến đi, đánh giá, ưu đãi, ví du lịch, tài liệu và thông báo tài khoản.';
+
+  @override
+  String get notificationCenterSemantic => 'Trung tâm thông báo và hoạt động';
+
+  @override
+  String get notificationRealBoundary =>
+      'Tài khoản thật sẽ dùng API thông báo trong ứng dụng đã commit khi lớp repository frontend được kết nối. Push, token thiết bị và quyền thông báo ngoài hệ thống chưa được kết nối trong giai đoạn UI này.';
+
+  @override
+  String get notificationDemoModeLabel => 'Demo cục bộ';
+
+  @override
+  String get notificationPreferenceBoundary =>
+      'Các công tắc thông báo chỉ là tùy chọn cục bộ trên thiết bị. Chúng không đăng ký token push hoặc đồng bộ tùy chọn máy chủ.';
+
+  @override
+  String notificationUnreadCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count chưa đọc',
+      one: '1 chưa đọc',
+      zero: '0 chưa đọc',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String notificationUnreadCountSemantic(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count thông báo chưa đọc',
+      one: '1 thông báo chưa đọc',
+      zero: 'Không có thông báo chưa đọc',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String notificationTotalCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count thông báo',
+      one: '1 thông báo',
+      zero: '0 thông báo',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get notificationMarkAllReadSemantic =>
+      'Đánh dấu tất cả thông báo demo là đã đọc';
+
+  @override
+  String notificationMarkAllReadResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Đã đánh dấu $count thông báo là đã đọc.',
+      one: 'Đã đánh dấu 1 thông báo là đã đọc.',
+      zero: 'Không có thông báo chưa đọc nào thay đổi.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get notificationFilterSemantic => 'Bộ lọc thông báo';
+
+  @override
+  String get notificationFilterAll => 'Tất cả';
+
+  @override
+  String get notificationFilterUnread => 'Chưa đọc';
+
+  @override
+  String get notificationFilterBookings => 'Booking';
+
+  @override
+  String get notificationFilterPayments => 'Thanh toán';
+
+  @override
+  String get notificationFilterTrips => 'Chuyến đi';
+
+  @override
+  String get notificationFilterReviews => 'Đánh giá';
+
+  @override
+  String get notificationFilterRewards => 'Ưu đãi';
+
+  @override
+  String get notificationFilterWallet => 'Ví';
+
+  @override
+  String get notificationFilterSystem => 'Hệ thống';
+
+  @override
+  String get notificationFilterEmptyMessage =>
+      'Không có thông báo phù hợp bộ lọc này.';
+
+  @override
+  String get notificationReadLabel => 'Đã đọc';
+
+  @override
+  String get notificationUnreadLabel => 'Chưa đọc';
+
+  @override
+  String notificationCardSemantic(
+      String readState, String type, String title, String time) {
+    return '$readState. Thông báo $type. $title. $time.';
+  }
+
+  @override
+  String get notificationMissingTitle => 'Thông báo không khả dụng';
+
+  @override
+  String get notificationMissingMessage =>
+      'Thông báo cục bộ này không còn khả dụng.';
+
+  @override
+  String get notificationCreatedAtLabel => 'Tạo lúc';
+
+  @override
+  String get notificationReadAtLabel => 'Đọc lúc';
+
+  @override
+  String get notificationPrivacyNote =>
+      'Mã booking và tham chiếu thanh toán riêng tư được che bớt hoặc bỏ qua trong chế độ xem hoạt động này.';
+
+  @override
+  String get notificationOpenTargetSemantic =>
+      'Mở mục được liên kết với thông báo';
+
+  @override
+  String get notificationDeleteAction => 'Xóa thông báo';
+
+  @override
+  String get notificationDeleteSemantic => 'Xóa thông báo demo này';
+
+  @override
+  String get notificationDeleteConfirmTitle => 'Xóa thông báo?';
+
+  @override
+  String get notificationDeleteConfirmMessage =>
+      'Xóa thông báo demo cục bộ này? Booking, thanh toán, chuyến đi, đánh giá, ưu đãi hoặc mục ví được liên kết sẽ không bị xóa.';
+
+  @override
+  String get notificationDeleteConfirmAction => 'Xóa thông báo';
+
+  @override
+  String get notificationDeletedMessage =>
+      'Đã xóa thông báo khỏi dữ liệu demo cục bộ.';
+
+  @override
+  String get notificationTargetUnavailable =>
+      'Thông báo này không có màn hình liên kết.';
+
+  @override
+  String get notificationTargetMissing =>
+      'Mục liên kết không còn trong dữ liệu demo cục bộ.';
+
+  @override
+  String get notificationNoTargetAction => 'Không có màn hình liên kết';
+
+  @override
+  String get notificationOpenBooking => 'Xem booking';
+
+  @override
+  String get notificationOpenPayment => 'Xem trạng thái thanh toán';
+
+  @override
+  String get notificationOpenTrip => 'Xem chuyến đi';
+
+  @override
+  String get notificationOpenTripCompanion => 'Xem người đồng hành';
+
+  @override
+  String get notificationOpenTripDocuments => 'Xem tài liệu chuyến đi';
+
+  @override
+  String get notificationOpenReview => 'Xem đánh giá';
+
+  @override
+  String get notificationOpenRewards => 'Xem ưu đãi';
+
+  @override
+  String get notificationOpenWallet => 'Xem ví du lịch';
+
+  @override
+  String get notificationTypeBooking => 'Booking';
+
+  @override
+  String get notificationTypePayment => 'Thanh toán';
+
+  @override
+  String get notificationTypeReservation => 'Giữ chỗ';
+
+  @override
+  String get notificationTypeSystem => 'Hệ thống';
+
+  @override
+  String get notificationTypePromotion => 'Khuyến mãi';
+
+  @override
+  String get notificationTypeReview => 'Đánh giá';
+
+  @override
+  String get notificationTypePartner => 'Đối tác';
+
+  @override
+  String get notificationTypeAdmin => 'Quản trị';
+
+  @override
+  String get notificationTypeMessage => 'Tin nhắn';
+
+  @override
+  String get notificationTypeTrip => 'Chuyến đi';
+
+  @override
+  String get notificationPriorityLow => 'Thấp';
+
+  @override
+  String get notificationPriorityNormal => 'Bình thường';
+
+  @override
+  String get notificationPriorityHigh => 'Cao';
+
+  @override
+  String get notificationPriorityUrgent => 'Khẩn cấp';
+
+  @override
+  String get notificationDemoBookingModifiedTitle => 'Đã lưu thay đổi booking';
+
+  @override
+  String get notificationDemoBookingModifiedMessage =>
+      'Chỗ ở Đà Lạt đang chờ xác nhận vẫn giữ nguyên mã booking trong khi bản xem trước sửa đổi cục bộ cập nhật snapshot lưu trú.';
+
+  @override
+  String get notificationDemoPaymentSuccessTitle => 'Thanh toán demo hoàn tất';
+
+  @override
+  String get notificationDemoPaymentSuccessMessage =>
+      'Bản xem trước checkout cục bộ đã ghi nhận thanh toán MOCK đã trả. Không có khoản phí thật nào được thực hiện.';
+
+  @override
+  String get notificationDemoPaymentFailedTitle =>
+      'Thanh toán demo cần xem lại';
+
+  @override
+  String get notificationDemoPaymentFailedMessage =>
+      'Một bản xem trước thanh toán cục bộ chưa hoàn tất. Hãy xem lại booking trước khi thử hành động checkout demo khác.';
+
+  @override
+  String get notificationDemoTripCollaborationTitle =>
+      'Cập nhật cộng tác chuyến đi';
+
+  @override
+  String get notificationDemoTripCollaborationMessage =>
+      'Danh sách người đồng hành chuyến Đà Lạt có cập nhật cộng tác cục bộ để bạn xem.';
+
+  @override
+  String get notificationDemoItineraryReminderTitle => 'Đã gửi nhắc lịch trình';
+
+  @override
+  String get notificationDemoItineraryReminderMessage =>
+      'Nhắc lịch UI-9 vẫn là bản ghi nhắc chuyến đi; đây chỉ là bản sao thông báo trong ứng dụng đã gửi.';
+
+  @override
+  String get notificationDemoReviewReplyTitle =>
+      'Khách sạn đã phản hồi đánh giá';
+
+  @override
+  String get notificationDemoReviewReplyMessage =>
+      'Phản hồi của chủ villa đã có trong chi tiết đánh giá mà không lộ dữ liệu kiểm duyệt nội bộ.';
+
+  @override
+  String get notificationDemoRewardTitle => 'Có cập nhật quyền lợi';
+
+  @override
+  String get notificationDemoRewardMessage =>
+      'Thông báo ưu đãi và quyền lợi cục bộ đã sẵn sàng trong trung tâm ưu đãi.';
+
+  @override
+  String get notificationDemoWalletTitle => 'Thông báo tài liệu ví';
+
+  @override
+  String get notificationDemoWalletMessage =>
+      'Ghi chú tài liệu du lịch đã che bớt đang có trong Ví du lịch.';
+
+  @override
+  String get notificationDemoSystemTitle => 'Thông báo tài khoản';
+
+  @override
+  String get notificationDemoSystemMessage =>
+      'Hoạt động tài khoản demo cục bộ được hiển thị tại đây mà không đăng ký push hoặc lưu token thiết bị.';
+
+  @override
+  String profileNotificationsUnreadBadge(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count thông báo chưa đọc',
+      one: '1 thông báo chưa đọc',
+      zero: 'Không có thông báo chưa đọc',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get exploreHeroTitle => 'Bạn muốn đi đâu?';
 
   @override

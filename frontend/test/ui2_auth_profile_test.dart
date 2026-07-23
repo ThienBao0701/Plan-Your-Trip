@@ -433,8 +433,8 @@ void main() {
       const Size(390, 900),
     );
 
-    expect(find.text('Timeline starts soon'), findsOneWidget);
-    expect(find.text('Booking update'), findsOneWidget);
+    expect(find.text('Booking changes saved'), findsOneWidget);
+    expect(find.text('Demo payment completed'), findsOneWidget);
   });
 
   testWidgets('UI-2 screens avoid narrow overflow and support text scaling',

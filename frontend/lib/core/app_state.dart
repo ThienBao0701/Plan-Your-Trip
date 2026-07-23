@@ -68,6 +68,8 @@ class AppState extends ChangeNotifier {
   List<TravelerReview> reviews = List.from(MockData.reviews);
   List<DemoPaymentAttempt> demoPaymentAttempts =
       List.from(MockData.demoPaymentAttempts);
+  List<UserNotification> userNotifications =
+      List.from(MockData.demoNotifications);
   Set<int> publicTripIds = Set<int>.from(MockData.publicTripIds);
   List<Category> get categories => MockData.categories;
 
@@ -126,6 +128,7 @@ class AppState extends ChangeNotifier {
     tripReminders = List.from(MockData.tripReminders);
     reviews = List.from(MockData.reviews);
     demoPaymentAttempts = List.from(MockData.demoPaymentAttempts);
+    userNotifications = List.from(MockData.demoNotifications);
     publicTripIds = Set<int>.from(MockData.publicTripIds);
     _applyRewardDataMode();
     notifyListeners();
@@ -146,6 +149,7 @@ class AppState extends ChangeNotifier {
       tripReminders = List.from(MockData.tripReminders);
       reviews = List.from(MockData.reviews);
       demoPaymentAttempts = List.from(MockData.demoPaymentAttempts);
+      userNotifications = List.from(MockData.demoNotifications);
       publicTripIds = Set<int>.from(MockData.publicTripIds);
       _applyRewardDataMode();
       return;
@@ -163,6 +167,7 @@ class AppState extends ChangeNotifier {
     tripReminders = [];
     reviews = [];
     demoPaymentAttempts = [];
+    userNotifications = [];
     publicTripIds = {};
     _applyRewardDataMode();
   }
@@ -229,6 +234,62 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ── Notifications ───────────────────────────────────────────────────────
+
+  List<UserNotification> get visibleNotifications {
+    if (!demoMode) return const <UserNotification>[];
+    return List<UserNotification>.from(userNotifications)
+      ..sort(_compareNotifications);
+  }
+
+  int get unreadNotificationCount =>
+      visibleNotifications.where((item) => !item.read).length;
+
+  UserNotification? notificationById(String id) => _firstWhereOrNull(
+        userNotifications,
+        (item) => item.id == id,
+      );
+
+  NotificationActionResult markNotificationRead(String id) {
+    if (!demoMode) return NotificationActionResult.unavailable;
+    final index = userNotifications.indexWhere((item) => item.id == id);
+    if (index < 0) return NotificationActionResult.notFound;
+    final notification = userNotifications[index];
+    if (notification.read) return NotificationActionResult.success;
+    final readAt = now().toUtc();
+    userNotifications = [
+      for (var i = 0; i < userNotifications.length; i++)
+        i == index
+            ? notification.copyWith(readAt: readAt)
+            : userNotifications[i],
+    ];
+    notifyListeners();
+    return NotificationActionResult.success;
+  }
+
+  int markAllNotificationsRead() {
+    if (!demoMode) return 0;
+    final unread = userNotifications.where((item) => !item.read).length;
+    if (unread == 0) return 0;
+    final readAt = now().toUtc();
+    userNotifications = userNotifications
+        .map((item) => item.read ? item : item.copyWith(readAt: readAt))
+        .toList();
+    notifyListeners();
+    return unread;
+  }
+
+  NotificationActionResult deleteNotification(String id) {
+    if (!demoMode) return NotificationActionResult.unavailable;
+    if (!userNotifications.any((item) => item.id == id)) {
+      return NotificationActionResult.notFound;
+    }
+    userNotifications =
+        userNotifications.where((item) => item.id != id).toList();
+    notifyListeners();
+    return NotificationActionResult.success;
+  }
+
   // ── Places ────────────────────────────────────────────────────────────────
 
   List<Place> filteredPlaces(PlaceQuery q) {
@@ -291,6 +352,16 @@ class AppState extends ChangeNotifier {
       return null;
     }
   }
+
+  TripDocument? tripDocumentById(String id) => _firstWhereOrNull(
+        tripDocuments,
+        (document) => document.id == id,
+      );
+
+  TravelWalletItem? travelWalletItemById(String id) => _firstWhereOrNull(
+        travelWalletItems,
+        (item) => item.id == id,
+      );
 
   void addTrip(Trip trip) {
     trips = [...trips, trip];
@@ -2341,6 +2412,14 @@ class AppState extends ChangeNotifier {
     final sortOrder = a.sortOrder.compareTo(b.sortOrder);
     if (sortOrder != 0) return sortOrder;
     return a.id.compareTo(b.id);
+  }
+
+  static int _compareNotifications(
+    UserNotification a,
+    UserNotification b,
+  ) {
+    final created = b.createdAt.compareTo(a.createdAt);
+    return created == 0 ? a.id.compareTo(b.id) : created;
   }
 
   WalletActionResult _updateWalletFlag(

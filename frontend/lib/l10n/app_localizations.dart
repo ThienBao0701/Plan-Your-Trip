@@ -1592,6 +1592,487 @@ abstract class AppLocalizations {
   /// **'12 Jul'**
   String get notificationBudgetDate;
 
+  /// No description provided for @notificationCenterSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A local in-app activity stream for bookings, payments, trips, reviews, rewards, wallet documents, and account notices.'**
+  String get notificationCenterSubtitle;
+
+  /// No description provided for @notificationCenterSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification and activity center'**
+  String get notificationCenterSemantic;
+
+  /// No description provided for @notificationRealBoundary.
+  ///
+  /// In en, this message translates to:
+  /// **'Real accounts will use the committed in-app notification API when the frontend repository layer is connected. Push delivery, device tokens, and external notification permissions are not connected in this UI phase.'**
+  String get notificationRealBoundary;
+
+  /// No description provided for @notificationDemoModeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Local Demo Mode'**
+  String get notificationDemoModeLabel;
+
+  /// No description provided for @notificationPreferenceBoundary.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification toggles are local device preferences only. They do not register push tokens or sync server preferences.'**
+  String get notificationPreferenceBoundary;
+
+  /// No description provided for @notificationUnreadCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{0 unread} =1{1 unread} other{{count} unread}}'**
+  String notificationUnreadCount(int count);
+
+  /// No description provided for @notificationUnreadCountSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No unread notifications} =1{1 unread notification} other{{count} unread notifications}}'**
+  String notificationUnreadCountSemantic(int count);
+
+  /// No description provided for @notificationTotalCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{0 notices} =1{1 notice} other{{count} notices}}'**
+  String notificationTotalCount(int count);
+
+  /// No description provided for @notificationMarkAllReadSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark all demo notifications as read'**
+  String get notificationMarkAllReadSemantic;
+
+  /// No description provided for @notificationMarkAllReadResult.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No unread notifications changed.} =1{Marked 1 notification as read.} other{Marked {count} notifications as read.}}'**
+  String notificationMarkAllReadResult(int count);
+
+  /// No description provided for @notificationFilterSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification filters'**
+  String get notificationFilterSemantic;
+
+  /// No description provided for @notificationFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get notificationFilterAll;
+
+  /// No description provided for @notificationFilterUnread.
+  ///
+  /// In en, this message translates to:
+  /// **'Unread'**
+  String get notificationFilterUnread;
+
+  /// No description provided for @notificationFilterBookings.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookings'**
+  String get notificationFilterBookings;
+
+  /// No description provided for @notificationFilterPayments.
+  ///
+  /// In en, this message translates to:
+  /// **'Payments'**
+  String get notificationFilterPayments;
+
+  /// No description provided for @notificationFilterTrips.
+  ///
+  /// In en, this message translates to:
+  /// **'Trips'**
+  String get notificationFilterTrips;
+
+  /// No description provided for @notificationFilterReviews.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviews'**
+  String get notificationFilterReviews;
+
+  /// No description provided for @notificationFilterRewards.
+  ///
+  /// In en, this message translates to:
+  /// **'Rewards'**
+  String get notificationFilterRewards;
+
+  /// No description provided for @notificationFilterWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet'**
+  String get notificationFilterWallet;
+
+  /// No description provided for @notificationFilterSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get notificationFilterSystem;
+
+  /// No description provided for @notificationFilterEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No notifications match this filter.'**
+  String get notificationFilterEmptyMessage;
+
+  /// No description provided for @notificationReadLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Read'**
+  String get notificationReadLabel;
+
+  /// No description provided for @notificationUnreadLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Unread'**
+  String get notificationUnreadLabel;
+
+  /// No description provided for @notificationCardSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{readState}. {type} notification. {title}. {time}.'**
+  String notificationCardSemantic(
+      String readState, String type, String title, String time);
+
+  /// No description provided for @notificationMissingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification unavailable'**
+  String get notificationMissingTitle;
+
+  /// No description provided for @notificationMissingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This local notification is no longer available.'**
+  String get notificationMissingMessage;
+
+  /// No description provided for @notificationCreatedAtLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Created'**
+  String get notificationCreatedAtLabel;
+
+  /// No description provided for @notificationReadAtLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Read at'**
+  String get notificationReadAtLabel;
+
+  /// No description provided for @notificationPrivacyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Private booking and payment references are masked or omitted in this activity view.'**
+  String get notificationPrivacyNote;
+
+  /// No description provided for @notificationOpenTargetSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Open notification target'**
+  String get notificationOpenTargetSemantic;
+
+  /// No description provided for @notificationDeleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete notification'**
+  String get notificationDeleteAction;
+
+  /// No description provided for @notificationDeleteSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this demo notification'**
+  String get notificationDeleteSemantic;
+
+  /// No description provided for @notificationDeleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete notification?'**
+  String get notificationDeleteConfirmTitle;
+
+  /// No description provided for @notificationDeleteConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this local demo notification? The linked booking, payment, trip, review, reward, or wallet item will not be deleted.'**
+  String get notificationDeleteConfirmMessage;
+
+  /// No description provided for @notificationDeleteConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete notification'**
+  String get notificationDeleteConfirmAction;
+
+  /// No description provided for @notificationDeletedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification deleted from local demo data.'**
+  String get notificationDeletedMessage;
+
+  /// No description provided for @notificationTargetUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This notification has no linked screen.'**
+  String get notificationTargetUnavailable;
+
+  /// No description provided for @notificationTargetMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'The linked item is no longer available in local demo data.'**
+  String get notificationTargetMissing;
+
+  /// No description provided for @notificationNoTargetAction.
+  ///
+  /// In en, this message translates to:
+  /// **'No linked screen'**
+  String get notificationNoTargetAction;
+
+  /// No description provided for @notificationOpenBooking.
+  ///
+  /// In en, this message translates to:
+  /// **'View booking'**
+  String get notificationOpenBooking;
+
+  /// No description provided for @notificationOpenPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'View payment status'**
+  String get notificationOpenPayment;
+
+  /// No description provided for @notificationOpenTrip.
+  ///
+  /// In en, this message translates to:
+  /// **'View trip'**
+  String get notificationOpenTrip;
+
+  /// No description provided for @notificationOpenTripCompanion.
+  ///
+  /// In en, this message translates to:
+  /// **'View companions'**
+  String get notificationOpenTripCompanion;
+
+  /// No description provided for @notificationOpenTripDocuments.
+  ///
+  /// In en, this message translates to:
+  /// **'View trip documents'**
+  String get notificationOpenTripDocuments;
+
+  /// No description provided for @notificationOpenReview.
+  ///
+  /// In en, this message translates to:
+  /// **'View review'**
+  String get notificationOpenReview;
+
+  /// No description provided for @notificationOpenRewards.
+  ///
+  /// In en, this message translates to:
+  /// **'View rewards'**
+  String get notificationOpenRewards;
+
+  /// No description provided for @notificationOpenWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'View travel wallet'**
+  String get notificationOpenWallet;
+
+  /// No description provided for @notificationTypeBooking.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking'**
+  String get notificationTypeBooking;
+
+  /// No description provided for @notificationTypePayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment'**
+  String get notificationTypePayment;
+
+  /// No description provided for @notificationTypeReservation.
+  ///
+  /// In en, this message translates to:
+  /// **'Reservation'**
+  String get notificationTypeReservation;
+
+  /// No description provided for @notificationTypeSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get notificationTypeSystem;
+
+  /// No description provided for @notificationTypePromotion.
+  ///
+  /// In en, this message translates to:
+  /// **'Promotion'**
+  String get notificationTypePromotion;
+
+  /// No description provided for @notificationTypeReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Review'**
+  String get notificationTypeReview;
+
+  /// No description provided for @notificationTypePartner.
+  ///
+  /// In en, this message translates to:
+  /// **'Partner'**
+  String get notificationTypePartner;
+
+  /// No description provided for @notificationTypeAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'Admin'**
+  String get notificationTypeAdmin;
+
+  /// No description provided for @notificationTypeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get notificationTypeMessage;
+
+  /// No description provided for @notificationTypeTrip.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip'**
+  String get notificationTypeTrip;
+
+  /// No description provided for @notificationPriorityLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Low'**
+  String get notificationPriorityLow;
+
+  /// No description provided for @notificationPriorityNormal.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal'**
+  String get notificationPriorityNormal;
+
+  /// No description provided for @notificationPriorityHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'High'**
+  String get notificationPriorityHigh;
+
+  /// No description provided for @notificationPriorityUrgent.
+  ///
+  /// In en, this message translates to:
+  /// **'Urgent'**
+  String get notificationPriorityUrgent;
+
+  /// No description provided for @notificationDemoBookingModifiedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking changes saved'**
+  String get notificationDemoBookingModifiedTitle;
+
+  /// No description provided for @notificationDemoBookingModifiedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your pending Da Lat stay keeps the same booking code while the local modification preview updates its stay snapshot.'**
+  String get notificationDemoBookingModifiedMessage;
+
+  /// No description provided for @notificationDemoPaymentSuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo payment completed'**
+  String get notificationDemoPaymentSuccessTitle;
+
+  /// No description provided for @notificationDemoPaymentSuccessMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The local checkout preview recorded a paid MOCK payment. No real charge was made.'**
+  String get notificationDemoPaymentSuccessMessage;
+
+  /// No description provided for @notificationDemoPaymentFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo payment needs attention'**
+  String get notificationDemoPaymentFailedTitle;
+
+  /// No description provided for @notificationDemoPaymentFailedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'A local payment preview did not complete. Review the booking before trying another demo checkout action.'**
+  String get notificationDemoPaymentFailedMessage;
+
+  /// No description provided for @notificationDemoTripCollaborationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip collaboration updated'**
+  String get notificationDemoTripCollaborationTitle;
+
+  /// No description provided for @notificationDemoTripCollaborationMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Da Lat trip companion list has a local collaboration update ready to review.'**
+  String get notificationDemoTripCollaborationMessage;
+
+  /// No description provided for @notificationDemoItineraryReminderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Itinerary reminder delivered'**
+  String get notificationDemoItineraryReminderTitle;
+
+  /// No description provided for @notificationDemoItineraryReminderMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The UI-9 reminder remains a trip reminder record; this is only the delivered in-app notification copy.'**
+  String get notificationDemoItineraryReminderMessage;
+
+  /// No description provided for @notificationDemoReviewReplyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Property replied to your review'**
+  String get notificationDemoReviewReplyTitle;
+
+  /// No description provided for @notificationDemoReviewReplyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The villa host response is available in your review detail without exposing moderation internals.'**
+  String get notificationDemoReviewReplyMessage;
+
+  /// No description provided for @notificationDemoRewardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Benefit update available'**
+  String get notificationDemoRewardTitle;
+
+  /// No description provided for @notificationDemoRewardMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'A local rewards and benefits notice is ready in the rewards hub.'**
+  String get notificationDemoRewardMessage;
+
+  /// No description provided for @notificationDemoWalletTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet document notice'**
+  String get notificationDemoWalletTitle;
+
+  /// No description provided for @notificationDemoWalletMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'A masked travel document note is available in your Travel Wallet.'**
+  String get notificationDemoWalletMessage;
+
+  /// No description provided for @notificationDemoSystemTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Account notice'**
+  String get notificationDemoSystemTitle;
+
+  /// No description provided for @notificationDemoSystemMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Local demo account activity is shown here without push registration or device-token storage.'**
+  String get notificationDemoSystemMessage;
+
+  /// No description provided for @profileNotificationsUnreadBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No unread notifications} =1{1 unread notification} other{{count} unread notifications}}'**
+  String profileNotificationsUnreadBadge(int count);
+
   /// No description provided for @exploreHeroTitle.
   ///
   /// In en, this message translates to:

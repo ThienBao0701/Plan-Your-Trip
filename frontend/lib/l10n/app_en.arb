@@ -379,6 +379,137 @@
   "notificationBudgetMessage": "You have used 62% of the planned demo budget.",
   "notificationYesterday": "Yesterday",
   "notificationBudgetDate": "12 Jul",
+  "notificationCenterSubtitle": "A local in-app activity stream for bookings, payments, trips, reviews, rewards, wallet documents, and account notices.",
+  "notificationCenterSemantic": "Notification and activity center",
+  "notificationRealBoundary": "Real accounts will use the committed in-app notification API when the frontend repository layer is connected. Push delivery, device tokens, and external notification permissions are not connected in this UI phase.",
+  "notificationDemoModeLabel": "Local Demo Mode",
+  "notificationPreferenceBoundary": "Notification toggles are local device preferences only. They do not register push tokens or sync server preferences.",
+  "notificationUnreadCount": "{count, plural, =0{0 unread} =1{1 unread} other{{count} unread}}",
+  "@notificationUnreadCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationUnreadCountSemantic": "{count, plural, =0{No unread notifications} =1{1 unread notification} other{{count} unread notifications}}",
+  "@notificationUnreadCountSemantic": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationTotalCount": "{count, plural, =0{0 notices} =1{1 notice} other{{count} notices}}",
+  "@notificationTotalCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationMarkAllReadSemantic": "Mark all demo notifications as read",
+  "notificationMarkAllReadResult": "{count, plural, =0{No unread notifications changed.} =1{Marked 1 notification as read.} other{Marked {count} notifications as read.}}",
+  "@notificationMarkAllReadResult": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationFilterSemantic": "Notification filters",
+  "notificationFilterAll": "All",
+  "notificationFilterUnread": "Unread",
+  "notificationFilterBookings": "Bookings",
+  "notificationFilterPayments": "Payments",
+  "notificationFilterTrips": "Trips",
+  "notificationFilterReviews": "Reviews",
+  "notificationFilterRewards": "Rewards",
+  "notificationFilterWallet": "Wallet",
+  "notificationFilterSystem": "System",
+  "notificationFilterEmptyMessage": "No notifications match this filter.",
+  "notificationReadLabel": "Read",
+  "notificationUnreadLabel": "Unread",
+  "notificationCardSemantic": "{readState}. {type} notification. {title}. {time}.",
+  "@notificationCardSemantic": {
+    "placeholders": {
+      "readState": {
+        "type": "String"
+      },
+      "type": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationMissingTitle": "Notification unavailable",
+  "notificationMissingMessage": "This local notification is no longer available.",
+  "notificationCreatedAtLabel": "Created",
+  "notificationReadAtLabel": "Read at",
+  "notificationPrivacyNote": "Private booking and payment references are masked or omitted in this activity view.",
+  "notificationOpenTargetSemantic": "Open notification target",
+  "notificationDeleteAction": "Delete notification",
+  "notificationDeleteSemantic": "Delete this demo notification",
+  "notificationDeleteConfirmTitle": "Delete notification?",
+  "notificationDeleteConfirmMessage": "Delete this local demo notification? The linked booking, payment, trip, review, reward, or wallet item will not be deleted.",
+  "notificationDeleteConfirmAction": "Delete notification",
+  "notificationDeletedMessage": "Notification deleted from local demo data.",
+  "notificationTargetUnavailable": "This notification has no linked screen.",
+  "notificationTargetMissing": "The linked item is no longer available in local demo data.",
+  "notificationNoTargetAction": "No linked screen",
+  "notificationOpenBooking": "View booking",
+  "notificationOpenPayment": "View payment status",
+  "notificationOpenTrip": "View trip",
+  "notificationOpenTripCompanion": "View companions",
+  "notificationOpenTripDocuments": "View trip documents",
+  "notificationOpenReview": "View review",
+  "notificationOpenRewards": "View rewards",
+  "notificationOpenWallet": "View travel wallet",
+  "notificationTypeBooking": "Booking",
+  "notificationTypePayment": "Payment",
+  "notificationTypeReservation": "Reservation",
+  "notificationTypeSystem": "System",
+  "notificationTypePromotion": "Promotion",
+  "notificationTypeReview": "Review",
+  "notificationTypePartner": "Partner",
+  "notificationTypeAdmin": "Admin",
+  "notificationTypeMessage": "Message",
+  "notificationTypeTrip": "Trip",
+  "notificationPriorityLow": "Low",
+  "notificationPriorityNormal": "Normal",
+  "notificationPriorityHigh": "High",
+  "notificationPriorityUrgent": "Urgent",
+  "notificationDemoBookingModifiedTitle": "Booking changes saved",
+  "notificationDemoBookingModifiedMessage": "Your pending Da Lat stay keeps the same booking code while the local modification preview updates its stay snapshot.",
+  "notificationDemoPaymentSuccessTitle": "Demo payment completed",
+  "notificationDemoPaymentSuccessMessage": "The local checkout preview recorded a paid MOCK payment. No real charge was made.",
+  "notificationDemoPaymentFailedTitle": "Demo payment needs attention",
+  "notificationDemoPaymentFailedMessage": "A local payment preview did not complete. Review the booking before trying another demo checkout action.",
+  "notificationDemoTripCollaborationTitle": "Trip collaboration updated",
+  "notificationDemoTripCollaborationMessage": "Your Da Lat trip companion list has a local collaboration update ready to review.",
+  "notificationDemoItineraryReminderTitle": "Itinerary reminder delivered",
+  "notificationDemoItineraryReminderMessage": "The UI-9 reminder remains a trip reminder record; this is only the delivered in-app notification copy.",
+  "notificationDemoReviewReplyTitle": "Property replied to your review",
+  "notificationDemoReviewReplyMessage": "The villa host response is available in your review detail without exposing moderation internals.",
+  "notificationDemoRewardTitle": "Benefit update available",
+  "notificationDemoRewardMessage": "A local rewards and benefits notice is ready in the rewards hub.",
+  "notificationDemoWalletTitle": "Wallet document notice",
+  "notificationDemoWalletMessage": "A masked travel document note is available in your Travel Wallet.",
+  "notificationDemoSystemTitle": "Account notice",
+  "notificationDemoSystemMessage": "Local demo account activity is shown here without push registration or device-token storage.",
+  "profileNotificationsUnreadBadge": "{count, plural, =0{No unread notifications} =1{1 unread notification} other{{count} unread notifications}}",
+  "@profileNotificationsUnreadBadge": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "exploreHeroTitle": "Where will you wander?",
   "exploreHeroSubtitle": "Curated places are local preview content. Personal trips stay local until a backend exists.",
   "exploreSearchHint": "Search cities, places, cafes, hotels...",
