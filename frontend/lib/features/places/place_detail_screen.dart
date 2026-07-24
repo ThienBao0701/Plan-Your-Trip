@@ -21,7 +21,12 @@ class PlaceDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final app = AppScope.of(context);
     final l10n = AppLocalizations.of(context)!;
+    final saved = app.isPlaceSaved(place.id);
+    final bookmarkLabel = saved
+        ? l10n.savedPlacesRemoveSemantic(place.name)
+        : l10n.savedPlacesSaveSemantic(place.name);
     return Scaffold(
       appBar: OceanGlassAppBar(
         leading: IconButton(
@@ -33,11 +38,15 @@ class PlaceDetailScreen extends StatelessWidget {
         actions: [
           Semantics(
             button: true,
-            label: l10n.savedPlacesBookmarkSemantic(place.name),
+            toggled: saved,
+            label: bookmarkLabel,
             child: IconButton(
-              tooltip: l10n.savedPlacesBookmarkSemantic(place.name),
+              tooltip: bookmarkLabel,
               onPressed: () => _bookmark(context),
-              icon: const Icon(Icons.bookmark_border_rounded),
+              icon: Icon(
+                saved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+                color: saved ? AppColors.ocean : null,
+              ),
             ),
           ),
         ],
@@ -230,14 +239,23 @@ class PlaceDetailScreen extends StatelessWidget {
   void _bookmark(BuildContext context) {
     final app = AppScope.of(context);
     final l10n = AppLocalizations.of(context)!;
+    final wasSaved = app.isPlaceSaved(place.id);
+    final outcome =
+        wasSaved ? app.removeSavedPlace(place.id) : app.savePlace(place.id);
+    final message = switch (outcome) {
+      SavedPlaceActionResult.success => wasSaved
+          ? l10n.savedPlacesRemovedPlace(place.name)
+          : l10n.savedPlacesSavedMessage(place.name),
+      SavedPlaceActionResult.duplicate =>
+        l10n.savedPlacesAlreadySavedMessage(place.name),
+      SavedPlaceActionResult.unavailable => l10n.savedPlacesRealEmptyMessage,
+      SavedPlaceActionResult.forbidden =>
+        l10n.savedPlacesActionForbiddenMessage,
+      SavedPlaceActionResult.notFound => l10n.savedPlacesMissingMessage,
+      SavedPlaceActionResult.invalidNote => l10n.savedPlacesNoteTooLongMessage,
+    };
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          app.demoMode
-              ? l10n.savedPlacesDemoLocalOnly
-              : l10n.savedPlacesRealEmptyMessage,
-        ),
-      ),
+      SnackBar(content: Text(message)),
     );
   }
 

@@ -751,6 +751,484 @@ class AppLocalizationsVi extends AppLocalizations {
   String get savedPlacesRemoved => 'Đã xóa khỏi danh sách đã lưu cục bộ.';
 
   @override
+  String get savedPlacesSubtitle =>
+      'Danh sách địa điểm du lịch bạn lưu, được lấy từ dữ liệu địa điểm công khai hiện tại.';
+
+  @override
+  String get savedPlacesDemoBoundary =>
+      'Mục lưu trong Chế độ demo là dữ liệu trình diễn cục bộ. Chúng chưa được đồng bộ với API wishlist.';
+
+  @override
+  String get savedPlacesEmptyTitle => 'Chưa có địa điểm đã lưu';
+
+  @override
+  String get savedPlacesEmptyMessage =>
+      'Lưu một địa điểm công khai từ Khám phá, tìm kiếm, khám phá danh mục hoặc trang chi tiết địa điểm.';
+
+  @override
+  String savedPlacesCountSemantic(int count) {
+    return '$count địa điểm đã lưu';
+  }
+
+  @override
+  String get savedPlacesFilterSemantic => 'Bộ lọc địa điểm đã lưu';
+
+  @override
+  String get savedPlacesSortNewest => 'Mới lưu';
+
+  @override
+  String get savedPlacesSortName => 'Tên';
+
+  @override
+  String savedPlacesCollectionCount(int count) {
+    return '$count bộ sưu tập';
+  }
+
+  @override
+  String savedPlacesCollectionCountSemantic(int count) {
+    return '$count bộ sưu tập đã lưu';
+  }
+
+  @override
+  String savedPlacesAllSavedTab(int count) {
+    return 'Tất cả đã lưu ($count)';
+  }
+
+  @override
+  String savedPlacesCollectionsTab(int count) {
+    return 'Bộ sưu tập ($count)';
+  }
+
+  @override
+  String get savedPlacesSectionTabsSemantic => 'Các mục địa điểm đã lưu';
+
+  @override
+  String get savedPlacesWishlistBoundaryTitle => 'Wishlist và ghi chú';
+
+  @override
+  String get savedPlacesWishlistBoundaryMessage =>
+      'Wishlist và ghi chú riêng tư là dữ liệu cục bộ trong Chế độ demo cho đến khi kết nối lưu trữ backend.';
+
+  @override
+  String get savedPlacesCollectionsTitle => 'Bộ sưu tập';
+
+  @override
+  String get savedPlacesCollectionsBoundaryMessage =>
+      'Bộ sưu tập là danh sách cục bộ trong Chế độ demo, căn theo /api/me/collections. Thêm địa điểm vào bộ sưu tập không thay đổi wishlist.';
+
+  @override
+  String get savedPlacesCollectionCreateAction => 'Tạo bộ sưu tập';
+
+  @override
+  String get savedPlacesCollectionCreateSemantic => 'Tạo bộ sưu tập đã lưu';
+
+  @override
+  String get savedPlacesCollectionsEmptyTitle => 'Chưa có bộ sưu tập';
+
+  @override
+  String get savedPlacesCollectionsEmptyMessage =>
+      'Tạo bộ sưu tập riêng tư cho một điểm đến, ý tưởng cuối tuần hoặc danh sách rút gọn.';
+
+  @override
+  String savedPlacesCollectionItemCount(int count) {
+    return '$count địa điểm';
+  }
+
+  @override
+  String savedPlacesCollectionItemCountSemantic(int count) {
+    return '$count địa điểm trong bộ sưu tập';
+  }
+
+  @override
+  String savedPlacesCollectionCardSemantic(String collection, int count) {
+    return '$collection, $count địa điểm';
+  }
+
+  @override
+  String get savedPlacesCollectionPrivateLabel => 'Riêng tư';
+
+  @override
+  String get savedPlacesCollectionVisibleLabel => 'Hiển thị';
+
+  @override
+  String savedPlacesCollectionUpdated(String date) {
+    return 'Cập nhật $date';
+  }
+
+  @override
+  String get savedPlacesCollectionOpenAction => 'Mở';
+
+  @override
+  String savedPlacesCollectionOpenSemantic(String collection) {
+    return 'Mở bộ sưu tập $collection';
+  }
+
+  @override
+  String get savedPlacesCollectionEditAction => 'Sửa';
+
+  @override
+  String savedPlacesCollectionEditSemantic(String collection) {
+    return 'Sửa bộ sưu tập $collection';
+  }
+
+  @override
+  String savedPlacesCollectionDeleteSemantic(String collection) {
+    return 'Xóa bộ sưu tập $collection';
+  }
+
+  @override
+  String savedPlacesCollectionDetailSemantic(String collection, int count) {
+    return '$collection, $count địa điểm';
+  }
+
+  @override
+  String get savedPlacesCollectionBackAction => 'Bộ sưu tập';
+
+  @override
+  String get savedPlacesCollectionBackSemantic => 'Quay lại bộ sưu tập đã lưu';
+
+  @override
+  String get savedPlacesCollectionAddSavedAction => 'Thêm địa điểm đã lưu';
+
+  @override
+  String savedPlacesCollectionAddSavedSemantic(String collection) {
+    return 'Thêm địa điểm đã lưu vào $collection';
+  }
+
+  @override
+  String get savedPlacesCollectionEmptyTitle => 'Bộ sưu tập trống';
+
+  @override
+  String get savedPlacesCollectionEmptyMessage =>
+      'Thêm một địa điểm công khai đã lưu. Việc này không thay đổi wishlist.';
+
+  @override
+  String savedPlacesCollectionPlaceSemantic(String place, String date) {
+    return '$place, đã thêm $date';
+  }
+
+  @override
+  String savedPlacesCollectionAddedOn(String date) {
+    return 'Đã thêm $date';
+  }
+
+  @override
+  String get savedPlacesCollectionRemovePlaceAction => 'Xóa';
+
+  @override
+  String savedPlacesCollectionRemovePlaceSemantic(String place) {
+    return 'Xóa $place khỏi bộ sưu tập này';
+  }
+
+  @override
+  String get savedPlacesCollectionStaleItemTitle =>
+      'Mục bộ sưu tập không khả dụng';
+
+  @override
+  String savedPlacesCollectionStaleItemMessage(int placeId) {
+    return 'Tham chiếu địa điểm $placeId không còn khớp với dữ liệu địa điểm công khai.';
+  }
+
+  @override
+  String get savedPlacesCollectionRemoveStaleSemantic =>
+      'Xóa địa điểm không khả dụng khỏi bộ sưu tập';
+
+  @override
+  String savedPlacesCollectionMembershipIn(String collection) {
+    return 'Có trong $collection';
+  }
+
+  @override
+  String savedPlacesCollectionMembershipOut(String collection) {
+    return 'Chưa có trong $collection';
+  }
+
+  @override
+  String savedPlacesCollectionRemoveMembershipSemantic(
+      String place, String collection) {
+    return 'Xóa $place khỏi $collection';
+  }
+
+  @override
+  String savedPlacesCollectionAddMembershipSemantic(
+      String place, String collection) {
+    return 'Thêm $place vào $collection';
+  }
+
+  @override
+  String get savedPlacesCollectionInAction => 'Đã thêm';
+
+  @override
+  String get savedPlacesCollectionAddAction => 'Thêm';
+
+  @override
+  String get savedPlacesCollectionEditTitle => 'Sửa bộ sưu tập';
+
+  @override
+  String get savedPlacesCollectionCreateTitle => 'Tạo bộ sưu tập';
+
+  @override
+  String get savedPlacesCollectionNameLabel => 'Tên bộ sưu tập';
+
+  @override
+  String savedPlacesCollectionNameHelper(int maxLength) {
+    return 'Bắt buộc, tối đa $maxLength ký tự.';
+  }
+
+  @override
+  String get savedPlacesCollectionDescriptionLabel => 'Mô tả';
+
+  @override
+  String savedPlacesCollectionDescriptionHelper(int maxLength) {
+    return 'Không bắt buộc, tối đa $maxLength ký tự.';
+  }
+
+  @override
+  String get savedPlacesCollectionCoverLabel => 'URL ảnh bìa';
+
+  @override
+  String savedPlacesCollectionCoverHelper(int maxLength) {
+    return 'Văn bản URL không bắt buộc, tối đa $maxLength ký tự.';
+  }
+
+  @override
+  String get savedPlacesCollectionPrivateHelper =>
+      'Mọi endpoint bộ sưu tập đều giới hạn theo chủ sở hữu trong giai đoạn này.';
+
+  @override
+  String get savedPlacesCollectionSaveAction => 'Lưu bộ sưu tập';
+
+  @override
+  String savedPlacesCollectionCreatedMessage(String collection) {
+    return 'Đã tạo bộ sưu tập $collection.';
+  }
+
+  @override
+  String savedPlacesCollectionUpdatedMessage(String collection) {
+    return 'Đã cập nhật bộ sưu tập $collection.';
+  }
+
+  @override
+  String savedPlacesCollectionDeleteTitle(String collection) {
+    return 'Xóa $collection?';
+  }
+
+  @override
+  String savedPlacesCollectionDeleteMessage(String collection) {
+    return 'Xóa $collection? Chỉ thành viên bộ sưu tập bị xóa. Địa điểm, ghi chú wishlist, chuyến đi, booking, đánh giá và tài liệu được giữ nguyên.';
+  }
+
+  @override
+  String get savedPlacesCollectionDeleteAction => 'Xóa bộ sưu tập';
+
+  @override
+  String savedPlacesCollectionDeletedMessage(String collection) {
+    return 'Đã xóa bộ sưu tập $collection.';
+  }
+
+  @override
+  String savedPlacesCollectionAddSavedTitle(String collection) {
+    return 'Thêm địa điểm đã lưu vào $collection';
+  }
+
+  @override
+  String get savedPlacesCollectionAddSavedMessage =>
+      'Chỉ liệt kê các địa điểm đang được lưu. Thành viên bộ sưu tập tách biệt với wishlist.';
+
+  @override
+  String savedPlacesManageCollectionsTitle(String place) {
+    return 'Bộ sưu tập cho $place';
+  }
+
+  @override
+  String get savedPlacesManageCollectionsMessage =>
+      'Thêm hoặc xóa địa điểm đã lưu này khỏi bộ sưu tập riêng tư trong Chế độ demo.';
+
+  @override
+  String get savedPlacesCollectionSavedMessage => 'Đã cập nhật bộ sưu tập.';
+
+  @override
+  String get savedPlacesCollectionsRealUnavailableMessage =>
+      'Bộ sưu tập đã lưu chưa được kết nối với backend cho tài khoản thật.';
+
+  @override
+  String savedPlacesCollectionInvalidNameMessage(int maxLength) {
+    return 'Tên bộ sưu tập là bắt buộc và tối đa $maxLength ký tự.';
+  }
+
+  @override
+  String savedPlacesCollectionInvalidDescriptionMessage(int maxLength) {
+    return 'Mô tả bộ sưu tập tối đa $maxLength ký tự.';
+  }
+
+  @override
+  String savedPlacesCollectionInvalidCoverMessage(int maxLength) {
+    return 'URL ảnh bìa bộ sưu tập tối đa $maxLength ký tự.';
+  }
+
+  @override
+  String savedPlacesCollectionLimitMessage(int maxCount) {
+    return 'Bạn đã đạt giới hạn cục bộ $maxCount bộ sưu tập.';
+  }
+
+  @override
+  String get savedPlacesCollectionNotFoundMessage =>
+      'Bộ sưu tập này không khả dụng.';
+
+  @override
+  String get savedPlacesCollectionPlaceNotFoundMessage =>
+      'Không thể thêm địa điểm này vì nó không còn khớp với dữ liệu địa điểm công khai.';
+
+  @override
+  String savedPlacesCollectionDuplicatePlaceMessage(
+      String place, String collection) {
+    return '$place đã có trong $collection.';
+  }
+
+  @override
+  String get savedPlacesCollectionItemNotFoundMessage =>
+      'Địa điểm này không nằm trong bộ sưu tập đã chọn.';
+
+  @override
+  String savedPlacesCollectionItemLimitMessage(int maxCount) {
+    return 'Bộ sưu tập này đã đạt giới hạn cục bộ $maxCount địa điểm.';
+  }
+
+  @override
+  String savedPlacesCollectionAddedPlaceMessage(
+      String place, String collection) {
+    return 'Đã thêm $place vào $collection.';
+  }
+
+  @override
+  String savedPlacesCollectionRemovedPlaceMessage(
+      String place, String collection) {
+    return 'Đã xóa $place khỏi $collection.';
+  }
+
+  @override
+  String get savedPlacesAddToCollectionAction => 'Bộ sưu tập';
+
+  @override
+  String savedPlacesManageCollectionsSemantic(String place) {
+    return 'Quản lý bộ sưu tập cho $place';
+  }
+
+  @override
+  String savedPlacesSavedOn(String date) {
+    return 'Đã lưu $date';
+  }
+
+  @override
+  String savedPlacesNote(String note) {
+    return 'Ghi chú: $note';
+  }
+
+  @override
+  String get savedPlacesEditNoteAction => 'Sửa ghi chú';
+
+  @override
+  String savedPlacesEditNoteSemantic(String place) {
+    return 'Sửa ghi chú riêng tư cho $place';
+  }
+
+  @override
+  String savedPlacesEditNoteTitle(String place) {
+    return 'Ghi chú riêng tư cho $place';
+  }
+
+  @override
+  String get savedPlacesNoteFieldLabel => 'Ghi chú riêng tư';
+
+  @override
+  String savedPlacesNoteFieldHelper(int maxLength) {
+    return 'Tối đa $maxLength ký tự. Để trống để xóa ghi chú.';
+  }
+
+  @override
+  String get savedPlacesNoteSaveAction => 'Lưu ghi chú';
+
+  @override
+  String savedPlacesNoteSavedMessage(String place) {
+    return 'Đã cập nhật ghi chú riêng tư cho $place.';
+  }
+
+  @override
+  String get savedPlacesNoteTooLongMessage =>
+      'Ghi chú riêng tư tối đa 500 ký tự.';
+
+  @override
+  String savedPlacesSaveSemantic(String place) {
+    return 'Lưu $place';
+  }
+
+  @override
+  String savedPlacesRemoveSemantic(String place) {
+    return 'Xóa địa điểm đã lưu $place';
+  }
+
+  @override
+  String savedPlacesSavedMessage(String place) {
+    return 'Đã lưu cục bộ $place.';
+  }
+
+  @override
+  String savedPlacesAlreadySavedMessage(String place) {
+    return '$place đã được lưu.';
+  }
+
+  @override
+  String savedPlacesRemovedPlace(String place) {
+    return 'Đã xóa $place khỏi danh sách đã lưu cục bộ.';
+  }
+
+  @override
+  String get savedPlacesActionForbiddenMessage =>
+      'Địa điểm đã lưu này thuộc về khách du lịch khác.';
+
+  @override
+  String get savedPlacesMissingTitle => 'Địa điểm đã lưu không khả dụng';
+
+  @override
+  String get savedPlacesMissingMessage =>
+      'Địa điểm đã lưu này không còn khớp với dữ liệu địa điểm công khai.';
+
+  @override
+  String savedPlacesMissingRecordMessage(int placeId) {
+    return 'Tham chiếu địa điểm đã lưu $placeId không còn khớp với dữ liệu địa điểm công khai.';
+  }
+
+  @override
+  String get savedPlacesRemoveAction => 'Xóa';
+
+  @override
+  String get savedPlacesRemoveConfirmTitle => 'Xóa địa điểm đã lưu?';
+
+  @override
+  String savedPlacesRemoveConfirmMessage(String place) {
+    return 'Xóa $place khỏi danh sách đã lưu cục bộ? Địa điểm, chuyến đi, đặt phòng, đánh giá và ví du lịch sẽ không bị xóa.';
+  }
+
+  @override
+  String get savedPlacesRemoveConfirmAction => 'Xóa địa điểm đã lưu';
+
+  @override
+  String get savedPlacesViewDetailsAction => 'Chi tiết';
+
+  @override
+  String savedPlacesOpenDetailSemantic(String place) {
+    return 'Mở chi tiết cho $place';
+  }
+
+  @override
+  String get savedPlacesHotelAction => 'Xem phòng';
+
+  @override
+  String savedPlacesCardSemantic(String place, String date) {
+    return '$place, đã lưu $date';
+  }
+
+  @override
   String get notificationsTitle => 'Thông báo';
 
   @override

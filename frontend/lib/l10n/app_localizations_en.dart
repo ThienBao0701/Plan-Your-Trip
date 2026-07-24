@@ -769,6 +769,526 @@ class AppLocalizationsEn extends AppLocalizations {
   String get savedPlacesRemoved => 'Removed from local saved places.';
 
   @override
+  String get savedPlacesSubtitle =>
+      'Your saved travel shortlist, resolved from current public place data.';
+
+  @override
+  String get savedPlacesDemoBoundary =>
+      'Demo Mode saves are local presentation data. They are not synchronized with the wishlist API.';
+
+  @override
+  String get savedPlacesEmptyTitle => 'No saved places yet';
+
+  @override
+  String get savedPlacesEmptyMessage =>
+      'Save a public place from Explore, search, category discovery, or place details.';
+
+  @override
+  String savedPlacesCountSemantic(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count saved places',
+      one: '1 saved place',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get savedPlacesFilterSemantic => 'Saved place filters';
+
+  @override
+  String get savedPlacesSortNewest => 'Newest saved';
+
+  @override
+  String get savedPlacesSortName => 'Name';
+
+  @override
+  String savedPlacesCollectionCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count collections',
+      one: '1 collection',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String savedPlacesCollectionCountSemantic(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count saved collections',
+      one: '1 saved collection',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String savedPlacesAllSavedTab(int count) {
+    return 'All saved ($count)';
+  }
+
+  @override
+  String savedPlacesCollectionsTab(int count) {
+    return 'Collections ($count)';
+  }
+
+  @override
+  String get savedPlacesSectionTabsSemantic => 'Saved places sections';
+
+  @override
+  String get savedPlacesWishlistBoundaryTitle => 'Wishlist and notes';
+
+  @override
+  String get savedPlacesWishlistBoundaryMessage =>
+      'The wishlist and private notes are local Demo Mode data until backend persistence is connected.';
+
+  @override
+  String get savedPlacesCollectionsTitle => 'Collections';
+
+  @override
+  String get savedPlacesCollectionsBoundaryMessage =>
+      'Collections are separate local Demo Mode lists aligned to /api/me/collections. Adding a place to a collection does not change the wishlist.';
+
+  @override
+  String get savedPlacesCollectionCreateAction => 'Create collection';
+
+  @override
+  String get savedPlacesCollectionCreateSemantic => 'Create a saved collection';
+
+  @override
+  String get savedPlacesCollectionsEmptyTitle => 'No collections yet';
+
+  @override
+  String get savedPlacesCollectionsEmptyMessage =>
+      'Create a private collection for a destination, weekend idea, or shortlist.';
+
+  @override
+  String savedPlacesCollectionItemCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count places',
+      one: '1 place',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String savedPlacesCollectionItemCountSemantic(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count places in collection',
+      one: '1 place in collection',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String savedPlacesCollectionCardSemantic(String collection, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count places',
+      one: '1 place',
+    );
+    return '$collection, $_temp0';
+  }
+
+  @override
+  String get savedPlacesCollectionPrivateLabel => 'Private';
+
+  @override
+  String get savedPlacesCollectionVisibleLabel => 'Visible';
+
+  @override
+  String savedPlacesCollectionUpdated(String date) {
+    return 'Updated $date';
+  }
+
+  @override
+  String get savedPlacesCollectionOpenAction => 'Open';
+
+  @override
+  String savedPlacesCollectionOpenSemantic(String collection) {
+    return 'Open collection $collection';
+  }
+
+  @override
+  String get savedPlacesCollectionEditAction => 'Edit';
+
+  @override
+  String savedPlacesCollectionEditSemantic(String collection) {
+    return 'Edit collection $collection';
+  }
+
+  @override
+  String savedPlacesCollectionDeleteSemantic(String collection) {
+    return 'Delete collection $collection';
+  }
+
+  @override
+  String savedPlacesCollectionDetailSemantic(String collection, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count places',
+      one: '1 place',
+    );
+    return '$collection, $_temp0';
+  }
+
+  @override
+  String get savedPlacesCollectionBackAction => 'Collections';
+
+  @override
+  String get savedPlacesCollectionBackSemantic => 'Back to saved collections';
+
+  @override
+  String get savedPlacesCollectionAddSavedAction => 'Add saved place';
+
+  @override
+  String savedPlacesCollectionAddSavedSemantic(String collection) {
+    return 'Add a saved place to $collection';
+  }
+
+  @override
+  String get savedPlacesCollectionEmptyTitle => 'Collection is empty';
+
+  @override
+  String get savedPlacesCollectionEmptyMessage =>
+      'Add an already-saved public place. This will not change your wishlist.';
+
+  @override
+  String savedPlacesCollectionPlaceSemantic(String place, String date) {
+    return '$place, added $date';
+  }
+
+  @override
+  String savedPlacesCollectionAddedOn(String date) {
+    return 'Added $date';
+  }
+
+  @override
+  String get savedPlacesCollectionRemovePlaceAction => 'Remove';
+
+  @override
+  String savedPlacesCollectionRemovePlaceSemantic(String place) {
+    return 'Remove $place from this collection';
+  }
+
+  @override
+  String get savedPlacesCollectionStaleItemTitle =>
+      'Collection item unavailable';
+
+  @override
+  String savedPlacesCollectionStaleItemMessage(int placeId) {
+    return 'Place reference $placeId no longer resolves to public place data.';
+  }
+
+  @override
+  String get savedPlacesCollectionRemoveStaleSemantic =>
+      'Remove unavailable place from collection';
+
+  @override
+  String savedPlacesCollectionMembershipIn(String collection) {
+    return 'In $collection';
+  }
+
+  @override
+  String savedPlacesCollectionMembershipOut(String collection) {
+    return 'Not in $collection';
+  }
+
+  @override
+  String savedPlacesCollectionRemoveMembershipSemantic(
+      String place, String collection) {
+    return 'Remove $place from $collection';
+  }
+
+  @override
+  String savedPlacesCollectionAddMembershipSemantic(
+      String place, String collection) {
+    return 'Add $place to $collection';
+  }
+
+  @override
+  String get savedPlacesCollectionInAction => 'Added';
+
+  @override
+  String get savedPlacesCollectionAddAction => 'Add';
+
+  @override
+  String get savedPlacesCollectionEditTitle => 'Edit collection';
+
+  @override
+  String get savedPlacesCollectionCreateTitle => 'Create collection';
+
+  @override
+  String get savedPlacesCollectionNameLabel => 'Collection name';
+
+  @override
+  String savedPlacesCollectionNameHelper(int maxLength) {
+    return 'Required, up to $maxLength characters.';
+  }
+
+  @override
+  String get savedPlacesCollectionDescriptionLabel => 'Description';
+
+  @override
+  String savedPlacesCollectionDescriptionHelper(int maxLength) {
+    return 'Optional, up to $maxLength characters.';
+  }
+
+  @override
+  String get savedPlacesCollectionCoverLabel => 'Cover image URL';
+
+  @override
+  String savedPlacesCollectionCoverHelper(int maxLength) {
+    return 'Optional URL text, up to $maxLength characters.';
+  }
+
+  @override
+  String get savedPlacesCollectionPrivateHelper =>
+      'All collection endpoints are owner-scoped in this phase.';
+
+  @override
+  String get savedPlacesCollectionSaveAction => 'Save collection';
+
+  @override
+  String savedPlacesCollectionCreatedMessage(String collection) {
+    return 'Created collection $collection.';
+  }
+
+  @override
+  String savedPlacesCollectionUpdatedMessage(String collection) {
+    return 'Updated collection $collection.';
+  }
+
+  @override
+  String savedPlacesCollectionDeleteTitle(String collection) {
+    return 'Delete $collection?';
+  }
+
+  @override
+  String savedPlacesCollectionDeleteMessage(String collection) {
+    return 'Delete $collection? Only collection membership is removed. Places, wishlist notes, trips, bookings, reviews, and documents are preserved.';
+  }
+
+  @override
+  String get savedPlacesCollectionDeleteAction => 'Delete collection';
+
+  @override
+  String savedPlacesCollectionDeletedMessage(String collection) {
+    return 'Deleted collection $collection.';
+  }
+
+  @override
+  String savedPlacesCollectionAddSavedTitle(String collection) {
+    return 'Add saved places to $collection';
+  }
+
+  @override
+  String get savedPlacesCollectionAddSavedMessage =>
+      'Only current saved places are listed. Collection membership stays separate from the wishlist.';
+
+  @override
+  String savedPlacesManageCollectionsTitle(String place) {
+    return 'Collections for $place';
+  }
+
+  @override
+  String get savedPlacesManageCollectionsMessage =>
+      'Add or remove this saved place from private Demo Mode collections.';
+
+  @override
+  String get savedPlacesCollectionSavedMessage => 'Collection updated.';
+
+  @override
+  String get savedPlacesCollectionsRealUnavailableMessage =>
+      'Saved collections are not connected to the backend yet for real accounts.';
+
+  @override
+  String savedPlacesCollectionInvalidNameMessage(int maxLength) {
+    return 'Collection name is required and limited to $maxLength characters.';
+  }
+
+  @override
+  String savedPlacesCollectionInvalidDescriptionMessage(int maxLength) {
+    return 'Collection description is limited to $maxLength characters.';
+  }
+
+  @override
+  String savedPlacesCollectionInvalidCoverMessage(int maxLength) {
+    return 'Collection cover URL is limited to $maxLength characters.';
+  }
+
+  @override
+  String savedPlacesCollectionLimitMessage(int maxCount) {
+    return 'You have reached the local limit of $maxCount collections.';
+  }
+
+  @override
+  String get savedPlacesCollectionNotFoundMessage =>
+      'This collection is unavailable.';
+
+  @override
+  String get savedPlacesCollectionPlaceNotFoundMessage =>
+      'This place cannot be added because it no longer resolves to public place data.';
+
+  @override
+  String savedPlacesCollectionDuplicatePlaceMessage(
+      String place, String collection) {
+    return '$place is already in $collection.';
+  }
+
+  @override
+  String get savedPlacesCollectionItemNotFoundMessage =>
+      'This place is not in the selected collection.';
+
+  @override
+  String savedPlacesCollectionItemLimitMessage(int maxCount) {
+    return 'This collection has reached the local limit of $maxCount places.';
+  }
+
+  @override
+  String savedPlacesCollectionAddedPlaceMessage(
+      String place, String collection) {
+    return 'Added $place to $collection.';
+  }
+
+  @override
+  String savedPlacesCollectionRemovedPlaceMessage(
+      String place, String collection) {
+    return 'Removed $place from $collection.';
+  }
+
+  @override
+  String get savedPlacesAddToCollectionAction => 'Collections';
+
+  @override
+  String savedPlacesManageCollectionsSemantic(String place) {
+    return 'Manage collections for $place';
+  }
+
+  @override
+  String savedPlacesSavedOn(String date) {
+    return 'Saved $date';
+  }
+
+  @override
+  String savedPlacesNote(String note) {
+    return 'Note: $note';
+  }
+
+  @override
+  String get savedPlacesEditNoteAction => 'Edit note';
+
+  @override
+  String savedPlacesEditNoteSemantic(String place) {
+    return 'Edit private note for $place';
+  }
+
+  @override
+  String savedPlacesEditNoteTitle(String place) {
+    return 'Private note for $place';
+  }
+
+  @override
+  String get savedPlacesNoteFieldLabel => 'Private note';
+
+  @override
+  String savedPlacesNoteFieldHelper(int maxLength) {
+    return 'Up to $maxLength characters. Leave blank to clear it.';
+  }
+
+  @override
+  String get savedPlacesNoteSaveAction => 'Save note';
+
+  @override
+  String savedPlacesNoteSavedMessage(String place) {
+    return 'Updated the private note for $place.';
+  }
+
+  @override
+  String get savedPlacesNoteTooLongMessage =>
+      'Private notes are limited to 500 characters.';
+
+  @override
+  String savedPlacesSaveSemantic(String place) {
+    return 'Save $place';
+  }
+
+  @override
+  String savedPlacesRemoveSemantic(String place) {
+    return 'Remove saved place $place';
+  }
+
+  @override
+  String savedPlacesSavedMessage(String place) {
+    return 'Saved $place locally.';
+  }
+
+  @override
+  String savedPlacesAlreadySavedMessage(String place) {
+    return '$place is already saved.';
+  }
+
+  @override
+  String savedPlacesRemovedPlace(String place) {
+    return 'Removed $place from local saved places.';
+  }
+
+  @override
+  String get savedPlacesActionForbiddenMessage =>
+      'This saved place belongs to another traveler.';
+
+  @override
+  String get savedPlacesMissingTitle => 'Saved place unavailable';
+
+  @override
+  String get savedPlacesMissingMessage =>
+      'This saved place no longer resolves to a public place.';
+
+  @override
+  String savedPlacesMissingRecordMessage(int placeId) {
+    return 'Saved place reference $placeId no longer resolves to public place data.';
+  }
+
+  @override
+  String get savedPlacesRemoveAction => 'Remove';
+
+  @override
+  String get savedPlacesRemoveConfirmTitle => 'Remove saved place?';
+
+  @override
+  String savedPlacesRemoveConfirmMessage(String place) {
+    return 'Remove $place from your local saved places? The place, trips, bookings, reviews, and wallet items will not be deleted.';
+  }
+
+  @override
+  String get savedPlacesRemoveConfirmAction => 'Remove saved place';
+
+  @override
+  String get savedPlacesViewDetailsAction => 'Details';
+
+  @override
+  String savedPlacesOpenDetailSemantic(String place) {
+    return 'Open details for $place';
+  }
+
+  @override
+  String get savedPlacesHotelAction => 'View rooms';
+
+  @override
+  String savedPlacesCardSemantic(String place, String date) {
+    return '$place, saved $date';
+  }
+
+  @override
   String get notificationsTitle => 'Notifications';
 
   @override

@@ -35,6 +35,11 @@ class AppState extends ChangeNotifier {
   bool reduceMotionEnabled = false;
 
   List<Place> places = List.from(MockData.places);
+  List<SavedPlaceRecord> savedPlaces = List.from(MockData.demoSavedPlaces);
+  List<SavedCollectionRecord> savedCollections =
+      List.from(MockData.demoSavedCollections);
+  List<SavedCollectionPlaceRecord> savedCollectionPlaces =
+      List.from(MockData.demoSavedCollectionPlaces);
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -115,6 +120,9 @@ class AppState extends ChangeNotifier {
     email = null;
     demoMode = true;
     places = List.from(MockData.places);
+    savedPlaces = List.from(MockData.demoSavedPlaces);
+    savedCollections = List.from(MockData.demoSavedCollections);
+    savedCollectionPlaces = List.from(MockData.demoSavedCollectionPlaces);
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -136,6 +144,9 @@ class AppState extends ChangeNotifier {
 
   void _applyPersonalDataMode() {
     if (demoMode) {
+      savedPlaces = List.from(MockData.demoSavedPlaces);
+      savedCollections = List.from(MockData.demoSavedCollections);
+      savedCollectionPlaces = List.from(MockData.demoSavedCollectionPlaces);
       trips = List.from(MockData.trips);
       timeline = List.from(MockData.timeline);
       expenses = List.from(MockData.expenses);
@@ -155,6 +166,9 @@ class AppState extends ChangeNotifier {
       return;
     }
     trips = [];
+    savedPlaces = [];
+    savedCollections = [];
+    savedCollectionPlaces = [];
     timeline = [];
     expenses = [];
     demoBookings = [];
@@ -291,6 +305,380 @@ class AppState extends ChangeNotifier {
   }
 
   // ── Places ────────────────────────────────────────────────────────────────
+
+  List<SavedPlaceRecord> get visibleSavedPlaces {
+    if (!demoMode) return const <SavedPlaceRecord>[];
+    final ownerId = currentDemoUser.id;
+    final newestByPlace = <int, SavedPlaceRecord>{};
+    for (final record
+        in savedPlaces.where((item) => item.ownerUserId == ownerId)) {
+      final existing = newestByPlace[record.placeId];
+      if (existing == null || _compareSavedPlaces(record, existing) < 0) {
+        newestByPlace[record.placeId] = record;
+      }
+    }
+    return newestByPlace.values.toList()..sort(_compareSavedPlaces);
+  }
+
+  int get savedPlaceCount => visibleSavedPlaces.length;
+
+  bool isPlaceSaved(int placeId) =>
+      demoMode && visibleSavedPlaces.any((record) => record.placeId == placeId);
+
+  SavedPlaceRecord? savedPlaceForPlaceId(int placeId) {
+    if (!demoMode) return null;
+    return _firstWhereOrNull(
+      visibleSavedPlaces,
+      (record) => record.placeId == placeId,
+    );
+  }
+
+  SavedPlaceRecord? savedPlaceById(String id) {
+    if (!demoMode) return null;
+    return _firstWhereOrNull(
+      visibleSavedPlaces,
+      (record) => record.id == id,
+    );
+  }
+
+  List<ResolvedSavedPlace> savedPlaceResults({
+    String query = '',
+    String? category,
+    SavedPlaceSort sort = SavedPlaceSort.newest,
+    bool includeMissing = true,
+  }) {
+    final normalizedQuery = normalizeSearchText(query);
+    final normalizedCategory = category == null || category.trim().isEmpty
+        ? null
+        : normalizeSearchText(category);
+    final results = <ResolvedSavedPlace>[];
+    for (final record in visibleSavedPlaces) {
+      final place = placeById(record.placeId);
+      if (place == null) {
+        final missingText =
+            normalizeSearchText('${record.id} ${record.note ?? ''}');
+        if (includeMissing &&
+            normalizedCategory == null &&
+            (normalizedQuery.isEmpty ||
+                missingText.contains(normalizedQuery))) {
+          results.add(ResolvedSavedPlace(record: record, place: null));
+        }
+        continue;
+      }
+      if (normalizedCategory != null &&
+          normalizeSearchText(place.category) != normalizedCategory &&
+          normalizeSearchText(place.effectiveCategorySlug) !=
+              normalizedCategory) {
+        continue;
+      }
+      if (normalizedQuery.isNotEmpty &&
+          !_savedPlaceMatchesQuery(record, place, normalizedQuery)) {
+        continue;
+      }
+      results.add(ResolvedSavedPlace(record: record, place: place));
+    }
+    switch (sort) {
+      case SavedPlaceSort.newest:
+        results.sort((a, b) => _compareSavedPlaces(a.record, b.record));
+        break;
+      case SavedPlaceSort.name:
+        results.sort((a, b) {
+          final aName = a.place?.name ?? '';
+          final bName = b.place?.name ?? '';
+          final name =
+              normalizeSearchText(aName).compareTo(normalizeSearchText(bName));
+          if (name != 0) return name;
+          return _compareSavedPlaces(a.record, b.record);
+        });
+        break;
+    }
+    return results;
+  }
+
+  List<String> get savedPlaceCategories {
+    final categories = <String>{};
+    for (final record in visibleSavedPlaces) {
+      final place = placeById(record.placeId);
+      if (place != null && place.category.trim().isNotEmpty) {
+        categories.add(place.category);
+      }
+    }
+    return categories.toList()..sort();
+  }
+
+  SavedPlaceActionResult savePlace(int placeId, {String? note}) {
+    if (!demoMode) return SavedPlaceActionResult.unavailable;
+    final place = placeById(placeId);
+    if (place == null) return SavedPlaceActionResult.notFound;
+    if (isPlaceSaved(placeId)) return SavedPlaceActionResult.duplicate;
+    if (_savedPlaceNoteTooLong(note)) {
+      return SavedPlaceActionResult.invalidNote;
+    }
+    final owner = currentDemoUser;
+    final savedAt = now().toUtc();
+    savedPlaces = [
+      ...savedPlaces,
+      SavedPlaceRecord(
+        id: 'wishlist-demo-$placeId',
+        ownerUserId: owner.id,
+        placeId: place.id,
+        savedAt: savedAt,
+        note: note,
+      ),
+    ];
+    notifyListeners();
+    return SavedPlaceActionResult.success;
+  }
+
+  SavedPlaceActionResult removeSavedPlace(int placeId) {
+    if (!demoMode) return SavedPlaceActionResult.unavailable;
+    final ownerId = currentDemoUser.id;
+    final index = savedPlaces.indexWhere(
+      (record) => record.ownerUserId == ownerId && record.placeId == placeId,
+    );
+    if (index < 0) {
+      return savedPlaces.any((record) => record.placeId == placeId)
+          ? SavedPlaceActionResult.forbidden
+          : SavedPlaceActionResult.notFound;
+    }
+    savedPlaces = [
+      for (var i = 0; i < savedPlaces.length; i++)
+        if (i != index) savedPlaces[i],
+    ];
+    notifyListeners();
+    return SavedPlaceActionResult.success;
+  }
+
+  SavedPlaceActionResult updateSavedPlaceNote(int placeId, String? note) {
+    if (!demoMode) return SavedPlaceActionResult.unavailable;
+    if (_savedPlaceNoteTooLong(note)) {
+      return SavedPlaceActionResult.invalidNote;
+    }
+    final ownerId = currentDemoUser.id;
+    final index = savedPlaces.indexWhere(
+      (record) => record.ownerUserId == ownerId && record.placeId == placeId,
+    );
+    if (index < 0) {
+      return savedPlaces.any((record) => record.placeId == placeId)
+          ? SavedPlaceActionResult.forbidden
+          : SavedPlaceActionResult.notFound;
+    }
+    final current = savedPlaces[index];
+    if (current.note == note) return SavedPlaceActionResult.success;
+    savedPlaces = [
+      for (var i = 0; i < savedPlaces.length; i++)
+        i == index ? current.copyWith(note: note) : savedPlaces[i],
+    ];
+    notifyListeners();
+    return SavedPlaceActionResult.success;
+  }
+
+  List<SavedCollectionRecord> get visibleSavedCollections {
+    if (!demoMode) return const <SavedCollectionRecord>[];
+    final ownerId = currentDemoUser.id;
+    return savedCollections
+        .where((collection) => collection.ownerUserId == ownerId)
+        .toList()
+      ..sort(_compareSavedCollections);
+  }
+
+  int get savedCollectionCount => visibleSavedCollections.length;
+
+  SavedCollectionRecord? savedCollectionById(String id) {
+    if (!demoMode) return null;
+    return _firstWhereOrNull(
+      visibleSavedCollections,
+      (collection) => collection.id == id,
+    );
+  }
+
+  List<SavedCollectionPlaceRecord> savedCollectionItems(String collectionId) {
+    final collection = savedCollectionById(collectionId);
+    if (collection == null) return const <SavedCollectionPlaceRecord>[];
+    return savedCollectionPlaces
+        .where((item) => item.collectionId == collection.id)
+        .toList()
+      ..sort(_compareSavedCollectionPlaces);
+  }
+
+  List<ResolvedCollectionPlace> resolvedCollectionPlaces(String collectionId) {
+    return savedCollectionItems(collectionId)
+        .map(
+          (item) => ResolvedCollectionPlace(
+            record: item,
+            place: placeById(item.placeId),
+          ),
+        )
+        .toList();
+  }
+
+  int savedCollectionItemCount(String collectionId) =>
+      savedCollectionItems(collectionId).length;
+
+  bool isPlaceInCollection({
+    required String collectionId,
+    required int placeId,
+  }) =>
+      savedCollectionItems(collectionId).any((item) => item.placeId == placeId);
+
+  SavedCollectionActionResult createSavedCollection({
+    required String name,
+    String? description,
+    String? coverImageUrl,
+    bool privateCollection = true,
+    int? sortOrder,
+  }) {
+    if (!demoMode) return SavedCollectionActionResult.unavailable;
+    final validation = _validateCollectionFields(
+      name: name,
+      description: description,
+      coverImageUrl: coverImageUrl,
+    );
+    if (validation != null) return validation;
+    if (visibleSavedCollections.length >=
+        SavedCollectionRecord.maxCollectionsPerUser) {
+      return SavedCollectionActionResult.collectionLimitReached;
+    }
+    final timestamp = now().toUtc();
+    final order = sortOrder ?? _nextCollectionSortOrder();
+    savedCollections = [
+      ...savedCollections,
+      SavedCollectionRecord(
+        id: 'collection-demo-${_collectionSlug(name)}-$order',
+        ownerUserId: currentDemoUser.id,
+        name: name,
+        description: description,
+        coverImageUrl: coverImageUrl,
+        privateCollection: privateCollection,
+        sortOrder: order,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      ),
+    ];
+    notifyListeners();
+    return SavedCollectionActionResult.success;
+  }
+
+  SavedCollectionActionResult updateSavedCollection({
+    required String collectionId,
+    required String name,
+    String? description,
+    String? coverImageUrl,
+    bool? privateCollection,
+    int? sortOrder,
+  }) {
+    if (!demoMode) return SavedCollectionActionResult.unavailable;
+    final index = _visibleSavedCollectionIndex(collectionId);
+    if (index < 0) return SavedCollectionActionResult.collectionNotFound;
+    final validation = _validateCollectionFields(
+      name: name,
+      description: description,
+      coverImageUrl: coverImageUrl,
+    );
+    if (validation != null) return validation;
+    final current = savedCollections[index];
+    final updated = current.copyWith(
+      name: name,
+      description: description,
+      coverImageUrl: coverImageUrl,
+      privateCollection: privateCollection ?? current.privateCollection,
+      sortOrder: sortOrder ?? current.sortOrder,
+      updatedAt: now().toUtc(),
+    );
+    savedCollections = [
+      for (var i = 0; i < savedCollections.length; i++)
+        i == index ? updated : savedCollections[i],
+    ];
+    notifyListeners();
+    return SavedCollectionActionResult.success;
+  }
+
+  SavedCollectionActionResult deleteSavedCollection(String collectionId) {
+    if (!demoMode) return SavedCollectionActionResult.unavailable;
+    final index = _visibleSavedCollectionIndex(collectionId);
+    if (index < 0) return SavedCollectionActionResult.collectionNotFound;
+    savedCollections = [
+      for (var i = 0; i < savedCollections.length; i++)
+        if (i != index) savedCollections[i],
+    ];
+    savedCollectionPlaces = savedCollectionPlaces
+        .where((item) => item.collectionId != collectionId)
+        .toList();
+    notifyListeners();
+    return SavedCollectionActionResult.success;
+  }
+
+  SavedCollectionActionResult addPlaceToCollection({
+    required String collectionId,
+    required int placeId,
+  }) {
+    if (!demoMode) return SavedCollectionActionResult.unavailable;
+    final collectionIndex = _visibleSavedCollectionIndex(collectionId);
+    if (collectionIndex < 0) {
+      return SavedCollectionActionResult.collectionNotFound;
+    }
+    final place = placeById(placeId);
+    if (place == null) return SavedCollectionActionResult.placeNotFound;
+    final existing = savedCollectionPlaces.any(
+      (item) => item.collectionId == collectionId && item.placeId == placeId,
+    );
+    if (existing) return SavedCollectionActionResult.duplicateItem;
+    final items = savedCollectionItems(collectionId);
+    if (items.length >= SavedCollectionPlaceRecord.maxPlacesPerCollection) {
+      return SavedCollectionActionResult.itemLimitReached;
+    }
+    final nextPosition = items.isEmpty
+        ? 0
+        : items.map((item) => item.position).reduce((a, b) => a > b ? a : b) +
+            1;
+    final timestamp = now().toUtc();
+    savedCollectionPlaces = [
+      ...savedCollectionPlaces,
+      SavedCollectionPlaceRecord(
+        id: '$collectionId-place-$placeId-$nextPosition',
+        collectionId: collectionId,
+        placeId: placeId,
+        position: nextPosition,
+        addedAt: timestamp,
+      ),
+    ];
+    savedCollections = [
+      for (var i = 0; i < savedCollections.length; i++)
+        i == collectionIndex
+            ? savedCollections[i].copyWith(updatedAt: timestamp)
+            : savedCollections[i],
+    ];
+    notifyListeners();
+    return SavedCollectionActionResult.success;
+  }
+
+  SavedCollectionActionResult removePlaceFromCollection({
+    required String collectionId,
+    required int placeId,
+  }) {
+    if (!demoMode) return SavedCollectionActionResult.unavailable;
+    final collectionIndex = _visibleSavedCollectionIndex(collectionId);
+    if (collectionIndex < 0) {
+      return SavedCollectionActionResult.collectionNotFound;
+    }
+    final itemIndex = savedCollectionPlaces.indexWhere(
+      (item) => item.collectionId == collectionId && item.placeId == placeId,
+    );
+    if (itemIndex < 0) return SavedCollectionActionResult.itemNotFound;
+    final timestamp = now().toUtc();
+    savedCollectionPlaces = [
+      for (var i = 0; i < savedCollectionPlaces.length; i++)
+        if (i != itemIndex) savedCollectionPlaces[i],
+    ];
+    savedCollections = [
+      for (var i = 0; i < savedCollections.length; i++)
+        i == collectionIndex
+            ? savedCollections[i].copyWith(updatedAt: timestamp)
+            : savedCollections[i],
+    ];
+    notifyListeners();
+    return SavedCollectionActionResult.success;
+  }
 
   List<Place> filteredPlaces(PlaceQuery q) {
     var result = places;
@@ -2420,6 +2808,175 @@ class AppState extends ChangeNotifier {
   ) {
     final created = b.createdAt.compareTo(a.createdAt);
     return created == 0 ? a.id.compareTo(b.id) : created;
+  }
+
+  static int _compareSavedPlaces(SavedPlaceRecord a, SavedPlaceRecord b) {
+    final saved = b.savedAt.compareTo(a.savedAt);
+    return saved == 0 ? a.id.compareTo(b.id) : saved;
+  }
+
+  static int _compareSavedCollections(
+    SavedCollectionRecord a,
+    SavedCollectionRecord b,
+  ) {
+    final order = a.sortOrder.compareTo(b.sortOrder);
+    if (order != 0) return order;
+    final created = a.createdAt.compareTo(b.createdAt);
+    return created == 0 ? a.id.compareTo(b.id) : created;
+  }
+
+  static int _compareSavedCollectionPlaces(
+    SavedCollectionPlaceRecord a,
+    SavedCollectionPlaceRecord b,
+  ) {
+    final position = a.position.compareTo(b.position);
+    if (position != 0) return position;
+    final added = a.addedAt.compareTo(b.addedAt);
+    return added == 0 ? a.id.compareTo(b.id) : added;
+  }
+
+  static bool _savedPlaceMatchesQuery(
+    SavedPlaceRecord record,
+    Place place,
+    String normalizedQuery,
+  ) {
+    if (normalizedQuery.isEmpty) return true;
+    final haystack = normalizeSearchText([
+      place.name,
+      place.category,
+      place.locationName,
+      place.city,
+      place.province,
+      place.description,
+      place.tags.join(' '),
+      record.note ?? '',
+    ].join(' '));
+    return haystack.contains(normalizedQuery);
+  }
+
+  static bool _savedPlaceNoteTooLong(String? value) =>
+      value != null && value.length > SavedPlaceRecord.maxNoteLength;
+
+  int _visibleSavedCollectionIndex(String collectionId) {
+    if (!demoMode) return -1;
+    final ownerId = currentDemoUser.id;
+    return savedCollections.indexWhere(
+      (collection) =>
+          collection.id == collectionId && collection.ownerUserId == ownerId,
+    );
+  }
+
+  int _nextCollectionSortOrder() {
+    final collections = visibleSavedCollections;
+    if (collections.isEmpty) return 0;
+    return collections
+            .map((collection) => collection.sortOrder)
+            .reduce((a, b) => a > b ? a : b) +
+        1;
+  }
+
+  static SavedCollectionActionResult? _validateCollectionFields({
+    required String name,
+    String? description,
+    String? coverImageUrl,
+  }) {
+    if (name.trim().isEmpty ||
+        name.length > SavedCollectionRecord.maxNameLength) {
+      return SavedCollectionActionResult.invalidName;
+    }
+    if (description != null &&
+        description.length > SavedCollectionRecord.maxDescriptionLength) {
+      return SavedCollectionActionResult.invalidDescription;
+    }
+    if (coverImageUrl != null &&
+        coverImageUrl.length > SavedCollectionRecord.maxCoverImageUrlLength) {
+      return SavedCollectionActionResult.invalidCover;
+    }
+    return null;
+  }
+
+  static String _collectionSlug(String name) {
+    final normalized = normalizeSearchText(name)
+        .replaceAll(RegExp(r'[^a-z0-9]+'), '-')
+        .replaceAll(RegExp(r'^-+|-+$'), '');
+    return normalized.isEmpty ? 'collection' : normalized;
+  }
+
+  static String normalizeSearchText(String value) {
+    var normalized = value.trim().toLowerCase();
+    const replacements = {
+      'à': 'a',
+      'á': 'a',
+      'ạ': 'a',
+      'ả': 'a',
+      'ã': 'a',
+      'â': 'a',
+      'ầ': 'a',
+      'ấ': 'a',
+      'ậ': 'a',
+      'ẩ': 'a',
+      'ẫ': 'a',
+      'ă': 'a',
+      'ằ': 'a',
+      'ắ': 'a',
+      'ặ': 'a',
+      'ẳ': 'a',
+      'ẵ': 'a',
+      'è': 'e',
+      'é': 'e',
+      'ẹ': 'e',
+      'ẻ': 'e',
+      'ẽ': 'e',
+      'ê': 'e',
+      'ề': 'e',
+      'ế': 'e',
+      'ệ': 'e',
+      'ể': 'e',
+      'ễ': 'e',
+      'ì': 'i',
+      'í': 'i',
+      'ị': 'i',
+      'ỉ': 'i',
+      'ĩ': 'i',
+      'ò': 'o',
+      'ó': 'o',
+      'ọ': 'o',
+      'ỏ': 'o',
+      'õ': 'o',
+      'ô': 'o',
+      'ồ': 'o',
+      'ố': 'o',
+      'ộ': 'o',
+      'ổ': 'o',
+      'ỗ': 'o',
+      'ơ': 'o',
+      'ờ': 'o',
+      'ớ': 'o',
+      'ợ': 'o',
+      'ở': 'o',
+      'ỡ': 'o',
+      'ù': 'u',
+      'ú': 'u',
+      'ụ': 'u',
+      'ủ': 'u',
+      'ũ': 'u',
+      'ư': 'u',
+      'ừ': 'u',
+      'ứ': 'u',
+      'ự': 'u',
+      'ử': 'u',
+      'ữ': 'u',
+      'ỳ': 'y',
+      'ý': 'y',
+      'ỵ': 'y',
+      'ỷ': 'y',
+      'ỹ': 'y',
+      'đ': 'd',
+    };
+    for (final entry in replacements.entries) {
+      normalized = normalized.replaceAll(entry.key, entry.value);
+    }
+    return normalized.replaceAll(RegExp(r'\s+'), ' ');
   }
 
   WalletActionResult _updateWalletFlag(

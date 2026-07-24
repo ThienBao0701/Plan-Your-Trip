@@ -407,7 +407,7 @@ void main() {
     );
 
     expect(find.text('Mây Lang Thang Villa'), findsOneWidget);
-    expect(find.text('4 places'), findsOneWidget);
+    expect(find.text('4 places'), findsWidgets);
   });
 
   testWidgets('notifications show real empty state and demo notifications',
@@ -493,7 +493,7 @@ void main() {
         const Size(390, 900),
       );
       expect(
-        find.bySemanticsLabel(RegExp('Saved bookmark for')),
+        find.bySemanticsLabel(RegExp('Remove saved place')),
         findsWidgets,
       );
 

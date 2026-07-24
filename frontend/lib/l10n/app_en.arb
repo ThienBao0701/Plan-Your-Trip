@@ -358,6 +358,539 @@
     }
   },
   "savedPlacesRemoved": "Removed from local saved places.",
+  "savedPlacesSubtitle": "Your saved travel shortlist, resolved from current public place data.",
+  "savedPlacesDemoBoundary": "Demo Mode saves are local presentation data. They are not synchronized with the wishlist API.",
+  "savedPlacesEmptyTitle": "No saved places yet",
+  "savedPlacesEmptyMessage": "Save a public place from Explore, search, category discovery, or place details.",
+  "savedPlacesCountSemantic": "{count, plural, =1{1 saved place} other{{count} saved places}}",
+  "@savedPlacesCountSemantic": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesFilterSemantic": "Saved place filters",
+  "savedPlacesSortNewest": "Newest saved",
+  "savedPlacesSortName": "Name",
+  "savedPlacesCollectionCount": "{count, plural, =1{1 collection} other{{count} collections}}",
+  "@savedPlacesCollectionCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesCollectionCountSemantic": "{count, plural, =1{1 saved collection} other{{count} saved collections}}",
+  "@savedPlacesCollectionCountSemantic": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesAllSavedTab": "All saved ({count})",
+  "@savedPlacesAllSavedTab": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesCollectionsTab": "Collections ({count})",
+  "@savedPlacesCollectionsTab": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesSectionTabsSemantic": "Saved places sections",
+  "savedPlacesWishlistBoundaryTitle": "Wishlist and notes",
+  "savedPlacesWishlistBoundaryMessage": "The wishlist and private notes are local Demo Mode data until backend persistence is connected.",
+  "savedPlacesCollectionsTitle": "Collections",
+  "savedPlacesCollectionsBoundaryMessage": "Collections are separate local Demo Mode lists aligned to /api/me/collections. Adding a place to a collection does not change the wishlist.",
+  "savedPlacesCollectionCreateAction": "Create collection",
+  "savedPlacesCollectionCreateSemantic": "Create a saved collection",
+  "savedPlacesCollectionsEmptyTitle": "No collections yet",
+  "savedPlacesCollectionsEmptyMessage": "Create a private collection for a destination, weekend idea, or shortlist.",
+  "savedPlacesCollectionItemCount": "{count, plural, =1{1 place} other{{count} places}}",
+  "@savedPlacesCollectionItemCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesCollectionItemCountSemantic": "{count, plural, =1{1 place in collection} other{{count} places in collection}}",
+  "@savedPlacesCollectionItemCountSemantic": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesCollectionCardSemantic": "{collection}, {count, plural, =1{1 place} other{{count} places}}",
+  "@savedPlacesCollectionCardSemantic": {
+    "placeholders": {
+      "collection": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesCollectionPrivateLabel": "Private",
+  "savedPlacesCollectionVisibleLabel": "Visible",
+  "savedPlacesCollectionUpdated": "Updated {date}",
+  "@savedPlacesCollectionUpdated": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionOpenAction": "Open",
+  "savedPlacesCollectionOpenSemantic": "Open collection {collection}",
+  "@savedPlacesCollectionOpenSemantic": {
+    "placeholders": {
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionEditAction": "Edit",
+  "savedPlacesCollectionEditSemantic": "Edit collection {collection}",
+  "@savedPlacesCollectionEditSemantic": {
+    "placeholders": {
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionDeleteSemantic": "Delete collection {collection}",
+  "@savedPlacesCollectionDeleteSemantic": {
+    "placeholders": {
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionDetailSemantic": "{collection}, {count, plural, =1{1 place} other{{count} places}}",
+  "@savedPlacesCollectionDetailSemantic": {
+    "placeholders": {
+      "collection": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesCollectionBackAction": "Collections",
+  "savedPlacesCollectionBackSemantic": "Back to saved collections",
+  "savedPlacesCollectionAddSavedAction": "Add saved place",
+  "savedPlacesCollectionAddSavedSemantic": "Add a saved place to {collection}",
+  "@savedPlacesCollectionAddSavedSemantic": {
+    "placeholders": {
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionEmptyTitle": "Collection is empty",
+  "savedPlacesCollectionEmptyMessage": "Add an already-saved public place. This will not change your wishlist.",
+  "savedPlacesCollectionPlaceSemantic": "{place}, added {date}",
+  "@savedPlacesCollectionPlaceSemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionAddedOn": "Added {date}",
+  "@savedPlacesCollectionAddedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionRemovePlaceAction": "Remove",
+  "savedPlacesCollectionRemovePlaceSemantic": "Remove {place} from this collection",
+  "@savedPlacesCollectionRemovePlaceSemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionStaleItemTitle": "Collection item unavailable",
+  "savedPlacesCollectionStaleItemMessage": "Place reference {placeId} no longer resolves to public place data.",
+  "@savedPlacesCollectionStaleItemMessage": {
+    "placeholders": {
+      "placeId": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesCollectionRemoveStaleSemantic": "Remove unavailable place from collection",
+  "savedPlacesCollectionMembershipIn": "In {collection}",
+  "@savedPlacesCollectionMembershipIn": {
+    "placeholders": {
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionMembershipOut": "Not in {collection}",
+  "@savedPlacesCollectionMembershipOut": {
+    "placeholders": {
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionRemoveMembershipSemantic": "Remove {place} from {collection}",
+  "@savedPlacesCollectionRemoveMembershipSemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      },
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionAddMembershipSemantic": "Add {place} to {collection}",
+  "@savedPlacesCollectionAddMembershipSemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      },
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionInAction": "Added",
+  "savedPlacesCollectionAddAction": "Add",
+  "savedPlacesCollectionEditTitle": "Edit collection",
+  "savedPlacesCollectionCreateTitle": "Create collection",
+  "savedPlacesCollectionNameLabel": "Collection name",
+  "savedPlacesCollectionNameHelper": "Required, up to {maxLength} characters.",
+  "@savedPlacesCollectionNameHelper": {
+    "placeholders": {
+      "maxLength": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesCollectionDescriptionLabel": "Description",
+  "savedPlacesCollectionDescriptionHelper": "Optional, up to {maxLength} characters.",
+  "@savedPlacesCollectionDescriptionHelper": {
+    "placeholders": {
+      "maxLength": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesCollectionCoverLabel": "Cover image URL",
+  "savedPlacesCollectionCoverHelper": "Optional URL text, up to {maxLength} characters.",
+  "@savedPlacesCollectionCoverHelper": {
+    "placeholders": {
+      "maxLength": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesCollectionPrivateHelper": "All collection endpoints are owner-scoped in this phase.",
+  "savedPlacesCollectionSaveAction": "Save collection",
+  "savedPlacesCollectionCreatedMessage": "Created collection {collection}.",
+  "@savedPlacesCollectionCreatedMessage": {
+    "placeholders": {
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionUpdatedMessage": "Updated collection {collection}.",
+  "@savedPlacesCollectionUpdatedMessage": {
+    "placeholders": {
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionDeleteTitle": "Delete {collection}?",
+  "@savedPlacesCollectionDeleteTitle": {
+    "placeholders": {
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionDeleteMessage": "Delete {collection}? Only collection membership is removed. Places, wishlist notes, trips, bookings, reviews, and documents are preserved.",
+  "@savedPlacesCollectionDeleteMessage": {
+    "placeholders": {
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionDeleteAction": "Delete collection",
+  "savedPlacesCollectionDeletedMessage": "Deleted collection {collection}.",
+  "@savedPlacesCollectionDeletedMessage": {
+    "placeholders": {
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionAddSavedTitle": "Add saved places to {collection}",
+  "@savedPlacesCollectionAddSavedTitle": {
+    "placeholders": {
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionAddSavedMessage": "Only current saved places are listed. Collection membership stays separate from the wishlist.",
+  "savedPlacesManageCollectionsTitle": "Collections for {place}",
+  "@savedPlacesManageCollectionsTitle": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesManageCollectionsMessage": "Add or remove this saved place from private Demo Mode collections.",
+  "savedPlacesCollectionSavedMessage": "Collection updated.",
+  "savedPlacesCollectionsRealUnavailableMessage": "Saved collections are not connected to the backend yet for real accounts.",
+  "savedPlacesCollectionInvalidNameMessage": "Collection name is required and limited to {maxLength} characters.",
+  "@savedPlacesCollectionInvalidNameMessage": {
+    "placeholders": {
+      "maxLength": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesCollectionInvalidDescriptionMessage": "Collection description is limited to {maxLength} characters.",
+  "@savedPlacesCollectionInvalidDescriptionMessage": {
+    "placeholders": {
+      "maxLength": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesCollectionInvalidCoverMessage": "Collection cover URL is limited to {maxLength} characters.",
+  "@savedPlacesCollectionInvalidCoverMessage": {
+    "placeholders": {
+      "maxLength": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesCollectionLimitMessage": "You have reached the local limit of {maxCount} collections.",
+  "@savedPlacesCollectionLimitMessage": {
+    "placeholders": {
+      "maxCount": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesCollectionNotFoundMessage": "This collection is unavailable.",
+  "savedPlacesCollectionPlaceNotFoundMessage": "This place cannot be added because it no longer resolves to public place data.",
+  "savedPlacesCollectionDuplicatePlaceMessage": "{place} is already in {collection}.",
+  "@savedPlacesCollectionDuplicatePlaceMessage": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      },
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionItemNotFoundMessage": "This place is not in the selected collection.",
+  "savedPlacesCollectionItemLimitMessage": "This collection has reached the local limit of {maxCount} places.",
+  "@savedPlacesCollectionItemLimitMessage": {
+    "placeholders": {
+      "maxCount": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesCollectionAddedPlaceMessage": "Added {place} to {collection}.",
+  "@savedPlacesCollectionAddedPlaceMessage": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      },
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionRemovedPlaceMessage": "Removed {place} from {collection}.",
+  "@savedPlacesCollectionRemovedPlaceMessage": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      },
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesAddToCollectionAction": "Collections",
+  "savedPlacesManageCollectionsSemantic": "Manage collections for {place}",
+  "@savedPlacesManageCollectionsSemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesSavedOn": "Saved {date}",
+  "@savedPlacesSavedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesNote": "Note: {note}",
+  "@savedPlacesNote": {
+    "placeholders": {
+      "note": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesEditNoteAction": "Edit note",
+  "savedPlacesEditNoteSemantic": "Edit private note for {place}",
+  "@savedPlacesEditNoteSemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesEditNoteTitle": "Private note for {place}",
+  "@savedPlacesEditNoteTitle": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesNoteFieldLabel": "Private note",
+  "savedPlacesNoteFieldHelper": "Up to {maxLength} characters. Leave blank to clear it.",
+  "@savedPlacesNoteFieldHelper": {
+    "placeholders": {
+      "maxLength": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesNoteSaveAction": "Save note",
+  "savedPlacesNoteSavedMessage": "Updated the private note for {place}.",
+  "@savedPlacesNoteSavedMessage": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesNoteTooLongMessage": "Private notes are limited to 500 characters.",
+  "savedPlacesSaveSemantic": "Save {place}",
+  "@savedPlacesSaveSemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesRemoveSemantic": "Remove saved place {place}",
+  "@savedPlacesRemoveSemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesSavedMessage": "Saved {place} locally.",
+  "@savedPlacesSavedMessage": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesAlreadySavedMessage": "{place} is already saved.",
+  "@savedPlacesAlreadySavedMessage": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesRemovedPlace": "Removed {place} from local saved places.",
+  "@savedPlacesRemovedPlace": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesActionForbiddenMessage": "This saved place belongs to another traveler.",
+  "savedPlacesMissingTitle": "Saved place unavailable",
+  "savedPlacesMissingMessage": "This saved place no longer resolves to a public place.",
+  "savedPlacesMissingRecordMessage": "Saved place reference {placeId} no longer resolves to public place data.",
+  "@savedPlacesMissingRecordMessage": {
+    "placeholders": {
+      "placeId": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesRemoveAction": "Remove",
+  "savedPlacesRemoveConfirmTitle": "Remove saved place?",
+  "savedPlacesRemoveConfirmMessage": "Remove {place} from your local saved places? The place, trips, bookings, reviews, and wallet items will not be deleted.",
+  "@savedPlacesRemoveConfirmMessage": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesRemoveConfirmAction": "Remove saved place",
+  "savedPlacesViewDetailsAction": "Details",
+  "savedPlacesOpenDetailSemantic": "Open details for {place}",
+  "@savedPlacesOpenDetailSemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesHotelAction": "View rooms",
+  "savedPlacesCardSemantic": "{place}, saved {date}",
+  "@savedPlacesCardSemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "notificationsTitle": "Notifications",
   "notificationsMarkAllRead": "Mark all as read",
   "notificationsToday": "Today",

@@ -358,6 +358,539 @@
     }
   },
   "savedPlacesRemoved": "Đã xóa khỏi danh sách đã lưu cục bộ.",
+  "savedPlacesSubtitle": "Danh sách địa điểm du lịch bạn lưu, được lấy từ dữ liệu địa điểm công khai hiện tại.",
+  "savedPlacesDemoBoundary": "Mục lưu trong Chế độ demo là dữ liệu trình diễn cục bộ. Chúng chưa được đồng bộ với API wishlist.",
+  "savedPlacesEmptyTitle": "Chưa có địa điểm đã lưu",
+  "savedPlacesEmptyMessage": "Lưu một địa điểm công khai từ Khám phá, tìm kiếm, khám phá danh mục hoặc trang chi tiết địa điểm.",
+  "savedPlacesCountSemantic": "{count} địa điểm đã lưu",
+  "@savedPlacesCountSemantic": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesFilterSemantic": "Bộ lọc địa điểm đã lưu",
+  "savedPlacesSortNewest": "Mới lưu",
+  "savedPlacesSortName": "Tên",
+  "savedPlacesCollectionCount": "{count} bộ sưu tập",
+  "@savedPlacesCollectionCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesCollectionCountSemantic": "{count} bộ sưu tập đã lưu",
+  "@savedPlacesCollectionCountSemantic": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesAllSavedTab": "Tất cả đã lưu ({count})",
+  "@savedPlacesAllSavedTab": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesCollectionsTab": "Bộ sưu tập ({count})",
+  "@savedPlacesCollectionsTab": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesSectionTabsSemantic": "Các mục địa điểm đã lưu",
+  "savedPlacesWishlistBoundaryTitle": "Wishlist và ghi chú",
+  "savedPlacesWishlistBoundaryMessage": "Wishlist và ghi chú riêng tư là dữ liệu cục bộ trong Chế độ demo cho đến khi kết nối lưu trữ backend.",
+  "savedPlacesCollectionsTitle": "Bộ sưu tập",
+  "savedPlacesCollectionsBoundaryMessage": "Bộ sưu tập là danh sách cục bộ trong Chế độ demo, căn theo /api/me/collections. Thêm địa điểm vào bộ sưu tập không thay đổi wishlist.",
+  "savedPlacesCollectionCreateAction": "Tạo bộ sưu tập",
+  "savedPlacesCollectionCreateSemantic": "Tạo bộ sưu tập đã lưu",
+  "savedPlacesCollectionsEmptyTitle": "Chưa có bộ sưu tập",
+  "savedPlacesCollectionsEmptyMessage": "Tạo bộ sưu tập riêng tư cho một điểm đến, ý tưởng cuối tuần hoặc danh sách rút gọn.",
+  "savedPlacesCollectionItemCount": "{count} địa điểm",
+  "@savedPlacesCollectionItemCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesCollectionItemCountSemantic": "{count} địa điểm trong bộ sưu tập",
+  "@savedPlacesCollectionItemCountSemantic": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesCollectionCardSemantic": "{collection}, {count} địa điểm",
+  "@savedPlacesCollectionCardSemantic": {
+    "placeholders": {
+      "collection": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesCollectionPrivateLabel": "Riêng tư",
+  "savedPlacesCollectionVisibleLabel": "Hiển thị",
+  "savedPlacesCollectionUpdated": "Cập nhật {date}",
+  "@savedPlacesCollectionUpdated": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionOpenAction": "Mở",
+  "savedPlacesCollectionOpenSemantic": "Mở bộ sưu tập {collection}",
+  "@savedPlacesCollectionOpenSemantic": {
+    "placeholders": {
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionEditAction": "Sửa",
+  "savedPlacesCollectionEditSemantic": "Sửa bộ sưu tập {collection}",
+  "@savedPlacesCollectionEditSemantic": {
+    "placeholders": {
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionDeleteSemantic": "Xóa bộ sưu tập {collection}",
+  "@savedPlacesCollectionDeleteSemantic": {
+    "placeholders": {
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionDetailSemantic": "{collection}, {count} địa điểm",
+  "@savedPlacesCollectionDetailSemantic": {
+    "placeholders": {
+      "collection": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesCollectionBackAction": "Bộ sưu tập",
+  "savedPlacesCollectionBackSemantic": "Quay lại bộ sưu tập đã lưu",
+  "savedPlacesCollectionAddSavedAction": "Thêm địa điểm đã lưu",
+  "savedPlacesCollectionAddSavedSemantic": "Thêm địa điểm đã lưu vào {collection}",
+  "@savedPlacesCollectionAddSavedSemantic": {
+    "placeholders": {
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionEmptyTitle": "Bộ sưu tập trống",
+  "savedPlacesCollectionEmptyMessage": "Thêm một địa điểm công khai đã lưu. Việc này không thay đổi wishlist.",
+  "savedPlacesCollectionPlaceSemantic": "{place}, đã thêm {date}",
+  "@savedPlacesCollectionPlaceSemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionAddedOn": "Đã thêm {date}",
+  "@savedPlacesCollectionAddedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionRemovePlaceAction": "Xóa",
+  "savedPlacesCollectionRemovePlaceSemantic": "Xóa {place} khỏi bộ sưu tập này",
+  "@savedPlacesCollectionRemovePlaceSemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionStaleItemTitle": "Mục bộ sưu tập không khả dụng",
+  "savedPlacesCollectionStaleItemMessage": "Tham chiếu địa điểm {placeId} không còn khớp với dữ liệu địa điểm công khai.",
+  "@savedPlacesCollectionStaleItemMessage": {
+    "placeholders": {
+      "placeId": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesCollectionRemoveStaleSemantic": "Xóa địa điểm không khả dụng khỏi bộ sưu tập",
+  "savedPlacesCollectionMembershipIn": "Có trong {collection}",
+  "@savedPlacesCollectionMembershipIn": {
+    "placeholders": {
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionMembershipOut": "Chưa có trong {collection}",
+  "@savedPlacesCollectionMembershipOut": {
+    "placeholders": {
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionRemoveMembershipSemantic": "Xóa {place} khỏi {collection}",
+  "@savedPlacesCollectionRemoveMembershipSemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      },
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionAddMembershipSemantic": "Thêm {place} vào {collection}",
+  "@savedPlacesCollectionAddMembershipSemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      },
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionInAction": "Đã thêm",
+  "savedPlacesCollectionAddAction": "Thêm",
+  "savedPlacesCollectionEditTitle": "Sửa bộ sưu tập",
+  "savedPlacesCollectionCreateTitle": "Tạo bộ sưu tập",
+  "savedPlacesCollectionNameLabel": "Tên bộ sưu tập",
+  "savedPlacesCollectionNameHelper": "Bắt buộc, tối đa {maxLength} ký tự.",
+  "@savedPlacesCollectionNameHelper": {
+    "placeholders": {
+      "maxLength": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesCollectionDescriptionLabel": "Mô tả",
+  "savedPlacesCollectionDescriptionHelper": "Không bắt buộc, tối đa {maxLength} ký tự.",
+  "@savedPlacesCollectionDescriptionHelper": {
+    "placeholders": {
+      "maxLength": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesCollectionCoverLabel": "URL ảnh bìa",
+  "savedPlacesCollectionCoverHelper": "Văn bản URL không bắt buộc, tối đa {maxLength} ký tự.",
+  "@savedPlacesCollectionCoverHelper": {
+    "placeholders": {
+      "maxLength": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesCollectionPrivateHelper": "Mọi endpoint bộ sưu tập đều giới hạn theo chủ sở hữu trong giai đoạn này.",
+  "savedPlacesCollectionSaveAction": "Lưu bộ sưu tập",
+  "savedPlacesCollectionCreatedMessage": "Đã tạo bộ sưu tập {collection}.",
+  "@savedPlacesCollectionCreatedMessage": {
+    "placeholders": {
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionUpdatedMessage": "Đã cập nhật bộ sưu tập {collection}.",
+  "@savedPlacesCollectionUpdatedMessage": {
+    "placeholders": {
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionDeleteTitle": "Xóa {collection}?",
+  "@savedPlacesCollectionDeleteTitle": {
+    "placeholders": {
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionDeleteMessage": "Xóa {collection}? Chỉ thành viên bộ sưu tập bị xóa. Địa điểm, ghi chú wishlist, chuyến đi, booking, đánh giá và tài liệu được giữ nguyên.",
+  "@savedPlacesCollectionDeleteMessage": {
+    "placeholders": {
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionDeleteAction": "Xóa bộ sưu tập",
+  "savedPlacesCollectionDeletedMessage": "Đã xóa bộ sưu tập {collection}.",
+  "@savedPlacesCollectionDeletedMessage": {
+    "placeholders": {
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionAddSavedTitle": "Thêm địa điểm đã lưu vào {collection}",
+  "@savedPlacesCollectionAddSavedTitle": {
+    "placeholders": {
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionAddSavedMessage": "Chỉ liệt kê các địa điểm đang được lưu. Thành viên bộ sưu tập tách biệt với wishlist.",
+  "savedPlacesManageCollectionsTitle": "Bộ sưu tập cho {place}",
+  "@savedPlacesManageCollectionsTitle": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesManageCollectionsMessage": "Thêm hoặc xóa địa điểm đã lưu này khỏi bộ sưu tập riêng tư trong Chế độ demo.",
+  "savedPlacesCollectionSavedMessage": "Đã cập nhật bộ sưu tập.",
+  "savedPlacesCollectionsRealUnavailableMessage": "Bộ sưu tập đã lưu chưa được kết nối với backend cho tài khoản thật.",
+  "savedPlacesCollectionInvalidNameMessage": "Tên bộ sưu tập là bắt buộc và tối đa {maxLength} ký tự.",
+  "@savedPlacesCollectionInvalidNameMessage": {
+    "placeholders": {
+      "maxLength": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesCollectionInvalidDescriptionMessage": "Mô tả bộ sưu tập tối đa {maxLength} ký tự.",
+  "@savedPlacesCollectionInvalidDescriptionMessage": {
+    "placeholders": {
+      "maxLength": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesCollectionInvalidCoverMessage": "URL ảnh bìa bộ sưu tập tối đa {maxLength} ký tự.",
+  "@savedPlacesCollectionInvalidCoverMessage": {
+    "placeholders": {
+      "maxLength": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesCollectionLimitMessage": "Bạn đã đạt giới hạn cục bộ {maxCount} bộ sưu tập.",
+  "@savedPlacesCollectionLimitMessage": {
+    "placeholders": {
+      "maxCount": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesCollectionNotFoundMessage": "Bộ sưu tập này không khả dụng.",
+  "savedPlacesCollectionPlaceNotFoundMessage": "Không thể thêm địa điểm này vì nó không còn khớp với dữ liệu địa điểm công khai.",
+  "savedPlacesCollectionDuplicatePlaceMessage": "{place} đã có trong {collection}.",
+  "@savedPlacesCollectionDuplicatePlaceMessage": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      },
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionItemNotFoundMessage": "Địa điểm này không nằm trong bộ sưu tập đã chọn.",
+  "savedPlacesCollectionItemLimitMessage": "Bộ sưu tập này đã đạt giới hạn cục bộ {maxCount} địa điểm.",
+  "@savedPlacesCollectionItemLimitMessage": {
+    "placeholders": {
+      "maxCount": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesCollectionAddedPlaceMessage": "Đã thêm {place} vào {collection}.",
+  "@savedPlacesCollectionAddedPlaceMessage": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      },
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesCollectionRemovedPlaceMessage": "Đã xóa {place} khỏi {collection}.",
+  "@savedPlacesCollectionRemovedPlaceMessage": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      },
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesAddToCollectionAction": "Bộ sưu tập",
+  "savedPlacesManageCollectionsSemantic": "Quản lý bộ sưu tập cho {place}",
+  "@savedPlacesManageCollectionsSemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesSavedOn": "Đã lưu {date}",
+  "@savedPlacesSavedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesNote": "Ghi chú: {note}",
+  "@savedPlacesNote": {
+    "placeholders": {
+      "note": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesEditNoteAction": "Sửa ghi chú",
+  "savedPlacesEditNoteSemantic": "Sửa ghi chú riêng tư cho {place}",
+  "@savedPlacesEditNoteSemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesEditNoteTitle": "Ghi chú riêng tư cho {place}",
+  "@savedPlacesEditNoteTitle": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesNoteFieldLabel": "Ghi chú riêng tư",
+  "savedPlacesNoteFieldHelper": "Tối đa {maxLength} ký tự. Để trống để xóa ghi chú.",
+  "@savedPlacesNoteFieldHelper": {
+    "placeholders": {
+      "maxLength": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesNoteSaveAction": "Lưu ghi chú",
+  "savedPlacesNoteSavedMessage": "Đã cập nhật ghi chú riêng tư cho {place}.",
+  "@savedPlacesNoteSavedMessage": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesNoteTooLongMessage": "Ghi chú riêng tư tối đa 500 ký tự.",
+  "savedPlacesSaveSemantic": "Lưu {place}",
+  "@savedPlacesSaveSemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesRemoveSemantic": "Xóa địa điểm đã lưu {place}",
+  "@savedPlacesRemoveSemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesSavedMessage": "Đã lưu cục bộ {place}.",
+  "@savedPlacesSavedMessage": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesAlreadySavedMessage": "{place} đã được lưu.",
+  "@savedPlacesAlreadySavedMessage": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesRemovedPlace": "Đã xóa {place} khỏi danh sách đã lưu cục bộ.",
+  "@savedPlacesRemovedPlace": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesActionForbiddenMessage": "Địa điểm đã lưu này thuộc về khách du lịch khác.",
+  "savedPlacesMissingTitle": "Địa điểm đã lưu không khả dụng",
+  "savedPlacesMissingMessage": "Địa điểm đã lưu này không còn khớp với dữ liệu địa điểm công khai.",
+  "savedPlacesMissingRecordMessage": "Tham chiếu địa điểm đã lưu {placeId} không còn khớp với dữ liệu địa điểm công khai.",
+  "@savedPlacesMissingRecordMessage": {
+    "placeholders": {
+      "placeId": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesRemoveAction": "Xóa",
+  "savedPlacesRemoveConfirmTitle": "Xóa địa điểm đã lưu?",
+  "savedPlacesRemoveConfirmMessage": "Xóa {place} khỏi danh sách đã lưu cục bộ? Địa điểm, chuyến đi, đặt phòng, đánh giá và ví du lịch sẽ không bị xóa.",
+  "@savedPlacesRemoveConfirmMessage": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesRemoveConfirmAction": "Xóa địa điểm đã lưu",
+  "savedPlacesViewDetailsAction": "Chi tiết",
+  "savedPlacesOpenDetailSemantic": "Mở chi tiết cho {place}",
+  "@savedPlacesOpenDetailSemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPlacesHotelAction": "Xem phòng",
+  "savedPlacesCardSemantic": "{place}, đã lưu {date}",
+  "@savedPlacesCardSemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "notificationsTitle": "Thông báo",
   "notificationsMarkAllRead": "Đánh dấu đã đọc",
   "notificationsToday": "Hôm nay",

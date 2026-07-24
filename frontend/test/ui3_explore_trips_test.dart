@@ -271,6 +271,7 @@ void main() {
   testWidgets('saved-place messaging separates demo and real mode',
       (tester) async {
     ignoreNetworkImageErrors();
+    final place = MockData.places[3];
     final demoApp = AppState()
       ..demoMode = true
       ..email = MockData.demoEmail;
@@ -278,18 +279,18 @@ void main() {
     await pumpSize(
       tester,
       testApp(
-        child: PlaceDetailScreen(place: MockData.places.first),
+        child: PlaceDetailScreen(place: place),
         app: demoApp,
       ),
       const Size(390, 900),
     );
 
     await tester.tap(
-      find.byTooltip('Saved bookmark for ${MockData.places.first.name}').first,
+      find.byTooltip('Save ${place.name}').first,
     );
     await tester.pump(const Duration(milliseconds: 250));
     expect(
-      find.text('Saved places are local to this demo session.'),
+      find.text('Saved ${place.name} locally.'),
       findsOneWidget,
     );
 
@@ -302,14 +303,14 @@ void main() {
     await pumpSize(
       tester,
       testApp(
-        child: PlaceDetailScreen(place: MockData.places.first),
+        child: PlaceDetailScreen(place: place),
         app: realApp,
       ),
       const Size(390, 900),
     );
 
     await tester.tap(
-      find.byTooltip('Saved bookmark for ${MockData.places.first.name}').first,
+      find.byTooltip('Save ${place.name}').first,
     );
     await tester.pump(const Duration(milliseconds: 250));
     expect(find.textContaining('not connected to the backend'), findsOneWidget);

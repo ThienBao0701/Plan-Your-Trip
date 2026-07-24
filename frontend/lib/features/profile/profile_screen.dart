@@ -108,7 +108,7 @@ class ProfileScreen extends StatelessWidget {
               const _StatDivider(),
               _ProfileStat(
                 icon: Icons.bookmark_rounded,
-                value: isDemo ? '4' : '-',
+                value: isDemo ? '${app.savedPlaceCount}' : '-',
                 label: l10n.profileSavedPlacesStat,
               ),
               const _StatDivider(),

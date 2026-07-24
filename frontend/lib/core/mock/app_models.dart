@@ -85,6 +85,184 @@ class Place {
       categorySlug ?? category.toLowerCase().replaceAll(' ', '-');
 }
 
+enum SavedPlaceSort { newest, name }
+
+enum SavedPlaceActionResult {
+  success,
+  unavailable,
+  notFound,
+  duplicate,
+  forbidden,
+  invalidNote,
+}
+
+class SavedPlaceRecord {
+  static const Object _unset = Object();
+  static const int maxNoteLength = 500;
+
+  final String id;
+  final int? backendId;
+  final String ownerUserId;
+  final int placeId;
+  final DateTime savedAt;
+  final String? note;
+  final bool demoOnly;
+
+  const SavedPlaceRecord({
+    required this.id,
+    this.backendId,
+    required this.ownerUserId,
+    required this.placeId,
+    required this.savedAt,
+    this.note,
+    this.demoOnly = true,
+  });
+
+  SavedPlaceRecord copyWith({
+    String? id,
+    Object? backendId = _unset,
+    String? ownerUserId,
+    int? placeId,
+    DateTime? savedAt,
+    Object? note = _unset,
+    bool? demoOnly,
+  }) =>
+      SavedPlaceRecord(
+        id: id ?? this.id,
+        backendId:
+            identical(backendId, _unset) ? this.backendId : backendId as int?,
+        ownerUserId: ownerUserId ?? this.ownerUserId,
+        placeId: placeId ?? this.placeId,
+        savedAt: savedAt ?? this.savedAt,
+        note: identical(note, _unset) ? this.note : note as String?,
+        demoOnly: demoOnly ?? this.demoOnly,
+      );
+}
+
+class ResolvedSavedPlace {
+  final SavedPlaceRecord record;
+  final Place? place;
+
+  const ResolvedSavedPlace({
+    required this.record,
+    required this.place,
+  });
+
+  bool get available => place != null;
+}
+
+enum SavedCollectionActionResult {
+  success,
+  unavailable,
+  invalidName,
+  invalidDescription,
+  invalidCover,
+  collectionLimitReached,
+  collectionNotFound,
+  placeNotFound,
+  duplicateItem,
+  itemNotFound,
+  itemLimitReached,
+}
+
+class SavedCollectionRecord {
+  static const Object _unset = Object();
+  static const int maxNameLength = 120;
+  static const int maxDescriptionLength = 1000;
+  static const int maxCoverImageUrlLength = 2048;
+  static const int maxCollectionsPerUser = 100;
+
+  final String id;
+  final int? backendId;
+  final String ownerUserId;
+  final String name;
+  final String? description;
+  final String? coverImageUrl;
+  final bool privateCollection;
+  final int sortOrder;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final bool demoOnly;
+
+  const SavedCollectionRecord({
+    required this.id,
+    this.backendId,
+    required this.ownerUserId,
+    required this.name,
+    this.description,
+    this.coverImageUrl,
+    this.privateCollection = true,
+    this.sortOrder = 0,
+    required this.createdAt,
+    required this.updatedAt,
+    this.demoOnly = true,
+  });
+
+  SavedCollectionRecord copyWith({
+    String? id,
+    Object? backendId = _unset,
+    String? ownerUserId,
+    String? name,
+    Object? description = _unset,
+    Object? coverImageUrl = _unset,
+    bool? privateCollection,
+    int? sortOrder,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    bool? demoOnly,
+  }) =>
+      SavedCollectionRecord(
+        id: id ?? this.id,
+        backendId:
+            identical(backendId, _unset) ? this.backendId : backendId as int?,
+        ownerUserId: ownerUserId ?? this.ownerUserId,
+        name: name ?? this.name,
+        description: identical(description, _unset)
+            ? this.description
+            : description as String?,
+        coverImageUrl: identical(coverImageUrl, _unset)
+            ? this.coverImageUrl
+            : coverImageUrl as String?,
+        privateCollection: privateCollection ?? this.privateCollection,
+        sortOrder: sortOrder ?? this.sortOrder,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+        demoOnly: demoOnly ?? this.demoOnly,
+      );
+}
+
+class SavedCollectionPlaceRecord {
+  static const int maxPlacesPerCollection = 500;
+
+  final String id;
+  final String collectionId;
+  final int placeId;
+  final int position;
+  final DateTime addedAt;
+  final bool demoOnly;
+
+  const SavedCollectionPlaceRecord({
+    required this.id,
+    required this.collectionId,
+    required this.placeId,
+    required this.position,
+    required this.addedAt,
+    this.demoOnly = true,
+  });
+}
+
+class ResolvedCollectionPlace {
+  final SavedCollectionPlaceRecord record;
+  final Place? place;
+
+  const ResolvedCollectionPlace({
+    required this.record,
+    required this.place,
+  });
+
+  bool get available => place != null;
+}
+
 enum RoomType {
   standard,
   superior,

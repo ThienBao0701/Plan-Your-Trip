@@ -171,6 +171,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   onAdd: (place) => showAddToTripSheet(context, place),
+                  onBookmark: _bookmark,
                 ),
             ],
           ),
@@ -191,6 +192,29 @@ class _HomeScreenState extends State<HomeScreen> {
         .toList()
       ..sort((a, b) => a.startDate.compareTo(b.startDate));
     return candidates.isEmpty ? null : candidates.first;
+  }
+
+  void _bookmark(Place place) {
+    final app = AppScope.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final wasSaved = app.isPlaceSaved(place.id);
+    final outcome =
+        wasSaved ? app.removeSavedPlace(place.id) : app.savePlace(place.id);
+    final message = switch (outcome) {
+      SavedPlaceActionResult.success => wasSaved
+          ? l10n.savedPlacesRemovedPlace(place.name)
+          : l10n.savedPlacesSavedMessage(place.name),
+      SavedPlaceActionResult.duplicate =>
+        l10n.savedPlacesAlreadySavedMessage(place.name),
+      SavedPlaceActionResult.unavailable => l10n.savedPlacesRealEmptyMessage,
+      SavedPlaceActionResult.forbidden =>
+        l10n.savedPlacesActionForbiddenMessage,
+      SavedPlaceActionResult.notFound => l10n.savedPlacesMissingMessage,
+      SavedPlaceActionResult.invalidNote => l10n.savedPlacesNoteTooLongMessage,
+    };
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 }
 
@@ -437,11 +461,13 @@ class _FeaturedPlaces extends StatelessWidget {
   final List<Place> places;
   final ValueChanged<Place> onPlace;
   final ValueChanged<Place> onAdd;
+  final ValueChanged<Place> onBookmark;
 
   const _FeaturedPlaces({
     required this.places,
     required this.onPlace,
     required this.onAdd,
+    required this.onBookmark,
   });
 
   @override
@@ -460,6 +486,7 @@ class _FeaturedPlaces extends StatelessWidget {
                         place: place,
                         onTap: () => onPlace(place),
                         onAdd: () => onAdd(place),
+                        onBookmark: () => onBookmark(place),
                       ),
                     ),
                   )
@@ -475,6 +502,7 @@ class _FeaturedPlaces extends StatelessWidget {
                       place: place,
                       onTap: () => onPlace(place),
                       onAdd: () => onAdd(place),
+                      onBookmark: () => onBookmark(place),
                     ),
                   ),
                 )
@@ -488,66 +516,117 @@ class _PlacePreviewCard extends StatelessWidget {
   final Place place;
   final VoidCallback onTap;
   final VoidCallback onAdd;
+  final VoidCallback onBookmark;
 
   const _PlacePreviewCard({
     required this.place,
     required this.onTap,
     required this.onAdd,
+    required this.onBookmark,
   });
 
   @override
   Widget build(BuildContext context) {
+    final app = AppScope.of(context);
     final l10n = AppLocalizations.of(context)!;
-    return OceanGlassCard(
-      onTap: onTap,
-      padding: const EdgeInsets.all(AppSpacing.sm),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _NetworkImageFrame(
-            imageUrl: place.imageUrl,
-            height: 104,
-            width: 104,
-            radius: AppRadii.lg,
-            fallbackIcon: Icons.place_rounded,
-          ),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                OceanStatusPill(
-                  label: place.category,
-                  icon: Icons.place_outlined,
-                ),
-                const SizedBox(height: AppSpacing.xs),
-                Text(
-                  place.name,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: AppSpacing.xxs),
-                Text(
-                  place.locationName,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ],
+    final saved = app.isPlaceSaved(place.id);
+    final bookmarkLabel = saved
+        ? l10n.savedPlacesRemoveSemantic(place.name)
+        : l10n.savedPlacesSaveSemantic(place.name);
+    Widget details() => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            OceanStatusPill(
+              label: place.category,
+              icon: Icons.place_outlined,
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              place.name,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: AppSpacing.xxs),
+            Text(
+              place.locationName,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ],
+        );
+
+    final actions = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Semantics(
+          button: true,
+          toggled: saved,
+          label: bookmarkLabel,
+          child: IconButton(
+            tooltip: bookmarkLabel,
+            onPressed: onBookmark,
+            icon: Icon(
+              saved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+              color: saved ? AppColors.ocean : null,
             ),
           ),
-          Semantics(
-            button: true,
-            label: l10n.placeAddToTripSemantic(place.name),
-            child: IconButton.filled(
-              tooltip: l10n.placeAddToTripSemantic(place.name),
-              onPressed: onAdd,
-              icon: const Icon(Icons.add_rounded),
-            ),
+        ),
+        Semantics(
+          button: true,
+          label: l10n.placeAddToTripSemantic(place.name),
+          child: IconButton.filled(
+            tooltip: l10n.placeAddToTripSemantic(place.name),
+            onPressed: onAdd,
+            icon: const Icon(Icons.add_rounded),
           ),
-        ],
-      ),
+        ),
+      ],
+    );
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final compact = constraints.maxWidth < 380;
+        return OceanGlassCard(
+          onTap: onTap,
+          padding: const EdgeInsets.all(AppSpacing.sm),
+          child: compact
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _NetworkImageFrame(
+                      imageUrl: place.imageUrl,
+                      height: 136,
+                      radius: AppRadii.lg,
+                      fallbackIcon: Icons.place_rounded,
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    details(),
+                    const SizedBox(height: AppSpacing.xs),
+                    Align(
+                      alignment: AlignmentDirectional.centerEnd,
+                      child: actions,
+                    ),
+                  ],
+                )
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _NetworkImageFrame(
+                      imageUrl: place.imageUrl,
+                      height: 104,
+                      width: 104,
+                      radius: AppRadii.lg,
+                      fallbackIcon: Icons.place_rounded,
+                    ),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(child: details()),
+                    actions,
+                  ],
+                ),
+        );
+      },
     );
   }
 }

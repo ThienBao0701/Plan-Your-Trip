@@ -601,6 +601,108 @@ class MockData {
   static const _demoCancellationRoomId = 601;
   static const _demoCancellationRatePlanId = 6001;
 
+  static final demoSavedPlaces = <SavedPlaceRecord>[
+    SavedPlaceRecord(
+      id: 'wishlist-demo-1',
+      backendId: 9001,
+      ownerUserId: 'demo-owner',
+      placeId: 1,
+      savedAt: DateTime.utc(2026, 7, 20, 9),
+      note: 'Shortlisted hillside stay for Da Lat.',
+    ),
+    SavedPlaceRecord(
+      id: 'wishlist-demo-2',
+      backendId: 9002,
+      ownerUserId: 'demo-owner',
+      placeId: 2,
+      savedAt: DateTime.utc(2026, 7, 19, 14, 30),
+      note: 'Photo stop for the second morning.',
+    ),
+    SavedPlaceRecord(
+      id: 'wishlist-demo-3',
+      backendId: 9003,
+      ownerUserId: 'demo-owner',
+      placeId: 3,
+      savedAt: DateTime.utc(2026, 7, 18, 8, 15),
+      note: 'Vietnamese coffee and sunset view.',
+    ),
+    SavedPlaceRecord(
+      id: 'wishlist-demo-5',
+      backendId: 9005,
+      ownerUserId: 'demo-owner',
+      placeId: 5,
+      savedAt: DateTime.utc(2026, 7, 17, 16),
+      note: 'Family activity option for Vung Tau.',
+    ),
+  ];
+
+  static final demoSavedCollections = <SavedCollectionRecord>[
+    SavedCollectionRecord(
+      id: 'collection-demo-dalat',
+      backendId: 9101,
+      ownerUserId: 'demo-owner',
+      name: 'Da Lat shortlist',
+      description: 'Hillside stays and photo stops for the Da Lat leg.',
+      privateCollection: true,
+      sortOrder: 0,
+      createdAt: DateTime.utc(2026, 7, 16, 8),
+      updatedAt: DateTime.utc(2026, 7, 20, 9),
+    ),
+    SavedCollectionRecord(
+      id: 'collection-demo-family',
+      backendId: 9102,
+      ownerUserId: 'demo-owner',
+      name: 'Family ideas',
+      description: 'A private empty list ready for kid-friendly options.',
+      privateCollection: true,
+      sortOrder: 1,
+      createdAt: DateTime.utc(2026, 7, 16, 9),
+      updatedAt: DateTime.utc(2026, 7, 16, 9),
+    ),
+    SavedCollectionRecord(
+      id: 'collection-demo-views',
+      backendId: 9103,
+      ownerUserId: 'demo-owner',
+      name: 'Coffee & views',
+      description: 'Cafes and viewpoints with relaxed pacing.',
+      privateCollection: true,
+      sortOrder: 2,
+      createdAt: DateTime.utc(2026, 7, 17, 10),
+      updatedAt: DateTime.utc(2026, 7, 19, 14, 30),
+    ),
+  ];
+
+  static final demoSavedCollectionPlaces = <SavedCollectionPlaceRecord>[
+    SavedCollectionPlaceRecord(
+      id: 'collection-demo-dalat-place-1',
+      collectionId: 'collection-demo-dalat',
+      placeId: 1,
+      position: 0,
+      addedAt: DateTime.utc(2026, 7, 20, 9),
+    ),
+    SavedCollectionPlaceRecord(
+      id: 'collection-demo-dalat-place-2',
+      collectionId: 'collection-demo-dalat',
+      placeId: 2,
+      position: 1,
+      addedAt: DateTime.utc(2026, 7, 19, 14, 30),
+    ),
+    SavedCollectionPlaceRecord(
+      id: 'collection-demo-views-place-3',
+      collectionId: 'collection-demo-views',
+      placeId: 3,
+      position: 0,
+      addedAt: DateTime.utc(2026, 7, 18, 8, 15),
+    ),
+    SavedCollectionPlaceRecord(
+      id: 'collection-demo-views-place-2',
+      collectionId: 'collection-demo-views',
+      placeId: 2,
+      position: 1,
+      addedAt: DateTime.utc(2026, 7, 19, 14, 30),
+    ),
+  ];
+
   static final demoBookings = buildDemoBookings();
   static final demoPaymentAttempts = buildDemoPaymentAttempts();
   static final demoNotifications = <UserNotification>[

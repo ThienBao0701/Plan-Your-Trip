@@ -182,6 +182,7 @@ class _HotelSearchScreenState extends State<HotelSearchScreen> {
                         criteria: _criteria,
                         onDetail: _openDetail,
                         onRooms: _openRooms,
+                        onBookmark: _bookmark,
                       ),
                   ],
                 ),
@@ -233,6 +234,29 @@ class _HotelSearchScreenState extends State<HotelSearchScreen> {
           today: widget.today,
         ),
       ),
+    );
+  }
+
+  void _bookmark(Place hotel) {
+    final app = AppScope.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final wasSaved = app.isPlaceSaved(hotel.id);
+    final outcome =
+        wasSaved ? app.removeSavedPlace(hotel.id) : app.savePlace(hotel.id);
+    final message = switch (outcome) {
+      SavedPlaceActionResult.success => wasSaved
+          ? l10n.savedPlacesRemovedPlace(hotel.name)
+          : l10n.savedPlacesSavedMessage(hotel.name),
+      SavedPlaceActionResult.duplicate =>
+        l10n.savedPlacesAlreadySavedMessage(hotel.name),
+      SavedPlaceActionResult.unavailable => l10n.savedPlacesRealEmptyMessage,
+      SavedPlaceActionResult.forbidden =>
+        l10n.savedPlacesActionForbiddenMessage,
+      SavedPlaceActionResult.notFound => l10n.savedPlacesMissingMessage,
+      SavedPlaceActionResult.invalidNote => l10n.savedPlacesNoteTooLongMessage,
+    };
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
     );
   }
 
@@ -482,12 +506,14 @@ class _HotelResults extends StatelessWidget {
   final HotelStayCriteria criteria;
   final ValueChanged<Place> onDetail;
   final ValueChanged<Place> onRooms;
+  final ValueChanged<Place> onBookmark;
 
   const _HotelResults({
     required this.hotels,
     required this.criteria,
     required this.onDetail,
     required this.onRooms,
+    required this.onBookmark,
   });
 
   @override
@@ -507,6 +533,7 @@ class _HotelResults extends StatelessWidget {
                       criteria: criteria,
                       onDetail: () => onDetail(hotel),
                       onRooms: () => onRooms(hotel),
+                      onBookmark: () => onBookmark(hotel),
                     ),
                   ),
               ],
@@ -522,6 +549,7 @@ class _HotelResults extends StatelessWidget {
                     criteria: criteria,
                     onDetail: () => onDetail(hotel),
                     onRooms: () => onRooms(hotel),
+                    onBookmark: () => onBookmark(hotel),
                   ),
                 ),
             ],
@@ -535,17 +563,24 @@ class _HotelCard extends StatelessWidget {
   final HotelStayCriteria criteria;
   final VoidCallback onDetail;
   final VoidCallback onRooms;
+  final VoidCallback onBookmark;
 
   const _HotelCard({
     required this.hotel,
     required this.criteria,
     required this.onDetail,
     required this.onRooms,
+    required this.onBookmark,
   });
 
   @override
   Widget build(BuildContext context) {
+    final app = AppScope.of(context);
     final l10n = AppLocalizations.of(context)!;
+    final saved = app.isPlaceSaved(hotel.id);
+    final bookmarkLabel = saved
+        ? l10n.savedPlacesRemoveSemantic(hotel.name)
+        : l10n.savedPlacesSaveSemantic(hotel.name);
     final rooms = availableRoomsFor(hotel, criteria);
     final price =
         rooms.map((room) => room.priceFrom).whereType<double>().fold<double?>(
@@ -599,6 +634,21 @@ class _HotelCard extends StatelessWidget {
                   icon: Icons.star_rounded,
                   color: AppColors.ocean,
                 ),
+              Semantics(
+                button: true,
+                toggled: saved,
+                label: bookmarkLabel,
+                child: IconButton(
+                  tooltip: bookmarkLabel,
+                  onPressed: onBookmark,
+                  icon: Icon(
+                    saved
+                        ? Icons.bookmark_rounded
+                        : Icons.bookmark_border_rounded,
+                    color: saved ? AppColors.ocean : null,
+                  ),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: AppSpacing.xs),

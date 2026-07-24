@@ -327,6 +327,7 @@ class _CategoryDiscoveryScreenState extends State<CategoryDiscoveryScreen> {
                             setState(() => _mode = ExploreMode.list),
                         onPlace: _openPlace,
                         onAdd: _addToTrip,
+                        onBookmark: _bookmark,
                       )
                     else
                       _CategoryResultList(
@@ -542,14 +543,23 @@ class _CategoryDiscoveryScreenState extends State<CategoryDiscoveryScreen> {
   void _bookmark(Place place) {
     final app = AppScope.of(context);
     final l10n = AppLocalizations.of(context)!;
+    final wasSaved = app.isPlaceSaved(place.id);
+    final outcome =
+        wasSaved ? app.removeSavedPlace(place.id) : app.savePlace(place.id);
+    final message = switch (outcome) {
+      SavedPlaceActionResult.success => wasSaved
+          ? l10n.savedPlacesRemovedPlace(place.name)
+          : l10n.savedPlacesSavedMessage(place.name),
+      SavedPlaceActionResult.duplicate =>
+        l10n.savedPlacesAlreadySavedMessage(place.name),
+      SavedPlaceActionResult.unavailable => l10n.savedPlacesRealEmptyMessage,
+      SavedPlaceActionResult.forbidden =>
+        l10n.savedPlacesActionForbiddenMessage,
+      SavedPlaceActionResult.notFound => l10n.savedPlacesMissingMessage,
+      SavedPlaceActionResult.invalidNote => l10n.savedPlacesNoteTooLongMessage,
+    };
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          app.demoMode
-              ? l10n.savedPlacesDemoLocalOnly
-              : l10n.savedPlacesRealEmptyMessage,
-        ),
-      ),
+      SnackBar(content: Text(message)),
     );
   }
 }
@@ -789,7 +799,12 @@ class _PlaceDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final app = AppScope.of(context);
     final l10n = AppLocalizations.of(context)!;
+    final saved = app.isPlaceSaved(place.id);
+    final bookmarkLabel = saved
+        ? l10n.savedPlacesRemoveSemantic(place.name)
+        : l10n.savedPlacesSaveSemantic(place.name);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -806,11 +821,17 @@ class _PlaceDetails extends StatelessWidget {
             ),
             Semantics(
               button: true,
-              label: l10n.savedPlacesBookmarkSemantic(place.name),
+              toggled: saved,
+              label: bookmarkLabel,
               child: IconButton(
-                tooltip: l10n.savedPlacesBookmarkSemantic(place.name),
+                tooltip: bookmarkLabel,
                 onPressed: onBookmark,
-                icon: const Icon(Icons.bookmark_border_rounded),
+                icon: Icon(
+                  saved
+                      ? Icons.bookmark_rounded
+                      : Icons.bookmark_border_rounded,
+                  color: saved ? AppColors.ocean : null,
+                ),
               ),
             ),
           ],
@@ -918,6 +939,7 @@ class _CategoryMapFallback extends StatelessWidget {
   final VoidCallback onListMode;
   final ValueChanged<Place> onPlace;
   final ValueChanged<Place> onAdd;
+  final ValueChanged<Place> onBookmark;
 
   const _CategoryMapFallback({
     required this.mode,
@@ -925,6 +947,7 @@ class _CategoryMapFallback extends StatelessWidget {
     required this.onListMode,
     required this.onPlace,
     required this.onAdd,
+    required this.onBookmark,
   });
 
   @override
@@ -950,7 +973,7 @@ class _CategoryMapFallback extends StatelessWidget {
           place: results.first,
           onTap: () => onPlace(results.first),
           onAdd: () => onAdd(results.first),
-          onBookmark: () {},
+          onBookmark: () => onBookmark(results.first),
         ),
       ],
     );

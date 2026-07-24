@@ -1466,6 +1466,695 @@ abstract class AppLocalizations {
   /// **'Removed from local saved places.'**
   String get savedPlacesRemoved;
 
+  /// No description provided for @savedPlacesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your saved travel shortlist, resolved from current public place data.'**
+  String get savedPlacesSubtitle;
+
+  /// No description provided for @savedPlacesDemoBoundary.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo Mode saves are local presentation data. They are not synchronized with the wishlist API.'**
+  String get savedPlacesDemoBoundary;
+
+  /// No description provided for @savedPlacesEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved places yet'**
+  String get savedPlacesEmptyTitle;
+
+  /// No description provided for @savedPlacesEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Save a public place from Explore, search, category discovery, or place details.'**
+  String get savedPlacesEmptyMessage;
+
+  /// No description provided for @savedPlacesCountSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 saved place} other{{count} saved places}}'**
+  String savedPlacesCountSemantic(int count);
+
+  /// No description provided for @savedPlacesFilterSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved place filters'**
+  String get savedPlacesFilterSemantic;
+
+  /// No description provided for @savedPlacesSortNewest.
+  ///
+  /// In en, this message translates to:
+  /// **'Newest saved'**
+  String get savedPlacesSortNewest;
+
+  /// No description provided for @savedPlacesSortName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get savedPlacesSortName;
+
+  /// No description provided for @savedPlacesCollectionCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 collection} other{{count} collections}}'**
+  String savedPlacesCollectionCount(int count);
+
+  /// No description provided for @savedPlacesCollectionCountSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 saved collection} other{{count} saved collections}}'**
+  String savedPlacesCollectionCountSemantic(int count);
+
+  /// No description provided for @savedPlacesAllSavedTab.
+  ///
+  /// In en, this message translates to:
+  /// **'All saved ({count})'**
+  String savedPlacesAllSavedTab(int count);
+
+  /// No description provided for @savedPlacesCollectionsTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Collections ({count})'**
+  String savedPlacesCollectionsTab(int count);
+
+  /// No description provided for @savedPlacesSectionTabsSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved places sections'**
+  String get savedPlacesSectionTabsSemantic;
+
+  /// No description provided for @savedPlacesWishlistBoundaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Wishlist and notes'**
+  String get savedPlacesWishlistBoundaryTitle;
+
+  /// No description provided for @savedPlacesWishlistBoundaryMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The wishlist and private notes are local Demo Mode data until backend persistence is connected.'**
+  String get savedPlacesWishlistBoundaryMessage;
+
+  /// No description provided for @savedPlacesCollectionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Collections'**
+  String get savedPlacesCollectionsTitle;
+
+  /// No description provided for @savedPlacesCollectionsBoundaryMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Collections are separate local Demo Mode lists aligned to /api/me/collections. Adding a place to a collection does not change the wishlist.'**
+  String get savedPlacesCollectionsBoundaryMessage;
+
+  /// No description provided for @savedPlacesCollectionCreateAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Create collection'**
+  String get savedPlacesCollectionCreateAction;
+
+  /// No description provided for @savedPlacesCollectionCreateSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a saved collection'**
+  String get savedPlacesCollectionCreateSemantic;
+
+  /// No description provided for @savedPlacesCollectionsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No collections yet'**
+  String get savedPlacesCollectionsEmptyTitle;
+
+  /// No description provided for @savedPlacesCollectionsEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a private collection for a destination, weekend idea, or shortlist.'**
+  String get savedPlacesCollectionsEmptyMessage;
+
+  /// No description provided for @savedPlacesCollectionItemCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 place} other{{count} places}}'**
+  String savedPlacesCollectionItemCount(int count);
+
+  /// No description provided for @savedPlacesCollectionItemCountSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 place in collection} other{{count} places in collection}}'**
+  String savedPlacesCollectionItemCountSemantic(int count);
+
+  /// No description provided for @savedPlacesCollectionCardSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{collection}, {count, plural, =1{1 place} other{{count} places}}'**
+  String savedPlacesCollectionCardSemantic(String collection, int count);
+
+  /// No description provided for @savedPlacesCollectionPrivateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Private'**
+  String get savedPlacesCollectionPrivateLabel;
+
+  /// No description provided for @savedPlacesCollectionVisibleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Visible'**
+  String get savedPlacesCollectionVisibleLabel;
+
+  /// No description provided for @savedPlacesCollectionUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated {date}'**
+  String savedPlacesCollectionUpdated(String date);
+
+  /// No description provided for @savedPlacesCollectionOpenAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get savedPlacesCollectionOpenAction;
+
+  /// No description provided for @savedPlacesCollectionOpenSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Open collection {collection}'**
+  String savedPlacesCollectionOpenSemantic(String collection);
+
+  /// No description provided for @savedPlacesCollectionEditAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get savedPlacesCollectionEditAction;
+
+  /// No description provided for @savedPlacesCollectionEditSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit collection {collection}'**
+  String savedPlacesCollectionEditSemantic(String collection);
+
+  /// No description provided for @savedPlacesCollectionDeleteSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete collection {collection}'**
+  String savedPlacesCollectionDeleteSemantic(String collection);
+
+  /// No description provided for @savedPlacesCollectionDetailSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{collection}, {count, plural, =1{1 place} other{{count} places}}'**
+  String savedPlacesCollectionDetailSemantic(String collection, int count);
+
+  /// No description provided for @savedPlacesCollectionBackAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Collections'**
+  String get savedPlacesCollectionBackAction;
+
+  /// No description provided for @savedPlacesCollectionBackSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to saved collections'**
+  String get savedPlacesCollectionBackSemantic;
+
+  /// No description provided for @savedPlacesCollectionAddSavedAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add saved place'**
+  String get savedPlacesCollectionAddSavedAction;
+
+  /// No description provided for @savedPlacesCollectionAddSavedSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a saved place to {collection}'**
+  String savedPlacesCollectionAddSavedSemantic(String collection);
+
+  /// No description provided for @savedPlacesCollectionEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Collection is empty'**
+  String get savedPlacesCollectionEmptyTitle;
+
+  /// No description provided for @savedPlacesCollectionEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Add an already-saved public place. This will not change your wishlist.'**
+  String get savedPlacesCollectionEmptyMessage;
+
+  /// No description provided for @savedPlacesCollectionPlaceSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{place}, added {date}'**
+  String savedPlacesCollectionPlaceSemantic(String place, String date);
+
+  /// No description provided for @savedPlacesCollectionAddedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Added {date}'**
+  String savedPlacesCollectionAddedOn(String date);
+
+  /// No description provided for @savedPlacesCollectionRemovePlaceAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get savedPlacesCollectionRemovePlaceAction;
+
+  /// No description provided for @savedPlacesCollectionRemovePlaceSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {place} from this collection'**
+  String savedPlacesCollectionRemovePlaceSemantic(String place);
+
+  /// No description provided for @savedPlacesCollectionStaleItemTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Collection item unavailable'**
+  String get savedPlacesCollectionStaleItemTitle;
+
+  /// No description provided for @savedPlacesCollectionStaleItemMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Place reference {placeId} no longer resolves to public place data.'**
+  String savedPlacesCollectionStaleItemMessage(int placeId);
+
+  /// No description provided for @savedPlacesCollectionRemoveStaleSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove unavailable place from collection'**
+  String get savedPlacesCollectionRemoveStaleSemantic;
+
+  /// No description provided for @savedPlacesCollectionMembershipIn.
+  ///
+  /// In en, this message translates to:
+  /// **'In {collection}'**
+  String savedPlacesCollectionMembershipIn(String collection);
+
+  /// No description provided for @savedPlacesCollectionMembershipOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Not in {collection}'**
+  String savedPlacesCollectionMembershipOut(String collection);
+
+  /// No description provided for @savedPlacesCollectionRemoveMembershipSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {place} from {collection}'**
+  String savedPlacesCollectionRemoveMembershipSemantic(
+      String place, String collection);
+
+  /// No description provided for @savedPlacesCollectionAddMembershipSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Add {place} to {collection}'**
+  String savedPlacesCollectionAddMembershipSemantic(
+      String place, String collection);
+
+  /// No description provided for @savedPlacesCollectionInAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Added'**
+  String get savedPlacesCollectionInAction;
+
+  /// No description provided for @savedPlacesCollectionAddAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get savedPlacesCollectionAddAction;
+
+  /// No description provided for @savedPlacesCollectionEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit collection'**
+  String get savedPlacesCollectionEditTitle;
+
+  /// No description provided for @savedPlacesCollectionCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create collection'**
+  String get savedPlacesCollectionCreateTitle;
+
+  /// No description provided for @savedPlacesCollectionNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Collection name'**
+  String get savedPlacesCollectionNameLabel;
+
+  /// No description provided for @savedPlacesCollectionNameHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Required, up to {maxLength} characters.'**
+  String savedPlacesCollectionNameHelper(int maxLength);
+
+  /// No description provided for @savedPlacesCollectionDescriptionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get savedPlacesCollectionDescriptionLabel;
+
+  /// No description provided for @savedPlacesCollectionDescriptionHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional, up to {maxLength} characters.'**
+  String savedPlacesCollectionDescriptionHelper(int maxLength);
+
+  /// No description provided for @savedPlacesCollectionCoverLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cover image URL'**
+  String get savedPlacesCollectionCoverLabel;
+
+  /// No description provided for @savedPlacesCollectionCoverHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional URL text, up to {maxLength} characters.'**
+  String savedPlacesCollectionCoverHelper(int maxLength);
+
+  /// No description provided for @savedPlacesCollectionPrivateHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'All collection endpoints are owner-scoped in this phase.'**
+  String get savedPlacesCollectionPrivateHelper;
+
+  /// No description provided for @savedPlacesCollectionSaveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Save collection'**
+  String get savedPlacesCollectionSaveAction;
+
+  /// No description provided for @savedPlacesCollectionCreatedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Created collection {collection}.'**
+  String savedPlacesCollectionCreatedMessage(String collection);
+
+  /// No description provided for @savedPlacesCollectionUpdatedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated collection {collection}.'**
+  String savedPlacesCollectionUpdatedMessage(String collection);
+
+  /// No description provided for @savedPlacesCollectionDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {collection}?'**
+  String savedPlacesCollectionDeleteTitle(String collection);
+
+  /// No description provided for @savedPlacesCollectionDeleteMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {collection}? Only collection membership is removed. Places, wishlist notes, trips, bookings, reviews, and documents are preserved.'**
+  String savedPlacesCollectionDeleteMessage(String collection);
+
+  /// No description provided for @savedPlacesCollectionDeleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete collection'**
+  String get savedPlacesCollectionDeleteAction;
+
+  /// No description provided for @savedPlacesCollectionDeletedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted collection {collection}.'**
+  String savedPlacesCollectionDeletedMessage(String collection);
+
+  /// No description provided for @savedPlacesCollectionAddSavedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add saved places to {collection}'**
+  String savedPlacesCollectionAddSavedTitle(String collection);
+
+  /// No description provided for @savedPlacesCollectionAddSavedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Only current saved places are listed. Collection membership stays separate from the wishlist.'**
+  String get savedPlacesCollectionAddSavedMessage;
+
+  /// No description provided for @savedPlacesManageCollectionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Collections for {place}'**
+  String savedPlacesManageCollectionsTitle(String place);
+
+  /// No description provided for @savedPlacesManageCollectionsMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Add or remove this saved place from private Demo Mode collections.'**
+  String get savedPlacesManageCollectionsMessage;
+
+  /// No description provided for @savedPlacesCollectionSavedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Collection updated.'**
+  String get savedPlacesCollectionSavedMessage;
+
+  /// No description provided for @savedPlacesCollectionsRealUnavailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved collections are not connected to the backend yet for real accounts.'**
+  String get savedPlacesCollectionsRealUnavailableMessage;
+
+  /// No description provided for @savedPlacesCollectionInvalidNameMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Collection name is required and limited to {maxLength} characters.'**
+  String savedPlacesCollectionInvalidNameMessage(int maxLength);
+
+  /// No description provided for @savedPlacesCollectionInvalidDescriptionMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Collection description is limited to {maxLength} characters.'**
+  String savedPlacesCollectionInvalidDescriptionMessage(int maxLength);
+
+  /// No description provided for @savedPlacesCollectionInvalidCoverMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Collection cover URL is limited to {maxLength} characters.'**
+  String savedPlacesCollectionInvalidCoverMessage(int maxLength);
+
+  /// No description provided for @savedPlacesCollectionLimitMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached the local limit of {maxCount} collections.'**
+  String savedPlacesCollectionLimitMessage(int maxCount);
+
+  /// No description provided for @savedPlacesCollectionNotFoundMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This collection is unavailable.'**
+  String get savedPlacesCollectionNotFoundMessage;
+
+  /// No description provided for @savedPlacesCollectionPlaceNotFoundMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This place cannot be added because it no longer resolves to public place data.'**
+  String get savedPlacesCollectionPlaceNotFoundMessage;
+
+  /// No description provided for @savedPlacesCollectionDuplicatePlaceMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{place} is already in {collection}.'**
+  String savedPlacesCollectionDuplicatePlaceMessage(
+      String place, String collection);
+
+  /// No description provided for @savedPlacesCollectionItemNotFoundMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This place is not in the selected collection.'**
+  String get savedPlacesCollectionItemNotFoundMessage;
+
+  /// No description provided for @savedPlacesCollectionItemLimitMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This collection has reached the local limit of {maxCount} places.'**
+  String savedPlacesCollectionItemLimitMessage(int maxCount);
+
+  /// No description provided for @savedPlacesCollectionAddedPlaceMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Added {place} to {collection}.'**
+  String savedPlacesCollectionAddedPlaceMessage(
+      String place, String collection);
+
+  /// No description provided for @savedPlacesCollectionRemovedPlaceMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed {place} from {collection}.'**
+  String savedPlacesCollectionRemovedPlaceMessage(
+      String place, String collection);
+
+  /// No description provided for @savedPlacesAddToCollectionAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Collections'**
+  String get savedPlacesAddToCollectionAction;
+
+  /// No description provided for @savedPlacesManageCollectionsSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage collections for {place}'**
+  String savedPlacesManageCollectionsSemantic(String place);
+
+  /// No description provided for @savedPlacesSavedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved {date}'**
+  String savedPlacesSavedOn(String date);
+
+  /// No description provided for @savedPlacesNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note: {note}'**
+  String savedPlacesNote(String note);
+
+  /// No description provided for @savedPlacesEditNoteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit note'**
+  String get savedPlacesEditNoteAction;
+
+  /// No description provided for @savedPlacesEditNoteSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit private note for {place}'**
+  String savedPlacesEditNoteSemantic(String place);
+
+  /// No description provided for @savedPlacesEditNoteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Private note for {place}'**
+  String savedPlacesEditNoteTitle(String place);
+
+  /// No description provided for @savedPlacesNoteFieldLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Private note'**
+  String get savedPlacesNoteFieldLabel;
+
+  /// No description provided for @savedPlacesNoteFieldHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Up to {maxLength} characters. Leave blank to clear it.'**
+  String savedPlacesNoteFieldHelper(int maxLength);
+
+  /// No description provided for @savedPlacesNoteSaveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Save note'**
+  String get savedPlacesNoteSaveAction;
+
+  /// No description provided for @savedPlacesNoteSavedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated the private note for {place}.'**
+  String savedPlacesNoteSavedMessage(String place);
+
+  /// No description provided for @savedPlacesNoteTooLongMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Private notes are limited to 500 characters.'**
+  String get savedPlacesNoteTooLongMessage;
+
+  /// No description provided for @savedPlacesSaveSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Save {place}'**
+  String savedPlacesSaveSemantic(String place);
+
+  /// No description provided for @savedPlacesRemoveSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove saved place {place}'**
+  String savedPlacesRemoveSemantic(String place);
+
+  /// No description provided for @savedPlacesSavedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved {place} locally.'**
+  String savedPlacesSavedMessage(String place);
+
+  /// No description provided for @savedPlacesAlreadySavedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{place} is already saved.'**
+  String savedPlacesAlreadySavedMessage(String place);
+
+  /// No description provided for @savedPlacesRemovedPlace.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed {place} from local saved places.'**
+  String savedPlacesRemovedPlace(String place);
+
+  /// No description provided for @savedPlacesActionForbiddenMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This saved place belongs to another traveler.'**
+  String get savedPlacesActionForbiddenMessage;
+
+  /// No description provided for @savedPlacesMissingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved place unavailable'**
+  String get savedPlacesMissingTitle;
+
+  /// No description provided for @savedPlacesMissingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This saved place no longer resolves to a public place.'**
+  String get savedPlacesMissingMessage;
+
+  /// No description provided for @savedPlacesMissingRecordMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved place reference {placeId} no longer resolves to public place data.'**
+  String savedPlacesMissingRecordMessage(int placeId);
+
+  /// No description provided for @savedPlacesRemoveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get savedPlacesRemoveAction;
+
+  /// No description provided for @savedPlacesRemoveConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove saved place?'**
+  String get savedPlacesRemoveConfirmTitle;
+
+  /// No description provided for @savedPlacesRemoveConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {place} from your local saved places? The place, trips, bookings, reviews, and wallet items will not be deleted.'**
+  String savedPlacesRemoveConfirmMessage(String place);
+
+  /// No description provided for @savedPlacesRemoveConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove saved place'**
+  String get savedPlacesRemoveConfirmAction;
+
+  /// No description provided for @savedPlacesViewDetailsAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get savedPlacesViewDetailsAction;
+
+  /// No description provided for @savedPlacesOpenDetailSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Open details for {place}'**
+  String savedPlacesOpenDetailSemantic(String place);
+
+  /// No description provided for @savedPlacesHotelAction.
+  ///
+  /// In en, this message translates to:
+  /// **'View rooms'**
+  String get savedPlacesHotelAction;
+
+  /// No description provided for @savedPlacesCardSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{place}, saved {date}'**
+  String savedPlacesCardSemantic(String place, String date);
+
   /// No description provided for @notificationsTitle.
   ///
   /// In en, this message translates to:
