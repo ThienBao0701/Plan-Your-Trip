@@ -11,6 +11,7 @@ import '../../design/app_spacing.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/add_to_trip_sheet.dart';
 import '../../shared/widgets/glass_widgets.dart';
+import '../auth/login_screen.dart';
 import '../hotels/hotel_room_selection_screen.dart';
 import '../hotels/hotel_utils.dart';
 import '../places/place_detail_screen.dart';
@@ -32,6 +33,7 @@ class _SavedPlacesScreenState extends State<SavedPlacesScreen> {
   SavedPlaceSort sort = SavedPlaceSort.newest;
   _SavedPlacesTab selectedTab = _SavedPlacesTab.allSaved;
   String? selectedCollectionId;
+  int? selectedRealCollectionId;
 
   @override
   void dispose() {
@@ -71,50 +73,64 @@ class _SavedPlacesScreenState extends State<SavedPlacesScreen> {
               ? const Center(
                   child: SizedBox(width: 420, child: OceanLoadingState()),
                 )
-              : ListView(
-                  padding: const EdgeInsets.fromLTRB(
-                    AppSpacing.lg,
-                    AppSpacing.lg,
-                    AppSpacing.lg,
-                    AppSpacing.xxl,
-                  ),
-                  children: [
-                    OceanContentConstraint(
-                      maxWidth: AppBreakpoints.maxContentWidth,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          _SavedPlacesHeader(
-                            count: app.savedPlaceCount,
-                            collectionCount: app.savedCollectionCount,
-                          ),
-                          const SizedBox(height: AppSpacing.md),
-                          if (!app.demoMode)
-                            OceanEmptyState(
-                              title: l10n.savedPlacesRealEmptyTitle,
-                              message: l10n.savedPlacesRealEmptyMessage,
-                            )
-                          else ...[
+              : RefreshIndicator(
+                  onRefresh: _handleRealRefresh,
+                  child: ListView(
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.lg,
+                      AppSpacing.lg,
+                      AppSpacing.lg,
+                      AppSpacing.xxl,
+                    ),
+                    children: [
+                      OceanContentConstraint(
+                        maxWidth: AppBreakpoints.maxContentWidth,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            _SavedPlacesHeader(
+                              count: app.savedPlaceCount,
+                              collectionCount: app.demoMode
+                                  ? app.savedCollectionCount
+                                  : app.realSavedCollections.length,
+                            ),
+                            const SizedBox(height: AppSpacing.md),
                             _SavedPlacesTabs(
                               selected: selectedTab,
                               savedCount: app.savedPlaceCount,
-                              collectionCount: app.savedCollectionCount,
-                              onSelected: (tab) => setState(() {
-                                selectedTab = tab;
-                                if (tab == _SavedPlacesTab.allSaved) {
-                                  selectedCollectionId = null;
+                              collectionCount: app.demoMode
+                                  ? app.savedCollectionCount
+                                  : app.realSavedCollections.length,
+                              onSelected: (tab) async {
+                                setState(() {
+                                  selectedTab = tab;
+                                  if (tab == _SavedPlacesTab.allSaved) {
+                                    selectedCollectionId = null;
+                                    selectedRealCollectionId = null;
+                                  }
+                                });
+                                if (tab == _SavedPlacesTab.collections &&
+                                    !app.demoMode) {
+                                  await _loadRealCollections();
                                 }
-                              }),
+                              },
                             ),
                             const SizedBox(height: AppSpacing.md),
                             if (selectedTab == _SavedPlacesTab.allSaved)
-                              _buildSavedList(
-                                app: app,
-                                l10n: l10n,
-                                categories: categories,
-                                effectiveCategory: effectiveCategory,
-                                results: results,
-                              )
+                              !app.demoMode
+                                  ? OceanEmptyState(
+                                      title: l10n.savedPlacesRealEmptyTitle,
+                                      message: l10n.savedPlacesRealEmptyMessage,
+                                    )
+                                  : _buildSavedList(
+                                      app: app,
+                                      l10n: l10n,
+                                      categories: categories,
+                                      effectiveCategory: effectiveCategory,
+                                      results: results,
+                                    )
+                            else if (!app.demoMode)
+                              _buildRealCollections(app, l10n)
                             else if (selectedCollection != null)
                               _CollectionDetailView(
                                 collection: selectedCollection,
@@ -154,14 +170,24 @@ class _SavedPlacesScreenState extends State<SavedPlacesScreen> {
                                 onDelete: _confirmDeleteCollection,
                               ),
                           ],
-                        ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
         ),
       ),
     );
+  }
+
+  Future<void> _handleRealRefresh() async {
+    final app = AppScope.of(context);
+    if (app.demoMode || selectedTab != _SavedPlacesTab.collections) return;
+    if (selectedRealCollectionId != null) {
+      await _loadRealCollectionDetail(selectedRealCollectionId!, refresh: true);
+      return;
+    }
+    await _loadRealCollections(refresh: true);
   }
 
   Widget _buildSavedList({
@@ -353,7 +379,13 @@ class _SavedPlacesScreenState extends State<SavedPlacesScreen> {
     final l10n = AppLocalizations.of(context)!;
     final draft = await showDialog<_SavedCollectionDraft>(
       context: context,
-      builder: (_) => _SavedCollectionDialog(collection: collection),
+      builder: (_) => _SavedCollectionDialog(
+        editing: collection != null,
+        initialName: collection?.name,
+        initialDescription: collection?.description,
+        initialCoverImageUrl: collection?.coverImageUrl,
+        initialPrivateCollection: collection?.privateCollection ?? true,
+      ),
     );
     if (!mounted || draft == null) return;
     final app = AppScope.of(context);
@@ -730,6 +762,12 @@ class _SavedPlacesScreenState extends State<SavedPlacesScreen> {
         l10n.savedPlacesCollectionItemLimitMessage(
           SavedCollectionPlaceRecord.maxPlacesPerCollection,
         ),
+      SavedCollectionActionResult.network =>
+        l10n.savedPlacesCollectionNetworkErrorMessage,
+      SavedCollectionActionResult.serverError =>
+        l10n.savedPlacesCollectionServerErrorMessage,
+      SavedCollectionActionResult.unauthenticated =>
+        l10n.savedPlacesCollectionUnauthenticatedMessage,
     };
   }
 
@@ -748,6 +786,364 @@ class _SavedPlacesScreenState extends State<SavedPlacesScreen> {
       ..sort((a, b) => a.startDate.compareTo(b.startDate));
     return candidates.isEmpty ? null : candidates.first;
   }
+
+  // ── Real Mode Saved Collections (UI-17) ───────────────────────────────────
+
+  Widget _buildRealCollections(AppState app, AppLocalizations l10n) {
+    if (selectedRealCollectionId != null) {
+      return _buildRealCollectionDetail(app, l10n, selectedRealCollectionId!);
+    }
+    if (app.realSavedCollectionsLoading && app.realSavedCollections.isEmpty) {
+      return const OceanLoadingState();
+    }
+    if (app.realSavedCollectionsError != null &&
+        app.realSavedCollections.isEmpty) {
+      return OceanRecoverableErrorState(
+        message: _collectionErrorMessage(l10n, app.realSavedCollectionsError!),
+        onReload: () => _loadRealCollections(refresh: true),
+      );
+    }
+    return _RealCollectionOverview(
+      collections: app.realSavedCollections,
+      onCreate: _createRealCollection,
+      onOpen: (collection) => _openRealCollection(collection.id),
+      onEdit: _editRealCollection,
+      onDelete: _confirmDeleteRealCollection,
+    );
+  }
+
+  Widget _buildRealCollectionDetail(
+    AppState app,
+    AppLocalizations l10n,
+    int collectionId,
+  ) {
+    final detail = app.realSelectedCollectionDetail;
+    final hasDetail = detail != null && detail.id == collectionId;
+    if (app.realCollectionDetailLoading && !hasDetail) {
+      return const OceanLoadingState();
+    }
+    if (!hasDetail) {
+      final error = app.realCollectionDetailError;
+      if (error == SavedCollectionActionResult.collectionNotFound) {
+        return OceanEmptyState(
+          title: l10n.savedPlacesCollectionNotFoundMessage,
+          message: l10n.savedPlacesCollectionNotFoundMessage,
+          actionLabel: l10n.savedPlacesCollectionBackAction,
+          onAction: () => setState(() => selectedRealCollectionId = null),
+        );
+      }
+      return OceanRecoverableErrorState(
+        message: error != null ? _collectionErrorMessage(l10n, error) : null,
+        onReload: () => _loadRealCollectionDetail(collectionId, refresh: true),
+      );
+    }
+    return _RealCollectionDetailView(
+      collection: detail,
+      onBack: () => setState(() => selectedRealCollectionId = null),
+      onEdit: () => _editRealCollection(detail.toSummary()),
+      onDelete: () => _confirmDeleteRealCollection(detail.toSummary()),
+      onAddSavedPlace: _showDeferredRealAddPlace,
+      onRemove: (place) => _removeRealCollectionPlace(detail.id, place),
+    );
+  }
+
+  Future<void> _loadRealCollections({bool refresh = false}) async {
+    final app = AppScope.of(context);
+    final outcome = await app.loadRealSavedCollections(refresh: refresh);
+    if (mounted && outcome == SavedCollectionActionResult.unauthenticated) {
+      _showRealCollectionsReauth();
+    }
+  }
+
+  Future<void> _loadRealCollectionDetail(
+    int collectionId, {
+    bool refresh = false,
+  }) async {
+    final app = AppScope.of(context);
+    final outcome = await app.loadRealCollectionDetail(
+      collectionId,
+      refresh: refresh,
+    );
+    if (mounted && outcome == SavedCollectionActionResult.unauthenticated) {
+      _showRealCollectionsReauth();
+    }
+  }
+
+  void _openRealCollection(int collectionId) {
+    setState(() => selectedRealCollectionId = collectionId);
+    _loadRealCollectionDetail(collectionId);
+  }
+
+  void _showRealCollectionsReauth() {
+    showOceanSessionExpiredSheet(
+      context,
+      onLogin: () {
+        Navigator.of(context).pop();
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+        );
+      },
+      onReturnHome: () => Navigator.of(context).pop(),
+    );
+  }
+
+  bool _recoverableRealOutcome(SavedCollectionActionResult outcome) =>
+      outcome == SavedCollectionActionResult.invalidName ||
+      outcome == SavedCollectionActionResult.invalidDescription ||
+      outcome == SavedCollectionActionResult.invalidCover ||
+      outcome == SavedCollectionActionResult.collectionLimitReached ||
+      outcome == SavedCollectionActionResult.network ||
+      outcome == SavedCollectionActionResult.serverError;
+
+  Future<void> _createRealCollection() async {
+    final app = AppScope.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    _SavedCollectionDraft? draft;
+    while (mounted) {
+      draft = await showDialog<_SavedCollectionDraft>(
+        context: context,
+        builder: (_) => _SavedCollectionDialog(
+          editing: false,
+          initialName: draft?.name,
+          initialDescription: draft?.description,
+          initialCoverImageUrl: draft?.coverImageUrl,
+          initialPrivateCollection: draft?.privateCollection ?? true,
+        ),
+      );
+      if (draft == null || !mounted) return;
+      final outcome = await app.createRealSavedCollection(
+        name: draft.name,
+        description: draft.description,
+        coverImageUrl: draft.coverImageUrl,
+        privateCollection: draft.privateCollection,
+      );
+      if (!mounted) return;
+      if (outcome == SavedCollectionActionResult.success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.savedPlacesCollectionCreatedMessage(draft.name)),
+          ),
+        );
+        return;
+      }
+      if (outcome == SavedCollectionActionResult.unauthenticated) {
+        _showRealCollectionsReauth();
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_realCollectionActionMessage(l10n, outcome))),
+      );
+      if (!_recoverableRealOutcome(outcome)) return;
+    }
+  }
+
+  Future<void> _editRealCollection(CollectionSummaryRecord collection) async {
+    final app = AppScope.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    var seed = collection;
+    while (mounted) {
+      final draft = await showDialog<_SavedCollectionDraft>(
+        context: context,
+        builder: (_) => _SavedCollectionDialog(
+          editing: true,
+          initialName: seed.name,
+          initialDescription: seed.description,
+          initialCoverImageUrl: seed.coverImageUrl,
+          initialPrivateCollection: seed.privateCollection,
+        ),
+      );
+      if (draft == null || !mounted) return;
+      seed = CollectionSummaryRecord(
+        id: collection.id,
+        name: draft.name,
+        description: draft.description,
+        coverImageUrl: draft.coverImageUrl,
+        privateCollection: draft.privateCollection,
+        sortOrder: collection.sortOrder,
+        placeCount: collection.placeCount,
+        createdAt: collection.createdAt,
+        updatedAt: collection.updatedAt,
+      );
+      final outcome = await app.updateRealSavedCollection(
+        collectionId: collection.id,
+        name: draft.name,
+        description: draft.description,
+        coverImageUrl: draft.coverImageUrl,
+        privateCollection: draft.privateCollection,
+        sortOrder: collection.sortOrder,
+      );
+      if (!mounted) return;
+      if (outcome == SavedCollectionActionResult.success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.savedPlacesCollectionUpdatedMessage(draft.name)),
+          ),
+        );
+        return;
+      }
+      if (outcome == SavedCollectionActionResult.unauthenticated) {
+        _showRealCollectionsReauth();
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_realCollectionActionMessage(l10n, outcome))),
+      );
+      if (!_recoverableRealOutcome(outcome)) return;
+    }
+  }
+
+  Future<void> _confirmDeleteRealCollection(
+    CollectionSummaryRecord collection,
+  ) async {
+    final app = AppScope.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.savedPlacesCollectionDeleteTitle(collection.name)),
+        content: Text(l10n.savedPlacesCollectionDeleteMessage(collection.name)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(l10n.profileCancel),
+          ),
+          FilledButton.icon(
+            key: Key('real-collection-delete-confirm-${collection.id}'),
+            onPressed: () => Navigator.pop(dialogContext, true),
+            icon: const Icon(Icons.delete_outline_rounded),
+            label: Text(l10n.savedPlacesCollectionDeleteAction),
+          ),
+        ],
+      ),
+    );
+    if (!mounted || confirmed != true) return;
+    final outcome = await app.deleteRealSavedCollection(collection.id);
+    if (!mounted) return;
+    if (outcome == SavedCollectionActionResult.success) {
+      if (selectedRealCollectionId == collection.id) {
+        setState(() => selectedRealCollectionId = null);
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content:
+              Text(l10n.savedPlacesCollectionDeletedMessage(collection.name)),
+        ),
+      );
+      return;
+    }
+    if (outcome == SavedCollectionActionResult.unauthenticated) {
+      _showRealCollectionsReauth();
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(_realCollectionActionMessage(l10n, outcome))),
+    );
+  }
+
+  Future<void> _removeRealCollectionPlace(
+    int collectionId,
+    CollectionPlaceRecord place,
+  ) async {
+    final app = AppScope.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final collectionName = app.realSelectedCollectionDetail?.name ?? '';
+    final outcome = await app.removeRealCollectionPlace(
+      collectionId: collectionId,
+      placeId: place.placeId,
+    );
+    if (!mounted) return;
+    if (outcome == SavedCollectionActionResult.success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            l10n.savedPlacesCollectionRemovedPlaceMessage(
+              place.name,
+              collectionName,
+            ),
+          ),
+        ),
+      );
+      return;
+    }
+    if (outcome == SavedCollectionActionResult.unauthenticated) {
+      _showRealCollectionsReauth();
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(_realCollectionActionMessage(l10n, outcome))),
+    );
+  }
+
+  void _showDeferredRealAddPlace() {
+    final l10n = AppLocalizations.of(context)!;
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (sheetContext) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: OceanEmptyState(
+            title: l10n.savedPlacesCollectionAddPlaceDeferredTitle,
+            message: l10n.savedPlacesCollectionAddPlaceDeferredMessage,
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _collectionErrorMessage(
+    AppLocalizations l10n,
+    SavedCollectionActionResult outcome,
+  ) {
+    switch (outcome) {
+      case SavedCollectionActionResult.network:
+        return l10n.savedPlacesCollectionNetworkErrorMessage;
+      case SavedCollectionActionResult.serverError:
+        return l10n.savedPlacesCollectionServerErrorMessage;
+      case SavedCollectionActionResult.unauthenticated:
+        return l10n.savedPlacesCollectionUnauthenticatedMessage;
+      case SavedCollectionActionResult.collectionNotFound:
+        return l10n.savedPlacesCollectionNotFoundMessage;
+      default:
+        return l10n.savedPlacesCollectionServerErrorMessage;
+    }
+  }
+
+  String _realCollectionActionMessage(
+    AppLocalizations l10n,
+    SavedCollectionActionResult outcome,
+  ) {
+    switch (outcome) {
+      case SavedCollectionActionResult.invalidName:
+        return l10n.savedPlacesCollectionInvalidNameMessage(
+          SavedCollectionRecord.maxNameLength,
+        );
+      case SavedCollectionActionResult.invalidDescription:
+        return l10n.savedPlacesCollectionInvalidDescriptionMessage(
+          SavedCollectionRecord.maxDescriptionLength,
+        );
+      case SavedCollectionActionResult.invalidCover:
+        return l10n.savedPlacesCollectionInvalidCoverMessage(
+          SavedCollectionRecord.maxCoverImageUrlLength,
+        );
+      case SavedCollectionActionResult.collectionLimitReached:
+        return l10n.savedPlacesCollectionLimitMessage(
+          SavedCollectionRecord.maxCollectionsPerUser,
+        );
+      case SavedCollectionActionResult.collectionNotFound:
+        return l10n.savedPlacesCollectionNotFoundMessage;
+      case SavedCollectionActionResult.itemNotFound:
+        return l10n.savedPlacesCollectionItemNotFoundMessage;
+      case SavedCollectionActionResult.network:
+        return l10n.savedPlacesCollectionNetworkErrorMessage;
+      case SavedCollectionActionResult.serverError:
+        return l10n.savedPlacesCollectionServerErrorMessage;
+      case SavedCollectionActionResult.success:
+        return l10n.savedPlacesCollectionSavedMessage;
+      default:
+        return l10n.savedPlacesCollectionServerErrorMessage;
+    }
+  }
 }
 
 class _SavedCollectionDraft {
@@ -765,9 +1161,19 @@ class _SavedCollectionDraft {
 }
 
 class _SavedCollectionDialog extends StatefulWidget {
-  final SavedCollectionRecord? collection;
+  final bool editing;
+  final String? initialName;
+  final String? initialDescription;
+  final String? initialCoverImageUrl;
+  final bool initialPrivateCollection;
 
-  const _SavedCollectionDialog({this.collection});
+  const _SavedCollectionDialog({
+    required this.editing,
+    this.initialName,
+    this.initialDescription,
+    this.initialCoverImageUrl,
+    this.initialPrivateCollection = true,
+  });
 
   @override
   State<_SavedCollectionDialog> createState() => _SavedCollectionDialogState();
@@ -785,13 +1191,12 @@ class _SavedCollectionDialogState extends State<_SavedCollectionDialog> {
   @override
   void initState() {
     super.initState();
-    final collection = widget.collection;
-    nameController = TextEditingController(text: collection?.name ?? '');
+    nameController = TextEditingController(text: widget.initialName ?? '');
     descriptionController =
-        TextEditingController(text: collection?.description ?? '');
+        TextEditingController(text: widget.initialDescription ?? '');
     coverController =
-        TextEditingController(text: collection?.coverImageUrl ?? '');
-    privateCollection = collection?.privateCollection ?? true;
+        TextEditingController(text: widget.initialCoverImageUrl ?? '');
+    privateCollection = widget.initialPrivateCollection;
   }
 
   @override
@@ -805,7 +1210,7 @@ class _SavedCollectionDialogState extends State<_SavedCollectionDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final editing = widget.collection != null;
+    final editing = widget.editing;
     return AlertDialog(
       title: Text(
         editing
@@ -1800,6 +2205,556 @@ class _MissingCollectionPlaceCard extends StatelessWidget {
             tooltip: l10n.savedPlacesCollectionRemoveStaleSemantic,
             onPressed: onRemove,
             icon: const Icon(Icons.playlist_remove_rounded),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RealCollectionOverview extends StatelessWidget {
+  final List<CollectionSummaryRecord> collections;
+  final VoidCallback onCreate;
+  final ValueChanged<CollectionSummaryRecord> onOpen;
+  final ValueChanged<CollectionSummaryRecord> onEdit;
+  final ValueChanged<CollectionSummaryRecord> onDelete;
+
+  const _RealCollectionOverview({
+    required this.collections,
+    required this.onCreate,
+    required this.onOpen,
+    required this.onEdit,
+    required this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        OceanGlassSurface(
+          blur: 0,
+          color: AppColors.paleCyan,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final compact = constraints.maxWidth < 560;
+              final text = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.savedPlacesCollectionsTitle,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: AppSpacing.xxs),
+                  Text(
+                    l10n.savedPlacesCollectionsBoundaryMessage,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ],
+              );
+              final action = OceanPrimaryButton(
+                key: const Key('real-collection-create'),
+                label: l10n.savedPlacesCollectionCreateAction,
+                icon: Icons.create_new_folder_rounded,
+                fullWidth: compact,
+                semanticLabel: l10n.savedPlacesCollectionCreateSemantic,
+                onPressed: onCreate,
+              );
+              if (compact) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    text,
+                    const SizedBox(height: AppSpacing.md),
+                    action,
+                  ],
+                );
+              }
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: text),
+                  const SizedBox(width: AppSpacing.md),
+                  action,
+                ],
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        if (collections.isEmpty)
+          OceanEmptyState(
+            title: l10n.savedPlacesCollectionsEmptyTitle,
+            message: l10n.savedPlacesCollectionsEmptyMessage,
+            actionLabel: l10n.savedPlacesCollectionCreateAction,
+            onAction: onCreate,
+          )
+        else
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final wide = constraints.maxWidth >= AppBreakpoints.tablet;
+              if (wide) {
+                return Wrap(
+                  spacing: AppSpacing.md,
+                  runSpacing: AppSpacing.md,
+                  children: [
+                    for (final collection in collections)
+                      SizedBox(
+                        width: (constraints.maxWidth - AppSpacing.md) / 2,
+                        child: _RealCollectionCard(
+                          collection: collection,
+                          onOpen: () => onOpen(collection),
+                          onEdit: () => onEdit(collection),
+                          onDelete: () => onDelete(collection),
+                        ),
+                      ),
+                  ],
+                );
+              }
+              return Column(
+                children: [
+                  for (final collection in collections)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                      child: _RealCollectionCard(
+                        collection: collection,
+                        onOpen: () => onOpen(collection),
+                        onEdit: () => onEdit(collection),
+                        onDelete: () => onDelete(collection),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+      ],
+    );
+  }
+}
+
+class _RealCollectionCard extends StatelessWidget {
+  final CollectionSummaryRecord collection;
+  final VoidCallback onOpen;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+
+  const _RealCollectionCard({
+    required this.collection,
+    required this.onOpen,
+    required this.onEdit,
+    required this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final updated = DateFormat.yMMMd(Localizations.localeOf(context).toString())
+        .format(collection.updatedAt.toLocal());
+    return OceanGlassCard(
+      onTap: onOpen,
+      semanticLabel: l10n.savedPlacesCollectionCardSemantic(
+        collection.name,
+        collection.placeCount,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: AppSpacing.minTouchTarget,
+                height: AppSpacing.minTouchTarget,
+                decoration: BoxDecoration(
+                  color: AppColors.paleCyan,
+                  borderRadius: BorderRadius.circular(AppRadii.md),
+                ),
+                child: const Icon(
+                  Icons.folder_copy_rounded,
+                  color: AppColors.ocean,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      collection.name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    if ((collection.description ?? '').trim().isNotEmpty) ...[
+                      const SizedBox(height: AppSpacing.xxs),
+                      Text(
+                        collection.description!,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Wrap(
+            spacing: AppSpacing.xs,
+            runSpacing: AppSpacing.xs,
+            children: [
+              OceanStatusPill(
+                label: l10n.savedPlacesCollectionItemCount(
+                  collection.placeCount,
+                ),
+                icon: Icons.place_outlined,
+                color: AppColors.ocean,
+                semanticLabel: l10n.savedPlacesCollectionItemCountSemantic(
+                  collection.placeCount,
+                ),
+              ),
+              OceanStatusPill(
+                label: collection.privateCollection
+                    ? l10n.savedPlacesCollectionPrivateLabel
+                    : l10n.savedPlacesCollectionVisibleLabel,
+                icon: collection.privateCollection
+                    ? Icons.lock_outline_rounded
+                    : Icons.visibility_outlined,
+                color: AppColors.turquoise600,
+              ),
+              OceanStatusPill(
+                label: l10n.savedPlacesCollectionUpdated(updated),
+                icon: Icons.update_rounded,
+                color: AppColors.success,
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Wrap(
+            spacing: AppSpacing.xs,
+            runSpacing: AppSpacing.xs,
+            children: [
+              OceanPrimaryButton(
+                key: Key('real-collection-open-${collection.id}'),
+                label: l10n.savedPlacesCollectionOpenAction,
+                icon: Icons.folder_open_rounded,
+                fullWidth: false,
+                semanticLabel:
+                    l10n.savedPlacesCollectionOpenSemantic(collection.name),
+                onPressed: onOpen,
+              ),
+              OceanSecondaryButton(
+                key: Key('real-collection-edit-${collection.id}'),
+                label: l10n.savedPlacesCollectionEditAction,
+                icon: Icons.edit_rounded,
+                fullWidth: false,
+                semanticLabel:
+                    l10n.savedPlacesCollectionEditSemantic(collection.name),
+                onPressed: onEdit,
+              ),
+              IconButton(
+                key: Key('real-collection-delete-${collection.id}'),
+                tooltip:
+                    l10n.savedPlacesCollectionDeleteSemantic(collection.name),
+                onPressed: onDelete,
+                icon: const Icon(Icons.delete_outline_rounded),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RealCollectionDetailView extends StatelessWidget {
+  final CollectionDetailRecord collection;
+  final VoidCallback onBack;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+  final VoidCallback onAddSavedPlace;
+  final ValueChanged<CollectionPlaceRecord> onRemove;
+
+  const _RealCollectionDetailView({
+    required this.collection,
+    required this.onBack,
+    required this.onEdit,
+    required this.onDelete,
+    required this.onAddSavedPlace,
+    required this.onRemove,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        OceanGlassCard(
+          semanticLabel: l10n.savedPlacesCollectionDetailSemantic(
+            collection.name,
+            collection.placeCount,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Wrap(
+                spacing: AppSpacing.xs,
+                runSpacing: AppSpacing.xs,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  OceanSecondaryButton(
+                    key: const Key('real-collection-back'),
+                    label: l10n.savedPlacesCollectionBackAction,
+                    icon: Icons.arrow_back_rounded,
+                    fullWidth: false,
+                    semanticLabel: l10n.savedPlacesCollectionBackSemantic,
+                    onPressed: onBack,
+                  ),
+                  OceanSecondaryButton(
+                    key: Key('real-collection-detail-edit-${collection.id}'),
+                    label: l10n.savedPlacesCollectionEditAction,
+                    icon: Icons.edit_rounded,
+                    fullWidth: false,
+                    semanticLabel:
+                        l10n.savedPlacesCollectionEditSemantic(collection.name),
+                    onPressed: onEdit,
+                  ),
+                  IconButton(
+                    key: Key(
+                      'real-collection-detail-delete-${collection.id}',
+                    ),
+                    tooltip: l10n
+                        .savedPlacesCollectionDeleteSemantic(collection.name),
+                    onPressed: onDelete,
+                    icon: const Icon(Icons.delete_outline_rounded),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                collection.name,
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              if ((collection.description ?? '').trim().isNotEmpty) ...[
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  collection.description!,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+              ],
+              const SizedBox(height: AppSpacing.md),
+              Wrap(
+                spacing: AppSpacing.xs,
+                runSpacing: AppSpacing.xs,
+                children: [
+                  OceanStatusPill(
+                    label: l10n.savedPlacesCollectionItemCount(
+                      collection.placeCount,
+                    ),
+                    icon: Icons.place_outlined,
+                    color: AppColors.ocean,
+                    semanticLabel: l10n.savedPlacesCollectionItemCountSemantic(
+                      collection.placeCount,
+                    ),
+                  ),
+                  OceanStatusPill(
+                    label: collection.privateCollection
+                        ? l10n.savedPlacesCollectionPrivateLabel
+                        : l10n.savedPlacesCollectionVisibleLabel,
+                    icon: collection.privateCollection
+                        ? Icons.lock_outline_rounded
+                        : Icons.visibility_outlined,
+                    color: AppColors.turquoise600,
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.md),
+              OceanPrimaryButton(
+                key: Key('real-collection-add-saved-${collection.id}'),
+                label: l10n.savedPlacesCollectionAddSavedAction,
+                icon: Icons.add_location_alt_rounded,
+                semanticLabel:
+                    l10n.savedPlacesCollectionAddSavedSemantic(collection.name),
+                onPressed: onAddSavedPlace,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        if (collection.places.isEmpty)
+          OceanEmptyState(
+            title: l10n.savedPlacesCollectionEmptyTitle,
+            message: l10n.savedPlacesCollectionEmptyMessage,
+            actionLabel: l10n.savedPlacesCollectionAddSavedAction,
+            onAction: onAddSavedPlace,
+          )
+        else
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final wide = constraints.maxWidth >= AppBreakpoints.tablet;
+              if (wide) {
+                return Wrap(
+                  spacing: AppSpacing.md,
+                  runSpacing: AppSpacing.md,
+                  children: [
+                    for (final place in collection.places)
+                      SizedBox(
+                        width: (constraints.maxWidth - AppSpacing.md) / 2,
+                        child: _RealCollectionPlaceCard(
+                          place: place,
+                          onRemove: () => onRemove(place),
+                        ),
+                      ),
+                  ],
+                );
+              }
+              return Column(
+                children: [
+                  for (final place in collection.places)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                      child: _RealCollectionPlaceCard(
+                        place: place,
+                        onRemove: () => onRemove(place),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+      ],
+    );
+  }
+}
+
+class _RealCollectionPlaceCard extends StatelessWidget {
+  final CollectionPlaceRecord place;
+  final VoidCallback onRemove;
+
+  const _RealCollectionPlaceCard({
+    required this.place,
+    required this.onRemove,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final added = DateFormat.yMMMd(Localizations.localeOf(context).toString())
+        .format(place.addedAt.toLocal());
+    return OceanGlassCard(
+      semanticLabel: l10n.savedPlacesCollectionPlaceSemantic(place.name, added),
+      padding: const EdgeInsets.all(AppSpacing.sm),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 128,
+            height: 128,
+            decoration: BoxDecoration(
+              color: AppColors.paleCyan,
+              borderRadius: BorderRadius.circular(AppRadii.lg),
+            ),
+            alignment: Alignment.center,
+            child: const Icon(
+              Icons.place_rounded,
+              color: AppColors.ocean,
+              size: AppIconSizes.lg,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  place.name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Wrap(
+                  spacing: AppSpacing.xs,
+                  runSpacing: AppSpacing.xs,
+                  children: [
+                    if ((place.categoryName ?? '').isNotEmpty)
+                      OceanStatusPill(
+                        label: place.categoryName!,
+                        icon: Icons.place_outlined,
+                        color: AppColors.ocean,
+                      ),
+                    OceanStatusPill(
+                      label: l10n.savedPlacesCollectionAddedOn(added),
+                      icon: Icons.playlist_add_check_rounded,
+                      color: AppColors.success,
+                    ),
+                    if (place.ratingAvg > 0)
+                      OceanStatusPill(
+                        label: place.ratingAvg.toStringAsFixed(1),
+                        icon: Icons.star_rounded,
+                        color: AppColors.warning,
+                      ),
+                  ],
+                ),
+                if ((place.address ?? '').trim().isNotEmpty) ...[
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    place.address!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ],
+                const SizedBox(height: AppSpacing.sm),
+                Wrap(
+                  spacing: AppSpacing.xs,
+                  runSpacing: AppSpacing.xs,
+                  children: [
+                    Tooltip(
+                      message: l10n.savedPlacesCollectionPlaceHydrationMessage,
+                      child: OceanSecondaryButton(
+                        key: Key(
+                            'real-collection-place-details-${place.placeId}'),
+                        label: l10n.savedPlacesViewDetailsAction,
+                        icon: Icons.info_outline_rounded,
+                        fullWidth: false,
+                        semanticLabel:
+                            l10n.savedPlacesCollectionPlaceHydrationMessage,
+                        onPressed: null,
+                      ),
+                    ),
+                    Tooltip(
+                      message: l10n.savedPlacesCollectionPlaceHydrationMessage,
+                      child: OceanSecondaryButton(
+                        key: Key(
+                          'real-collection-place-add-trip-${place.placeId}',
+                        ),
+                        label: l10n.placeAddToTrip,
+                        icon: Icons.add_location_alt_rounded,
+                        fullWidth: false,
+                        semanticLabel:
+                            l10n.savedPlacesCollectionPlaceHydrationMessage,
+                        onPressed: null,
+                      ),
+                    ),
+                    OceanSecondaryButton(
+                      key: Key('real-collection-place-remove-${place.placeId}'),
+                      label: l10n.savedPlacesCollectionRemovePlaceAction,
+                      icon: Icons.playlist_remove_rounded,
+                      fullWidth: false,
+                      semanticLabel:
+                          l10n.savedPlacesCollectionRemovePlaceSemantic(
+                        place.name,
+                      ),
+                      onPressed: onRemove,
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),

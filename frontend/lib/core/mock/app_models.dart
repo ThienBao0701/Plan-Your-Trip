@@ -163,6 +163,9 @@ enum SavedCollectionActionResult {
   duplicateItem,
   itemNotFound,
   itemLimitReached,
+  network,
+  serverError,
+  unauthenticated,
 }
 
 class SavedCollectionRecord {
@@ -261,6 +264,163 @@ class ResolvedCollectionPlace {
   });
 
   bool get available => place != null;
+}
+
+/// Real-backend mirror of `CollectionSummaryResponse` (`/api/me/collections`,
+/// `backend-v1.0-foundation`). Kept separate from [SavedCollectionRecord],
+/// which is Demo Mode's local shape.
+class CollectionSummaryRecord {
+  final int id;
+  final String name;
+  final String? description;
+  final String? coverImageUrl;
+  final bool privateCollection;
+  final int sortOrder;
+  final int placeCount;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  const CollectionSummaryRecord({
+    required this.id,
+    required this.name,
+    this.description,
+    this.coverImageUrl,
+    required this.privateCollection,
+    required this.sortOrder,
+    required this.placeCount,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory CollectionSummaryRecord.fromJson(Map<String, dynamic> json) =>
+      CollectionSummaryRecord(
+        id: (json['id'] as num).toInt(),
+        name: json['name'] as String,
+        description: json['description'] as String?,
+        coverImageUrl: json['coverImageUrl'] as String?,
+        privateCollection: json['privateCollection'] as bool,
+        sortOrder: (json['sortOrder'] as num).toInt(),
+        placeCount: (json['placeCount'] as num).toInt(),
+        createdAt: DateTime.parse(json['createdAt'] as String),
+        updatedAt: DateTime.parse(json['updatedAt'] as String),
+      );
+}
+
+/// Real-backend mirror of `CollectionPlaceResponse`. Carries only the Place
+/// fields the backend actually returns for a collection item — no
+/// `imageUrl`/`locationName`/`city`, unlike the Demo Mode `Place` model.
+class CollectionPlaceRecord {
+  final int placeId;
+  final String name;
+  final String slug;
+  final String? categoryName;
+  final String? address;
+  final String? shortDescription;
+  final double ratingAvg;
+  final int reviewCount;
+  final int position;
+  final DateTime addedAt;
+
+  const CollectionPlaceRecord({
+    required this.placeId,
+    required this.name,
+    required this.slug,
+    this.categoryName,
+    this.address,
+    this.shortDescription,
+    required this.ratingAvg,
+    required this.reviewCount,
+    required this.position,
+    required this.addedAt,
+  });
+
+  factory CollectionPlaceRecord.fromJson(Map<String, dynamic> json) =>
+      CollectionPlaceRecord(
+        placeId: (json['placeId'] as num).toInt(),
+        name: json['name'] as String,
+        slug: json['slug'] as String,
+        categoryName: json['categoryName'] as String?,
+        address: json['address'] as String?,
+        shortDescription: json['shortDescription'] as String?,
+        ratingAvg: (json['ratingAvg'] as num).toDouble(),
+        reviewCount: (json['reviewCount'] as num).toInt(),
+        position: (json['position'] as num).toInt(),
+        addedAt: DateTime.parse(json['addedAt'] as String),
+      );
+}
+
+/// Real-backend mirror of `CollectionDetailResponse`.
+class CollectionDetailRecord {
+  final int id;
+  final String name;
+  final String? description;
+  final String? coverImageUrl;
+  final bool privateCollection;
+  final int sortOrder;
+  final int placeCount;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final List<CollectionPlaceRecord> places;
+
+  const CollectionDetailRecord({
+    required this.id,
+    required this.name,
+    this.description,
+    this.coverImageUrl,
+    required this.privateCollection,
+    required this.sortOrder,
+    required this.placeCount,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.places,
+  });
+
+  factory CollectionDetailRecord.fromJson(Map<String, dynamic> json) =>
+      CollectionDetailRecord(
+        id: (json['id'] as num).toInt(),
+        name: json['name'] as String,
+        description: json['description'] as String?,
+        coverImageUrl: json['coverImageUrl'] as String?,
+        privateCollection: json['privateCollection'] as bool,
+        sortOrder: (json['sortOrder'] as num).toInt(),
+        placeCount: (json['placeCount'] as num).toInt(),
+        createdAt: DateTime.parse(json['createdAt'] as String),
+        updatedAt: DateTime.parse(json['updatedAt'] as String),
+        places: (json['places'] as List<dynamic>? ?? const [])
+            .map(
+              (e) => CollectionPlaceRecord.fromJson(e as Map<String, dynamic>),
+            )
+            .toList(),
+      );
+
+  CollectionDetailRecord copyWith({
+    List<CollectionPlaceRecord>? places,
+    int? placeCount,
+  }) =>
+      CollectionDetailRecord(
+        id: id,
+        name: name,
+        description: description,
+        coverImageUrl: coverImageUrl,
+        privateCollection: privateCollection,
+        sortOrder: sortOrder,
+        placeCount: placeCount ?? this.placeCount,
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+        places: places ?? this.places,
+      );
+
+  CollectionSummaryRecord toSummary() => CollectionSummaryRecord(
+        id: id,
+        name: name,
+        description: description,
+        coverImageUrl: coverImageUrl,
+        privateCollection: privateCollection,
+        sortOrder: sortOrder,
+        placeCount: placeCount,
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
 }
 
 enum RoomType {

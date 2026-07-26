@@ -734,7 +734,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get savedPlacesRealEmptyMessage =>
-      'Địa điểm đã lưu chưa được kết nối với backend cho tài khoản thật.';
+      'Danh sách yêu thích (địa điểm lưu nhanh) chưa được kết nối với backend cho tài khoản thật. Bộ sưu tập đã lưu được đồng bộ với tài khoản của bạn bên dưới.';
 
   @override
   String get savedPlacesDemoEmptyTitle => 'Không có địa điểm phù hợp';
@@ -814,7 +814,31 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get savedPlacesCollectionsBoundaryMessage =>
-      'Bộ sưu tập là danh sách cục bộ trong Chế độ demo, căn theo /api/me/collections. Thêm địa điểm vào bộ sưu tập không thay đổi wishlist.';
+      'Bộ sưu tập đồng bộ với /api/me/collections cho tài khoản thật; Chế độ demo chỉ dùng dữ liệu cục bộ. Thêm địa điểm vào bộ sưu tập không bao giờ thay đổi wishlist.';
+
+  @override
+  String get savedPlacesCollectionNetworkErrorMessage =>
+      'Không thể kết nối với backend. Kiểm tra kết nối mạng và thử lại.';
+
+  @override
+  String get savedPlacesCollectionServerErrorMessage =>
+      'Backend gặp sự cố khi hoàn tất thao tác này. Vui lòng thử lại.';
+
+  @override
+  String get savedPlacesCollectionUnauthenticatedMessage =>
+      'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại để tiếp tục.';
+
+  @override
+  String get savedPlacesCollectionPlaceHydrationMessage =>
+      'Thông tin đầy đủ về địa điểm chưa được đồng bộ cho bộ sưu tập thật. Xem chi tiết và Thêm vào chuyến đi sẽ có ở giai đoạn sau.';
+
+  @override
+  String get savedPlacesCollectionAddPlaceDeferredTitle =>
+      'Thêm địa điểm sẽ có sau';
+
+  @override
+  String get savedPlacesCollectionAddPlaceDeferredMessage =>
+      'Chọn địa điểm đã lưu để thêm vào bộ sưu tập thật chưa khả dụng. Tính năng này sẽ được kết nối ở giai đoạn sau.';
 
   @override
   String get savedPlacesCollectionCreateAction => 'Tạo bộ sưu tập';

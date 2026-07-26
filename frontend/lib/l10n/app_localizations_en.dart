@@ -751,7 +751,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get savedPlacesRealEmptyMessage =>
-      'Saved places are not connected to the backend yet for real accounts.';
+      'The wishlist (quick-saved places) is not connected to the backend yet for real accounts. Saved collections are synced with your account below.';
 
   @override
   String get savedPlacesDemoEmptyTitle => 'No matching saved places';
@@ -850,7 +850,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get savedPlacesCollectionsBoundaryMessage =>
-      'Collections are separate local Demo Mode lists aligned to /api/me/collections. Adding a place to a collection does not change the wishlist.';
+      'Collections sync with /api/me/collections for real accounts; Demo Mode uses local data only. Adding a place to a collection never changes the wishlist.';
+
+  @override
+  String get savedPlacesCollectionNetworkErrorMessage =>
+      'Could not reach the backend. Check your connection and try again.';
+
+  @override
+  String get savedPlacesCollectionServerErrorMessage =>
+      'The backend had a problem completing this action. Please try again.';
+
+  @override
+  String get savedPlacesCollectionUnauthenticatedMessage =>
+      'Your session expired. Please sign in again to continue.';
+
+  @override
+  String get savedPlacesCollectionPlaceHydrationMessage =>
+      'Full place details are not synced yet for real collections. View details and Add to trip arrive in a later phase.';
+
+  @override
+  String get savedPlacesCollectionAddPlaceDeferredTitle =>
+      'Adding places arrives later';
+
+  @override
+  String get savedPlacesCollectionAddPlaceDeferredMessage =>
+      'Choosing a saved place to add to a real collection is not available yet. This will be connected in a later phase.';
 
   @override
   String get savedPlacesCollectionCreateAction => 'Create collection';

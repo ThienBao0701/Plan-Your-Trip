@@ -40,6 +40,22 @@ class AppState extends ChangeNotifier {
       List.from(MockData.demoSavedCollections);
   List<SavedCollectionPlaceRecord> savedCollectionPlaces =
       List.from(MockData.demoSavedCollectionPlaces);
+
+  // ── Real Mode Saved Collections (/api/me/collections, UI-17) ─────────────
+  // Kept entirely separate from the demo-only fields above — never merged.
+  List<CollectionSummaryRecord> realSavedCollections = [];
+  bool realSavedCollectionsLoading = false;
+  bool realSavedCollectionsLoaded = false;
+  SavedCollectionActionResult? realSavedCollectionsError;
+  int? realSelectedCollectionId;
+  CollectionDetailRecord? realSelectedCollectionDetail;
+  bool realCollectionDetailLoading = false;
+  SavedCollectionActionResult? realCollectionDetailError;
+  bool realCollectionCreateInFlight = false;
+  bool realCollectionUpdateInFlight = false;
+  bool realCollectionDeleteInFlight = false;
+  bool realCollectionPlaceActionInFlight = false;
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -123,6 +139,7 @@ class AppState extends ChangeNotifier {
     savedPlaces = List.from(MockData.demoSavedPlaces);
     savedCollections = List.from(MockData.demoSavedCollections);
     savedCollectionPlaces = List.from(MockData.demoSavedCollectionPlaces);
+    _resetRealSavedCollectionsState();
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -142,11 +159,27 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void _resetRealSavedCollectionsState() {
+    realSavedCollections = [];
+    realSavedCollectionsLoading = false;
+    realSavedCollectionsLoaded = false;
+    realSavedCollectionsError = null;
+    realSelectedCollectionId = null;
+    realSelectedCollectionDetail = null;
+    realCollectionDetailLoading = false;
+    realCollectionDetailError = null;
+    realCollectionCreateInFlight = false;
+    realCollectionUpdateInFlight = false;
+    realCollectionDeleteInFlight = false;
+    realCollectionPlaceActionInFlight = false;
+  }
+
   void _applyPersonalDataMode() {
     if (demoMode) {
       savedPlaces = List.from(MockData.demoSavedPlaces);
       savedCollections = List.from(MockData.demoSavedCollections);
       savedCollectionPlaces = List.from(MockData.demoSavedCollectionPlaces);
+      _resetRealSavedCollectionsState();
       trips = List.from(MockData.trips);
       timeline = List.from(MockData.timeline);
       expenses = List.from(MockData.expenses);
@@ -169,6 +202,7 @@ class AppState extends ChangeNotifier {
     savedPlaces = [];
     savedCollections = [];
     savedCollectionPlaces = [];
+    _resetRealSavedCollectionsState();
     timeline = [];
     expenses = [];
     demoBookings = [];
@@ -678,6 +712,360 @@ class AppState extends ChangeNotifier {
     ];
     notifyListeners();
     return SavedCollectionActionResult.success;
+  }
+
+  // ── Real Mode Saved Collections (/api/me/collections, UI-17) ─────────────
+  // Wired against ApiClient's typed collection endpoints. Every one of these
+  // is gated by `demoMode` in the opposite direction of the demo methods
+  // above: they are no-ops (`unavailable`) while demoMode is true, and never
+  // touch `savedCollections`/`savedCollectionPlaces`. A 401 never calls
+  // `logout()` or clears already-loaded state — only the caller decides to
+  // show a re-auth prompt.
+
+  SavedCollectionActionResult _mapReadError(ApiErrorKind? kind) {
+    switch (kind) {
+      case ApiErrorKind.unauthorized:
+        return SavedCollectionActionResult.unauthenticated;
+      case ApiErrorKind.notFound:
+        return SavedCollectionActionResult.collectionNotFound;
+      case ApiErrorKind.network:
+      case ApiErrorKind.timeout:
+        return SavedCollectionActionResult.network;
+      case ApiErrorKind.server:
+      case ApiErrorKind.malformed:
+      case ApiErrorKind.validation:
+      case ApiErrorKind.conflict:
+      case null:
+        return SavedCollectionActionResult.serverError;
+    }
+  }
+
+  Future<SavedCollectionActionResult> loadRealSavedCollections({
+    bool refresh = false,
+  }) async {
+    if (demoMode) return SavedCollectionActionResult.unavailable;
+    if (realSavedCollectionsLoading) return SavedCollectionActionResult.success;
+    if (realSavedCollectionsLoaded && !refresh) {
+      return SavedCollectionActionResult.success;
+    }
+    realSavedCollectionsLoading = true;
+    notifyListeners();
+    final result = await api.listCollections();
+    realSavedCollectionsLoading = false;
+    if (result.success) {
+      realSavedCollections = result.data!;
+      realSavedCollectionsLoaded = true;
+      realSavedCollectionsError = null;
+      notifyListeners();
+      return SavedCollectionActionResult.success;
+    }
+    final outcome = _mapReadError(result.errorKind);
+    realSavedCollectionsError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  Future<SavedCollectionActionResult> loadRealCollectionDetail(
+    int collectionId, {
+    bool refresh = false,
+  }) async {
+    if (demoMode) return SavedCollectionActionResult.unavailable;
+    if (realCollectionDetailLoading) return SavedCollectionActionResult.success;
+    if (!refresh &&
+        realSelectedCollectionDetail != null &&
+        realSelectedCollectionDetail!.id == collectionId) {
+      return SavedCollectionActionResult.success;
+    }
+    realSelectedCollectionId = collectionId;
+    realCollectionDetailLoading = true;
+    notifyListeners();
+    final result = await api.getCollectionDetail(collectionId);
+    realCollectionDetailLoading = false;
+    if (result.success) {
+      realSelectedCollectionDetail = result.data;
+      realCollectionDetailError = null;
+      notifyListeners();
+      return SavedCollectionActionResult.success;
+    }
+    final outcome = _mapReadError(result.errorKind);
+    realCollectionDetailError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  void clearRealCollectionSelection() {
+    realSelectedCollectionId = null;
+    realSelectedCollectionDetail = null;
+    realCollectionDetailError = null;
+    notifyListeners();
+  }
+
+  Future<SavedCollectionActionResult> createRealSavedCollection({
+    required String name,
+    String? description,
+    String? coverImageUrl,
+    bool privateCollection = true,
+  }) async {
+    if (demoMode) return SavedCollectionActionResult.unavailable;
+    if (realCollectionCreateInFlight)
+      return SavedCollectionActionResult.success;
+    final validation = _validateCollectionFields(
+      name: name,
+      description: description,
+      coverImageUrl: coverImageUrl,
+    );
+    if (validation != null) return validation;
+    if (realSavedCollections.length >=
+        SavedCollectionRecord.maxCollectionsPerUser) {
+      return SavedCollectionActionResult.collectionLimitReached;
+    }
+    realCollectionCreateInFlight = true;
+    notifyListeners();
+    final result = await api.createCollection(
+      name: name,
+      description: description,
+      coverImageUrl: coverImageUrl,
+      privateCollection: privateCollection,
+    );
+    realCollectionCreateInFlight = false;
+    if (result.success) {
+      final detail = result.data!;
+      realSavedCollections = [
+        ...realSavedCollections,
+        detail.toSummary(),
+      ]..sort(_compareCollectionSummaries);
+      notifyListeners();
+      return SavedCollectionActionResult.success;
+    }
+    final outcome = switch (result.errorKind) {
+      ApiErrorKind.conflict =>
+        SavedCollectionActionResult.collectionLimitReached,
+      ApiErrorKind.unauthorized => SavedCollectionActionResult.unauthenticated,
+      ApiErrorKind.network ||
+      ApiErrorKind.timeout =>
+        SavedCollectionActionResult.network,
+      ApiErrorKind.validation => SavedCollectionActionResult.invalidName,
+      _ => SavedCollectionActionResult.serverError,
+    };
+    notifyListeners();
+    return outcome;
+  }
+
+  Future<SavedCollectionActionResult> updateRealSavedCollection({
+    required int collectionId,
+    required String name,
+    String? description,
+    String? coverImageUrl,
+    required bool privateCollection,
+    required int sortOrder,
+  }) async {
+    if (demoMode) return SavedCollectionActionResult.unavailable;
+    if (realCollectionUpdateInFlight)
+      return SavedCollectionActionResult.success;
+    final validation = _validateCollectionFields(
+      name: name,
+      description: description,
+      coverImageUrl: coverImageUrl,
+    );
+    if (validation != null) return validation;
+    realCollectionUpdateInFlight = true;
+    notifyListeners();
+    final result = await api.updateCollection(
+      collectionId: collectionId,
+      name: name,
+      description: description,
+      coverImageUrl: coverImageUrl,
+      privateCollection: privateCollection,
+      sortOrder: sortOrder,
+    );
+    realCollectionUpdateInFlight = false;
+    if (result.success) {
+      final detail = result.data!;
+      _upsertRealCollectionSummary(detail.toSummary());
+      if (realSelectedCollectionDetail?.id == collectionId) {
+        realSelectedCollectionDetail = detail;
+      }
+      notifyListeners();
+      return SavedCollectionActionResult.success;
+    }
+    final outcome = switch (result.errorKind) {
+      ApiErrorKind.notFound => SavedCollectionActionResult.collectionNotFound,
+      ApiErrorKind.unauthorized => SavedCollectionActionResult.unauthenticated,
+      ApiErrorKind.network ||
+      ApiErrorKind.timeout =>
+        SavedCollectionActionResult.network,
+      ApiErrorKind.validation => SavedCollectionActionResult.invalidName,
+      _ => SavedCollectionActionResult.serverError,
+    };
+    notifyListeners();
+    return outcome;
+  }
+
+  Future<SavedCollectionActionResult> deleteRealSavedCollection(
+    int collectionId,
+  ) async {
+    if (demoMode) return SavedCollectionActionResult.unavailable;
+    if (realCollectionDeleteInFlight)
+      return SavedCollectionActionResult.success;
+    realCollectionDeleteInFlight = true;
+    notifyListeners();
+    final result = await api.deleteCollection(collectionId);
+    realCollectionDeleteInFlight = false;
+    if (result.success) {
+      realSavedCollections =
+          realSavedCollections.where((c) => c.id != collectionId).toList();
+      if (realSelectedCollectionDetail?.id == collectionId) {
+        realSelectedCollectionDetail = null;
+        realSelectedCollectionId = null;
+      }
+      notifyListeners();
+      return SavedCollectionActionResult.success;
+    }
+    final outcome = switch (result.errorKind) {
+      ApiErrorKind.notFound => SavedCollectionActionResult.collectionNotFound,
+      ApiErrorKind.unauthorized => SavedCollectionActionResult.unauthenticated,
+      ApiErrorKind.network ||
+      ApiErrorKind.timeout =>
+        SavedCollectionActionResult.network,
+      _ => SavedCollectionActionResult.serverError,
+    };
+    notifyListeners();
+    return outcome;
+  }
+
+  Future<SavedCollectionActionResult> addRealCollectionPlace({
+    required int collectionId,
+    required int placeId,
+  }) async {
+    if (demoMode) return SavedCollectionActionResult.unavailable;
+    if (realCollectionPlaceActionInFlight) {
+      return SavedCollectionActionResult.success;
+    }
+    final knownPlaceCount = realSelectedCollectionDetail?.id == collectionId
+        ? realSelectedCollectionDetail!.placeCount
+        : _firstWhereOrNull(
+            realSavedCollections,
+            (c) => c.id == collectionId,
+          )?.placeCount;
+    if (knownPlaceCount != null &&
+        knownPlaceCount >= SavedCollectionPlaceRecord.maxPlacesPerCollection) {
+      return SavedCollectionActionResult.itemLimitReached;
+    }
+    realCollectionPlaceActionInFlight = true;
+    notifyListeners();
+    final result = await api.addCollectionPlace(
+      collectionId: collectionId,
+      placeId: placeId,
+    );
+    realCollectionPlaceActionInFlight = false;
+    if (result.success) {
+      final place = result.data!;
+      if (realSelectedCollectionDetail?.id == collectionId) {
+        realSelectedCollectionDetail = realSelectedCollectionDetail!.copyWith(
+          places: [...realSelectedCollectionDetail!.places, place],
+          placeCount: realSelectedCollectionDetail!.placeCount + 1,
+        );
+      }
+      _bumpRealCollectionPlaceCount(collectionId, 1);
+      notifyListeners();
+      return SavedCollectionActionResult.success;
+    }
+    // Call-site context: this always targets a collection already loaded in
+    // detail view, so a 404 here means the place id itself was not found
+    // (see SavedCollectionService.addPlace — the collection lookup happens
+    // first and would otherwise have surfaced earlier as collectionNotFound).
+    final outcome = switch (result.errorKind) {
+      ApiErrorKind.notFound => SavedCollectionActionResult.placeNotFound,
+      ApiErrorKind.conflict => SavedCollectionActionResult.duplicateItem,
+      ApiErrorKind.unauthorized => SavedCollectionActionResult.unauthenticated,
+      ApiErrorKind.network ||
+      ApiErrorKind.timeout =>
+        SavedCollectionActionResult.network,
+      _ => SavedCollectionActionResult.serverError,
+    };
+    notifyListeners();
+    return outcome;
+  }
+
+  Future<SavedCollectionActionResult> removeRealCollectionPlace({
+    required int collectionId,
+    required int placeId,
+  }) async {
+    if (demoMode) return SavedCollectionActionResult.unavailable;
+    if (realCollectionPlaceActionInFlight) {
+      return SavedCollectionActionResult.success;
+    }
+    realCollectionPlaceActionInFlight = true;
+    notifyListeners();
+    final result = await api.removeCollectionPlace(
+      collectionId: collectionId,
+      placeId: placeId,
+    );
+    realCollectionPlaceActionInFlight = false;
+    if (result.success) {
+      if (realSelectedCollectionDetail?.id == collectionId) {
+        realSelectedCollectionDetail = realSelectedCollectionDetail!.copyWith(
+          places: realSelectedCollectionDetail!.places
+              .where((p) => p.placeId != placeId)
+              .toList(),
+          placeCount: realSelectedCollectionDetail!.placeCount - 1,
+        );
+      }
+      _bumpRealCollectionPlaceCount(collectionId, -1);
+      notifyListeners();
+      return SavedCollectionActionResult.success;
+    }
+    final outcome = switch (result.errorKind) {
+      ApiErrorKind.notFound => SavedCollectionActionResult.itemNotFound,
+      ApiErrorKind.unauthorized => SavedCollectionActionResult.unauthenticated,
+      ApiErrorKind.network ||
+      ApiErrorKind.timeout =>
+        SavedCollectionActionResult.network,
+      _ => SavedCollectionActionResult.serverError,
+    };
+    notifyListeners();
+    return outcome;
+  }
+
+  void _upsertRealCollectionSummary(CollectionSummaryRecord summary) {
+    final index = realSavedCollections.indexWhere((c) => c.id == summary.id);
+    if (index < 0) {
+      realSavedCollections = [...realSavedCollections, summary]
+        ..sort(_compareCollectionSummaries);
+      return;
+    }
+    realSavedCollections = [
+      for (var i = 0; i < realSavedCollections.length; i++)
+        i == index ? summary : realSavedCollections[i],
+    ]..sort(_compareCollectionSummaries);
+  }
+
+  void _bumpRealCollectionPlaceCount(int collectionId, int delta) {
+    final index = realSavedCollections.indexWhere((c) => c.id == collectionId);
+    if (index < 0) return;
+    final current = realSavedCollections[index];
+    _upsertRealCollectionSummary(
+      CollectionSummaryRecord(
+        id: current.id,
+        name: current.name,
+        description: current.description,
+        coverImageUrl: current.coverImageUrl,
+        privateCollection: current.privateCollection,
+        sortOrder: current.sortOrder,
+        placeCount: current.placeCount + delta,
+        createdAt: current.createdAt,
+        updatedAt: current.updatedAt,
+      ),
+    );
+  }
+
+  static int _compareCollectionSummaries(
+    CollectionSummaryRecord a,
+    CollectionSummaryRecord b,
+  ) {
+    final order = a.sortOrder.compareTo(b.sortOrder);
+    if (order != 0) return order;
+    return a.createdAt.compareTo(b.createdAt);
   }
 
   List<Place> filteredPlaces(PlaceQuery q) {

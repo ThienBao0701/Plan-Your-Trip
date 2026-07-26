@@ -1439,7 +1439,7 @@ abstract class AppLocalizations {
   /// No description provided for @savedPlacesRealEmptyMessage.
   ///
   /// In en, this message translates to:
-  /// **'Saved places are not connected to the backend yet for real accounts.'**
+  /// **'The wishlist (quick-saved places) is not connected to the backend yet for real accounts. Saved collections are synced with your account below.'**
   String get savedPlacesRealEmptyMessage;
 
   /// No description provided for @savedPlacesDemoEmptyTitle.
@@ -1565,8 +1565,44 @@ abstract class AppLocalizations {
   /// No description provided for @savedPlacesCollectionsBoundaryMessage.
   ///
   /// In en, this message translates to:
-  /// **'Collections are separate local Demo Mode lists aligned to /api/me/collections. Adding a place to a collection does not change the wishlist.'**
+  /// **'Collections sync with /api/me/collections for real accounts; Demo Mode uses local data only. Adding a place to a collection never changes the wishlist.'**
   String get savedPlacesCollectionsBoundaryMessage;
+
+  /// No description provided for @savedPlacesCollectionNetworkErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not reach the backend. Check your connection and try again.'**
+  String get savedPlacesCollectionNetworkErrorMessage;
+
+  /// No description provided for @savedPlacesCollectionServerErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The backend had a problem completing this action. Please try again.'**
+  String get savedPlacesCollectionServerErrorMessage;
+
+  /// No description provided for @savedPlacesCollectionUnauthenticatedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your session expired. Please sign in again to continue.'**
+  String get savedPlacesCollectionUnauthenticatedMessage;
+
+  /// No description provided for @savedPlacesCollectionPlaceHydrationMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Full place details are not synced yet for real collections. View details and Add to trip arrive in a later phase.'**
+  String get savedPlacesCollectionPlaceHydrationMessage;
+
+  /// No description provided for @savedPlacesCollectionAddPlaceDeferredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Adding places arrives later'**
+  String get savedPlacesCollectionAddPlaceDeferredTitle;
+
+  /// No description provided for @savedPlacesCollectionAddPlaceDeferredMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Choosing a saved place to add to a real collection is not available yet. This will be connected in a later phase.'**
+  String get savedPlacesCollectionAddPlaceDeferredMessage;
 
   /// No description provided for @savedPlacesCollectionCreateAction.
   ///
