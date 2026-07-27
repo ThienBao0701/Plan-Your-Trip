@@ -10,6 +10,7 @@ import '../../design/app_radii.dart';
 import '../../design/app_spacing.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/add_to_trip_sheet.dart';
+import '../../shared/widgets/bookmark_button.dart';
 import '../../shared/widgets/glass_widgets.dart';
 import '../auth/login_screen.dart';
 import '../hotels/hotel_room_selection_screen.dart';
@@ -34,6 +35,18 @@ class _SavedPlacesScreenState extends State<SavedPlacesScreen> {
   _SavedPlacesTab selectedTab = _SavedPlacesTab.allSaved;
   String? selectedCollectionId;
   int? selectedRealCollectionId;
+
+  @override
+  void initState() {
+    super.initState();
+    // In Real Mode, load the wishlist for the default "All saved" tab so its
+    // list and counts are accurate. No-op / no HTTP in Demo Mode.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final app = AppScope.of(context);
+      if (!app.demoMode) _loadRealWishlist();
+    });
+  }
 
   @override
   void dispose() {
@@ -89,7 +102,9 @@ class _SavedPlacesScreenState extends State<SavedPlacesScreen> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             _SavedPlacesHeader(
-                              count: app.savedPlaceCount,
+                              count: app.demoMode
+                                  ? app.savedPlaceCount
+                                  : app.realWishlist.length,
                               collectionCount: app.demoMode
                                   ? app.savedCollectionCount
                                   : app.realSavedCollections.length,
@@ -97,7 +112,9 @@ class _SavedPlacesScreenState extends State<SavedPlacesScreen> {
                             const SizedBox(height: AppSpacing.md),
                             _SavedPlacesTabs(
                               selected: selectedTab,
-                              savedCount: app.savedPlaceCount,
+                              savedCount: app.demoMode
+                                  ? app.savedPlaceCount
+                                  : app.realWishlist.length,
                               collectionCount: app.demoMode
                                   ? app.savedCollectionCount
                                   : app.realSavedCollections.length,
@@ -109,19 +126,19 @@ class _SavedPlacesScreenState extends State<SavedPlacesScreen> {
                                     selectedRealCollectionId = null;
                                   }
                                 });
-                                if (tab == _SavedPlacesTab.collections &&
-                                    !app.demoMode) {
-                                  await _loadRealCollections();
+                                if (!app.demoMode) {
+                                  if (tab == _SavedPlacesTab.collections) {
+                                    await _loadRealCollections();
+                                  } else {
+                                    await _loadRealWishlist();
+                                  }
                                 }
                               },
                             ),
                             const SizedBox(height: AppSpacing.md),
                             if (selectedTab == _SavedPlacesTab.allSaved)
                               !app.demoMode
-                                  ? OceanEmptyState(
-                                      title: l10n.savedPlacesRealEmptyTitle,
-                                      message: l10n.savedPlacesRealEmptyMessage,
-                                    )
+                                  ? _buildRealWishlist(app, l10n)
                                   : _buildSavedList(
                                       app: app,
                                       l10n: l10n,
@@ -182,12 +199,55 @@ class _SavedPlacesScreenState extends State<SavedPlacesScreen> {
 
   Future<void> _handleRealRefresh() async {
     final app = AppScope.of(context);
-    if (app.demoMode || selectedTab != _SavedPlacesTab.collections) return;
+    if (app.demoMode) return;
+    if (selectedTab == _SavedPlacesTab.allSaved) {
+      await _loadRealWishlist(refresh: true);
+      return;
+    }
     if (selectedRealCollectionId != null) {
       await _loadRealCollectionDetail(selectedRealCollectionId!, refresh: true);
       return;
     }
     await _loadRealCollections(refresh: true);
+  }
+
+  Future<void> _loadRealWishlist({bool refresh = false}) async {
+    final app = AppScope.of(context);
+    final outcome = await app.loadRealWishlist(refresh: refresh);
+    if (mounted && outcome == WishlistActionResult.unauthenticated) {
+      _showRealCollectionsReauth();
+    }
+  }
+
+  Widget _buildRealWishlist(AppState app, AppLocalizations l10n) {
+    if (app.realWishlistLoading && app.realWishlist.isEmpty) {
+      return const OceanLoadingState();
+    }
+    final error = app.realWishlistError;
+    if (error != null && app.realWishlist.isEmpty) {
+      return OceanRecoverableErrorState(
+        message: error == WishlistActionResult.network
+            ? l10n.wishlistBookmarkNetworkMessage
+            : l10n.wishlistRealErrorMessage,
+        onReload: () => _loadRealWishlist(refresh: true),
+      );
+    }
+    if (app.realWishlist.isEmpty) {
+      return OceanEmptyState(
+        title: l10n.wishlistRealEmptyTitle,
+        message: l10n.wishlistRealEmptyMessage,
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (final item in app.realWishlist)
+          Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.md),
+            child: _RealWishlistCard(item: item),
+          ),
+      ],
+    );
   }
 
   Widget _buildSavedList({
@@ -3216,4 +3276,100 @@ class _PlaceImage extends StatelessWidget {
           ),
         ),
       );
+}
+
+/// Real Mode wishlist item card. Renders ONLY the fields the backend
+/// `WishlistPlaceSummary` actually returns (no image/city/full Place), with a
+/// neutral placeholder and a localized note explaining the limited details.
+/// The saved/remove control reuses the shared [BookmarkButton], which keeps the
+/// item in sync with every other bookmark control for the same place.
+class _RealWishlistCard extends StatelessWidget {
+  final WishlistItemRecord item;
+
+  const _RealWishlistCard({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final textTheme = Theme.of(context).textTheme;
+    final place = item.place;
+    final subtitleParts = <String>[
+      if (place.categoryName != null && place.categoryName!.trim().isNotEmpty)
+        place.categoryName!,
+      if (place.address != null && place.address!.trim().isNotEmpty)
+        place.address!,
+    ];
+    return OceanGlassCard(
+      key: Key('real-wishlist-item-${item.placeId}'),
+      padding: const EdgeInsets.all(AppSpacing.sm),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: AppColors.paleCyan,
+                  borderRadius: BorderRadius.circular(AppRadii.md),
+                ),
+                alignment: Alignment.center,
+                child: const Icon(Icons.place_rounded, color: AppColors.ocean),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      place.name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: textTheme.titleMedium,
+                    ),
+                    if (subtitleParts.isNotEmpty) ...[
+                      const SizedBox(height: AppSpacing.xxs),
+                      Text(
+                        subtitleParts.join(' · '),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: textTheme.bodyMedium,
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              BookmarkButton(placeId: place.id, placeName: place.name),
+            ],
+          ),
+          if (place.shortDescription != null &&
+              place.shortDescription!.trim().isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              place.shortDescription!,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: textTheme.bodyMedium,
+            ),
+          ],
+          if (place.ratingAvg > 0) ...[
+            const SizedBox(height: AppSpacing.xs),
+            OceanStatusPill(
+              label: '${place.ratingAvg.toStringAsFixed(1)}'
+                  ' · ${place.reviewCount}',
+              icon: Icons.star_rounded,
+              color: AppColors.ocean,
+            ),
+          ],
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            l10n.wishlistRealPartialDetailsNote,
+            style: textTheme.bodySmall,
+          ),
+        ],
+      ),
+    );
+  }
 }

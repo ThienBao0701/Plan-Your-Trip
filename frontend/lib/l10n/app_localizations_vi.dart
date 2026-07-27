@@ -5500,4 +5500,56 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get reviewStatusReported => 'Đã báo cáo';
+
+  @override
+  String wishlistBookmarkAddedMessage(String place) {
+    return 'Đã lưu $place vào danh sách yêu thích.';
+  }
+
+  @override
+  String wishlistBookmarkRemovedMessage(String place) {
+    return 'Đã xóa $place khỏi danh sách yêu thích.';
+  }
+
+  @override
+  String wishlistBookmarkNotPublishedMessage(String place) {
+    return '$place chưa được xuất bản nên chưa thể lưu.';
+  }
+
+  @override
+  String get wishlistBookmarkNetworkMessage =>
+      'Không thể kết nối máy chủ. Hãy kiểm tra kết nối và thử lại.';
+
+  @override
+  String get wishlistBookmarkServerErrorMessage =>
+      'Đã xảy ra lỗi phía máy chủ. Vui lòng thử lại.';
+
+  @override
+  String get wishlistBookmarkUnavailableMessage => 'Hiện chưa thể lưu.';
+
+  @override
+  String wishlistBookmarkSavingSemantic(String place) {
+    return 'Đang cập nhật trạng thái lưu cho $place';
+  }
+
+  @override
+  String get wishlistRealLoadingTitle => 'Đang tải danh sách yêu thích';
+
+  @override
+  String get wishlistRealLoadingMessage => 'Đang lấy các địa điểm đã lưu…';
+
+  @override
+  String get wishlistRealEmptyTitle => 'Danh sách yêu thích trống';
+
+  @override
+  String get wishlistRealEmptyMessage =>
+      'Chạm vào biểu tượng dấu trang ở bất kỳ địa điểm nào để lưu vào đây.';
+
+  @override
+  String get wishlistRealErrorMessage =>
+      'Không thể tải danh sách yêu thích. Vui lòng thử lại.';
+
+  @override
+  String get wishlistRealPartialDetailsNote =>
+      'Chỉ có thông tin hạn chế cho địa điểm đã lưu này.';
 }

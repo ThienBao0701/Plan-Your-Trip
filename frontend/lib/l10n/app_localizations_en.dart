@@ -5660,4 +5660,57 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reviewStatusReported => 'Reported';
+
+  @override
+  String wishlistBookmarkAddedMessage(String place) {
+    return 'Saved $place to your wishlist.';
+  }
+
+  @override
+  String wishlistBookmarkRemovedMessage(String place) {
+    return 'Removed $place from your wishlist.';
+  }
+
+  @override
+  String wishlistBookmarkNotPublishedMessage(String place) {
+    return '$place isn\'t published yet, so it can\'t be saved.';
+  }
+
+  @override
+  String get wishlistBookmarkNetworkMessage =>
+      'Couldn\'t reach the server. Check your connection and try again.';
+
+  @override
+  String get wishlistBookmarkServerErrorMessage =>
+      'Something went wrong on our end. Please try again.';
+
+  @override
+  String get wishlistBookmarkUnavailableMessage =>
+      'Saving isn\'t available right now.';
+
+  @override
+  String wishlistBookmarkSavingSemantic(String place) {
+    return 'Updating saved state for $place';
+  }
+
+  @override
+  String get wishlistRealLoadingTitle => 'Loading your wishlist';
+
+  @override
+  String get wishlistRealLoadingMessage => 'Fetching your saved places…';
+
+  @override
+  String get wishlistRealEmptyTitle => 'Your wishlist is empty';
+
+  @override
+  String get wishlistRealEmptyMessage =>
+      'Tap the bookmark on any place to save it here.';
+
+  @override
+  String get wishlistRealErrorMessage =>
+      'We couldn\'t load your wishlist. Please try again.';
+
+  @override
+  String get wishlistRealPartialDetailsNote =>
+      'Limited details are available for this saved place.';
 }

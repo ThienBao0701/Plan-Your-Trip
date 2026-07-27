@@ -395,7 +395,11 @@ void main() {
       const Size(390, 900),
     );
 
-    expect(find.text('No saved places yet'), findsOneWidget);
+    // Real mode no longer shows a static boundary message; the "All saved" tab
+    // is the real backend wishlist (UI-18). It must not surface demo-seeded
+    // places or render the demo saved-list search UI.
+    expect(find.text('Mây Lang Thang Villa'), findsNothing);
+    expect(find.byKey(const Key('saved-places-search-field')), findsNothing);
 
     final demoApp = AppState()
       ..demoMode = true

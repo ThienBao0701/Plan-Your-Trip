@@ -9,6 +9,7 @@ import '../../design/app_radii.dart';
 import '../../design/app_spacing.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/add_to_trip_sheet.dart';
+import '../../shared/widgets/bookmark_button.dart';
 import '../../shared/widgets/glass_widgets.dart';
 import '../places/place_detail_screen.dart';
 import '../places/places_screen.dart';
@@ -327,14 +328,12 @@ class _CategoryDiscoveryScreenState extends State<CategoryDiscoveryScreen> {
                             setState(() => _mode = ExploreMode.list),
                         onPlace: _openPlace,
                         onAdd: _addToTrip,
-                        onBookmark: _bookmark,
                       )
                     else
                       _CategoryResultList(
                         results: results,
                         onPlace: _openPlace,
                         onAdd: _addToTrip,
-                        onBookmark: _bookmark,
                       ),
                   ],
                 ),
@@ -539,29 +538,6 @@ class _CategoryDiscoveryScreenState extends State<CategoryDiscoveryScreen> {
   }
 
   void _addToTrip(Place place) => showAddToTripSheet(context, place);
-
-  void _bookmark(Place place) {
-    final app = AppScope.of(context);
-    final l10n = AppLocalizations.of(context)!;
-    final wasSaved = app.isPlaceSaved(place.id);
-    final outcome =
-        wasSaved ? app.removeSavedPlace(place.id) : app.savePlace(place.id);
-    final message = switch (outcome) {
-      SavedPlaceActionResult.success => wasSaved
-          ? l10n.savedPlacesRemovedPlace(place.name)
-          : l10n.savedPlacesSavedMessage(place.name),
-      SavedPlaceActionResult.duplicate =>
-        l10n.savedPlacesAlreadySavedMessage(place.name),
-      SavedPlaceActionResult.unavailable => l10n.savedPlacesRealEmptyMessage,
-      SavedPlaceActionResult.forbidden =>
-        l10n.savedPlacesActionForbiddenMessage,
-      SavedPlaceActionResult.notFound => l10n.savedPlacesMissingMessage,
-      SavedPlaceActionResult.invalidNote => l10n.savedPlacesNoteTooLongMessage,
-    };
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
-  }
 }
 
 class _CategoryHero extends StatelessWidget {
@@ -709,13 +685,11 @@ class _CategoryResultList extends StatelessWidget {
   final List<Place> results;
   final ValueChanged<Place> onPlace;
   final ValueChanged<Place> onAdd;
-  final ValueChanged<Place> onBookmark;
 
   const _CategoryResultList({
     required this.results,
     required this.onPlace,
     required this.onAdd,
-    required this.onBookmark,
   });
 
   @override
@@ -728,7 +702,6 @@ class _CategoryResultList extends StatelessWidget {
                 place: place,
                 onTap: () => onPlace(place),
                 onAdd: () => onAdd(place),
-                onBookmark: () => onBookmark(place),
               ),
             ),
         ],
@@ -739,13 +712,11 @@ class _CategoryPlaceCard extends StatelessWidget {
   final Place place;
   final VoidCallback onTap;
   final VoidCallback onAdd;
-  final VoidCallback onBookmark;
 
   const _CategoryPlaceCard({
     required this.place,
     required this.onTap,
     required this.onAdd,
-    required this.onBookmark,
   });
 
   @override
@@ -756,7 +727,6 @@ class _CategoryPlaceCard extends StatelessWidget {
         final image = _PlaceThumb(place: place, compact: compact);
         final details = _PlaceDetails(
           place: place,
-          onBookmark: onBookmark,
           onAdd: onAdd,
         );
         return OceanGlassCard(
@@ -788,23 +758,16 @@ class _CategoryPlaceCard extends StatelessWidget {
 
 class _PlaceDetails extends StatelessWidget {
   final Place place;
-  final VoidCallback onBookmark;
   final VoidCallback onAdd;
 
   const _PlaceDetails({
     required this.place,
-    required this.onBookmark,
     required this.onAdd,
   });
 
   @override
   Widget build(BuildContext context) {
-    final app = AppScope.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final saved = app.isPlaceSaved(place.id);
-    final bookmarkLabel = saved
-        ? l10n.savedPlacesRemoveSemantic(place.name)
-        : l10n.savedPlacesSaveSemantic(place.name);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -819,21 +782,7 @@ class _PlaceDetails extends StatelessWidget {
                 style: Theme.of(context).textTheme.titleLarge,
               ),
             ),
-            Semantics(
-              button: true,
-              toggled: saved,
-              label: bookmarkLabel,
-              child: IconButton(
-                tooltip: bookmarkLabel,
-                onPressed: onBookmark,
-                icon: Icon(
-                  saved
-                      ? Icons.bookmark_rounded
-                      : Icons.bookmark_border_rounded,
-                  color: saved ? AppColors.ocean : null,
-                ),
-              ),
-            ),
+            BookmarkButton(placeId: place.id, placeName: place.name),
           ],
         ),
         Text(
@@ -939,7 +888,6 @@ class _CategoryMapFallback extends StatelessWidget {
   final VoidCallback onListMode;
   final ValueChanged<Place> onPlace;
   final ValueChanged<Place> onAdd;
-  final ValueChanged<Place> onBookmark;
 
   const _CategoryMapFallback({
     required this.mode,
@@ -947,7 +895,6 @@ class _CategoryMapFallback extends StatelessWidget {
     required this.onListMode,
     required this.onPlace,
     required this.onAdd,
-    required this.onBookmark,
   });
 
   @override
@@ -973,7 +920,6 @@ class _CategoryMapFallback extends StatelessWidget {
           place: results.first,
           onTap: () => onPlace(results.first),
           onAdd: () => onAdd(results.first),
-          onBookmark: () => onBookmark(results.first),
         ),
       ],
     );

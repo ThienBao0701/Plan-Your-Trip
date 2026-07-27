@@ -56,6 +56,17 @@ class AppState extends ChangeNotifier {
   bool realCollectionDeleteInFlight = false;
   bool realCollectionPlaceActionInFlight = false;
 
+  // ── Real Mode Wishlist (/api/me/wishlist, UI-18) ─────────────────────────
+  // Parallel to the demo-only [savedPlaces] list — never merged. A 401 here
+  // never calls logout()/clears state; the caller shows a re-auth prompt.
+  List<WishlistItemRecord> realWishlist = [];
+  bool realWishlistLoading = false;
+  bool realWishlistLoaded = false;
+  WishlistActionResult? realWishlistError;
+  // Per-placeId in-flight guard: many bookmark buttons for different places can
+  // be live at once, so a single bool would over-block unrelated toggles.
+  final Set<int> realWishlistActionInFlight = <int>{};
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -140,6 +151,7 @@ class AppState extends ChangeNotifier {
     savedCollections = List.from(MockData.demoSavedCollections);
     savedCollectionPlaces = List.from(MockData.demoSavedCollectionPlaces);
     _resetRealSavedCollectionsState();
+    _resetRealWishlistState();
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -174,12 +186,21 @@ class AppState extends ChangeNotifier {
     realCollectionPlaceActionInFlight = false;
   }
 
+  void _resetRealWishlistState() {
+    realWishlist = [];
+    realWishlistLoading = false;
+    realWishlistLoaded = false;
+    realWishlistError = null;
+    realWishlistActionInFlight.clear();
+  }
+
   void _applyPersonalDataMode() {
     if (demoMode) {
       savedPlaces = List.from(MockData.demoSavedPlaces);
       savedCollections = List.from(MockData.demoSavedCollections);
       savedCollectionPlaces = List.from(MockData.demoSavedCollectionPlaces);
       _resetRealSavedCollectionsState();
+      _resetRealWishlistState();
       trips = List.from(MockData.trips);
       timeline = List.from(MockData.timeline);
       expenses = List.from(MockData.expenses);
@@ -203,6 +224,7 @@ class AppState extends ChangeNotifier {
     savedCollections = [];
     savedCollectionPlaces = [];
     _resetRealSavedCollectionsState();
+    _resetRealWishlistState();
     timeline = [];
     expenses = [];
     demoBookings = [];
@@ -734,6 +756,7 @@ class AppState extends ChangeNotifier {
       case ApiErrorKind.server:
       case ApiErrorKind.malformed:
       case ApiErrorKind.validation:
+      case ApiErrorKind.unprocessable:
       case ApiErrorKind.conflict:
       case null:
         return SavedCollectionActionResult.serverError;
@@ -1066,6 +1089,200 @@ class AppState extends ChangeNotifier {
     final order = a.sortOrder.compareTo(b.sortOrder);
     if (order != 0) return order;
     return a.createdAt.compareTo(b.createdAt);
+  }
+
+  // ── Real Mode Wishlist (/api/me/wishlist, UI-18) ─────────────────────────
+  //
+  // Mirrors the UI-17 real-collections shape: guarded on `!demoMode`,
+  // confirmed-only success (no optimistic mutation), a 401 maps to
+  // `unauthenticated` and NEVER calls logout()/clears state.
+
+  WishlistActionResult _mapWishlistReadError(ApiErrorKind? kind) {
+    switch (kind) {
+      case ApiErrorKind.unauthorized:
+        return WishlistActionResult.unauthenticated;
+      case ApiErrorKind.network:
+      case ApiErrorKind.timeout:
+        return WishlistActionResult.network;
+      case ApiErrorKind.notFound:
+      case ApiErrorKind.conflict:
+      case ApiErrorKind.validation:
+      case ApiErrorKind.unprocessable:
+      case ApiErrorKind.server:
+      case ApiErrorKind.malformed:
+      case null:
+        return WishlistActionResult.serverError;
+    }
+  }
+
+  bool isPlaceInRealWishlist(int placeId) =>
+      !demoMode && realWishlist.any((item) => item.placeId == placeId);
+
+  bool isWishlistActionInFlight(int placeId) =>
+      realWishlistActionInFlight.contains(placeId);
+
+  Future<WishlistActionResult> loadRealWishlist({bool refresh = false}) async {
+    if (demoMode) return WishlistActionResult.unavailable;
+    if (realWishlistLoading) return WishlistActionResult.success;
+    if (realWishlistLoaded && !refresh) return WishlistActionResult.success;
+    realWishlistLoading = true;
+    notifyListeners();
+    final result = await api.getWishlist();
+    realWishlistLoading = false;
+    if (result.success) {
+      // Preserve the backend's newest-first (createdAt DESC) order.
+      realWishlist = result.data!.items;
+      realWishlistLoaded = true;
+      realWishlistError = null;
+      notifyListeners();
+      return WishlistActionResult.success;
+    }
+    final outcome = _mapWishlistReadError(result.errorKind);
+    realWishlistError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  Future<WishlistActionResult> refreshRealWishlist() =>
+      loadRealWishlist(refresh: true);
+
+  /// Loads the real wishlist once (no-op if already loaded/loading). Called by
+  /// cross-screen bookmark controls so their saved-state icons are accurate.
+  Future<WishlistActionResult> ensureRealWishlistLoaded() => loadRealWishlist();
+
+  Future<WishlistActionResult> addPlaceToRealWishlist(
+    int placeId, {
+    String? note,
+  }) async {
+    if (demoMode) return WishlistActionResult.unavailable;
+    if (realWishlistActionInFlight.contains(placeId)) {
+      return WishlistActionResult.success;
+    }
+    realWishlistActionInFlight.add(placeId);
+    notifyListeners();
+    final result = await api.addWishlistItem(placeId: placeId, note: note);
+    realWishlistActionInFlight.remove(placeId);
+    if (result.success) {
+      final item = result.data!;
+      if (!realWishlist.any((i) => i.placeId == item.placeId)) {
+        // Backend returns newest-first; a freshly added item leads the list.
+        realWishlist = [item, ...realWishlist];
+      }
+      realWishlistError = null;
+      notifyListeners();
+      return WishlistActionResult.success;
+    }
+    final outcome = switch (result.errorKind) {
+      ApiErrorKind.notFound => WishlistActionResult.placeNotFound,
+      ApiErrorKind.conflict => WishlistActionResult.duplicate,
+      ApiErrorKind.unprocessable => WishlistActionResult.notPublished,
+      ApiErrorKind.validation => WishlistActionResult.invalid,
+      ApiErrorKind.unauthorized => WishlistActionResult.unauthenticated,
+      ApiErrorKind.network ||
+      ApiErrorKind.timeout =>
+        WishlistActionResult.network,
+      _ => WishlistActionResult.serverError,
+    };
+    notifyListeners();
+    return outcome;
+  }
+
+  Future<WishlistActionResult> removePlaceFromRealWishlist(int placeId) async {
+    if (demoMode) return WishlistActionResult.unavailable;
+    if (realWishlistActionInFlight.contains(placeId)) {
+      return WishlistActionResult.success;
+    }
+    realWishlistActionInFlight.add(placeId);
+    notifyListeners();
+    final result = await api.removeWishlistItem(placeId);
+    realWishlistActionInFlight.remove(placeId);
+    if (result.success) {
+      realWishlist =
+          realWishlist.where((item) => item.placeId != placeId).toList();
+      realWishlistError = null;
+      notifyListeners();
+      return WishlistActionResult.success;
+    }
+    final outcome = switch (result.errorKind) {
+      ApiErrorKind.notFound => WishlistActionResult.itemNotFound,
+      ApiErrorKind.unauthorized => WishlistActionResult.unauthenticated,
+      ApiErrorKind.network ||
+      ApiErrorKind.timeout =>
+        WishlistActionResult.network,
+      _ => WishlistActionResult.serverError,
+    };
+    notifyListeners();
+    return outcome;
+  }
+
+  // ── Mode-aware bookmark path (shared by BookmarkButton, UI-18) ────────────
+
+  /// Whether [placeId] is bookmarked in the active mode (demo wishlist vs the
+  /// real backend wishlist). The single query every bookmark control reads.
+  bool isPlaceBookmarked(int placeId) =>
+      demoMode ? isPlaceSaved(placeId) : isPlaceInRealWishlist(placeId);
+
+  /// Toggles the bookmark for [placeId] in the active mode, returning one
+  /// unified outcome. Demo Mode stays fully local/synchronous (zero HTTP);
+  /// Real Mode confirms with the backend before any local state changes.
+  Future<BookmarkOutcome> toggleBookmark(int placeId) async {
+    if (demoMode) {
+      final wasSaved = isPlaceSaved(placeId);
+      final result = wasSaved ? removeSavedPlace(placeId) : savePlace(placeId);
+      return _demoBookmarkOutcome(result, removing: wasSaved);
+    }
+    final wasSaved = isPlaceInRealWishlist(placeId);
+    final result = wasSaved
+        ? await removePlaceFromRealWishlist(placeId)
+        : await addPlaceToRealWishlist(placeId);
+    return _realBookmarkOutcome(result, removing: wasSaved);
+  }
+
+  BookmarkOutcome _demoBookmarkOutcome(
+    SavedPlaceActionResult result, {
+    required bool removing,
+  }) {
+    switch (result) {
+      case SavedPlaceActionResult.success:
+        return removing ? BookmarkOutcome.removed : BookmarkOutcome.added;
+      case SavedPlaceActionResult.duplicate:
+        return BookmarkOutcome.duplicate;
+      case SavedPlaceActionResult.notFound:
+        return BookmarkOutcome.notFound;
+      case SavedPlaceActionResult.forbidden:
+        return BookmarkOutcome.forbidden;
+      case SavedPlaceActionResult.invalidNote:
+        return BookmarkOutcome.invalid;
+      case SavedPlaceActionResult.unavailable:
+        return BookmarkOutcome.unavailable;
+    }
+  }
+
+  BookmarkOutcome _realBookmarkOutcome(
+    WishlistActionResult result, {
+    required bool removing,
+  }) {
+    switch (result) {
+      case WishlistActionResult.success:
+        return removing ? BookmarkOutcome.removed : BookmarkOutcome.added;
+      case WishlistActionResult.duplicate:
+        return BookmarkOutcome.duplicate;
+      case WishlistActionResult.placeNotFound:
+      case WishlistActionResult.itemNotFound:
+        return BookmarkOutcome.notFound;
+      case WishlistActionResult.notPublished:
+        return BookmarkOutcome.notPublished;
+      case WishlistActionResult.network:
+        return BookmarkOutcome.network;
+      case WishlistActionResult.unauthenticated:
+        return BookmarkOutcome.sessionExpired;
+      case WishlistActionResult.invalid:
+        return BookmarkOutcome.invalid;
+      case WishlistActionResult.unavailable:
+        return BookmarkOutcome.unavailable;
+      case WishlistActionResult.serverError:
+        return BookmarkOutcome.serverError;
+    }
   }
 
   List<Place> filteredPlaces(PlaceQuery q) {

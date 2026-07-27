@@ -9,6 +9,7 @@ import '../../design/app_radii.dart';
 import '../../design/app_spacing.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/add_to_trip_sheet.dart';
+import '../../shared/widgets/bookmark_button.dart';
 import '../../shared/widgets/glass_widgets.dart';
 import 'place_detail_screen.dart';
 
@@ -147,7 +148,6 @@ class _PlacesScreenState extends State<PlacesScreen> {
                         results: results,
                         onPlace: _openPlace,
                         onAdd: (place) => showAddToTripSheet(context, place),
-                        onBookmark: (place) => _bookmark(place),
                       )
                     else
                       _MapFallback(
@@ -155,7 +155,6 @@ class _PlacesScreenState extends State<PlacesScreen> {
                         onListMode: () =>
                             setState(() => mode = ExploreMode.list),
                         onPlace: _openPlace,
-                        onBookmark: _bookmark,
                       ),
                   ],
                 ),
@@ -201,29 +200,6 @@ class _PlacesScreenState extends State<PlacesScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => PlaceDetailScreen(place: place)),
-    );
-  }
-
-  void _bookmark(Place place) {
-    final app = AppScope.of(context);
-    final l10n = AppLocalizations.of(context)!;
-    final wasSaved = app.isPlaceSaved(place.id);
-    final outcome =
-        wasSaved ? app.removeSavedPlace(place.id) : app.savePlace(place.id);
-    final message = switch (outcome) {
-      SavedPlaceActionResult.success => wasSaved
-          ? l10n.savedPlacesRemovedPlace(place.name)
-          : l10n.savedPlacesSavedMessage(place.name),
-      SavedPlaceActionResult.duplicate =>
-        l10n.savedPlacesAlreadySavedMessage(place.name),
-      SavedPlaceActionResult.unavailable => l10n.savedPlacesRealEmptyMessage,
-      SavedPlaceActionResult.forbidden =>
-        l10n.savedPlacesActionForbiddenMessage,
-      SavedPlaceActionResult.notFound => l10n.savedPlacesMissingMessage,
-      SavedPlaceActionResult.invalidNote => l10n.savedPlacesNoteTooLongMessage,
-    };
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
     );
   }
 
@@ -435,13 +411,11 @@ class _ResultList extends StatelessWidget {
   final List<Place> results;
   final ValueChanged<Place> onPlace;
   final ValueChanged<Place> onAdd;
-  final ValueChanged<Place> onBookmark;
 
   const _ResultList({
     required this.results,
     required this.onPlace,
     required this.onAdd,
-    required this.onBookmark,
   });
 
   @override
@@ -454,7 +428,6 @@ class _ResultList extends StatelessWidget {
                 place: place,
                 onTap: () => onPlace(place),
                 onAdd: () => onAdd(place),
-                onBookmark: () => onBookmark(place),
               ),
             ),
         ],
@@ -465,23 +438,16 @@ class _SearchResultCard extends StatelessWidget {
   final Place place;
   final VoidCallback onTap;
   final VoidCallback onAdd;
-  final VoidCallback onBookmark;
 
   const _SearchResultCard({
     required this.place,
     required this.onTap,
     required this.onAdd,
-    required this.onBookmark,
   });
 
   @override
   Widget build(BuildContext context) {
-    final app = AppScope.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final saved = app.isPlaceSaved(place.id);
-    final bookmarkLabel = saved
-        ? l10n.savedPlacesRemoveSemantic(place.name)
-        : l10n.savedPlacesSaveSemantic(place.name);
     Widget addButton() => Semantics(
           button: true,
           label: l10n.placeAddToTripSemantic(place.name),
@@ -506,21 +472,7 @@ class _SearchResultCard extends StatelessWidget {
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
-                Semantics(
-                  button: true,
-                  toggled: saved,
-                  label: bookmarkLabel,
-                  child: IconButton(
-                    tooltip: bookmarkLabel,
-                    onPressed: onBookmark,
-                    icon: Icon(
-                      saved
-                          ? Icons.bookmark_rounded
-                          : Icons.bookmark_border_rounded,
-                      color: saved ? AppColors.ocean : null,
-                    ),
-                  ),
-                ),
+                BookmarkButton(placeId: place.id, placeName: place.name),
               ],
             ),
             Text(
@@ -604,13 +556,11 @@ class _MapFallback extends StatelessWidget {
   final List<Place> results;
   final VoidCallback onListMode;
   final ValueChanged<Place> onPlace;
-  final ValueChanged<Place> onBookmark;
 
   const _MapFallback({
     required this.results,
     required this.onListMode,
     required this.onPlace,
-    required this.onBookmark,
   });
 
   @override
@@ -667,7 +617,6 @@ class _MapFallback extends StatelessWidget {
           place: results.first,
           onTap: () => onPlace(results.first),
           onAdd: () => showAddToTripSheet(context, results.first),
-          onBookmark: () => onBookmark(results.first),
         ),
       ],
     );

@@ -16,6 +16,7 @@ enum ApiErrorKind {
   notFound,
   conflict,
   validation,
+  unprocessable,
   server,
   malformed,
 }
@@ -139,6 +140,7 @@ class ApiClient {
     if (statusCode == 401) return ApiErrorKind.unauthorized;
     if (statusCode == 404) return ApiErrorKind.notFound;
     if (statusCode == 409) return ApiErrorKind.conflict;
+    if (statusCode == 422) return ApiErrorKind.unprocessable;
     if (statusCode >= 500) return ApiErrorKind.server;
     return ApiErrorKind.malformed;
   }
@@ -370,6 +372,100 @@ class ApiClient {
       final res = await _client
           .delete(
             Uri.parse('$baseUrl/me/collections/$collectionId/places/$placeId'),
+            headers: _jsonHeaders,
+          )
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 204) {
+        return const CollectionApiVoidResult.success();
+      }
+      return CollectionApiVoidResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  // ── Wishlist (/api/me/wishlist, UI-18) ──────────────────────────────────
+  //
+  // Reuses the Saved Collections typed-result infrastructure (ApiErrorKind,
+  // CollectionApiResult, _jsonHeaders, _errorKindForStatus, _decodeJsonMap,
+  // _collectionsTimeout). The backend GET is get-or-create (never 404); add
+  // may return 422 when the place is not PUBLISHED.
+
+  Future<CollectionApiResult<WishlistRecord>> getWishlist() async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/me/wishlist'), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(WishlistRecord.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  Future<CollectionApiResult<WishlistItemRecord>> addWishlistItem({
+    required int placeId,
+    String? note,
+  }) async {
+    try {
+      final res = await _client
+          .post(
+            Uri.parse('$baseUrl/me/wishlist/items'),
+            headers: _jsonHeaders,
+            body: jsonEncode({'placeId': placeId, 'note': note}),
+          )
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 201) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(WishlistItemRecord.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  Future<CollectionApiVoidResult> removeWishlistItem(int placeId) async {
+    try {
+      final res = await _client
+          .delete(
+            Uri.parse('$baseUrl/me/wishlist/items/$placeId'),
             headers: _jsonHeaders,
           )
           .timeout(_collectionsTimeout);

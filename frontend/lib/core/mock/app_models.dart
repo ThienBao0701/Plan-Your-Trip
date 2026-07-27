@@ -423,6 +423,142 @@ class CollectionDetailRecord {
       );
 }
 
+// ── Real Mode Wishlist (/api/me/wishlist, UI-18) ─────────────────────────────
+//
+// Typed mirrors of the backend `WishlistDto` records. Kept entirely separate
+// from the Demo Mode [SavedPlaceRecord] shape — the real wishlist is a distinct
+// data source that must never be merged with the local demo list.
+
+/// Real-mode outcome for the authenticated `/api/me/wishlist` endpoints.
+/// Distinct from the Demo Mode [SavedPlaceActionResult]. Note: the backend
+/// enforces NO per-wishlist item cap, so there is deliberately no
+/// `itemLimitReached` member (surfacing one would be a fabricated contract).
+enum WishlistActionResult {
+  success,
+  unavailable,
+  network,
+  serverError,
+  unauthenticated,
+  placeNotFound,
+  itemNotFound,
+  duplicate,
+  notPublished,
+  invalid,
+}
+
+/// The single unified outcome the shared `BookmarkButton` switches on, spanning
+/// both Demo Mode (local, synchronous) and Real Mode (backend) bookmark toggles.
+enum BookmarkOutcome {
+  added,
+  removed,
+  duplicate,
+  notFound,
+  notPublished,
+  network,
+  serverError,
+  sessionExpired,
+  unavailable,
+  invalid,
+  forbidden,
+}
+
+DateTime? _parseNullableInstant(Object? raw) {
+  if (raw is! String || raw.isEmpty) return null;
+  return DateTime.tryParse(raw);
+}
+
+/// Real-backend mirror of `WishlistDto.WishlistPlaceSummary`. Carries only the
+/// Place fields the backend actually returns — no `imageUrl`/`locationName`/
+/// `city`, unlike the Demo Mode [Place] model.
+class WishlistPlaceSummaryRecord {
+  final int id;
+  final String name;
+  final String? slug;
+  final String? categoryName;
+  final String? address;
+  final String? shortDescription;
+  final double ratingAvg;
+  final int reviewCount;
+
+  const WishlistPlaceSummaryRecord({
+    required this.id,
+    required this.name,
+    this.slug,
+    this.categoryName,
+    this.address,
+    this.shortDescription,
+    this.ratingAvg = 0,
+    this.reviewCount = 0,
+  });
+
+  factory WishlistPlaceSummaryRecord.fromJson(Map<String, dynamic> json) =>
+      WishlistPlaceSummaryRecord(
+        id: (json['id'] as num).toInt(),
+        name: json['name'] as String,
+        slug: json['slug'] as String?,
+        categoryName: json['categoryName'] as String?,
+        address: json['address'] as String?,
+        shortDescription: json['shortDescription'] as String?,
+        ratingAvg: (json['ratingAvg'] as num?)?.toDouble() ?? 0,
+        reviewCount: (json['reviewCount'] as num?)?.toInt() ?? 0,
+      );
+}
+
+/// Real-backend mirror of `WishlistDto.WishlistItemResponse`.
+class WishlistItemRecord {
+  final int id;
+  final WishlistPlaceSummaryRecord place;
+  final String? note;
+  final DateTime? createdAt;
+
+  const WishlistItemRecord({
+    required this.id,
+    required this.place,
+    this.note,
+    this.createdAt,
+  });
+
+  int get placeId => place.id;
+
+  factory WishlistItemRecord.fromJson(Map<String, dynamic> json) =>
+      WishlistItemRecord(
+        id: (json['id'] as num).toInt(),
+        place: WishlistPlaceSummaryRecord.fromJson(
+          json['place'] as Map<String, dynamic>,
+        ),
+        note: json['note'] as String?,
+        createdAt: _parseNullableInstant(json['createdAt']),
+      );
+}
+
+/// Real-backend mirror of `WishlistDto.WishlistResponse`. The backend returns
+/// items newest-first (`createdAt DESC`); that server order is preserved.
+class WishlistRecord {
+  final int id;
+  final int? userId;
+  final List<WishlistItemRecord> items;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+
+  const WishlistRecord({
+    required this.id,
+    this.userId,
+    this.items = const [],
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  factory WishlistRecord.fromJson(Map<String, dynamic> json) => WishlistRecord(
+        id: (json['id'] as num).toInt(),
+        userId: (json['userId'] as num?)?.toInt(),
+        items: (json['items'] as List<dynamic>? ?? const [])
+            .map((e) => WishlistItemRecord.fromJson(e as Map<String, dynamic>))
+            .toList(),
+        createdAt: _parseNullableInstant(json['createdAt']),
+        updatedAt: _parseNullableInstant(json['updatedAt']),
+      );
+}
+
 enum RoomType {
   standard,
   superior,

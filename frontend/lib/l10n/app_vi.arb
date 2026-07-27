@@ -2983,5 +2983,46 @@
   "reviewStatusApproved": "Đã duyệt",
   "reviewStatusRejected": "Đã từ chối",
   "reviewStatusHidden": "Đã ẩn",
-  "reviewStatusReported": "Đã báo cáo"
+  "reviewStatusReported": "Đã báo cáo",
+  "wishlistBookmarkAddedMessage": "Đã lưu {place} vào danh sách yêu thích.",
+  "@wishlistBookmarkAddedMessage": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "wishlistBookmarkRemovedMessage": "Đã xóa {place} khỏi danh sách yêu thích.",
+  "@wishlistBookmarkRemovedMessage": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "wishlistBookmarkNotPublishedMessage": "{place} chưa được xuất bản nên chưa thể lưu.",
+  "@wishlistBookmarkNotPublishedMessage": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "wishlistBookmarkNetworkMessage": "Không thể kết nối máy chủ. Hãy kiểm tra kết nối và thử lại.",
+  "wishlistBookmarkServerErrorMessage": "Đã xảy ra lỗi phía máy chủ. Vui lòng thử lại.",
+  "wishlistBookmarkUnavailableMessage": "Hiện chưa thể lưu.",
+  "wishlistBookmarkSavingSemantic": "Đang cập nhật trạng thái lưu cho {place}",
+  "@wishlistBookmarkSavingSemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "wishlistRealLoadingTitle": "Đang tải danh sách yêu thích",
+  "wishlistRealLoadingMessage": "Đang lấy các địa điểm đã lưu…",
+  "wishlistRealEmptyTitle": "Danh sách yêu thích trống",
+  "wishlistRealEmptyMessage": "Chạm vào biểu tượng dấu trang ở bất kỳ địa điểm nào để lưu vào đây.",
+  "wishlistRealErrorMessage": "Không thể tải danh sách yêu thích. Vui lòng thử lại.",
+  "wishlistRealPartialDetailsNote": "Chỉ có thông tin hạn chế cho địa điểm đã lưu này."
 }

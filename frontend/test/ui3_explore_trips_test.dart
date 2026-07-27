@@ -313,7 +313,11 @@ void main() {
       find.byTooltip('Save ${place.name}').first,
     );
     await tester.pump(const Duration(milliseconds: 250));
-    expect(find.textContaining('not connected to the backend'), findsOneWidget);
+    // UI-18: real mode never fabricates a local save. It calls the backend and,
+    // whatever the (unreachable-in-test) outcome, it neither shows the demo
+    // "Saved … locally." message nor adds the place to the real wishlist.
+    expect(find.text('Saved ${place.name} locally.'), findsNothing);
+    expect(realApp.isPlaceInRealWishlist(place.id), isFalse);
   });
 
   testWidgets('smart trips sections and real empty boundary render',

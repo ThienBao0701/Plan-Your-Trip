@@ -9645,6 +9645,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reported'**
   String get reviewStatusReported;
+
+  /// No description provided for @wishlistBookmarkAddedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved {place} to your wishlist.'**
+  String wishlistBookmarkAddedMessage(String place);
+
+  /// No description provided for @wishlistBookmarkRemovedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed {place} from your wishlist.'**
+  String wishlistBookmarkRemovedMessage(String place);
+
+  /// No description provided for @wishlistBookmarkNotPublishedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{place} isn\'t published yet, so it can\'t be saved.'**
+  String wishlistBookmarkNotPublishedMessage(String place);
+
+  /// No description provided for @wishlistBookmarkNetworkMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t reach the server. Check your connection and try again.'**
+  String get wishlistBookmarkNetworkMessage;
+
+  /// No description provided for @wishlistBookmarkServerErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong on our end. Please try again.'**
+  String get wishlistBookmarkServerErrorMessage;
+
+  /// No description provided for @wishlistBookmarkUnavailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving isn\'t available right now.'**
+  String get wishlistBookmarkUnavailableMessage;
+
+  /// No description provided for @wishlistBookmarkSavingSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Updating saved state for {place}'**
+  String wishlistBookmarkSavingSemantic(String place);
+
+  /// No description provided for @wishlistRealLoadingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading your wishlist'**
+  String get wishlistRealLoadingTitle;
+
+  /// No description provided for @wishlistRealLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetching your saved places…'**
+  String get wishlistRealLoadingMessage;
+
+  /// No description provided for @wishlistRealEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your wishlist is empty'**
+  String get wishlistRealEmptyTitle;
+
+  /// No description provided for @wishlistRealEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the bookmark on any place to save it here.'**
+  String get wishlistRealEmptyMessage;
+
+  /// No description provided for @wishlistRealErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load your wishlist. Please try again.'**
+  String get wishlistRealErrorMessage;
+
+  /// No description provided for @wishlistRealPartialDetailsNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Limited details are available for this saved place.'**
+  String get wishlistRealPartialDetailsNote;
 }
 
 class _AppLocalizationsDelegate

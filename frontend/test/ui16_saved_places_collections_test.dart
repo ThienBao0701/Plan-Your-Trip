@@ -906,8 +906,11 @@ void main() {
       const Size(430, 932),
     );
 
-    expect(find.text('No saved places yet'), findsOneWidget);
+    // Real mode must not surface any demo-seeded saved place, and must not
+    // render the demo saved-list UI (search field). The "All saved" tab is now
+    // the real backend wishlist (UI-18) rather than a static boundary message.
     expect(find.text('Mây Lang Thang Villa'), findsNothing);
+    expect(find.byKey(const Key('saved-places-search-field')), findsNothing);
   });
 
   testWidgets('saved places layout supports narrow, wide, and large text',

@@ -2983,5 +2983,46 @@
   "reviewStatusApproved": "Approved",
   "reviewStatusRejected": "Rejected",
   "reviewStatusHidden": "Hidden",
-  "reviewStatusReported": "Reported"
+  "reviewStatusReported": "Reported",
+  "wishlistBookmarkAddedMessage": "Saved {place} to your wishlist.",
+  "@wishlistBookmarkAddedMessage": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "wishlistBookmarkRemovedMessage": "Removed {place} from your wishlist.",
+  "@wishlistBookmarkRemovedMessage": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "wishlistBookmarkNotPublishedMessage": "{place} isn't published yet, so it can't be saved.",
+  "@wishlistBookmarkNotPublishedMessage": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "wishlistBookmarkNetworkMessage": "Couldn't reach the server. Check your connection and try again.",
+  "wishlistBookmarkServerErrorMessage": "Something went wrong on our end. Please try again.",
+  "wishlistBookmarkUnavailableMessage": "Saving isn't available right now.",
+  "wishlistBookmarkSavingSemantic": "Updating saved state for {place}",
+  "@wishlistBookmarkSavingSemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "wishlistRealLoadingTitle": "Loading your wishlist",
+  "wishlistRealLoadingMessage": "Fetching your saved places…",
+  "wishlistRealEmptyTitle": "Your wishlist is empty",
+  "wishlistRealEmptyMessage": "Tap the bookmark on any place to save it here.",
+  "wishlistRealErrorMessage": "We couldn't load your wishlist. Please try again.",
+  "wishlistRealPartialDetailsNote": "Limited details are available for this saved place."
 }
