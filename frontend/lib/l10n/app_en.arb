@@ -3024,5 +3024,15 @@
   "wishlistRealEmptyTitle": "Your wishlist is empty",
   "wishlistRealEmptyMessage": "Tap the bookmark on any place to save it here.",
   "wishlistRealErrorMessage": "We couldn't load your wishlist. Please try again.",
-  "wishlistRealPartialDetailsNote": "Limited details are available for this saved place."
+  "wishlistRealPartialDetailsNote": "Limited details are available for this saved place.",
+  "placeHydrationLoadingSemantic": "Loading details for {place}",
+  "@placeHydrationLoadingSemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "placeHydrationUnavailableMessage": "This place is no longer available.",
+  "placeHydrationErrorMessage": "Couldn't load place details. Please try again."
 }

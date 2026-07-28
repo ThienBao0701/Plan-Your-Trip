@@ -219,6 +219,64 @@ class _SavedPlacesScreenState extends State<SavedPlacesScreen> {
     }
   }
 
+  /// Hydrates the full real [Place] for [placeId] and, only on confirmed
+  /// success, opens its detail screen. On failure we stay put and show an
+  /// honest message; saved membership is never mutated here.
+  Future<void> _hydrateAndOpenDetails(int placeId) async {
+    final app = AppScope.of(context);
+    final navigator = Navigator.of(context);
+    final outcome = await app.hydrateRealPlace(placeId);
+    if (!mounted) return;
+    if (outcome == PlaceHydrationResult.success) {
+      final place = app.getHydratedRealPlace(placeId);
+      if (place == null) {
+        _showHydrationMessage(PlaceHydrationResult.serverError);
+        return;
+      }
+      navigator.push(
+        MaterialPageRoute(builder: (_) => PlaceDetailScreen(place: place)),
+      );
+      return;
+    }
+    _handleHydrationFailure(outcome);
+  }
+
+  /// Hydrates the full real [Place] for [placeId] and, only on confirmed
+  /// success, opens the existing Add-to-Trip sheet with the real place.
+  Future<void> _hydrateAndAddToTrip(int placeId) async {
+    final app = AppScope.of(context);
+    final outcome = await app.hydrateRealPlace(placeId);
+    if (!mounted) return;
+    if (outcome == PlaceHydrationResult.success) {
+      final place = app.getHydratedRealPlace(placeId);
+      if (place == null) {
+        _showHydrationMessage(PlaceHydrationResult.serverError);
+        return;
+      }
+      showAddToTripSheet(context, place);
+      return;
+    }
+    _handleHydrationFailure(outcome);
+  }
+
+  void _handleHydrationFailure(PlaceHydrationResult outcome) {
+    if (outcome == PlaceHydrationResult.sessionExpired) {
+      _showRealCollectionsReauth();
+      return;
+    }
+    _showHydrationMessage(outcome);
+  }
+
+  void _showHydrationMessage(PlaceHydrationResult outcome) {
+    final l10n = AppLocalizations.of(context)!;
+    final message = outcome == PlaceHydrationResult.notFound
+        ? l10n.placeHydrationUnavailableMessage
+        : l10n.placeHydrationErrorMessage;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
   Widget _buildRealWishlist(AppState app, AppLocalizations l10n) {
     if (app.realWishlistLoading && app.realWishlist.isEmpty) {
       return const OceanLoadingState();
@@ -244,7 +302,11 @@ class _SavedPlacesScreenState extends State<SavedPlacesScreen> {
         for (final item in app.realWishlist)
           Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.md),
-            child: _RealWishlistCard(item: item),
+            child: _RealWishlistCard(
+              item: item,
+              onViewDetails: () => _hydrateAndOpenDetails(item.placeId),
+              onAddToTrip: () => _hydrateAndAddToTrip(item.placeId),
+            ),
           ),
       ],
     );
@@ -903,6 +965,8 @@ class _SavedPlacesScreenState extends State<SavedPlacesScreen> {
       onEdit: () => _editRealCollection(detail.toSummary()),
       onDelete: () => _confirmDeleteRealCollection(detail.toSummary()),
       onAddSavedPlace: _showDeferredRealAddPlace,
+      onViewDetails: _hydrateAndOpenDetails,
+      onAddToTrip: _hydrateAndAddToTrip,
       onRemove: (place) => _removeRealCollectionPlace(detail.id, place),
     );
   }
@@ -2535,6 +2599,8 @@ class _RealCollectionDetailView extends StatelessWidget {
   final VoidCallback onEdit;
   final VoidCallback onDelete;
   final VoidCallback onAddSavedPlace;
+  final ValueChanged<int> onViewDetails;
+  final ValueChanged<int> onAddToTrip;
   final ValueChanged<CollectionPlaceRecord> onRemove;
 
   const _RealCollectionDetailView({
@@ -2543,6 +2609,8 @@ class _RealCollectionDetailView extends StatelessWidget {
     required this.onEdit,
     required this.onDelete,
     required this.onAddSavedPlace,
+    required this.onViewDetails,
+    required this.onAddToTrip,
     required this.onRemove,
   });
 
@@ -2665,6 +2733,8 @@ class _RealCollectionDetailView extends StatelessWidget {
                         width: (constraints.maxWidth - AppSpacing.md) / 2,
                         child: _RealCollectionPlaceCard(
                           place: place,
+                          onViewDetails: () => onViewDetails(place.placeId),
+                          onAddToTrip: () => onAddToTrip(place.placeId),
                           onRemove: () => onRemove(place),
                         ),
                       ),
@@ -2678,6 +2748,8 @@ class _RealCollectionDetailView extends StatelessWidget {
                       padding: const EdgeInsets.only(bottom: AppSpacing.md),
                       child: _RealCollectionPlaceCard(
                         place: place,
+                        onViewDetails: () => onViewDetails(place.placeId),
+                        onAddToTrip: () => onAddToTrip(place.placeId),
                         onRemove: () => onRemove(place),
                       ),
                     ),
@@ -2690,12 +2762,84 @@ class _RealCollectionDetailView extends StatelessWidget {
   }
 }
 
+/// The "Details" + "Add to trip" actions shared by real wishlist and real
+/// collection cards (UI19). Both require hydrating the full [Place] first; while
+/// a hydration for [placeId] is in flight both buttons are disabled (double-tap
+/// safe) and a spinner with a localized loading label is shown. An optional
+/// [trailing] widget (e.g. a Remove button) is laid out in the same wrap.
+class _HydrationActionButtons extends StatelessWidget {
+  final int placeId;
+  final String placeName;
+  final String keyPrefix;
+  final VoidCallback onViewDetails;
+  final VoidCallback onAddToTrip;
+  final Widget? trailing;
+
+  const _HydrationActionButtons({
+    required this.placeId,
+    required this.placeName,
+    required this.keyPrefix,
+    required this.onViewDetails,
+    required this.onAddToTrip,
+    this.trailing,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final inFlight = AppScope.of(context).isRealPlaceHydrationInFlight(placeId);
+    final loadingLabel = l10n.placeHydrationLoadingSemantic(placeName);
+    return Wrap(
+      spacing: AppSpacing.xs,
+      runSpacing: AppSpacing.xs,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        if (inFlight)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+            child: Semantics(
+              label: loadingLabel,
+              child: const SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ),
+          ),
+        OceanSecondaryButton(
+          key: Key('$keyPrefix-details-$placeId'),
+          label: l10n.savedPlacesViewDetailsAction,
+          icon: Icons.info_outline_rounded,
+          fullWidth: false,
+          semanticLabel:
+              inFlight ? loadingLabel : l10n.savedPlacesViewDetailsAction,
+          onPressed: inFlight ? null : onViewDetails,
+        ),
+        OceanSecondaryButton(
+          key: Key('$keyPrefix-add-trip-$placeId'),
+          label: l10n.placeAddToTrip,
+          icon: Icons.add_location_alt_rounded,
+          fullWidth: false,
+          semanticLabel:
+              inFlight ? loadingLabel : l10n.placeAddToTripSemantic(placeName),
+          onPressed: inFlight ? null : onAddToTrip,
+        ),
+        if (trailing != null) trailing!,
+      ],
+    );
+  }
+}
+
 class _RealCollectionPlaceCard extends StatelessWidget {
   final CollectionPlaceRecord place;
+  final VoidCallback onViewDetails;
+  final VoidCallback onAddToTrip;
   final VoidCallback onRemove;
 
   const _RealCollectionPlaceCard({
     required this.place,
+    required this.onViewDetails,
+    required this.onAddToTrip,
     required this.onRemove,
   });
 
@@ -2769,49 +2913,23 @@ class _RealCollectionPlaceCard extends StatelessWidget {
                   ),
                 ],
                 const SizedBox(height: AppSpacing.sm),
-                Wrap(
-                  spacing: AppSpacing.xs,
-                  runSpacing: AppSpacing.xs,
-                  children: [
-                    Tooltip(
-                      message: l10n.savedPlacesCollectionPlaceHydrationMessage,
-                      child: OceanSecondaryButton(
-                        key: Key(
-                            'real-collection-place-details-${place.placeId}'),
-                        label: l10n.savedPlacesViewDetailsAction,
-                        icon: Icons.info_outline_rounded,
-                        fullWidth: false,
-                        semanticLabel:
-                            l10n.savedPlacesCollectionPlaceHydrationMessage,
-                        onPressed: null,
-                      ),
+                _HydrationActionButtons(
+                  placeId: place.placeId,
+                  placeName: place.name,
+                  keyPrefix: 'real-collection-place',
+                  onViewDetails: onViewDetails,
+                  onAddToTrip: onAddToTrip,
+                  trailing: OceanSecondaryButton(
+                    key: Key('real-collection-place-remove-${place.placeId}'),
+                    label: l10n.savedPlacesCollectionRemovePlaceAction,
+                    icon: Icons.playlist_remove_rounded,
+                    fullWidth: false,
+                    semanticLabel:
+                        l10n.savedPlacesCollectionRemovePlaceSemantic(
+                      place.name,
                     ),
-                    Tooltip(
-                      message: l10n.savedPlacesCollectionPlaceHydrationMessage,
-                      child: OceanSecondaryButton(
-                        key: Key(
-                          'real-collection-place-add-trip-${place.placeId}',
-                        ),
-                        label: l10n.placeAddToTrip,
-                        icon: Icons.add_location_alt_rounded,
-                        fullWidth: false,
-                        semanticLabel:
-                            l10n.savedPlacesCollectionPlaceHydrationMessage,
-                        onPressed: null,
-                      ),
-                    ),
-                    OceanSecondaryButton(
-                      key: Key('real-collection-place-remove-${place.placeId}'),
-                      label: l10n.savedPlacesCollectionRemovePlaceAction,
-                      icon: Icons.playlist_remove_rounded,
-                      fullWidth: false,
-                      semanticLabel:
-                          l10n.savedPlacesCollectionRemovePlaceSemantic(
-                        place.name,
-                      ),
-                      onPressed: onRemove,
-                    ),
-                  ],
+                    onPressed: onRemove,
+                  ),
                 ),
               ],
             ),
@@ -3285,8 +3403,14 @@ class _PlaceImage extends StatelessWidget {
 /// item in sync with every other bookmark control for the same place.
 class _RealWishlistCard extends StatelessWidget {
   final WishlistItemRecord item;
+  final VoidCallback onViewDetails;
+  final VoidCallback onAddToTrip;
 
-  const _RealWishlistCard({required this.item});
+  const _RealWishlistCard({
+    required this.item,
+    required this.onViewDetails,
+    required this.onAddToTrip,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -3363,6 +3487,14 @@ class _RealWishlistCard extends StatelessWidget {
               color: AppColors.ocean,
             ),
           ],
+          const SizedBox(height: AppSpacing.sm),
+          _HydrationActionButtons(
+            placeId: item.placeId,
+            placeName: place.name,
+            keyPrefix: 'real-wishlist-place',
+            onViewDetails: onViewDetails,
+            onAddToTrip: onAddToTrip,
+          ),
           const SizedBox(height: AppSpacing.xs),
           Text(
             l10n.wishlistRealPartialDetailsNote,

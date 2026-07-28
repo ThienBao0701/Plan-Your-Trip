@@ -3024,5 +3024,15 @@
   "wishlistRealEmptyTitle": "Danh sách yêu thích trống",
   "wishlistRealEmptyMessage": "Chạm vào biểu tượng dấu trang ở bất kỳ địa điểm nào để lưu vào đây.",
   "wishlistRealErrorMessage": "Không thể tải danh sách yêu thích. Vui lòng thử lại.",
-  "wishlistRealPartialDetailsNote": "Chỉ có thông tin hạn chế cho địa điểm đã lưu này."
+  "wishlistRealPartialDetailsNote": "Chỉ có thông tin hạn chế cho địa điểm đã lưu này.",
+  "placeHydrationLoadingSemantic": "Đang tải chi tiết cho {place}",
+  "@placeHydrationLoadingSemantic": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "placeHydrationUnavailableMessage": "Địa điểm này không còn khả dụng.",
+  "placeHydrationErrorMessage": "Không thể tải chi tiết địa điểm. Vui lòng thử lại."
 }

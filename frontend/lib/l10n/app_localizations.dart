@@ -9723,6 +9723,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Limited details are available for this saved place.'**
   String get wishlistRealPartialDetailsNote;
+
+  /// No description provided for @placeHydrationLoadingSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading details for {place}'**
+  String placeHydrationLoadingSemantic(String place);
+
+  /// No description provided for @placeHydrationUnavailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This place is no longer available.'**
+  String get placeHydrationUnavailableMessage;
+
+  /// No description provided for @placeHydrationErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load place details. Please try again.'**
+  String get placeHydrationErrorMessage;
 }
 
 class _AppLocalizationsDelegate

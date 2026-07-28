@@ -5552,4 +5552,17 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get wishlistRealPartialDetailsNote =>
       'Chỉ có thông tin hạn chế cho địa điểm đã lưu này.';
+
+  @override
+  String placeHydrationLoadingSemantic(String place) {
+    return 'Đang tải chi tiết cho $place';
+  }
+
+  @override
+  String get placeHydrationUnavailableMessage =>
+      'Địa điểm này không còn khả dụng.';
+
+  @override
+  String get placeHydrationErrorMessage =>
+      'Không thể tải chi tiết địa điểm. Vui lòng thử lại.';
 }

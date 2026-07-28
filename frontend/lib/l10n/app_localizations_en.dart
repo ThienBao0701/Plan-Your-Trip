@@ -5713,4 +5713,17 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get wishlistRealPartialDetailsNote =>
       'Limited details are available for this saved place.';
+
+  @override
+  String placeHydrationLoadingSemantic(String place) {
+    return 'Loading details for $place';
+  }
+
+  @override
+  String get placeHydrationUnavailableMessage =>
+      'This place is no longer available.';
+
+  @override
+  String get placeHydrationErrorMessage =>
+      'Couldn\'t load place details. Please try again.';
 }

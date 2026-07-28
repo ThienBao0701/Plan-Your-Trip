@@ -559,6 +559,331 @@ class WishlistRecord {
       );
 }
 
+/// Outcome of hydrating a partial saved place into a full [Place] via the real
+/// backend. [unavailable] is the Demo Mode / no-op guard; [sessionExpired] is a
+/// defensive-only branch — the place-detail endpoint is public, so a 401 is not
+/// expected, but if one ever occurs it must be surfaced without logging out.
+enum PlaceHydrationResult {
+  success,
+  notFound,
+  network,
+  serverError,
+  sessionExpired,
+  unavailable,
+}
+
+/// One consecutive-days opening-hours group from `PlaceDetailResponse`
+/// (`groupedOpeningHours`). The backend pre-labels `days` (e.g. "Monday -
+/// Friday") and serialises times as `"HH:mm:ss"`.
+class PlaceOpeningHourGroupRecord {
+  final String days;
+  final String? openTime;
+  final String? closeTime;
+  final bool closed;
+
+  const PlaceOpeningHourGroupRecord({
+    required this.days,
+    this.openTime,
+    this.closeTime,
+    this.closed = false,
+  });
+
+  factory PlaceOpeningHourGroupRecord.fromJson(Map<String, dynamic> json) =>
+      PlaceOpeningHourGroupRecord(
+        days: (json['days'] as String?) ?? '',
+        openTime: json['openTime'] as String?,
+        closeTime: json['closeTime'] as String?,
+        closed: (json['closed'] as bool?) ?? false,
+      );
+}
+
+/// Trims a backend `"HH:mm:ss"` (or `"HH:mm"`) time string down to `"HH:mm"`.
+String? _shortTime(String? raw) {
+  if (raw == null || raw.isEmpty) return null;
+  final parts = raw.split(':');
+  if (parts.length >= 2) return '${parts[0]}:${parts[1]}';
+  return raw;
+}
+
+/// Best-effort parent (province-level) segment of a collapsed location
+/// `fullPath` hierarchy. Uses only backend-supplied text — never invents an
+/// administrative division. Falls back to [fallback] when the path has no
+/// distinct parent segment.
+String _provinceFromFullPath(String? fullPath, String fallback) {
+  if (fullPath == null || fullPath.trim().isEmpty) return fallback;
+  for (final sep in const [' > ', ' / ', ' - ', ',', '/', '>']) {
+    if (fullPath.contains(sep)) {
+      final parts = fullPath
+          .split(sep)
+          .map((s) => s.trim())
+          .where((s) => s.isNotEmpty)
+          .toList();
+      if (parts.length >= 2) return parts[parts.length - 2];
+    }
+  }
+  return fallback;
+}
+
+RoomType _roomTypeFromCode(String? code) {
+  final upper = (code ?? '').toUpperCase();
+  return RoomType.values.firstWhere(
+    (v) => v.code == upper,
+    orElse: () => RoomType.standard,
+  );
+}
+
+BedType _bedTypeFromCode(String? code) {
+  final upper = (code ?? '').toUpperCase();
+  return BedType.values.firstWhere(
+    (v) => v.code == upper,
+    orElse: () => BedType.single,
+  );
+}
+
+/// Maps a `PlaceDetailResponse.hotelDetail` JSON object (already decoded) into
+/// the Demo-Mode-shaped domain [HotelDetail]. Every value comes from the
+/// backend response; nothing is fabricated. `ratePlans` are intentionally left
+/// empty — they are a local booking-preview concept computed elsewhere and are
+/// out of hydration scope.
+HotelDetail _hotelDetailFromJson(Map<String, dynamic> json) {
+  List<String> stringList(Object? raw) => (raw as List<dynamic>? ?? const [])
+      .map((e) => e?.toString() ?? '')
+      .where((e) => e.isNotEmpty)
+      .toList();
+
+  final facilities = (json['facilities'] as List<dynamic>? ?? const [])
+      .map((e) => (e as Map<String, dynamic>)['facilityName']?.toString() ?? '')
+      .where((e) => e.isNotEmpty)
+      .toList();
+  final services = (json['services'] as List<dynamic>? ?? const [])
+      .map((e) => (e as Map<String, dynamic>)['serviceName']?.toString() ?? '')
+      .where((e) => e.isNotEmpty)
+      .toList();
+  final parking = json['parking'] as Map<String, dynamic>?;
+  final internet = json['internet'] as Map<String, dynamic>?;
+  final rooms = (json['rooms'] as List<dynamic>? ?? const [])
+      .map((e) => _hotelRoomFromJson(e as Map<String, dynamic>))
+      .toList();
+
+  return HotelDetail(
+    starRating: (json['starRating'] as num?)?.toInt(),
+    checkInTime: _shortTime(json['checkInTime'] as String?),
+    checkOutTime: _shortTime(json['checkOutTime'] as String?),
+    distanceToBeachMeters: (json['distanceToBeachMeters'] as num?)?.toInt(),
+    distanceToCityCenterMeters:
+        (json['distanceToCityCenterMeters'] as num?)?.toInt(),
+    totalRooms: (json['totalRooms'] as num?)?.toInt(),
+    availableRooms: (json['availableRooms'] as num?)?.toInt(),
+    freeCancellation: json['freeCancellation'] as bool?,
+    cancellationPolicy: json['cancellationPolicy'] as String?,
+    prepaymentRequired: json['prepaymentRequired'] as bool?,
+    paymentPolicy: json['paymentPolicy'] as String?,
+    childrenPolicy: json['childrenPolicy'] as String?,
+    petPolicy: json['petPolicy'] as String?,
+    smokingPolicy: json['smokingPolicy'] as String?,
+    breakfastIncluded: json['breakfastIncluded'] as bool?,
+    airportShuttle: json['airportShuttle'] as bool?,
+    facilities: facilities,
+    services: services,
+    languages: stringList(json['languages']),
+    paymentMethods: stringList(json['paymentMethods']),
+    parking: parking?['parkingDescription'] as String?,
+    internet: internet?['internetDescription'] as String?,
+    rooms: rooms,
+  );
+}
+
+HotelRoom _hotelRoomFromJson(Map<String, dynamic> json) {
+  final gallery = (json['galleryImages'] as List<dynamic>? ?? const [])
+      .map((e) => (e as Map<String, dynamic>)['url']?.toString() ?? '')
+      .where((e) => e.isNotEmpty)
+      .toList();
+  final amenities = (json['amenities'] as List<dynamic>? ?? const [])
+      .map((e) => (e as Map<String, dynamic>)['name']?.toString() ?? '')
+      .where((e) => e.isNotEmpty)
+      .toList();
+  return HotelRoom(
+    id: (json['id'] as num?)?.toInt() ?? 0,
+    roomName: (json['roomName'] as String?) ?? '',
+    roomCode: (json['roomCode'] as String?) ?? '',
+    roomType: _roomTypeFromCode(json['roomType'] as String?),
+    description: (json['description'] as String?) ?? '',
+    bedType: _bedTypeFromCode(json['bedType'] as String?),
+    bedCount: (json['bedCount'] as num?)?.toInt() ?? 1,
+    maxAdults: (json['maxAdults'] as num?)?.toInt() ?? 1,
+    maxChildren: (json['maxChildren'] as num?)?.toInt() ?? 0,
+    maxGuests: (json['maxGuests'] as num?)?.toInt() ?? 1,
+    roomSizeSqm: (json['roomSizeSqm'] as num?)?.toInt(),
+    floorNumber: (json['floorNumber'] as num?)?.toInt(),
+    smokingAllowed: (json['smokingAllowed'] as bool?) ?? false,
+    breakfastIncluded: (json['breakfastIncluded'] as bool?) ?? false,
+    freeCancellation: (json['freeCancellation'] as bool?) ?? false,
+    instantConfirmation: (json['instantConfirmation'] as bool?) ?? false,
+    priceFrom: (json['priceFrom'] as num?)?.toDouble(),
+    originalPrice: (json['originalPrice'] as num?)?.toDouble(),
+    quantity: (json['quantity'] as num?)?.toInt() ?? 0,
+    availableQuantity: (json['availableQuantity'] as num?)?.toInt() ?? 0,
+    active: (json['active'] as bool?) ?? true,
+    amenities: amenities,
+    coverImageUrl: json['coverImageUrl'] as String?,
+    galleryImages: gallery,
+    // ratePlans are a local booking-preview concept, out of hydration scope.
+  );
+}
+
+/// Typed transport mirror of the backend `PlaceDetailResponse`
+/// (`GET /api/places/{id}`). All `Map<String, dynamic>` decoding is confined to
+/// [fromJson]; [toPlace] is a pure typed→typed mapping into the Demo-Mode-shaped
+/// domain [Place]. The backend collapses the location hierarchy into
+/// `location.name` (leaf) + `location.fullPath`, and has no discrete
+/// city/province/country — [toPlace] reuses the authoritative location text
+/// rather than inventing administrative divisions.
+class PlaceDetailRecord {
+  final int id;
+  final String name;
+  final String? slug;
+  final String? shortDescription;
+  final String? description;
+  final String address;
+  final double? latitude;
+  final double? longitude;
+  final String? categoryName;
+  final String? categorySlug;
+  final String? subcategorySlug;
+  final String locationName;
+  final String? locationFullPath;
+  final double ratingAvg;
+  final int ratingCount;
+  final int priceLevel;
+  final bool featured;
+  final bool verified;
+  final List<String> tags;
+  final String? coverImageUrl;
+  final List<String> galleryUrls;
+  final int? estimatedVisitMinutes;
+  final List<PlaceOpeningHourGroupRecord> groupedOpeningHours;
+  final HotelDetail? hotelDetail;
+
+  const PlaceDetailRecord({
+    required this.id,
+    required this.name,
+    this.slug,
+    this.shortDescription,
+    this.description,
+    this.address = '',
+    this.latitude,
+    this.longitude,
+    this.categoryName,
+    this.categorySlug,
+    this.subcategorySlug,
+    this.locationName = '',
+    this.locationFullPath,
+    this.ratingAvg = 0,
+    this.ratingCount = 0,
+    this.priceLevel = 0,
+    this.featured = false,
+    this.verified = false,
+    this.tags = const [],
+    this.coverImageUrl,
+    this.galleryUrls = const [],
+    this.estimatedVisitMinutes,
+    this.groupedOpeningHours = const [],
+    this.hotelDetail,
+  });
+
+  factory PlaceDetailRecord.fromJson(Map<String, dynamic> json) {
+    final category = json['category'] as Map<String, dynamic>?;
+    final subcategory = json['subcategory'] as Map<String, dynamic>?;
+    final location = json['location'] as Map<String, dynamic>?;
+    final metadata = json['metadata'] as Map<String, dynamic>?;
+    final hotelDetail = json['hotelDetail'] as Map<String, dynamic>?;
+    return PlaceDetailRecord(
+      id: (json['id'] as num).toInt(),
+      name: json['name'] as String,
+      slug: json['slug'] as String?,
+      shortDescription: json['shortDescription'] as String?,
+      description: json['description'] as String?,
+      address: (json['address'] as String?) ?? '',
+      latitude: (json['latitude'] as num?)?.toDouble(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
+      categoryName: category?['name'] as String?,
+      categorySlug: category?['slug'] as String?,
+      subcategorySlug: subcategory?['slug'] as String?,
+      locationName: (location?['name'] as String?) ?? '',
+      locationFullPath: location?['fullPath'] as String?,
+      ratingAvg: (json['ratingAvg'] as num?)?.toDouble() ?? 0,
+      ratingCount: (json['ratingCount'] as num?)?.toInt() ?? 0,
+      priceLevel: (json['priceLevel'] as num?)?.toInt() ?? 0,
+      featured: (json['featured'] as bool?) ?? false,
+      verified: (json['verified'] as bool?) ?? false,
+      tags: (json['tags'] as List<dynamic>? ?? const [])
+          .map((e) => (e as Map<String, dynamic>)['tag']?.toString() ?? '')
+          .where((e) => e.isNotEmpty)
+          .toList(),
+      coverImageUrl: json['coverImageUrl'] as String?,
+      galleryUrls: (json['galleryImages'] as List<dynamic>? ?? const [])
+          .map((e) => (e as Map<String, dynamic>)['url']?.toString() ?? '')
+          .where((e) => e.isNotEmpty)
+          .toList(),
+      estimatedVisitMinutes:
+          (metadata?['estimatedVisitMinutes'] as num?)?.toInt(),
+      groupedOpeningHours:
+          (json['groupedOpeningHours'] as List<dynamic>? ?? const [])
+              .map((e) => PlaceOpeningHourGroupRecord.fromJson(
+                    e as Map<String, dynamic>,
+                  ))
+              .toList(),
+      hotelDetail:
+          hotelDetail == null ? null : _hotelDetailFromJson(hotelDetail),
+    );
+  }
+
+  /// Builds a compact opening-hours summary from [groupedOpeningHours], showing
+  /// only the days the place is open (the backend already labels each group's
+  /// `days`). Returns `null` when no open group is available so the detail
+  /// screen simply omits the row rather than showing a fabricated schedule.
+  String? get _openingHoursSummary {
+    final open = groupedOpeningHours
+        .where((g) => !g.closed && g.openTime != null && g.closeTime != null)
+        .map((g) =>
+            '${g.days}: ${_shortTime(g.openTime)}–${_shortTime(g.closeTime)}')
+        .toList();
+    return open.isEmpty ? null : open.join('\n');
+  }
+
+  /// Maps this verified backend detail into the full domain [Place]. Required
+  /// [Place] fields the backend does not model discretely reuse authoritative
+  /// backend text or the model's own neutral defaults — nothing is invented.
+  Place toPlace() {
+    final level = priceLevel.clamp(0, 4);
+    return Place(
+      id: id,
+      name: name,
+      category: categoryName ?? '',
+      categorySlug: categorySlug,
+      subcategorySlug: subcategorySlug,
+      locationName: locationName,
+      city: locationName,
+      province: _provinceFromFullPath(locationFullPath, locationName),
+      address: address,
+      latitude: latitude,
+      longitude: longitude,
+      description: description ?? shortDescription ?? '',
+      imageUrl:
+          coverImageUrl ?? (galleryUrls.isNotEmpty ? galleryUrls.first : ''),
+      rating: ratingAvg,
+      reviewCount: ratingCount,
+      priceLevel: '\$' * level,
+      estimatedDurationMinutes: estimatedVisitMinutes ?? 60,
+      openingHours: _openingHoursSummary,
+      tags: tags,
+      isFeatured: featured,
+      verified: verified,
+      hotelDetail: hotelDetail,
+    );
+  }
+}
+
 enum RoomType {
   standard,
   superior,

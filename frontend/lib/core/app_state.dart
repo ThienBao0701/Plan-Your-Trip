@@ -67,6 +67,17 @@ class AppState extends ChangeNotifier {
   // be live at once, so a single bool would over-block unrelated toggles.
   final Set<int> realWishlistActionInFlight = <int>{};
 
+  // ── Real place-detail hydration cache (UI19) ──────────────────────────────
+  // Partial saved records (wishlist / collection) only carry a summary; a full
+  // [Place] is fetched on demand from the public place-detail endpoint and
+  // cached for the authenticated session. Cleared on logout / mode / user
+  // change so no stale place survives. Only successful hydrations are cached.
+  final Map<int, Place> _hydratedRealPlaces = <int, Place>{};
+  // In-flight requests keyed by placeId: a second caller for the same place
+  // awaits the same Future, so concurrent taps issue a single HTTP request.
+  final Map<int, Future<PlaceHydrationResult>> _hydrationInFlight =
+      <int, Future<PlaceHydrationResult>>{};
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -152,6 +163,7 @@ class AppState extends ChangeNotifier {
     savedCollectionPlaces = List.from(MockData.demoSavedCollectionPlaces);
     _resetRealSavedCollectionsState();
     _resetRealWishlistState();
+    clearRealPlaceHydrationCache();
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -194,6 +206,16 @@ class AppState extends ChangeNotifier {
     realWishlistActionInFlight.clear();
   }
 
+  /// Drops every hydrated real place and abandons in-flight hydration tracking.
+  /// Called on logout / mode / user change so one account never sees another's
+  /// (or a stale) hydrated place. In-flight Futures are allowed to complete but
+  /// their results are no longer cached (the map they'd remove themselves from
+  /// is already empty).
+  void clearRealPlaceHydrationCache() {
+    _hydratedRealPlaces.clear();
+    _hydrationInFlight.clear();
+  }
+
   void _applyPersonalDataMode() {
     if (demoMode) {
       savedPlaces = List.from(MockData.demoSavedPlaces);
@@ -201,6 +223,7 @@ class AppState extends ChangeNotifier {
       savedCollectionPlaces = List.from(MockData.demoSavedCollectionPlaces);
       _resetRealSavedCollectionsState();
       _resetRealWishlistState();
+      clearRealPlaceHydrationCache();
       trips = List.from(MockData.trips);
       timeline = List.from(MockData.timeline);
       expenses = List.from(MockData.expenses);
@@ -1282,6 +1305,57 @@ class AppState extends ChangeNotifier {
         return BookmarkOutcome.unavailable;
       case WishlistActionResult.serverError:
         return BookmarkOutcome.serverError;
+    }
+  }
+
+  // ── Real place-detail hydration (UI19) ────────────────────────────────────
+
+  /// The full [Place] for [placeId] if it has already been hydrated this
+  /// session, else `null`. Never falls back to demo data.
+  Place? getHydratedRealPlace(int placeId) => _hydratedRealPlaces[placeId];
+
+  /// Whether a hydration request for [placeId] is currently in flight.
+  bool isRealPlaceHydrationInFlight(int placeId) =>
+      _hydrationInFlight.containsKey(placeId);
+
+  /// Hydrates the full [Place] for [placeId] from the public place-detail
+  /// endpoint, caching a successful result for the session. Demo Mode never
+  /// hits the network. Concurrent callers for the same place share one request;
+  /// a failed hydration is never cached, so a retry can succeed. On success the
+  /// [Place] is available via [getHydratedRealPlace].
+  Future<PlaceHydrationResult> hydrateRealPlace(int placeId) {
+    if (demoMode) return Future.value(PlaceHydrationResult.unavailable);
+    if (_hydratedRealPlaces.containsKey(placeId)) {
+      return Future.value(PlaceHydrationResult.success);
+    }
+    final existing = _hydrationInFlight[placeId];
+    if (existing != null) return existing;
+    final future = _performHydration(placeId);
+    _hydrationInFlight[placeId] = future;
+    notifyListeners();
+    return future;
+  }
+
+  Future<PlaceHydrationResult> _performHydration(int placeId) async {
+    try {
+      final result = await api.getPlaceDetail(placeId);
+      if (result.success && result.data != null) {
+        _hydratedRealPlaces[placeId] = result.data!.toPlace();
+        return PlaceHydrationResult.success;
+      }
+      return switch (result.errorKind) {
+        ApiErrorKind.notFound => PlaceHydrationResult.notFound,
+        ApiErrorKind.unauthorized => PlaceHydrationResult.sessionExpired,
+        ApiErrorKind.network ||
+        ApiErrorKind.timeout =>
+          PlaceHydrationResult.network,
+        _ => PlaceHydrationResult.serverError,
+      };
+    } finally {
+      // Always release the in-flight slot so failures aren't cached and a
+      // retry remains possible.
+      _hydrationInFlight.remove(placeId);
+      notifyListeners();
     }
   }
 

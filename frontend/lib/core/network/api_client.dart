@@ -257,6 +257,42 @@ class ApiClient {
     }
   }
 
+  /// Fetches a full place from the public `GET /api/places/{id}` endpoint so a
+  /// partial saved record (wishlist / collection) can be hydrated into a
+  /// complete [Place]. The endpoint is public (no auth); a missing or
+  /// non-`PUBLISHED` place returns 404 → [ApiErrorKind.notFound].
+  Future<CollectionApiResult<PlaceDetailRecord>> getPlaceDetail(
+    int placeId,
+  ) async {
+    try {
+      final res = await _client
+          .get(
+            Uri.parse('$baseUrl/places/$placeId'),
+            headers: _jsonHeaders,
+          )
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(PlaceDetailRecord.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
   Future<CollectionApiResult<CollectionDetailRecord>> updateCollection({
     required int collectionId,
     required String name,
