@@ -3088,5 +3088,22 @@
   "addToTripRealErrorMessage": "We couldn't add this place. Please try again.",
   "addToTripRealUnpublishedMessage": "This place can't be added to a trip right now.",
   "addToTripRealTripUnavailableMessage": "That trip or place is no longer available.",
-  "createTripRealErrorMessage": "We couldn't create your trip. Please try again."
+  "createTripRealErrorMessage": "We couldn't create your trip. Please try again.",
+  "searchRealLoadingMessage": "Searching places…",
+  "searchRealErrorMessage": "We couldn't load places. Please try again.",
+  "searchRealNoResultsMessage": "No places match your search. Try different keywords or filters.",
+  "searchRealEndOfResults": "You've reached the end of the results.",
+  "searchRealSortLabel": "Sort by",
+  "searchRealRatingLabel": "Minimum rating",
+  "searchRealPriceLabel": "Maximum price",
+  "searchRealSortNewest": "Newest",
+  "searchRealSortTopRated": "Top rated",
+  "searchRealSortPriceLow": "Price: low to high",
+  "searchRealSortPriceHigh": "Price: high to low",
+  "searchRealSortName": "Name A–Z",
+  "searchRealRatingAny": "Any",
+  "searchRealRating3plus": "3.0+",
+  "searchRealRating4plus": "4.0+",
+  "searchRealRating45plus": "4.5+",
+  "searchRealPriceAny": "Any"
 }

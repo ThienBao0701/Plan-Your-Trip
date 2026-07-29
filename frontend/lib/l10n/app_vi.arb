@@ -3088,5 +3088,22 @@
   "addToTripRealErrorMessage": "Không thể thêm địa điểm này. Vui lòng thử lại.",
   "addToTripRealUnpublishedMessage": "Hiện chưa thể thêm địa điểm này vào chuyến đi.",
   "addToTripRealTripUnavailableMessage": "Chuyến đi hoặc địa điểm đó không còn khả dụng.",
-  "createTripRealErrorMessage": "Không thể tạo chuyến đi của bạn. Vui lòng thử lại."
+  "createTripRealErrorMessage": "Không thể tạo chuyến đi của bạn. Vui lòng thử lại.",
+  "searchRealLoadingMessage": "Đang tìm địa điểm…",
+  "searchRealErrorMessage": "Không thể tải địa điểm. Vui lòng thử lại.",
+  "searchRealNoResultsMessage": "Không có địa điểm nào phù hợp. Hãy thử từ khóa hoặc bộ lọc khác.",
+  "searchRealEndOfResults": "Bạn đã xem hết kết quả.",
+  "searchRealSortLabel": "Sắp xếp theo",
+  "searchRealRatingLabel": "Đánh giá tối thiểu",
+  "searchRealPriceLabel": "Giá tối đa",
+  "searchRealSortNewest": "Mới nhất",
+  "searchRealSortTopRated": "Đánh giá cao nhất",
+  "searchRealSortPriceLow": "Giá: thấp đến cao",
+  "searchRealSortPriceHigh": "Giá: cao đến thấp",
+  "searchRealSortName": "Tên A–Z",
+  "searchRealRatingAny": "Bất kỳ",
+  "searchRealRating3plus": "3.0+",
+  "searchRealRating4plus": "4.0+",
+  "searchRealRating45plus": "4.5+",
+  "searchRealPriceAny": "Bất kỳ"
 }

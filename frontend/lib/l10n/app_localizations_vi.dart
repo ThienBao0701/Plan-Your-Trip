@@ -5684,4 +5684,57 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get createTripRealErrorMessage =>
       'Không thể tạo chuyến đi của bạn. Vui lòng thử lại.';
+
+  @override
+  String get searchRealLoadingMessage => 'Đang tìm địa điểm…';
+
+  @override
+  String get searchRealErrorMessage =>
+      'Không thể tải địa điểm. Vui lòng thử lại.';
+
+  @override
+  String get searchRealNoResultsMessage =>
+      'Không có địa điểm nào phù hợp. Hãy thử từ khóa hoặc bộ lọc khác.';
+
+  @override
+  String get searchRealEndOfResults => 'Bạn đã xem hết kết quả.';
+
+  @override
+  String get searchRealSortLabel => 'Sắp xếp theo';
+
+  @override
+  String get searchRealRatingLabel => 'Đánh giá tối thiểu';
+
+  @override
+  String get searchRealPriceLabel => 'Giá tối đa';
+
+  @override
+  String get searchRealSortNewest => 'Mới nhất';
+
+  @override
+  String get searchRealSortTopRated => 'Đánh giá cao nhất';
+
+  @override
+  String get searchRealSortPriceLow => 'Giá: thấp đến cao';
+
+  @override
+  String get searchRealSortPriceHigh => 'Giá: cao đến thấp';
+
+  @override
+  String get searchRealSortName => 'Tên A–Z';
+
+  @override
+  String get searchRealRatingAny => 'Bất kỳ';
+
+  @override
+  String get searchRealRating3plus => '3.0+';
+
+  @override
+  String get searchRealRating4plus => '4.0+';
+
+  @override
+  String get searchRealRating45plus => '4.5+';
+
+  @override
+  String get searchRealPriceAny => 'Bất kỳ';
 }

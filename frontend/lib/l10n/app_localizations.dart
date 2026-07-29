@@ -9939,6 +9939,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'We couldn\'t create your trip. Please try again.'**
   String get createTripRealErrorMessage;
+
+  /// No description provided for @searchRealLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Searching places…'**
+  String get searchRealLoadingMessage;
+
+  /// No description provided for @searchRealErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load places. Please try again.'**
+  String get searchRealErrorMessage;
+
+  /// No description provided for @searchRealNoResultsMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No places match your search. Try different keywords or filters.'**
+  String get searchRealNoResultsMessage;
+
+  /// No description provided for @searchRealEndOfResults.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve reached the end of the results.'**
+  String get searchRealEndOfResults;
+
+  /// No description provided for @searchRealSortLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort by'**
+  String get searchRealSortLabel;
+
+  /// No description provided for @searchRealRatingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum rating'**
+  String get searchRealRatingLabel;
+
+  /// No description provided for @searchRealPriceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum price'**
+  String get searchRealPriceLabel;
+
+  /// No description provided for @searchRealSortNewest.
+  ///
+  /// In en, this message translates to:
+  /// **'Newest'**
+  String get searchRealSortNewest;
+
+  /// No description provided for @searchRealSortTopRated.
+  ///
+  /// In en, this message translates to:
+  /// **'Top rated'**
+  String get searchRealSortTopRated;
+
+  /// No description provided for @searchRealSortPriceLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Price: low to high'**
+  String get searchRealSortPriceLow;
+
+  /// No description provided for @searchRealSortPriceHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'Price: high to low'**
+  String get searchRealSortPriceHigh;
+
+  /// No description provided for @searchRealSortName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name A–Z'**
+  String get searchRealSortName;
+
+  /// No description provided for @searchRealRatingAny.
+  ///
+  /// In en, this message translates to:
+  /// **'Any'**
+  String get searchRealRatingAny;
+
+  /// No description provided for @searchRealRating3plus.
+  ///
+  /// In en, this message translates to:
+  /// **'3.0+'**
+  String get searchRealRating3plus;
+
+  /// No description provided for @searchRealRating4plus.
+  ///
+  /// In en, this message translates to:
+  /// **'4.0+'**
+  String get searchRealRating4plus;
+
+  /// No description provided for @searchRealRating45plus.
+  ///
+  /// In en, this message translates to:
+  /// **'4.5+'**
+  String get searchRealRating45plus;
+
+  /// No description provided for @searchRealPriceAny.
+  ///
+  /// In en, this message translates to:
+  /// **'Any'**
+  String get searchRealPriceAny;
 }
 
 class _AppLocalizationsDelegate

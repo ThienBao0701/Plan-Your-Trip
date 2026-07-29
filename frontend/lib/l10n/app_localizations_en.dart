@@ -5846,4 +5846,58 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get createTripRealErrorMessage =>
       'We couldn\'t create your trip. Please try again.';
+
+  @override
+  String get searchRealLoadingMessage => 'Searching places…';
+
+  @override
+  String get searchRealErrorMessage =>
+      'We couldn\'t load places. Please try again.';
+
+  @override
+  String get searchRealNoResultsMessage =>
+      'No places match your search. Try different keywords or filters.';
+
+  @override
+  String get searchRealEndOfResults =>
+      'You\'ve reached the end of the results.';
+
+  @override
+  String get searchRealSortLabel => 'Sort by';
+
+  @override
+  String get searchRealRatingLabel => 'Minimum rating';
+
+  @override
+  String get searchRealPriceLabel => 'Maximum price';
+
+  @override
+  String get searchRealSortNewest => 'Newest';
+
+  @override
+  String get searchRealSortTopRated => 'Top rated';
+
+  @override
+  String get searchRealSortPriceLow => 'Price: low to high';
+
+  @override
+  String get searchRealSortPriceHigh => 'Price: high to low';
+
+  @override
+  String get searchRealSortName => 'Name A–Z';
+
+  @override
+  String get searchRealRatingAny => 'Any';
+
+  @override
+  String get searchRealRating3plus => '3.0+';
+
+  @override
+  String get searchRealRating4plus => '4.0+';
+
+  @override
+  String get searchRealRating45plus => '4.5+';
+
+  @override
+  String get searchRealPriceAny => 'Any';
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../core/app_state.dart';
@@ -11,6 +13,7 @@ import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/add_to_trip_sheet.dart';
 import '../../shared/widgets/bookmark_button.dart';
 import '../../shared/widgets/glass_widgets.dart';
+import '../auth/login_screen.dart';
 import 'place_detail_screen.dart';
 
 enum ExploreMode { list, map }
@@ -50,6 +53,11 @@ class _PlacesScreenState extends State<PlacesScreen> {
   @override
   Widget build(BuildContext context) {
     final app = AppScope.of(context);
+    // Real Mode is backend-search-backed with its own loading/paging/error
+    // lifecycle; Demo Mode keeps the exact local behaviour below.
+    if (!app.demoMode) {
+      return _RealPlacesSearchView(initialQuery: widget.initialQuery);
+    }
     final l10n = AppLocalizations.of(context)!;
     final results = _sorted(
       app.filteredPlaces(
@@ -731,4 +739,598 @@ class _PlaceImage extends StatelessWidget {
           ),
         ),
       );
+}
+
+// ── Real Mode place search (UI-21) ───────────────────────────────────────────
+
+/// Backend-search-backed Places screen for Real Mode: debounced keyword search,
+/// offset pagination (infinite scroll), pull-to-refresh, and honest loading /
+/// empty / error states. Results render only backend summary fields; opening a
+/// result or adding it to a trip goes through UI-19 hydration.
+class _RealPlacesSearchView extends StatefulWidget {
+  final String? initialQuery;
+
+  const _RealPlacesSearchView({this.initialQuery});
+
+  @override
+  State<_RealPlacesSearchView> createState() => _RealPlacesSearchViewState();
+}
+
+class _RealPlacesSearchViewState extends State<_RealPlacesSearchView> {
+  late final TextEditingController _search;
+  late final ScrollController _scroll;
+  Timer? _debounce;
+
+  @override
+  void initState() {
+    super.initState();
+    _search = TextEditingController(text: widget.initialQuery ?? '');
+    _scroll = ScrollController()..addListener(_onScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      AppScope.of(context).runRealSearch(query: _search.text.trim());
+    });
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _scroll.removeListener(_onScroll);
+    _scroll.dispose();
+    _search.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_scroll.hasClients) return;
+    final pos = _scroll.position;
+    if (pos.pixels >= pos.maxScrollExtent - 400) {
+      AppScope.of(context).loadMoreRealSearch();
+    }
+  }
+
+  void _onSearchChanged(String value) {
+    setState(() {}); // reflect the clear-button visibility
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 350), () {
+      if (!mounted) return;
+      AppScope.of(context).runRealSearch(query: value.trim());
+    });
+  }
+
+  void _onSearchSubmitted(String value) {
+    _debounce?.cancel();
+    AppScope.of(context).runRealSearch(query: value.trim());
+  }
+
+  void _clearSearch() {
+    _debounce?.cancel();
+    setState(_search.clear);
+    AppScope.of(context).runRealSearch(query: '');
+  }
+
+  Future<void> _refresh() => AppScope.of(context).runRealSearch(refresh: true);
+
+  void _reauth() {
+    showOceanSessionExpiredSheet(
+      context,
+      onLogin: () {
+        Navigator.of(context).pop();
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+        );
+      },
+      onReturnHome: () => Navigator.of(context).pop(),
+    );
+  }
+
+  Future<void> _hydrateAndOpen(int placeId) async {
+    final app = AppScope.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+    final result = await app.hydrateRealPlace(placeId);
+    if (!mounted) return;
+    switch (result) {
+      case PlaceHydrationResult.success:
+        final place = app.getHydratedRealPlace(placeId);
+        if (place != null) {
+          navigator.push(
+            MaterialPageRoute(builder: (_) => PlaceDetailScreen(place: place)),
+          );
+        }
+      case PlaceHydrationResult.sessionExpired:
+        _reauth();
+      case PlaceHydrationResult.notFound:
+        messenger.showSnackBar(
+          SnackBar(content: Text(l10n.placeHydrationUnavailableMessage)),
+        );
+      case PlaceHydrationResult.network:
+      case PlaceHydrationResult.serverError:
+      case PlaceHydrationResult.unavailable:
+        messenger.showSnackBar(
+          SnackBar(content: Text(l10n.placeHydrationErrorMessage)),
+        );
+    }
+  }
+
+  Future<void> _hydrateAndAdd(int placeId) async {
+    final app = AppScope.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+    final result = await app.hydrateRealPlace(placeId);
+    if (!mounted) return;
+    switch (result) {
+      case PlaceHydrationResult.success:
+        final place = app.getHydratedRealPlace(placeId);
+        if (place != null) showAddToTripSheet(context, place);
+      case PlaceHydrationResult.sessionExpired:
+        _reauth();
+      case PlaceHydrationResult.notFound:
+        messenger.showSnackBar(
+          SnackBar(content: Text(l10n.placeHydrationUnavailableMessage)),
+        );
+      case PlaceHydrationResult.network:
+      case PlaceHydrationResult.serverError:
+      case PlaceHydrationResult.unavailable:
+        messenger.showSnackBar(
+          SnackBar(content: Text(l10n.placeHydrationErrorMessage)),
+        );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final app = AppScope.of(context);
+    final l10n = AppLocalizations.of(context)!;
+
+    return Scaffold(
+      appBar: OceanGlassAppBar(
+        leading: IconButton(
+          tooltip: l10n.commonBackSemantic,
+          onPressed: () => Navigator.maybePop(context),
+          icon: const Icon(Icons.arrow_back_rounded),
+        ),
+        title: Text(l10n.searchTitle),
+        actions: [
+          Semantics(
+            button: true,
+            label: l10n.exploreFiltersSemantic,
+            child: IconButton(
+              tooltip: l10n.exploreFiltersSemantic,
+              onPressed: () => _showRealFilters(app),
+              icon: const Icon(Icons.tune_rounded),
+            ),
+          ),
+        ],
+      ),
+      body: BubbleBackground(
+        child: SafeArea(
+          top: false,
+          child: RefreshIndicator(
+            onRefresh: _refresh,
+            child: ListView(
+              controller: _scroll,
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                AppSpacing.lg,
+                AppSpacing.lg,
+                AppSpacing.xxl,
+              ),
+              children: [
+                OceanContentConstraint(
+                  maxWidth: AppBreakpoints.maxContentWidth,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _realSearchField(l10n),
+                      const SizedBox(height: AppSpacing.lg),
+                      _content(context, app, l10n),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _realSearchField(AppLocalizations l10n) => TextField(
+        key: const Key('real-explore-search-field'),
+        controller: _search,
+        onChanged: _onSearchChanged,
+        onSubmitted: _onSearchSubmitted,
+        textInputAction: TextInputAction.search,
+        decoration: InputDecoration(
+          hintText: l10n.searchHint,
+          prefixIcon: const Icon(Icons.search_rounded),
+          suffixIcon: _search.text.isEmpty
+              ? null
+              : Semantics(
+                  button: true,
+                  label: l10n.searchClearSemantic,
+                  child: IconButton(
+                    tooltip: l10n.searchClearSemantic,
+                    onPressed: _clearSearch,
+                    icon: const Icon(Icons.clear_rounded),
+                  ),
+                ),
+        ),
+      );
+
+  Widget _content(BuildContext context, AppState app, AppLocalizations l10n) {
+    if (app.realSearchLoading && !app.realSearchLoaded) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
+        child: OceanLoadingState(message: l10n.searchRealLoadingMessage),
+      );
+    }
+    if (app.realSearchError != null && app.realSearchResults.isEmpty) {
+      final err = app.realSearchError!;
+      if (err == PlaceSearchOutcome.sessionExpired) {
+        return OceanEmptyState(
+          key: const Key('real-search-session-expired'),
+          title: l10n.tripsRealSessionExpiredTitle,
+          message: l10n.tripsRealSessionExpiredMessage,
+          actionLabel: l10n.tripsRealSignInAction,
+          onAction: _reauth,
+        );
+      }
+      return OceanRecoverableErrorState(
+        key: const Key('real-search-error'),
+        message: err == PlaceSearchOutcome.forbidden
+            ? l10n.tripRealPermissionDeniedMessage
+            : l10n.searchRealErrorMessage,
+        onReload: () => app.runRealSearch(refresh: true),
+      );
+    }
+    if (app.realSearchResults.isEmpty) {
+      return OceanEmptyState(
+        key: const Key('real-search-empty'),
+        title: l10n.searchEmptyTitle,
+        message: l10n.searchRealNoResultsMessage,
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Semantics(
+          liveRegion: true,
+          child: Text(
+            l10n.searchResultCount(app.realSearchTotalElements),
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        for (final record in app.realSearchResults)
+          Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.md),
+            child: _RealSearchResultCard(
+              record: record,
+              hydrating: app.isRealPlaceHydrationInFlight(record.id),
+              onViewDetails: () => _hydrateAndOpen(record.id),
+              onAddToTrip: () => _hydrateAndAdd(record.id),
+            ),
+          ),
+        if (app.realSearchLoadingMore)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
+            child: Center(
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ),
+          )
+        else if (!app.realSearchHasMore)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+            child: Text(
+              l10n.searchRealEndOfResults,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ),
+      ],
+    );
+  }
+
+  Future<void> _showRealFilters(AppState app) {
+    final l10n = AppLocalizations.of(context)!;
+    var draftSort = app.realSearchSort;
+    double? draftMinRating = app.realSearchMinRating;
+    int? draftMaxPrice = app.realSearchMaxPriceLevel;
+
+    return showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) => OceanGlassBottomSheet(
+        child: StatefulBuilder(
+          builder: (context, setSheetState) => SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(l10n.searchFiltersTitle,
+                    style: Theme.of(context).textTheme.titleLarge),
+                const SizedBox(height: AppSpacing.md),
+                Text(l10n.searchRealSortLabel,
+                    style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: AppSpacing.xs),
+                Wrap(
+                  spacing: AppSpacing.xs,
+                  runSpacing: AppSpacing.xs,
+                  children: [
+                    for (final s in PlaceSearchSort.values)
+                      ChoiceChip(
+                        label: Text(_realSortLabel(l10n, s)),
+                        selected: draftSort == s,
+                        onSelected: (_) => setSheetState(() => draftSort = s),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Text(l10n.searchRealRatingLabel,
+                    style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: AppSpacing.xs),
+                Wrap(
+                  spacing: AppSpacing.xs,
+                  runSpacing: AppSpacing.xs,
+                  children: [
+                    _ratingChip(l10n.searchRealRatingAny, null, draftMinRating,
+                        (v) => setSheetState(() => draftMinRating = v)),
+                    _ratingChip(l10n.searchRealRating3plus, 3, draftMinRating,
+                        (v) => setSheetState(() => draftMinRating = v)),
+                    _ratingChip(l10n.searchRealRating4plus, 4, draftMinRating,
+                        (v) => setSheetState(() => draftMinRating = v)),
+                    _ratingChip(
+                        l10n.searchRealRating45plus,
+                        4.5,
+                        draftMinRating,
+                        (v) => setSheetState(() => draftMinRating = v)),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Text(l10n.searchRealPriceLabel,
+                    style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: AppSpacing.xs),
+                Wrap(
+                  spacing: AppSpacing.xs,
+                  runSpacing: AppSpacing.xs,
+                  children: [
+                    _priceChip(l10n.searchRealPriceAny, null, draftMaxPrice,
+                        (v) => setSheetState(() => draftMaxPrice = v)),
+                    for (var level = 1; level <= 4; level++)
+                      _priceChip('\$' * level, level, draftMaxPrice,
+                          (v) => setSheetState(() => draftMaxPrice = v)),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                OceanPrimaryButton(
+                  key: const Key('real-search-apply-filters'),
+                  label: l10n.searchApplyFilters,
+                  icon: Icons.check_rounded,
+                  onPressed: () {
+                    Navigator.pop(sheetContext);
+                    app.runRealSearch(
+                      sort: draftSort,
+                      minRating: draftMinRating,
+                      maxPriceLevel: draftMaxPrice,
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _ratingChip(
+    String label,
+    double? value,
+    double? selected,
+    ValueChanged<double?> onSelect,
+  ) =>
+      ChoiceChip(
+        label: Text(label),
+        selected: selected == value,
+        onSelected: (_) => onSelect(value),
+      );
+
+  Widget _priceChip(
+    String label,
+    int? value,
+    int? selected,
+    ValueChanged<int?> onSelect,
+  ) =>
+      ChoiceChip(
+        label: Text(label),
+        selected: selected == value,
+        onSelected: (_) => onSelect(value),
+      );
+
+  String _realSortLabel(AppLocalizations l10n, PlaceSearchSort s) =>
+      switch (s) {
+        PlaceSearchSort.newest => l10n.searchRealSortNewest,
+        PlaceSearchSort.ratingDesc => l10n.searchRealSortTopRated,
+        PlaceSearchSort.priceAsc => l10n.searchRealSortPriceLow,
+        PlaceSearchSort.priceDesc => l10n.searchRealSortPriceHigh,
+        PlaceSearchSort.nameAsc => l10n.searchRealSortName,
+      };
+}
+
+/// One real search result, rendered from a lean [PlaceSummaryRecord]. Only
+/// backend fields are shown — no fabricated rating/reviewCount/price/image.
+/// Details / Add-to-Trip go through UI-19 hydration ([hydrating] drives the
+/// per-card spinner); the bookmark reuses UI-18 ([BookmarkButton]).
+class _RealSearchResultCard extends StatelessWidget {
+  final PlaceSummaryRecord record;
+  final bool hydrating;
+  final VoidCallback onViewDetails;
+  final VoidCallback onAddToTrip;
+
+  const _RealSearchResultCard({
+    required this.record,
+    required this.hydrating,
+    required this.onViewDetails,
+    required this.onAddToTrip,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    Widget trailing() => hydrating
+        ? const Padding(
+            padding: EdgeInsets.all(AppSpacing.sm),
+            child: SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          )
+        : Semantics(
+            button: true,
+            label: l10n.placeAddToTripSemantic(record.name),
+            child: IconButton.filled(
+              key: Key('real-search-add-${record.id}'),
+              tooltip: l10n.placeAddToTripSemantic(record.name),
+              onPressed: onAddToTrip,
+              icon: const Icon(Icons.add_rounded),
+            ),
+          );
+
+    return OceanGlassCard(
+      key: Key('real-search-card-${record.id}'),
+      onTap: hydrating ? null : onViewDetails,
+      padding: const EdgeInsets.all(AppSpacing.sm),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _RealPlaceImage(url: record.coverImageUrl, size: 96),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        record.name,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                    ),
+                    BookmarkButton(
+                      placeId: record.id,
+                      placeName: record.name,
+                    ),
+                  ],
+                ),
+                if (record.locationName.isNotEmpty)
+                  Text(
+                    record.locationName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                if (record.ratingAvg > 0) ...[
+                  const SizedBox(height: AppSpacing.xs),
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: AppSpacing.xxs,
+                    runSpacing: AppSpacing.xxs,
+                    children: [
+                      const Icon(Icons.star_rounded,
+                          color: AppColors.ocean, size: AppIconSizes.xs),
+                      Text(
+                        record.ratingAvg.toStringAsFixed(1),
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyMedium
+                            ?.copyWith(color: AppColors.ocean),
+                      ),
+                      if (record.reviewCount > 0)
+                        Text(
+                          l10n.placeReviewCount(record.reviewCount),
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                    ],
+                  ),
+                ],
+                const SizedBox(height: AppSpacing.xs),
+                Wrap(
+                  spacing: AppSpacing.xs,
+                  runSpacing: AppSpacing.xs,
+                  children: [
+                    if (record.categoryName != null &&
+                        record.categoryName!.isNotEmpty)
+                      OceanStatusPill(
+                        label: record.categoryName!,
+                        icon: Icons.place_outlined,
+                      ),
+                    if (record.priceLevel > 0)
+                      OceanStatusPill(
+                        label: record.priceLevelLabel,
+                        icon: Icons.payments_outlined,
+                        color: AppColors.turquoise600,
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: AppSpacing.xs),
+          trailing(),
+        ],
+      ),
+    );
+  }
+}
+
+/// Image for a real search card — placeholder when the backend has no cover.
+class _RealPlaceImage extends StatelessWidget {
+  final String? url;
+  final double size;
+
+  const _RealPlaceImage({required this.url, required this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    Widget placeholder() => Container(
+          width: size,
+          height: size,
+          color: AppColors.paleCyan,
+          alignment: Alignment.center,
+          child: const Icon(
+            Icons.place_rounded,
+            color: AppColors.ocean,
+            size: AppIconSizes.lg,
+          ),
+        );
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(AppRadii.lg),
+      child: (url == null || url!.isEmpty)
+          ? placeholder()
+          : Image.network(
+              url!,
+              width: size,
+              height: size,
+              fit: BoxFit.cover,
+              excludeFromSemantics: true,
+              errorBuilder: (_, __, ___) => placeholder(),
+            ),
+    );
+  }
 }

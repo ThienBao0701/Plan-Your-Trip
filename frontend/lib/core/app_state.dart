@@ -95,6 +95,33 @@ class AppState extends ChangeNotifier {
   // double-submission for both.
   bool realTripActionInFlight = false;
 
+  // ── Real Mode Place Search (/api/places/search, UI-21) ────────────────────
+  // Parallel to the demo-only [places]/[filteredPlaces] path — never merged.
+  // The public search endpoint needs no auth, so a 401/403 is not expected but
+  // is mapped defensively without logging out.
+  List<PlaceSummaryRecord> realSearchResults = [];
+  bool realSearchLoading = false; // initial / new-query load
+  bool realSearchLoadingMore = false; // pagination
+  bool realSearchRefreshing = false; // pull-to-refresh
+  bool realSearchLoaded = false;
+  PlaceSearchOutcome? realSearchError;
+  String realSearchQuery = '';
+  double? realSearchMinRating;
+  int? realSearchMaxPriceLevel;
+  PlaceSearchSort realSearchSort = PlaceSearchSort.newest;
+  int realSearchPage = 0;
+  int realSearchTotalPages = 0;
+  int realSearchTotalElements = 0;
+  // Monotonic id so a newer search always wins — a slower older response is
+  // discarded instead of overwriting fresher results.
+  int _realSearchRequestId = 0;
+  static const int _realSearchPageSize = 20;
+  // Sentinel distinguishing "argument omitted" from "explicitly set to null"
+  // for the nullable filter parameters of [runRealSearch].
+  static const Object _unset = Object();
+
+  bool get realSearchHasMore => realSearchPage + 1 < realSearchTotalPages;
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -182,6 +209,7 @@ class AppState extends ChangeNotifier {
     _resetRealWishlistState();
     clearRealPlaceHydrationCache();
     _resetRealTripsState();
+    _resetRealSearchState();
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -248,6 +276,24 @@ class AppState extends ChangeNotifier {
     realTripActionInFlight = false;
   }
 
+  void _resetRealSearchState() {
+    realSearchResults = [];
+    realSearchLoading = false;
+    realSearchLoadingMore = false;
+    realSearchRefreshing = false;
+    realSearchLoaded = false;
+    realSearchError = null;
+    realSearchQuery = '';
+    realSearchMinRating = null;
+    realSearchMaxPriceLevel = null;
+    realSearchSort = PlaceSearchSort.newest;
+    realSearchPage = 0;
+    realSearchTotalPages = 0;
+    realSearchTotalElements = 0;
+    // Bump the request id so any in-flight response is discarded on reset.
+    _realSearchRequestId++;
+  }
+
   void _applyPersonalDataMode() {
     if (demoMode) {
       savedPlaces = List.from(MockData.demoSavedPlaces);
@@ -257,6 +303,7 @@ class AppState extends ChangeNotifier {
       _resetRealWishlistState();
       clearRealPlaceHydrationCache();
       _resetRealTripsState();
+      _resetRealSearchState();
       trips = List.from(MockData.trips);
       timeline = List.from(MockData.timeline);
       expenses = List.from(MockData.expenses);
@@ -283,6 +330,7 @@ class AppState extends ChangeNotifier {
     _resetRealWishlistState();
     clearRealPlaceHydrationCache();
     _resetRealTripsState();
+    _resetRealSearchState();
     timeline = [];
     expenses = [];
     demoBookings = [];
@@ -1605,6 +1653,132 @@ class AppState extends ChangeNotifier {
         dayCount: t.dayCount + 1,
         updatedAt: t.updatedAt,
       );
+  }
+
+  // ── Real Mode Place Search (UI-21) ────────────────────────────────────────
+  //
+  // Parallel to the demo [filteredPlaces] path — never fabricates results. A
+  // monotonic request id guarantees last-request-wins: a slower older response
+  // is discarded rather than overwriting fresher results. 401/403 map without
+  // logging out (the search endpoint is public, so they should never occur).
+
+  PlaceSearchOutcome _mapSearchError(ApiErrorKind? kind) {
+    return switch (kind) {
+      ApiErrorKind.unauthorized => PlaceSearchOutcome.sessionExpired,
+      ApiErrorKind.forbidden => PlaceSearchOutcome.forbidden,
+      ApiErrorKind.notFound => PlaceSearchOutcome.notFound,
+      ApiErrorKind.validation => PlaceSearchOutcome.validation,
+      ApiErrorKind.network => PlaceSearchOutcome.network,
+      ApiErrorKind.timeout => PlaceSearchOutcome.timeout,
+      ApiErrorKind.server => PlaceSearchOutcome.serverError,
+      ApiErrorKind.malformed => PlaceSearchOutcome.malformed,
+      _ => PlaceSearchOutcome.serverError,
+    };
+  }
+
+  /// Runs a fresh real-mode search (page 0). Passing a filter argument updates
+  /// that criterion; omitted arguments keep the current value. A newer call
+  /// supersedes an older in-flight one (last wins); on failure the previous
+  /// results are preserved so the UI can show an error without losing content.
+  Future<PlaceSearchOutcome> runRealSearch({
+    String? query,
+    Object? minRating = _unset,
+    Object? maxPriceLevel = _unset,
+    PlaceSearchSort? sort,
+    bool refresh = false,
+  }) async {
+    if (demoMode) return PlaceSearchOutcome.unavailable;
+    if (query != null) realSearchQuery = query;
+    if (!identical(minRating, _unset)) {
+      realSearchMinRating = minRating as double?;
+    }
+    if (!identical(maxPriceLevel, _unset)) {
+      realSearchMaxPriceLevel = maxPriceLevel as int?;
+    }
+    if (sort != null) realSearchSort = sort;
+
+    final reqId = ++_realSearchRequestId;
+    realSearchPage = 0;
+    if (refresh) {
+      realSearchRefreshing = true;
+    } else {
+      realSearchLoading = true;
+    }
+    realSearchError = null;
+    notifyListeners();
+
+    final result = await api.searchPlaces(
+      q: realSearchQuery,
+      minRating: realSearchMinRating,
+      maxPriceLevel: realSearchMaxPriceLevel,
+      sort: realSearchSort.token,
+      page: 0,
+      size: _realSearchPageSize,
+    );
+
+    // A newer search started while this was in flight — discard this response.
+    if (reqId != _realSearchRequestId) return PlaceSearchOutcome.success;
+    realSearchLoading = false;
+    realSearchRefreshing = false;
+    if (result.success && result.data != null) {
+      final page = result.data!;
+      realSearchResults = page.content;
+      realSearchPage = page.page;
+      realSearchTotalPages = page.totalPages;
+      realSearchTotalElements = page.totalElements;
+      realSearchLoaded = true;
+      realSearchError = null;
+      notifyListeners();
+      return PlaceSearchOutcome.success;
+    }
+    final outcome = _mapSearchError(result.errorKind);
+    realSearchError = outcome; // prior results preserved
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Loads and appends the next page of the current real-mode search. Guarded
+  /// against demo mode, concurrent loads, and end-of-results; a filter/query
+  /// change mid-flight (new request id) discards the stale page.
+  Future<PlaceSearchOutcome> loadMoreRealSearch() async {
+    if (demoMode) return PlaceSearchOutcome.unavailable;
+    if (realSearchLoading || realSearchLoadingMore || realSearchRefreshing) {
+      return PlaceSearchOutcome.success;
+    }
+    if (!realSearchHasMore) return PlaceSearchOutcome.success;
+    final reqId = _realSearchRequestId;
+    final nextPage = realSearchPage + 1;
+    realSearchLoadingMore = true;
+    notifyListeners();
+
+    final result = await api.searchPlaces(
+      q: realSearchQuery,
+      minRating: realSearchMinRating,
+      maxPriceLevel: realSearchMaxPriceLevel,
+      sort: realSearchSort.token,
+      page: nextPage,
+      size: _realSearchPageSize,
+    );
+
+    // The query/filters changed while paging — drop this stale page.
+    if (reqId != _realSearchRequestId) {
+      realSearchLoadingMore = false;
+      return PlaceSearchOutcome.success;
+    }
+    realSearchLoadingMore = false;
+    if (result.success && result.data != null) {
+      final page = result.data!;
+      realSearchResults = [...realSearchResults, ...page.content];
+      realSearchPage = page.page;
+      realSearchTotalPages = page.totalPages;
+      realSearchTotalElements = page.totalElements;
+      notifyListeners();
+      return PlaceSearchOutcome.success;
+    }
+    final outcome = _mapSearchError(result.errorKind);
+    realSearchError = outcome;
+    notifyListeners();
+    return outcome;
   }
 
   List<Place> filteredPlaces(PlaceQuery q) {

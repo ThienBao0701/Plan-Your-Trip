@@ -714,6 +714,62 @@ class ApiClient {
     }
   }
 
+  // ── Place search (/api/places/search, UI-21) ────────────────────────────
+  //
+  // Public, offset-paginated (`PageResponse<PlaceSummaryResponse>`). Only
+  // backend-verified params are sent; blanks/nulls are omitted. `size` must be
+  // ≤ 100 or the backend returns 400 → ApiErrorKind.validation.
+  Future<CollectionApiResult<PlaceSearchPage>> searchPlaces({
+    String? q,
+    String? categorySlug,
+    double? minRating,
+    int? maxPriceLevel,
+    bool? featured,
+    String sort = 'newest',
+    int page = 0,
+    int size = 20,
+  }) async {
+    final params = <String, String>{
+      if (q != null && q.trim().isNotEmpty) 'q': q.trim(),
+      if (categorySlug != null && categorySlug.isNotEmpty)
+        'categorySlug': categorySlug,
+      if (minRating != null) 'minRating': minRating.toString(),
+      if (maxPriceLevel != null) 'maxPriceLevel': maxPriceLevel.toString(),
+      if (featured != null) 'featured': featured.toString(),
+      'sort': sort,
+      'page': page.toString(),
+      'size': size.toString(),
+    };
+    try {
+      final res = await _client
+          .get(
+            Uri.parse('$baseUrl/places/search')
+                .replace(queryParameters: params),
+            headers: _jsonHeaders,
+          )
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(PlaceSearchPage.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
   Map<String, dynamic> _failureForStatus(http.Response res) {
     Map<String, dynamic>? body;
     try {

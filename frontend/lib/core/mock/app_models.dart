@@ -1186,6 +1186,141 @@ class TripDetailRecord {
       );
 }
 
+// ── Real Mode Place Search (UI-21, `GET /api/places/search`) ─────────────────
+//
+// Typed transport mirrors of the backend `PageResponse<PlaceSummaryResponse>`.
+// The search list is deliberately lean — the backend summary carries no
+// tags/description/openingHours/gallery/distance, so result cards render only
+// these fields and a full [Place] is materialised on demand via UI-19
+// hydration (never fabricated). Note the summary's `administrativeUnit`/
+// `reviewCount` naming differs from the detail DTO's `location`/`ratingCount`.
+
+/// Backend sort tokens for `GET /api/places/search` (fixed whitelist; anything
+/// else falls to `newest` server-side).
+enum PlaceSearchSort { newest, ratingDesc, priceAsc, priceDesc, nameAsc }
+
+extension PlaceSearchSortToken on PlaceSearchSort {
+  String get token => switch (this) {
+        PlaceSearchSort.newest => 'newest',
+        PlaceSearchSort.ratingDesc => 'rating_desc',
+        PlaceSearchSort.priceAsc => 'price_asc',
+        PlaceSearchSort.priceDesc => 'price_desc',
+        PlaceSearchSort.nameAsc => 'name_asc',
+      };
+}
+
+/// Machine-readable outcome of a real-mode place-search operation. Mirrors
+/// [TripActionResult]; [unavailable] is the Demo Mode guard. The public search
+/// endpoint never returns 401/403, but [sessionExpired]/[forbidden] are mapped
+/// defensively and never trigger a logout.
+enum PlaceSearchOutcome {
+  success,
+  unavailable,
+  network,
+  timeout,
+  sessionExpired,
+  forbidden,
+  notFound,
+  validation,
+  serverError,
+  malformed,
+}
+
+/// Real-backend mirror of `PlaceSummaryResponse` — one search result row.
+class PlaceSummaryRecord {
+  final int id;
+  final String name;
+  final String? slug;
+  final String? categoryName;
+  final String? categorySlug;
+  final String locationName;
+  final String address;
+  final String? shortDescription;
+  final int priceLevel;
+  final double ratingAvg;
+  final int reviewCount;
+  final bool featured;
+  final bool verified;
+  final String? coverImageUrl;
+  final double? latitude;
+  final double? longitude;
+
+  const PlaceSummaryRecord({
+    required this.id,
+    required this.name,
+    this.slug,
+    this.categoryName,
+    this.categorySlug,
+    this.locationName = '',
+    this.address = '',
+    this.shortDescription,
+    this.priceLevel = 0,
+    this.ratingAvg = 0,
+    this.reviewCount = 0,
+    this.featured = false,
+    this.verified = false,
+    this.coverImageUrl,
+    this.latitude,
+    this.longitude,
+  });
+
+  /// A faithful `$`-scale label for the 0–4 price level (empty when 0/unknown).
+  String get priceLevelLabel => '\$' * priceLevel.clamp(0, 4);
+
+  factory PlaceSummaryRecord.fromJson(Map<String, dynamic> json) {
+    final category = json['category'] as Map<String, dynamic>?;
+    final unit = json['administrativeUnit'] as Map<String, dynamic>?;
+    return PlaceSummaryRecord(
+      id: (json['id'] as num).toInt(),
+      name: (json['name'] as String?) ?? '',
+      slug: json['slug'] as String?,
+      categoryName: category?['name'] as String?,
+      categorySlug: category?['slug'] as String?,
+      locationName: (unit?['name'] as String?) ?? '',
+      address: (json['address'] as String?) ?? '',
+      shortDescription: json['shortDescription'] as String?,
+      priceLevel: (json['priceLevel'] as num?)?.toInt() ?? 0,
+      ratingAvg: (json['ratingAvg'] as num?)?.toDouble() ?? 0,
+      reviewCount: (json['reviewCount'] as num?)?.toInt() ?? 0,
+      featured: (json['featured'] as bool?) ?? false,
+      verified: (json['verified'] as bool?) ?? false,
+      coverImageUrl: json['coverImageUrl'] as String?,
+      latitude: (json['latitude'] as num?)?.toDouble(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
+    );
+  }
+}
+
+/// Real-backend mirror of `PageResponse<PlaceSummaryResponse>` (offset paging).
+class PlaceSearchPage {
+  final List<PlaceSummaryRecord> content;
+  final int page;
+  final int size;
+  final int totalElements;
+  final int totalPages;
+
+  const PlaceSearchPage({
+    required this.content,
+    required this.page,
+    required this.size,
+    required this.totalElements,
+    required this.totalPages,
+  });
+
+  bool get hasMore => page + 1 < totalPages;
+
+  factory PlaceSearchPage.fromJson(Map<String, dynamic> json) =>
+      PlaceSearchPage(
+        content: (json['content'] as List<dynamic>? ?? const [])
+            .map((e) => PlaceSummaryRecord.fromJson(e as Map<String, dynamic>))
+            .toList(),
+        page: (json['page'] as num?)?.toInt() ?? 0,
+        size: (json['size'] as num?)?.toInt() ?? 0,
+        totalElements: (json['totalElements'] as num?)?.toInt() ?? 0,
+        totalPages: (json['totalPages'] as num?)?.toInt() ?? 0,
+      );
+}
+
 enum RoomType {
   standard,
   superior,
