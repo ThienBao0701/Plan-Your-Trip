@@ -5900,4 +5900,53 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get searchRealPriceAny => 'Any';
+
+  @override
+  String get availabilityRealLoadingMessage => 'Checking real availability…';
+
+  @override
+  String get availabilityRealErrorMessage =>
+      'We couldn\'t load availability. Please try again.';
+
+  @override
+  String get availabilityRealInvalidDatesMessage =>
+      'Choose a check-out date after check-in to see rooms.';
+
+  @override
+  String availabilityRealRoomCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count rooms available',
+      one: '1 room available',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String availabilityRealPerNight(String price) {
+    return '$price / night';
+  }
+
+  @override
+  String availabilityRealOriginalPrice(String price) {
+    return '$price';
+  }
+
+  @override
+  String availabilityRealTotalForNights(String price, int nights) {
+    String _temp0 = intl.Intl.pluralLogic(
+      nights,
+      locale: localeName,
+      other: '$nights nights',
+      one: '1 night',
+    );
+    return '$price total · $_temp0';
+  }
+
+  @override
+  String get availabilityRealFreeCancellation => 'Free cancellation';
+
+  @override
+  String get availabilityRealInstantConfirmation => 'Instant confirmation';
 }

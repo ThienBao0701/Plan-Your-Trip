@@ -5737,4 +5737,54 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get searchRealPriceAny => 'Bất kỳ';
+
+  @override
+  String get availabilityRealLoadingMessage =>
+      'Đang kiểm tra phòng trống thực tế…';
+
+  @override
+  String get availabilityRealErrorMessage =>
+      'Không tải được phòng trống. Vui lòng thử lại.';
+
+  @override
+  String get availabilityRealInvalidDatesMessage =>
+      'Chọn ngày trả phòng sau ngày nhận phòng để xem phòng.';
+
+  @override
+  String availabilityRealRoomCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Còn $count phòng',
+      one: 'Còn 1 phòng',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String availabilityRealPerNight(String price) {
+    return '$price / đêm';
+  }
+
+  @override
+  String availabilityRealOriginalPrice(String price) {
+    return '$price';
+  }
+
+  @override
+  String availabilityRealTotalForNights(String price, int nights) {
+    String _temp0 = intl.Intl.pluralLogic(
+      nights,
+      locale: localeName,
+      other: '$nights đêm',
+      one: '1 đêm',
+    );
+    return '$price tổng · $_temp0';
+  }
+
+  @override
+  String get availabilityRealFreeCancellation => 'Miễn phí hủy';
+
+  @override
+  String get availabilityRealInstantConfirmation => 'Xác nhận tức thì';
 }

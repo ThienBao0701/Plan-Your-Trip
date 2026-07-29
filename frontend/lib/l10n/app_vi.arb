@@ -3105,5 +3105,35 @@
   "searchRealRating3plus": "3.0+",
   "searchRealRating4plus": "4.0+",
   "searchRealRating45plus": "4.5+",
-  "searchRealPriceAny": "Bất kỳ"
+  "searchRealPriceAny": "Bất kỳ",
+  "availabilityRealLoadingMessage": "Đang kiểm tra phòng trống thực tế…",
+  "availabilityRealErrorMessage": "Không tải được phòng trống. Vui lòng thử lại.",
+  "availabilityRealInvalidDatesMessage": "Chọn ngày trả phòng sau ngày nhận phòng để xem phòng.",
+  "availabilityRealRoomCount": "{count, plural, =1{Còn 1 phòng} other{Còn {count} phòng}}",
+  "@availabilityRealRoomCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "availabilityRealPerNight": "{price} / đêm",
+  "@availabilityRealPerNight": {
+    "placeholders": {
+      "price": { "type": "String" }
+    }
+  },
+  "availabilityRealOriginalPrice": "{price}",
+  "@availabilityRealOriginalPrice": {
+    "placeholders": {
+      "price": { "type": "String" }
+    }
+  },
+  "availabilityRealTotalForNights": "{price} tổng · {nights, plural, =1{1 đêm} other{{nights} đêm}}",
+  "@availabilityRealTotalForNights": {
+    "placeholders": {
+      "price": { "type": "String" },
+      "nights": { "type": "int" }
+    }
+  },
+  "availabilityRealFreeCancellation": "Miễn phí hủy",
+  "availabilityRealInstantConfirmation": "Xác nhận tức thì"
 }

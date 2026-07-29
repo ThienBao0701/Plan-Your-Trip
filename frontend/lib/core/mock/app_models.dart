@@ -1321,6 +1321,159 @@ class PlaceSearchPage {
       );
 }
 
+/// Machine-readable outcome of a real-mode hotel availability lookup. Mirrors
+/// [PlaceSearchOutcome]; [unavailable] is the Demo Mode guard and [invalidDates]
+/// is a client-side guard that mirrors the backend's own 400 for a check-out
+/// that is not after check-in (or a past check-in). The public availability
+/// endpoint never returns 401/403, but [sessionExpired]/[forbidden] are mapped
+/// defensively and never trigger a logout.
+enum HotelAvailabilityOutcome {
+  success,
+  unavailable,
+  invalidDates,
+  network,
+  timeout,
+  sessionExpired,
+  forbidden,
+  notFound,
+  validation,
+  serverError,
+  malformed,
+}
+
+/// Real-backend mirror of `RatePlanDto.AvailableRoomResult` — one bookable room
+/// returned by `GET /api/places/{placeId}/availability`. Every field comes
+/// straight from the backend; nothing is synthesized. Money values are decoded
+/// as-is (the availability DTO carries no explicit currency code — see
+/// [HotelAvailabilityResult]).
+class AvailableRoomRecord {
+  final int roomId;
+  final String roomName;
+  final String? roomCode;
+  final String? roomType;
+  final String? bedType;
+  final int? bedCount;
+  final int? maxAdults;
+  final int? maxChildren;
+  final int? maxGuests;
+  final double? roomSizeSqm;
+  final bool breakfastIncluded;
+  final bool freeCancellation;
+  final bool instantConfirmation;
+  final double? pricePerNight;
+  final double? originalPricePerNight;
+  final double? totalPrice;
+  final int nights;
+  final String? appliedRatePlan;
+  final String? coverImageUrl;
+  final List<String> amenities;
+
+  const AvailableRoomRecord({
+    required this.roomId,
+    required this.roomName,
+    this.roomCode,
+    this.roomType,
+    this.bedType,
+    this.bedCount,
+    this.maxAdults,
+    this.maxChildren,
+    this.maxGuests,
+    this.roomSizeSqm,
+    this.breakfastIncluded = false,
+    this.freeCancellation = false,
+    this.instantConfirmation = false,
+    this.pricePerNight,
+    this.originalPricePerNight,
+    this.totalPrice,
+    this.nights = 0,
+    this.appliedRatePlan,
+    this.coverImageUrl,
+    this.amenities = const [],
+  });
+
+  /// True only when the backend reports a strictly lower current price than the
+  /// original — used to show a discount without ever inventing one.
+  bool get hasDiscount =>
+      pricePerNight != null &&
+      originalPricePerNight != null &&
+      originalPricePerNight! > pricePerNight!;
+
+  factory AvailableRoomRecord.fromJson(Map<String, dynamic> json) {
+    final amenities = (json['amenities'] as List<dynamic>? ?? const [])
+        .whereType<Map<String, dynamic>>()
+        .map((a) => (a['name'] as String?)?.trim() ?? '')
+        .where((name) => name.isNotEmpty)
+        .toList();
+    return AvailableRoomRecord(
+      roomId: (json['roomId'] as num).toInt(),
+      roomName: (json['roomName'] as String?) ?? '',
+      roomCode: json['roomCode'] as String?,
+      roomType: json['roomType'] as String?,
+      bedType: json['bedType'] as String?,
+      bedCount: (json['bedCount'] as num?)?.toInt(),
+      maxAdults: (json['maxAdults'] as num?)?.toInt(),
+      maxChildren: (json['maxChildren'] as num?)?.toInt(),
+      maxGuests: (json['maxGuests'] as num?)?.toInt(),
+      roomSizeSqm: (json['roomSizeSqm'] as num?)?.toDouble(),
+      breakfastIncluded: (json['breakfastIncluded'] as bool?) ?? false,
+      freeCancellation: (json['freeCancellation'] as bool?) ?? false,
+      instantConfirmation: (json['instantConfirmation'] as bool?) ?? false,
+      pricePerNight: (json['pricePerNight'] as num?)?.toDouble(),
+      originalPricePerNight:
+          (json['originalPricePerNight'] as num?)?.toDouble(),
+      totalPrice: (json['totalPrice'] as num?)?.toDouble(),
+      nights: (json['nights'] as num?)?.toInt() ?? 0,
+      appliedRatePlan: json['appliedRatePlan'] as String?,
+      coverImageUrl: json['coverImageUrl'] as String?,
+      amenities: amenities,
+    );
+  }
+}
+
+/// Real-backend mirror of `RatePlanDto.HotelAvailabilityResponse` for a single
+/// hotel place and date range. The DTO carries no currency code, so callers use
+/// the app's default (VND) formatting — documented as a known limitation.
+class HotelAvailabilityResult {
+  final int placeId;
+  final String placeName;
+  final DateTime? checkIn;
+  final DateTime? checkOut;
+  final int nights;
+  final int adults;
+  final int children;
+  final List<AvailableRoomRecord> availableRooms;
+
+  const HotelAvailabilityResult({
+    required this.placeId,
+    this.placeName = '',
+    this.checkIn,
+    this.checkOut,
+    this.nights = 0,
+    this.adults = 1,
+    this.children = 0,
+    this.availableRooms = const [],
+  });
+
+  static DateTime? _parseDate(Object? value) {
+    if (value is! String || value.isEmpty) return null;
+    return DateTime.tryParse(value);
+  }
+
+  factory HotelAvailabilityResult.fromJson(Map<String, dynamic> json) =>
+      HotelAvailabilityResult(
+        placeId: (json['placeId'] as num?)?.toInt() ?? 0,
+        placeName: (json['placeName'] as String?) ?? '',
+        checkIn: _parseDate(json['checkIn']),
+        checkOut: _parseDate(json['checkOut']),
+        nights: (json['nights'] as num?)?.toInt() ?? 0,
+        adults: (json['adults'] as num?)?.toInt() ?? 1,
+        children: (json['children'] as num?)?.toInt() ?? 0,
+        availableRooms: (json['availableRooms'] as List<dynamic>? ?? const [])
+            .map((e) => AvailableRoomRecord.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
+}
+
 enum RoomType {
   standard,
   superior,

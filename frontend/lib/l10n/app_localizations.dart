@@ -10041,6 +10041,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Any'**
   String get searchRealPriceAny;
+
+  /// No description provided for @availabilityRealLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking real availability…'**
+  String get availabilityRealLoadingMessage;
+
+  /// No description provided for @availabilityRealErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load availability. Please try again.'**
+  String get availabilityRealErrorMessage;
+
+  /// No description provided for @availabilityRealInvalidDatesMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a check-out date after check-in to see rooms.'**
+  String get availabilityRealInvalidDatesMessage;
+
+  /// No description provided for @availabilityRealRoomCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 room available} other{{count} rooms available}}'**
+  String availabilityRealRoomCount(int count);
+
+  /// No description provided for @availabilityRealPerNight.
+  ///
+  /// In en, this message translates to:
+  /// **'{price} / night'**
+  String availabilityRealPerNight(String price);
+
+  /// No description provided for @availabilityRealOriginalPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'{price}'**
+  String availabilityRealOriginalPrice(String price);
+
+  /// No description provided for @availabilityRealTotalForNights.
+  ///
+  /// In en, this message translates to:
+  /// **'{price} total · {nights, plural, =1{1 night} other{{nights} nights}}'**
+  String availabilityRealTotalForNights(String price, int nights);
+
+  /// No description provided for @availabilityRealFreeCancellation.
+  ///
+  /// In en, this message translates to:
+  /// **'Free cancellation'**
+  String get availabilityRealFreeCancellation;
+
+  /// No description provided for @availabilityRealInstantConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Instant confirmation'**
+  String get availabilityRealInstantConfirmation;
 }
 
 class _AppLocalizationsDelegate

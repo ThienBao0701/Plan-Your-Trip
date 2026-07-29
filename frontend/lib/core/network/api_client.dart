@@ -770,6 +770,59 @@ class ApiClient {
     }
   }
 
+  // ── Hotel availability (/api/places/{placeId}/availability, UI-22) ────────
+  //
+  // Public endpoint (permitted GET on /api/places/**). Returns real bookable
+  // rooms with real prices for a hotel place + date range + guest count. The
+  // backend 400s on checkOut<=checkIn / past checkIn / adults<1, and 404s when
+  // the place is missing or has no hotel detail.
+  Future<CollectionApiResult<HotelAvailabilityResult>> getHotelAvailability({
+    required int placeId,
+    required DateTime checkIn,
+    required DateTime checkOut,
+    int adults = 1,
+    int children = 0,
+  }) async {
+    String d(DateTime v) => '${v.year.toString().padLeft(4, '0')}-'
+        '${v.month.toString().padLeft(2, '0')}-'
+        '${v.day.toString().padLeft(2, '0')}';
+    final params = <String, String>{
+      'checkIn': d(checkIn),
+      'checkOut': d(checkOut),
+      'adults': adults.toString(),
+      'children': children.toString(),
+    };
+    try {
+      final res = await _client
+          .get(
+            Uri.parse('$baseUrl/places/$placeId/availability')
+                .replace(queryParameters: params),
+            headers: _jsonHeaders,
+          )
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(
+            HotelAvailabilityResult.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
   Map<String, dynamic> _failureForStatus(http.Response res) {
     Map<String, dynamic>? body;
     try {

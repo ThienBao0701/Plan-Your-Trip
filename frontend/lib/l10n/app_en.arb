@@ -3105,5 +3105,35 @@
   "searchRealRating3plus": "3.0+",
   "searchRealRating4plus": "4.0+",
   "searchRealRating45plus": "4.5+",
-  "searchRealPriceAny": "Any"
+  "searchRealPriceAny": "Any",
+  "availabilityRealLoadingMessage": "Checking real availability…",
+  "availabilityRealErrorMessage": "We couldn't load availability. Please try again.",
+  "availabilityRealInvalidDatesMessage": "Choose a check-out date after check-in to see rooms.",
+  "availabilityRealRoomCount": "{count, plural, =1{1 room available} other{{count} rooms available}}",
+  "@availabilityRealRoomCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "availabilityRealPerNight": "{price} / night",
+  "@availabilityRealPerNight": {
+    "placeholders": {
+      "price": { "type": "String" }
+    }
+  },
+  "availabilityRealOriginalPrice": "{price}",
+  "@availabilityRealOriginalPrice": {
+    "placeholders": {
+      "price": { "type": "String" }
+    }
+  },
+  "availabilityRealTotalForNights": "{price} total · {nights, plural, =1{1 night} other{{nights} nights}}",
+  "@availabilityRealTotalForNights": {
+    "placeholders": {
+      "price": { "type": "String" },
+      "nights": { "type": "int" }
+    }
+  },
+  "availabilityRealFreeCancellation": "Free cancellation",
+  "availabilityRealInstantConfirmation": "Instant confirmation"
 }

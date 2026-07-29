@@ -122,6 +122,17 @@ class AppState extends ChangeNotifier {
 
   bool get realSearchHasMore => realSearchPage + 1 < realSearchTotalPages;
 
+  // ── Real Mode Hotel Availability (/api/places/{id}/availability, UI-22) ────
+  // Per-hotel real room availability + prices. Not paginated (the backend
+  // returns the full room list), so there is no load-more here. A newer lookup
+  // supersedes an older in-flight one (last wins). Zero HTTP in Demo Mode.
+  HotelAvailabilityResult? realAvailability;
+  bool realAvailabilityLoading = false;
+  bool realAvailabilityRefreshing = false;
+  HotelAvailabilityOutcome? realAvailabilityError;
+  int? realAvailabilityPlaceId;
+  int _realAvailabilityRequestId = 0;
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -210,6 +221,7 @@ class AppState extends ChangeNotifier {
     clearRealPlaceHydrationCache();
     _resetRealTripsState();
     _resetRealSearchState();
+    _resetRealAvailabilityState();
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -294,6 +306,16 @@ class AppState extends ChangeNotifier {
     _realSearchRequestId++;
   }
 
+  void _resetRealAvailabilityState() {
+    realAvailability = null;
+    realAvailabilityLoading = false;
+    realAvailabilityRefreshing = false;
+    realAvailabilityError = null;
+    realAvailabilityPlaceId = null;
+    // Bump the request id so any in-flight response is discarded on reset.
+    _realAvailabilityRequestId++;
+  }
+
   void _applyPersonalDataMode() {
     if (demoMode) {
       savedPlaces = List.from(MockData.demoSavedPlaces);
@@ -304,6 +326,7 @@ class AppState extends ChangeNotifier {
       clearRealPlaceHydrationCache();
       _resetRealTripsState();
       _resetRealSearchState();
+      _resetRealAvailabilityState();
       trips = List.from(MockData.trips);
       timeline = List.from(MockData.timeline);
       expenses = List.from(MockData.expenses);
@@ -331,6 +354,7 @@ class AppState extends ChangeNotifier {
     clearRealPlaceHydrationCache();
     _resetRealTripsState();
     _resetRealSearchState();
+    _resetRealAvailabilityState();
     timeline = [];
     expenses = [];
     demoBookings = [];
@@ -1777,6 +1801,85 @@ class AppState extends ChangeNotifier {
     }
     final outcome = _mapSearchError(result.errorKind);
     realSearchError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  HotelAvailabilityOutcome _mapAvailabilityError(ApiErrorKind? kind) {
+    return switch (kind) {
+      ApiErrorKind.unauthorized => HotelAvailabilityOutcome.sessionExpired,
+      ApiErrorKind.forbidden => HotelAvailabilityOutcome.forbidden,
+      ApiErrorKind.notFound => HotelAvailabilityOutcome.notFound,
+      ApiErrorKind.validation => HotelAvailabilityOutcome.validation,
+      ApiErrorKind.network => HotelAvailabilityOutcome.network,
+      ApiErrorKind.timeout => HotelAvailabilityOutcome.timeout,
+      ApiErrorKind.server => HotelAvailabilityOutcome.serverError,
+      ApiErrorKind.malformed => HotelAvailabilityOutcome.malformed,
+      _ => HotelAvailabilityOutcome.serverError,
+    };
+  }
+
+  /// Loads real bookable rooms for a hotel [placeId] over a date range in Real
+  /// Mode only. Guards invalid dates client-side (mirroring the backend 400),
+  /// never fabricates rooms/prices, and lets a newer lookup supersede an older
+  /// in-flight one (last wins). On failure the previous result is cleared only
+  /// when it belonged to a different hotel, so a transient error on the same
+  /// hotel keeps the last-known rooms visible behind the error banner.
+  Future<HotelAvailabilityOutcome> loadRealAvailability({
+    required int placeId,
+    required DateTime checkIn,
+    required DateTime checkOut,
+    int adults = 1,
+    int children = 0,
+    bool refresh = false,
+  }) async {
+    if (demoMode) return HotelAvailabilityOutcome.unavailable;
+    final inDay = DateTime(checkIn.year, checkIn.month, checkIn.day);
+    final outDay = DateTime(checkOut.year, checkOut.month, checkOut.day);
+    if (!outDay.isAfter(inDay)) {
+      realAvailabilityError = HotelAvailabilityOutcome.invalidDates;
+      realAvailabilityLoading = false;
+      realAvailabilityRefreshing = false;
+      notifyListeners();
+      return HotelAvailabilityOutcome.invalidDates;
+    }
+
+    final reqId = ++_realAvailabilityRequestId;
+    if (realAvailabilityPlaceId != placeId) {
+      // Switching hotels — don't show a stale hotel's rooms while loading.
+      realAvailability = null;
+    }
+    realAvailabilityPlaceId = placeId;
+    if (refresh) {
+      realAvailabilityRefreshing = true;
+    } else {
+      realAvailabilityLoading = true;
+    }
+    realAvailabilityError = null;
+    notifyListeners();
+
+    final result = await api.getHotelAvailability(
+      placeId: placeId,
+      checkIn: inDay,
+      checkOut: outDay,
+      adults: adults,
+      children: children,
+    );
+
+    // A newer lookup started while this was in flight — discard this response.
+    if (reqId != _realAvailabilityRequestId) {
+      return HotelAvailabilityOutcome.success;
+    }
+    realAvailabilityLoading = false;
+    realAvailabilityRefreshing = false;
+    if (result.success && result.data != null) {
+      realAvailability = result.data!;
+      realAvailabilityError = null;
+      notifyListeners();
+      return HotelAvailabilityOutcome.success;
+    }
+    final outcome = _mapAvailabilityError(result.errorKind);
+    realAvailabilityError = outcome;
     notifyListeners();
     return outcome;
   }
