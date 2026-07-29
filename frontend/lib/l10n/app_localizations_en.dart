@@ -5726,4 +5726,124 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get placeHydrationErrorMessage =>
       'Couldn\'t load place details. Please try again.';
+
+  @override
+  String get tripsRealLoadingMessage => 'Loading your trips…';
+
+  @override
+  String get tripsRealErrorMessage =>
+      'We couldn\'t load your trips. Please try again.';
+
+  @override
+  String get tripsRealEmptyMessage =>
+      'You haven\'t created any trips yet. Start planning your next adventure.';
+
+  @override
+  String get tripsRealSessionExpiredTitle => 'Session expired';
+
+  @override
+  String get tripsRealSessionExpiredMessage =>
+      'Please sign in again to see your trips.';
+
+  @override
+  String get tripsRealSignInAction => 'Sign in';
+
+  @override
+  String get tripRealPermissionDeniedMessage =>
+      'You don\'t have permission to do that.';
+
+  @override
+  String get tripStatusPlanning => 'Planning';
+
+  @override
+  String get tripStatusActive => 'Active';
+
+  @override
+  String get tripStatusCompleted => 'Completed';
+
+  @override
+  String get tripStatusCancelled => 'Cancelled';
+
+  @override
+  String get tripStatusUnknown => 'Trip';
+
+  @override
+  String tripDayLabel(int day) {
+    return 'Day $day';
+  }
+
+  @override
+  String get tripDetailRealTitle => 'Trip';
+
+  @override
+  String get tripDetailRealLoadingMessage => 'Loading trip details…';
+
+  @override
+  String get tripDetailRealUnavailableTitle => 'Trip unavailable';
+
+  @override
+  String get tripDetailRealUnavailableMessage =>
+      'This trip is no longer available.';
+
+  @override
+  String get tripDetailRealErrorMessage =>
+      'We couldn\'t load this trip. Please try again.';
+
+  @override
+  String get tripDetailRealEditDisabledNote =>
+      'Editing this itinerary isn\'t available yet.';
+
+  @override
+  String get tripDetailRealNoDaysMessage =>
+      'This trip doesn\'t have any days yet.';
+
+  @override
+  String get tripDetailRealNoItemsMessage =>
+      'No activities planned for this day yet.';
+
+  @override
+  String get addToTripRealLoadingTrips => 'Loading your trips…';
+
+  @override
+  String get addToTripRealNoTripsMessage =>
+      'You don\'t have any trips yet. Create one to start adding places.';
+
+  @override
+  String get addToTripRealSelectTripLabel => 'Choose a trip';
+
+  @override
+  String get addToTripRealSelectDayLabel => 'Choose a day';
+
+  @override
+  String addToTripRealNewDayOption(int day) {
+    return 'New day (Day $day)';
+  }
+
+  @override
+  String get addToTripRealPlanningNote =>
+      'This adds the place to your trip plan. It isn\'t a booking.';
+
+  @override
+  String get addToTripRealAddingMessage => 'Adding to your trip…';
+
+  @override
+  String addToTripRealAddedMessage(String place) {
+    return '$place was added to your trip.';
+  }
+
+  @override
+  String get addToTripRealErrorMessage =>
+      'We couldn\'t add this place. Please try again.';
+
+  @override
+  String get addToTripRealUnpublishedMessage =>
+      'This place can\'t be added to a trip right now.';
+
+  @override
+  String get addToTripRealTripUnavailableMessage =>
+      'That trip or place is no longer available.';
+
+  @override
+  String get createTripRealErrorMessage =>
+      'We couldn\'t create your trip. Please try again.';
 }

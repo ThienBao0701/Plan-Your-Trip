@@ -6,6 +6,7 @@ import '../../core/mock/app_models.dart';
 import '../../design/app_colors.dart';
 import '../../design/app_radii.dart';
 import '../../design/app_spacing.dart';
+import '../../features/auth/login_screen.dart';
 import '../../features/planner/planner_timeline.dart';
 import '../../features/planner/planner_utils.dart';
 import '../../features/timeline/timeline_screen.dart';
@@ -40,6 +41,20 @@ class _AddToTripSheetState extends State<_AddToTripSheet> {
   int _selectedDay = 1;
   bool _submitting = false;
   bool _navigating = false;
+  // Real Mode selection: a concrete backend day id, or a request to append a
+  // brand-new day (for trips that have none yet).
+  int? _selectedDayId;
+  bool _useNewDay = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final app = AppScope.of(context);
+      if (!app.demoMode) app.loadRealTrips();
+    });
+  }
 
   @override
   void dispose() {
@@ -53,6 +68,8 @@ class _AddToTripSheetState extends State<_AddToTripSheet> {
   Widget build(BuildContext context) {
     final app = AppScope.of(context);
     final l10n = AppLocalizations.of(context)!;
+    // Real Mode has its own trip/day loading + backend-confirmed add flow.
+    if (!app.demoMode) return _buildRealSheet(context, app, l10n);
     final trips = List<Trip>.from(app.trips)
       ..sort((a, b) => a.startDate.compareTo(b.startDate));
     Trip? selectedTrip;
@@ -275,6 +292,372 @@ class _AddToTripSheetState extends State<_AddToTripSheet> {
             MaterialPageRoute(builder: (_) => TimelineScreen(trip: trip)),
           ),
         ),
+      ),
+    );
+  }
+
+  // ── Real Mode add-to-trip ─────────────────────────────────────────────────
+
+  Widget _buildRealSheet(
+    BuildContext context,
+    AppState app,
+    AppLocalizations l10n,
+  ) {
+    final trips = app.realTrips;
+    final selectedId = _selectedTripId;
+    final detail =
+        selectedId == null ? null : app.realTripDetailFor(selectedId);
+
+    Widget body;
+    if (app.realTripsLoading && !app.realTripsLoaded) {
+      body = Center(
+        child: SizedBox(
+          width: 280,
+          child: OceanLoadingState(message: l10n.addToTripRealLoadingTrips),
+        ),
+      );
+    } else if (app.realTripsError != null && trips.isEmpty) {
+      final err = app.realTripsError!;
+      body = err == TripActionResult.sessionExpired
+          ? OceanEmptyState(
+              title: l10n.tripsRealSessionExpiredTitle,
+              message: l10n.tripsRealSessionExpiredMessage,
+              actionLabel: l10n.tripsRealSignInAction,
+              onAction: _reauthReal,
+            )
+          : OceanRecoverableErrorState(
+              message: l10n.tripsRealErrorMessage,
+              onReload: () => app.loadRealTrips(refresh: true),
+            );
+    } else if (trips.isEmpty) {
+      body = OceanEmptyState(
+        key: const Key('real-quick-add-empty'),
+        title: l10n.quickAddNoTripTitle,
+        message: l10n.addToTripRealNoTripsMessage,
+        actionLabel: l10n.plannerCreateTripAction,
+        onAction: _openCreateTrip,
+      );
+    } else {
+      body = Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            l10n.addToTripRealSelectTripLabel,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          for (final trip in trips)
+            _RealTripOption(
+              key: Key('real-quick-add-trip-${trip.id}'),
+              trip: trip,
+              selected: selectedId == trip.id,
+              onTap: () {
+                setState(() {
+                  _selectedTripId = trip.id;
+                  _selectedDayId = null;
+                  _useNewDay = false;
+                });
+                app.loadRealTripDetail(trip.id);
+              },
+            ),
+          if (selectedId != null) ...[
+            const SizedBox(height: AppSpacing.md),
+            _buildRealDaySection(context, app, l10n, selectedId, detail),
+          ],
+        ],
+      );
+    }
+
+    return OceanGlassBottomSheet(
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Center(
+              child: Container(
+                width: 48,
+                height: 5,
+                margin: const EdgeInsets.only(bottom: AppSpacing.md),
+                decoration: BoxDecoration(
+                  color: AppColors.disabled,
+                  borderRadius: BorderRadius.circular(AppRadii.pill),
+                ),
+              ),
+            ),
+            Text(
+              l10n.quickAddTitle,
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              l10n.quickAddPlaceSubtitle(widget.place.name),
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            body,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRealDaySection(
+    BuildContext context,
+    AppState app,
+    AppLocalizations l10n,
+    int tripId,
+    TripDetailRecord? detail,
+  ) {
+    if (app.realTripDetailLoading && detail == null) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(AppSpacing.md),
+          child: SizedBox(
+            width: 24,
+            height: 24,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+        ),
+      );
+    }
+    if (detail == null) {
+      final err = app.realTripDetailError;
+      if (err == TripActionResult.sessionExpired) {
+        return OceanEmptyState(
+          title: l10n.tripsRealSessionExpiredTitle,
+          message: l10n.tripsRealSessionExpiredMessage,
+          actionLabel: l10n.tripsRealSignInAction,
+          onAction: _reauthReal,
+        );
+      }
+      return OceanRecoverableErrorState(
+        message: err == TripActionResult.forbidden
+            ? l10n.tripRealPermissionDeniedMessage
+            : l10n.tripDetailRealErrorMessage,
+        onReload: () => app.loadRealTripDetail(tripId),
+      );
+    }
+
+    final locale = Localizations.localeOf(context).toString();
+    final newDayNumber = detail.nextDayNumber;
+    final busy = _submitting || app.realTripActionInFlight;
+    final onlyNewDay = detail.days.isEmpty;
+    final canSubmit =
+        !busy && (_useNewDay || onlyNewDay || _selectedDayId != null);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          l10n.addToTripRealSelectDayLabel,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              for (final day in detail.days)
+                Padding(
+                  padding: const EdgeInsets.only(right: AppSpacing.xs),
+                  child: ChoiceChip(
+                    key: Key('real-quick-add-day-${day.id}'),
+                    selected: !_useNewDay && _selectedDayId == day.id,
+                    label: Text(
+                      day.date != null
+                          ? '${l10n.tripDayLabel(day.dayNumber)} · '
+                              '${DateFormat.MMMd(locale).format(day.date!)}'
+                          : l10n.tripDayLabel(day.dayNumber),
+                    ),
+                    onSelected: (_) => setState(() {
+                      _useNewDay = false;
+                      _selectedDayId = day.id;
+                    }),
+                  ),
+                ),
+              Padding(
+                padding: const EdgeInsets.only(right: AppSpacing.xs),
+                child: ChoiceChip(
+                  key: const Key('real-quick-add-new-day'),
+                  selected: _useNewDay || onlyNewDay,
+                  label: Text(l10n.addToTripRealNewDayOption(newDayNumber)),
+                  onSelected: (_) => setState(() {
+                    _useNewDay = true;
+                    _selectedDayId = null;
+                  }),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        OceanGlassSurface(
+          blur: 0,
+          color: AppColors.paleCyan,
+          child: Text(
+            l10n.addToTripRealPlanningNote,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        busy
+            ? Center(
+                child: SizedBox(
+                  width: 280,
+                  child: OceanLoadingState(
+                    message: l10n.addToTripRealAddingMessage,
+                  ),
+                ),
+              )
+            : OceanPrimaryButton(
+                key: const Key('real-quick-add-submit'),
+                label: l10n.placeAddToTrip,
+                icon: Icons.add_rounded,
+                semanticLabel: l10n.placeAddToTripSemantic(widget.place.name),
+                onPressed:
+                    canSubmit ? () => _confirmReal(detail, newDayNumber) : null,
+              ),
+      ],
+    );
+  }
+
+  Future<void> _confirmReal(TripDetailRecord detail, int newDayNumber) async {
+    final app = AppScope.of(context);
+    if (_submitting || app.realTripActionInFlight) return;
+    final tripId = _selectedTripId;
+    if (tripId == null) return;
+    setState(() => _submitting = true);
+
+    int? dayId = (_useNewDay || detail.days.isEmpty) ? null : _selectedDayId;
+    if (dayId == null) {
+      // Append a new day first (verified POST .../days), then place the item.
+      final dayResult = await app.createRealTripDay(
+        tripId: tripId,
+        dayNumber: newDayNumber,
+      );
+      if (!mounted) return;
+      if (dayResult.result != TripActionResult.success ||
+          dayResult.dayId == null) {
+        setState(() => _submitting = false);
+        _handleRealFailure(dayResult.result);
+        return;
+      }
+      dayId = dayResult.dayId;
+    }
+
+    final result = await app.addRealTripPlace(
+      dayId: dayId!,
+      placeId: widget.place.id,
+    );
+    if (!mounted) return;
+    setState(() => _submitting = false);
+    if (result == TripActionResult.success) {
+      _finishRealSuccess();
+      return;
+    }
+    _handleRealFailure(result);
+  }
+
+  void _finishRealSuccess() {
+    if (!widget.parentContext.mounted) {
+      Navigator.pop(context);
+      return;
+    }
+    final l10n = AppLocalizations.of(widget.parentContext)!;
+    final messenger = ScaffoldMessenger.of(widget.parentContext);
+    Navigator.pop(context);
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(l10n.addToTripRealAddedMessage(widget.place.name)),
+      ),
+    );
+  }
+
+  void _handleRealFailure(TripActionResult result) {
+    final l10n = AppLocalizations.of(context)!;
+    if (result == TripActionResult.sessionExpired) {
+      _reauthReal();
+      return;
+    }
+    final message = switch (result) {
+      TripActionResult.forbidden => l10n.tripRealPermissionDeniedMessage,
+      TripActionResult.notFound => l10n.addToTripRealTripUnavailableMessage,
+      TripActionResult.unprocessable => l10n.addToTripRealUnpublishedMessage,
+      _ => l10n.addToTripRealErrorMessage,
+    };
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  void _reauthReal() {
+    if (!widget.parentContext.mounted) return;
+    final nav = Navigator.of(widget.parentContext);
+    Navigator.pop(context); // close the add-to-trip sheet first
+    showOceanSessionExpiredSheet(
+      widget.parentContext,
+      onLogin: () {
+        nav.pop();
+        nav.push(MaterialPageRoute(builder: (_) => const LoginScreen()));
+      },
+      onReturnHome: () => nav.pop(),
+    );
+  }
+}
+
+class _RealTripOption extends StatelessWidget {
+  final TripSummaryRecord trip;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _RealTripOption({
+    super.key,
+    required this.trip,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final locale = Localizations.localeOf(context).toString();
+    final date = DateFormat.yMMMd(locale);
+    final range = (trip.startDate != null && trip.endDate != null)
+        ? '${date.format(trip.startDate!)} - ${date.format(trip.endDate!)}'
+        : null;
+    return OceanGlassSurface(
+      blur: 0,
+      color: selected
+          ? AppColors.ocean.withValues(alpha: .10)
+          : AppColors.surfaceOverlay,
+      border: Border.all(
+        color: selected ? AppColors.ocean : AppColors.divider,
+      ),
+      padding: const EdgeInsets.all(AppSpacing.sm),
+      onTap: onTap,
+      child: Row(
+        children: [
+          Icon(
+            Icons.map_rounded,
+            color: selected ? AppColors.ocean : AppColors.textSecondary,
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  trip.title,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                if (range != null)
+                  Text(range, style: Theme.of(context).textTheme.bodyMedium),
+              ],
+            ),
+          ),
+          if (selected)
+            const Icon(Icons.check_circle_rounded, color: AppColors.ocean),
+        ],
       ),
     );
   }

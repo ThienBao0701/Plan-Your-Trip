@@ -884,6 +884,308 @@ class PlaceDetailRecord {
   }
 }
 
+// ── Real Mode Trips (UI-20, `/api/me/trips` TripPlan planner) ────────────────
+//
+// Typed transport mirrors of the backend TripPlan DTOs. All `Map<String,
+// dynamic>` decoding is confined to the `fromJson` factories. The real trip
+// list/detail UIs render these records directly — they are deliberately NOT
+// mapped into the Demo-Mode `Trip`/`TimelineItem` models (whose flat shape and
+// travelers/budget fields the backend does not model). Backend dates are
+// `yyyy-MM-dd`, times `HH:mm:ss`, timestamps ISO `Instant`.
+
+/// Backend `TripPlanStatus` (`PLANNING/ACTIVE/COMPLETED/CANCELLED`). [unknown]
+/// keeps forward-compatibility with any future status the backend may add — the
+/// raw string is preserved on the record for honest display fallback.
+enum TripPlanStatusValue { planning, active, completed, cancelled, unknown }
+
+TripPlanStatusValue _tripStatusFromString(String? raw) {
+  switch ((raw ?? '').toUpperCase()) {
+    case 'PLANNING':
+      return TripPlanStatusValue.planning;
+    case 'ACTIVE':
+      return TripPlanStatusValue.active;
+    case 'COMPLETED':
+      return TripPlanStatusValue.completed;
+    case 'CANCELLED':
+      return TripPlanStatusValue.cancelled;
+    default:
+      return TripPlanStatusValue.unknown;
+  }
+}
+
+/// Defensive ISO date/instant parse — returns `null` for missing or malformed
+/// values so a nullable backend field degrades honestly instead of throwing.
+DateTime? _tryParseDate(Object? raw) {
+  if (raw is! String || raw.isEmpty) return null;
+  return DateTime.tryParse(raw);
+}
+
+/// Machine-readable outcome of a real-mode trip operation. Mirrors
+/// [SavedCollectionActionResult] and adds [forbidden]/[unprocessable] for the
+/// 403/422 responses the TripPlan endpoints can return. [unavailable] is the
+/// Demo Mode guard; [sessionExpired] maps a 401 without ever logging out.
+enum TripActionResult {
+  success,
+  unavailable,
+  network,
+  timeout,
+  sessionExpired,
+  forbidden,
+  notFound,
+  conflict,
+  unprocessable,
+  validation,
+  serverError,
+  malformed,
+}
+
+/// Real-backend mirror of `TripSummaryResponse` (`GET /api/me/trips`). Carries
+/// only list-row fields — no days (fetch the detail for those).
+class TripSummaryRecord {
+  final int id;
+  final String title;
+  final String? destination;
+  final String? coverImage;
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final String statusRaw;
+  final TripPlanStatusValue status;
+  final bool isPublic;
+  final int dayCount;
+  final DateTime? updatedAt;
+
+  const TripSummaryRecord({
+    required this.id,
+    required this.title,
+    this.destination,
+    this.coverImage,
+    this.startDate,
+    this.endDate,
+    this.statusRaw = '',
+    this.status = TripPlanStatusValue.unknown,
+    this.isPublic = false,
+    this.dayCount = 0,
+    this.updatedAt,
+  });
+
+  factory TripSummaryRecord.fromJson(Map<String, dynamic> json) {
+    final statusRaw = (json['status'] as String?) ?? '';
+    return TripSummaryRecord(
+      id: (json['id'] as num).toInt(),
+      title: (json['title'] as String?) ?? '',
+      destination: json['destination'] as String?,
+      coverImage: json['coverImage'] as String?,
+      startDate: _tryParseDate(json['startDate']),
+      endDate: _tryParseDate(json['endDate']),
+      statusRaw: statusRaw,
+      status: _tripStatusFromString(statusRaw),
+      isPublic: (json['isPublic'] as bool?) ?? false,
+      dayCount: (json['dayCount'] as num?)?.toInt() ?? 0,
+      updatedAt: _tryParseDate(json['updatedAt']),
+    );
+  }
+
+  /// Derives a summary row from a full detail record — used after create, where
+  /// the backend returns a `TripResponse` but the list wants a summary row.
+  factory TripSummaryRecord.fromDetail(TripDetailRecord d) => TripSummaryRecord(
+        id: d.id,
+        title: d.title,
+        destination: d.destination,
+        coverImage: d.coverImage,
+        startDate: d.startDate,
+        endDate: d.endDate,
+        statusRaw: d.statusRaw,
+        status: d.status,
+        isPublic: d.isPublic,
+        dayCount: d.days.length,
+        updatedAt: d.updatedAt,
+      );
+}
+
+/// Real-backend mirror of `TripItemResponse` — the "activity" row. An item is
+/// either place-linked (`placeId`/`placeName`) or a custom activity
+/// (`customTitle`). Times are trimmed to `HH:mm` for display.
+class TripItemRecord {
+  final int id;
+  final int? placeId;
+  final String? placeName;
+  final String? placeSlug;
+  final String? customTitle;
+  final String? customDescription;
+  final String? startTime;
+  final String? endTime;
+  final int sortOrder;
+  final double? estimatedCost;
+  final double? latitude;
+  final double? longitude;
+  final String? transportationNote;
+
+  const TripItemRecord({
+    required this.id,
+    this.placeId,
+    this.placeName,
+    this.placeSlug,
+    this.customTitle,
+    this.customDescription,
+    this.startTime,
+    this.endTime,
+    this.sortOrder = 0,
+    this.estimatedCost,
+    this.latitude,
+    this.longitude,
+    this.transportationNote,
+  });
+
+  bool get hasPlace => placeId != null;
+
+  /// The linked place name, else the custom title, else empty.
+  String get displayTitle => (placeName != null && placeName!.isNotEmpty)
+      ? placeName!
+      : (customTitle ?? '');
+
+  factory TripItemRecord.fromJson(Map<String, dynamic> json) => TripItemRecord(
+        id: (json['id'] as num).toInt(),
+        placeId: (json['placeId'] as num?)?.toInt(),
+        placeName: json['placeName'] as String?,
+        placeSlug: json['placeSlug'] as String?,
+        customTitle: json['customTitle'] as String?,
+        customDescription: json['customDescription'] as String?,
+        startTime: _shortTime(json['startTime'] as String?),
+        endTime: _shortTime(json['endTime'] as String?),
+        sortOrder: (json['sortOrder'] as num?)?.toInt() ?? 0,
+        estimatedCost: (json['estimatedCost'] as num?)?.toDouble(),
+        latitude: (json['latitude'] as num?)?.toDouble(),
+        longitude: (json['longitude'] as num?)?.toDouble(),
+        transportationNote: json['transportationNote'] as String?,
+      );
+}
+
+/// Real-backend mirror of `TripDayResponse`. Items are sorted by `sortOrder`
+/// defensively (the backend already orders them).
+class TripDayRecord {
+  final int id;
+  final int dayNumber;
+  final DateTime? date;
+  final String? title;
+  final String? notes;
+  final List<TripItemRecord> items;
+
+  const TripDayRecord({
+    required this.id,
+    required this.dayNumber,
+    this.date,
+    this.title,
+    this.notes,
+    this.items = const [],
+  });
+
+  factory TripDayRecord.fromJson(Map<String, dynamic> json) {
+    final items = (json['items'] as List<dynamic>? ?? const [])
+        .map((e) => TripItemRecord.fromJson(e as Map<String, dynamic>))
+        .toList()
+      ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+    return TripDayRecord(
+      id: (json['id'] as num).toInt(),
+      dayNumber: (json['dayNumber'] as num?)?.toInt() ?? 0,
+      date: _tryParseDate(json['date']),
+      title: json['title'] as String?,
+      notes: json['notes'] as String?,
+      items: items,
+    );
+  }
+
+  TripDayRecord copyWith({List<TripItemRecord>? items}) => TripDayRecord(
+        id: id,
+        dayNumber: dayNumber,
+        date: date,
+        title: title,
+        notes: notes,
+        items: items ?? this.items,
+      );
+}
+
+/// Real-backend mirror of `TripResponse` (`GET /api/me/trips/{id}`), the full
+/// day→item itinerary. Days are sorted by `dayNumber` defensively.
+class TripDetailRecord {
+  final int id;
+  final int? userId;
+  final String title;
+  final String? description;
+  final String? destination;
+  final String? coverImage;
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final String statusRaw;
+  final TripPlanStatusValue status;
+  final bool isPublic;
+  final List<TripDayRecord> days;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+
+  const TripDetailRecord({
+    required this.id,
+    this.userId,
+    required this.title,
+    this.description,
+    this.destination,
+    this.coverImage,
+    this.startDate,
+    this.endDate,
+    this.statusRaw = '',
+    this.status = TripPlanStatusValue.unknown,
+    this.isPublic = false,
+    this.days = const [],
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  factory TripDetailRecord.fromJson(Map<String, dynamic> json) {
+    final statusRaw = (json['status'] as String?) ?? '';
+    final days = (json['days'] as List<dynamic>? ?? const [])
+        .map((e) => TripDayRecord.fromJson(e as Map<String, dynamic>))
+        .toList()
+      ..sort((a, b) => a.dayNumber.compareTo(b.dayNumber));
+    return TripDetailRecord(
+      id: (json['id'] as num).toInt(),
+      userId: (json['userId'] as num?)?.toInt(),
+      title: (json['title'] as String?) ?? '',
+      description: json['description'] as String?,
+      destination: json['destination'] as String?,
+      coverImage: json['coverImage'] as String?,
+      startDate: _tryParseDate(json['startDate']),
+      endDate: _tryParseDate(json['endDate']),
+      statusRaw: statusRaw,
+      status: _tripStatusFromString(statusRaw),
+      isPublic: (json['isPublic'] as bool?) ?? false,
+      days: days,
+      createdAt: _tryParseDate(json['createdAt']),
+      updatedAt: _tryParseDate(json['updatedAt']),
+    );
+  }
+
+  /// Next `dayNumber` to use when appending a new day (max existing + 1, else 1).
+  int get nextDayNumber => days.isEmpty
+      ? 1
+      : days.map((d) => d.dayNumber).reduce((a, b) => a > b ? a : b) + 1;
+
+  TripDetailRecord copyWith({List<TripDayRecord>? days}) => TripDetailRecord(
+        id: id,
+        userId: userId,
+        title: title,
+        description: description,
+        destination: destination,
+        coverImage: coverImage,
+        startDate: startDate,
+        endDate: endDate,
+        statusRaw: statusRaw,
+        status: status,
+        isPublic: isPublic,
+        days: days ?? this.days,
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
+}
+
 enum RoomType {
   standard,
   superior,

@@ -368,11 +368,10 @@ void main() {
       const Size(420, 920),
     );
 
-    expect(
-      find.text(
-          'Personal trip history is not connected to a backend repository yet.'),
-      findsOneWidget,
-    );
+    // UI-20: real mode is now backend-connected. With no reachable backend in
+    // tests the list surfaces a retryable error state (never the seeded demo
+    // trips) instead of the old "not connected" placeholder.
+    expect(find.byKey(const Key('real-trips-error')), findsOneWidget);
     expect(find.text(MockData.trips.first.title), findsNothing);
   });
 

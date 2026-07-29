@@ -9,6 +9,7 @@ import '../../design/app_radii.dart';
 import '../../design/app_spacing.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/glass_widgets.dart';
+import '../auth/login_screen.dart';
 
 class CreateTripScreen extends StatefulWidget {
   final String? prefilledDestination;
@@ -241,12 +242,45 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
   Future<void> _submit() async {
     if (saving || submitted) return;
     if (!_validateDestination() || !_validateDates()) return;
+    final app = AppScope.of(context);
+    final dest = destination.text.trim();
+    final tripTitle =
+        title.text.trim().isEmpty ? '$dest trip' : title.text.trim();
+    final start = _parseDate(startDate.text)!;
+    final end = _parseDate(endDate.text)!;
+
+    // Real Mode — backend-confirmed create; never optimistic, never inserts a
+    // local demo trip, and preserves the form on a recoverable failure.
+    if (!app.demoMode) {
+      setState(() => saving = true);
+      final result = await app.createRealTrip(
+        title: tripTitle,
+        destination: dest,
+        startDate: start,
+        endDate: end,
+        description: notes.text.trim().isEmpty ? null : notes.text.trim(),
+      );
+      if (!mounted) return;
+      setState(() => saving = false);
+      if (result == TripActionResult.success) {
+        final messenger = ScaffoldMessenger.of(context);
+        final nav = Navigator.of(context);
+        if (nav.canPop()) nav.pop();
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.tripCreatedMessage),
+          ),
+        );
+        return;
+      }
+      _handleRealCreateFailure(result);
+      return;
+    }
+
     setState(() {
       saving = true;
       submitted = true;
     });
-    final app = AppScope.of(context);
-    final dest = destination.text.trim();
     final matchedPlace = app.places.where((place) {
       final value = dest.toLowerCase();
       return place.city.toLowerCase().contains(value) ||
@@ -278,6 +312,31 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
     }
     messenger.showSnackBar(
       SnackBar(content: Text(AppLocalizations.of(context)!.tripCreatedMessage)),
+    );
+  }
+
+  void _handleRealCreateFailure(TripActionResult result) {
+    final l10n = AppLocalizations.of(context)!;
+    if (result == TripActionResult.sessionExpired) {
+      _reauthCreate();
+      return;
+    }
+    final message = result == TripActionResult.forbidden
+        ? l10n.tripRealPermissionDeniedMessage
+        : l10n.createTripRealErrorMessage;
+    _snack(message);
+  }
+
+  void _reauthCreate() {
+    showOceanSessionExpiredSheet(
+      context,
+      onLogin: () {
+        Navigator.of(context).pop();
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+        );
+      },
+      onReturnHome: () => Navigator.of(context).pop(),
     );
   }
 

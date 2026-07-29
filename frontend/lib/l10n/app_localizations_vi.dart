@@ -5565,4 +5565,123 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get placeHydrationErrorMessage =>
       'Không thể tải chi tiết địa điểm. Vui lòng thử lại.';
+
+  @override
+  String get tripsRealLoadingMessage => 'Đang tải chuyến đi của bạn…';
+
+  @override
+  String get tripsRealErrorMessage =>
+      'Không thể tải chuyến đi của bạn. Vui lòng thử lại.';
+
+  @override
+  String get tripsRealEmptyMessage =>
+      'Bạn chưa tạo chuyến đi nào. Hãy bắt đầu lên kế hoạch cho hành trình tiếp theo.';
+
+  @override
+  String get tripsRealSessionExpiredTitle => 'Phiên đăng nhập đã hết hạn';
+
+  @override
+  String get tripsRealSessionExpiredMessage =>
+      'Vui lòng đăng nhập lại để xem chuyến đi của bạn.';
+
+  @override
+  String get tripsRealSignInAction => 'Đăng nhập';
+
+  @override
+  String get tripRealPermissionDeniedMessage =>
+      'Bạn không có quyền thực hiện thao tác này.';
+
+  @override
+  String get tripStatusPlanning => 'Đang lên kế hoạch';
+
+  @override
+  String get tripStatusActive => 'Đang diễn ra';
+
+  @override
+  String get tripStatusCompleted => 'Đã hoàn thành';
+
+  @override
+  String get tripStatusCancelled => 'Đã hủy';
+
+  @override
+  String get tripStatusUnknown => 'Chuyến đi';
+
+  @override
+  String tripDayLabel(int day) {
+    return 'Ngày $day';
+  }
+
+  @override
+  String get tripDetailRealTitle => 'Chuyến đi';
+
+  @override
+  String get tripDetailRealLoadingMessage => 'Đang tải chi tiết chuyến đi…';
+
+  @override
+  String get tripDetailRealUnavailableTitle => 'Chuyến đi không khả dụng';
+
+  @override
+  String get tripDetailRealUnavailableMessage =>
+      'Chuyến đi này không còn khả dụng.';
+
+  @override
+  String get tripDetailRealErrorMessage =>
+      'Không thể tải chuyến đi này. Vui lòng thử lại.';
+
+  @override
+  String get tripDetailRealEditDisabledNote =>
+      'Chưa thể chỉnh sửa lịch trình này.';
+
+  @override
+  String get tripDetailRealNoDaysMessage => 'Chuyến đi này chưa có ngày nào.';
+
+  @override
+  String get tripDetailRealNoItemsMessage =>
+      'Chưa có hoạt động nào cho ngày này.';
+
+  @override
+  String get addToTripRealLoadingTrips => 'Đang tải chuyến đi của bạn…';
+
+  @override
+  String get addToTripRealNoTripsMessage =>
+      'Bạn chưa có chuyến đi nào. Hãy tạo một chuyến để bắt đầu thêm địa điểm.';
+
+  @override
+  String get addToTripRealSelectTripLabel => 'Chọn chuyến đi';
+
+  @override
+  String get addToTripRealSelectDayLabel => 'Chọn ngày';
+
+  @override
+  String addToTripRealNewDayOption(int day) {
+    return 'Ngày mới (Ngày $day)';
+  }
+
+  @override
+  String get addToTripRealPlanningNote =>
+      'Thao tác này thêm địa điểm vào kế hoạch chuyến đi. Đây không phải là đặt chỗ.';
+
+  @override
+  String get addToTripRealAddingMessage => 'Đang thêm vào chuyến đi…';
+
+  @override
+  String addToTripRealAddedMessage(String place) {
+    return 'Đã thêm $place vào chuyến đi của bạn.';
+  }
+
+  @override
+  String get addToTripRealErrorMessage =>
+      'Không thể thêm địa điểm này. Vui lòng thử lại.';
+
+  @override
+  String get addToTripRealUnpublishedMessage =>
+      'Hiện chưa thể thêm địa điểm này vào chuyến đi.';
+
+  @override
+  String get addToTripRealTripUnavailableMessage =>
+      'Chuyến đi hoặc địa điểm đó không còn khả dụng.';
+
+  @override
+  String get createTripRealErrorMessage =>
+      'Không thể tạo chuyến đi của bạn. Vui lòng thử lại.';
 }

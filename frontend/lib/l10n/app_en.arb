@@ -3034,5 +3034,59 @@
     }
   },
   "placeHydrationUnavailableMessage": "This place is no longer available.",
-  "placeHydrationErrorMessage": "Couldn't load place details. Please try again."
+  "placeHydrationErrorMessage": "Couldn't load place details. Please try again.",
+  "tripsRealLoadingMessage": "Loading your trips…",
+  "tripsRealErrorMessage": "We couldn't load your trips. Please try again.",
+  "tripsRealEmptyMessage": "You haven't created any trips yet. Start planning your next adventure.",
+  "tripsRealSessionExpiredTitle": "Session expired",
+  "tripsRealSessionExpiredMessage": "Please sign in again to see your trips.",
+  "tripsRealSignInAction": "Sign in",
+  "tripRealPermissionDeniedMessage": "You don't have permission to do that.",
+  "tripStatusPlanning": "Planning",
+  "tripStatusActive": "Active",
+  "tripStatusCompleted": "Completed",
+  "tripStatusCancelled": "Cancelled",
+  "tripStatusUnknown": "Trip",
+  "tripDayLabel": "Day {day}",
+  "@tripDayLabel": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "tripDetailRealTitle": "Trip",
+  "tripDetailRealLoadingMessage": "Loading trip details…",
+  "tripDetailRealUnavailableTitle": "Trip unavailable",
+  "tripDetailRealUnavailableMessage": "This trip is no longer available.",
+  "tripDetailRealErrorMessage": "We couldn't load this trip. Please try again.",
+  "tripDetailRealEditDisabledNote": "Editing this itinerary isn't available yet.",
+  "tripDetailRealNoDaysMessage": "This trip doesn't have any days yet.",
+  "tripDetailRealNoItemsMessage": "No activities planned for this day yet.",
+  "addToTripRealLoadingTrips": "Loading your trips…",
+  "addToTripRealNoTripsMessage": "You don't have any trips yet. Create one to start adding places.",
+  "addToTripRealSelectTripLabel": "Choose a trip",
+  "addToTripRealSelectDayLabel": "Choose a day",
+  "addToTripRealNewDayOption": "New day (Day {day})",
+  "@addToTripRealNewDayOption": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "addToTripRealPlanningNote": "This adds the place to your trip plan. It isn't a booking.",
+  "addToTripRealAddingMessage": "Adding to your trip…",
+  "addToTripRealAddedMessage": "{place} was added to your trip.",
+  "@addToTripRealAddedMessage": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "addToTripRealErrorMessage": "We couldn't add this place. Please try again.",
+  "addToTripRealUnpublishedMessage": "This place can't be added to a trip right now.",
+  "addToTripRealTripUnavailableMessage": "That trip or place is no longer available.",
+  "createTripRealErrorMessage": "We couldn't create your trip. Please try again."
 }

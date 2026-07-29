@@ -78,6 +78,23 @@ class AppState extends ChangeNotifier {
   final Map<int, Future<PlaceHydrationResult>> _hydrationInFlight =
       <int, Future<PlaceHydrationResult>>{};
 
+  // ── Real Mode Trips (/api/me/trips, UI-20 TripPlan planner) ───────────────
+  // Parallel to the demo-only [trips]/[timeline] lists — never merged. A 401
+  // here never calls logout()/clears session; the caller shows a re-auth sheet.
+  List<TripSummaryRecord> realTrips = [];
+  bool realTripsLoading = false;
+  bool realTripsLoaded = false;
+  bool realTripsRefreshing = false;
+  TripActionResult? realTripsError;
+  int? realSelectedTripId;
+  TripDetailRecord? realSelectedTripDetail;
+  bool realTripDetailLoading = false;
+  TripActionResult? realTripDetailError;
+  bool realTripCreateInFlight = false;
+  // Add-day / add-item run from a single modal at a time, so one bool guards
+  // double-submission for both.
+  bool realTripActionInFlight = false;
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -164,6 +181,7 @@ class AppState extends ChangeNotifier {
     _resetRealSavedCollectionsState();
     _resetRealWishlistState();
     clearRealPlaceHydrationCache();
+    _resetRealTripsState();
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -216,6 +234,20 @@ class AppState extends ChangeNotifier {
     _hydrationInFlight.clear();
   }
 
+  void _resetRealTripsState() {
+    realTrips = [];
+    realTripsLoading = false;
+    realTripsLoaded = false;
+    realTripsRefreshing = false;
+    realTripsError = null;
+    realSelectedTripId = null;
+    realSelectedTripDetail = null;
+    realTripDetailLoading = false;
+    realTripDetailError = null;
+    realTripCreateInFlight = false;
+    realTripActionInFlight = false;
+  }
+
   void _applyPersonalDataMode() {
     if (demoMode) {
       savedPlaces = List.from(MockData.demoSavedPlaces);
@@ -224,6 +256,7 @@ class AppState extends ChangeNotifier {
       _resetRealSavedCollectionsState();
       _resetRealWishlistState();
       clearRealPlaceHydrationCache();
+      _resetRealTripsState();
       trips = List.from(MockData.trips);
       timeline = List.from(MockData.timeline);
       expenses = List.from(MockData.expenses);
@@ -248,6 +281,8 @@ class AppState extends ChangeNotifier {
     savedCollectionPlaces = [];
     _resetRealSavedCollectionsState();
     _resetRealWishlistState();
+    clearRealPlaceHydrationCache();
+    _resetRealTripsState();
     timeline = [];
     expenses = [];
     demoBookings = [];
@@ -781,6 +816,7 @@ class AppState extends ChangeNotifier {
       case ApiErrorKind.validation:
       case ApiErrorKind.unprocessable:
       case ApiErrorKind.conflict:
+      case ApiErrorKind.forbidden:
       case null:
         return SavedCollectionActionResult.serverError;
     }
@@ -1133,6 +1169,7 @@ class AppState extends ChangeNotifier {
       case ApiErrorKind.unprocessable:
       case ApiErrorKind.server:
       case ApiErrorKind.malformed:
+      case ApiErrorKind.forbidden:
       case null:
         return WishlistActionResult.serverError;
     }
@@ -1357,6 +1394,217 @@ class AppState extends ChangeNotifier {
       _hydrationInFlight.remove(placeId);
       notifyListeners();
     }
+  }
+
+  // ── Real Mode Trips (/api/me/trips, UI20) ─────────────────────────────────
+  //
+  // Parallel to the demo trip methods below — never fabricates success. A 401
+  // maps to [TripActionResult.sessionExpired] (caller shows a re-auth sheet;
+  // this never logs out or clears the session); a 403 stays distinct as
+  // [TripActionResult.forbidden] so callers show a permission error.
+
+  TripActionResult _mapTripError(ApiErrorKind? kind) {
+    return switch (kind) {
+      ApiErrorKind.unauthorized => TripActionResult.sessionExpired,
+      ApiErrorKind.forbidden => TripActionResult.forbidden,
+      ApiErrorKind.notFound => TripActionResult.notFound,
+      ApiErrorKind.conflict => TripActionResult.conflict,
+      ApiErrorKind.unprocessable => TripActionResult.unprocessable,
+      ApiErrorKind.validation => TripActionResult.validation,
+      ApiErrorKind.network => TripActionResult.network,
+      ApiErrorKind.timeout => TripActionResult.timeout,
+      ApiErrorKind.server => TripActionResult.serverError,
+      ApiErrorKind.malformed => TripActionResult.malformed,
+      null => TripActionResult.serverError,
+    };
+  }
+
+  /// The loaded detail if it belongs to [tripId], else `null`.
+  TripDetailRecord? realTripDetailFor(int tripId) =>
+      realSelectedTripId == tripId ? realSelectedTripDetail : null;
+
+  /// Loads the authenticated user's real trip list. [refresh] forces a re-fetch
+  /// (pull-to-refresh) and preserves the current list if the re-fetch fails.
+  Future<TripActionResult> loadRealTrips({bool refresh = false}) async {
+    if (demoMode) return TripActionResult.unavailable;
+    if (realTripsLoading || realTripsRefreshing) {
+      return TripActionResult.success;
+    }
+    if (realTripsLoaded && !refresh) return TripActionResult.success;
+    if (refresh) {
+      realTripsRefreshing = true;
+    } else {
+      realTripsLoading = true;
+    }
+    realTripsError = null;
+    notifyListeners();
+    final result = await api.getMyTrips();
+    realTripsLoading = false;
+    realTripsRefreshing = false;
+    if (result.success && result.data != null) {
+      realTrips = result.data!;
+      realTripsLoaded = true;
+      realTripsError = null;
+      notifyListeners();
+      return TripActionResult.success;
+    }
+    // Preserve any previously loaded list; only surface the error.
+    final outcome = _mapTripError(result.errorKind);
+    realTripsError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Loads one real trip's full day→item detail into [realSelectedTripDetail].
+  /// A newer selection supersedes an older in-flight load (last request wins).
+  Future<TripActionResult> loadRealTripDetail(int tripId) async {
+    if (demoMode) return TripActionResult.unavailable;
+    realSelectedTripId = tripId;
+    realSelectedTripDetail = null;
+    realTripDetailLoading = true;
+    realTripDetailError = null;
+    notifyListeners();
+    final result = await api.getTripDetail(tripId);
+    // If a newer selection started while this was in flight, ignore this result.
+    if (realSelectedTripId != tripId) return TripActionResult.success;
+    realTripDetailLoading = false;
+    if (result.success && result.data != null) {
+      realSelectedTripDetail = result.data!;
+      realTripDetailError = null;
+      notifyListeners();
+      return TripActionResult.success;
+    }
+    final outcome = _mapTripError(result.errorKind);
+    realTripDetailError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Creates a real trip. Never reports optimistic success — the new summary is
+  /// only prepended after the backend confirms (201). The form should navigate
+  /// away only when this returns [TripActionResult.success].
+  Future<TripActionResult> createRealTrip({
+    required String title,
+    String? description,
+    String? destination,
+    required DateTime startDate,
+    required DateTime endDate,
+  }) async {
+    if (demoMode) return TripActionResult.unavailable;
+    if (realTripCreateInFlight) return TripActionResult.success;
+    realTripCreateInFlight = true;
+    notifyListeners();
+    final result = await api.createTrip(
+      title: title,
+      description: description,
+      destination: destination,
+      startDate: startDate,
+      endDate: endDate,
+    );
+    realTripCreateInFlight = false;
+    if (result.success && result.data != null) {
+      realTrips = [TripSummaryRecord.fromDetail(result.data!), ...realTrips];
+      realTripsLoaded = true;
+      notifyListeners();
+      return TripActionResult.success;
+    }
+    final outcome = _mapTripError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Creates a day on a real trip and returns the new [TripDayRecord.id] so the
+  /// Add-to-Trip flow can immediately place an item on it. Reflects the new day
+  /// into the loaded detail (and bumps the summary's day count) on success.
+  Future<({TripActionResult result, int? dayId})> createRealTripDay({
+    required int tripId,
+    required int dayNumber,
+    DateTime? date,
+    String? title,
+  }) async {
+    if (demoMode) {
+      return (result: TripActionResult.unavailable, dayId: null);
+    }
+    if (realTripActionInFlight) {
+      return (result: TripActionResult.success, dayId: null);
+    }
+    realTripActionInFlight = true;
+    notifyListeners();
+    final res = await api.createTripDay(
+      tripId: tripId,
+      dayNumber: dayNumber,
+      date: date,
+      title: title,
+    );
+    realTripActionInFlight = false;
+    if (res.success && res.data != null) {
+      final day = res.data!;
+      final detail = realSelectedTripDetail;
+      if (realSelectedTripId == tripId && detail != null) {
+        final days = [...detail.days, day]
+          ..sort((a, b) => a.dayNumber.compareTo(b.dayNumber));
+        realSelectedTripDetail = detail.copyWith(days: days);
+      }
+      _bumpRealTripDayCount(tripId);
+      notifyListeners();
+      return (result: TripActionResult.success, dayId: day.id);
+    }
+    final outcome = _mapTripError(res.errorKind);
+    notifyListeners();
+    return (result: outcome, dayId: null);
+  }
+
+  /// Adds a hydrated place to a real trip day. Never optimistic — the item is
+  /// only reflected into the loaded detail after the backend confirms (201).
+  Future<TripActionResult> addRealTripPlace({
+    required int dayId,
+    required int placeId,
+  }) async {
+    if (demoMode) return TripActionResult.unavailable;
+    if (realTripActionInFlight) return TripActionResult.success;
+    realTripActionInFlight = true;
+    notifyListeners();
+    final res = await api.addTripItem(dayId: dayId, placeId: placeId);
+    realTripActionInFlight = false;
+    if (res.success && res.data != null) {
+      final item = res.data!;
+      final detail = realSelectedTripDetail;
+      if (detail != null && detail.days.any((d) => d.id == dayId)) {
+        final days = detail.days.map((d) {
+          if (d.id != dayId) return d;
+          final items = [...d.items, item]
+            ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+          return d.copyWith(items: items);
+        }).toList();
+        realSelectedTripDetail = detail.copyWith(days: days);
+      }
+      notifyListeners();
+      return TripActionResult.success;
+    }
+    final outcome = _mapTripError(res.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Increments the cached summary day count for [tripId] after a day is added,
+  /// so the list stays consistent without a full refresh.
+  void _bumpRealTripDayCount(int tripId) {
+    final idx = realTrips.indexWhere((t) => t.id == tripId);
+    if (idx < 0) return;
+    final t = realTrips[idx];
+    realTrips = [...realTrips]..[idx] = TripSummaryRecord(
+        id: t.id,
+        title: t.title,
+        destination: t.destination,
+        coverImage: t.coverImage,
+        startDate: t.startDate,
+        endDate: t.endDate,
+        statusRaw: t.statusRaw,
+        status: t.status,
+        isPublic: t.isPublic,
+        dayCount: t.dayCount + 1,
+        updatedAt: t.updatedAt,
+      );
   }
 
   List<Place> filteredPlaces(PlaceQuery q) {

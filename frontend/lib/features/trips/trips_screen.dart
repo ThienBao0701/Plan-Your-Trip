@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 
 import '../../core/app_state.dart';
 import '../../core/mock/app_models.dart';
-import '../../core/mock/mock_data.dart';
 import '../../design/app_breakpoints.dart';
 import '../../design/app_colors.dart';
 import '../../design/app_icon_sizes.dart';
@@ -11,8 +10,10 @@ import '../../design/app_radii.dart';
 import '../../design/app_spacing.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/glass_widgets.dart';
+import '../auth/login_screen.dart';
 import 'create_trip_screen.dart';
 import 'edit_trip_screen.dart';
+import 'real_trip_detail_screen.dart';
 import 'trip_companion_screen.dart';
 import 'trip_detail_screen.dart';
 import 'trip_sections.dart';
@@ -25,8 +26,11 @@ class TripsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final app = AppScope.of(context);
+    // Real Mode is fetch-backed and has its own loading/empty/error/refresh
+    // lifecycle; Demo Mode keeps the exact local behaviour below.
+    if (!app.demoMode) return const _RealTripsView();
     final l10n = AppLocalizations.of(context)!;
-    final visibleTrips = _visibleTrips(app);
+    final visibleTrips = app.trips;
     final grouped = groupTripsBySection(visibleTrips, today ?? DateTime.now());
 
     return ListView(
@@ -121,18 +125,231 @@ class TripsScreen extends StatelessWidget {
       ],
     );
   }
+}
 
-  List<Trip> _visibleTrips(AppState app) {
-    if (app.demoMode) return app.trips;
-    final seeded = app.trips.length == MockData.trips.length &&
-        app.trips.every(
-          (trip) => MockData.trips.any(
-            (seed) => seed.id == trip.id && seed.title == trip.title,
-          ),
+/// Real Mode trips tab — loads the authenticated user's trips from the backend
+/// with honest loading / empty / error / refresh / session-expired states.
+class _RealTripsView extends StatefulWidget {
+  const _RealTripsView();
+
+  @override
+  State<_RealTripsView> createState() => _RealTripsViewState();
+}
+
+class _RealTripsViewState extends State<_RealTripsView> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      AppScope.of(context).loadRealTrips();
+    });
+  }
+
+  Future<void> _refresh() => AppScope.of(context).loadRealTrips(refresh: true);
+
+  void _openCreate() => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const CreateTripScreen()),
+      );
+
+  void _reauth() {
+    showOceanSessionExpiredSheet(
+      context,
+      onLogin: () {
+        Navigator.of(context).pop();
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
         );
-    return seeded ? <Trip>[] : app.trips;
+      },
+      onReturnHome: () => Navigator.of(context).pop(),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final app = AppScope.of(context);
+    final l10n = AppLocalizations.of(context)!;
+
+    Widget content;
+    if (app.realTripsLoading && !app.realTripsLoaded) {
+      content = Padding(
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
+        child: OceanLoadingState(message: l10n.tripsRealLoadingMessage),
+      );
+    } else if (app.realTripsError != null && app.realTrips.isEmpty) {
+      final err = app.realTripsError!;
+      if (err == TripActionResult.sessionExpired) {
+        content = OceanEmptyState(
+          key: const Key('real-trips-session-expired'),
+          title: l10n.tripsRealSessionExpiredTitle,
+          message: l10n.tripsRealSessionExpiredMessage,
+          actionLabel: l10n.tripsRealSignInAction,
+          onAction: _reauth,
+        );
+      } else {
+        content = OceanRecoverableErrorState(
+          key: const Key('real-trips-error'),
+          message: err == TripActionResult.forbidden
+              ? l10n.tripRealPermissionDeniedMessage
+              : l10n.tripsRealErrorMessage,
+          onReload: () => app.loadRealTrips(refresh: true),
+        );
+      }
+    } else if (app.realTrips.isEmpty) {
+      content = OceanEmptyState(
+        key: const Key('real-trips-empty'),
+        title: l10n.tripsEmptyTitle,
+        message: l10n.tripsRealEmptyMessage,
+        actionLabel: l10n.tripsCreateAction,
+        onAction: _openCreate,
+      );
+    } else {
+      content = Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (final trip in app.realTrips)
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.md),
+              child: _RealTripCard(trip: trip),
+            ),
+        ],
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: _refresh,
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.lg,
+          AppSpacing.lg,
+          120,
+        ),
+        children: [
+          OceanContentConstraint(
+            maxWidth: AppBreakpoints.maxContentWidth,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.tripsTitle,
+                            style: Theme.of(context).textTheme.displaySmall,
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            l10n.tripsSubtitle,
+                            style: Theme.of(context).textTheme.bodyLarge,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Semantics(
+                      container: true,
+                      button: true,
+                      label: l10n.tripsCreateSemantic,
+                      child: IconButton.filled(
+                        tooltip: l10n.tripsCreateSemantic,
+                        onPressed: _openCreate,
+                        icon: const Icon(Icons.add_rounded),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                content,
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
+
+class _RealTripCard extends StatelessWidget {
+  final TripSummaryRecord trip;
+
+  const _RealTripCard({required this.trip});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context).toString();
+    final date = DateFormat.MMMd(locale);
+    final range = (trip.startDate != null && trip.endDate != null)
+        ? '${date.format(trip.startDate!)} – ${date.format(trip.endDate!)}'
+        : null;
+    return OceanGlassCard(
+      key: Key('real-trip-card-${trip.id}'),
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => RealTripDetailScreen(tripId: trip.id),
+        ),
+      ),
+      semanticLabel: l10n.tripCardSemantic(trip.title),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            trip.title,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.headlineMedium,
+          ),
+          if (range != null) ...[
+            const SizedBox(height: AppSpacing.xs),
+            Text(range, style: Theme.of(context).textTheme.bodyLarge),
+          ],
+          const SizedBox(height: AppSpacing.sm),
+          Wrap(
+            spacing: AppSpacing.xs,
+            runSpacing: AppSpacing.xs,
+            children: [
+              if (trip.destination != null && trip.destination!.isNotEmpty)
+                OceanStatusPill(
+                  label: trip.destination!,
+                  icon: Icons.place_rounded,
+                ),
+              OceanStatusPill(
+                label: l10n.tripDayCount(trip.dayCount),
+                icon: Icons.calendar_today_rounded,
+                color: AppColors.turquoise600,
+              ),
+              OceanStatusPill(
+                label: realTripStatusLabel(l10n, trip.status, trip.statusRaw),
+                icon: Icons.flag_rounded,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Localised label for a real trip status, falling back to the raw backend
+/// value for any status the client doesn't yet know (never fabricated).
+String realTripStatusLabel(
+  AppLocalizations l10n,
+  TripPlanStatusValue status,
+  String raw,
+) =>
+    switch (status) {
+      TripPlanStatusValue.planning => l10n.tripStatusPlanning,
+      TripPlanStatusValue.active => l10n.tripStatusActive,
+      TripPlanStatusValue.completed => l10n.tripStatusCompleted,
+      TripPlanStatusValue.cancelled => l10n.tripStatusCancelled,
+      TripPlanStatusValue.unknown => raw.isEmpty ? l10n.tripStatusUnknown : raw,
+    };
 
 class _SharedWithMeEntry extends StatelessWidget {
   final int count;

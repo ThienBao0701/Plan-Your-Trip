@@ -9741,6 +9741,204 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Couldn\'t load place details. Please try again.'**
   String get placeHydrationErrorMessage;
+
+  /// No description provided for @tripsRealLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading your trips…'**
+  String get tripsRealLoadingMessage;
+
+  /// No description provided for @tripsRealErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load your trips. Please try again.'**
+  String get tripsRealErrorMessage;
+
+  /// No description provided for @tripsRealEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t created any trips yet. Start planning your next adventure.'**
+  String get tripsRealEmptyMessage;
+
+  /// No description provided for @tripsRealSessionExpiredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Session expired'**
+  String get tripsRealSessionExpiredTitle;
+
+  /// No description provided for @tripsRealSessionExpiredMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Please sign in again to see your trips.'**
+  String get tripsRealSessionExpiredMessage;
+
+  /// No description provided for @tripsRealSignInAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get tripsRealSignInAction;
+
+  /// No description provided for @tripRealPermissionDeniedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have permission to do that.'**
+  String get tripRealPermissionDeniedMessage;
+
+  /// No description provided for @tripStatusPlanning.
+  ///
+  /// In en, this message translates to:
+  /// **'Planning'**
+  String get tripStatusPlanning;
+
+  /// No description provided for @tripStatusActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get tripStatusActive;
+
+  /// No description provided for @tripStatusCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get tripStatusCompleted;
+
+  /// No description provided for @tripStatusCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get tripStatusCancelled;
+
+  /// No description provided for @tripStatusUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip'**
+  String get tripStatusUnknown;
+
+  /// No description provided for @tripDayLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day}'**
+  String tripDayLabel(int day);
+
+  /// No description provided for @tripDetailRealTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip'**
+  String get tripDetailRealTitle;
+
+  /// No description provided for @tripDetailRealLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading trip details…'**
+  String get tripDetailRealLoadingMessage;
+
+  /// No description provided for @tripDetailRealUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip unavailable'**
+  String get tripDetailRealUnavailableTitle;
+
+  /// No description provided for @tripDetailRealUnavailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This trip is no longer available.'**
+  String get tripDetailRealUnavailableMessage;
+
+  /// No description provided for @tripDetailRealErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load this trip. Please try again.'**
+  String get tripDetailRealErrorMessage;
+
+  /// No description provided for @tripDetailRealEditDisabledNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Editing this itinerary isn\'t available yet.'**
+  String get tripDetailRealEditDisabledNote;
+
+  /// No description provided for @tripDetailRealNoDaysMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This trip doesn\'t have any days yet.'**
+  String get tripDetailRealNoDaysMessage;
+
+  /// No description provided for @tripDetailRealNoItemsMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No activities planned for this day yet.'**
+  String get tripDetailRealNoItemsMessage;
+
+  /// No description provided for @addToTripRealLoadingTrips.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading your trips…'**
+  String get addToTripRealLoadingTrips;
+
+  /// No description provided for @addToTripRealNoTripsMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have any trips yet. Create one to start adding places.'**
+  String get addToTripRealNoTripsMessage;
+
+  /// No description provided for @addToTripRealSelectTripLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a trip'**
+  String get addToTripRealSelectTripLabel;
+
+  /// No description provided for @addToTripRealSelectDayLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a day'**
+  String get addToTripRealSelectDayLabel;
+
+  /// No description provided for @addToTripRealNewDayOption.
+  ///
+  /// In en, this message translates to:
+  /// **'New day (Day {day})'**
+  String addToTripRealNewDayOption(int day);
+
+  /// No description provided for @addToTripRealPlanningNote.
+  ///
+  /// In en, this message translates to:
+  /// **'This adds the place to your trip plan. It isn\'t a booking.'**
+  String get addToTripRealPlanningNote;
+
+  /// No description provided for @addToTripRealAddingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Adding to your trip…'**
+  String get addToTripRealAddingMessage;
+
+  /// No description provided for @addToTripRealAddedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{place} was added to your trip.'**
+  String addToTripRealAddedMessage(String place);
+
+  /// No description provided for @addToTripRealErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t add this place. Please try again.'**
+  String get addToTripRealErrorMessage;
+
+  /// No description provided for @addToTripRealUnpublishedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This place can\'t be added to a trip right now.'**
+  String get addToTripRealUnpublishedMessage;
+
+  /// No description provided for @addToTripRealTripUnavailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'That trip or place is no longer available.'**
+  String get addToTripRealTripUnavailableMessage;
+
+  /// No description provided for @createTripRealErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t create your trip. Please try again.'**
+  String get createTripRealErrorMessage;
 }
 
 class _AppLocalizationsDelegate

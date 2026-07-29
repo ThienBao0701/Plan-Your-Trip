@@ -13,6 +13,7 @@ enum ApiErrorKind {
   network,
   timeout,
   unauthorized,
+  forbidden,
   notFound,
   conflict,
   validation,
@@ -138,6 +139,7 @@ class ApiClient {
   ApiErrorKind _errorKindForStatus(int statusCode) {
     if (statusCode == 400) return ApiErrorKind.validation;
     if (statusCode == 401) return ApiErrorKind.unauthorized;
+    if (statusCode == 403) return ApiErrorKind.forbidden;
     if (statusCode == 404) return ApiErrorKind.notFound;
     if (statusCode == 409) return ApiErrorKind.conflict;
     if (statusCode == 422) return ApiErrorKind.unprocessable;
@@ -520,6 +522,195 @@ class ApiClient {
       return const CollectionApiVoidResult.failure(ApiErrorKind.malformed);
     } catch (_) {
       return const CollectionApiVoidResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  // ── Trips (/api/me/trips, UI-20 TripPlan planner) ───────────────────────
+  //
+  // Reuses the Saved Collections typed-result infrastructure. Every endpoint is
+  // JWT-authenticated. Creates return 201; a 403 (collaborator without edit
+  // rights) maps to ApiErrorKind.forbidden, kept distinct from 401 so callers
+  // show a permission error rather than the session-expired sheet.
+
+  static String _isoDate(DateTime d) => '${d.year.toString().padLeft(4, '0')}-'
+      '${d.month.toString().padLeft(2, '0')}-'
+      '${d.day.toString().padLeft(2, '0')}';
+
+  Future<CollectionApiResult<List<TripSummaryRecord>>> getMyTrips() async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/me/trips'), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final decoded = jsonDecode(utf8.decode(res.bodyBytes));
+        if (decoded is! List) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(
+          decoded
+              .map((e) => TripSummaryRecord.fromJson(e as Map<String, dynamic>))
+              .toList(),
+        );
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  Future<CollectionApiResult<TripDetailRecord>> getTripDetail(
+    int tripId,
+  ) async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/me/trips/$tripId'), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(TripDetailRecord.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  Future<CollectionApiResult<TripDetailRecord>> createTrip({
+    required String title,
+    String? description,
+    String? destination,
+    required DateTime startDate,
+    required DateTime endDate,
+  }) async {
+    try {
+      final res = await _client
+          .post(
+            Uri.parse('$baseUrl/me/trips'),
+            headers: _jsonHeaders,
+            body: jsonEncode({
+              'title': title,
+              'description': description,
+              'destination': destination,
+              'startDate': _isoDate(startDate),
+              'endDate': _isoDate(endDate),
+              'isPublic': false,
+            }),
+          )
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(TripDetailRecord.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  Future<CollectionApiResult<TripDayRecord>> createTripDay({
+    required int tripId,
+    required int dayNumber,
+    DateTime? date,
+    String? title,
+  }) async {
+    try {
+      final res = await _client
+          .post(
+            Uri.parse('$baseUrl/me/trips/$tripId/days'),
+            headers: _jsonHeaders,
+            body: jsonEncode({
+              'dayNumber': dayNumber,
+              'date': date == null ? null : _isoDate(date),
+              'title': title,
+            }),
+          )
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(TripDayRecord.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  Future<CollectionApiResult<TripItemRecord>> addTripItem({
+    required int dayId,
+    required int placeId,
+  }) async {
+    try {
+      final res = await _client
+          .post(
+            Uri.parse('$baseUrl/me/trips/days/$dayId/items'),
+            headers: _jsonHeaders,
+            body: jsonEncode({'placeId': placeId}),
+          )
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(TripItemRecord.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
     }
   }
 

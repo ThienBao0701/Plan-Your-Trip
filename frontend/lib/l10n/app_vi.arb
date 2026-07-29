@@ -3034,5 +3034,59 @@
     }
   },
   "placeHydrationUnavailableMessage": "Địa điểm này không còn khả dụng.",
-  "placeHydrationErrorMessage": "Không thể tải chi tiết địa điểm. Vui lòng thử lại."
+  "placeHydrationErrorMessage": "Không thể tải chi tiết địa điểm. Vui lòng thử lại.",
+  "tripsRealLoadingMessage": "Đang tải chuyến đi của bạn…",
+  "tripsRealErrorMessage": "Không thể tải chuyến đi của bạn. Vui lòng thử lại.",
+  "tripsRealEmptyMessage": "Bạn chưa tạo chuyến đi nào. Hãy bắt đầu lên kế hoạch cho hành trình tiếp theo.",
+  "tripsRealSessionExpiredTitle": "Phiên đăng nhập đã hết hạn",
+  "tripsRealSessionExpiredMessage": "Vui lòng đăng nhập lại để xem chuyến đi của bạn.",
+  "tripsRealSignInAction": "Đăng nhập",
+  "tripRealPermissionDeniedMessage": "Bạn không có quyền thực hiện thao tác này.",
+  "tripStatusPlanning": "Đang lên kế hoạch",
+  "tripStatusActive": "Đang diễn ra",
+  "tripStatusCompleted": "Đã hoàn thành",
+  "tripStatusCancelled": "Đã hủy",
+  "tripStatusUnknown": "Chuyến đi",
+  "tripDayLabel": "Ngày {day}",
+  "@tripDayLabel": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "tripDetailRealTitle": "Chuyến đi",
+  "tripDetailRealLoadingMessage": "Đang tải chi tiết chuyến đi…",
+  "tripDetailRealUnavailableTitle": "Chuyến đi không khả dụng",
+  "tripDetailRealUnavailableMessage": "Chuyến đi này không còn khả dụng.",
+  "tripDetailRealErrorMessage": "Không thể tải chuyến đi này. Vui lòng thử lại.",
+  "tripDetailRealEditDisabledNote": "Chưa thể chỉnh sửa lịch trình này.",
+  "tripDetailRealNoDaysMessage": "Chuyến đi này chưa có ngày nào.",
+  "tripDetailRealNoItemsMessage": "Chưa có hoạt động nào cho ngày này.",
+  "addToTripRealLoadingTrips": "Đang tải chuyến đi của bạn…",
+  "addToTripRealNoTripsMessage": "Bạn chưa có chuyến đi nào. Hãy tạo một chuyến để bắt đầu thêm địa điểm.",
+  "addToTripRealSelectTripLabel": "Chọn chuyến đi",
+  "addToTripRealSelectDayLabel": "Chọn ngày",
+  "addToTripRealNewDayOption": "Ngày mới (Ngày {day})",
+  "@addToTripRealNewDayOption": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "addToTripRealPlanningNote": "Thao tác này thêm địa điểm vào kế hoạch chuyến đi. Đây không phải là đặt chỗ.",
+  "addToTripRealAddingMessage": "Đang thêm vào chuyến đi…",
+  "addToTripRealAddedMessage": "Đã thêm {place} vào chuyến đi của bạn.",
+  "@addToTripRealAddedMessage": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "addToTripRealErrorMessage": "Không thể thêm địa điểm này. Vui lòng thử lại.",
+  "addToTripRealUnpublishedMessage": "Hiện chưa thể thêm địa điểm này vào chuyến đi.",
+  "addToTripRealTripUnavailableMessage": "Chuyến đi hoặc địa điểm đó không còn khả dụng.",
+  "createTripRealErrorMessage": "Không thể tạo chuyến đi của bạn. Vui lòng thử lại."
 }
