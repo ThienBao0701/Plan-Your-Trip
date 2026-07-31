@@ -5949,4 +5949,294 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get availabilityRealInstantConfirmation => 'Instant confirmation';
+
+  @override
+  String get placeDetailRealLoadingMessage => 'Loading place details…';
+
+  @override
+  String get placeDetailRealErrorMessage =>
+      'We couldn\'t load this place. Please try again.';
+
+  @override
+  String get placeDetailRealNotFoundMessage =>
+      'This place is no longer available.';
+
+  @override
+  String placeGallerySemantic(String name, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count images',
+      one: '1 image',
+    );
+    return 'Photo gallery for $name, $_temp0';
+  }
+
+  @override
+  String get placeGalleryClose => 'Close photo';
+
+  @override
+  String get placeOpenNow => 'Open now';
+
+  @override
+  String get placeClosedNow => 'Closed now';
+
+  @override
+  String get placeOpeningHoursTitle => 'Opening hours';
+
+  @override
+  String get placeOpeningHoursClosed => 'Closed';
+
+  @override
+  String get placeCoordinatesTitle => 'Location';
+
+  @override
+  String placeCoordinatesValue(String lat, String long) {
+    return '$lat, $long';
+  }
+
+  @override
+  String get placeAmenitiesTitle => 'Amenities';
+
+  @override
+  String get placeMetadataTitle => 'Good to know';
+
+  @override
+  String get metadataVisitDurationTitle => 'Suggested visit';
+
+  @override
+  String get metadataTravelStylesTitle => 'Travel styles';
+
+  @override
+  String get metadataBestSeasonsTitle => 'Best seasons';
+
+  @override
+  String get metadataBestVisitTimesTitle => 'Best time of day';
+
+  @override
+  String get metadataWeatherTitle => 'Weather';
+
+  @override
+  String get metadataBudgetTitle => 'Budget';
+
+  @override
+  String get metadataDifficultyTitle => 'Difficulty';
+
+  @override
+  String get metadataAccessibilityTitle => 'Accessibility';
+
+  @override
+  String get metadataCrowdTitle => 'Crowd level';
+
+  @override
+  String get metadataHighlightsTitle => 'Highlights';
+
+  @override
+  String get metadataNotesTitle => 'Notes';
+
+  @override
+  String get travelStyleSolo => 'Solo';
+
+  @override
+  String get travelStyleCouple => 'Couple';
+
+  @override
+  String get travelStyleFamily => 'Family';
+
+  @override
+  String get travelStyleFriends => 'Friends';
+
+  @override
+  String get travelStyleBusiness => 'Business';
+
+  @override
+  String get travelStyleBackpacker => 'Backpacker';
+
+  @override
+  String get travelStyleLuxury => 'Luxury';
+
+  @override
+  String get bestVisitTimeEarlyMorning => 'Early morning';
+
+  @override
+  String get bestVisitTimeMorning => 'Morning';
+
+  @override
+  String get bestVisitTimeAfternoon => 'Afternoon';
+
+  @override
+  String get bestVisitTimeSunset => 'Sunset';
+
+  @override
+  String get bestVisitTimeEvening => 'Evening';
+
+  @override
+  String get bestVisitTimeNight => 'Night';
+
+  @override
+  String get bestSeasonSpring => 'Spring';
+
+  @override
+  String get bestSeasonSummer => 'Summer';
+
+  @override
+  String get bestSeasonAutumn => 'Autumn';
+
+  @override
+  String get bestSeasonWinter => 'Winter';
+
+  @override
+  String get bestSeasonAllYear => 'All year';
+
+  @override
+  String get weatherSunny => 'Sunny';
+
+  @override
+  String get weatherCloudy => 'Cloudy';
+
+  @override
+  String get weatherRainy => 'Rainy';
+
+  @override
+  String get weatherCool => 'Cool';
+
+  @override
+  String get weatherAny => 'Any weather';
+
+  @override
+  String get budgetFree => 'Free';
+
+  @override
+  String get budgetLow => 'Low budget';
+
+  @override
+  String get budgetMedium => 'Mid-range';
+
+  @override
+  String get budgetHigh => 'High-end';
+
+  @override
+  String get budgetLuxury => 'Luxury';
+
+  @override
+  String get difficultyEasy => 'Easy';
+
+  @override
+  String get difficultyModerate => 'Moderate';
+
+  @override
+  String get difficultyHard => 'Hard';
+
+  @override
+  String get accessibilityLow => 'Limited access';
+
+  @override
+  String get accessibilityMedium => 'Moderate access';
+
+  @override
+  String get accessibilityHigh => 'Fully accessible';
+
+  @override
+  String get crowdLow => 'Quiet';
+
+  @override
+  String get crowdMedium => 'Moderate crowd';
+
+  @override
+  String get crowdHigh => 'Busy';
+
+  @override
+  String get flagRomantic => 'Romantic';
+
+  @override
+  String get flagFamilyFriendly => 'Family-friendly';
+
+  @override
+  String get flagKidFriendly => 'Kid-friendly';
+
+  @override
+  String get flagPetFriendly => 'Pet-friendly';
+
+  @override
+  String get flagWheelchairFriendly => 'Wheelchair-friendly';
+
+  @override
+  String get flagPhotographySpot => 'Photography spot';
+
+  @override
+  String get flagSunsetSpot => 'Sunset spot';
+
+  @override
+  String get flagSunriseSpot => 'Sunrise spot';
+
+  @override
+  String get flagIndoor => 'Indoor';
+
+  @override
+  String get flagOutdoor => 'Outdoor';
+
+  @override
+  String get flagRainyDaySuitable => 'Rainy-day friendly';
+
+  @override
+  String get facilityGroupGeneral => 'General';
+
+  @override
+  String get facilityGroupWellness => 'Wellness';
+
+  @override
+  String get facilityGroupBusiness => 'Business';
+
+  @override
+  String get facilityGroupFood => 'Food & drink';
+
+  @override
+  String get facilityGroupOutdoor => 'Outdoor';
+
+  @override
+  String get facilityGroupFamily => 'Family';
+
+  @override
+  String get facilityGroupAccessibility => 'Accessibility';
+
+  @override
+  String get hotelPoliciesTitle => 'Policies';
+
+  @override
+  String get hotelPolicyCancellation => 'Cancellation';
+
+  @override
+  String get hotelPolicyPayment => 'Payment';
+
+  @override
+  String get hotelPolicyChildren => 'Children';
+
+  @override
+  String get hotelPolicyPet => 'Pets';
+
+  @override
+  String get hotelPolicySmoking => 'Smoking';
+
+  @override
+  String get hotelParkingFree => 'Free parking';
+
+  @override
+  String get hotelParkingPaid => 'Paid parking';
+
+  @override
+  String get hotelParkingUnavailable => 'No parking';
+
+  @override
+  String get hotelWifiFree => 'Free Wi-Fi';
+
+  @override
+  String get hotelWifiPaid => 'Paid Wi-Fi';
+
+  @override
+  String get hotelWifiUnavailable => 'No Wi-Fi';
+
+  @override
+  String hotelServiceUnavailable(String service) {
+    return '$service (unavailable)';
+  }
 }

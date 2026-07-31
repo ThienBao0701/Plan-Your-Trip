@@ -10095,6 +10095,558 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Instant confirmation'**
   String get availabilityRealInstantConfirmation;
+
+  /// No description provided for @placeDetailRealLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading place details…'**
+  String get placeDetailRealLoadingMessage;
+
+  /// No description provided for @placeDetailRealErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load this place. Please try again.'**
+  String get placeDetailRealErrorMessage;
+
+  /// No description provided for @placeDetailRealNotFoundMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This place is no longer available.'**
+  String get placeDetailRealNotFoundMessage;
+
+  /// No description provided for @placeGallerySemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo gallery for {name}, {count, plural, =1{1 image} other{{count} images}}'**
+  String placeGallerySemantic(String name, int count);
+
+  /// No description provided for @placeGalleryClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close photo'**
+  String get placeGalleryClose;
+
+  /// No description provided for @placeOpenNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Open now'**
+  String get placeOpenNow;
+
+  /// No description provided for @placeClosedNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed now'**
+  String get placeClosedNow;
+
+  /// No description provided for @placeOpeningHoursTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening hours'**
+  String get placeOpeningHoursTitle;
+
+  /// No description provided for @placeOpeningHoursClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed'**
+  String get placeOpeningHoursClosed;
+
+  /// No description provided for @placeCoordinatesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get placeCoordinatesTitle;
+
+  /// No description provided for @placeCoordinatesValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{lat}, {long}'**
+  String placeCoordinatesValue(String lat, String long);
+
+  /// No description provided for @placeAmenitiesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Amenities'**
+  String get placeAmenitiesTitle;
+
+  /// No description provided for @placeMetadataTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Good to know'**
+  String get placeMetadataTitle;
+
+  /// No description provided for @metadataVisitDurationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggested visit'**
+  String get metadataVisitDurationTitle;
+
+  /// No description provided for @metadataTravelStylesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Travel styles'**
+  String get metadataTravelStylesTitle;
+
+  /// No description provided for @metadataBestSeasonsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Best seasons'**
+  String get metadataBestSeasonsTitle;
+
+  /// No description provided for @metadataBestVisitTimesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Best time of day'**
+  String get metadataBestVisitTimesTitle;
+
+  /// No description provided for @metadataWeatherTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weather'**
+  String get metadataWeatherTitle;
+
+  /// No description provided for @metadataBudgetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget'**
+  String get metadataBudgetTitle;
+
+  /// No description provided for @metadataDifficultyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Difficulty'**
+  String get metadataDifficultyTitle;
+
+  /// No description provided for @metadataAccessibilityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Accessibility'**
+  String get metadataAccessibilityTitle;
+
+  /// No description provided for @metadataCrowdTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Crowd level'**
+  String get metadataCrowdTitle;
+
+  /// No description provided for @metadataHighlightsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Highlights'**
+  String get metadataHighlightsTitle;
+
+  /// No description provided for @metadataNotesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get metadataNotesTitle;
+
+  /// No description provided for @travelStyleSolo.
+  ///
+  /// In en, this message translates to:
+  /// **'Solo'**
+  String get travelStyleSolo;
+
+  /// No description provided for @travelStyleCouple.
+  ///
+  /// In en, this message translates to:
+  /// **'Couple'**
+  String get travelStyleCouple;
+
+  /// No description provided for @travelStyleFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Family'**
+  String get travelStyleFamily;
+
+  /// No description provided for @travelStyleFriends.
+  ///
+  /// In en, this message translates to:
+  /// **'Friends'**
+  String get travelStyleFriends;
+
+  /// No description provided for @travelStyleBusiness.
+  ///
+  /// In en, this message translates to:
+  /// **'Business'**
+  String get travelStyleBusiness;
+
+  /// No description provided for @travelStyleBackpacker.
+  ///
+  /// In en, this message translates to:
+  /// **'Backpacker'**
+  String get travelStyleBackpacker;
+
+  /// No description provided for @travelStyleLuxury.
+  ///
+  /// In en, this message translates to:
+  /// **'Luxury'**
+  String get travelStyleLuxury;
+
+  /// No description provided for @bestVisitTimeEarlyMorning.
+  ///
+  /// In en, this message translates to:
+  /// **'Early morning'**
+  String get bestVisitTimeEarlyMorning;
+
+  /// No description provided for @bestVisitTimeMorning.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning'**
+  String get bestVisitTimeMorning;
+
+  /// No description provided for @bestVisitTimeAfternoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Afternoon'**
+  String get bestVisitTimeAfternoon;
+
+  /// No description provided for @bestVisitTimeSunset.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunset'**
+  String get bestVisitTimeSunset;
+
+  /// No description provided for @bestVisitTimeEvening.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening'**
+  String get bestVisitTimeEvening;
+
+  /// No description provided for @bestVisitTimeNight.
+  ///
+  /// In en, this message translates to:
+  /// **'Night'**
+  String get bestVisitTimeNight;
+
+  /// No description provided for @bestSeasonSpring.
+  ///
+  /// In en, this message translates to:
+  /// **'Spring'**
+  String get bestSeasonSpring;
+
+  /// No description provided for @bestSeasonSummer.
+  ///
+  /// In en, this message translates to:
+  /// **'Summer'**
+  String get bestSeasonSummer;
+
+  /// No description provided for @bestSeasonAutumn.
+  ///
+  /// In en, this message translates to:
+  /// **'Autumn'**
+  String get bestSeasonAutumn;
+
+  /// No description provided for @bestSeasonWinter.
+  ///
+  /// In en, this message translates to:
+  /// **'Winter'**
+  String get bestSeasonWinter;
+
+  /// No description provided for @bestSeasonAllYear.
+  ///
+  /// In en, this message translates to:
+  /// **'All year'**
+  String get bestSeasonAllYear;
+
+  /// No description provided for @weatherSunny.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunny'**
+  String get weatherSunny;
+
+  /// No description provided for @weatherCloudy.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloudy'**
+  String get weatherCloudy;
+
+  /// No description provided for @weatherRainy.
+  ///
+  /// In en, this message translates to:
+  /// **'Rainy'**
+  String get weatherRainy;
+
+  /// No description provided for @weatherCool.
+  ///
+  /// In en, this message translates to:
+  /// **'Cool'**
+  String get weatherCool;
+
+  /// No description provided for @weatherAny.
+  ///
+  /// In en, this message translates to:
+  /// **'Any weather'**
+  String get weatherAny;
+
+  /// No description provided for @budgetFree.
+  ///
+  /// In en, this message translates to:
+  /// **'Free'**
+  String get budgetFree;
+
+  /// No description provided for @budgetLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Low budget'**
+  String get budgetLow;
+
+  /// No description provided for @budgetMedium.
+  ///
+  /// In en, this message translates to:
+  /// **'Mid-range'**
+  String get budgetMedium;
+
+  /// No description provided for @budgetHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'High-end'**
+  String get budgetHigh;
+
+  /// No description provided for @budgetLuxury.
+  ///
+  /// In en, this message translates to:
+  /// **'Luxury'**
+  String get budgetLuxury;
+
+  /// No description provided for @difficultyEasy.
+  ///
+  /// In en, this message translates to:
+  /// **'Easy'**
+  String get difficultyEasy;
+
+  /// No description provided for @difficultyModerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderate'**
+  String get difficultyModerate;
+
+  /// No description provided for @difficultyHard.
+  ///
+  /// In en, this message translates to:
+  /// **'Hard'**
+  String get difficultyHard;
+
+  /// No description provided for @accessibilityLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Limited access'**
+  String get accessibilityLow;
+
+  /// No description provided for @accessibilityMedium.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderate access'**
+  String get accessibilityMedium;
+
+  /// No description provided for @accessibilityHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'Fully accessible'**
+  String get accessibilityHigh;
+
+  /// No description provided for @crowdLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Quiet'**
+  String get crowdLow;
+
+  /// No description provided for @crowdMedium.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderate crowd'**
+  String get crowdMedium;
+
+  /// No description provided for @crowdHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'Busy'**
+  String get crowdHigh;
+
+  /// No description provided for @flagRomantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Romantic'**
+  String get flagRomantic;
+
+  /// No description provided for @flagFamilyFriendly.
+  ///
+  /// In en, this message translates to:
+  /// **'Family-friendly'**
+  String get flagFamilyFriendly;
+
+  /// No description provided for @flagKidFriendly.
+  ///
+  /// In en, this message translates to:
+  /// **'Kid-friendly'**
+  String get flagKidFriendly;
+
+  /// No description provided for @flagPetFriendly.
+  ///
+  /// In en, this message translates to:
+  /// **'Pet-friendly'**
+  String get flagPetFriendly;
+
+  /// No description provided for @flagWheelchairFriendly.
+  ///
+  /// In en, this message translates to:
+  /// **'Wheelchair-friendly'**
+  String get flagWheelchairFriendly;
+
+  /// No description provided for @flagPhotographySpot.
+  ///
+  /// In en, this message translates to:
+  /// **'Photography spot'**
+  String get flagPhotographySpot;
+
+  /// No description provided for @flagSunsetSpot.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunset spot'**
+  String get flagSunsetSpot;
+
+  /// No description provided for @flagSunriseSpot.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunrise spot'**
+  String get flagSunriseSpot;
+
+  /// No description provided for @flagIndoor.
+  ///
+  /// In en, this message translates to:
+  /// **'Indoor'**
+  String get flagIndoor;
+
+  /// No description provided for @flagOutdoor.
+  ///
+  /// In en, this message translates to:
+  /// **'Outdoor'**
+  String get flagOutdoor;
+
+  /// No description provided for @flagRainyDaySuitable.
+  ///
+  /// In en, this message translates to:
+  /// **'Rainy-day friendly'**
+  String get flagRainyDaySuitable;
+
+  /// No description provided for @facilityGroupGeneral.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get facilityGroupGeneral;
+
+  /// No description provided for @facilityGroupWellness.
+  ///
+  /// In en, this message translates to:
+  /// **'Wellness'**
+  String get facilityGroupWellness;
+
+  /// No description provided for @facilityGroupBusiness.
+  ///
+  /// In en, this message translates to:
+  /// **'Business'**
+  String get facilityGroupBusiness;
+
+  /// No description provided for @facilityGroupFood.
+  ///
+  /// In en, this message translates to:
+  /// **'Food & drink'**
+  String get facilityGroupFood;
+
+  /// No description provided for @facilityGroupOutdoor.
+  ///
+  /// In en, this message translates to:
+  /// **'Outdoor'**
+  String get facilityGroupOutdoor;
+
+  /// No description provided for @facilityGroupFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Family'**
+  String get facilityGroupFamily;
+
+  /// No description provided for @facilityGroupAccessibility.
+  ///
+  /// In en, this message translates to:
+  /// **'Accessibility'**
+  String get facilityGroupAccessibility;
+
+  /// No description provided for @hotelPoliciesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Policies'**
+  String get hotelPoliciesTitle;
+
+  /// No description provided for @hotelPolicyCancellation.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancellation'**
+  String get hotelPolicyCancellation;
+
+  /// No description provided for @hotelPolicyPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment'**
+  String get hotelPolicyPayment;
+
+  /// No description provided for @hotelPolicyChildren.
+  ///
+  /// In en, this message translates to:
+  /// **'Children'**
+  String get hotelPolicyChildren;
+
+  /// No description provided for @hotelPolicyPet.
+  ///
+  /// In en, this message translates to:
+  /// **'Pets'**
+  String get hotelPolicyPet;
+
+  /// No description provided for @hotelPolicySmoking.
+  ///
+  /// In en, this message translates to:
+  /// **'Smoking'**
+  String get hotelPolicySmoking;
+
+  /// No description provided for @hotelParkingFree.
+  ///
+  /// In en, this message translates to:
+  /// **'Free parking'**
+  String get hotelParkingFree;
+
+  /// No description provided for @hotelParkingPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid parking'**
+  String get hotelParkingPaid;
+
+  /// No description provided for @hotelParkingUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No parking'**
+  String get hotelParkingUnavailable;
+
+  /// No description provided for @hotelWifiFree.
+  ///
+  /// In en, this message translates to:
+  /// **'Free Wi-Fi'**
+  String get hotelWifiFree;
+
+  /// No description provided for @hotelWifiPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid Wi-Fi'**
+  String get hotelWifiPaid;
+
+  /// No description provided for @hotelWifiUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No Wi-Fi'**
+  String get hotelWifiUnavailable;
+
+  /// No description provided for @hotelServiceUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'{service} (unavailable)'**
+  String hotelServiceUnavailable(String service);
 }
 
 class _AppLocalizationsDelegate

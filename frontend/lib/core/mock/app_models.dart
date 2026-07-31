@@ -597,6 +597,393 @@ class PlaceOpeningHourGroupRecord {
       );
 }
 
+/// One gallery image from `PlaceDetailResponse.galleryImages` (backed by the
+/// MediaAsset table, pre-sorted by `sortOrder`). Real-Mode only — the Demo
+/// [Place] keeps just a single `imageUrl`.
+class PlaceGalleryImageRecord {
+  final int id;
+  final String url;
+  final String? thumbnailUrl;
+  final String? altText;
+  final int sortOrder;
+  final bool cover;
+
+  const PlaceGalleryImageRecord({
+    required this.id,
+    required this.url,
+    this.thumbnailUrl,
+    this.altText,
+    this.sortOrder = 0,
+    this.cover = false,
+  });
+
+  factory PlaceGalleryImageRecord.fromJson(Map<String, dynamic> json) =>
+      PlaceGalleryImageRecord(
+        id: (json['id'] as num?)?.toInt() ?? 0,
+        url: (json['url'] as String?) ?? '',
+        thumbnailUrl: json['thumbnailUrl'] as String?,
+        altText: json['altText'] as String?,
+        sortOrder: (json['sortOrder'] as num?)?.toInt() ?? 0,
+        cover: (json['cover'] as bool?) ?? false,
+      );
+}
+
+/// One place-level amenity from `PlaceDetailResponse.amenities` (`AmenityRef`).
+class PlaceAmenityRecord {
+  final int id;
+  final String name;
+  final String? slug;
+  final String? icon;
+  final String? groupName;
+
+  const PlaceAmenityRecord({
+    required this.id,
+    required this.name,
+    this.slug,
+    this.icon,
+    this.groupName,
+  });
+
+  factory PlaceAmenityRecord.fromJson(Map<String, dynamic> json) =>
+      PlaceAmenityRecord(
+        id: (json['id'] as num?)?.toInt() ?? 0,
+        name: (json['name'] as String?) ?? '',
+        slug: json['slug'] as String?,
+        icon: json['icon'] as String?,
+        groupName: json['groupName'] as String?,
+      );
+}
+
+/// Real-Mode mirror of the nullable `PlaceMetadataResponse`. Enum values are
+/// kept as raw UPPER-CASE strings; the UI maps them to localized labels.
+/// Nothing is fabricated — absent fields stay null/empty and the detail screen
+/// hides the section when [isEmpty].
+class PlaceMetadataRecord {
+  final List<String> travelStyles;
+  final List<String> bestVisitTimes;
+  final List<String> bestSeasons;
+  final List<String> weatherTypes;
+  final int? estimatedVisitMinutes;
+  final String? budgetLevel;
+  final String? difficultyLevel;
+  final String? accessibilityLevel;
+  final String? crowdLevel;
+  final bool romantic;
+  final bool familyFriendly;
+  final bool kidFriendly;
+  final bool petFriendly;
+  final bool wheelchairFriendly;
+  final bool photographySpot;
+  final bool sunsetSpot;
+  final bool sunriseSpot;
+  final bool indoor;
+  final bool outdoor;
+  final bool rainyDaySuitable;
+  final String? notes;
+
+  const PlaceMetadataRecord({
+    this.travelStyles = const [],
+    this.bestVisitTimes = const [],
+    this.bestSeasons = const [],
+    this.weatherTypes = const [],
+    this.estimatedVisitMinutes,
+    this.budgetLevel,
+    this.difficultyLevel,
+    this.accessibilityLevel,
+    this.crowdLevel,
+    this.romantic = false,
+    this.familyFriendly = false,
+    this.kidFriendly = false,
+    this.petFriendly = false,
+    this.wheelchairFriendly = false,
+    this.photographySpot = false,
+    this.sunsetSpot = false,
+    this.sunriseSpot = false,
+    this.indoor = false,
+    this.outdoor = false,
+    this.rainyDaySuitable = false,
+    this.notes,
+  });
+
+  factory PlaceMetadataRecord.fromJson(Map<String, dynamic> json) {
+    List<String> enumList(Object? raw) => (raw as List<dynamic>? ?? const [])
+        .map((e) => e?.toString().trim() ?? '')
+        .where((e) => e.isNotEmpty)
+        .toList();
+    return PlaceMetadataRecord(
+      travelStyles: enumList(json['travelStyles']),
+      bestVisitTimes: enumList(json['bestVisitTimes']),
+      bestSeasons: enumList(json['bestSeasons']),
+      weatherTypes: enumList(json['weatherTypes']),
+      estimatedVisitMinutes: (json['estimatedVisitMinutes'] as num?)?.toInt(),
+      budgetLevel: json['estimatedBudgetLevel'] as String?,
+      difficultyLevel: json['difficultyLevel'] as String?,
+      accessibilityLevel: json['accessibilityLevel'] as String?,
+      crowdLevel: json['crowdLevel'] as String?,
+      romantic: (json['romantic'] as bool?) ?? false,
+      familyFriendly: (json['familyFriendly'] as bool?) ?? false,
+      kidFriendly: (json['kidFriendly'] as bool?) ?? false,
+      petFriendly: (json['petFriendly'] as bool?) ?? false,
+      wheelchairFriendly: (json['wheelchairFriendly'] as bool?) ?? false,
+      photographySpot: (json['photographySpot'] as bool?) ?? false,
+      sunsetSpot: (json['sunsetSpot'] as bool?) ?? false,
+      sunriseSpot: (json['sunriseSpot'] as bool?) ?? false,
+      indoor: (json['indoor'] as bool?) ?? false,
+      outdoor: (json['outdoor'] as bool?) ?? false,
+      rainyDaySuitable: (json['rainyDaySuitable'] as bool?) ?? false,
+      notes: json['notes'] as String?,
+    );
+  }
+
+  /// The subset of boolean characteristic flags that are `true`, as raw keys
+  /// the UI maps to localized labels. Order is stable for deterministic render.
+  List<String> get activeFlags {
+    final flags = <String>[];
+    if (romantic) flags.add('romantic');
+    if (familyFriendly) flags.add('familyFriendly');
+    if (kidFriendly) flags.add('kidFriendly');
+    if (petFriendly) flags.add('petFriendly');
+    if (wheelchairFriendly) flags.add('wheelchairFriendly');
+    if (photographySpot) flags.add('photographySpot');
+    if (sunsetSpot) flags.add('sunsetSpot');
+    if (sunriseSpot) flags.add('sunriseSpot');
+    if (indoor) flags.add('indoor');
+    if (outdoor) flags.add('outdoor');
+    if (rainyDaySuitable) flags.add('rainyDaySuitable');
+    return flags;
+  }
+
+  bool get isEmpty =>
+      travelStyles.isEmpty &&
+      bestVisitTimes.isEmpty &&
+      bestSeasons.isEmpty &&
+      weatherTypes.isEmpty &&
+      estimatedVisitMinutes == null &&
+      budgetLevel == null &&
+      difficultyLevel == null &&
+      accessibilityLevel == null &&
+      crowdLevel == null &&
+      activeFlags.isEmpty &&
+      (notes == null || notes!.trim().isEmpty);
+}
+
+/// One hotel facility from `hotelDetail.facilities` (`FacilityResponse`) — keeps
+/// the `facilityGroup` the collapsed demo [HotelDetail] discards.
+class HotelFacilityRecord {
+  final int id;
+  final String facilityName;
+  final String? facilityGroup;
+  final String? icon;
+  final int sortOrder;
+
+  const HotelFacilityRecord({
+    required this.id,
+    required this.facilityName,
+    this.facilityGroup,
+    this.icon,
+    this.sortOrder = 0,
+  });
+
+  factory HotelFacilityRecord.fromJson(Map<String, dynamic> json) =>
+      HotelFacilityRecord(
+        id: (json['id'] as num?)?.toInt() ?? 0,
+        facilityName: (json['facilityName'] as String?) ?? '',
+        facilityGroup: json['facilityGroup'] as String?,
+        icon: json['icon'] as String?,
+        sortOrder: (json['sortOrder'] as num?)?.toInt() ?? 0,
+      );
+}
+
+/// One hotel service from `hotelDetail.services` (`ServiceResponse`) — keeps the
+/// `available` flag the collapsed demo [HotelDetail] discards.
+class HotelServiceRecord {
+  final int id;
+  final String serviceName;
+  final String? icon;
+  final bool available;
+
+  const HotelServiceRecord({
+    required this.id,
+    required this.serviceName,
+    this.icon,
+    this.available = true,
+  });
+
+  factory HotelServiceRecord.fromJson(Map<String, dynamic> json) =>
+      HotelServiceRecord(
+        id: (json['id'] as num?)?.toInt() ?? 0,
+        serviceName: (json['serviceName'] as String?) ?? '',
+        icon: json['icon'] as String?,
+        available: (json['available'] as bool?) ?? true,
+      );
+}
+
+/// Parking info from `hotelDetail.parking` (`ParkingInfo`).
+class HotelParkingRecord {
+  final bool available;
+  final bool free;
+  final String? description;
+
+  const HotelParkingRecord({
+    this.available = false,
+    this.free = false,
+    this.description,
+  });
+
+  factory HotelParkingRecord.fromJson(Map<String, dynamic> json) =>
+      HotelParkingRecord(
+        available: (json['parkingAvailable'] as bool?) ?? false,
+        free: (json['parkingFree'] as bool?) ?? false,
+        description: json['parkingDescription'] as String?,
+      );
+
+  bool get hasInfo =>
+      available || free || (description?.trim().isNotEmpty ?? false);
+}
+
+/// Internet info from `hotelDetail.internet` (`InternetInfo`).
+class HotelInternetRecord {
+  final bool wifiAvailable;
+  final bool wifiFree;
+  final String? description;
+
+  const HotelInternetRecord({
+    this.wifiAvailable = false,
+    this.wifiFree = false,
+    this.description,
+  });
+
+  factory HotelInternetRecord.fromJson(Map<String, dynamic> json) =>
+      HotelInternetRecord(
+        wifiAvailable: (json['wifiAvailable'] as bool?) ?? false,
+        wifiFree: (json['wifiFree'] as bool?) ?? false,
+        description: json['internetDescription'] as String?,
+      );
+
+  bool get hasInfo =>
+      wifiAvailable || wifiFree || (description?.trim().isNotEmpty ?? false);
+}
+
+/// Rich Real-Mode mirror of `hotelDetail` — preserves facility grouping, service
+/// availability, and the parking/wifi booleans that the collapsed demo
+/// [HotelDetail] drops. Rooms reuse the shared [HotelRoom] model; times are
+/// trimmed to `HH:mm`. Every value comes from the backend; nothing is invented.
+class HotelDetailRecord {
+  final int id;
+  final int? starRating;
+  final String? checkInTime;
+  final String? checkOutTime;
+  final int? distanceToBeachMeters;
+  final int? distanceToCityCenterMeters;
+  final int? totalRooms;
+  final int? availableRooms;
+  final bool freeCancellation;
+  final String? cancellationPolicy;
+  final bool prepaymentRequired;
+  final String? paymentPolicy;
+  final String? childrenPolicy;
+  final String? petPolicy;
+  final String? smokingPolicy;
+  final bool breakfastIncluded;
+  final bool airportShuttle;
+  final List<HotelFacilityRecord> facilities;
+  final List<HotelServiceRecord> services;
+  final List<String> languages;
+  final List<String> paymentMethods;
+  final HotelParkingRecord parking;
+  final HotelInternetRecord internet;
+  final List<HotelRoom> rooms;
+
+  const HotelDetailRecord({
+    required this.id,
+    this.starRating,
+    this.checkInTime,
+    this.checkOutTime,
+    this.distanceToBeachMeters,
+    this.distanceToCityCenterMeters,
+    this.totalRooms,
+    this.availableRooms,
+    this.freeCancellation = false,
+    this.cancellationPolicy,
+    this.prepaymentRequired = false,
+    this.paymentPolicy,
+    this.childrenPolicy,
+    this.petPolicy,
+    this.smokingPolicy,
+    this.breakfastIncluded = false,
+    this.airportShuttle = false,
+    this.facilities = const [],
+    this.services = const [],
+    this.languages = const [],
+    this.paymentMethods = const [],
+    this.parking = const HotelParkingRecord(),
+    this.internet = const HotelInternetRecord(),
+    this.rooms = const [],
+  });
+
+  factory HotelDetailRecord.fromJson(Map<String, dynamic> json) {
+    List<String> stringList(Object? raw) => (raw as List<dynamic>? ?? const [])
+        .map((e) => e?.toString() ?? '')
+        .where((e) => e.isNotEmpty)
+        .toList();
+    final parking = json['parking'] as Map<String, dynamic>?;
+    final internet = json['internet'] as Map<String, dynamic>?;
+    return HotelDetailRecord(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      starRating: (json['starRating'] as num?)?.toInt(),
+      checkInTime: _shortTime(json['checkInTime'] as String?),
+      checkOutTime: _shortTime(json['checkOutTime'] as String?),
+      distanceToBeachMeters: (json['distanceToBeachMeters'] as num?)?.toInt(),
+      distanceToCityCenterMeters:
+          (json['distanceToCityCenterMeters'] as num?)?.toInt(),
+      totalRooms: (json['totalRooms'] as num?)?.toInt(),
+      availableRooms: (json['availableRooms'] as num?)?.toInt(),
+      freeCancellation: (json['freeCancellation'] as bool?) ?? false,
+      cancellationPolicy: json['cancellationPolicy'] as String?,
+      prepaymentRequired: (json['prepaymentRequired'] as bool?) ?? false,
+      paymentPolicy: json['paymentPolicy'] as String?,
+      childrenPolicy: json['childrenPolicy'] as String?,
+      petPolicy: json['petPolicy'] as String?,
+      smokingPolicy: json['smokingPolicy'] as String?,
+      breakfastIncluded: (json['breakfastIncluded'] as bool?) ?? false,
+      airportShuttle: (json['airportShuttle'] as bool?) ?? false,
+      facilities: (json['facilities'] as List<dynamic>? ?? const [])
+          .map((e) => HotelFacilityRecord.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      services: (json['services'] as List<dynamic>? ?? const [])
+          .map((e) => HotelServiceRecord.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      languages: stringList(json['languages']),
+      paymentMethods: stringList(json['paymentMethods']),
+      parking: parking == null
+          ? const HotelParkingRecord()
+          : HotelParkingRecord.fromJson(parking),
+      internet: internet == null
+          ? const HotelInternetRecord()
+          : HotelInternetRecord.fromJson(internet),
+      rooms: (json['rooms'] as List<dynamic>? ?? const [])
+          .map((e) => _hotelRoomFromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  /// Facilities grouped by `facilityGroup` (null/blank → `GENERAL`), each list
+  /// sorted by `sortOrder`, groups in first-seen order. Empty when no facilities.
+  List<MapEntry<String, List<HotelFacilityRecord>>> get groupedFacilities {
+    final groups = <String, List<HotelFacilityRecord>>{};
+    for (final f in facilities) {
+      final key = (f.facilityGroup == null || f.facilityGroup!.trim().isEmpty)
+          ? 'GENERAL'
+          : f.facilityGroup!.trim().toUpperCase();
+      groups.putIfAbsent(key, () => <HotelFacilityRecord>[]).add(f);
+    }
+    for (final list in groups.values) {
+      list.sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+    }
+    return groups.entries.toList();
+  }
+}
+
 /// Trims a backend `"HH:mm:ss"` (or `"HH:mm"`) time string down to `"HH:mm"`.
 String? _shortTime(String? raw) {
   if (raw == null || raw.isEmpty) return null;
@@ -759,10 +1146,22 @@ class PlaceDetailRecord {
   final bool verified;
   final List<String> tags;
   final String? coverImageUrl;
-  final List<String> galleryUrls;
+  final List<PlaceGalleryImageRecord> galleryImages;
   final int? estimatedVisitMinutes;
   final List<PlaceOpeningHourGroupRecord> groupedOpeningHours;
   final HotelDetail? hotelDetail;
+
+  // ── UI23 rich Real-Mode detail fields (dropped by [toPlace]) ──────────────
+  final String? googleMapUrl;
+  final bool openNow;
+  final List<PlaceAmenityRecord> amenities;
+  final PlaceMetadataRecord? metadata;
+  final HotelDetailRecord? hotelDetailRich;
+
+  /// Convenience view of [galleryImages] as plain URLs (used by [toPlace] and
+  /// any summary rendering); derived so there is a single source of truth.
+  List<String> get galleryUrls =>
+      galleryImages.map((g) => g.url).where((u) => u.isNotEmpty).toList();
 
   const PlaceDetailRecord({
     required this.id,
@@ -785,10 +1184,15 @@ class PlaceDetailRecord {
     this.verified = false,
     this.tags = const [],
     this.coverImageUrl,
-    this.galleryUrls = const [],
+    this.galleryImages = const [],
     this.estimatedVisitMinutes,
     this.groupedOpeningHours = const [],
     this.hotelDetail,
+    this.googleMapUrl,
+    this.openNow = false,
+    this.amenities = const [],
+    this.metadata,
+    this.hotelDetailRich,
   });
 
   factory PlaceDetailRecord.fromJson(Map<String, dynamic> json) {
@@ -821,9 +1225,10 @@ class PlaceDetailRecord {
           .where((e) => e.isNotEmpty)
           .toList(),
       coverImageUrl: json['coverImageUrl'] as String?,
-      galleryUrls: (json['galleryImages'] as List<dynamic>? ?? const [])
-          .map((e) => (e as Map<String, dynamic>)['url']?.toString() ?? '')
-          .where((e) => e.isNotEmpty)
+      galleryImages: (json['galleryImages'] as List<dynamic>? ?? const [])
+          .map((e) =>
+              PlaceGalleryImageRecord.fromJson(e as Map<String, dynamic>))
+          .where((g) => g.url.isNotEmpty)
           .toList(),
       estimatedVisitMinutes:
           (metadata?['estimatedVisitMinutes'] as num?)?.toInt(),
@@ -835,6 +1240,16 @@ class PlaceDetailRecord {
               .toList(),
       hotelDetail:
           hotelDetail == null ? null : _hotelDetailFromJson(hotelDetail),
+      googleMapUrl: json['googleMapUrl'] as String?,
+      openNow: (json['openNow'] as bool?) ?? false,
+      amenities: (json['amenities'] as List<dynamic>? ?? const [])
+          .map((e) => PlaceAmenityRecord.fromJson(e as Map<String, dynamic>))
+          .where((a) => a.name.isNotEmpty)
+          .toList(),
+      metadata:
+          metadata == null ? null : PlaceMetadataRecord.fromJson(metadata),
+      hotelDetailRich:
+          hotelDetail == null ? null : HotelDetailRecord.fromJson(hotelDetail),
     );
   }
 

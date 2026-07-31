@@ -73,6 +73,13 @@ class AppState extends ChangeNotifier {
   // cached for the authenticated session. Cleared on logout / mode / user
   // change so no stale place survives. Only successful hydrations are cached.
   final Map<int, Place> _hydratedRealPlaces = <int, Place>{};
+  // The full typed detail record behind each hydrated place (UI23). The [Place]
+  // above is a lossy projection (single image, flattened hours); the rich
+  // detail screen renders gallery / grouped hours / metadata / rich hotelDetail
+  // from this record. Populated by the same single hydration call — no extra
+  // HTTP — and cleared together with [_hydratedRealPlaces].
+  final Map<int, PlaceDetailRecord> _hydratedRealPlaceDetails =
+      <int, PlaceDetailRecord>{};
   // In-flight requests keyed by placeId: a second caller for the same place
   // awaits the same Future, so concurrent taps issue a single HTTP request.
   final Map<int, Future<PlaceHydrationResult>> _hydrationInFlight =
@@ -271,6 +278,7 @@ class AppState extends ChangeNotifier {
   /// is already empty).
   void clearRealPlaceHydrationCache() {
     _hydratedRealPlaces.clear();
+    _hydratedRealPlaceDetails.clear();
     _hydrationInFlight.clear();
   }
 
@@ -1423,6 +1431,12 @@ class AppState extends ChangeNotifier {
   /// session, else `null`. Never falls back to demo data.
   Place? getHydratedRealPlace(int placeId) => _hydratedRealPlaces[placeId];
 
+  /// The full typed [PlaceDetailRecord] for [placeId] if it has been hydrated
+  /// this session, else `null` (UI23). Carries the gallery, grouped opening
+  /// hours, metadata, and rich hotelDetail the lossy [Place] projection drops.
+  PlaceDetailRecord? getHydratedRealPlaceDetail(int placeId) =>
+      _hydratedRealPlaceDetails[placeId];
+
   /// Whether a hydration request for [placeId] is currently in flight.
   bool isRealPlaceHydrationInFlight(int placeId) =>
       _hydrationInFlight.containsKey(placeId);
@@ -1431,10 +1445,16 @@ class AppState extends ChangeNotifier {
   /// endpoint, caching a successful result for the session. Demo Mode never
   /// hits the network. Concurrent callers for the same place share one request;
   /// a failed hydration is never cached, so a retry can succeed. On success the
-  /// [Place] is available via [getHydratedRealPlace].
-  Future<PlaceHydrationResult> hydrateRealPlace(int placeId) {
+  /// [Place] is available via [getHydratedRealPlace] and the full typed record
+  /// via [getHydratedRealPlaceDetail]. Pass [refresh] `true` (pull-to-refresh)
+  /// to bypass the cache and re-fetch; a failed refresh keeps the prior cached
+  /// record rather than clearing it to a fake-empty state.
+  Future<PlaceHydrationResult> hydrateRealPlace(
+    int placeId, {
+    bool refresh = false,
+  }) {
     if (demoMode) return Future.value(PlaceHydrationResult.unavailable);
-    if (_hydratedRealPlaces.containsKey(placeId)) {
+    if (!refresh && _hydratedRealPlaces.containsKey(placeId)) {
       return Future.value(PlaceHydrationResult.success);
     }
     final existing = _hydrationInFlight[placeId];
@@ -1449,6 +1469,7 @@ class AppState extends ChangeNotifier {
     try {
       final result = await api.getPlaceDetail(placeId);
       if (result.success && result.data != null) {
+        _hydratedRealPlaceDetails[placeId] = result.data!;
         _hydratedRealPlaces[placeId] = result.data!.toPlace();
         return PlaceHydrationResult.success;
       }

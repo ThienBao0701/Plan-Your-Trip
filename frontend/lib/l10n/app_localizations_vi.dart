@@ -5787,4 +5787,293 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get availabilityRealInstantConfirmation => 'Xác nhận tức thì';
+
+  @override
+  String get placeDetailRealLoadingMessage => 'Đang tải thông tin địa điểm…';
+
+  @override
+  String get placeDetailRealErrorMessage =>
+      'Không thể tải địa điểm này. Vui lòng thử lại.';
+
+  @override
+  String get placeDetailRealNotFoundMessage =>
+      'Địa điểm này không còn khả dụng.';
+
+  @override
+  String placeGallerySemantic(String name, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ảnh',
+    );
+    return 'Thư viện ảnh của $name, $_temp0';
+  }
+
+  @override
+  String get placeGalleryClose => 'Đóng ảnh';
+
+  @override
+  String get placeOpenNow => 'Đang mở cửa';
+
+  @override
+  String get placeClosedNow => 'Đang đóng cửa';
+
+  @override
+  String get placeOpeningHoursTitle => 'Giờ mở cửa';
+
+  @override
+  String get placeOpeningHoursClosed => 'Đóng cửa';
+
+  @override
+  String get placeCoordinatesTitle => 'Vị trí';
+
+  @override
+  String placeCoordinatesValue(String lat, String long) {
+    return '$lat, $long';
+  }
+
+  @override
+  String get placeAmenitiesTitle => 'Tiện ích';
+
+  @override
+  String get placeMetadataTitle => 'Thông tin hữu ích';
+
+  @override
+  String get metadataVisitDurationTitle => 'Thời gian tham quan gợi ý';
+
+  @override
+  String get metadataTravelStylesTitle => 'Phong cách du lịch';
+
+  @override
+  String get metadataBestSeasonsTitle => 'Mùa đẹp nhất';
+
+  @override
+  String get metadataBestVisitTimesTitle => 'Thời điểm trong ngày';
+
+  @override
+  String get metadataWeatherTitle => 'Thời tiết';
+
+  @override
+  String get metadataBudgetTitle => 'Ngân sách';
+
+  @override
+  String get metadataDifficultyTitle => 'Độ khó';
+
+  @override
+  String get metadataAccessibilityTitle => 'Khả năng tiếp cận';
+
+  @override
+  String get metadataCrowdTitle => 'Mức độ đông đúc';
+
+  @override
+  String get metadataHighlightsTitle => 'Điểm nổi bật';
+
+  @override
+  String get metadataNotesTitle => 'Ghi chú';
+
+  @override
+  String get travelStyleSolo => 'Một mình';
+
+  @override
+  String get travelStyleCouple => 'Cặp đôi';
+
+  @override
+  String get travelStyleFamily => 'Gia đình';
+
+  @override
+  String get travelStyleFriends => 'Bạn bè';
+
+  @override
+  String get travelStyleBusiness => 'Công tác';
+
+  @override
+  String get travelStyleBackpacker => 'Phượt';
+
+  @override
+  String get travelStyleLuxury => 'Sang trọng';
+
+  @override
+  String get bestVisitTimeEarlyMorning => 'Sáng sớm';
+
+  @override
+  String get bestVisitTimeMorning => 'Buổi sáng';
+
+  @override
+  String get bestVisitTimeAfternoon => 'Buổi chiều';
+
+  @override
+  String get bestVisitTimeSunset => 'Hoàng hôn';
+
+  @override
+  String get bestVisitTimeEvening => 'Buổi tối';
+
+  @override
+  String get bestVisitTimeNight => 'Ban đêm';
+
+  @override
+  String get bestSeasonSpring => 'Mùa xuân';
+
+  @override
+  String get bestSeasonSummer => 'Mùa hè';
+
+  @override
+  String get bestSeasonAutumn => 'Mùa thu';
+
+  @override
+  String get bestSeasonWinter => 'Mùa đông';
+
+  @override
+  String get bestSeasonAllYear => 'Quanh năm';
+
+  @override
+  String get weatherSunny => 'Nắng';
+
+  @override
+  String get weatherCloudy => 'Nhiều mây';
+
+  @override
+  String get weatherRainy => 'Mưa';
+
+  @override
+  String get weatherCool => 'Mát mẻ';
+
+  @override
+  String get weatherAny => 'Mọi thời tiết';
+
+  @override
+  String get budgetFree => 'Miễn phí';
+
+  @override
+  String get budgetLow => 'Tiết kiệm';
+
+  @override
+  String get budgetMedium => 'Tầm trung';
+
+  @override
+  String get budgetHigh => 'Cao cấp';
+
+  @override
+  String get budgetLuxury => 'Xa xỉ';
+
+  @override
+  String get difficultyEasy => 'Dễ';
+
+  @override
+  String get difficultyModerate => 'Vừa phải';
+
+  @override
+  String get difficultyHard => 'Khó';
+
+  @override
+  String get accessibilityLow => 'Hạn chế tiếp cận';
+
+  @override
+  String get accessibilityMedium => 'Tiếp cận vừa phải';
+
+  @override
+  String get accessibilityHigh => 'Dễ tiếp cận';
+
+  @override
+  String get crowdLow => 'Yên tĩnh';
+
+  @override
+  String get crowdMedium => 'Vừa phải';
+
+  @override
+  String get crowdHigh => 'Đông đúc';
+
+  @override
+  String get flagRomantic => 'Lãng mạn';
+
+  @override
+  String get flagFamilyFriendly => 'Phù hợp gia đình';
+
+  @override
+  String get flagKidFriendly => 'Phù hợp trẻ em';
+
+  @override
+  String get flagPetFriendly => 'Cho phép thú cưng';
+
+  @override
+  String get flagWheelchairFriendly => 'Thân thiện xe lăn';
+
+  @override
+  String get flagPhotographySpot => 'Điểm chụp ảnh';
+
+  @override
+  String get flagSunsetSpot => 'Ngắm hoàng hôn';
+
+  @override
+  String get flagSunriseSpot => 'Ngắm bình minh';
+
+  @override
+  String get flagIndoor => 'Trong nhà';
+
+  @override
+  String get flagOutdoor => 'Ngoài trời';
+
+  @override
+  String get flagRainyDaySuitable => 'Hợp ngày mưa';
+
+  @override
+  String get facilityGroupGeneral => 'Chung';
+
+  @override
+  String get facilityGroupWellness => 'Chăm sóc sức khỏe';
+
+  @override
+  String get facilityGroupBusiness => 'Công vụ';
+
+  @override
+  String get facilityGroupFood => 'Ẩm thực';
+
+  @override
+  String get facilityGroupOutdoor => 'Ngoài trời';
+
+  @override
+  String get facilityGroupFamily => 'Gia đình';
+
+  @override
+  String get facilityGroupAccessibility => 'Tiếp cận';
+
+  @override
+  String get hotelPoliciesTitle => 'Chính sách';
+
+  @override
+  String get hotelPolicyCancellation => 'Hủy phòng';
+
+  @override
+  String get hotelPolicyPayment => 'Thanh toán';
+
+  @override
+  String get hotelPolicyChildren => 'Trẻ em';
+
+  @override
+  String get hotelPolicyPet => 'Thú cưng';
+
+  @override
+  String get hotelPolicySmoking => 'Hút thuốc';
+
+  @override
+  String get hotelParkingFree => 'Đỗ xe miễn phí';
+
+  @override
+  String get hotelParkingPaid => 'Đỗ xe có phí';
+
+  @override
+  String get hotelParkingUnavailable => 'Không có chỗ đỗ xe';
+
+  @override
+  String get hotelWifiFree => 'Wi-Fi miễn phí';
+
+  @override
+  String get hotelWifiPaid => 'Wi-Fi có phí';
+
+  @override
+  String get hotelWifiUnavailable => 'Không có Wi-Fi';
+
+  @override
+  String hotelServiceUnavailable(String service) {
+    return '$service (không khả dụng)';
+  }
 }
