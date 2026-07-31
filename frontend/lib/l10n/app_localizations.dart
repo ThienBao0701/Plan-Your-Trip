@@ -10647,6 +10647,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{service} (unavailable)'**
   String hotelServiceUnavailable(String service);
+
+  /// No description provided for @roomSelectAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Select this room'**
+  String get roomSelectAction;
+
+  /// No description provided for @roomSelectSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Select {name}'**
+  String roomSelectSemantic(String name);
+
+  /// No description provided for @roomSelectedBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected'**
+  String get roomSelectedBadge;
+
+  /// No description provided for @roomDetailImageSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos of {name}'**
+  String roomDetailImageSemantic(String name);
+
+  /// No description provided for @roomCodeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Room code {code}'**
+  String roomCodeLabel(String code);
+
+  /// No description provided for @roomBedConfig.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 {bed}} other{{count} {bed}}}'**
+  String roomBedConfig(int count, String bed);
+
+  /// No description provided for @roomOccupancyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Occupancy'**
+  String get roomOccupancyTitle;
+
+  /// No description provided for @roomOccupancyAdults.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 adult} other{{count} adults}}'**
+  String roomOccupancyAdults(int count);
+
+  /// No description provided for @roomOccupancyChildren.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 child} other{{count} children}}'**
+  String roomOccupancyChildren(int count);
+
+  /// No description provided for @roomPriceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get roomPriceTitle;
+
+  /// No description provided for @hotelRoomCardSelectedSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}, selected'**
+  String hotelRoomCardSelectedSemantic(String name);
+
+  /// No description provided for @roomRatePlansTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate plans'**
+  String get roomRatePlansTitle;
+
+  /// No description provided for @roomRatePlansLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading rate plans…'**
+  String get roomRatePlansLoadingMessage;
+
+  /// No description provided for @roomRatePlansErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load rate plans. Please try again.'**
+  String get roomRatePlansErrorMessage;
+
+  /// No description provided for @roomRatePlansInvalidDatesMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a check-out date after check-in to see rate plans.'**
+  String get roomRatePlansInvalidDatesMessage;
+
+  /// No description provided for @roomRatePlansEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No rate plans'**
+  String get roomRatePlansEmptyTitle;
+
+  /// No description provided for @roomRatePlansEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This room has no sellable rate plans for the selected stay.'**
+  String get roomRatePlansEmptyMessage;
+
+  /// No description provided for @roomRatePlanSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate plan {name}'**
+  String roomRatePlanSemantic(String name);
+
+  /// No description provided for @roomRatePlanSelectedSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate plan {name}, selected'**
+  String roomRatePlanSelectedSemantic(String name);
+
+  /// No description provided for @roomRatePlanIneligible.
+  ///
+  /// In en, this message translates to:
+  /// **'Not available for the selected stay.'**
+  String get roomRatePlanIneligible;
+
+  /// No description provided for @ratePlanRefundable.
+  ///
+  /// In en, this message translates to:
+  /// **'Refundable'**
+  String get ratePlanRefundable;
+
+  /// No description provided for @ratePlanNonRefundable.
+  ///
+  /// In en, this message translates to:
+  /// **'Non-refundable'**
+  String get ratePlanNonRefundable;
+
+  /// No description provided for @ratePlanFinalNightly.
+  ///
+  /// In en, this message translates to:
+  /// **'{price} / night'**
+  String ratePlanFinalNightly(String price);
+
+  /// No description provided for @ratePlanBaseNightly.
+  ///
+  /// In en, this message translates to:
+  /// **'Base {price} / night'**
+  String ratePlanBaseNightly(String price);
+
+  /// No description provided for @ratePlanStaySubtotal.
+  ///
+  /// In en, this message translates to:
+  /// **'{price} for {nights, plural, =1{1 night} other{{nights} nights}}'**
+  String ratePlanStaySubtotal(String price, int nights);
 }
 
 class _AppLocalizationsDelegate

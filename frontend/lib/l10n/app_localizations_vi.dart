@@ -6076,4 +6076,126 @@ class AppLocalizationsVi extends AppLocalizations {
   String hotelServiceUnavailable(String service) {
     return '$service (không khả dụng)';
   }
+
+  @override
+  String get roomSelectAction => 'Chọn phòng này';
+
+  @override
+  String roomSelectSemantic(String name) {
+    return 'Chọn $name';
+  }
+
+  @override
+  String get roomSelectedBadge => 'Đã chọn';
+
+  @override
+  String roomDetailImageSemantic(String name) {
+    return 'Ảnh của $name';
+  }
+
+  @override
+  String roomCodeLabel(String code) {
+    return 'Mã phòng $code';
+  }
+
+  @override
+  String roomBedConfig(int count, String bed) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count $bed',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get roomOccupancyTitle => 'Sức chứa';
+
+  @override
+  String roomOccupancyAdults(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count người lớn',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String roomOccupancyChildren(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count trẻ em',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get roomPriceTitle => 'Giá';
+
+  @override
+  String hotelRoomCardSelectedSemantic(String name) {
+    return '$name, đã chọn';
+  }
+
+  @override
+  String get roomRatePlansTitle => 'Gói giá';
+
+  @override
+  String get roomRatePlansLoadingMessage => 'Đang tải gói giá…';
+
+  @override
+  String get roomRatePlansErrorMessage =>
+      'Không thể tải gói giá. Vui lòng thử lại.';
+
+  @override
+  String get roomRatePlansInvalidDatesMessage =>
+      'Chọn ngày trả phòng sau ngày nhận phòng để xem gói giá.';
+
+  @override
+  String get roomRatePlansEmptyTitle => 'Không có gói giá';
+
+  @override
+  String get roomRatePlansEmptyMessage =>
+      'Phòng này không có gói giá khả dụng cho kỳ lưu trú đã chọn.';
+
+  @override
+  String roomRatePlanSemantic(String name) {
+    return 'Gói giá $name';
+  }
+
+  @override
+  String roomRatePlanSelectedSemantic(String name) {
+    return 'Gói giá $name, đã chọn';
+  }
+
+  @override
+  String get roomRatePlanIneligible => 'Không khả dụng cho kỳ lưu trú đã chọn.';
+
+  @override
+  String get ratePlanRefundable => 'Được hoàn tiền';
+
+  @override
+  String get ratePlanNonRefundable => 'Không hoàn tiền';
+
+  @override
+  String ratePlanFinalNightly(String price) {
+    return '$price / đêm';
+  }
+
+  @override
+  String ratePlanBaseNightly(String price) {
+    return 'Giá gốc $price / đêm';
+  }
+
+  @override
+  String ratePlanStaySubtotal(String price, int nights) {
+    String _temp0 = intl.Intl.pluralLogic(
+      nights,
+      locale: localeName,
+      other: '$nights đêm',
+    );
+    return '$price cho $_temp0';
+  }
 }

@@ -3244,5 +3244,92 @@
     "placeholders": {
       "service": { "type": "String" }
     }
+  },
+  "roomSelectAction": "Select this room",
+  "roomSelectSemantic": "Select {name}",
+  "@roomSelectSemantic": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "roomSelectedBadge": "Selected",
+  "roomDetailImageSemantic": "Photos of {name}",
+  "@roomDetailImageSemantic": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "roomCodeLabel": "Room code {code}",
+  "@roomCodeLabel": {
+    "placeholders": {
+      "code": { "type": "String" }
+    }
+  },
+  "roomBedConfig": "{count, plural, =1{1 {bed}} other{{count} {bed}}}",
+  "@roomBedConfig": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "bed": { "type": "String" }
+    }
+  },
+  "roomOccupancyTitle": "Occupancy",
+  "roomOccupancyAdults": "{count, plural, =1{1 adult} other{{count} adults}}",
+  "@roomOccupancyAdults": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "roomOccupancyChildren": "{count, plural, =1{1 child} other{{count} children}}",
+  "@roomOccupancyChildren": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "roomPriceTitle": "Price",
+  "hotelRoomCardSelectedSemantic": "{name}, selected",
+  "@hotelRoomCardSelectedSemantic": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "roomRatePlansTitle": "Rate plans",
+  "roomRatePlansLoadingMessage": "Loading rate plans…",
+  "roomRatePlansErrorMessage": "We couldn't load rate plans. Please try again.",
+  "roomRatePlansInvalidDatesMessage": "Choose a check-out date after check-in to see rate plans.",
+  "roomRatePlansEmptyTitle": "No rate plans",
+  "roomRatePlansEmptyMessage": "This room has no sellable rate plans for the selected stay.",
+  "roomRatePlanSemantic": "Rate plan {name}",
+  "@roomRatePlanSemantic": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "roomRatePlanSelectedSemantic": "Rate plan {name}, selected",
+  "@roomRatePlanSelectedSemantic": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "roomRatePlanIneligible": "Not available for the selected stay.",
+  "ratePlanRefundable": "Refundable",
+  "ratePlanNonRefundable": "Non-refundable",
+  "ratePlanFinalNightly": "{price} / night",
+  "@ratePlanFinalNightly": {
+    "placeholders": {
+      "price": { "type": "String" }
+    }
+  },
+  "ratePlanBaseNightly": "Base {price} / night",
+  "@ratePlanBaseNightly": {
+    "placeholders": {
+      "price": { "type": "String" }
+    }
+  },
+  "ratePlanStaySubtotal": "{price} for {nights, plural, =1{1 night} other{{nights} nights}}",
+  "@ratePlanStaySubtotal": {
+    "placeholders": {
+      "price": { "type": "String" },
+      "nights": { "type": "int" }
+    }
   }
 }

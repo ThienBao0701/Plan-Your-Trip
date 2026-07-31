@@ -140,6 +140,20 @@ class AppState extends ChangeNotifier {
   int? realAvailabilityPlaceId;
   int _realAvailabilityRequestId = 0;
 
+  // UI24 — Real room selection over the UI22 availability result plus the
+  // public per-room rate plans (`GET /rooms/{id}/rate-plans`). Selection is
+  // client-side (the backend checkout is offline/mocked). Exactly one room may
+  // be selected at a time; a date/guest change re-runs availability and
+  // invalidates the selection if the room is no longer offered. Reset on
+  // logout / mode change with the availability state.
+  int? selectedRoomId;
+  int? selectedRatePlanId;
+  List<HotelRatePlan> roomRatePlans = const [];
+  bool roomRatePlansLoading = false;
+  RatePlanOutcome? roomRatePlansError;
+  int? roomRatePlansRoomId;
+  int _roomRatePlanRequestId = 0;
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -322,6 +336,17 @@ class AppState extends ChangeNotifier {
     realAvailabilityPlaceId = null;
     // Bump the request id so any in-flight response is discarded on reset.
     _realAvailabilityRequestId++;
+    _resetRoomSelectionState();
+  }
+
+  void _resetRoomSelectionState() {
+    selectedRoomId = null;
+    selectedRatePlanId = null;
+    roomRatePlans = const [];
+    roomRatePlansLoading = false;
+    roomRatePlansError = null;
+    roomRatePlansRoomId = null;
+    _roomRatePlanRequestId++;
   }
 
   void _applyPersonalDataMode() {
@@ -1896,11 +1921,170 @@ class AppState extends ChangeNotifier {
     if (result.success && result.data != null) {
       realAvailability = result.data!;
       realAvailabilityError = null;
+      // A date/guest change re-runs availability; drop a selection whose room is
+      // no longer offered so the UI never shows a stale/invalid selection.
+      _revalidateRoomSelection();
       notifyListeners();
       return HotelAvailabilityOutcome.success;
     }
     final outcome = _mapAvailabilityError(result.errorKind);
     realAvailabilityError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  // ── UI24 Real room selection ──────────────────────────────────────────────
+
+  /// The currently selected room within the loaded availability, or `null` if
+  /// no room is selected or it is no longer in the result.
+  AvailableRoomRecord? get selectedRoom {
+    final id = selectedRoomId;
+    final rooms = realAvailability?.availableRooms;
+    if (id == null || rooms == null) return null;
+    for (final room in rooms) {
+      if (room.roomId == id) return room;
+    }
+    return null;
+  }
+
+  /// The currently selected rate plan within the loaded rate plans, or `null`.
+  HotelRatePlan? get selectedRatePlan {
+    final id = selectedRatePlanId;
+    if (id == null) return null;
+    for (final plan in roomRatePlans) {
+      if (plan.ratePlanId == id) return plan;
+    }
+    return null;
+  }
+
+  /// Guests / nights for the current stay, taken from the availability result
+  /// (never recomputed client-side).
+  int get selectedGuestCount =>
+      (realAvailability?.adults ?? 0) + (realAvailability?.children ?? 0);
+  int get selectedNightCount => realAvailability?.nights ?? 0;
+
+  /// Selects exactly one [roomId] (and optionally a [ratePlanId]) from the
+  /// loaded availability. Ignored in Demo Mode or when the room is not offered.
+  void selectRoom(int roomId, {int? ratePlanId}) {
+    if (demoMode) return;
+    final rooms = realAvailability?.availableRooms;
+    if (rooms == null || !rooms.any((r) => r.roomId == roomId)) return;
+    selectedRoomId = roomId;
+    if (ratePlanId != null &&
+        roomRatePlansRoomId == roomId &&
+        roomRatePlans.any((p) => p.ratePlanId == ratePlanId)) {
+      selectedRatePlanId = ratePlanId;
+    } else if (ratePlanId == null) {
+      // Keep an existing plan only if it still belongs to this room.
+      if (roomRatePlansRoomId != roomId) selectedRatePlanId = null;
+    } else {
+      selectedRatePlanId = null;
+    }
+    notifyListeners();
+  }
+
+  /// Clears any current room + rate-plan selection.
+  void clearRoomSelection() {
+    if (selectedRoomId == null && selectedRatePlanId == null) return;
+    selectedRoomId = null;
+    selectedRatePlanId = null;
+    notifyListeners();
+  }
+
+  /// Drops the selection when the selected room is no longer in the loaded
+  /// availability (e.g. after a date/guest change). Also drops rate plans that
+  /// no longer apply to the selected room.
+  void _revalidateRoomSelection() {
+    final id = selectedRoomId;
+    if (id == null) return;
+    final rooms =
+        realAvailability?.availableRooms ?? const <AvailableRoomRecord>[];
+    if (!rooms.any((r) => r.roomId == id)) {
+      selectedRoomId = null;
+      selectedRatePlanId = null;
+      if (roomRatePlansRoomId == id) {
+        roomRatePlans = const [];
+        roomRatePlansRoomId = null;
+        roomRatePlansError = null;
+      }
+    }
+  }
+
+  RatePlanOutcome _mapRatePlanError(ApiErrorKind? kind) {
+    return switch (kind) {
+      ApiErrorKind.unauthorized => RatePlanOutcome.sessionExpired,
+      ApiErrorKind.forbidden => RatePlanOutcome.forbidden,
+      ApiErrorKind.notFound => RatePlanOutcome.notFound,
+      ApiErrorKind.validation => RatePlanOutcome.validation,
+      ApiErrorKind.network => RatePlanOutcome.network,
+      ApiErrorKind.timeout => RatePlanOutcome.timeout,
+      ApiErrorKind.server => RatePlanOutcome.serverError,
+      ApiErrorKind.malformed => RatePlanOutcome.malformed,
+      _ => RatePlanOutcome.serverError,
+    };
+  }
+
+  /// Loads the real rate plans for [roomId] over the stay in Real Mode only.
+  /// Guards invalid dates client-side (mirroring the backend 400). Reuses the
+  /// cached plans for the same room unless [refresh] is set — this never
+  /// re-issues the UI22 availability request. A newer load supersedes an older
+  /// in-flight one (last wins).
+  Future<RatePlanOutcome> loadRoomRatePlans({
+    required int roomId,
+    required DateTime checkIn,
+    required DateTime checkOut,
+    int adults = 2,
+    int children = 0,
+    int extraBeds = 0,
+    bool refresh = false,
+  }) async {
+    if (demoMode) return RatePlanOutcome.unavailable;
+    final inDay = DateTime(checkIn.year, checkIn.month, checkIn.day);
+    final outDay = DateTime(checkOut.year, checkOut.month, checkOut.day);
+    if (!outDay.isAfter(inDay)) {
+      roomRatePlansRoomId = roomId;
+      roomRatePlansError = RatePlanOutcome.invalidDates;
+      roomRatePlansLoading = false;
+      notifyListeners();
+      return RatePlanOutcome.invalidDates;
+    }
+    if (!refresh &&
+        roomRatePlansRoomId == roomId &&
+        roomRatePlansError == null &&
+        roomRatePlans.isNotEmpty) {
+      return RatePlanOutcome.success; // cached — no HTTP
+    }
+
+    final reqId = ++_roomRatePlanRequestId;
+    if (roomRatePlansRoomId != roomId) {
+      roomRatePlans = const [];
+    }
+    roomRatePlansRoomId = roomId;
+    roomRatePlansLoading = true;
+    roomRatePlansError = null;
+    notifyListeners();
+
+    final result = await api.getRoomRatePlans(
+      roomId: roomId,
+      checkIn: inDay,
+      checkOut: outDay,
+      adults: adults,
+      children: children,
+      extraBeds: extraBeds,
+    );
+
+    if (reqId != _roomRatePlanRequestId) {
+      return RatePlanOutcome.success; // superseded — discard
+    }
+    roomRatePlansLoading = false;
+    if (result.success && result.data != null) {
+      roomRatePlans = result.data!;
+      roomRatePlansError = null;
+      notifyListeners();
+      return RatePlanOutcome.success;
+    }
+    final outcome = _mapRatePlanError(result.errorKind);
+    roomRatePlansError = outcome;
     notifyListeners();
     return outcome;
   }

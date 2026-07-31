@@ -16,6 +16,7 @@ import '../auth/login_screen.dart';
 import '../expenses/expenses_screen.dart';
 import 'hotel_booking_review_screen.dart';
 import 'hotel_utils.dart';
+import 'real_room_detail_screen.dart';
 
 class HotelRoomSelectionScreen extends StatefulWidget {
   final Place hotel;
@@ -775,7 +776,12 @@ class _RealHotelAvailabilityViewState
         for (final room in rooms)
           Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.md),
-            child: _RealAvailableRoomCard(room: room),
+            child: _RealAvailableRoomCard(
+              room: room,
+              hotel: widget.hotel,
+              criteria: _criteria,
+              selected: app.selectedRoomId == room.roomId,
+            ),
           ),
       ],
     );
@@ -784,11 +790,20 @@ class _RealHotelAvailabilityViewState
 
 /// Renders one real [AvailableRoomRecord]. Missing values are hidden, never
 /// synthesized. The availability DTO carries no currency code, so prices use
-/// the app's default VND formatting (documented as a known limitation).
+/// the app's default VND formatting (documented as a known limitation). Tapping
+/// the card opens the room detail (UI24); a selected room is badged.
 class _RealAvailableRoomCard extends StatelessWidget {
   final AvailableRoomRecord room;
+  final Place hotel;
+  final HotelStayCriteria criteria;
+  final bool selected;
 
-  const _RealAvailableRoomCard({required this.room});
+  const _RealAvailableRoomCard({
+    required this.room,
+    required this.hotel,
+    required this.criteria,
+    required this.selected,
+  });
 
   static String _humanizeToken(String raw) {
     final cleaned = raw.replaceAll('_', ' ').trim().toLowerCase();
@@ -852,8 +867,19 @@ class _RealAvailableRoomCard extends StatelessWidget {
 
     return OceanGlassCard(
       key: Key('real-room-card-${room.roomId}'),
-      semanticLabel: l10n.hotelRoomCardSemantic(room.roomName),
+      semanticLabel: selected
+          ? l10n.hotelRoomCardSelectedSemantic(room.roomName)
+          : l10n.hotelRoomCardSemantic(room.roomName),
       padding: const EdgeInsets.all(AppSpacing.sm),
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => RealRoomDetailScreen(
+            hotel: hotel,
+            room: room,
+            criteria: criteria,
+          ),
+        ),
+      ),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final compact = constraints.maxWidth < 520;
@@ -862,6 +888,24 @@ class _RealAvailableRoomCard extends StatelessWidget {
           final details = Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              if (selected) ...[
+                Row(
+                  key: const Key('real-room-card-selected'),
+                  children: [
+                    const Icon(Icons.check_circle_rounded,
+                        color: AppColors.ocean, size: AppIconSizes.sm),
+                    const SizedBox(width: AppSpacing.xxs),
+                    Text(
+                      l10n.roomSelectedBadge,
+                      style: Theme.of(context)
+                          .textTheme
+                          .labelLarge
+                          ?.copyWith(color: AppColors.ocean),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.xs),
+              ],
               Text(
                 room.roomName,
                 style: Theme.of(context).textTheme.titleLarge,

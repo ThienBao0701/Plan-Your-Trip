@@ -2702,6 +2702,91 @@ class HotelRatePlan {
     this.cancellationDeadline,
     this.policySummary = '',
   });
+
+  /// Real-backend mirror of `RatePlanDto.RatePlanPricingBreakdownResponse`
+  /// (`GET /api/rooms/{roomId}/rate-plans`). Every value is taken straight from
+  /// the response; `Map` decoding is confined here. The DTO carries no currency
+  /// code, so price fields use the app's default (VND) formatting downstream.
+  factory HotelRatePlan.fromJson(Map<String, dynamic> json) => HotelRatePlan(
+        ratePlanId: (json['ratePlanId'] as num?)?.toInt() ?? 0,
+        code: (json['code'] as String?) ?? '',
+        rateName: (json['rateName'] as String?) ?? '',
+        roomId: (json['roomId'] as num?)?.toInt() ?? 0,
+        roomName: (json['roomName'] as String?) ?? '',
+        sourceType: (json['sourceType'] as String?) ?? '',
+        parentRatePlanId: (json['parentRatePlanId'] as num?)?.toInt(),
+        eligible: (json['eligible'] as bool?) ?? false,
+        reason: json['reason'] as String?,
+        nights: (json['nights'] as num?)?.toInt() ?? 0,
+        baseNightlyRate: (json['baseNightlyRate'] as num?)?.toDouble(),
+        derivedAdjustment: (json['derivedAdjustment'] as num?)?.toDouble() ?? 0,
+        occupancyAdjustment:
+            (json['occupancyAdjustment'] as num?)?.toDouble() ?? 0,
+        childSupplement: (json['childSupplement'] as num?)?.toDouble() ?? 0,
+        extraBedSupplement:
+            (json['extraBedSupplement'] as num?)?.toDouble() ?? 0,
+        finalNightlyRate: (json['finalNightlyRate'] as num?)?.toDouble(),
+        staySubtotal: (json['staySubtotal'] as num?)?.toDouble(),
+        mealPlan: _mealPlanFromCode(json['mealPlan'] as String?),
+        cancellationPolicyType:
+            _cancellationPolicyFromCode(json['cancellationPolicy'] as String?),
+        refundable: (json['refundable'] as bool?) ?? false,
+        cancellationDeadline: _tryParseDate(json['cancellationDeadline']),
+        policySummary: (json['policySummary'] as String?) ?? '',
+      );
+
+  bool get hasBreakdown =>
+      baseNightlyRate != null ||
+      finalNightlyRate != null ||
+      staySubtotal != null;
+}
+
+/// Outcome of loading a room's real rate plans (`GET /rooms/{id}/rate-plans`).
+/// [unavailable] is the Demo Mode guard; [invalidDates] is a client-side guard
+/// mirroring the backend 400; [sessionExpired] surfaces a 401 without logging
+/// out (the endpoint is public so it is not expected).
+enum RatePlanOutcome {
+  success,
+  unavailable,
+  invalidDates,
+  notFound,
+  network,
+  timeout,
+  sessionExpired,
+  forbidden,
+  validation,
+  serverError,
+  malformed,
+}
+
+MealPlanType _mealPlanFromCode(String? code) {
+  switch ((code ?? '').toUpperCase()) {
+    case 'BREAKFAST':
+      return MealPlanType.breakfast;
+    case 'HALF_BOARD':
+      return MealPlanType.halfBoard;
+    case 'FULL_BOARD':
+      return MealPlanType.fullBoard;
+    case 'ALL_INCLUSIVE':
+      return MealPlanType.allInclusive;
+    case 'ROOM_ONLY':
+    default:
+      return MealPlanType.roomOnly;
+  }
+}
+
+CancellationPolicyType _cancellationPolicyFromCode(String? code) {
+  switch ((code ?? '').toUpperCase()) {
+    case 'FREE_CANCELLATION':
+      return CancellationPolicyType.freeCancellation;
+    case 'PARTIALLY_REFUNDABLE':
+      return CancellationPolicyType.partiallyRefundable;
+    case 'NON_REFUNDABLE':
+      return CancellationPolicyType.nonRefundable;
+    case 'CUSTOM':
+    default:
+      return CancellationPolicyType.custom;
+  }
 }
 
 class HotelStayCriteria {

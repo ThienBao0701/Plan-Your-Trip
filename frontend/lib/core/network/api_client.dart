@@ -823,6 +823,62 @@ class ApiClient {
     }
   }
 
+  /// Lists a room's real sellable rate plans with pricing + eligibility +
+  /// cancellation terms for a stay (`GET /api/rooms/{roomId}/rate-plans`). This
+  /// is a public, read-only endpoint distinct from the availability search — it
+  /// is never a duplicate of [getHotelAvailability]. Returns a JSON array.
+  Future<CollectionApiResult<List<HotelRatePlan>>> getRoomRatePlans({
+    required int roomId,
+    required DateTime checkIn,
+    required DateTime checkOut,
+    int adults = 2,
+    int children = 0,
+    int extraBeds = 0,
+  }) async {
+    String d(DateTime v) => '${v.year.toString().padLeft(4, '0')}-'
+        '${v.month.toString().padLeft(2, '0')}-'
+        '${v.day.toString().padLeft(2, '0')}';
+    final params = <String, String>{
+      'checkIn': d(checkIn),
+      'checkOut': d(checkOut),
+      'adults': adults.toString(),
+      'children': children.toString(),
+      'extraBeds': extraBeds.toString(),
+    };
+    try {
+      final res = await _client
+          .get(
+            Uri.parse('$baseUrl/rooms/$roomId/rate-plans')
+                .replace(queryParameters: params),
+            headers: _jsonHeaders,
+          )
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final decoded = jsonDecode(utf8.decode(res.bodyBytes));
+        if (decoded is! List) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(
+          decoded
+              .map((e) => HotelRatePlan.fromJson(e as Map<String, dynamic>))
+              .toList(),
+        );
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
   Map<String, dynamic> _failureForStatus(http.Response res) {
     Map<String, dynamic>? body;
     try {

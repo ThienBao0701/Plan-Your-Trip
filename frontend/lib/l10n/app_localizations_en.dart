@@ -6239,4 +6239,130 @@ class AppLocalizationsEn extends AppLocalizations {
   String hotelServiceUnavailable(String service) {
     return '$service (unavailable)';
   }
+
+  @override
+  String get roomSelectAction => 'Select this room';
+
+  @override
+  String roomSelectSemantic(String name) {
+    return 'Select $name';
+  }
+
+  @override
+  String get roomSelectedBadge => 'Selected';
+
+  @override
+  String roomDetailImageSemantic(String name) {
+    return 'Photos of $name';
+  }
+
+  @override
+  String roomCodeLabel(String code) {
+    return 'Room code $code';
+  }
+
+  @override
+  String roomBedConfig(int count, String bed) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count $bed',
+      one: '1 $bed',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get roomOccupancyTitle => 'Occupancy';
+
+  @override
+  String roomOccupancyAdults(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count adults',
+      one: '1 adult',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String roomOccupancyChildren(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count children',
+      one: '1 child',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get roomPriceTitle => 'Price';
+
+  @override
+  String hotelRoomCardSelectedSemantic(String name) {
+    return '$name, selected';
+  }
+
+  @override
+  String get roomRatePlansTitle => 'Rate plans';
+
+  @override
+  String get roomRatePlansLoadingMessage => 'Loading rate plans…';
+
+  @override
+  String get roomRatePlansErrorMessage =>
+      'We couldn\'t load rate plans. Please try again.';
+
+  @override
+  String get roomRatePlansInvalidDatesMessage =>
+      'Choose a check-out date after check-in to see rate plans.';
+
+  @override
+  String get roomRatePlansEmptyTitle => 'No rate plans';
+
+  @override
+  String get roomRatePlansEmptyMessage =>
+      'This room has no sellable rate plans for the selected stay.';
+
+  @override
+  String roomRatePlanSemantic(String name) {
+    return 'Rate plan $name';
+  }
+
+  @override
+  String roomRatePlanSelectedSemantic(String name) {
+    return 'Rate plan $name, selected';
+  }
+
+  @override
+  String get roomRatePlanIneligible => 'Not available for the selected stay.';
+
+  @override
+  String get ratePlanRefundable => 'Refundable';
+
+  @override
+  String get ratePlanNonRefundable => 'Non-refundable';
+
+  @override
+  String ratePlanFinalNightly(String price) {
+    return '$price / night';
+  }
+
+  @override
+  String ratePlanBaseNightly(String price) {
+    return 'Base $price / night';
+  }
+
+  @override
+  String ratePlanStaySubtotal(String price, int nights) {
+    String _temp0 = intl.Intl.pluralLogic(
+      nights,
+      locale: localeName,
+      other: '$nights nights',
+      one: '1 night',
+    );
+    return '$price for $_temp0';
+  }
 }

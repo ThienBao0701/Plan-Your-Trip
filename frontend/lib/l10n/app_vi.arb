@@ -3244,5 +3244,92 @@
     "placeholders": {
       "service": { "type": "String" }
     }
+  },
+  "roomSelectAction": "Chọn phòng này",
+  "roomSelectSemantic": "Chọn {name}",
+  "@roomSelectSemantic": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "roomSelectedBadge": "Đã chọn",
+  "roomDetailImageSemantic": "Ảnh của {name}",
+  "@roomDetailImageSemantic": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "roomCodeLabel": "Mã phòng {code}",
+  "@roomCodeLabel": {
+    "placeholders": {
+      "code": { "type": "String" }
+    }
+  },
+  "roomBedConfig": "{count, plural, other{{count} {bed}}}",
+  "@roomBedConfig": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "bed": { "type": "String" }
+    }
+  },
+  "roomOccupancyTitle": "Sức chứa",
+  "roomOccupancyAdults": "{count, plural, other{{count} người lớn}}",
+  "@roomOccupancyAdults": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "roomOccupancyChildren": "{count, plural, other{{count} trẻ em}}",
+  "@roomOccupancyChildren": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "roomPriceTitle": "Giá",
+  "hotelRoomCardSelectedSemantic": "{name}, đã chọn",
+  "@hotelRoomCardSelectedSemantic": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "roomRatePlansTitle": "Gói giá",
+  "roomRatePlansLoadingMessage": "Đang tải gói giá…",
+  "roomRatePlansErrorMessage": "Không thể tải gói giá. Vui lòng thử lại.",
+  "roomRatePlansInvalidDatesMessage": "Chọn ngày trả phòng sau ngày nhận phòng để xem gói giá.",
+  "roomRatePlansEmptyTitle": "Không có gói giá",
+  "roomRatePlansEmptyMessage": "Phòng này không có gói giá khả dụng cho kỳ lưu trú đã chọn.",
+  "roomRatePlanSemantic": "Gói giá {name}",
+  "@roomRatePlanSemantic": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "roomRatePlanSelectedSemantic": "Gói giá {name}, đã chọn",
+  "@roomRatePlanSelectedSemantic": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "roomRatePlanIneligible": "Không khả dụng cho kỳ lưu trú đã chọn.",
+  "ratePlanRefundable": "Được hoàn tiền",
+  "ratePlanNonRefundable": "Không hoàn tiền",
+  "ratePlanFinalNightly": "{price} / đêm",
+  "@ratePlanFinalNightly": {
+    "placeholders": {
+      "price": { "type": "String" }
+    }
+  },
+  "ratePlanBaseNightly": "Giá gốc {price} / đêm",
+  "@ratePlanBaseNightly": {
+    "placeholders": {
+      "price": { "type": "String" }
+    }
+  },
+  "ratePlanStaySubtotal": "{price} cho {nights, plural, other{{nights} đêm}}",
+  "@ratePlanStaySubtotal": {
+    "placeholders": {
+      "price": { "type": "String" },
+      "nights": { "type": "int" }
+    }
   }
 }
