@@ -879,6 +879,57 @@ class ApiClient {
     }
   }
 
+  /// Fetches the canonical, backend-computed pricing quote for a room + stay
+  /// from the public `POST /api/rooms/{roomId}/pricing/quote` endpoint. This is
+  /// read-only: it never creates a booking, holds inventory, or applies customer
+  /// benefits (the authenticated `/api/me/...` variant does that; deferred). All
+  /// prices come straight from the backend — nothing is computed client-side.
+  Future<CollectionApiResult<HotelPricingQuote>> getRoomPricingQuote({
+    required int roomId,
+    required DateTime checkIn,
+    required DateTime checkOut,
+    int adults = 2,
+    int children = 0,
+    int extraBeds = 0,
+    int? ratePlanId,
+  }) async {
+    try {
+      final res = await _client
+          .post(
+            Uri.parse('$baseUrl/rooms/$roomId/pricing/quote'),
+            headers: _jsonHeaders,
+            body: jsonEncode({
+              'checkIn': _isoDate(checkIn),
+              'checkOut': _isoDate(checkOut),
+              'adults': adults,
+              'children': children,
+              'extraBeds': extraBeds,
+              if (ratePlanId != null) 'ratePlanId': ratePlanId,
+            }),
+          )
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(HotelPricingQuote.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
   Map<String, dynamic> _failureForStatus(http.Response res) {
     Map<String, dynamic>? body;
     try {

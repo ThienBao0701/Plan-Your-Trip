@@ -14,6 +14,7 @@ import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/glass_widgets.dart';
 import '../auth/login_screen.dart';
 import '../expenses/expenses_screen.dart';
+import 'booking_summary_screen.dart';
 import 'hotel_booking_review_screen.dart';
 import 'hotel_utils.dart';
 import 'real_room_detail_screen.dart';
@@ -783,6 +784,27 @@ class _RealHotelAvailabilityViewState
               selected: app.selectedRoomId == room.roomId,
             ),
           ),
+        // UI25 — "Continue to booking" appears once a room is selected. It opens
+        // the booking-summary step (backend-priced draft flow); the selection
+        // lives in AppState, so this survives scrolling and re-loads.
+        if (app.selectedRoomId != null &&
+            rooms.any((r) => r.roomId == app.selectedRoomId)) ...[
+          const SizedBox(height: AppSpacing.sm),
+          OceanPrimaryButton(
+            key: const Key('booking-continue-action'),
+            label: l10n.bookingContinueAction,
+            icon: Icons.arrow_forward_rounded,
+            semanticLabel: l10n.bookingContinueSemantic,
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => BookingSummaryScreen(
+                  hotel: widget.hotel,
+                  criteria: _criteria,
+                ),
+              ),
+            ),
+          ),
+        ],
       ],
     );
   }

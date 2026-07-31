@@ -4827,6 +4827,282 @@ abstract class AppLocalizations {
   /// **'Duplicate booking creation was blocked.'**
   String get bookingDuplicatePrevented;
 
+  /// No description provided for @bookingContinueAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to booking'**
+  String get bookingContinueAction;
+
+  /// No description provided for @bookingContinueSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to booking with the selected room'**
+  String get bookingContinueSemantic;
+
+  /// No description provided for @bookingStepLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Step {current} of {total}'**
+  String bookingStepLabel(int current, int total);
+
+  /// No description provided for @bookingSummaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking summary'**
+  String get bookingSummaryTitle;
+
+  /// No description provided for @bookingSummaryStayTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your stay'**
+  String get bookingSummaryStayTitle;
+
+  /// No description provided for @bookingQuoteLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetching the latest price…'**
+  String get bookingQuoteLoadingMessage;
+
+  /// No description provided for @bookingQuoteErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load the price. Please try again.'**
+  String get bookingQuoteErrorMessage;
+
+  /// No description provided for @bookingQuoteInvalidDatesMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-out must be after check-in.'**
+  String get bookingQuoteInvalidDatesMessage;
+
+  /// No description provided for @bookingTripLinkedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked to your trip'**
+  String get bookingTripLinkedLabel;
+
+  /// No description provided for @bookingGuestInfoContinueAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to guest details'**
+  String get bookingGuestInfoContinueAction;
+
+  /// No description provided for @bookingGuestInfoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest details'**
+  String get bookingGuestInfoTitle;
+
+  /// No description provided for @bookingGuestSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Primary guest'**
+  String get bookingGuestSectionTitle;
+
+  /// No description provided for @bookingGuestNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Full name'**
+  String get bookingGuestNameLabel;
+
+  /// No description provided for @bookingGuestEmailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get bookingGuestEmailLabel;
+
+  /// No description provided for @bookingGuestPhoneLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone (optional)'**
+  String get bookingGuestPhoneLabel;
+
+  /// No description provided for @bookingGuestCountryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Country or region (optional)'**
+  String get bookingGuestCountryLabel;
+
+  /// No description provided for @bookingArrivalTimeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated arrival time (optional)'**
+  String get bookingArrivalTimeLabel;
+
+  /// No description provided for @bookingArrivalTimeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 15:00'**
+  String get bookingArrivalTimeHint;
+
+  /// No description provided for @bookingGuestLocalOnlyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Name, phone, country and arrival time are saved on this device for now — the booking API doesn\'t store them yet.'**
+  String get bookingGuestLocalOnlyNote;
+
+  /// No description provided for @bookingSpecialRequestsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Special requests'**
+  String get bookingSpecialRequestsTitle;
+
+  /// No description provided for @specialRequestLateCheckIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Late check-in'**
+  String get specialRequestLateCheckIn;
+
+  /// No description provided for @specialRequestHighFloor.
+  ///
+  /// In en, this message translates to:
+  /// **'High floor'**
+  String get specialRequestHighFloor;
+
+  /// No description provided for @specialRequestQuietRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Quiet room'**
+  String get specialRequestQuietRoom;
+
+  /// No description provided for @specialRequestTwinBed.
+  ///
+  /// In en, this message translates to:
+  /// **'Twin beds'**
+  String get specialRequestTwinBed;
+
+  /// No description provided for @specialRequestLargeBed.
+  ///
+  /// In en, this message translates to:
+  /// **'Large bed'**
+  String get specialRequestLargeBed;
+
+  /// No description provided for @bookingSpecialRequestNoteLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Other requests'**
+  String get bookingSpecialRequestNoteLabel;
+
+  /// No description provided for @bookingSpecialRequestNoteHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional. Requests are noted but not guaranteed.'**
+  String get bookingSpecialRequestNoteHelper;
+
+  /// No description provided for @bookingValidationNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter the guest\'s full name.'**
+  String get bookingValidationNameRequired;
+
+  /// No description provided for @bookingValidationEmailRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a contact email.'**
+  String get bookingValidationEmailRequired;
+
+  /// No description provided for @bookingValidationEmailInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email address.'**
+  String get bookingValidationEmailInvalid;
+
+  /// No description provided for @bookingValidationPhoneInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid phone number.'**
+  String get bookingValidationPhoneInvalid;
+
+  /// No description provided for @bookingValidationTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'This value is too long.'**
+  String get bookingValidationTooLong;
+
+  /// No description provided for @bookingReviewContinueAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to review'**
+  String get bookingReviewContinueAction;
+
+  /// No description provided for @bookingReviewGuestTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest details'**
+  String get bookingReviewGuestTitle;
+
+  /// No description provided for @bookingNoSpecialRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'No special requests'**
+  String get bookingNoSpecialRequests;
+
+  /// No description provided for @bookingDraftTermsAcknowledgement.
+  ///
+  /// In en, this message translates to:
+  /// **'I understand this prepares a booking draft only — no reservation, payment, or confirmation is made in this step.'**
+  String get bookingDraftTermsAcknowledgement;
+
+  /// No description provided for @bookingDraftNoReservationNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing a draft does not create a reservation or take payment.'**
+  String get bookingDraftNoReservationNote;
+
+  /// No description provided for @bookingPrepareAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Prepare booking'**
+  String get bookingPrepareAction;
+
+  /// No description provided for @bookingPrepareSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Prepare your booking draft'**
+  String get bookingPrepareSemantic;
+
+  /// No description provided for @bookingDraftInvalidMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Please complete the guest details first.'**
+  String get bookingDraftInvalidMessage;
+
+  /// No description provided for @bookingDraftQuoteMissingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The price is still loading. Please wait a moment.'**
+  String get bookingDraftQuoteMissingMessage;
+
+  /// No description provided for @bookingReadyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking ready'**
+  String get bookingReadyTitle;
+
+  /// No description provided for @bookingReadyHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Your booking is ready to confirm'**
+  String get bookingReadyHeadline;
+
+  /// No description provided for @bookingReadyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ve prepared your booking details. This is a draft — no reservation has been made, no payment taken, and no confirmation number issued. Connecting the reservation and payment steps is coming next.'**
+  String get bookingReadyBody;
+
+  /// No description provided for @bookingReadySemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking prepared and ready to confirm'**
+  String get bookingReadySemantic;
+
+  /// No description provided for @bookingReadyDoneAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to explore'**
+  String get bookingReadyDoneAction;
+
   /// No description provided for @checkoutTitle.
   ///
   /// In en, this message translates to:

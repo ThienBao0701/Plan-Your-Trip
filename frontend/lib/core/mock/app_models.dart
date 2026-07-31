@@ -2910,7 +2910,213 @@ class HotelPricingQuote {
     this.warnings = const [],
     this.eligibilityReason,
   });
+
+  /// Real-backend mirror of `RoomPricingQuoteDto.RoomPricingQuoteResponse`
+  /// (`POST /api/rooms/{roomId}/pricing/quote`, public, read-only). Every value
+  /// is taken straight from the response — the backend computes all prices, so
+  /// nothing here is calculated client-side (CLAUDE.md §6). `Map` decoding is
+  /// confined to this factory. Unlike the availability/rate-plan DTOs, the quote
+  /// carries a real `currency`, so downstream formatting is no longer hardcoded.
+  factory HotelPricingQuote.fromJson(Map<String, dynamic> json) {
+    final generated = _tryParseDate(json['quoteGeneratedAt']) ?? DateTime.now();
+    return HotelPricingQuote(
+      roomId: (json['roomId'] as num?)?.toInt() ?? 0,
+      roomName: (json['roomName'] as String?) ?? '',
+      roomCode: (json['roomCode'] as String?) ?? '',
+      placeId: (json['placeId'] as num?)?.toInt() ?? 0,
+      hotelId: (json['hotelId'] as num?)?.toInt(),
+      checkIn: _tryParseDate(json['checkIn']) ?? generated,
+      checkOut: _tryParseDate(json['checkOut']) ??
+          generated.add(const Duration(days: 1)),
+      nights: (json['nights'] as num?)?.toInt() ?? 1,
+      adults: (json['adults'] as num?)?.toInt() ?? 1,
+      children: (json['children'] as num?)?.toInt() ?? 0,
+      extraBeds: (json['extraBeds'] as num?)?.toInt() ?? 0,
+      selectedRatePlanId: (json['selectedRatePlanId'] as num?)?.toInt(),
+      selectedRatePlanCode: json['selectedRatePlanCode'] as String?,
+      selectedRatePlanName: json['selectedRatePlanName'] as String?,
+      mealPlanType: json['mealPlanType'] == null
+          ? null
+          : _mealPlanFromCode(json['mealPlanType'] as String?),
+      cancellationPolicyType: json['cancellationPolicyType'] == null
+          ? null
+          : _cancellationPolicyFromCode(
+              json['cancellationPolicyType'] as String?),
+      refundable: (json['refundable'] as bool?) ?? false,
+      cancellationDeadline: _tryParseDate(json['cancellationDeadline']),
+      baseNightlyRate: (json['baseNightlyRate'] as num?)?.toDouble(),
+      derivedAdjustment: (json['derivedAdjustment'] as num?)?.toDouble() ?? 0,
+      occupancyAdjustment:
+          (json['occupancyAdjustment'] as num?)?.toDouble() ?? 0,
+      childSupplement: (json['childSupplement'] as num?)?.toDouble() ?? 0,
+      extraBedSupplement: (json['extraBedSupplement'] as num?)?.toDouble() ?? 0,
+      finalNightlyRate: (json['finalNightlyRate'] as num?)?.toDouble(),
+      staySubtotal: (json['staySubtotal'] as num?)?.toDouble(),
+      promotionDiscount: (json['promotionDiscount'] as num?)?.toDouble() ?? 0,
+      totalBeforeCustomerBenefits:
+          (json['totalBeforeCustomerBenefits'] as num?)?.toDouble(),
+      finalQuotedPrice: (json['finalQuotedPrice'] as num?)?.toDouble(),
+      currency: (json['currency'] as String?) ?? 'VND',
+      inventoryAvailable: (json['inventoryAvailable'] as bool?) ?? true,
+      availableRooms: (json['availableRooms'] as num?)?.toInt() ?? 0,
+      quoteGeneratedAt: generated,
+      quoteExpiresAt: _tryParseDate(json['quoteExpiresAt']) ??
+          generated.add(const Duration(minutes: 15)),
+      warnings: (json['warnings'] as List?)
+              ?.map((e) => e.toString())
+              .toList(growable: false) ??
+          const [],
+      eligibilityReason: json['eligibilityReason'] as String?,
+    );
+  }
 }
+
+/// Preset special-request options offered in the booking guest form. Each maps
+/// to a localized label; the free-text note is stored separately. These are
+/// composed into the backend's single `specialRequest` string only when a
+/// future real booking-create call is wired (deferred).
+enum SpecialRequestPreset {
+  lateCheckIn,
+  highFloor,
+  quietRoom,
+  twinBed,
+  largeBed,
+}
+
+/// Locally-collected guest details for a booking draft. The backend booking
+/// request carries no guest/traveler/contact object (the booker is the JWT
+/// user, and no phone field exists in the domain), so [fullName], [phone] and
+/// [country] are foundation-only local data; [arrivalTime] folds into the
+/// backend `specialRequest` when a future create is wired.
+class BookingGuestInfo {
+  final String fullName;
+  final String email;
+  final String phone;
+  final String country;
+  final String arrivalTime;
+
+  const BookingGuestInfo({
+    this.fullName = '',
+    this.email = '',
+    this.phone = '',
+    this.country = '',
+    this.arrivalTime = '',
+  });
+}
+
+/// Per-field validation of the booking guest form. Pure value type — computed
+/// from the working fields with no backend call. Mirrors the backend's own
+/// `@NotNull`/`@Email` constraints where they exist, plus client-side length
+/// limits for the local-only fields.
+class BookingValidation {
+  final bool nameRequired;
+  final bool emailRequired;
+  final bool emailInvalid;
+  final bool phoneInvalid;
+  final bool nameTooLong;
+  final bool phoneTooLong;
+  final bool countryTooLong;
+  final bool noteTooLong;
+
+  const BookingValidation({
+    this.nameRequired = false,
+    this.emailRequired = false,
+    this.emailInvalid = false,
+    this.phoneInvalid = false,
+    this.nameTooLong = false,
+    this.phoneTooLong = false,
+    this.countryTooLong = false,
+    this.noteTooLong = false,
+  });
+
+  bool get isValid =>
+      !nameRequired &&
+      !emailRequired &&
+      !emailInvalid &&
+      !phoneInvalid &&
+      !nameTooLong &&
+      !phoneTooLong &&
+      !countryTooLong &&
+      !noteTooLong;
+
+  static const int maxNameLength = 120;
+  static const int maxPhoneLength = 32;
+  static const int maxCountryLength = 60;
+  static const int maxNoteLength = 500;
+}
+
+/// A prepared (not yet submitted) booking. This is the honest "Booking Ready"
+/// artifact of UI25: it snapshots the selected stay, guest details, requests and
+/// the backend-computed [quote], but it is **not** a reservation — no booking
+/// was created, so there is no reservation id, confirmation number, payment, or
+/// status. The side-effecting `POST /api/bookings` create is deferred.
+class BookingDraft {
+  final int placeId;
+  final String hotelName;
+  final int roomId;
+  final String roomName;
+  final String? roomCode;
+  final int? ratePlanId;
+  final String? ratePlanName;
+  final DateTime checkIn;
+  final DateTime checkOut;
+  final int nights;
+  final int adults;
+  final int children;
+  final int extraBeds;
+  final BookingGuestInfo guest;
+  final Set<SpecialRequestPreset> specialRequestPresets;
+  final String specialRequestNote;
+  final HotelPricingQuote quote;
+  final int? tripId;
+  final DateTime createdAt;
+
+  const BookingDraft({
+    required this.placeId,
+    required this.hotelName,
+    required this.roomId,
+    required this.roomName,
+    this.roomCode,
+    this.ratePlanId,
+    this.ratePlanName,
+    required this.checkIn,
+    required this.checkOut,
+    required this.nights,
+    required this.adults,
+    required this.children,
+    this.extraBeds = 0,
+    required this.guest,
+    this.specialRequestPresets = const {},
+    this.specialRequestNote = '',
+    required this.quote,
+    this.tripId,
+    required this.createdAt,
+  });
+}
+
+/// Outcome of loading a real room pricing quote
+/// (`POST /api/rooms/{id}/pricing/quote`). [unavailable] is the Demo Mode guard;
+/// [invalidDates] is a client-side guard mirroring the backend 400. The endpoint
+/// is public, so [sessionExpired]/[forbidden] are mapped defensively but not
+/// expected.
+enum BookingQuoteOutcome {
+  success,
+  unavailable,
+  invalidDates,
+  notFound,
+  network,
+  timeout,
+  sessionExpired,
+  forbidden,
+  validation,
+  serverError,
+  malformed,
+}
+
+/// Outcome of preparing a client-side [BookingDraft]. [unavailable] is the Demo
+/// Mode guard; [invalid] means the guest form failed validation; [quoteMissing]
+/// means no backend quote is loaded yet. No reservation is ever created here.
+enum BookingDraftOutcome { ready, invalid, quoteMissing, unavailable }
 
 class DemoBooking {
   final String code;

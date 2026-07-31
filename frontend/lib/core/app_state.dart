@@ -154,6 +154,28 @@ class AppState extends ChangeNotifier {
   int? roomRatePlansRoomId;
   int _roomRatePlanRequestId = 0;
 
+  // UI25 — Real booking flow foundation. A client-side booking DRAFT built on
+  // top of the UI24 selection, priced by the real read-only quote endpoint
+  // (`POST /api/rooms/{id}/pricing/quote`). No reservation is created — the
+  // side-effecting `POST /api/bookings` create + payment are deferred. The guest
+  // form is autosaved in-session (survives navigation) and reset only on logout
+  // / mode change via [_resetBookingFlowState]. Zero HTTP in Demo Mode.
+  String bookingGuestName = '';
+  String bookingContactEmail = '';
+  String bookingContactPhone = '';
+  String bookingGuestCountry = '';
+  String bookingArrivalTime = '';
+  Set<SpecialRequestPreset> bookingSpecialRequestPresets =
+      <SpecialRequestPreset>{};
+  String bookingSpecialRequestNote = '';
+  bool bookingTermsAccepted = false;
+  HotelPricingQuote? bookingQuote;
+  bool bookingQuoteLoading = false;
+  BookingQuoteOutcome? bookingQuoteError;
+  int? bookingQuoteRoomId;
+  int _bookingQuoteRequestId = 0;
+  BookingDraft? bookingDraft;
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -347,6 +369,28 @@ class AppState extends ChangeNotifier {
     roomRatePlansError = null;
     roomRatePlansRoomId = null;
     _roomRatePlanRequestId++;
+    // The booking-flow draft is downstream of room selection, so it resets on
+    // the same logout / mode-change boundaries (never on an in-session
+    // criteria change, which only revalidates the selection).
+    _resetBookingFlowState();
+  }
+
+  void _resetBookingFlowState() {
+    bookingGuestName = '';
+    bookingContactEmail = '';
+    bookingContactPhone = '';
+    bookingGuestCountry = '';
+    bookingArrivalTime = '';
+    bookingSpecialRequestPresets = <SpecialRequestPreset>{};
+    bookingSpecialRequestNote = '';
+    bookingTermsAccepted = false;
+    bookingQuote = null;
+    bookingQuoteLoading = false;
+    bookingQuoteError = null;
+    bookingQuoteRoomId = null;
+    bookingDraft = null;
+    // Bump the request id so any in-flight quote response is discarded.
+    _bookingQuoteRequestId++;
   }
 
   void _applyPersonalDataMode() {
@@ -2087,6 +2131,216 @@ class AppState extends ChangeNotifier {
     roomRatePlansError = outcome;
     notifyListeners();
     return outcome;
+  }
+
+  // ── UI25 Real booking flow foundation ─────────────────────────────────────
+
+  /// Guests / nights for the booking, taken from the availability result — never
+  /// recomputed client-side (aliases the UI24 selection getters for booking use).
+  int get bookingGuestCount => selectedGuestCount;
+  int get bookingNightCount => selectedNightCount;
+
+  /// Autosaves a single guest-form field in-session. Whitespace is trimmed on
+  /// finalization, not here, so the field editing experience is unaffected.
+  void updateBookingGuestField({
+    String? name,
+    String? email,
+    String? phone,
+    String? country,
+    String? arrivalTime,
+  }) {
+    if (name != null) bookingGuestName = name;
+    if (email != null) bookingContactEmail = email;
+    if (phone != null) bookingContactPhone = phone;
+    if (country != null) bookingGuestCountry = country;
+    if (arrivalTime != null) bookingArrivalTime = arrivalTime;
+    notifyListeners();
+  }
+
+  /// Prefills the contact email from the signed-in account when the guest form
+  /// is first opened and the field is still blank. Never overwrites user input.
+  void prefillBookingContactEmail() {
+    final current = bookingContactEmail.trim();
+    if (current.isEmpty && (email?.trim().isNotEmpty ?? false)) {
+      bookingContactEmail = email!.trim();
+      notifyListeners();
+    }
+  }
+
+  void toggleBookingSpecialRequest(SpecialRequestPreset preset) {
+    final next = Set<SpecialRequestPreset>.from(bookingSpecialRequestPresets);
+    if (!next.remove(preset)) next.add(preset);
+    bookingSpecialRequestPresets = next;
+    notifyListeners();
+  }
+
+  void setBookingSpecialRequestNote(String note) {
+    bookingSpecialRequestNote = note;
+    notifyListeners();
+  }
+
+  void setBookingTermsAccepted(bool accepted) {
+    if (bookingTermsAccepted == accepted) return;
+    bookingTermsAccepted = accepted;
+    notifyListeners();
+  }
+
+  /// Clears any prepared draft (leaves the guest form intact for editing).
+  void clearBookingDraft() {
+    if (bookingDraft == null) return;
+    bookingDraft = null;
+    notifyListeners();
+  }
+
+  BookingQuoteOutcome _mapBookingQuoteError(ApiErrorKind? kind) {
+    return switch (kind) {
+      ApiErrorKind.unauthorized => BookingQuoteOutcome.sessionExpired,
+      ApiErrorKind.forbidden => BookingQuoteOutcome.forbidden,
+      ApiErrorKind.notFound => BookingQuoteOutcome.notFound,
+      ApiErrorKind.validation => BookingQuoteOutcome.validation,
+      ApiErrorKind.network => BookingQuoteOutcome.network,
+      ApiErrorKind.timeout => BookingQuoteOutcome.timeout,
+      ApiErrorKind.server => BookingQuoteOutcome.serverError,
+      ApiErrorKind.malformed => BookingQuoteOutcome.malformed,
+      _ => BookingQuoteOutcome.serverError,
+    };
+  }
+
+  /// Loads the real, backend-computed pricing quote for [roomId] over the stay
+  /// in Real Mode only. Guards invalid dates client-side (mirroring the backend
+  /// 400). Reuses the cached quote for the same room unless [refresh] is set. A
+  /// newer load supersedes an older in-flight one (last wins).
+  Future<BookingQuoteOutcome> loadBookingQuote({
+    required int roomId,
+    required DateTime checkIn,
+    required DateTime checkOut,
+    int adults = 2,
+    int children = 0,
+    int extraBeds = 0,
+    int? ratePlanId,
+    bool refresh = false,
+  }) async {
+    if (demoMode) return BookingQuoteOutcome.unavailable;
+    final inDay = DateTime(checkIn.year, checkIn.month, checkIn.day);
+    final outDay = DateTime(checkOut.year, checkOut.month, checkOut.day);
+    if (!outDay.isAfter(inDay)) {
+      bookingQuoteRoomId = roomId;
+      bookingQuoteError = BookingQuoteOutcome.invalidDates;
+      bookingQuoteLoading = false;
+      notifyListeners();
+      return BookingQuoteOutcome.invalidDates;
+    }
+    if (!refresh &&
+        bookingQuoteRoomId == roomId &&
+        bookingQuoteError == null &&
+        bookingQuote != null) {
+      return BookingQuoteOutcome.success; // cached — no HTTP
+    }
+
+    final reqId = ++_bookingQuoteRequestId;
+    if (bookingQuoteRoomId != roomId) {
+      bookingQuote = null;
+    }
+    bookingQuoteRoomId = roomId;
+    bookingQuoteLoading = true;
+    bookingQuoteError = null;
+    notifyListeners();
+
+    final result = await api.getRoomPricingQuote(
+      roomId: roomId,
+      checkIn: inDay,
+      checkOut: outDay,
+      adults: adults,
+      children: children,
+      extraBeds: extraBeds,
+      ratePlanId: ratePlanId,
+    );
+
+    if (reqId != _bookingQuoteRequestId) {
+      return BookingQuoteOutcome.success; // superseded — discard
+    }
+    bookingQuoteLoading = false;
+    if (result.success && result.data != null) {
+      bookingQuote = result.data!;
+      bookingQuoteError = null;
+      notifyListeners();
+      return BookingQuoteOutcome.success;
+    }
+    final outcome = _mapBookingQuoteError(result.errorKind);
+    bookingQuoteError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Validates the current guest form. Pure — no backend call, no mutation.
+  /// Required name + email and email format mirror what a future create needs;
+  /// phone format and length caps guard the local-only fields.
+  BookingValidation validateBookingDraft() {
+    final name = bookingGuestName.trim();
+    final mail = bookingContactEmail.trim();
+    final phone = bookingContactPhone.trim();
+    final country = bookingGuestCountry.trim();
+    final note = bookingSpecialRequestNote.trim();
+    final emailRe = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+    final phoneRe = RegExp(r'^[+0-9][0-9 ()\-]{5,}$');
+    return BookingValidation(
+      nameRequired: name.isEmpty,
+      emailRequired: mail.isEmpty,
+      emailInvalid: mail.isNotEmpty && !emailRe.hasMatch(mail),
+      phoneInvalid: phone.isNotEmpty && !phoneRe.hasMatch(phone),
+      nameTooLong: name.length > BookingValidation.maxNameLength,
+      phoneTooLong: phone.length > BookingValidation.maxPhoneLength,
+      countryTooLong: country.length > BookingValidation.maxCountryLength,
+      noteTooLong: note.length > BookingValidation.maxNoteLength,
+    );
+  }
+
+  /// Prepares (but never submits) a client-side [BookingDraft] from the current
+  /// selection, guest form and loaded quote. Real Mode only. No reservation is
+  /// created — the side-effecting `POST /api/bookings` is deferred, so this can
+  /// never produce a fake confirmation.
+  BookingDraftOutcome finalizeBookingDraft({int? tripId}) {
+    if (demoMode) return BookingDraftOutcome.unavailable;
+    if (!validateBookingDraft().isValid) return BookingDraftOutcome.invalid;
+    final room = selectedRoom;
+    final quote = bookingQuote;
+    final availability = realAvailability;
+    if (room == null || quote == null || availability == null) {
+      return BookingDraftOutcome.quoteMissing;
+    }
+    final plan = selectedRatePlan;
+    final checkIn = availability.checkIn ?? quote.checkIn;
+    final checkOut = availability.checkOut ?? quote.checkOut;
+    bookingDraft = BookingDraft(
+      placeId: availability.placeId,
+      hotelName: availability.placeName,
+      roomId: room.roomId,
+      roomName: room.roomName,
+      roomCode: room.roomCode,
+      ratePlanId: plan?.ratePlanId ?? quote.selectedRatePlanId,
+      ratePlanName: plan?.rateName ?? quote.selectedRatePlanName,
+      checkIn: checkIn,
+      checkOut: checkOut,
+      nights: availability.nights,
+      adults: availability.adults,
+      children: availability.children,
+      extraBeds: quote.extraBeds,
+      guest: BookingGuestInfo(
+        fullName: bookingGuestName.trim(),
+        email: bookingContactEmail.trim(),
+        phone: bookingContactPhone.trim(),
+        country: bookingGuestCountry.trim(),
+        arrivalTime: bookingArrivalTime.trim(),
+      ),
+      specialRequestPresets:
+          Set<SpecialRequestPreset>.from(bookingSpecialRequestPresets),
+      specialRequestNote: bookingSpecialRequestNote.trim(),
+      quote: quote,
+      tripId: tripId,
+      createdAt: now(),
+    );
+    notifyListeners();
+    return BookingDraftOutcome.ready;
   }
 
   List<Place> filteredPlaces(PlaceQuery q) {

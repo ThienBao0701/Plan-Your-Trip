@@ -2788,6 +2788,157 @@ class AppLocalizationsVi extends AppLocalizations {
   String get bookingDuplicatePrevented => 'Đã chặn tạo đặt phòng trùng.';
 
   @override
+  String get bookingContinueAction => 'Tiếp tục đặt phòng';
+
+  @override
+  String get bookingContinueSemantic => 'Tiếp tục đặt phòng với phòng đã chọn';
+
+  @override
+  String bookingStepLabel(int current, int total) {
+    return 'Bước $current/$total';
+  }
+
+  @override
+  String get bookingSummaryTitle => 'Tóm tắt đặt phòng';
+
+  @override
+  String get bookingSummaryStayTitle => 'Kỳ nghỉ của bạn';
+
+  @override
+  String get bookingQuoteLoadingMessage => 'Đang lấy giá mới nhất…';
+
+  @override
+  String get bookingQuoteErrorMessage =>
+      'Không tải được giá. Vui lòng thử lại.';
+
+  @override
+  String get bookingQuoteInvalidDatesMessage =>
+      'Ngày trả phòng phải sau ngày nhận phòng.';
+
+  @override
+  String get bookingTripLinkedLabel => 'Đã liên kết với chuyến đi của bạn';
+
+  @override
+  String get bookingGuestInfoContinueAction => 'Tiếp tục nhập thông tin khách';
+
+  @override
+  String get bookingGuestInfoTitle => 'Thông tin khách';
+
+  @override
+  String get bookingGuestSectionTitle => 'Khách chính';
+
+  @override
+  String get bookingGuestNameLabel => 'Họ và tên';
+
+  @override
+  String get bookingGuestEmailLabel => 'Email';
+
+  @override
+  String get bookingGuestPhoneLabel => 'Số điện thoại (tùy chọn)';
+
+  @override
+  String get bookingGuestCountryLabel => 'Quốc gia hoặc khu vực (tùy chọn)';
+
+  @override
+  String get bookingArrivalTimeLabel => 'Giờ đến dự kiến (tùy chọn)';
+
+  @override
+  String get bookingArrivalTimeHint => 'ví dụ 15:00';
+
+  @override
+  String get bookingGuestLocalOnlyNote =>
+      'Họ tên, số điện thoại, quốc gia và giờ đến hiện chỉ được lưu trên thiết bị này — API đặt phòng chưa lưu các thông tin này.';
+
+  @override
+  String get bookingSpecialRequestsTitle => 'Yêu cầu đặc biệt';
+
+  @override
+  String get specialRequestLateCheckIn => 'Nhận phòng muộn';
+
+  @override
+  String get specialRequestHighFloor => 'Tầng cao';
+
+  @override
+  String get specialRequestQuietRoom => 'Phòng yên tĩnh';
+
+  @override
+  String get specialRequestTwinBed => 'Giường đôi tách';
+
+  @override
+  String get specialRequestLargeBed => 'Giường lớn';
+
+  @override
+  String get bookingSpecialRequestNoteLabel => 'Yêu cầu khác';
+
+  @override
+  String get bookingSpecialRequestNoteHelper =>
+      'Tùy chọn. Yêu cầu được ghi nhận nhưng không đảm bảo.';
+
+  @override
+  String get bookingValidationNameRequired => 'Vui lòng nhập họ tên của khách.';
+
+  @override
+  String get bookingValidationEmailRequired => 'Vui lòng nhập email liên hệ.';
+
+  @override
+  String get bookingValidationEmailInvalid => 'Nhập địa chỉ email hợp lệ.';
+
+  @override
+  String get bookingValidationPhoneInvalid => 'Nhập số điện thoại hợp lệ.';
+
+  @override
+  String get bookingValidationTooLong => 'Giá trị này quá dài.';
+
+  @override
+  String get bookingReviewContinueAction => 'Tiếp tục đến xem lại';
+
+  @override
+  String get bookingReviewGuestTitle => 'Thông tin khách';
+
+  @override
+  String get bookingNoSpecialRequests => 'Không có yêu cầu đặc biệt';
+
+  @override
+  String get bookingDraftTermsAcknowledgement =>
+      'Tôi hiểu bước này chỉ chuẩn bị bản nháp đặt phòng — chưa tạo đặt phòng, chưa thanh toán và chưa có xác nhận.';
+
+  @override
+  String get bookingDraftNoReservationNote =>
+      'Việc chuẩn bị bản nháp không tạo đặt phòng hay thu tiền.';
+
+  @override
+  String get bookingPrepareAction => 'Chuẩn bị đặt phòng';
+
+  @override
+  String get bookingPrepareSemantic => 'Chuẩn bị bản nháp đặt phòng của bạn';
+
+  @override
+  String get bookingDraftInvalidMessage =>
+      'Vui lòng hoàn tất thông tin khách trước.';
+
+  @override
+  String get bookingDraftQuoteMissingMessage =>
+      'Giá vẫn đang tải. Vui lòng đợi một chút.';
+
+  @override
+  String get bookingReadyTitle => 'Đặt phòng đã sẵn sàng';
+
+  @override
+  String get bookingReadyHeadline =>
+      'Đặt phòng của bạn đã sẵn sàng để xác nhận';
+
+  @override
+  String get bookingReadyBody =>
+      'Chúng tôi đã chuẩn bị thông tin đặt phòng của bạn. Đây là bản nháp — chưa tạo đặt phòng, chưa thu tiền và chưa cấp mã xác nhận. Việc kết nối bước đặt phòng và thanh toán sẽ có ở giai đoạn tiếp theo.';
+
+  @override
+  String get bookingReadySemantic =>
+      'Đặt phòng đã được chuẩn bị và sẵn sàng để xác nhận';
+
+  @override
+  String get bookingReadyDoneAction => 'Quay lại khám phá';
+
+  @override
   String get checkoutTitle => 'Thanh toán an toàn';
 
   @override

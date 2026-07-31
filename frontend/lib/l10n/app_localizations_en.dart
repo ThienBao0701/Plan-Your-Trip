@@ -2947,6 +2947,157 @@ class AppLocalizationsEn extends AppLocalizations {
       'Duplicate booking creation was blocked.';
 
   @override
+  String get bookingContinueAction => 'Continue to booking';
+
+  @override
+  String get bookingContinueSemantic =>
+      'Continue to booking with the selected room';
+
+  @override
+  String bookingStepLabel(int current, int total) {
+    return 'Step $current of $total';
+  }
+
+  @override
+  String get bookingSummaryTitle => 'Booking summary';
+
+  @override
+  String get bookingSummaryStayTitle => 'Your stay';
+
+  @override
+  String get bookingQuoteLoadingMessage => 'Fetching the latest price…';
+
+  @override
+  String get bookingQuoteErrorMessage =>
+      'We couldn\'t load the price. Please try again.';
+
+  @override
+  String get bookingQuoteInvalidDatesMessage =>
+      'Check-out must be after check-in.';
+
+  @override
+  String get bookingTripLinkedLabel => 'Linked to your trip';
+
+  @override
+  String get bookingGuestInfoContinueAction => 'Continue to guest details';
+
+  @override
+  String get bookingGuestInfoTitle => 'Guest details';
+
+  @override
+  String get bookingGuestSectionTitle => 'Primary guest';
+
+  @override
+  String get bookingGuestNameLabel => 'Full name';
+
+  @override
+  String get bookingGuestEmailLabel => 'Email';
+
+  @override
+  String get bookingGuestPhoneLabel => 'Phone (optional)';
+
+  @override
+  String get bookingGuestCountryLabel => 'Country or region (optional)';
+
+  @override
+  String get bookingArrivalTimeLabel => 'Estimated arrival time (optional)';
+
+  @override
+  String get bookingArrivalTimeHint => 'e.g. 15:00';
+
+  @override
+  String get bookingGuestLocalOnlyNote =>
+      'Name, phone, country and arrival time are saved on this device for now — the booking API doesn\'t store them yet.';
+
+  @override
+  String get bookingSpecialRequestsTitle => 'Special requests';
+
+  @override
+  String get specialRequestLateCheckIn => 'Late check-in';
+
+  @override
+  String get specialRequestHighFloor => 'High floor';
+
+  @override
+  String get specialRequestQuietRoom => 'Quiet room';
+
+  @override
+  String get specialRequestTwinBed => 'Twin beds';
+
+  @override
+  String get specialRequestLargeBed => 'Large bed';
+
+  @override
+  String get bookingSpecialRequestNoteLabel => 'Other requests';
+
+  @override
+  String get bookingSpecialRequestNoteHelper =>
+      'Optional. Requests are noted but not guaranteed.';
+
+  @override
+  String get bookingValidationNameRequired =>
+      'Please enter the guest\'s full name.';
+
+  @override
+  String get bookingValidationEmailRequired => 'Please enter a contact email.';
+
+  @override
+  String get bookingValidationEmailInvalid => 'Enter a valid email address.';
+
+  @override
+  String get bookingValidationPhoneInvalid => 'Enter a valid phone number.';
+
+  @override
+  String get bookingValidationTooLong => 'This value is too long.';
+
+  @override
+  String get bookingReviewContinueAction => 'Continue to review';
+
+  @override
+  String get bookingReviewGuestTitle => 'Guest details';
+
+  @override
+  String get bookingNoSpecialRequests => 'No special requests';
+
+  @override
+  String get bookingDraftTermsAcknowledgement =>
+      'I understand this prepares a booking draft only — no reservation, payment, or confirmation is made in this step.';
+
+  @override
+  String get bookingDraftNoReservationNote =>
+      'Preparing a draft does not create a reservation or take payment.';
+
+  @override
+  String get bookingPrepareAction => 'Prepare booking';
+
+  @override
+  String get bookingPrepareSemantic => 'Prepare your booking draft';
+
+  @override
+  String get bookingDraftInvalidMessage =>
+      'Please complete the guest details first.';
+
+  @override
+  String get bookingDraftQuoteMissingMessage =>
+      'The price is still loading. Please wait a moment.';
+
+  @override
+  String get bookingReadyTitle => 'Booking ready';
+
+  @override
+  String get bookingReadyHeadline => 'Your booking is ready to confirm';
+
+  @override
+  String get bookingReadyBody =>
+      'We\'ve prepared your booking details. This is a draft — no reservation has been made, no payment taken, and no confirmation number issued. Connecting the reservation and payment steps is coming next.';
+
+  @override
+  String get bookingReadySemantic => 'Booking prepared and ready to confirm';
+
+  @override
+  String get bookingReadyDoneAction => 'Back to explore';
+
+  @override
   String get checkoutTitle => 'Secure checkout';
 
   @override
