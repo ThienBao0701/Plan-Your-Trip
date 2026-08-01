@@ -3387,5 +3387,38 @@
       "price": { "type": "String" },
       "nights": { "type": "int" }
     }
-  }
+  },
+  "bookingCreateAction": "Tạo đặt phòng",
+  "bookingCreateSemantic": "Tạo đặt phòng của bạn",
+  "bookingCreatingLabel": "Đang tạo đặt phòng…",
+  "bookingResultTitle": "Đặt phòng của bạn",
+  "bookingResultCodeLabel": "Mã đặt phòng",
+  "bookingResultStatusLabel": "Trạng thái",
+  "bookingResultDoneAction": "Xong",
+  "bookingResultBaseLabel": "Giá phòng",
+  "bookingResultPaymentNextNote": "Đặt phòng của bạn đã được tạo. Thanh toán là bước tiếp theo và hiện chưa có trong ứng dụng — cơ sở lưu trú sẽ liên hệ, hoặc bạn có thể thanh toán khi tính năng này được bật.",
+  "bookingPriceChangedNote": "Giá cuối cùng do máy chủ xác nhận khác với báo giá trước đó. Số tiền hiển thị ở trên là số tiền áp dụng cho đặt phòng của bạn.",
+  "bookingStatusPendingLabel": "Đang chờ",
+  "bookingStatusConfirmedLabel": "Đã xác nhận",
+  "bookingStatusUnknownLabel": "Không xác định",
+  "bookingStatusPendingHeadline": "Đặt phòng đang chờ",
+  "bookingStatusPendingBody": "Chúng tôi đã tạo đặt phòng và đang giữ phòng cho bạn. Đặt phòng vẫn ở trạng thái đang chờ cho đến khi thanh toán và cơ sở lưu trú xác nhận — đây chưa phải là kỳ nghỉ đã được xác nhận.",
+  "bookingStatusConfirmedHeadline": "Đặt phòng đã xác nhận",
+  "bookingStatusConfirmedBody": "Đặt phòng của bạn đã được cơ sở lưu trú xác nhận.",
+  "bookingStatusGenericHeadline": "Trạng thái đặt phòng: {status}",
+  "@bookingStatusGenericHeadline": {
+    "placeholders": {
+      "status": { "type": "String" }
+    }
+  },
+  "bookingSubmitValidationMessage": "Một số thông tin đặt phòng không hợp lệ. Vui lòng kiểm tra lại ngày và số khách rồi thử lại.",
+  "bookingSubmitForbiddenMessage": "Bạn không có quyền tạo đặt phòng này.",
+  "bookingSubmitRoomUnavailableMessage": "Phòng hoặc gói giá này không còn khả dụng. Vui lòng quay lại và chọn lại.",
+  "bookingSubmitConflictMessage": "Phòng này vừa được đặt cho ngày của bạn. Vui lòng quay lại và thử phòng hoặc ngày khác.",
+  "bookingSubmitUnprocessableMessage": "Không thể đặt phòng này cho ngày đã chọn. Vui lòng quay lại và điều chỉnh kỳ nghỉ.",
+  "bookingSubmitServerErrorMessage": "Đã xảy ra lỗi khi tạo đặt phòng. Chưa có đặt phòng nào được tạo — vui lòng thử lại.",
+  "bookingSubmitNetworkMessage": "Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối và thử lại.",
+  "bookingSubmitUncertainTitle": "Chưa xác nhận đặt phòng",
+  "bookingSubmitUncertainBody": "Chúng tôi không thể xác nhận đặt phòng đã được tạo hay chưa. Vui lòng đừng gửi lại — hãy kiểm tra danh sách đặt phòng sau để xem đã thành công chưa.",
+  "bookingSubmitUncertainAcknowledge": "Tôi hiểu điều này có thể tạo ra một đặt phòng trùng lặp"
 }

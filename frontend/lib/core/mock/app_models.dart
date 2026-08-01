@@ -3118,6 +3118,217 @@ enum BookingQuoteOutcome {
 /// means no backend quote is loaded yet. No reservation is ever created here.
 enum BookingDraftOutcome { ready, invalid, quoteMissing, unavailable }
 
+String _isoDay(DateTime d) => '${d.year.toString().padLeft(4, '0')}-'
+    '${d.month.toString().padLeft(2, '0')}-'
+    '${d.day.toString().padLeft(2, '0')}';
+
+/// Typed request body for `POST /api/bookings` (verified against
+/// `BookingDto.BookingRequest`). Only backend-supported fields are sent — the
+/// backend has NO guest name / email / phone / country / arrival field, so those
+/// local-only draft fields are never included; the sole free text is
+/// [specialRequest]. `Map` construction is confined to [toJson]. UI26 collects no
+/// coupon / travel-credit / gift-card, so those optional fields are omitted.
+class BookingCreatePayload {
+  final int roomId;
+  final DateTime checkIn;
+  final DateTime checkOut;
+  final int adults;
+  final int children;
+  final int numberOfRooms;
+  final int extraBeds;
+  final int? ratePlanId;
+  final String? specialRequest;
+
+  const BookingCreatePayload({
+    required this.roomId,
+    required this.checkIn,
+    required this.checkOut,
+    required this.adults,
+    this.children = 0,
+    this.numberOfRooms = 1,
+    this.extraBeds = 0,
+    this.ratePlanId,
+    this.specialRequest,
+  });
+
+  Map<String, dynamic> toJson() {
+    final sr = specialRequest?.trim();
+    return {
+      'roomId': roomId,
+      'checkIn': _isoDay(checkIn),
+      'checkOut': _isoDay(checkOut),
+      'adults': adults,
+      'children': children,
+      'numberOfRooms': numberOfRooms,
+      'extraBeds': extraBeds,
+      if (ratePlanId != null) 'ratePlanId': ratePlanId,
+      if (sr != null && sr.isNotEmpty) 'specialRequest': sr,
+    };
+  }
+}
+
+/// A safe, backend-normalized view of `BookingStatus`. Unknown/future server
+/// values degrade to [unknown] (the raw string is preserved separately by the
+/// caller) rather than being coerced into a misleading known state.
+enum BookingStatusView {
+  pending,
+  confirmed,
+  checkInReady,
+  checkedIn,
+  checkedOut,
+  completed,
+  cancelled,
+  refunded,
+  archived,
+  noShow,
+  unknown,
+}
+
+BookingStatusView bookingStatusViewFromCode(String? raw) {
+  switch (raw?.trim().toUpperCase()) {
+    case 'PENDING':
+      return BookingStatusView.pending;
+    case 'CONFIRMED':
+      return BookingStatusView.confirmed;
+    case 'CHECK_IN_READY':
+      return BookingStatusView.checkInReady;
+    case 'CHECKED_IN':
+      return BookingStatusView.checkedIn;
+    case 'CHECKED_OUT':
+      return BookingStatusView.checkedOut;
+    case 'COMPLETED':
+      return BookingStatusView.completed;
+    case 'CANCELLED':
+      return BookingStatusView.cancelled;
+    case 'REFUNDED':
+      return BookingStatusView.refunded;
+    case 'ARCHIVED':
+      return BookingStatusView.archived;
+    case 'NO_SHOW':
+      return BookingStatusView.noShow;
+    default:
+      return BookingStatusView.unknown;
+  }
+}
+
+/// Real-backend mirror of `BookingDto.BookingResponse` (`POST /api/bookings`),
+/// carrying only the fields the booking-result screen renders. Every price /
+/// status / code value is the server's own (CLAUDE.md §6 — nothing computed
+/// client-side); [status] is kept as the RAW server string so an unknown future
+/// value is never coerced. `Map` decoding is confined to [fromJson].
+class BookingCreateRecord {
+  final int id;
+  final String bookingCode;
+  final int? hotelId;
+  final String hotelName;
+  final int roomId;
+  final String roomName;
+  final String? roomCode;
+  final DateTime? checkIn;
+  final DateTime? checkOut;
+  final int nights;
+  final int adults;
+  final int children;
+  final int numberOfRooms;
+  final String status;
+  final String currency;
+  final double? basePrice;
+  final double? ratePlanPrice;
+  final double? discountAmount;
+  final double? finalPrice;
+  final String? specialRequest;
+  final int? selectedRatePlanId;
+  final String? selectedRatePlanName;
+  final bool? refundable;
+  final DateTime? createdAt;
+  final DateTime? confirmedAt;
+
+  const BookingCreateRecord({
+    required this.id,
+    required this.bookingCode,
+    this.hotelId,
+    required this.hotelName,
+    required this.roomId,
+    required this.roomName,
+    this.roomCode,
+    this.checkIn,
+    this.checkOut,
+    this.nights = 0,
+    this.adults = 0,
+    this.children = 0,
+    this.numberOfRooms = 1,
+    required this.status,
+    this.currency = 'VND',
+    this.basePrice,
+    this.ratePlanPrice,
+    this.discountAmount,
+    this.finalPrice,
+    this.specialRequest,
+    this.selectedRatePlanId,
+    this.selectedRatePlanName,
+    this.refundable,
+    this.createdAt,
+    this.confirmedAt,
+  });
+
+  BookingStatusView get statusView => bookingStatusViewFromCode(status);
+
+  factory BookingCreateRecord.fromJson(Map<String, dynamic> json) {
+    return BookingCreateRecord(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      bookingCode: (json['bookingCode'] as String?) ?? '',
+      hotelId: (json['hotelId'] as num?)?.toInt(),
+      hotelName: (json['hotelName'] as String?) ?? '',
+      roomId: (json['roomId'] as num?)?.toInt() ?? 0,
+      roomName: (json['roomName'] as String?) ?? '',
+      roomCode: json['roomCode'] as String?,
+      checkIn: _tryParseDate(json['checkIn']),
+      checkOut: _tryParseDate(json['checkOut']),
+      nights: (json['nights'] as num?)?.toInt() ?? 0,
+      adults: (json['adults'] as num?)?.toInt() ?? 0,
+      children: (json['children'] as num?)?.toInt() ?? 0,
+      numberOfRooms: (json['numberOfRooms'] as num?)?.toInt() ?? 1,
+      status: (json['status'] as String?) ?? '',
+      currency: (json['currency'] as String?) ?? 'VND',
+      basePrice: (json['basePrice'] as num?)?.toDouble(),
+      ratePlanPrice: (json['ratePlanPrice'] as num?)?.toDouble(),
+      discountAmount: (json['discountAmount'] as num?)?.toDouble(),
+      finalPrice: (json['finalPrice'] as num?)?.toDouble(),
+      specialRequest: json['specialRequest'] as String?,
+      selectedRatePlanId: (json['selectedRatePlanId'] as num?)?.toInt(),
+      selectedRatePlanName: json['selectedRatePlanName'] as String?,
+      refundable: json['refundable'] as bool?,
+      createdAt: _tryParseDate(json['createdAt']),
+      confirmedAt: _tryParseDate(json['confirmedAt']),
+    );
+  }
+}
+
+/// Outcome of a real `POST /api/bookings` submission. Client-side guards:
+/// [demoUnavailable] (Demo Mode — zero HTTP), [busy] (a submit is already in
+/// flight — single-flight guard), [invalid] (guest form), [quoteMissing] (no
+/// selection/quote). Server-mapped: [validation] 400, [sessionExpired] 401,
+/// [forbidden] 403, [notFound] 404, [conflict] 409, [unprocessable] 422,
+/// [serverError] 5xx, [network] transport. [uncertain] is a WRITE-safety outcome
+/// — a timeout or malformed success where the booking MAY have been created, so
+/// no blind retry is safe.
+enum BookingSubmissionOutcome {
+  success,
+  invalid,
+  quoteMissing,
+  demoUnavailable,
+  busy,
+  validation,
+  sessionExpired,
+  forbidden,
+  notFound,
+  conflict,
+  unprocessable,
+  uncertain,
+  network,
+  serverError,
+}
+
 class DemoBooking {
   final String code;
   final String ownerUserId;

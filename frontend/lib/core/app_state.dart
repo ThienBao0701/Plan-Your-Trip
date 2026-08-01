@@ -176,6 +176,21 @@ class AppState extends ChangeNotifier {
   int _bookingQuoteRequestId = 0;
   BookingDraft? bookingDraft;
 
+  // UI26 — Real booking submission. `submitRealBooking` performs the real
+  // `POST /api/bookings` create (Real Mode only) and stores the server's own
+  // booking record. Single-flight (only one submit at a time); no optimistic
+  // insert; state advances only on a real backend response; the draft/guest form
+  // are preserved on any failure. Cleared on logout / mode-or-user change via
+  // [_resetBookingFlowState]. Zero HTTP in Demo Mode.
+  bool realBookingSubmitting = false;
+  BookingCreateRecord? lastCreatedBooking;
+  BookingSubmissionOutcome? realBookingSubmissionError;
+
+  /// True when the last submission could not be confirmed (timeout / malformed
+  /// success). The booking MAY have been created — no blind resubmit is safe.
+  bool get realBookingSubmissionUncertain =>
+      realBookingSubmissionError == BookingSubmissionOutcome.uncertain;
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -389,6 +404,11 @@ class AppState extends ChangeNotifier {
     bookingQuoteError = null;
     bookingQuoteRoomId = null;
     bookingDraft = null;
+    // UI26 — clear real submission state so a created booking never leaks across
+    // logout / mode / user change (session isolation).
+    realBookingSubmitting = false;
+    lastCreatedBooking = null;
+    realBookingSubmissionError = null;
     // Bump the request id so any in-flight quote response is discarded.
     _bookingQuoteRequestId++;
   }
@@ -966,6 +986,7 @@ class AppState extends ChangeNotifier {
       case ApiErrorKind.unprocessable:
       case ApiErrorKind.conflict:
       case ApiErrorKind.forbidden:
+      case ApiErrorKind.uncertain:
       case null:
         return SavedCollectionActionResult.serverError;
     }
@@ -1319,6 +1340,7 @@ class AppState extends ChangeNotifier {
       case ApiErrorKind.server:
       case ApiErrorKind.malformed:
       case ApiErrorKind.forbidden:
+      case ApiErrorKind.uncertain:
       case null:
         return WishlistActionResult.serverError;
     }
@@ -1577,6 +1599,7 @@ class AppState extends ChangeNotifier {
       ApiErrorKind.timeout => TripActionResult.timeout,
       ApiErrorKind.server => TripActionResult.serverError,
       ApiErrorKind.malformed => TripActionResult.malformed,
+      ApiErrorKind.uncertain => TripActionResult.serverError,
       null => TripActionResult.serverError,
     };
   }
@@ -2341,6 +2364,91 @@ class AppState extends ChangeNotifier {
     );
     notifyListeners();
     return BookingDraftOutcome.ready;
+  }
+
+  BookingSubmissionOutcome _mapBookingSubmissionError(ApiErrorKind? kind) {
+    return switch (kind) {
+      ApiErrorKind.unauthorized => BookingSubmissionOutcome.sessionExpired,
+      ApiErrorKind.forbidden => BookingSubmissionOutcome.forbidden,
+      ApiErrorKind.notFound => BookingSubmissionOutcome.notFound,
+      ApiErrorKind.validation => BookingSubmissionOutcome.validation,
+      ApiErrorKind.conflict => BookingSubmissionOutcome.conflict,
+      ApiErrorKind.unprocessable => BookingSubmissionOutcome.unprocessable,
+      ApiErrorKind.uncertain => BookingSubmissionOutcome.uncertain,
+      ApiErrorKind.network => BookingSubmissionOutcome.network,
+      ApiErrorKind.server => BookingSubmissionOutcome.serverError,
+      _ => BookingSubmissionOutcome.serverError,
+    };
+  }
+
+  /// Submits a REAL booking (`POST /api/bookings`) in Real Mode only. Returns
+  /// the server's own booking code / status / pricing — nothing is fabricated,
+  /// no payment state is implied, and [PENDING] stays pending. Single-flight:
+  /// while one submit is in flight a second call returns [busy] with no HTTP. On
+  /// any failure or an [uncertain] (timeout / malformed success) outcome the
+  /// draft and guest form are preserved and no automatic retry is attempted.
+  ///
+  /// [specialRequest] is the composed, backend-supported free text (guest
+  /// name/phone/country/email have no backend field and are never submitted).
+  Future<BookingSubmissionOutcome> submitRealBooking({
+    String? specialRequest,
+    int? tripId,
+  }) async {
+    // Demo Mode: zero HTTP. Single-flight guard: no second concurrent submit.
+    if (demoMode) return BookingSubmissionOutcome.demoUnavailable;
+    if (realBookingSubmitting) return BookingSubmissionOutcome.busy;
+    if (!validateBookingDraft().isValid) {
+      return BookingSubmissionOutcome.invalid;
+    }
+    final room = selectedRoom;
+    final quote = bookingQuote;
+    final availability = realAvailability;
+    if (room == null || quote == null || availability == null) {
+      return BookingSubmissionOutcome.quoteMissing;
+    }
+
+    final sr = specialRequest?.trim();
+    final payload = BookingCreatePayload(
+      roomId: room.roomId,
+      checkIn: availability.checkIn ?? quote.checkIn,
+      checkOut: availability.checkOut ?? quote.checkOut,
+      adults: availability.adults,
+      children: availability.children,
+      numberOfRooms: 1,
+      extraBeds: quote.extraBeds,
+      ratePlanId: selectedRatePlan?.ratePlanId ?? quote.selectedRatePlanId,
+      specialRequest: (sr != null && sr.isNotEmpty) ? sr : null,
+    );
+
+    realBookingSubmitting = true;
+    realBookingSubmissionError = null;
+    notifyListeners();
+
+    final result = await api.createBooking(payload);
+
+    realBookingSubmitting = false;
+    if (result.success && result.data != null) {
+      // Store the server's real record. Deliberately NOT clearing the draft or
+      // implying any payment success — payment is a separate future phase.
+      lastCreatedBooking = result.data!;
+      realBookingSubmissionError = null;
+      notifyListeners();
+      return BookingSubmissionOutcome.success;
+    }
+    // Failure / uncertain: preserve the draft + guest form so the user can
+    // review or recover; never fabricate a success.
+    final outcome = _mapBookingSubmissionError(result.errorKind);
+    realBookingSubmissionError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Clears a prior submission error so the user can explicitly recover (e.g.
+  /// dismiss an uncertain-submission warning). Does not touch [lastCreatedBooking].
+  void clearBookingSubmissionError() {
+    if (realBookingSubmissionError == null) return;
+    realBookingSubmissionError = null;
+    notifyListeners();
   }
 
   List<Place> filteredPlaces(PlaceQuery q) {

@@ -29,6 +29,56 @@ String specialRequestPresetLabel(
   }
 }
 
+/// Composes the single backend-supported `specialRequest` string from the
+/// user-selected presets, arrival time and free note (in a stable, localized
+/// order). The backend has NO guest name / email / phone / country field, so
+/// those are deliberately excluded here — only text the user actually entered as
+/// a request is submitted. Returns null when nothing was requested. Capped to
+/// [BookingValidation.maxNoteLength] to match the local guard.
+String? composeBookingSpecialRequest(
+  AppLocalizations l10n,
+  Set<SpecialRequestPreset> presets,
+  String arrivalTime,
+  String note,
+) {
+  final parts = <String>[];
+  for (final preset in SpecialRequestPreset.values) {
+    if (presets.contains(preset)) {
+      parts.add(specialRequestPresetLabel(l10n, preset));
+    }
+  }
+  final arrival = arrivalTime.trim();
+  if (arrival.isNotEmpty) {
+    parts.add('${l10n.bookingArrivalTimeLabel}: $arrival');
+  }
+  final trimmedNote = note.trim();
+  if (trimmedNote.isNotEmpty) parts.add(trimmedNote);
+  if (parts.isEmpty) return null;
+  var combined = parts.join('\n');
+  if (combined.length > BookingValidation.maxNoteLength) {
+    combined = combined.substring(0, BookingValidation.maxNoteLength);
+  }
+  return combined;
+}
+
+/// Localized short label for a booking status. PENDING / CONFIRMED (the states a
+/// freshly-created booking can hold) are localized; any other/unknown value
+/// shows the raw server code honestly rather than a coerced label.
+String bookingStatusChipLabel(
+  AppLocalizations l10n,
+  BookingStatusView view,
+  String raw,
+) {
+  switch (view) {
+    case BookingStatusView.pending:
+      return l10n.bookingStatusPendingLabel;
+    case BookingStatusView.confirmed:
+      return l10n.bookingStatusConfirmedLabel;
+    default:
+      return raw.trim().isEmpty ? l10n.bookingStatusUnknownLabel : raw.trim();
+  }
+}
+
 IconData specialRequestPresetIcon(SpecialRequestPreset preset) {
   switch (preset) {
     case SpecialRequestPreset.lateCheckIn:
@@ -406,6 +456,156 @@ class _PriceRow extends StatelessWidget {
         children: [
           Expanded(child: Text(label, style: style)),
           Text(value, style: style),
+        ],
+      ),
+    );
+  }
+}
+
+/// A status chip that always pairs an icon + localized text (never colour alone,
+/// per CLAUDE.md §10). The colour is advisory; the label is authoritative.
+class BookingStatusChip extends StatelessWidget {
+  final BookingStatusView view;
+  final String label;
+
+  const BookingStatusChip({
+    super.key,
+    required this.view,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final (IconData icon, Color color) = switch (view) {
+      BookingStatusView.pending => (
+          Icons.hourglass_top_rounded,
+          AppColors.ocean
+        ),
+      BookingStatusView.confirmed => (
+          Icons.verified_rounded,
+          AppColors.success
+        ),
+      BookingStatusView.checkInReady || BookingStatusView.checkedIn => (
+          Icons.login_rounded,
+          AppColors.turquoise600
+        ),
+      BookingStatusView.checkedOut || BookingStatusView.completed => (
+          Icons.check_circle_rounded,
+          AppColors.success
+        ),
+      BookingStatusView.cancelled ||
+      BookingStatusView.refunded ||
+      BookingStatusView.noShow =>
+        (Icons.cancel_rounded, AppColors.coral),
+      BookingStatusView.archived => (
+          Icons.inventory_2_rounded,
+          AppColors.ocean400
+        ),
+      BookingStatusView.unknown => (
+          Icons.help_outline_rounded,
+          AppColors.ocean
+        ),
+    };
+    return OceanStatusPill(label: label, icon: icon, color: color);
+  }
+}
+
+/// Stay snapshot for the booking-result screen, built entirely from the server's
+/// [BookingCreateRecord] (no client-side computation).
+class BookingResultSummaryCard extends StatelessWidget {
+  final BookingCreateRecord record;
+
+  const BookingResultSummaryCard({super.key, required this.record});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final date = DateFormat.yMMMd(Localizations.localeOf(context).toString());
+    final checkIn = record.checkIn;
+    final checkOut = record.checkOut;
+    return OceanGlassCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.bookingSummaryStayTitle,
+              style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: AppSpacing.xs),
+          Text(record.hotelName,
+              style: Theme.of(context).textTheme.headlineSmall),
+          const SizedBox(height: AppSpacing.xxs),
+          Text(record.roomName, style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: AppSpacing.md),
+          Wrap(
+            spacing: AppSpacing.xs,
+            runSpacing: AppSpacing.xs,
+            children: [
+              if (checkIn != null && checkOut != null)
+                OceanStatusPill(
+                  label: '${date.format(checkIn)} - ${date.format(checkOut)}',
+                  icon: Icons.calendar_month_rounded,
+                ),
+              OceanStatusPill(
+                label: l10n.hotelNights(record.nights),
+                icon: Icons.nights_stay_rounded,
+                color: AppColors.turquoise600,
+              ),
+              OceanStatusPill(
+                label: l10n.hotelGuestSummary(record.adults, record.children),
+                icon: Icons.group_rounded,
+                color: AppColors.ocean,
+              ),
+              if ((record.selectedRatePlanName ?? '').isNotEmpty)
+                OceanStatusPill(
+                  label: record.selectedRatePlanName!,
+                  icon: Icons.sell_rounded,
+                  color: AppColors.violet,
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Price breakdown for the booking-result screen. Every figure is the server's
+/// own final pricing from the create response — nothing is recomputed.
+class BookingResultPriceCard extends StatelessWidget {
+  final BookingCreateRecord record;
+
+  const BookingResultPriceCard({super.key, required this.record});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final cur = record.currency;
+    return OceanGlassCard(
+      semanticLabel: l10n.bookingPriceSemantic,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.bookingPriceTitle,
+              semanticsLabel: l10n.bookingPriceSemantic,
+              style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: AppSpacing.md),
+          if (record.basePrice != null)
+            _PriceRow(
+              label: l10n.bookingResultBaseLabel,
+              value: formatMoney(context, record.basePrice!, cur),
+            ),
+          if ((record.discountAmount ?? 0) > 0)
+            _PriceRow(
+              label: l10n.bookingPromotionDiscount,
+              value: '-${formatMoney(context, record.discountAmount!, cur)}',
+            ),
+          const Divider(height: AppSpacing.lg),
+          _PriceRow(
+            label: l10n.bookingFinalQuotedPrice,
+            value: record.finalPrice == null
+                ? l10n.bookingQuoteUnavailable
+                : formatMoney(context, record.finalPrice!, cur),
+            emphasized: true,
+          ),
         ],
       ),
     );

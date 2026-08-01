@@ -6516,4 +6516,103 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$price for $_temp0';
   }
+
+  @override
+  String get bookingCreateAction => 'Create booking';
+
+  @override
+  String get bookingCreateSemantic => 'Create your booking';
+
+  @override
+  String get bookingCreatingLabel => 'Creating your booking…';
+
+  @override
+  String get bookingResultTitle => 'Your booking';
+
+  @override
+  String get bookingResultCodeLabel => 'Booking code';
+
+  @override
+  String get bookingResultStatusLabel => 'Status';
+
+  @override
+  String get bookingResultDoneAction => 'Done';
+
+  @override
+  String get bookingResultBaseLabel => 'Room price';
+
+  @override
+  String get bookingResultPaymentNextNote =>
+      'Your booking is created. Payment is the next step and isn\'t available in the app yet — the property will follow up, or you can pay once payment is enabled.';
+
+  @override
+  String get bookingPriceChangedNote =>
+      'The final price confirmed by the server differs from the earlier quote. The amount shown above is the one that applies to your booking.';
+
+  @override
+  String get bookingStatusPendingLabel => 'Pending';
+
+  @override
+  String get bookingStatusConfirmedLabel => 'Confirmed';
+
+  @override
+  String get bookingStatusUnknownLabel => 'Unknown';
+
+  @override
+  String get bookingStatusPendingHeadline => 'Booking pending';
+
+  @override
+  String get bookingStatusPendingBody =>
+      'We\'ve created your booking and are holding the room. It stays pending until payment and property confirmation — it is not yet a confirmed stay.';
+
+  @override
+  String get bookingStatusConfirmedHeadline => 'Booking confirmed';
+
+  @override
+  String get bookingStatusConfirmedBody =>
+      'Your booking has been confirmed by the property.';
+
+  @override
+  String bookingStatusGenericHeadline(String status) {
+    return 'Booking status: $status';
+  }
+
+  @override
+  String get bookingSubmitValidationMessage =>
+      'Some booking details couldn\'t be accepted. Please review your dates and guests and try again.';
+
+  @override
+  String get bookingSubmitForbiddenMessage =>
+      'You don\'t have permission to create this booking.';
+
+  @override
+  String get bookingSubmitRoomUnavailableMessage =>
+      'This room or rate plan is no longer available. Please go back and choose again.';
+
+  @override
+  String get bookingSubmitConflictMessage =>
+      'This room was just taken for your dates. Please go back and try another room or dates.';
+
+  @override
+  String get bookingSubmitUnprocessableMessage =>
+      'This room can\'t be booked for the selected dates. Please go back and adjust your stay.';
+
+  @override
+  String get bookingSubmitServerErrorMessage =>
+      'Something went wrong creating your booking. No booking was created — please try again.';
+
+  @override
+  String get bookingSubmitNetworkMessage =>
+      'We couldn\'t reach the server. Please check your connection and try again.';
+
+  @override
+  String get bookingSubmitUncertainTitle => 'Booking not confirmed';
+
+  @override
+  String get bookingSubmitUncertainBody =>
+      'We couldn\'t confirm whether your booking was created. Please don\'t submit again — check your bookings later to see if it went through.';
+
+  @override
+  String get bookingSubmitUncertainAcknowledge =>
+      'I understand this may create a duplicate booking';
 }

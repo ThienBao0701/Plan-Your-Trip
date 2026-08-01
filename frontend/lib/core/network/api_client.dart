@@ -20,6 +20,10 @@ enum ApiErrorKind {
   unprocessable,
   server,
   malformed,
+  // Write-only: the request may have reached and been committed by the server
+  // (e.g. a timeout or malformed success on a create). Never map this to a
+  // clean failure and never blindly retry.
+  uncertain,
 }
 
 class CollectionApiResult<T> {
@@ -925,6 +929,53 @@ class ApiClient {
       return const CollectionApiResult.failure(ApiErrorKind.network);
     } on FormatException {
       return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  // A create is a WRITE, so it gets a longer budget than the read-only
+  // collections calls (the backend takes pessimistic inventory locks) and a
+  // WRITE-safe failure mapping below.
+  static const Duration _bookingTimeout = Duration(seconds: 20);
+
+  /// Creates a real backend booking (`POST /api/bookings`, authenticated).
+  /// Returns the server's own booking code / status / pricing — nothing is
+  /// fabricated. Because the backend has NO idempotency on create, this method
+  /// performs exactly one request and never retries: a timeout or a malformed
+  /// success is surfaced as [ApiErrorKind.uncertain] (the write may already have
+  /// been committed), NOT as a clean failure the caller could safely resubmit.
+  Future<CollectionApiResult<BookingCreateRecord>> createBooking(
+    BookingCreatePayload payload,
+  ) async {
+    try {
+      final res = await _client
+          .post(
+            Uri.parse('$baseUrl/bookings'),
+            headers: _jsonHeaders,
+            body: jsonEncode(payload.toJson()),
+          )
+          .timeout(_bookingTimeout);
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          // Success status but unreadable body — the booking may exist.
+          return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+        }
+        return CollectionApiResult.success(BookingCreateRecord.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      // The request may have reached the server and committed — uncertain.
+      return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      // Thrown parsing a success body → the booking may exist — uncertain.
+      return const CollectionApiResult.failure(ApiErrorKind.uncertain);
     } catch (_) {
       return const CollectionApiResult.failure(ApiErrorKind.network);
     }

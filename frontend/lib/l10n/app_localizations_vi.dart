@@ -6349,4 +6349,103 @@ class AppLocalizationsVi extends AppLocalizations {
     );
     return '$price cho $_temp0';
   }
+
+  @override
+  String get bookingCreateAction => 'Tạo đặt phòng';
+
+  @override
+  String get bookingCreateSemantic => 'Tạo đặt phòng của bạn';
+
+  @override
+  String get bookingCreatingLabel => 'Đang tạo đặt phòng…';
+
+  @override
+  String get bookingResultTitle => 'Đặt phòng của bạn';
+
+  @override
+  String get bookingResultCodeLabel => 'Mã đặt phòng';
+
+  @override
+  String get bookingResultStatusLabel => 'Trạng thái';
+
+  @override
+  String get bookingResultDoneAction => 'Xong';
+
+  @override
+  String get bookingResultBaseLabel => 'Giá phòng';
+
+  @override
+  String get bookingResultPaymentNextNote =>
+      'Đặt phòng của bạn đã được tạo. Thanh toán là bước tiếp theo và hiện chưa có trong ứng dụng — cơ sở lưu trú sẽ liên hệ, hoặc bạn có thể thanh toán khi tính năng này được bật.';
+
+  @override
+  String get bookingPriceChangedNote =>
+      'Giá cuối cùng do máy chủ xác nhận khác với báo giá trước đó. Số tiền hiển thị ở trên là số tiền áp dụng cho đặt phòng của bạn.';
+
+  @override
+  String get bookingStatusPendingLabel => 'Đang chờ';
+
+  @override
+  String get bookingStatusConfirmedLabel => 'Đã xác nhận';
+
+  @override
+  String get bookingStatusUnknownLabel => 'Không xác định';
+
+  @override
+  String get bookingStatusPendingHeadline => 'Đặt phòng đang chờ';
+
+  @override
+  String get bookingStatusPendingBody =>
+      'Chúng tôi đã tạo đặt phòng và đang giữ phòng cho bạn. Đặt phòng vẫn ở trạng thái đang chờ cho đến khi thanh toán và cơ sở lưu trú xác nhận — đây chưa phải là kỳ nghỉ đã được xác nhận.';
+
+  @override
+  String get bookingStatusConfirmedHeadline => 'Đặt phòng đã xác nhận';
+
+  @override
+  String get bookingStatusConfirmedBody =>
+      'Đặt phòng của bạn đã được cơ sở lưu trú xác nhận.';
+
+  @override
+  String bookingStatusGenericHeadline(String status) {
+    return 'Trạng thái đặt phòng: $status';
+  }
+
+  @override
+  String get bookingSubmitValidationMessage =>
+      'Một số thông tin đặt phòng không hợp lệ. Vui lòng kiểm tra lại ngày và số khách rồi thử lại.';
+
+  @override
+  String get bookingSubmitForbiddenMessage =>
+      'Bạn không có quyền tạo đặt phòng này.';
+
+  @override
+  String get bookingSubmitRoomUnavailableMessage =>
+      'Phòng hoặc gói giá này không còn khả dụng. Vui lòng quay lại và chọn lại.';
+
+  @override
+  String get bookingSubmitConflictMessage =>
+      'Phòng này vừa được đặt cho ngày của bạn. Vui lòng quay lại và thử phòng hoặc ngày khác.';
+
+  @override
+  String get bookingSubmitUnprocessableMessage =>
+      'Không thể đặt phòng này cho ngày đã chọn. Vui lòng quay lại và điều chỉnh kỳ nghỉ.';
+
+  @override
+  String get bookingSubmitServerErrorMessage =>
+      'Đã xảy ra lỗi khi tạo đặt phòng. Chưa có đặt phòng nào được tạo — vui lòng thử lại.';
+
+  @override
+  String get bookingSubmitNetworkMessage =>
+      'Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối và thử lại.';
+
+  @override
+  String get bookingSubmitUncertainTitle => 'Chưa xác nhận đặt phòng';
+
+  @override
+  String get bookingSubmitUncertainBody =>
+      'Chúng tôi không thể xác nhận đặt phòng đã được tạo hay chưa. Vui lòng đừng gửi lại — hãy kiểm tra danh sách đặt phòng sau để xem đã thành công chưa.';
+
+  @override
+  String get bookingSubmitUncertainAcknowledge =>
+      'Tôi hiểu điều này có thể tạo ra một đặt phòng trùng lặp';
 }

@@ -11073,6 +11073,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{price} for {nights, plural, =1{1 night} other{{nights} nights}}'**
   String ratePlanStaySubtotal(String price, int nights);
+
+  /// No description provided for @bookingCreateAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Create booking'**
+  String get bookingCreateAction;
+
+  /// No description provided for @bookingCreateSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your booking'**
+  String get bookingCreateSemantic;
+
+  /// No description provided for @bookingCreatingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating your booking…'**
+  String get bookingCreatingLabel;
+
+  /// No description provided for @bookingResultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your booking'**
+  String get bookingResultTitle;
+
+  /// No description provided for @bookingResultCodeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking code'**
+  String get bookingResultCodeLabel;
+
+  /// No description provided for @bookingResultStatusLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get bookingResultStatusLabel;
+
+  /// No description provided for @bookingResultDoneAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get bookingResultDoneAction;
+
+  /// No description provided for @bookingResultBaseLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Room price'**
+  String get bookingResultBaseLabel;
+
+  /// No description provided for @bookingResultPaymentNextNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Your booking is created. Payment is the next step and isn\'t available in the app yet — the property will follow up, or you can pay once payment is enabled.'**
+  String get bookingResultPaymentNextNote;
+
+  /// No description provided for @bookingPriceChangedNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The final price confirmed by the server differs from the earlier quote. The amount shown above is the one that applies to your booking.'**
+  String get bookingPriceChangedNote;
+
+  /// No description provided for @bookingStatusPendingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get bookingStatusPendingLabel;
+
+  /// No description provided for @bookingStatusConfirmedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed'**
+  String get bookingStatusConfirmedLabel;
+
+  /// No description provided for @bookingStatusUnknownLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get bookingStatusUnknownLabel;
+
+  /// No description provided for @bookingStatusPendingHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking pending'**
+  String get bookingStatusPendingHeadline;
+
+  /// No description provided for @bookingStatusPendingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ve created your booking and are holding the room. It stays pending until payment and property confirmation — it is not yet a confirmed stay.'**
+  String get bookingStatusPendingBody;
+
+  /// No description provided for @bookingStatusConfirmedHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking confirmed'**
+  String get bookingStatusConfirmedHeadline;
+
+  /// No description provided for @bookingStatusConfirmedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your booking has been confirmed by the property.'**
+  String get bookingStatusConfirmedBody;
+
+  /// No description provided for @bookingStatusGenericHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking status: {status}'**
+  String bookingStatusGenericHeadline(String status);
+
+  /// No description provided for @bookingSubmitValidationMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Some booking details couldn\'t be accepted. Please review your dates and guests and try again.'**
+  String get bookingSubmitValidationMessage;
+
+  /// No description provided for @bookingSubmitForbiddenMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have permission to create this booking.'**
+  String get bookingSubmitForbiddenMessage;
+
+  /// No description provided for @bookingSubmitRoomUnavailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This room or rate plan is no longer available. Please go back and choose again.'**
+  String get bookingSubmitRoomUnavailableMessage;
+
+  /// No description provided for @bookingSubmitConflictMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This room was just taken for your dates. Please go back and try another room or dates.'**
+  String get bookingSubmitConflictMessage;
+
+  /// No description provided for @bookingSubmitUnprocessableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This room can\'t be booked for the selected dates. Please go back and adjust your stay.'**
+  String get bookingSubmitUnprocessableMessage;
+
+  /// No description provided for @bookingSubmitServerErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong creating your booking. No booking was created — please try again.'**
+  String get bookingSubmitServerErrorMessage;
+
+  /// No description provided for @bookingSubmitNetworkMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t reach the server. Please check your connection and try again.'**
+  String get bookingSubmitNetworkMessage;
+
+  /// No description provided for @bookingSubmitUncertainTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking not confirmed'**
+  String get bookingSubmitUncertainTitle;
+
+  /// No description provided for @bookingSubmitUncertainBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t confirm whether your booking was created. Please don\'t submit again — check your bookings later to see if it went through.'**
+  String get bookingSubmitUncertainBody;
+
+  /// No description provided for @bookingSubmitUncertainAcknowledge.
+  ///
+  /// In en, this message translates to:
+  /// **'I understand this may create a duplicate booking'**
+  String get bookingSubmitUncertainAcknowledge;
 }
 
 class _AppLocalizationsDelegate

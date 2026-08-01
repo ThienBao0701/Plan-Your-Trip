@@ -666,11 +666,36 @@ void main() {
   });
 
   group('Booking review widget', () {
-    testWidgets('terms gate the prepare action; preparing opens Booking Ready',
+    // UI26: the review CTA now performs the real POST /api/bookings submission
+    // (was the UI25 draft-prepare step). Terms still gate it; success opens the
+    // real booking-result screen. (Full submit coverage lives in the UI26 test.)
+    testWidgets('terms gate the create action; creating opens the result',
         (tester) async {
       ignoreNetworkImageErrors();
-      final app = await seedReviewReady(
-          MockClient((request) async => jsonResponse(availabilityJson(), 200)));
+      final app = await seedReviewReady(MockClient((request) async {
+        if (request.method == 'POST' &&
+            request.url.path.endsWith('/bookings')) {
+          return jsonResponse({
+            'id': 55,
+            'bookingCode': 'PYT-20300601-000055',
+            'hotelId': 7,
+            'hotelName': 'Backend Villa',
+            'roomId': 100,
+            'roomName': 'Deluxe Garden View',
+            'roomCode': 'DLX',
+            'checkIn': '2030-06-01',
+            'checkOut': '2030-06-04',
+            'nights': 3,
+            'adults': 2,
+            'children': 0,
+            'numberOfRooms': 1,
+            'status': 'PENDING',
+            'currency': 'VND',
+            'finalPrice': 3300000,
+          }, 201);
+        }
+        return jsonResponse(availabilityJson(), 200);
+      }));
       await pumpSize(
         tester,
         testApp(
@@ -682,18 +707,18 @@ void main() {
       );
       expect(find.byKey(const Key('booking-review-content')), findsOneWidget);
 
-      // Prepare is disabled until the terms are acknowledged.
+      // Create is disabled until the terms are acknowledged.
       final button = tester.widget<OceanPrimaryButton>(
-          find.byKey(const Key('booking-prepare-action')));
+          find.byKey(const Key('booking-submit-action')));
       expect(button.onPressed, isNull);
 
       await tester.tap(find.byKey(const Key('booking-terms-checkbox')));
       await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('booking-prepare-action')));
+      await tester.tap(find.byKey(const Key('booking-submit-action')));
       await tester.pumpAndSettle();
 
-      expect(app.bookingDraft, isNotNull);
-      expect(find.byKey(const Key('booking-ready-content')), findsOneWidget);
+      expect(app.lastCreatedBooking, isNotNull);
+      expect(find.byKey(const Key('booking-result-content')), findsOneWidget);
     });
   });
 
