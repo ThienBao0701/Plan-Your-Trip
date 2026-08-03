@@ -6615,4 +6615,32 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get bookingSubmitUncertainAcknowledge =>
       'I understand this may create a duplicate booking';
+
+  @override
+  String get bookingsRealLoadingMessage => 'Loading your bookings…';
+
+  @override
+  String get bookingsRealErrorMessage =>
+      'We couldn\'t load your bookings. Please try again.';
+
+  @override
+  String get bookingDetailLoadingMessage => 'Loading booking details…';
+
+  @override
+  String get bookingDetailErrorMessage =>
+      'We couldn\'t load this booking. Please try again.';
+
+  @override
+  String get bookingDetailSpecialRequestLabel => 'Special request';
+
+  @override
+  String get bookingHistoryUncertainTitle =>
+      'A booking may not have gone through';
+
+  @override
+  String get bookingHistoryUncertainBody =>
+      'Your last booking couldn\'t be confirmed. Check the list below to see whether it was created before trying again.';
+
+  @override
+  String get bookingHistoryUncertainDismiss => 'Dismiss';
 }

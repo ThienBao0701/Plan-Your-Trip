@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:planyourtrip_frontend/core/app_state.dart';
 import 'package:planyourtrip_frontend/core/mock/app_models.dart';
 import 'package:planyourtrip_frontend/core/mock/mock_data.dart';
+import 'package:planyourtrip_frontend/core/network/api_client.dart';
 import 'package:planyourtrip_frontend/design/app_theme.dart';
 import 'package:planyourtrip_frontend/features/bookings/my_bookings_screen.dart';
 import 'package:planyourtrip_frontend/features/home/home_screen.dart';
@@ -32,11 +35,24 @@ void main() {
     addTearDown(() => FlutterError.onError = originalOnError);
   }
 
+  // Real Mode makes a real GET /api/me/bookings on the My Bookings screen (UI27);
+  // answer it with an empty history so the real path is deterministic.
+  ApiClient emptyBookingsApi() => ApiClient(
+        client: MockClient(
+          (_) async => http.Response(
+            '[]',
+            200,
+            headers: {'content-type': 'application/json; charset=utf-8'},
+          ),
+        ),
+      )..demoMode = false;
+
   AppState testState({bool demoMode = true}) {
     final app = AppState(
       now: () => today,
       bookingCodeGenerator: (sequence) =>
           'DEMO-${sequence.toString().padLeft(2, '0')}',
+      api: demoMode ? null : emptyBookingsApi(),
     )
       ..demoMode = demoMode
       ..email = demoMode ? MockData.demoEmail : 'real@example.com';

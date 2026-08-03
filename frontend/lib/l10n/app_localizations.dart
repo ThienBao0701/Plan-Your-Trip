@@ -11241,6 +11241,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'I understand this may create a duplicate booking'**
   String get bookingSubmitUncertainAcknowledge;
+
+  /// No description provided for @bookingsRealLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading your bookings…'**
+  String get bookingsRealLoadingMessage;
+
+  /// No description provided for @bookingsRealErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load your bookings. Please try again.'**
+  String get bookingsRealErrorMessage;
+
+  /// No description provided for @bookingDetailLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading booking details…'**
+  String get bookingDetailLoadingMessage;
+
+  /// No description provided for @bookingDetailErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load this booking. Please try again.'**
+  String get bookingDetailErrorMessage;
+
+  /// No description provided for @bookingDetailSpecialRequestLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Special request'**
+  String get bookingDetailSpecialRequestLabel;
+
+  /// No description provided for @bookingHistoryUncertainTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A booking may not have gone through'**
+  String get bookingHistoryUncertainTitle;
+
+  /// No description provided for @bookingHistoryUncertainBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your last booking couldn\'t be confirmed. Check the list below to see whether it was created before trying again.'**
+  String get bookingHistoryUncertainBody;
+
+  /// No description provided for @bookingHistoryUncertainDismiss.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get bookingHistoryUncertainDismiss;
 }
 
 class _AppLocalizationsDelegate

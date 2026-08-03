@@ -9,13 +9,16 @@ import '../../design/app_spacing.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/add_to_trip_sheet.dart';
 import '../../shared/widgets/glass_widgets.dart';
+import '../auth/login_screen.dart';
 import '../expenses/expenses_screen.dart';
+import '../hotels/booking_widgets.dart';
 import '../hotels/hotel_utils.dart';
 import '../payments/secure_checkout_screen.dart';
 import '../places/place_detail_screen.dart';
 import '../reviews/reviews_screen.dart';
 import '../timeline/timeline_screen.dart';
 import 'modify_booking_screen.dart';
+import 'real_booking_detail_screen.dart';
 
 class MyBookingsScreen extends StatefulWidget {
   final DateTime? today;
@@ -34,13 +37,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
     final app = AppScope.of(context);
     final l10n = AppLocalizations.of(context)!;
     final today = widget.today ?? app.now();
-    final bookings = app.demoBookings
-        .where((booking) => bookingInSection(booking, _section, today: today))
-        .toList()
-      ..sort((a, b) {
-        final date = a.criteria.checkIn.compareTo(b.criteria.checkIn);
-        return date == 0 ? a.code.compareTo(b.code) : date;
-      });
+    if (!app.demoMode) _maybeLoadReal(app);
 
     return Scaffold(
       appBar: OceanGlassAppBar(
@@ -54,62 +51,223 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
       body: BubbleBackground(
         child: SafeArea(
           top: false,
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.lg,
-              AppSpacing.lg,
-              AppSpacing.lg,
-              AppSpacing.xxl,
-            ),
+          child: app.demoMode
+              ? _buildDemo(context, app, l10n, today)
+              : _buildReal(context, app, l10n, today),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDemo(
+    BuildContext context,
+    AppState app,
+    AppLocalizations l10n,
+    DateTime today,
+  ) {
+    final bookings = app.demoBookings
+        .where((booking) => bookingInSection(booking, _section, today: today))
+        .toList()
+      ..sort((a, b) {
+        final date = a.criteria.checkIn.compareTo(b.criteria.checkIn);
+        return date == 0 ? a.code.compareTo(b.code) : date;
+      });
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.lg,
+        AppSpacing.lg,
+        AppSpacing.xxl,
+      ),
+      children: [
+        OceanContentConstraint(
+          maxWidth: AppBreakpoints.maxContentWidth,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              OceanContentConstraint(
-                maxWidth: AppBreakpoints.maxContentWidth,
-                child: !app.demoMode
-                    ? OceanEmptyState(
-                        title: l10n.myBookingsRealEmptyTitle,
-                        message: l10n.myBookingsRealEmptyMessage,
-                      )
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Text(
-                            l10n.myBookingsTitle,
-                            style: Theme.of(context).textTheme.displaySmall,
-                          ),
-                          const SizedBox(height: AppSpacing.xs),
-                          Text(
-                            l10n.myBookingsDemoLocalOnly,
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
-                          const SizedBox(height: AppSpacing.md),
-                          _SectionSwitch(
-                            selected: _section,
-                            onChanged: (section) =>
-                                setState(() => _section = section),
-                          ),
-                          const SizedBox(height: AppSpacing.lg),
-                          if (bookings.isEmpty)
-                            OceanEmptyState(
-                              title: l10n.myBookingsEmptyTitle,
-                              message: l10n.myBookingsEmptyMessage,
-                            )
-                          else
-                            for (final booking in bookings)
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                  bottom: AppSpacing.md,
-                                ),
-                                child: _BookingCard(
-                                  booking: booking,
-                                  onTap: () => _openBooking(booking, today),
-                                ),
-                              ),
-                        ],
-                      ),
+              Text(
+                l10n.myBookingsTitle,
+                style: Theme.of(context).textTheme.displaySmall,
               ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                l10n.myBookingsDemoLocalOnly,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+              const SizedBox(height: AppSpacing.md),
+              _SectionSwitch(
+                selected: _section,
+                onChanged: (section) => setState(() => _section = section),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              if (bookings.isEmpty)
+                OceanEmptyState(
+                  title: l10n.myBookingsEmptyTitle,
+                  message: l10n.myBookingsEmptyMessage,
+                )
+              else
+                for (final booking in bookings)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                    child: _BookingCard(
+                      booking: booking,
+                      onTap: () => _openBooking(booking, today),
+                    ),
+                  ),
             ],
           ),
         ),
+      ],
+    );
+  }
+
+  // Fire the real history load once. Guarded so it never re-issues while loading,
+  // after a successful load, or after an error (retry is explicit via the error
+  // state's reload action / pull-to-refresh) — no polling loop.
+  void _maybeLoadReal(AppState app) {
+    if (app.realBookingsLoaded ||
+        app.realBookingsLoading ||
+        app.realBookingsError != null) {
+      return;
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) app.loadMyBookings();
+    });
+  }
+
+  Widget _buildReal(
+    BuildContext context,
+    AppState app,
+    AppLocalizations l10n,
+    DateTime today,
+  ) {
+    if (app.realBookingsError == BookingHistoryOutcome.sessionExpired &&
+        !app.realBookingsLoaded) {
+      return _centeredReal(
+        OceanSessionExpiredState(
+          key: const Key('booking-history-session-expired'),
+          onLogin: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const LoginScreen()),
+          ),
+          onReturnHome: () => Navigator.maybePop(context),
+        ),
+      );
+    }
+    if (app.realBookingsLoading && !app.realBookingsLoaded) {
+      return _centeredReal(
+        Semantics(
+          liveRegion: true,
+          label: l10n.bookingsRealLoadingMessage,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: AppSpacing.md),
+              Text(l10n.bookingsRealLoadingMessage),
+            ],
+          ),
+        ),
+      );
+    }
+    if (app.realBookingsError != null && !app.realBookingsLoaded) {
+      return _centeredReal(
+        OceanRecoverableErrorState(
+          key: const Key('booking-history-error'),
+          message: l10n.bookingsRealErrorMessage,
+          onReload: () => app.loadMyBookings(refresh: true),
+        ),
+      );
+    }
+    final filtered = app.realBookings
+        .where(
+          (b) => bookingSectionMatchesReal(
+            b.statusView,
+            b.checkIn,
+            _section,
+            today: today,
+          ),
+        )
+        .toList();
+    return RefreshIndicator(
+      onRefresh: () => app.loadMyBookings(refresh: true),
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.lg,
+          AppSpacing.lg,
+          AppSpacing.xxl,
+        ),
+        children: [
+          OceanContentConstraint(
+            maxWidth: AppBreakpoints.maxContentWidth,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  l10n.myBookingsTitle,
+                  style: Theme.of(context).textTheme.displaySmall,
+                ),
+                const SizedBox(height: AppSpacing.md),
+                if (app.realBookingSubmissionUncertain) ...[
+                  _UncertainHistoryBanner(
+                    onDismiss: () => app.clearBookingSubmissionError(),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                ],
+                _SectionSwitch(
+                  selected: _section,
+                  onChanged: (section) => setState(() => _section = section),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                if (app.realBookings.isEmpty)
+                  OceanEmptyState(
+                    key: const Key('booking-history-empty'),
+                    title: l10n.myBookingsRealEmptyTitle,
+                    message: l10n.myBookingsRealEmptyMessage,
+                  )
+                else if (filtered.isEmpty)
+                  OceanEmptyState(
+                    key: const Key('booking-history-section-empty'),
+                    title: l10n.myBookingsEmptyTitle,
+                    message: l10n.myBookingsEmptyMessage,
+                  )
+                else
+                  for (final record in filtered)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                      child: RealBookingSummaryCard(
+                        record: record,
+                        onTap: () => _openRealBooking(record.id),
+                      ),
+                    ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _centeredReal(Widget child) => ListView(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.xxl,
+          AppSpacing.lg,
+          AppSpacing.xxl,
+        ),
+        children: [
+          OceanContentConstraint(
+            maxWidth: AppBreakpoints.maxContentWidth,
+            child: Center(child: child),
+          ),
+        ],
+      );
+
+  void _openRealBooking(int bookingId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => RealBookingDetailScreen(bookingId: bookingId),
       ),
     );
   }
@@ -152,6 +310,65 @@ class _SectionSwitch extends StatelessWidget {
         ],
         selected: {selected},
         onSelectionChanged: (values) => onChanged(values.first),
+      ),
+    );
+  }
+}
+
+/// Honest reconciliation surface for a UI26 uncertain submission (a create whose
+/// outcome could not be confirmed). The backend has no idempotency key, so the
+/// booking cannot be positively matched — this advisory points the user at the
+/// list below to check for themselves and lets them dismiss it. No auto-match,
+/// no auto-clear, no fabricated reconciliation.
+class _UncertainHistoryBanner extends StatelessWidget {
+  final VoidCallback onDismiss;
+
+  const _UncertainHistoryBanner({required this.onDismiss});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Semantics(
+      liveRegion: true,
+      child: OceanGlassSurface(
+        key: const Key('booking-history-uncertain'),
+        blur: 0,
+        color: AppColors.paleCyan,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(Icons.help_outline_rounded, color: AppColors.coral),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Text(
+                    l10n.bookingHistoryUncertainTitle,
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleMedium
+                        ?.copyWith(color: AppColors.coral),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              l10n.bookingHistoryUncertainBody,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                key: const Key('booking-history-uncertain-dismiss'),
+                onPressed: onDismiss,
+                child: Text(l10n.bookingHistoryUncertainDismiss),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

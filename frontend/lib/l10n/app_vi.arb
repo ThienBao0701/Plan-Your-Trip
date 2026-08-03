@@ -3420,5 +3420,13 @@
   "bookingSubmitNetworkMessage": "Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối và thử lại.",
   "bookingSubmitUncertainTitle": "Chưa xác nhận đặt phòng",
   "bookingSubmitUncertainBody": "Chúng tôi không thể xác nhận đặt phòng đã được tạo hay chưa. Vui lòng đừng gửi lại — hãy kiểm tra danh sách đặt phòng sau để xem đã thành công chưa.",
-  "bookingSubmitUncertainAcknowledge": "Tôi hiểu điều này có thể tạo ra một đặt phòng trùng lặp"
+  "bookingSubmitUncertainAcknowledge": "Tôi hiểu điều này có thể tạo ra một đặt phòng trùng lặp",
+  "bookingsRealLoadingMessage": "Đang tải đặt phòng của bạn…",
+  "bookingsRealErrorMessage": "Không thể tải danh sách đặt phòng. Vui lòng thử lại.",
+  "bookingDetailLoadingMessage": "Đang tải chi tiết đặt phòng…",
+  "bookingDetailErrorMessage": "Không thể tải đặt phòng này. Vui lòng thử lại.",
+  "bookingDetailSpecialRequestLabel": "Yêu cầu đặc biệt",
+  "bookingHistoryUncertainTitle": "Một đặt phòng có thể chưa thành công",
+  "bookingHistoryUncertainBody": "Đặt phòng gần nhất của bạn chưa được xác nhận. Hãy kiểm tra danh sách bên dưới để xem nó đã được tạo hay chưa trước khi thử lại.",
+  "bookingHistoryUncertainDismiss": "Bỏ qua"
 }

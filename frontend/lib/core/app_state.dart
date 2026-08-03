@@ -191,6 +191,21 @@ class AppState extends ChangeNotifier {
   bool get realBookingSubmissionUncertain =>
       realBookingSubmissionError == BookingSubmissionOutcome.uncertain;
 
+  // ── Real Mode Booking History (/api/me/bookings + /api/bookings/{id}, UI-27) ─
+  // Parallel to the demo-only [demoBookings] list — never merged. Read-only:
+  // the full history list (bare array, no paging) + a per-id detail cache. A 401
+  // here never calls logout(); the caller shows a re-auth affordance. Cleared on
+  // logout / mode / user change via [_resetRealBookingHistoryState]. Zero HTTP in
+  // Demo Mode.
+  List<BookingSummaryRecord> realBookings = [];
+  bool realBookingsLoading = false;
+  bool realBookingsLoaded = false;
+  bool realBookingsRefreshing = false;
+  BookingHistoryOutcome? realBookingsError;
+  final Map<int, BookingCreateRecord> bookingDetailCache = {};
+  int? bookingDetailLoadingId;
+  BookingHistoryOutcome? bookingDetailError;
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -280,6 +295,7 @@ class AppState extends ChangeNotifier {
     _resetRealTripsState();
     _resetRealSearchState();
     _resetRealAvailabilityState();
+    _resetRealBookingHistoryState();
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -345,6 +361,17 @@ class AppState extends ChangeNotifier {
     realTripDetailError = null;
     realTripCreateInFlight = false;
     realTripActionInFlight = false;
+  }
+
+  void _resetRealBookingHistoryState() {
+    realBookings = [];
+    realBookingsLoading = false;
+    realBookingsLoaded = false;
+    realBookingsRefreshing = false;
+    realBookingsError = null;
+    bookingDetailCache.clear();
+    bookingDetailLoadingId = null;
+    bookingDetailError = null;
   }
 
   void _resetRealSearchState() {
@@ -452,6 +479,7 @@ class AppState extends ChangeNotifier {
     _resetRealTripsState();
     _resetRealSearchState();
     _resetRealAvailabilityState();
+    _resetRealBookingHistoryState();
     timeline = [];
     expenses = [];
     demoBookings = [];
@@ -2449,6 +2477,83 @@ class AppState extends ChangeNotifier {
     if (realBookingSubmissionError == null) return;
     realBookingSubmissionError = null;
     notifyListeners();
+  }
+
+  BookingHistoryOutcome _mapBookingHistoryError(ApiErrorKind? kind) {
+    return switch (kind) {
+      ApiErrorKind.unauthorized => BookingHistoryOutcome.sessionExpired,
+      ApiErrorKind.forbidden => BookingHistoryOutcome.forbidden,
+      ApiErrorKind.notFound => BookingHistoryOutcome.notFound,
+      ApiErrorKind.network => BookingHistoryOutcome.network,
+      ApiErrorKind.timeout => BookingHistoryOutcome.network,
+      ApiErrorKind.server => BookingHistoryOutcome.serverError,
+      _ => BookingHistoryOutcome.serverError,
+    };
+  }
+
+  /// Loads the authenticated user's real booking history (`GET /api/me/bookings`,
+  /// UI-27). [refresh] forces a re-fetch (pull-to-refresh) and preserves the
+  /// current list if the re-fetch fails. Zero HTTP in Demo Mode. A 401 maps to
+  /// [BookingHistoryOutcome.sessionExpired] and never calls [logout].
+  Future<BookingHistoryOutcome> loadMyBookings({bool refresh = false}) async {
+    if (demoMode) return BookingHistoryOutcome.demoUnavailable;
+    if (realBookingsLoading || realBookingsRefreshing) {
+      return BookingHistoryOutcome.success;
+    }
+    if (realBookingsLoaded && !refresh) return BookingHistoryOutcome.success;
+    if (refresh) {
+      realBookingsRefreshing = true;
+    } else {
+      realBookingsLoading = true;
+    }
+    realBookingsError = null;
+    notifyListeners();
+    final result = await api.getMyBookings();
+    realBookingsLoading = false;
+    realBookingsRefreshing = false;
+    if (result.success && result.data != null) {
+      realBookings = result.data!;
+      realBookingsLoaded = true;
+      realBookingsError = null;
+      notifyListeners();
+      return BookingHistoryOutcome.success;
+    }
+    // Preserve any previously loaded list; only surface the error.
+    final outcome = _mapBookingHistoryError(result.errorKind);
+    realBookingsError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  BookingCreateRecord? bookingDetailFor(int id) => bookingDetailCache[id];
+
+  /// Loads one real booking's full detail (`GET /api/bookings/{id}`, UI-27) into
+  /// [bookingDetailCache]. A cached record short-circuits unless [refresh]. Zero
+  /// HTTP in Demo Mode; a 401 maps to [sessionExpired] and never calls [logout].
+  Future<BookingHistoryOutcome> loadBookingDetail(
+    int id, {
+    bool refresh = false,
+  }) async {
+    if (demoMode) return BookingHistoryOutcome.demoUnavailable;
+    if (bookingDetailCache.containsKey(id) && !refresh) {
+      return BookingHistoryOutcome.success;
+    }
+    if (bookingDetailLoadingId == id) return BookingHistoryOutcome.success;
+    bookingDetailLoadingId = id;
+    bookingDetailError = null;
+    notifyListeners();
+    final result = await api.getBookingDetail(id);
+    bookingDetailLoadingId = null;
+    if (result.success && result.data != null) {
+      bookingDetailCache[id] = result.data!;
+      bookingDetailError = null;
+      notifyListeners();
+      return BookingHistoryOutcome.success;
+    }
+    final outcome = _mapBookingHistoryError(result.errorKind);
+    bookingDetailError = outcome;
+    notifyListeners();
+    return outcome;
   }
 
   List<Place> filteredPlaces(PlaceQuery q) {

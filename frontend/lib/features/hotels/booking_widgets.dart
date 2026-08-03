@@ -568,6 +568,90 @@ class BookingResultSummaryCard extends StatelessWidget {
   }
 }
 
+/// A booking-history row (UI27) built entirely from the server's
+/// [BookingSummaryRecord] (`GET /api/me/bookings`). Shows only backend fields —
+/// no fabricated hotel image (the summary DTO carries none), price, status or
+/// code. Status is a [BookingStatusChip] (icon + text, never colour alone).
+class RealBookingSummaryCard extends StatelessWidget {
+  final BookingSummaryRecord record;
+  final VoidCallback onTap;
+
+  const RealBookingSummaryCard({
+    super.key,
+    required this.record,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final date = DateFormat.yMMMd(Localizations.localeOf(context).toString());
+    final checkIn = record.checkIn;
+    final checkOut = record.checkOut;
+    return OceanGlassCard(
+      key: Key('real-booking-card-${record.id}'),
+      onTap: onTap,
+      semanticLabel: l10n.myBookingCardSemantic,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Text(
+                  record.hotelName,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              BookingStatusChip(
+                view: record.statusView,
+                label: bookingStatusChipLabel(
+                  l10n,
+                  record.statusView,
+                  record.status,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(record.roomName, style: Theme.of(context).textTheme.bodyLarge),
+          const SizedBox(height: AppSpacing.sm),
+          Wrap(
+            spacing: AppSpacing.xs,
+            runSpacing: AppSpacing.xs,
+            children: [
+              if (checkIn != null && checkOut != null)
+                OceanStatusPill(
+                  label: '${date.format(checkIn)} - ${date.format(checkOut)}',
+                  icon: Icons.calendar_month_rounded,
+                ),
+              Semantics(
+                label: l10n.bookingCodeSemantic,
+                child: ExcludeSemantics(
+                  child: OceanStatusPill(
+                    label: record.bookingCode,
+                    icon: Icons.confirmation_number_rounded,
+                    color: AppColors.turquoise600,
+                  ),
+                ),
+              ),
+              if (record.finalPrice != null)
+                OceanStatusPill(
+                  label:
+                      formatMoney(context, record.finalPrice!, record.currency),
+                  icon: Icons.payments_rounded,
+                  color: AppColors.success,
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// Price breakdown for the booking-result screen. Every figure is the server's
 /// own final pricing from the create response — nothing is recomputed.
 class BookingResultPriceCard extends StatelessWidget {

@@ -981,6 +981,77 @@ class ApiClient {
     }
   }
 
+  /// Loads the authenticated user's real booking history
+  /// (`GET /api/me/bookings`, authenticated). The backend returns a bare JSON
+  /// array of `BookingSummaryResponse` — ALL of the caller's bookings sorted
+  /// createdAt DESC. There is NO pagination / sort / status query param on this
+  /// endpoint, so this sends none and fetches the whole list once.
+  Future<CollectionApiResult<List<BookingSummaryRecord>>>
+      getMyBookings() async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/me/bookings'), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final decoded = jsonDecode(utf8.decode(res.bodyBytes));
+        if (decoded is! List) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(
+          decoded
+              .map((e) =>
+                  BookingSummaryRecord.fromJson(e as Map<String, dynamic>))
+              .toList(),
+        );
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Loads one booking's full detail (`GET /api/bookings/{id}`, authenticated,
+  /// owner-only — ADMIN may also read). Returns the same `BookingResponse` shape
+  /// as create, so it reuses [BookingCreateRecord]. 403 (not your booking) and
+  /// 404 (not found) surface as typed error kinds — never fabricated.
+  Future<CollectionApiResult<BookingCreateRecord>> getBookingDetail(
+    int id,
+  ) async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/bookings/$id'), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(BookingCreateRecord.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
   Map<String, dynamic> _failureForStatus(http.Response res) {
     Map<String, dynamic>? body;
     try {

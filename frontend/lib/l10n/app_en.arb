@@ -3420,5 +3420,13 @@
   "bookingSubmitNetworkMessage": "We couldn't reach the server. Please check your connection and try again.",
   "bookingSubmitUncertainTitle": "Booking not confirmed",
   "bookingSubmitUncertainBody": "We couldn't confirm whether your booking was created. Please don't submit again — check your bookings later to see if it went through.",
-  "bookingSubmitUncertainAcknowledge": "I understand this may create a duplicate booking"
+  "bookingSubmitUncertainAcknowledge": "I understand this may create a duplicate booking",
+  "bookingsRealLoadingMessage": "Loading your bookings…",
+  "bookingsRealErrorMessage": "We couldn't load your bookings. Please try again.",
+  "bookingDetailLoadingMessage": "Loading booking details…",
+  "bookingDetailErrorMessage": "We couldn't load this booking. Please try again.",
+  "bookingDetailSpecialRequestLabel": "Special request",
+  "bookingHistoryUncertainTitle": "A booking may not have gone through",
+  "bookingHistoryUncertainBody": "Your last booking couldn't be confirmed. Check the list below to see whether it was created before trying again.",
+  "bookingHistoryUncertainDismiss": "Dismiss"
 }

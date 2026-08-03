@@ -236,6 +236,42 @@ bool bookingInSection(
   }
 }
 
+/// Real-Mode analogue of [bookingInSection], operating on a backend
+/// [BookingStatusView] + check-in date (from `BookingSummaryRecord`) instead of a
+/// [DemoBooking]. Mirrors the server bucket rules (upcoming / active / history)
+/// exactly so client-side tab filtering of the full `/api/me/bookings` list never
+/// reclassifies a booking or invents a bucket.
+bool bookingSectionMatchesReal(
+  BookingStatusView view,
+  DateTime? checkIn,
+  BookingSection section, {
+  required DateTime today,
+}) {
+  if (section == BookingSection.all) return true;
+  final current = hotelDateOnly(today);
+  switch (section) {
+    case BookingSection.upcoming:
+      return (view == BookingStatusView.pending ||
+              view == BookingStatusView.confirmed ||
+              view == BookingStatusView.checkInReady) &&
+          checkIn != null &&
+          !hotelDateOnly(checkIn).isBefore(current);
+    case BookingSection.active:
+      return view == BookingStatusView.checkedIn;
+    case BookingSection.history:
+      return view == BookingStatusView.checkedOut ||
+          view == BookingStatusView.completed ||
+          view == BookingStatusView.cancelled ||
+          view == BookingStatusView.refunded ||
+          view == BookingStatusView.archived ||
+          view == BookingStatusView.noShow;
+    case BookingSection.cancelled:
+      return view == BookingStatusView.cancelled;
+    case BookingSection.all:
+      return true;
+  }
+}
+
 List<BookingTimelineEvent> bookingTimelineFor(DemoBooking booking) {
   final events = <BookingTimelineEvent>[
     BookingTimelineEvent(code: 'CREATED', occurredAt: booking.createdAt),

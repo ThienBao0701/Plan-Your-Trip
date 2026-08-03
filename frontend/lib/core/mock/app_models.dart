@@ -3329,6 +3329,80 @@ enum BookingSubmissionOutcome {
   serverError,
 }
 
+/// Real-backend mirror of `BookingDto.BookingSummaryResponse`
+/// (`GET /api/me/bookings`) — the row shape for the UI27 booking-history list.
+/// The backend returns a bare JSON array (all of the caller's bookings sorted
+/// createdAt DESC; no pagination). Every value is the server's own; [status] is
+/// kept as the RAW server string so an unknown/future value is never coerced.
+/// `Map` decoding is confined to [fromJson].
+class BookingSummaryRecord {
+  final int id;
+  final String bookingCode;
+  final int? hotelId;
+  final String hotelName;
+  final int? roomId;
+  final String roomName;
+  final DateTime? checkIn;
+  final DateTime? checkOut;
+  final int nights;
+  final String status;
+  final double? finalPrice;
+  final String currency;
+  final DateTime? createdAt;
+
+  const BookingSummaryRecord({
+    required this.id,
+    required this.bookingCode,
+    this.hotelId,
+    required this.hotelName,
+    this.roomId,
+    required this.roomName,
+    this.checkIn,
+    this.checkOut,
+    this.nights = 0,
+    required this.status,
+    this.finalPrice,
+    this.currency = 'VND',
+    this.createdAt,
+  });
+
+  BookingStatusView get statusView => bookingStatusViewFromCode(status);
+
+  factory BookingSummaryRecord.fromJson(Map<String, dynamic> json) {
+    return BookingSummaryRecord(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      bookingCode: (json['bookingCode'] as String?) ?? '',
+      hotelId: (json['hotelId'] as num?)?.toInt(),
+      hotelName: (json['hotelName'] as String?) ?? '',
+      roomId: (json['roomId'] as num?)?.toInt(),
+      roomName: (json['roomName'] as String?) ?? '',
+      checkIn: _tryParseDate(json['checkIn']),
+      checkOut: _tryParseDate(json['checkOut']),
+      nights: (json['nights'] as num?)?.toInt() ?? 0,
+      status: (json['status'] as String?) ?? '',
+      finalPrice: (json['finalPrice'] as num?)?.toDouble(),
+      currency: (json['currency'] as String?) ?? 'VND',
+      createdAt: _tryParseDate(json['createdAt']),
+    );
+  }
+}
+
+/// Outcome of a real booking-history / booking-detail READ
+/// (`GET /api/me/bookings`, `GET /api/bookings/{id}`). [demoUnavailable] is the
+/// Demo Mode guard (zero HTTP); [sessionExpired] (401) never triggers
+/// auto-logout — the caller shows a re-auth affordance. [forbidden] (403),
+/// [notFound] (404), [serverError] (5xx / unexpected) and [network] (transport /
+/// timeout) map the read failures. There is no write here, so no `uncertain`.
+enum BookingHistoryOutcome {
+  success,
+  demoUnavailable,
+  sessionExpired,
+  forbidden,
+  notFound,
+  network,
+  serverError,
+}
+
 class DemoBooking {
   final String code;
   final String ownerUserId;

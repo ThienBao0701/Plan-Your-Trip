@@ -6448,4 +6448,32 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get bookingSubmitUncertainAcknowledge =>
       'Tôi hiểu điều này có thể tạo ra một đặt phòng trùng lặp';
+
+  @override
+  String get bookingsRealLoadingMessage => 'Đang tải đặt phòng của bạn…';
+
+  @override
+  String get bookingsRealErrorMessage =>
+      'Không thể tải danh sách đặt phòng. Vui lòng thử lại.';
+
+  @override
+  String get bookingDetailLoadingMessage => 'Đang tải chi tiết đặt phòng…';
+
+  @override
+  String get bookingDetailErrorMessage =>
+      'Không thể tải đặt phòng này. Vui lòng thử lại.';
+
+  @override
+  String get bookingDetailSpecialRequestLabel => 'Yêu cầu đặc biệt';
+
+  @override
+  String get bookingHistoryUncertainTitle =>
+      'Một đặt phòng có thể chưa thành công';
+
+  @override
+  String get bookingHistoryUncertainBody =>
+      'Đặt phòng gần nhất của bạn chưa được xác nhận. Hãy kiểm tra danh sách bên dưới để xem nó đã được tạo hay chưa trước khi thử lại.';
+
+  @override
+  String get bookingHistoryUncertainDismiss => 'Bỏ qua';
 }
