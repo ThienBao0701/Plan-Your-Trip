@@ -9,6 +9,7 @@ import '../../design/app_spacing.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/add_to_trip_sheet.dart';
 import '../../shared/widgets/glass_widgets.dart';
+import '../payments/real_payment_screen.dart';
 import 'booking_widgets.dart';
 
 /// Final step of the UI26 booking flow. Renders the GENUINE backend booking
@@ -175,6 +176,25 @@ class BookingResultScreen extends StatelessWidget {
         ),
       ),
       const SizedBox(height: AppSpacing.lg),
+      if (view == BookingStatusView.pending) ...[
+        OceanPrimaryButton(
+          key: const Key('booking-result-pay'),
+          label: l10n.paymentPayNowAction,
+          icon: Icons.payments_rounded,
+          semanticLabel: l10n.paymentPayNowAction,
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => RealPaymentScreen(
+                bookingId: record.id,
+                bookingCode: record.bookingCode,
+                amount: record.finalPrice,
+                currency: record.currency,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+      ],
       if ((criteria?.tripId) == null) ...[
         OceanSecondaryButton(
           key: const Key('booking-result-add-trip'),

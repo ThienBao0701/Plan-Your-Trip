@@ -206,6 +206,18 @@ class AppState extends ChangeNotifier {
   int? bookingDetailLoadingId;
   BookingHistoryOutcome? bookingDetailError;
 
+  // ── Real Mode Payment (/api/payments, UI-28) ──────────────────────────────
+  // The currently-open payment context for one booking. Read-only settlement:
+  // create a PENDING payment, read/refresh its status, and settle it offline via
+  // the backend's own sandbox endpoints (no live gateway → no redirect). A 401
+  // here never calls logout(). Cleared on logout / mode / user change via
+  // [_resetRealPaymentState]. Zero HTTP in Demo Mode.
+  int? realPaymentBookingId;
+  RealPaymentRecord? realPayment;
+  bool realPaymentLoading = false;
+  bool realPaymentSubmitting = false;
+  PaymentActionOutcome? realPaymentError;
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -296,6 +308,7 @@ class AppState extends ChangeNotifier {
     _resetRealSearchState();
     _resetRealAvailabilityState();
     _resetRealBookingHistoryState();
+    _resetRealPaymentState();
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -372,6 +385,14 @@ class AppState extends ChangeNotifier {
     bookingDetailCache.clear();
     bookingDetailLoadingId = null;
     bookingDetailError = null;
+  }
+
+  void _resetRealPaymentState() {
+    realPaymentBookingId = null;
+    realPayment = null;
+    realPaymentLoading = false;
+    realPaymentSubmitting = false;
+    realPaymentError = null;
   }
 
   void _resetRealSearchState() {
@@ -480,6 +501,7 @@ class AppState extends ChangeNotifier {
     _resetRealSearchState();
     _resetRealAvailabilityState();
     _resetRealBookingHistoryState();
+    _resetRealPaymentState();
     timeline = [];
     expenses = [];
     demoBookings = [];
@@ -2554,6 +2576,141 @@ class AppState extends ChangeNotifier {
     bookingDetailError = outcome;
     notifyListeners();
     return outcome;
+  }
+
+  PaymentActionOutcome _mapPaymentError(ApiErrorKind? kind) {
+    return switch (kind) {
+      ApiErrorKind.unauthorized => PaymentActionOutcome.sessionExpired,
+      ApiErrorKind.forbidden => PaymentActionOutcome.forbidden,
+      ApiErrorKind.notFound => PaymentActionOutcome.notFound,
+      ApiErrorKind.validation => PaymentActionOutcome.validation,
+      ApiErrorKind.conflict => PaymentActionOutcome.conflict,
+      ApiErrorKind.unprocessable => PaymentActionOutcome.unprocessable,
+      ApiErrorKind.network => PaymentActionOutcome.network,
+      ApiErrorKind.timeout => PaymentActionOutcome.network,
+      ApiErrorKind.server => PaymentActionOutcome.serverError,
+      _ => PaymentActionOutcome.serverError,
+    };
+  }
+
+  /// Opens the payment context for [bookingId] and loads any EXISTING payment
+  /// (`GET /api/bookings/{id}/payments`, latest first — the backend sorts
+  /// createdAt DESC). Leaves [realPayment] null when the booking has none yet.
+  /// Zero HTTP in Demo Mode; a 401 maps to sessionExpired, never [logout].
+  Future<PaymentActionOutcome> loadPaymentForBooking(int bookingId) async {
+    if (demoMode) return PaymentActionOutcome.demoUnavailable;
+    realPaymentBookingId = bookingId;
+    realPayment = null;
+    realPaymentLoading = true;
+    realPaymentError = null;
+    notifyListeners();
+    final result = await api.getBookingPayments(bookingId);
+    // Ignore a stale response if the user opened a different booking meanwhile.
+    if (realPaymentBookingId != bookingId) return PaymentActionOutcome.success;
+    realPaymentLoading = false;
+    if (result.success && result.data != null) {
+      realPayment = result.data!.isEmpty ? null : result.data!.first;
+      realPaymentError = null;
+      notifyListeners();
+      return PaymentActionOutcome.success;
+    }
+    final outcome = _mapPaymentError(result.errorKind);
+    realPaymentError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Creates a real PENDING payment for [bookingId] (`POST /api/payments`).
+  /// Single-flight. On success stores [realPayment]; on failure preserves any
+  /// existing payment and surfaces the mapped outcome.
+  Future<PaymentActionOutcome> createRealPayment(int bookingId) async {
+    if (demoMode) return PaymentActionOutcome.demoUnavailable;
+    if (realPaymentSubmitting) return PaymentActionOutcome.busy;
+    realPaymentBookingId = bookingId;
+    realPaymentSubmitting = true;
+    realPaymentError = null;
+    notifyListeners();
+    final result = await api.createPayment(bookingId);
+    realPaymentSubmitting = false;
+    if (result.success && result.data != null) {
+      realPayment = result.data!;
+      realPaymentError = null;
+      notifyListeners();
+      return PaymentActionOutcome.success;
+    }
+    final outcome = _mapPaymentError(result.errorKind);
+    realPaymentError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Re-fetches the current payment's status (`GET /api/payments/{id}`).
+  Future<PaymentActionOutcome> refreshRealPayment() async {
+    if (demoMode) return PaymentActionOutcome.demoUnavailable;
+    final payment = realPayment;
+    if (payment == null) return PaymentActionOutcome.notFound;
+    if (realPaymentLoading) return PaymentActionOutcome.busy;
+    realPaymentLoading = true;
+    realPaymentError = null;
+    notifyListeners();
+    final result = await api.getPayment(payment.id);
+    realPaymentLoading = false;
+    if (result.success && result.data != null) {
+      realPayment = result.data!;
+      realPaymentError = null;
+      notifyListeners();
+      return PaymentActionOutcome.success;
+    }
+    final outcome = _mapPaymentError(result.errorKind);
+    realPaymentError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Settles the current PENDING payment via the backend's sandbox endpoints
+  /// ([success]=true → `mock-success` → PAID + booking CONFIRMED; false →
+  /// `mock-fail` → FAILED). These are REAL backend endpoints (the only offline
+  /// completion path). On a successful capture the real booking history/detail
+  /// caches are invalidated so the now-CONFIRMED booking is re-fetched.
+  Future<PaymentActionOutcome> settleRealPaymentSandbox({
+    required bool success,
+  }) async {
+    if (demoMode) return PaymentActionOutcome.demoUnavailable;
+    if (realPaymentSubmitting) return PaymentActionOutcome.busy;
+    final payment = realPayment;
+    if (payment == null) return PaymentActionOutcome.notFound;
+    realPaymentSubmitting = true;
+    realPaymentError = null;
+    notifyListeners();
+    final result = await api.settlePaymentSandbox(payment.id, success: success);
+    realPaymentSubmitting = false;
+    if (result.success && result.data != null) {
+      realPayment = result.data!;
+      realPaymentError = null;
+      if (result.data!.statusView == PaymentStatusView.paid) {
+        _invalidateRealBookingsAfterPayment(result.data!.bookingId);
+      }
+      notifyListeners();
+      return PaymentActionOutcome.success;
+    }
+    final outcome = _mapPaymentError(result.errorKind);
+    realPaymentError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  /// A PAID payment CONFIRMS the booking server-side, so the cached history list
+  /// and this booking's detail are now stale — drop them so the next open
+  /// re-fetches the real, updated status. No fabricated local status flip.
+  void _invalidateRealBookingsAfterPayment(int bookingId) {
+    realBookingsLoaded = false;
+    bookingDetailCache.remove(bookingId);
+  }
+
+  void clearRealPaymentError() {
+    if (realPaymentError == null) return;
+    realPaymentError = null;
+    notifyListeners();
   }
 
   List<Place> filteredPlaces(PlaceQuery q) {

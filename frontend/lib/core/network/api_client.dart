@@ -1052,6 +1052,149 @@ class ApiClient {
     }
   }
 
+  // ── Payments (/api/payments, /api/bookings/{id}/payments, UI-28) ─────────────
+  // The backend has NO live payment gateway (checkoutUrl is null on the
+  // settlement flow — CLAUDE.md), so there is no redirect to launch. A payment is
+  // created PENDING and settled offline via the backend's own mock-success /
+  // mock-fail endpoints. All calls are authenticated, 8s timeout, no retry.
+
+  /// Creates a real payment for a booking (`POST /api/payments`, 201). The
+  /// backend charges `booking.finalPrice`; [method] is the backend `PaymentMethod`
+  /// enum name (default sandbox `MOCK`, as no live gateway is wired).
+  Future<CollectionApiResult<RealPaymentRecord>> createPayment(
+    int bookingId, {
+    String method = 'MOCK',
+  }) async {
+    try {
+      final res = await _client
+          .post(
+            Uri.parse('$baseUrl/payments'),
+            headers: _jsonHeaders,
+            body: jsonEncode({'bookingId': bookingId, 'paymentMethod': method}),
+          )
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealPaymentRecord.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Lists the payments for a booking (`GET /api/bookings/{id}/payments`,
+  /// owner-only) — a bare JSON array sorted createdAt DESC.
+  Future<CollectionApiResult<List<RealPaymentRecord>>> getBookingPayments(
+    int bookingId,
+  ) async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/bookings/$bookingId/payments'),
+              headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final decoded = jsonDecode(utf8.decode(res.bodyBytes));
+        if (decoded is! List) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(
+          decoded
+              .map((e) => RealPaymentRecord.fromJson(e as Map<String, dynamic>))
+              .toList(),
+        );
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Fetches one payment's current status (`GET /api/payments/{id}`, owner/admin).
+  Future<CollectionApiResult<RealPaymentRecord>> getPayment(int id) async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/payments/$id'), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealPaymentRecord.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Settles a PENDING payment via the backend's own sandbox endpoint
+  /// ([success]=true → `mock-success` → PAID + booking CONFIRMED; false →
+  /// `mock-fail` → FAILED). These are REAL backend endpoints (the only offline
+  /// completion path, as no live gateway exists) — not a fabricated result.
+  Future<CollectionApiResult<RealPaymentRecord>> settlePaymentSandbox(
+    int id, {
+    required bool success,
+  }) async {
+    final suffix = success ? 'mock-success' : 'mock-fail';
+    try {
+      final res = await _client
+          .post(Uri.parse('$baseUrl/payments/$id/$suffix'),
+              headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealPaymentRecord.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
   Map<String, dynamic> _failureForStatus(http.Response res) {
     Map<String, dynamic>? body;
     try {

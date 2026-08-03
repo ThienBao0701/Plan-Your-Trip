@@ -6376,7 +6376,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get bookingResultPaymentNextNote =>
-      'Đặt phòng của bạn đã được tạo. Thanh toán là bước tiếp theo và hiện chưa có trong ứng dụng — cơ sở lưu trú sẽ liên hệ, hoặc bạn có thể thanh toán khi tính năng này được bật.';
+      'Đặt phòng của bạn đã được tạo và đang ở trạng thái chờ. Hoàn tất thanh toán để xác nhận.';
 
   @override
   String get bookingPriceChangedNote =>
@@ -6476,4 +6476,117 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get bookingHistoryUncertainDismiss => 'Bỏ qua';
+
+  @override
+  String get paymentTitle => 'Thanh toán';
+
+  @override
+  String get paymentPayNowAction => 'Thanh toán ngay';
+
+  @override
+  String get paymentLoadingMessage => 'Đang tải thanh toán…';
+
+  @override
+  String get paymentErrorMessage =>
+      'Không thể tải thanh toán. Vui lòng thử lại.';
+
+  @override
+  String get paymentSandboxNotice =>
+      'Chưa có cổng thanh toán trực tiếp nào được kết nối. Thanh toán được tạo thật trên máy chủ và xử lý trong môi trường thử nghiệm — không có thẻ nào bị trừ tiền và không có trang thanh toán bên ngoài nào mở ra.';
+
+  @override
+  String get paymentAmountToPayLabel => 'Số tiền cần thanh toán';
+
+  @override
+  String get paymentNoneTitle => 'Chưa có thanh toán';
+
+  @override
+  String get paymentNoneMessage =>
+      'Tạo một khoản thanh toán cho đặt phòng này để tiếp tục.';
+
+  @override
+  String get paymentCreateAction => 'Tạo thanh toán';
+
+  @override
+  String get paymentCreatingLabel => 'Đang tạo thanh toán…';
+
+  @override
+  String get paymentCodeLabel => 'Mã thanh toán';
+
+  @override
+  String get paymentMethodLabel => 'Phương thức';
+
+  @override
+  String get paymentProcessingLabel => 'Đang xử lý…';
+
+  @override
+  String get paymentSuccessHeadline => 'Thanh toán thành công';
+
+  @override
+  String get paymentSuccessBody =>
+      'Thanh toán đã hoàn tất và đặt phòng của bạn đã được xác nhận.';
+
+  @override
+  String get paymentPendingHeadline => 'Thanh toán đang chờ';
+
+  @override
+  String get paymentPendingBody =>
+      'Khoản thanh toán đã được tạo và đang chờ hoàn tất.';
+
+  @override
+  String get paymentFailedHeadline => 'Thanh toán thất bại';
+
+  @override
+  String get paymentFailedBody =>
+      'Khoản thanh toán này chưa thành công. Bạn có thể tạo một khoản thanh toán mới.';
+
+  @override
+  String get paymentCompleteSandboxAction => 'Hoàn tất thanh toán (thử nghiệm)';
+
+  @override
+  String get paymentFailSandboxAction =>
+      'Mô phỏng thanh toán thất bại (thử nghiệm)';
+
+  @override
+  String get paymentRefreshAction => 'Làm mới trạng thái';
+
+  @override
+  String get paymentRetryNewAction => 'Bắt đầu thanh toán mới';
+
+  @override
+  String get paymentConfirmTitle => 'Hoàn tất thanh toán này?';
+
+  @override
+  String get paymentConfirmMessage =>
+      'Thao tác này xử lý thanh toán trên máy chủ (thử nghiệm) và xác nhận đặt phòng của bạn. Không có thẻ nào bị trừ tiền.';
+
+  @override
+  String get paymentConfirmAction => 'Hoàn tất thanh toán';
+
+  @override
+  String get paymentStatusUnknownLabel => 'Không xác định';
+
+  @override
+  String get paymentActionValidationMessage =>
+      'Yêu cầu thanh toán không hợp lệ. Vui lòng thử lại.';
+
+  @override
+  String get paymentActionForbiddenMessage =>
+      'Bạn không có quyền thanh toán cho đặt phòng này.';
+
+  @override
+  String get paymentActionNotPayableMessage =>
+      'Đặt phòng này hiện không thể thanh toán. Có thể nó đã bị hủy, đã thanh toán, hoặc không còn ở trạng thái chờ.';
+
+  @override
+  String get paymentActionConflictMessage =>
+      'Khoản thanh toán đã thay đổi trên máy chủ. Hãy làm mới và thử lại.';
+
+  @override
+  String get paymentActionServerErrorMessage =>
+      'Đã xảy ra lỗi với thanh toán. Vui lòng thử lại.';
+
+  @override
+  String get paymentActionNetworkMessage =>
+      'Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối và thử lại.';
 }

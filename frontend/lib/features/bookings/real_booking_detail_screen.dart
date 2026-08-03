@@ -10,6 +10,7 @@ import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/glass_widgets.dart';
 import '../auth/login_screen.dart';
 import '../hotels/booking_widgets.dart';
+import '../payments/real_payment_screen.dart';
 
 /// UI27 — Real Mode booking detail. Fetches `GET /api/bookings/{id}` and renders
 /// ONLY the server's own `BookingResponse` (reused as [BookingCreateRecord]).
@@ -246,6 +247,25 @@ class _RealBookingDetailScreenState extends State<RealBookingDetailScreen> {
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
+              if (view == BookingStatusView.pending) ...[
+                OceanPrimaryButton(
+                  key: const Key('booking-detail-pay'),
+                  label: l10n.paymentPayNowAction,
+                  icon: Icons.payments_rounded,
+                  semanticLabel: l10n.paymentPayNowAction,
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => RealPaymentScreen(
+                        bookingId: record.id,
+                        bookingCode: record.bookingCode,
+                        amount: record.finalPrice,
+                        currency: record.currency,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+              ],
               OceanPrimaryButton(
                 key: const Key('booking-detail-done'),
                 label: l10n.bookingResultDoneAction,

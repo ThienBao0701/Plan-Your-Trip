@@ -11125,7 +11125,7 @@ abstract class AppLocalizations {
   /// No description provided for @bookingResultPaymentNextNote.
   ///
   /// In en, this message translates to:
-  /// **'Your booking is created. Payment is the next step and isn\'t available in the app yet — the property will follow up, or you can pay once payment is enabled.'**
+  /// **'Your booking is created and held as pending. Complete payment to confirm it.'**
   String get bookingResultPaymentNextNote;
 
   /// No description provided for @bookingPriceChangedNote.
@@ -11289,6 +11289,204 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dismiss'**
   String get bookingHistoryUncertainDismiss;
+
+  /// No description provided for @paymentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment'**
+  String get paymentTitle;
+
+  /// No description provided for @paymentPayNowAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay now'**
+  String get paymentPayNowAction;
+
+  /// No description provided for @paymentLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading payment…'**
+  String get paymentLoadingMessage;
+
+  /// No description provided for @paymentErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load the payment. Please try again.'**
+  String get paymentErrorMessage;
+
+  /// No description provided for @paymentSandboxNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'No live payment gateway is connected. The payment is created for real on the backend and settled in a sandbox — no card is charged and no external checkout opens.'**
+  String get paymentSandboxNotice;
+
+  /// No description provided for @paymentAmountToPayLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount to pay'**
+  String get paymentAmountToPayLabel;
+
+  /// No description provided for @paymentNoneTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No payment yet'**
+  String get paymentNoneTitle;
+
+  /// No description provided for @paymentNoneMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a payment for this booking to continue.'**
+  String get paymentNoneMessage;
+
+  /// No description provided for @paymentCreateAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Create payment'**
+  String get paymentCreateAction;
+
+  /// No description provided for @paymentCreatingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating payment…'**
+  String get paymentCreatingLabel;
+
+  /// No description provided for @paymentCodeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment code'**
+  String get paymentCodeLabel;
+
+  /// No description provided for @paymentMethodLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Method'**
+  String get paymentMethodLabel;
+
+  /// No description provided for @paymentProcessingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Processing…'**
+  String get paymentProcessingLabel;
+
+  /// No description provided for @paymentSuccessHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment successful'**
+  String get paymentSuccessHeadline;
+
+  /// No description provided for @paymentSuccessBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your payment went through and the booking is now confirmed.'**
+  String get paymentSuccessBody;
+
+  /// No description provided for @paymentPendingHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment pending'**
+  String get paymentPendingHeadline;
+
+  /// No description provided for @paymentPendingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The payment has been created and is awaiting completion.'**
+  String get paymentPendingBody;
+
+  /// No description provided for @paymentFailedHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment failed'**
+  String get paymentFailedHeadline;
+
+  /// No description provided for @paymentFailedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This payment did not go through. You can start a new payment.'**
+  String get paymentFailedBody;
+
+  /// No description provided for @paymentCompleteSandboxAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete payment (sandbox)'**
+  String get paymentCompleteSandboxAction;
+
+  /// No description provided for @paymentFailSandboxAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Simulate failed payment (sandbox)'**
+  String get paymentFailSandboxAction;
+
+  /// No description provided for @paymentRefreshAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh status'**
+  String get paymentRefreshAction;
+
+  /// No description provided for @paymentRetryNewAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Start a new payment'**
+  String get paymentRetryNewAction;
+
+  /// No description provided for @paymentConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete this payment?'**
+  String get paymentConfirmTitle;
+
+  /// No description provided for @paymentConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This settles the payment on the backend (sandbox) and confirms your booking. No card is charged.'**
+  String get paymentConfirmMessage;
+
+  /// No description provided for @paymentConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete payment'**
+  String get paymentConfirmAction;
+
+  /// No description provided for @paymentStatusUnknownLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get paymentStatusUnknownLabel;
+
+  /// No description provided for @paymentActionValidationMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The payment request was invalid. Please try again.'**
+  String get paymentActionValidationMessage;
+
+  /// No description provided for @paymentActionForbiddenMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have permission to pay for this booking.'**
+  String get paymentActionForbiddenMessage;
+
+  /// No description provided for @paymentActionNotPayableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This booking can\'t be paid right now. It may be cancelled, already paid, or no longer pending.'**
+  String get paymentActionNotPayableMessage;
+
+  /// No description provided for @paymentActionConflictMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The payment changed on the server. Refresh and try again.'**
+  String get paymentActionConflictMessage;
+
+  /// No description provided for @paymentActionServerErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong with the payment. Please try again.'**
+  String get paymentActionServerErrorMessage;
+
+  /// No description provided for @paymentActionNetworkMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t reach the server. Please check your connection and try again.'**
+  String get paymentActionNetworkMessage;
 }
 
 class _AppLocalizationsDelegate

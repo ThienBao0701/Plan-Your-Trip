@@ -3403,6 +3403,123 @@ enum BookingHistoryOutcome {
   serverError,
 }
 
+/// A safe, backend-normalized view of the settlement `PaymentStatus`
+/// (PENDING/PAID/FAILED/CANCELLED/REFUNDED). Unknown/future server values degrade
+/// to [unknown] (the raw string is preserved by the record) rather than being
+/// coerced into a misleading known state.
+enum PaymentStatusView { pending, paid, failed, cancelled, refunded, unknown }
+
+PaymentStatusView paymentStatusViewFromCode(String? raw) {
+  switch (raw?.trim().toUpperCase()) {
+    case 'PENDING':
+      return PaymentStatusView.pending;
+    case 'PAID':
+      return PaymentStatusView.paid;
+    case 'FAILED':
+      return PaymentStatusView.failed;
+    case 'CANCELLED':
+      return PaymentStatusView.cancelled;
+    case 'REFUNDED':
+      return PaymentStatusView.refunded;
+    default:
+      return PaymentStatusView.unknown;
+  }
+}
+
+/// Real-backend mirror of `PaymentDto.PaymentResponse` (`POST /api/payments`,
+/// `GET /api/payments/{id}`, `GET /api/bookings/{id}/payments`,
+/// `.../mock-success`, `.../mock-fail`). Every amount / status / code value is
+/// the server's own (CLAUDE.md §6 — nothing computed client-side); [status] is
+/// kept as the RAW server string so an unknown future value is never coerced.
+/// `Map` decoding is confined to [fromJson]. NOTE: this backend has no live
+/// payment gateway — [checkoutUrl] is null for the settlement flow, so there is
+/// no real redirect to launch.
+class RealPaymentRecord {
+  final int id;
+  final String paymentCode;
+  final int bookingId;
+  final String bookingCode;
+  final double? amount;
+  final String currency;
+  final String paymentMethod;
+  final String status;
+  final String provider;
+  final String? providerTransactionId;
+  final String? checkoutUrl;
+  final String? failureReason;
+  final DateTime? paidAt;
+  final DateTime? failedAt;
+  final DateTime? refundedAt;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+
+  const RealPaymentRecord({
+    required this.id,
+    required this.paymentCode,
+    required this.bookingId,
+    required this.bookingCode,
+    this.amount,
+    this.currency = 'VND',
+    this.paymentMethod = '',
+    required this.status,
+    this.provider = '',
+    this.providerTransactionId,
+    this.checkoutUrl,
+    this.failureReason,
+    this.paidAt,
+    this.failedAt,
+    this.refundedAt,
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  PaymentStatusView get statusView => paymentStatusViewFromCode(status);
+
+  factory RealPaymentRecord.fromJson(Map<String, dynamic> json) {
+    return RealPaymentRecord(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      paymentCode: (json['paymentCode'] as String?) ?? '',
+      bookingId: (json['bookingId'] as num?)?.toInt() ?? 0,
+      bookingCode: (json['bookingCode'] as String?) ?? '',
+      amount: (json['amount'] as num?)?.toDouble(),
+      currency: (json['currency'] as String?) ?? 'VND',
+      paymentMethod: (json['paymentMethod'] as String?) ?? '',
+      status: (json['status'] as String?) ?? '',
+      provider: (json['provider'] as String?) ?? '',
+      providerTransactionId: json['providerTransactionId'] as String?,
+      checkoutUrl: json['checkoutUrl'] as String?,
+      failureReason: json['failureReason'] as String?,
+      paidAt: _tryParseDate(json['paidAt']),
+      failedAt: _tryParseDate(json['failedAt']),
+      refundedAt: _tryParseDate(json['refundedAt']),
+      createdAt: _tryParseDate(json['createdAt']),
+      updatedAt: _tryParseDate(json['updatedAt']),
+    );
+  }
+}
+
+/// Outcome of a real payment action (`POST /api/payments`, its reads, and the
+/// `mock-success` / `mock-fail` sandbox settlement endpoints). [demoUnavailable]
+/// is the Demo Mode guard (zero HTTP); [busy] is the single-flight guard;
+/// [sessionExpired] (401) never triggers auto-logout; [validation] 400,
+/// [forbidden] 403, [notFound] 404, [conflict] 409, [unprocessable] 422 (e.g.
+/// booking not payable / already paid / payment not PENDING), [serverError] 5xx,
+/// [network] transport/timeout. No write here is idempotency-keyed, but every
+/// action here is an explicit, user-initiated single request.
+enum PaymentActionOutcome {
+  success,
+  demoUnavailable,
+  busy,
+  validation,
+  sessionExpired,
+  forbidden,
+  notFound,
+  conflict,
+  unprocessable,
+  network,
+  serverError,
+}
+
 class DemoBooking {
   final String code;
   final String ownerUserId;

@@ -6543,7 +6543,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bookingResultPaymentNextNote =>
-      'Your booking is created. Payment is the next step and isn\'t available in the app yet — the property will follow up, or you can pay once payment is enabled.';
+      'Your booking is created and held as pending. Complete payment to confirm it.';
 
   @override
   String get bookingPriceChangedNote =>
@@ -6643,4 +6643,116 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bookingHistoryUncertainDismiss => 'Dismiss';
+
+  @override
+  String get paymentTitle => 'Payment';
+
+  @override
+  String get paymentPayNowAction => 'Pay now';
+
+  @override
+  String get paymentLoadingMessage => 'Loading payment…';
+
+  @override
+  String get paymentErrorMessage =>
+      'We couldn\'t load the payment. Please try again.';
+
+  @override
+  String get paymentSandboxNotice =>
+      'No live payment gateway is connected. The payment is created for real on the backend and settled in a sandbox — no card is charged and no external checkout opens.';
+
+  @override
+  String get paymentAmountToPayLabel => 'Amount to pay';
+
+  @override
+  String get paymentNoneTitle => 'No payment yet';
+
+  @override
+  String get paymentNoneMessage =>
+      'Create a payment for this booking to continue.';
+
+  @override
+  String get paymentCreateAction => 'Create payment';
+
+  @override
+  String get paymentCreatingLabel => 'Creating payment…';
+
+  @override
+  String get paymentCodeLabel => 'Payment code';
+
+  @override
+  String get paymentMethodLabel => 'Method';
+
+  @override
+  String get paymentProcessingLabel => 'Processing…';
+
+  @override
+  String get paymentSuccessHeadline => 'Payment successful';
+
+  @override
+  String get paymentSuccessBody =>
+      'Your payment went through and the booking is now confirmed.';
+
+  @override
+  String get paymentPendingHeadline => 'Payment pending';
+
+  @override
+  String get paymentPendingBody =>
+      'The payment has been created and is awaiting completion.';
+
+  @override
+  String get paymentFailedHeadline => 'Payment failed';
+
+  @override
+  String get paymentFailedBody =>
+      'This payment did not go through. You can start a new payment.';
+
+  @override
+  String get paymentCompleteSandboxAction => 'Complete payment (sandbox)';
+
+  @override
+  String get paymentFailSandboxAction => 'Simulate failed payment (sandbox)';
+
+  @override
+  String get paymentRefreshAction => 'Refresh status';
+
+  @override
+  String get paymentRetryNewAction => 'Start a new payment';
+
+  @override
+  String get paymentConfirmTitle => 'Complete this payment?';
+
+  @override
+  String get paymentConfirmMessage =>
+      'This settles the payment on the backend (sandbox) and confirms your booking. No card is charged.';
+
+  @override
+  String get paymentConfirmAction => 'Complete payment';
+
+  @override
+  String get paymentStatusUnknownLabel => 'Unknown';
+
+  @override
+  String get paymentActionValidationMessage =>
+      'The payment request was invalid. Please try again.';
+
+  @override
+  String get paymentActionForbiddenMessage =>
+      'You don\'t have permission to pay for this booking.';
+
+  @override
+  String get paymentActionNotPayableMessage =>
+      'This booking can\'t be paid right now. It may be cancelled, already paid, or no longer pending.';
+
+  @override
+  String get paymentActionConflictMessage =>
+      'The payment changed on the server. Refresh and try again.';
+
+  @override
+  String get paymentActionServerErrorMessage =>
+      'Something went wrong with the payment. Please try again.';
+
+  @override
+  String get paymentActionNetworkMessage =>
+      'We couldn\'t reach the server. Please check your connection and try again.';
 }
