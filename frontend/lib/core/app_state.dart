@@ -218,6 +218,25 @@ class AppState extends ChangeNotifier {
   bool realPaymentSubmitting = false;
   PaymentActionOutcome? realPaymentError;
 
+  // ── Real Mode Reviews (/api/reviews, /api/me/reviews, UI-29) ──────────────
+  // Read a place's public (approved) reviews, the user's own reviews, and submit
+  // a review for a COMPLETED booking (created PENDING → awaits moderation). A 401
+  // never calls logout(). Cleared on logout / mode / user change via
+  // [_resetRealReviewsState]. Zero HTTP in Demo Mode.
+  int? reviewsPlaceId;
+  List<ReviewSummaryRecord> placeReviews = [];
+  bool placeReviewsLoading = false;
+  bool placeReviewsLoaded = false;
+  ReviewActionOutcome? placeReviewsError;
+  List<ReviewSummaryRecord> realMyReviews = [];
+  bool myReviewsLoading = false;
+  bool myReviewsLoaded = false;
+  bool myReviewsRefreshing = false;
+  ReviewActionOutcome? myReviewsError;
+  bool reviewSubmitting = false;
+  ReviewActionOutcome? reviewSubmitError;
+  ReviewDetailRecord? lastSubmittedReview;
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -309,6 +328,7 @@ class AppState extends ChangeNotifier {
     _resetRealAvailabilityState();
     _resetRealBookingHistoryState();
     _resetRealPaymentState();
+    _resetRealReviewsState();
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -393,6 +413,22 @@ class AppState extends ChangeNotifier {
     realPaymentLoading = false;
     realPaymentSubmitting = false;
     realPaymentError = null;
+  }
+
+  void _resetRealReviewsState() {
+    reviewsPlaceId = null;
+    placeReviews = [];
+    placeReviewsLoading = false;
+    placeReviewsLoaded = false;
+    placeReviewsError = null;
+    realMyReviews = [];
+    myReviewsLoading = false;
+    myReviewsLoaded = false;
+    myReviewsRefreshing = false;
+    myReviewsError = null;
+    reviewSubmitting = false;
+    reviewSubmitError = null;
+    lastSubmittedReview = null;
   }
 
   void _resetRealSearchState() {
@@ -502,6 +538,7 @@ class AppState extends ChangeNotifier {
     _resetRealAvailabilityState();
     _resetRealBookingHistoryState();
     _resetRealPaymentState();
+    _resetRealReviewsState();
     timeline = [];
     expenses = [];
     demoBookings = [];
@@ -2710,6 +2747,116 @@ class AppState extends ChangeNotifier {
   void clearRealPaymentError() {
     if (realPaymentError == null) return;
     realPaymentError = null;
+    notifyListeners();
+  }
+
+  ReviewActionOutcome _mapReviewError(ApiErrorKind? kind) {
+    return switch (kind) {
+      ApiErrorKind.unauthorized => ReviewActionOutcome.sessionExpired,
+      ApiErrorKind.forbidden => ReviewActionOutcome.forbidden,
+      ApiErrorKind.notFound => ReviewActionOutcome.notFound,
+      ApiErrorKind.validation => ReviewActionOutcome.validation,
+      ApiErrorKind.conflict => ReviewActionOutcome.alreadyReviewed,
+      ApiErrorKind.unprocessable => ReviewActionOutcome.notCompleted,
+      ApiErrorKind.network => ReviewActionOutcome.network,
+      ApiErrorKind.timeout => ReviewActionOutcome.network,
+      ApiErrorKind.server => ReviewActionOutcome.serverError,
+      _ => ReviewActionOutcome.serverError,
+    };
+  }
+
+  /// Loads a place's PUBLIC (approved) reviews (`GET /api/places/{id}/reviews`).
+  /// A different place supersedes an older in-flight load (last request wins).
+  Future<ReviewActionOutcome> loadPlaceReviews(
+    int placeId, {
+    bool refresh = false,
+  }) async {
+    if (demoMode) return ReviewActionOutcome.demoUnavailable;
+    if (reviewsPlaceId == placeId &&
+        placeReviewsLoaded &&
+        !refresh &&
+        !placeReviewsLoading) {
+      return ReviewActionOutcome.success;
+    }
+    reviewsPlaceId = placeId;
+    placeReviewsLoading = true;
+    placeReviewsError = null;
+    notifyListeners();
+    final result = await api.getPlaceReviews(placeId);
+    if (reviewsPlaceId != placeId) return ReviewActionOutcome.success;
+    placeReviewsLoading = false;
+    if (result.success && result.data != null) {
+      placeReviews = result.data!;
+      placeReviewsLoaded = true;
+      placeReviewsError = null;
+      notifyListeners();
+      return ReviewActionOutcome.success;
+    }
+    final outcome = _mapReviewError(result.errorKind);
+    placeReviewsError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Loads the authenticated user's own reviews (`GET /api/me/reviews`).
+  /// [refresh] forces a re-fetch and preserves the current list on failure.
+  Future<ReviewActionOutcome> loadMyReviews({bool refresh = false}) async {
+    if (demoMode) return ReviewActionOutcome.demoUnavailable;
+    if (myReviewsLoading || myReviewsRefreshing) {
+      return ReviewActionOutcome.success;
+    }
+    if (myReviewsLoaded && !refresh) return ReviewActionOutcome.success;
+    if (refresh) {
+      myReviewsRefreshing = true;
+    } else {
+      myReviewsLoading = true;
+    }
+    myReviewsError = null;
+    notifyListeners();
+    final result = await api.getMyReviews();
+    myReviewsLoading = false;
+    myReviewsRefreshing = false;
+    if (result.success && result.data != null) {
+      realMyReviews = result.data!;
+      myReviewsLoaded = true;
+      myReviewsError = null;
+      notifyListeners();
+      return ReviewActionOutcome.success;
+    }
+    final outcome = _mapReviewError(result.errorKind);
+    myReviewsError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Submits a review for a COMPLETED booking (`POST /api/reviews`). Single-flight.
+  /// The created review is PENDING (awaits moderation) — no fabricated approval.
+  /// On success invalidates the my-reviews cache so it re-fetches on next open.
+  Future<ReviewActionOutcome> submitReview(ReviewCreatePayload payload) async {
+    if (demoMode) return ReviewActionOutcome.demoUnavailable;
+    if (reviewSubmitting) return ReviewActionOutcome.busy;
+    reviewSubmitting = true;
+    reviewSubmitError = null;
+    notifyListeners();
+    final result = await api.createReview(payload);
+    reviewSubmitting = false;
+    if (result.success && result.data != null) {
+      lastSubmittedReview = result.data!;
+      reviewSubmitError = null;
+      // The new review belongs in the user's list — invalidate it for a re-fetch.
+      myReviewsLoaded = false;
+      notifyListeners();
+      return ReviewActionOutcome.success;
+    }
+    final outcome = _mapReviewError(result.errorKind);
+    reviewSubmitError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  void clearReviewSubmitError() {
+    if (reviewSubmitError == null) return;
+    reviewSubmitError = null;
     notifyListeners();
   }
 

@@ -3520,6 +3520,312 @@ enum PaymentActionOutcome {
   serverError,
 }
 
+/// A safe, backend-normalized view of `ReviewStatus`
+/// (PENDING/APPROVED/REJECTED/HIDDEN/REPORTED). A freshly-created review is
+/// PENDING (awaiting moderation — not publicly visible until APPROVED). Unknown
+/// values degrade to [unknown] (raw kept), never coerced.
+enum ReviewStatusView {
+  pending,
+  approved,
+  rejected,
+  hidden,
+  reported,
+  unknown,
+}
+
+ReviewStatusView reviewStatusViewFromCode(String? raw) {
+  switch (raw?.trim().toUpperCase()) {
+    case 'PENDING':
+      return ReviewStatusView.pending;
+    case 'APPROVED':
+      return ReviewStatusView.approved;
+    case 'REJECTED':
+      return ReviewStatusView.rejected;
+    case 'HIDDEN':
+      return ReviewStatusView.hidden;
+    case 'REPORTED':
+      return ReviewStatusView.reported;
+    default:
+      return ReviewStatusView.unknown;
+  }
+}
+
+/// Real-backend mirror of `ReviewDto.ReviewMediaItem` (safe public projection of
+/// a review's attached media). `Map` decoding is confined to [fromJson].
+class ReviewMediaRecord {
+  final int id;
+  final String? url;
+  final String? thumbnailUrl;
+  final String? mediaType;
+  final int sortOrder;
+  final bool cover;
+  final String? altText;
+
+  const ReviewMediaRecord({
+    required this.id,
+    this.url,
+    this.thumbnailUrl,
+    this.mediaType,
+    this.sortOrder = 0,
+    this.cover = false,
+    this.altText,
+  });
+
+  factory ReviewMediaRecord.fromJson(Map<String, dynamic> json) {
+    return ReviewMediaRecord(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      url: json['url'] as String?,
+      thumbnailUrl: json['thumbnailUrl'] as String?,
+      mediaType: json['mediaType'] as String?,
+      sortOrder: (json['sortOrder'] as num?)?.toInt() ?? 0,
+      cover: json['cover'] as bool? ?? false,
+      altText: json['altText'] as String?,
+    );
+  }
+}
+
+/// Real-backend mirror of `ReviewDto.PartnerReplyInfo` — the hotel's public
+/// reply to a review. Null when the review has no reply.
+class ReviewPartnerReplyRecord {
+  final String content;
+  final DateTime? repliedAt;
+  final DateTime? updatedAt;
+  final String? partnerDisplayName;
+
+  const ReviewPartnerReplyRecord({
+    required this.content,
+    this.repliedAt,
+    this.updatedAt,
+    this.partnerDisplayName,
+  });
+
+  static ReviewPartnerReplyRecord? fromJsonOrNull(Object? raw) {
+    if (raw is! Map<String, dynamic>) return null;
+    return ReviewPartnerReplyRecord(
+      content: (raw['content'] as String?) ?? '',
+      repliedAt: _tryParseDate(raw['repliedAt']),
+      updatedAt: _tryParseDate(raw['updatedAt']),
+      partnerDisplayName: raw['partnerDisplayName'] as String?,
+    );
+  }
+}
+
+List<ReviewMediaRecord> _reviewMediaFromJson(Object? raw) {
+  if (raw is! List) return const [];
+  return raw
+      .whereType<Map<String, dynamic>>()
+      .map(ReviewMediaRecord.fromJson)
+      .toList();
+}
+
+/// Real-backend mirror of `ReviewDto.ReviewSummaryResponse`
+/// (`GET /api/me/reviews`, `GET /api/places/{id}/reviews`). [status] is kept as
+/// the RAW server string so an unknown value is never coerced. `Map` decoding is
+/// confined to [fromJson].
+class ReviewSummaryRecord {
+  final int id;
+  final int? placeId;
+  final String placeName;
+  final int? userId;
+  final String userName;
+  final int? ratingOverall;
+  final String? title;
+  final String status;
+  final DateTime? createdAt;
+  final ReviewPartnerReplyRecord? partnerReply;
+  final List<ReviewMediaRecord> media;
+
+  const ReviewSummaryRecord({
+    required this.id,
+    this.placeId,
+    this.placeName = '',
+    this.userId,
+    this.userName = '',
+    this.ratingOverall,
+    this.title,
+    required this.status,
+    this.createdAt,
+    this.partnerReply,
+    this.media = const [],
+  });
+
+  ReviewStatusView get statusView => reviewStatusViewFromCode(status);
+
+  factory ReviewSummaryRecord.fromJson(Map<String, dynamic> json) {
+    return ReviewSummaryRecord(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      placeId: (json['placeId'] as num?)?.toInt(),
+      placeName: (json['placeName'] as String?) ?? '',
+      userId: (json['userId'] as num?)?.toInt(),
+      userName: (json['userName'] as String?) ?? '',
+      ratingOverall: (json['ratingOverall'] as num?)?.toInt(),
+      title: json['title'] as String?,
+      status: (json['status'] as String?) ?? '',
+      createdAt: _tryParseDate(json['createdAt']),
+      partnerReply:
+          ReviewPartnerReplyRecord.fromJsonOrNull(json['partnerReply']),
+      media: _reviewMediaFromJson(json['media']),
+    );
+  }
+}
+
+/// Real-backend mirror of `ReviewDto.ReviewResponse` (`POST /api/reviews`,
+/// `GET /api/reviews/{id}`). Full detail incl. every sub-rating. [status] is kept
+/// raw. `Map` decoding is confined to [fromJson].
+class ReviewDetailRecord {
+  final int id;
+  final int? bookingId;
+  final String? bookingCode;
+  final int? userId;
+  final String userName;
+  final int? placeId;
+  final String placeName;
+  final int? ratingOverall;
+  final int? ratingCleanliness;
+  final int? ratingService;
+  final int? ratingLocation;
+  final int? ratingValue;
+  final int? ratingFacilities;
+  final String? title;
+  final String? content;
+  final String status;
+  final int helpfulCount;
+  final int reportedCount;
+  final DateTime? approvedAt;
+  final DateTime? rejectedAt;
+  final String? rejectReason;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+  final ReviewPartnerReplyRecord? partnerReply;
+  final List<ReviewMediaRecord> media;
+
+  const ReviewDetailRecord({
+    required this.id,
+    this.bookingId,
+    this.bookingCode,
+    this.userId,
+    this.userName = '',
+    this.placeId,
+    this.placeName = '',
+    this.ratingOverall,
+    this.ratingCleanliness,
+    this.ratingService,
+    this.ratingLocation,
+    this.ratingValue,
+    this.ratingFacilities,
+    this.title,
+    this.content,
+    required this.status,
+    this.helpfulCount = 0,
+    this.reportedCount = 0,
+    this.approvedAt,
+    this.rejectedAt,
+    this.rejectReason,
+    this.createdAt,
+    this.updatedAt,
+    this.partnerReply,
+    this.media = const [],
+  });
+
+  ReviewStatusView get statusView => reviewStatusViewFromCode(status);
+
+  factory ReviewDetailRecord.fromJson(Map<String, dynamic> json) {
+    return ReviewDetailRecord(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      bookingId: (json['bookingId'] as num?)?.toInt(),
+      bookingCode: json['bookingCode'] as String?,
+      userId: (json['userId'] as num?)?.toInt(),
+      userName: (json['userName'] as String?) ?? '',
+      placeId: (json['placeId'] as num?)?.toInt(),
+      placeName: (json['placeName'] as String?) ?? '',
+      ratingOverall: (json['ratingOverall'] as num?)?.toInt(),
+      ratingCleanliness: (json['ratingCleanliness'] as num?)?.toInt(),
+      ratingService: (json['ratingService'] as num?)?.toInt(),
+      ratingLocation: (json['ratingLocation'] as num?)?.toInt(),
+      ratingValue: (json['ratingValue'] as num?)?.toInt(),
+      ratingFacilities: (json['ratingFacilities'] as num?)?.toInt(),
+      title: json['title'] as String?,
+      content: json['content'] as String?,
+      status: (json['status'] as String?) ?? '',
+      helpfulCount: (json['helpfulCount'] as num?)?.toInt() ?? 0,
+      reportedCount: (json['reportedCount'] as num?)?.toInt() ?? 0,
+      approvedAt: _tryParseDate(json['approvedAt']),
+      rejectedAt: _tryParseDate(json['rejectedAt']),
+      rejectReason: json['rejectReason'] as String?,
+      createdAt: _tryParseDate(json['createdAt']),
+      updatedAt: _tryParseDate(json['updatedAt']),
+      partnerReply:
+          ReviewPartnerReplyRecord.fromJsonOrNull(json['partnerReply']),
+      media: _reviewMediaFromJson(json['media']),
+    );
+  }
+}
+
+/// Typed request body for `POST /api/reviews` (verified against
+/// `ReviewDto.ReviewRequest`). Only backend-supported fields are sent; sub-ratings
+/// and title/content are omitted when unset. `Map` construction is confined to
+/// [toJson].
+class ReviewCreatePayload {
+  final int bookingId;
+  final int ratingOverall;
+  final int? ratingCleanliness;
+  final int? ratingService;
+  final int? ratingLocation;
+  final int? ratingValue;
+  final int? ratingFacilities;
+  final String? title;
+  final String? content;
+
+  const ReviewCreatePayload({
+    required this.bookingId,
+    required this.ratingOverall,
+    this.ratingCleanliness,
+    this.ratingService,
+    this.ratingLocation,
+    this.ratingValue,
+    this.ratingFacilities,
+    this.title,
+    this.content,
+  });
+
+  Map<String, dynamic> toJson() {
+    final t = title?.trim();
+    final c = content?.trim();
+    return {
+      'bookingId': bookingId,
+      'ratingOverall': ratingOverall,
+      if (ratingCleanliness != null) 'ratingCleanliness': ratingCleanliness,
+      if (ratingService != null) 'ratingService': ratingService,
+      if (ratingLocation != null) 'ratingLocation': ratingLocation,
+      if (ratingValue != null) 'ratingValue': ratingValue,
+      if (ratingFacilities != null) 'ratingFacilities': ratingFacilities,
+      if (t != null && t.isNotEmpty) 'title': t,
+      if (c != null && c.isNotEmpty) 'content': c,
+    };
+  }
+}
+
+/// Outcome of a real review action (`GET /api/places/{id}/reviews`,
+/// `GET /api/me/reviews`, `GET /api/reviews/{id}`, `POST /api/reviews`).
+/// [demoUnavailable] is the Demo Mode guard (zero HTTP); [busy] is the
+/// single-flight guard; [sessionExpired] (401) never triggers auto-logout;
+/// [validation] 400, [forbidden] 403, [notFound] 404, [alreadyReviewed] 409 (one
+/// review per booking), [notCompleted] 422 (only completed bookings are
+/// reviewable), [serverError] 5xx, [network] transport/timeout.
+enum ReviewActionOutcome {
+  success,
+  demoUnavailable,
+  busy,
+  validation,
+  sessionExpired,
+  forbidden,
+  notFound,
+  alreadyReviewed,
+  notCompleted,
+  network,
+  serverError,
+}
+
 class DemoBooking {
   final String code;
   final String ownerUserId;

@@ -1195,6 +1195,119 @@ class ApiClient {
     }
   }
 
+  // ── Reviews (/api/reviews, /api/me/reviews, /api/places/{id}/reviews, UI-29) ─
+  // Reads are bare JSON arrays. A create returns 201 with the full review, which
+  // is PENDING (awaiting moderation). All authenticated, 8s timeout, no retry.
+
+  /// Lists a place's PUBLIC (approved-only) reviews (`GET /api/places/{id}/reviews`).
+  Future<CollectionApiResult<List<ReviewSummaryRecord>>> getPlaceReviews(
+    int placeId,
+  ) =>
+      _getReviewList('$baseUrl/places/$placeId/reviews');
+
+  /// Lists the authenticated user's own reviews (`GET /api/me/reviews`).
+  Future<CollectionApiResult<List<ReviewSummaryRecord>>> getMyReviews() =>
+      _getReviewList('$baseUrl/me/reviews');
+
+  Future<CollectionApiResult<List<ReviewSummaryRecord>>> _getReviewList(
+    String url,
+  ) async {
+    try {
+      final res = await _client
+          .get(Uri.parse(url), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final decoded = jsonDecode(utf8.decode(res.bodyBytes));
+        if (decoded is! List) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(
+          decoded
+              .map((e) =>
+                  ReviewSummaryRecord.fromJson(e as Map<String, dynamic>))
+              .toList(),
+        );
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Fetches one review in full (`GET /api/reviews/{id}`, owner or admin).
+  Future<CollectionApiResult<ReviewDetailRecord>> getReview(int id) async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/reviews/$id'), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(ReviewDetailRecord.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Creates a review for a COMPLETED booking (`POST /api/reviews`, 201). The
+  /// created review is PENDING (awaiting moderation — not publicly visible until
+  /// APPROVED). 422 if the booking is not completed, 409 if it was already
+  /// reviewed — surfaced honestly, never fabricated.
+  Future<CollectionApiResult<ReviewDetailRecord>> createReview(
+    ReviewCreatePayload payload,
+  ) async {
+    try {
+      final res = await _client
+          .post(
+            Uri.parse('$baseUrl/reviews'),
+            headers: _jsonHeaders,
+            body: jsonEncode(payload.toJson()),
+          )
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(ReviewDetailRecord.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
   Map<String, dynamic> _failureForStatus(http.Response res) {
     Map<String, dynamic>? body;
     try {

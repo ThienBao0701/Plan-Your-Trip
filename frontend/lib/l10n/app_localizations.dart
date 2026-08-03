@@ -11487,6 +11487,228 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'We couldn\'t reach the server. Please check your connection and try again.'**
   String get paymentActionNetworkMessage;
+
+  /// No description provided for @reviewStatusUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get reviewStatusUnknown;
+
+  /// No description provided for @reviewsListLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading reviews…'**
+  String get reviewsListLoadingMessage;
+
+  /// No description provided for @reviewsListErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load reviews. Please try again.'**
+  String get reviewsListErrorMessage;
+
+  /// No description provided for @placeReviewsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviews'**
+  String get placeReviewsTitle;
+
+  /// No description provided for @placeReviewsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No reviews yet'**
+  String get placeReviewsEmptyTitle;
+
+  /// No description provided for @placeReviewsEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This place has no published reviews yet.'**
+  String get placeReviewsEmptyMessage;
+
+  /// No description provided for @reviewsMineTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My reviews'**
+  String get reviewsMineTitle;
+
+  /// No description provided for @reviewsMineEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No reviews yet'**
+  String get reviewsMineEmptyTitle;
+
+  /// No description provided for @reviewsMineEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviews you write for completed stays will appear here.'**
+  String get reviewsMineEmptyMessage;
+
+  /// No description provided for @reviewStarsSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{rating} out of 5'**
+  String reviewStarsSemantic(int rating);
+
+  /// No description provided for @writeReviewRateStarSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate {rating} out of 5'**
+  String writeReviewRateStarSemantic(int rating);
+
+  /// No description provided for @reviewPartnerReplyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Response from the property'**
+  String get reviewPartnerReplyTitle;
+
+  /// No description provided for @reviewUnknownPlace.
+  ///
+  /// In en, this message translates to:
+  /// **'Place'**
+  String get reviewUnknownPlace;
+
+  /// No description provided for @reviewAnonymousReviewer.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest'**
+  String get reviewAnonymousReviewer;
+
+  /// No description provided for @reviewRatingCleanliness.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleanliness'**
+  String get reviewRatingCleanliness;
+
+  /// No description provided for @reviewRatingService.
+  ///
+  /// In en, this message translates to:
+  /// **'Service'**
+  String get reviewRatingService;
+
+  /// No description provided for @reviewRatingLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get reviewRatingLocation;
+
+  /// No description provided for @reviewRatingValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Value'**
+  String get reviewRatingValue;
+
+  /// No description provided for @reviewRatingFacilities.
+  ///
+  /// In en, this message translates to:
+  /// **'Facilities'**
+  String get reviewRatingFacilities;
+
+  /// No description provided for @writeReviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a review'**
+  String get writeReviewTitle;
+
+  /// No description provided for @writeReviewOverallLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Overall rating'**
+  String get writeReviewOverallLabel;
+
+  /// No description provided for @writeReviewSubRatingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate the details (optional)'**
+  String get writeReviewSubRatingsTitle;
+
+  /// No description provided for @writeReviewTitleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Title (optional)'**
+  String get writeReviewTitleLabel;
+
+  /// No description provided for @writeReviewContentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Your review (optional)'**
+  String get writeReviewContentLabel;
+
+  /// No description provided for @writeReviewSubmitAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit review'**
+  String get writeReviewSubmitAction;
+
+  /// No description provided for @writeReviewSubmittingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitting review…'**
+  String get writeReviewSubmittingLabel;
+
+  /// No description provided for @writeReviewModerationNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Your review is submitted for moderation and becomes public once approved.'**
+  String get writeReviewModerationNote;
+
+  /// No description provided for @writeReviewPendingHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Review submitted'**
+  String get writeReviewPendingHeadline;
+
+  /// No description provided for @writeReviewPendingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Thanks! Your review is pending moderation and will be published once approved.'**
+  String get writeReviewPendingBody;
+
+  /// No description provided for @writeReviewOverallRequiredHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap a star to set your overall rating.'**
+  String get writeReviewOverallRequiredHint;
+
+  /// No description provided for @bookingDetailSeeReviewsAction.
+  ///
+  /// In en, this message translates to:
+  /// **'See hotel reviews'**
+  String get bookingDetailSeeReviewsAction;
+
+  /// No description provided for @reviewSubmitValidationMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Please check your review and try again.'**
+  String get reviewSubmitValidationMessage;
+
+  /// No description provided for @reviewSubmitForbiddenMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You can only review your own booking.'**
+  String get reviewSubmitForbiddenMessage;
+
+  /// No description provided for @reviewSubmitAlreadyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve already reviewed this booking.'**
+  String get reviewSubmitAlreadyMessage;
+
+  /// No description provided for @reviewSubmitNotCompletedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You can review a stay only after it\'s completed.'**
+  String get reviewSubmitNotCompletedMessage;
+
+  /// No description provided for @reviewSubmitServerErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong submitting your review. Please try again.'**
+  String get reviewSubmitServerErrorMessage;
+
+  /// No description provided for @reviewSubmitNetworkMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t reach the server. Please check your connection and try again.'**
+  String get reviewSubmitNetworkMessage;
 }
 
 class _AppLocalizationsDelegate

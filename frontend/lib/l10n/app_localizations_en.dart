@@ -6755,4 +6755,131 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get paymentActionNetworkMessage =>
       'We couldn\'t reach the server. Please check your connection and try again.';
+
+  @override
+  String get reviewStatusUnknown => 'Unknown';
+
+  @override
+  String get reviewsListLoadingMessage => 'Loading reviews…';
+
+  @override
+  String get reviewsListErrorMessage =>
+      'We couldn\'t load reviews. Please try again.';
+
+  @override
+  String get placeReviewsTitle => 'Reviews';
+
+  @override
+  String get placeReviewsEmptyTitle => 'No reviews yet';
+
+  @override
+  String get placeReviewsEmptyMessage =>
+      'This place has no published reviews yet.';
+
+  @override
+  String get reviewsMineTitle => 'My reviews';
+
+  @override
+  String get reviewsMineEmptyTitle => 'No reviews yet';
+
+  @override
+  String get reviewsMineEmptyMessage =>
+      'Reviews you write for completed stays will appear here.';
+
+  @override
+  String reviewStarsSemantic(int rating) {
+    return '$rating out of 5';
+  }
+
+  @override
+  String writeReviewRateStarSemantic(int rating) {
+    return 'Rate $rating out of 5';
+  }
+
+  @override
+  String get reviewPartnerReplyTitle => 'Response from the property';
+
+  @override
+  String get reviewUnknownPlace => 'Place';
+
+  @override
+  String get reviewAnonymousReviewer => 'Guest';
+
+  @override
+  String get reviewRatingCleanliness => 'Cleanliness';
+
+  @override
+  String get reviewRatingService => 'Service';
+
+  @override
+  String get reviewRatingLocation => 'Location';
+
+  @override
+  String get reviewRatingValue => 'Value';
+
+  @override
+  String get reviewRatingFacilities => 'Facilities';
+
+  @override
+  String get writeReviewTitle => 'Write a review';
+
+  @override
+  String get writeReviewOverallLabel => 'Overall rating';
+
+  @override
+  String get writeReviewSubRatingsTitle => 'Rate the details (optional)';
+
+  @override
+  String get writeReviewTitleLabel => 'Title (optional)';
+
+  @override
+  String get writeReviewContentLabel => 'Your review (optional)';
+
+  @override
+  String get writeReviewSubmitAction => 'Submit review';
+
+  @override
+  String get writeReviewSubmittingLabel => 'Submitting review…';
+
+  @override
+  String get writeReviewModerationNote =>
+      'Your review is submitted for moderation and becomes public once approved.';
+
+  @override
+  String get writeReviewPendingHeadline => 'Review submitted';
+
+  @override
+  String get writeReviewPendingBody =>
+      'Thanks! Your review is pending moderation and will be published once approved.';
+
+  @override
+  String get writeReviewOverallRequiredHint =>
+      'Tap a star to set your overall rating.';
+
+  @override
+  String get bookingDetailSeeReviewsAction => 'See hotel reviews';
+
+  @override
+  String get reviewSubmitValidationMessage =>
+      'Please check your review and try again.';
+
+  @override
+  String get reviewSubmitForbiddenMessage =>
+      'You can only review your own booking.';
+
+  @override
+  String get reviewSubmitAlreadyMessage =>
+      'You\'ve already reviewed this booking.';
+
+  @override
+  String get reviewSubmitNotCompletedMessage =>
+      'You can review a stay only after it\'s completed.';
+
+  @override
+  String get reviewSubmitServerErrorMessage =>
+      'Something went wrong submitting your review. Please try again.';
+
+  @override
+  String get reviewSubmitNetworkMessage =>
+      'We couldn\'t reach the server. Please check your connection and try again.';
 }

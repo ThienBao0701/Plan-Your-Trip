@@ -11,6 +11,9 @@ import '../../shared/widgets/glass_widgets.dart';
 import '../auth/login_screen.dart';
 import '../hotels/booking_widgets.dart';
 import '../payments/real_payment_screen.dart';
+import '../reviews/real_my_reviews_screen.dart';
+import '../reviews/real_place_reviews_screen.dart';
+import '../reviews/real_write_review_screen.dart';
 
 /// UI27 — Real Mode booking detail. Fetches `GET /api/bookings/{id}` and renders
 /// ONLY the server's own `BookingResponse` (reused as [BookingCreateRecord]).
@@ -266,6 +269,49 @@ class _RealBookingDetailScreenState extends State<RealBookingDetailScreen> {
                 ),
                 const SizedBox(height: AppSpacing.sm),
               ],
+              if (view == BookingStatusView.completed) ...[
+                OceanSecondaryButton(
+                  key: const Key('booking-detail-write-review'),
+                  label: l10n.reviewWriteAction,
+                  icon: Icons.rate_review_rounded,
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => RealWriteReviewScreen(
+                        bookingId: record.id,
+                        placeName: record.hotelName,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+              ],
+              if (record.hotelId != null) ...[
+                OceanSecondaryButton(
+                  key: const Key('booking-detail-hotel-reviews'),
+                  label: l10n.bookingDetailSeeReviewsAction,
+                  icon: Icons.reviews_rounded,
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => RealPlaceReviewsScreen(
+                        placeId: record.hotelId!,
+                        placeName: record.hotelName,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+              ],
+              OceanSecondaryButton(
+                key: const Key('booking-detail-my-reviews'),
+                label: l10n.reviewsMineTitle,
+                icon: Icons.list_alt_rounded,
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const RealMyReviewsScreen(),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
               OceanPrimaryButton(
                 key: const Key('booking-detail-done'),
                 label: l10n.bookingResultDoneAction,

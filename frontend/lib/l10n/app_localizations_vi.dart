@@ -6589,4 +6589,130 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get paymentActionNetworkMessage =>
       'Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối và thử lại.';
+
+  @override
+  String get reviewStatusUnknown => 'Không xác định';
+
+  @override
+  String get reviewsListLoadingMessage => 'Đang tải đánh giá…';
+
+  @override
+  String get reviewsListErrorMessage =>
+      'Không thể tải đánh giá. Vui lòng thử lại.';
+
+  @override
+  String get placeReviewsTitle => 'Đánh giá';
+
+  @override
+  String get placeReviewsEmptyTitle => 'Chưa có đánh giá';
+
+  @override
+  String get placeReviewsEmptyMessage =>
+      'Địa điểm này chưa có đánh giá nào được đăng.';
+
+  @override
+  String get reviewsMineTitle => 'Đánh giá của tôi';
+
+  @override
+  String get reviewsMineEmptyTitle => 'Chưa có đánh giá';
+
+  @override
+  String get reviewsMineEmptyMessage =>
+      'Đánh giá bạn viết cho các kỳ nghỉ đã hoàn tất sẽ xuất hiện ở đây.';
+
+  @override
+  String reviewStarsSemantic(int rating) {
+    return '$rating trên 5';
+  }
+
+  @override
+  String writeReviewRateStarSemantic(int rating) {
+    return 'Chấm $rating trên 5';
+  }
+
+  @override
+  String get reviewPartnerReplyTitle => 'Phản hồi từ cơ sở lưu trú';
+
+  @override
+  String get reviewUnknownPlace => 'Địa điểm';
+
+  @override
+  String get reviewAnonymousReviewer => 'Khách';
+
+  @override
+  String get reviewRatingCleanliness => 'Sạch sẽ';
+
+  @override
+  String get reviewRatingService => 'Dịch vụ';
+
+  @override
+  String get reviewRatingLocation => 'Vị trí';
+
+  @override
+  String get reviewRatingValue => 'Đáng giá';
+
+  @override
+  String get reviewRatingFacilities => 'Tiện nghi';
+
+  @override
+  String get writeReviewTitle => 'Viết đánh giá';
+
+  @override
+  String get writeReviewOverallLabel => 'Đánh giá tổng thể';
+
+  @override
+  String get writeReviewSubRatingsTitle => 'Chấm chi tiết (tùy chọn)';
+
+  @override
+  String get writeReviewTitleLabel => 'Tiêu đề (tùy chọn)';
+
+  @override
+  String get writeReviewContentLabel => 'Nội dung đánh giá (tùy chọn)';
+
+  @override
+  String get writeReviewSubmitAction => 'Gửi đánh giá';
+
+  @override
+  String get writeReviewSubmittingLabel => 'Đang gửi đánh giá…';
+
+  @override
+  String get writeReviewModerationNote =>
+      'Đánh giá của bạn được gửi để kiểm duyệt và sẽ hiển thị công khai sau khi được duyệt.';
+
+  @override
+  String get writeReviewPendingHeadline => 'Đã gửi đánh giá';
+
+  @override
+  String get writeReviewPendingBody =>
+      'Cảm ơn bạn! Đánh giá của bạn đang chờ kiểm duyệt và sẽ được đăng sau khi được duyệt.';
+
+  @override
+  String get writeReviewOverallRequiredHint =>
+      'Chạm vào ngôi sao để đặt đánh giá tổng thể của bạn.';
+
+  @override
+  String get bookingDetailSeeReviewsAction => 'Xem đánh giá khách sạn';
+
+  @override
+  String get reviewSubmitValidationMessage =>
+      'Vui lòng kiểm tra lại đánh giá và thử lại.';
+
+  @override
+  String get reviewSubmitForbiddenMessage =>
+      'Bạn chỉ có thể đánh giá đặt phòng của chính mình.';
+
+  @override
+  String get reviewSubmitAlreadyMessage => 'Bạn đã đánh giá đặt phòng này rồi.';
+
+  @override
+  String get reviewSubmitNotCompletedMessage =>
+      'Bạn chỉ có thể đánh giá kỳ nghỉ sau khi nó đã hoàn tất.';
+
+  @override
+  String get reviewSubmitServerErrorMessage =>
+      'Đã xảy ra lỗi khi gửi đánh giá. Vui lòng thử lại.';
+
+  @override
+  String get reviewSubmitNetworkMessage =>
+      'Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối và thử lại.';
 }
