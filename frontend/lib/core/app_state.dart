@@ -237,6 +237,23 @@ class AppState extends ChangeNotifier {
   ReviewActionOutcome? reviewSubmitError;
   ReviewDetailRecord? lastSubmittedReview;
 
+  // ── Real Mode Notifications (/api/me/notifications, UI-30) ─────────────────
+  // Parallel to the demo-only [userNotifications] — never merged. Read the real
+  // notification list, mark one/all read, delete. A 401 never calls logout().
+  // Cleared on logout / mode / user change via [_resetRealNotificationsState].
+  // Zero HTTP in Demo Mode. Unread count is derived from the loaded list plus an
+  // authoritative server count (unread-count endpoint) shown in the header.
+  List<RealNotificationRecord> realNotifications = [];
+  bool realNotificationsLoading = false;
+  bool realNotificationsLoaded = false;
+  bool realNotificationsRefreshing = false;
+  RealNotificationOutcome? realNotificationsError;
+  int? realNotificationsServerUnread;
+  final Set<int> notificationActionInFlight = {};
+
+  int get realNotificationsUnreadCount =>
+      realNotifications.where((n) => !n.read).length;
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -329,6 +346,7 @@ class AppState extends ChangeNotifier {
     _resetRealBookingHistoryState();
     _resetRealPaymentState();
     _resetRealReviewsState();
+    _resetRealNotificationsState();
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -413,6 +431,16 @@ class AppState extends ChangeNotifier {
     realPaymentLoading = false;
     realPaymentSubmitting = false;
     realPaymentError = null;
+  }
+
+  void _resetRealNotificationsState() {
+    realNotifications = [];
+    realNotificationsLoading = false;
+    realNotificationsLoaded = false;
+    realNotificationsRefreshing = false;
+    realNotificationsError = null;
+    realNotificationsServerUnread = null;
+    notificationActionInFlight.clear();
   }
 
   void _resetRealReviewsState() {
@@ -539,6 +567,7 @@ class AppState extends ChangeNotifier {
     _resetRealBookingHistoryState();
     _resetRealPaymentState();
     _resetRealReviewsState();
+    _resetRealNotificationsState();
     timeline = [];
     expenses = [];
     demoBookings = [];
@@ -2858,6 +2887,133 @@ class AppState extends ChangeNotifier {
     if (reviewSubmitError == null) return;
     reviewSubmitError = null;
     notifyListeners();
+  }
+
+  RealNotificationOutcome _mapNotificationError(ApiErrorKind? kind) {
+    return switch (kind) {
+      ApiErrorKind.unauthorized => RealNotificationOutcome.sessionExpired,
+      ApiErrorKind.forbidden => RealNotificationOutcome.forbidden,
+      ApiErrorKind.notFound => RealNotificationOutcome.notFound,
+      ApiErrorKind.network => RealNotificationOutcome.network,
+      ApiErrorKind.timeout => RealNotificationOutcome.network,
+      ApiErrorKind.server => RealNotificationOutcome.serverError,
+      _ => RealNotificationOutcome.serverError,
+    };
+  }
+
+  Future<void> _refreshServerUnread() async {
+    final result = await api.getUnreadNotificationCount();
+    if (result.success && result.data != null) {
+      realNotificationsServerUnread = result.data;
+      notifyListeners();
+    }
+  }
+
+  /// Loads the authenticated user's real notifications (`GET /api/me/notifications`).
+  /// [refresh] forces a re-fetch and preserves the current list on failure.
+  Future<RealNotificationOutcome> loadRealNotifications({
+    bool refresh = false,
+  }) async {
+    if (demoMode) return RealNotificationOutcome.demoUnavailable;
+    if (realNotificationsLoading || realNotificationsRefreshing) {
+      return RealNotificationOutcome.success;
+    }
+    if (realNotificationsLoaded && !refresh) {
+      return RealNotificationOutcome.success;
+    }
+    if (refresh) {
+      realNotificationsRefreshing = true;
+    } else {
+      realNotificationsLoading = true;
+    }
+    realNotificationsError = null;
+    notifyListeners();
+    final result = await api.getNotifications();
+    realNotificationsLoading = false;
+    realNotificationsRefreshing = false;
+    if (result.success && result.data != null) {
+      realNotifications = result.data!;
+      realNotificationsLoaded = true;
+      realNotificationsError = null;
+      notifyListeners();
+      // Best-effort authoritative unread count for the header badge.
+      await _refreshServerUnread();
+      return RealNotificationOutcome.success;
+    }
+    final outcome = _mapNotificationError(result.errorKind);
+    realNotificationsError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Marks one notification read (`PATCH /api/me/notifications/{id}/read`). The
+  /// list item is replaced with the server's updated record — no optimistic flip.
+  Future<RealNotificationOutcome> markRealNotificationRead(int id) async {
+    if (demoMode) return RealNotificationOutcome.demoUnavailable;
+    if (notificationActionInFlight.contains(id)) {
+      return RealNotificationOutcome.busy;
+    }
+    notificationActionInFlight.add(id);
+    notifyListeners();
+    final result = await api.markNotificationRead(id);
+    notificationActionInFlight.remove(id);
+    if (result.success && result.data != null) {
+      final updated = result.data!;
+      realNotifications = [
+        for (final n in realNotifications)
+          if (n.id == id) updated else n,
+      ];
+      notifyListeners();
+      await _refreshServerUnread();
+      return RealNotificationOutcome.success;
+    }
+    final outcome = _mapNotificationError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Marks every notification read (`PATCH /api/me/notifications/read-all`), then
+  /// re-fetches the list so the read state reflects the server (no local guess).
+  Future<RealNotificationOutcome> markAllRealNotificationsRead() async {
+    if (demoMode) return RealNotificationOutcome.demoUnavailable;
+    if (notificationActionInFlight.isNotEmpty) {
+      return RealNotificationOutcome.busy;
+    }
+    // Reserve a sentinel so no concurrent action runs during the batch update.
+    notificationActionInFlight.add(-1);
+    notifyListeners();
+    final result = await api.markAllNotificationsRead();
+    notificationActionInFlight.remove(-1);
+    if (result.success) {
+      notifyListeners();
+      await loadRealNotifications(refresh: true);
+      return RealNotificationOutcome.success;
+    }
+    final outcome = _mapNotificationError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Deletes one notification (`DELETE /api/me/notifications/{id}`) and removes it
+  /// from the list only after the server confirms.
+  Future<RealNotificationOutcome> deleteRealNotification(int id) async {
+    if (demoMode) return RealNotificationOutcome.demoUnavailable;
+    if (notificationActionInFlight.contains(id)) {
+      return RealNotificationOutcome.busy;
+    }
+    notificationActionInFlight.add(id);
+    notifyListeners();
+    final result = await api.deleteNotification(id);
+    notificationActionInFlight.remove(id);
+    if (result.success) {
+      realNotifications = realNotifications.where((n) => n.id != id).toList();
+      notifyListeners();
+      await _refreshServerUnread();
+      return RealNotificationOutcome.success;
+    }
+    final outcome = _mapNotificationError(result.errorKind);
+    notifyListeners();
+    return outcome;
   }
 
   List<Place> filteredPlaces(PlaceQuery q) {

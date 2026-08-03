@@ -18,6 +18,7 @@ import '../trips/trip_companion_screen.dart';
 import '../trips/trip_detail_screen.dart';
 import '../trips/trip_documents_screen.dart';
 import '../wallet/travel_wallet_screen.dart';
+import 'real_notifications_view.dart';
 import 'settings_screen.dart';
 
 class NotificationsScreen extends StatefulWidget {
@@ -64,59 +65,65 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       body: BubbleBackground(
         child: SafeArea(
           top: false,
-          child: widget.loading
-              ? const Center(
-                  child: SizedBox(width: 420, child: OceanLoadingState()),
-                )
-              : ListView(
-                  key: const Key('notification-center-screen'),
-                  padding: const EdgeInsets.fromLTRB(
-                    AppSpacing.lg,
-                    AppSpacing.lg,
-                    AppSpacing.lg,
-                    AppSpacing.xxl,
-                  ),
-                  children: [
-                    OceanContentConstraint(
-                      maxWidth: AppBreakpoints.maxContentWidth,
-                      child: !app.demoMode
-                          ? _RealModeBoundary(l10n: l10n)
-                          : Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                _NotificationHeader(
-                                  unreadCount: unreadCount,
-                                  totalCount: app.visibleNotifications.length,
-                                  onMarkAllRead: unreadCount == 0
-                                      ? null
-                                      : () => _markAllRead(app),
+          child: !app.demoMode
+              ? const RealNotificationsBody()
+              : widget.loading
+                  ? const Center(
+                      child: SizedBox(width: 420, child: OceanLoadingState()),
+                    )
+                  : ListView(
+                      key: const Key('notification-center-screen'),
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpacing.lg,
+                        AppSpacing.lg,
+                        AppSpacing.lg,
+                        AppSpacing.xxl,
+                      ),
+                      children: [
+                        OceanContentConstraint(
+                          maxWidth: AppBreakpoints.maxContentWidth,
+                          child: !app.demoMode
+                              ? _RealModeBoundary(l10n: l10n)
+                              : Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    _NotificationHeader(
+                                      unreadCount: unreadCount,
+                                      totalCount:
+                                          app.visibleNotifications.length,
+                                      onMarkAllRead: unreadCount == 0
+                                          ? null
+                                          : () => _markAllRead(app),
+                                    ),
+                                    const SizedBox(height: AppSpacing.md),
+                                    _FilterRail(
+                                      selected: _filter,
+                                      onChanged: (filter) =>
+                                          setState(() => _filter = filter),
+                                    ),
+                                    const SizedBox(height: AppSpacing.md),
+                                    if (notifications.isEmpty)
+                                      OceanEmptyState(
+                                        title: l10n.notificationsDemoEmptyTitle,
+                                        message: _filter ==
+                                                _NotificationFilter.all
+                                            ? l10n.notificationsDemoEmptyMessage
+                                            : l10n
+                                                .notificationFilterEmptyMessage,
+                                      )
+                                    else
+                                      _NotificationGroups(
+                                        notifications: notifications,
+                                        today: app.now(),
+                                        onOpen: (notification) =>
+                                            _openNotification(notification),
+                                      ),
+                                  ],
                                 ),
-                                const SizedBox(height: AppSpacing.md),
-                                _FilterRail(
-                                  selected: _filter,
-                                  onChanged: (filter) =>
-                                      setState(() => _filter = filter),
-                                ),
-                                const SizedBox(height: AppSpacing.md),
-                                if (notifications.isEmpty)
-                                  OceanEmptyState(
-                                    title: l10n.notificationsDemoEmptyTitle,
-                                    message: _filter == _NotificationFilter.all
-                                        ? l10n.notificationsDemoEmptyMessage
-                                        : l10n.notificationFilterEmptyMessage,
-                                  )
-                                else
-                                  _NotificationGroups(
-                                    notifications: notifications,
-                                    today: app.now(),
-                                    onOpen: (notification) =>
-                                        _openNotification(notification),
-                                  ),
-                              ],
-                            ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
         ),
       ),
     );

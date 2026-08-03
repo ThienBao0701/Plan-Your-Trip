@@ -6715,4 +6715,27 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get reviewSubmitNetworkMessage =>
       'Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối và thử lại.';
+
+  @override
+  String get notificationsRealLoadingMessage => 'Đang tải thông báo…';
+
+  @override
+  String get notificationsRealErrorMessage =>
+      'Không thể tải thông báo của bạn. Vui lòng thử lại.';
+
+  @override
+  String get notificationsRealSubtitle =>
+      'Cập nhật từ đặt phòng, thanh toán và đánh giá của bạn.';
+
+  @override
+  String get notificationActionForbiddenMessage =>
+      'Bạn không có quyền thay đổi thông báo này.';
+
+  @override
+  String get notificationActionServerErrorMessage =>
+      'Đã xảy ra lỗi khi cập nhật thông báo của bạn. Vui lòng thử lại.';
+
+  @override
+  String get notificationActionNetworkMessage =>
+      'Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối và thử lại.';
 }

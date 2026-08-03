@@ -416,7 +416,19 @@ void main() {
 
   testWidgets('notifications show real empty state and demo notifications',
       (tester) async {
-    final realApp = AppState()
+    // UI30: real mode loads /api/me/notifications; answer with an empty inbox so
+    // the real notification center renders its empty state deterministically.
+    final realApp = AppState(
+      api: ApiClient(
+        client: MockClient(
+          (r) async => http.Response(
+            r.url.path.endsWith('/unread-count') ? '0' : '[]',
+            200,
+            headers: {'content-type': 'application/json; charset=utf-8'},
+          ),
+        ),
+      )..demoMode = false,
+    )
       ..demoMode = false
       ..email = 'real@example.com';
 
@@ -426,7 +438,7 @@ void main() {
       const Size(390, 900),
     );
 
-    expect(find.text('No notifications'), findsOneWidget);
+    expect(find.byKey(const Key('real-notifications-empty')), findsOneWidget);
 
     final demoApp = AppState()
       ..demoMode = true

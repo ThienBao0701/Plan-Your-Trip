@@ -3504,5 +3504,11 @@
   "reviewSubmitAlreadyMessage": "You've already reviewed this booking.",
   "reviewSubmitNotCompletedMessage": "You can review a stay only after it's completed.",
   "reviewSubmitServerErrorMessage": "Something went wrong submitting your review. Please try again.",
-  "reviewSubmitNetworkMessage": "We couldn't reach the server. Please check your connection and try again."
+  "reviewSubmitNetworkMessage": "We couldn't reach the server. Please check your connection and try again.",
+  "notificationsRealLoadingMessage": "Loading notifications…",
+  "notificationsRealErrorMessage": "We couldn't load your notifications. Please try again.",
+  "notificationsRealSubtitle": "Updates from your bookings, payments and reviews.",
+  "notificationActionForbiddenMessage": "You don't have permission to change this notification.",
+  "notificationActionServerErrorMessage": "Something went wrong updating your notifications. Please try again.",
+  "notificationActionNetworkMessage": "We couldn't reach the server. Please check your connection and try again."
 }

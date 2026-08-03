@@ -6882,4 +6882,27 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get reviewSubmitNetworkMessage =>
       'We couldn\'t reach the server. Please check your connection and try again.';
+
+  @override
+  String get notificationsRealLoadingMessage => 'Loading notifications…';
+
+  @override
+  String get notificationsRealErrorMessage =>
+      'We couldn\'t load your notifications. Please try again.';
+
+  @override
+  String get notificationsRealSubtitle =>
+      'Updates from your bookings, payments and reviews.';
+
+  @override
+  String get notificationActionForbiddenMessage =>
+      'You don\'t have permission to change this notification.';
+
+  @override
+  String get notificationActionServerErrorMessage =>
+      'Something went wrong updating your notifications. Please try again.';
+
+  @override
+  String get notificationActionNetworkMessage =>
+      'We couldn\'t reach the server. Please check your connection and try again.';
 }

@@ -11709,6 +11709,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'We couldn\'t reach the server. Please check your connection and try again.'**
   String get reviewSubmitNetworkMessage;
+
+  /// No description provided for @notificationsRealLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading notifications…'**
+  String get notificationsRealLoadingMessage;
+
+  /// No description provided for @notificationsRealErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load your notifications. Please try again.'**
+  String get notificationsRealErrorMessage;
+
+  /// No description provided for @notificationsRealSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Updates from your bookings, payments and reviews.'**
+  String get notificationsRealSubtitle;
+
+  /// No description provided for @notificationActionForbiddenMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have permission to change this notification.'**
+  String get notificationActionForbiddenMessage;
+
+  /// No description provided for @notificationActionServerErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong updating your notifications. Please try again.'**
+  String get notificationActionServerErrorMessage;
+
+  /// No description provided for @notificationActionNetworkMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t reach the server. Please check your connection and try again.'**
+  String get notificationActionNetworkMessage;
 }
 
 class _AppLocalizationsDelegate

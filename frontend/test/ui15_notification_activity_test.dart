@@ -3,9 +3,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:planyourtrip_frontend/core/app_state.dart';
 import 'package:planyourtrip_frontend/core/mock/app_models.dart';
 import 'package:planyourtrip_frontend/core/mock/mock_data.dart';
+import 'package:planyourtrip_frontend/core/network/api_client.dart';
 import 'package:planyourtrip_frontend/design/app_theme.dart';
 import 'package:planyourtrip_frontend/features/home/app_shell.dart';
 import 'package:planyourtrip_frontend/features/profile/notifications_screen.dart';
@@ -34,24 +37,38 @@ void main() {
     ..demoMode = true
     ..email = MockData.demoEmail;
 
-  AppState realState() => AppState(now: () => fixedNow)
-    ..demoMode = false
-    ..email = 'real@example.com'
-    ..trips = []
-    ..timeline = []
-    ..expenses = []
-    ..demoBookings = []
-    ..demoPaymentAttempts = []
-    ..travelWalletItems = []
-    ..tripDocuments = []
-    ..tripCollaborators = []
-    ..sharedTrips = []
-    ..tripNotes = []
-    ..packingItems = []
-    ..tripReminders = []
-    ..reviews = []
-    ..userNotifications = []
-    ..publicTripIds = {};
+  // Real Mode makes a real GET /api/me/notifications on the notifications screen
+  // (UI30). Answer it (and the unread-count) deterministically with an empty
+  // inbox so the real path renders its empty state instead of a live backend.
+  ApiClient emptyNotificationsApi() => ApiClient(
+        client: MockClient(
+          (r) async => http.Response(
+            r.url.path.endsWith('/unread-count') ? '0' : '[]',
+            200,
+            headers: {'content-type': 'application/json; charset=utf-8'},
+          ),
+        ),
+      )..demoMode = false;
+
+  AppState realState() =>
+      AppState(now: () => fixedNow, api: emptyNotificationsApi())
+        ..demoMode = false
+        ..email = 'real@example.com'
+        ..trips = []
+        ..timeline = []
+        ..expenses = []
+        ..demoBookings = []
+        ..demoPaymentAttempts = []
+        ..travelWalletItems = []
+        ..tripDocuments = []
+        ..tripCollaborators = []
+        ..sharedTrips = []
+        ..tripNotes = []
+        ..packingItems = []
+        ..tripReminders = []
+        ..reviews = []
+        ..userNotifications = []
+        ..publicTripIds = {};
 
   Widget harness({
     required Widget child,
@@ -398,7 +415,7 @@ void main() {
         findsOneWidget);
   });
 
-  testWidgets('real mode shows unavailable boundary without seeded data',
+  testWidgets('real mode loads the real notification center (empty inbox)',
       (tester) async {
     await pumpSize(
       tester,
@@ -407,11 +424,9 @@ void main() {
       app: realState(),
     );
 
-    expect(find.text('No notifications'), findsOneWidget);
-    expect(
-      find.textContaining('Push delivery, device tokens'),
-      findsOneWidget,
-    );
+    // UI30: real mode now loads /api/me/notifications; an empty inbox renders the
+    // real empty state, never the demo notifications.
+    expect(find.byKey(const Key('real-notifications-empty')), findsOneWidget);
     expect(find.text('Booking changes saved'), findsNothing);
   });
 

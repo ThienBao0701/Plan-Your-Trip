@@ -1308,6 +1308,162 @@ class ApiClient {
     }
   }
 
+  // ── Notifications (/api/me/notifications, UI-30) ─────────────────────────────
+  // List is a bare JSON array; mark-read returns the updated notification;
+  // mark-all-read and unread-count return a bare number; delete returns 204. All
+  // authenticated, 8s timeout, no retry.
+
+  /// Lists the authenticated user's notifications (`GET /api/me/notifications`),
+  /// newest first (bare array of NotificationSummaryResponse).
+  Future<CollectionApiResult<List<RealNotificationRecord>>>
+      getNotifications() async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/me/notifications'), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final decoded = jsonDecode(utf8.decode(res.bodyBytes));
+        if (decoded is! List) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(
+          decoded
+              .map((e) =>
+                  RealNotificationRecord.fromJson(e as Map<String, dynamic>))
+              .toList(),
+        );
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Counts unread notifications (`GET /api/me/notifications/unread-count`) — the
+  /// backend returns a bare number.
+  Future<CollectionApiResult<int>> getUnreadNotificationCount() async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/me/notifications/unread-count'),
+              headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final decoded = jsonDecode(utf8.decode(res.bodyBytes));
+        if (decoded is! num) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(decoded.toInt());
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Marks one notification read (`PATCH /api/me/notifications/{id}/read`,
+  /// owner-only) and returns the updated notification.
+  Future<CollectionApiResult<RealNotificationRecord>> markNotificationRead(
+    int id,
+  ) async {
+    try {
+      final res = await _client
+          .patch(Uri.parse('$baseUrl/me/notifications/$id/read'),
+              headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(
+            RealNotificationRecord.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Marks all of the user's notifications read
+  /// (`PATCH /api/me/notifications/read-all`) — returns the count updated.
+  Future<CollectionApiResult<int>> markAllNotificationsRead() async {
+    try {
+      final res = await _client
+          .patch(Uri.parse('$baseUrl/me/notifications/read-all'),
+              headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final decoded = jsonDecode(utf8.decode(res.bodyBytes));
+        final count = decoded is num ? decoded.toInt() : 0;
+        return CollectionApiResult.success(count);
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Deletes one notification (`DELETE /api/me/notifications/{id}`, 204).
+  Future<CollectionApiVoidResult> deleteNotification(int id) async {
+    try {
+      final res = await _client
+          .delete(Uri.parse('$baseUrl/me/notifications/$id'),
+              headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 204) {
+        return const CollectionApiVoidResult.success();
+      }
+      return CollectionApiVoidResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.network);
+    }
+  }
+
   Map<String, dynamic> _failureForStatus(http.Response res) {
     Map<String, dynamic>? body;
     try {

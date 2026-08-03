@@ -3826,6 +3826,74 @@ enum ReviewActionOutcome {
   serverError,
 }
 
+/// Real-backend mirror of `NotificationDto` (`NotificationSummaryResponse` for
+/// the list, `NotificationResponse` for a single item after mark-read). [title]
+/// and [message] are literal server strings (NOT derived from a demo template);
+/// [notificationType]/[priority] are kept raw and mapped to the existing
+/// [UserNotificationType]/[UserNotificationPriority] view enums via the shared
+/// wire mappers. `Map` decoding is confined to [fromJson].
+class RealNotificationRecord {
+  final int id;
+  final String title;
+  final String message;
+  final String notificationType;
+  final String priority;
+  final bool read;
+  final DateTime? readAt;
+  final DateTime? createdAt;
+  final String? relatedEntityType;
+  final int? relatedEntityId;
+
+  const RealNotificationRecord({
+    required this.id,
+    this.title = '',
+    this.message = '',
+    this.notificationType = '',
+    this.priority = '',
+    this.read = false,
+    this.readAt,
+    this.createdAt,
+    this.relatedEntityType,
+    this.relatedEntityId,
+  });
+
+  UserNotificationType? get typeView =>
+      userNotificationTypeFromWire(notificationType);
+  UserNotificationPriority? get priorityView =>
+      userNotificationPriorityFromWire(priority);
+
+  factory RealNotificationRecord.fromJson(Map<String, dynamic> json) {
+    return RealNotificationRecord(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      title: (json['title'] as String?) ?? '',
+      message: (json['message'] as String?) ?? '',
+      notificationType: (json['notificationType'] as String?) ?? '',
+      priority: (json['priority'] as String?) ?? '',
+      read: json['read'] as bool? ?? false,
+      readAt: _tryParseDate(json['readAt']),
+      createdAt: _tryParseDate(json['createdAt']),
+      relatedEntityType: json['relatedEntityType'] as String?,
+      relatedEntityId: (json['relatedEntityId'] as num?)?.toInt(),
+    );
+  }
+}
+
+/// Outcome of a real notification action (`GET /api/me/notifications`, its
+/// mark-read / mark-all-read / delete mutations). [demoUnavailable] is the Demo
+/// Mode guard (zero HTTP); [busy] the single-flight guard; [sessionExpired] (401)
+/// never triggers auto-logout; [forbidden] 403, [notFound] 404, [serverError]
+/// 5xx, [network] transport/timeout.
+enum RealNotificationOutcome {
+  success,
+  demoUnavailable,
+  busy,
+  sessionExpired,
+  forbidden,
+  notFound,
+  network,
+  serverError,
+}
+
 class DemoBooking {
   final String code;
   final String ownerUserId;

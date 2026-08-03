@@ -3504,5 +3504,11 @@
   "reviewSubmitAlreadyMessage": "Bạn đã đánh giá đặt phòng này rồi.",
   "reviewSubmitNotCompletedMessage": "Bạn chỉ có thể đánh giá kỳ nghỉ sau khi nó đã hoàn tất.",
   "reviewSubmitServerErrorMessage": "Đã xảy ra lỗi khi gửi đánh giá. Vui lòng thử lại.",
-  "reviewSubmitNetworkMessage": "Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối và thử lại."
+  "reviewSubmitNetworkMessage": "Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối và thử lại.",
+  "notificationsRealLoadingMessage": "Đang tải thông báo…",
+  "notificationsRealErrorMessage": "Không thể tải thông báo của bạn. Vui lòng thử lại.",
+  "notificationsRealSubtitle": "Cập nhật từ đặt phòng, thanh toán và đánh giá của bạn.",
+  "notificationActionForbiddenMessage": "Bạn không có quyền thay đổi thông báo này.",
+  "notificationActionServerErrorMessage": "Đã xảy ra lỗi khi cập nhật thông báo của bạn. Vui lòng thử lại.",
+  "notificationActionNetworkMessage": "Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối và thử lại."
 }
