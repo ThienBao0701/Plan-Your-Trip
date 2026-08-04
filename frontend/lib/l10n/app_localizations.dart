@@ -12159,6 +12159,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Current balance {balance}'**
   String giftCardsRealBalanceSemantic(String balance);
+
+  /// No description provided for @loyaltyRealLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading your loyalty points…'**
+  String get loyaltyRealLoadingMessage;
+
+  /// No description provided for @loyaltyRealErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load your loyalty points. Please try again.'**
+  String get loyaltyRealErrorMessage;
+
+  /// No description provided for @loyaltyRealLoadMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Load more'**
+  String get loyaltyRealLoadMore;
+
+  /// No description provided for @loyaltyRealEarnNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Points are earned automatically from completed bookings and reviews. They can\'t be redeemed directly here.'**
+  String get loyaltyRealEarnNote;
 }
 
 class _AppLocalizationsDelegate

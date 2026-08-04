@@ -1843,6 +1843,77 @@ class ApiClient {
     }
   }
 
+  // ── Loyalty (/api/me/loyalty, UI-34) ─────────────────────────────────────────
+  // Customer READ-ONLY: account (balance + lifetime earned, created lazily) and
+  // an immutable transaction ledger (PageResponse, createdAt DESC). No customer
+  // mutation exists. All authenticated + owner-scoped. 8s timeout, no retry.
+
+  /// Reads the user's loyalty account (`GET /api/me/loyalty`).
+  Future<CollectionApiResult<RealLoyaltyAccount>> getLoyaltyAccount() async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/me/loyalty'), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealLoyaltyAccount.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Lists the user's loyalty transactions
+  /// (`GET /api/me/loyalty/transactions`, paged).
+  Future<CollectionApiResult<RealLoyaltyTransactionsPage>>
+      getLoyaltyTransactions({int? page, int? size}) async {
+    try {
+      final uri = Uri.parse('$baseUrl/me/loyalty/transactions').replace(
+        queryParameters: {
+          if (page != null) 'page': '$page',
+          if (size != null) 'size': '$size',
+        },
+      );
+      final res = await _client
+          .get(uri, headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(
+          RealLoyaltyTransactionsPage.fromJson(body),
+        );
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
   Map<String, dynamic> _failureForStatus(http.Response res) {
     Map<String, dynamic>? body;
     try {

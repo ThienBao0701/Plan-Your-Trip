@@ -6979,4 +6979,18 @@ class AppLocalizationsVi extends AppLocalizations {
   String giftCardsRealBalanceSemantic(String balance) {
     return 'Số dư hiện tại $balance';
   }
+
+  @override
+  String get loyaltyRealLoadingMessage => 'Đang tải điểm thưởng của bạn…';
+
+  @override
+  String get loyaltyRealErrorMessage =>
+      'Không thể tải điểm thưởng. Vui lòng thử lại.';
+
+  @override
+  String get loyaltyRealLoadMore => 'Tải thêm';
+
+  @override
+  String get loyaltyRealEarnNote =>
+      'Điểm được tích lũy tự động từ các đặt phòng và đánh giá đã hoàn tất. Không thể quy đổi trực tiếp tại đây.';
 }

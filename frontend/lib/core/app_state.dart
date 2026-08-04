@@ -303,6 +303,24 @@ class AppState extends ChangeNotifier {
   bool get realGiftCardsHasMore =>
       realGiftCardsPage + 1 < realGiftCardsTotalPages;
 
+  // ── Real Mode Loyalty (/api/me/loyalty, UI-34) ────────────────────────────
+  // Read-only: the customer's loyalty account (balance + lifetime earned) and an
+  // immutable transaction ledger (paged). A 401 never calls logout(). Cleared on
+  // logout / mode / user change via [_resetRealLoyaltyState]. Zero HTTP in Demo
+  // Mode.
+  RealLoyaltyAccount? realLoyaltyAccount;
+  bool realLoyaltyLoading = false;
+  bool realLoyaltyLoaded = false;
+  bool realLoyaltyRefreshing = false;
+  LoyaltyOutcome? realLoyaltyError;
+  List<RealLoyaltyTransaction> realLoyaltyTransactions = [];
+  int realLoyaltyTxPage = 0;
+  int realLoyaltyTxTotalPages = 0;
+  bool realLoyaltyTxLoadingMore = false;
+
+  bool get realLoyaltyTxHasMore =>
+      realLoyaltyTxPage + 1 < realLoyaltyTxTotalPages;
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -399,6 +417,7 @@ class AppState extends ChangeNotifier {
     _resetRealRecentlyViewedState();
     _resetRealProfileState();
     _resetRealGiftCardsState();
+    _resetRealLoyaltyState();
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -522,6 +541,18 @@ class AppState extends ChangeNotifier {
     giftCardTransactionsCache.clear();
     giftCardTransactionsLoadingId = null;
     giftCardActionInFlight.clear();
+  }
+
+  void _resetRealLoyaltyState() {
+    realLoyaltyAccount = null;
+    realLoyaltyLoading = false;
+    realLoyaltyLoaded = false;
+    realLoyaltyRefreshing = false;
+    realLoyaltyError = null;
+    realLoyaltyTransactions = [];
+    realLoyaltyTxPage = 0;
+    realLoyaltyTxTotalPages = 0;
+    realLoyaltyTxLoadingMore = false;
   }
 
   void _resetRealNotificationsState() {
@@ -662,6 +693,7 @@ class AppState extends ChangeNotifier {
     _resetRealRecentlyViewedState();
     _resetRealProfileState();
     _resetRealGiftCardsState();
+    _resetRealLoyaltyState();
     timeline = [];
     expenses = [];
     demoBookings = [];
@@ -3486,6 +3518,96 @@ class AppState extends ChangeNotifier {
       return GiftCardActionOutcome.success;
     }
     final outcome = _mapGiftCardError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  // ── Real Mode Loyalty (UI-34) ────────────────────────────────────────────
+
+  static const int _loyaltyPageSize = 20;
+
+  LoyaltyOutcome _mapLoyaltyError(ApiErrorKind? kind) {
+    return switch (kind) {
+      ApiErrorKind.unauthorized => LoyaltyOutcome.sessionExpired,
+      ApiErrorKind.forbidden => LoyaltyOutcome.forbidden,
+      ApiErrorKind.notFound => LoyaltyOutcome.notFound,
+      ApiErrorKind.network => LoyaltyOutcome.network,
+      ApiErrorKind.timeout => LoyaltyOutcome.network,
+      ApiErrorKind.server => LoyaltyOutcome.serverError,
+      _ => LoyaltyOutcome.serverError,
+    };
+  }
+
+  /// Loads the loyalty account (`GET /api/me/loyalty`) plus the first page of the
+  /// transaction ledger (`GET /api/me/loyalty/transactions`). Both must succeed
+  /// to commit; on failure the prior state is preserved. [refresh] forces a
+  /// re-fetch. Zero HTTP in Demo Mode.
+  Future<LoyaltyOutcome> loadRealLoyalty({bool refresh = false}) async {
+    if (demoMode) return LoyaltyOutcome.demoUnavailable;
+    if (realLoyaltyLoading || realLoyaltyRefreshing) {
+      return LoyaltyOutcome.success;
+    }
+    if (realLoyaltyLoaded && !refresh) return LoyaltyOutcome.success;
+    if (refresh) {
+      realLoyaltyRefreshing = true;
+    } else {
+      realLoyaltyLoading = true;
+    }
+    realLoyaltyError = null;
+    notifyListeners();
+    final accountResult = await api.getLoyaltyAccount();
+    if (!accountResult.success || accountResult.data == null) {
+      realLoyaltyLoading = false;
+      realLoyaltyRefreshing = false;
+      final outcome = _mapLoyaltyError(accountResult.errorKind);
+      realLoyaltyError = outcome;
+      notifyListeners();
+      return outcome;
+    }
+    final txResult =
+        await api.getLoyaltyTransactions(page: 0, size: _loyaltyPageSize);
+    realLoyaltyLoading = false;
+    realLoyaltyRefreshing = false;
+    if (!txResult.success || txResult.data == null) {
+      final outcome = _mapLoyaltyError(txResult.errorKind);
+      realLoyaltyError = outcome;
+      notifyListeners();
+      return outcome;
+    }
+    realLoyaltyAccount = accountResult.data!;
+    realLoyaltyTransactions = txResult.data!.content;
+    realLoyaltyTxPage = txResult.data!.page;
+    realLoyaltyTxTotalPages = txResult.data!.totalPages;
+    realLoyaltyLoaded = true;
+    realLoyaltyError = null;
+    notifyListeners();
+    return LoyaltyOutcome.success;
+  }
+
+  /// Appends the next page of loyalty transactions (real backend pagination).
+  Future<LoyaltyOutcome> loadMoreRealLoyaltyTransactions() async {
+    if (demoMode) return LoyaltyOutcome.demoUnavailable;
+    if (!realLoyaltyLoaded || realLoyaltyTxLoadingMore) {
+      return LoyaltyOutcome.success;
+    }
+    if (!realLoyaltyTxHasMore) return LoyaltyOutcome.success;
+    realLoyaltyTxLoadingMore = true;
+    notifyListeners();
+    final next = realLoyaltyTxPage + 1;
+    final result =
+        await api.getLoyaltyTransactions(page: next, size: _loyaltyPageSize);
+    realLoyaltyTxLoadingMore = false;
+    if (result.success && result.data != null) {
+      realLoyaltyTransactions = [
+        ...realLoyaltyTransactions,
+        ...result.data!.content,
+      ];
+      realLoyaltyTxPage = result.data!.page;
+      realLoyaltyTxTotalPages = result.data!.totalPages;
+      notifyListeners();
+      return LoyaltyOutcome.success;
+    }
+    final outcome = _mapLoyaltyError(result.errorKind);
     notifyListeners();
     return outcome;
   }

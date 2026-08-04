@@ -3611,5 +3611,9 @@
     "placeholders": {
       "balance": { "type": "String" }
     }
-  }
+  },
+  "loyaltyRealLoadingMessage": "Loading your loyalty points…",
+  "loyaltyRealErrorMessage": "We couldn't load your loyalty points. Please try again.",
+  "loyaltyRealLoadMore": "Load more",
+  "loyaltyRealEarnNote": "Points are earned automatically from completed bookings and reviews. They can't be redeemed directly here."
 }

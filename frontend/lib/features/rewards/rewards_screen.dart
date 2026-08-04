@@ -11,6 +11,7 @@ import '../../design/app_radii.dart';
 import '../../design/app_spacing.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/glass_widgets.dart';
+import '../auth/login_screen.dart';
 import '../expenses/expenses_screen.dart';
 import 'real_gift_cards_view.dart';
 
@@ -227,7 +228,14 @@ class LoyaltyScreen extends StatelessWidget {
     final app = AppScope.of(context);
     final l10n = AppLocalizations.of(context)!;
     final account = app.loyaltyAccount;
-    if (!app.demoMode || account == null) {
+    if (!app.demoMode) {
+      // UI34: real loyalty is backend-connected. Demo Mode is byte-identical.
+      return _RewardsScaffold(
+        title: l10n.loyaltyTitle,
+        child: const _RealLoyaltyBody(),
+      );
+    }
+    if (account == null) {
       return _RewardsScaffold(
         title: l10n.loyaltyTitle,
         child: OceanEmptyState(
@@ -282,6 +290,154 @@ class LoyaltyScreen extends StatelessWidget {
               _LoyaltyTransactionTile(transaction: transaction),
         ],
       ),
+    );
+  }
+}
+
+/// UI34 — Real Mode loyalty (`GET /api/me/loyalty`, `/transactions`). Read-only
+/// account metrics + immutable, paginated ledger. Rendered inside the existing
+/// Loyalty scaffold, replacing the real-mode placeholder. A 401 never logs the
+/// user out.
+class _RealLoyaltyBody extends StatefulWidget {
+  const _RealLoyaltyBody();
+
+  @override
+  State<_RealLoyaltyBody> createState() => _RealLoyaltyBodyState();
+}
+
+class _RealLoyaltyBodyState extends State<_RealLoyaltyBody> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) AppScope.of(context).loadRealLoyalty();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final app = AppScope.of(context);
+    final l10n = AppLocalizations.of(context)!;
+
+    if (app.realLoyaltyError == LoyaltyOutcome.sessionExpired &&
+        !app.realLoyaltyLoaded) {
+      return OceanSessionExpiredState(
+        key: const Key('loyalty-session-expired'),
+        onLogin: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+        ),
+        onReturnHome: () => Navigator.maybePop(context),
+      );
+    }
+    if (app.realLoyaltyLoading && !app.realLoyaltyLoaded) {
+      return Semantics(
+        liveRegion: true,
+        label: l10n.loyaltyRealLoadingMessage,
+        child: Column(
+          children: [
+            const SizedBox(height: AppSpacing.xxl),
+            const CircularProgressIndicator(key: Key('loyalty-loading')),
+            const SizedBox(height: AppSpacing.md),
+            Text(l10n.loyaltyRealLoadingMessage),
+          ],
+        ),
+      );
+    }
+    if (app.realLoyaltyError != null && !app.realLoyaltyLoaded) {
+      return OceanRecoverableErrorState(
+        key: const Key('loyalty-error'),
+        message: l10n.loyaltyRealErrorMessage,
+        onReload: () => app.loadRealLoyalty(refresh: true),
+      );
+    }
+
+    final account = app.realLoyaltyAccount;
+    if (account == null) {
+      return const Padding(
+        padding: EdgeInsets.all(AppSpacing.xxl),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+    final transactions = app.realLoyaltyTransactions;
+    return Column(
+      key: const Key('loyalty-content'),
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        OceanGlassCard(
+          semanticLabel: l10n.loyaltyBalanceSemantic,
+          child: Wrap(
+            spacing: AppSpacing.md,
+            runSpacing: AppSpacing.md,
+            children: [
+              _MetricBlock(
+                label: l10n.loyaltyCurrentBalance,
+                value: l10n.loyaltyPointsValue(account.currentBalance),
+                icon: Icons.stars_rounded,
+              ),
+              _MetricBlock(
+                label: l10n.loyaltyLifetimeEarned,
+                value: l10n.loyaltyPointsValue(account.lifetimePointsEarned),
+                icon: Icons.timeline_rounded,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        OceanGlassSurface(
+          blur: 0,
+          color: AppColors.paleCyan,
+          child: Text(
+            l10n.loyaltyRealEarnNote,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        _SectionTitle(l10n.loyaltyTransactions),
+        const SizedBox(height: AppSpacing.sm),
+        if (transactions.isEmpty)
+          OceanEmptyState(
+            key: const Key('loyalty-transactions-empty'),
+            title: l10n.rewardsHistoryEmptyTitle,
+            message: l10n.rewardsHistoryEmptyMessage,
+          )
+        else ...[
+          for (final tx in transactions)
+            _RealLoyaltyTransactionTile(transaction: tx),
+          if (app.realLoyaltyTxHasMore) ...[
+            const SizedBox(height: AppSpacing.xs),
+            OceanSecondaryButton(
+              key: const Key('loyalty-load-more'),
+              label: l10n.loyaltyRealLoadMore,
+              icon: Icons.expand_more_rounded,
+              onPressed: app.realLoyaltyTxLoadingMore
+                  ? null
+                  : () => app.loadMoreRealLoyaltyTransactions(),
+            ),
+          ],
+        ],
+      ],
+    );
+  }
+}
+
+class _RealLoyaltyTransactionTile extends StatelessWidget {
+  final RealLoyaltyTransaction transaction;
+
+  const _RealLoyaltyTransactionTile({required this.transaction});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final increase = transaction.increasesBalance;
+    final typeView = transaction.typeView;
+    final title = typeView != null
+        ? loyaltyTransactionLabel(l10n, typeView)
+        : transaction.transactionType;
+    return _LedgerTile(
+      title: title,
+      subtitle: transaction.description,
+      amount: '${increase ? '+' : '-'}${transaction.points} ${l10n.pointsUnit}',
+      color: increase ? AppColors.success : AppColors.danger,
     );
   }
 }

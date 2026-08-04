@@ -7146,4 +7146,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String giftCardsRealBalanceSemantic(String balance) {
     return 'Current balance $balance';
   }
+
+  @override
+  String get loyaltyRealLoadingMessage => 'Loading your loyalty points…';
+
+  @override
+  String get loyaltyRealErrorMessage =>
+      'We couldn\'t load your loyalty points. Please try again.';
+
+  @override
+  String get loyaltyRealLoadMore => 'Load more';
+
+  @override
+  String get loyaltyRealEarnNote =>
+      'Points are earned automatically from completed bookings and reviews. They can\'t be redeemed directly here.';
 }

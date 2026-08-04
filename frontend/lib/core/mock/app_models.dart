@@ -4397,6 +4397,158 @@ enum GiftCardActionOutcome {
   serverError,
 }
 
+/// Maps a backend `LoyaltyTransactionType` wire string to the existing demo
+/// [LoyaltyTransactionType] view enum (reusing its label + [knownIncrease]
+/// direction logic). Returns null for any unrecognised code so the caller can
+/// fall back to the balance delta.
+LoyaltyTransactionType? loyaltyTransactionTypeFromCode(String? code) {
+  switch (code) {
+    case 'EARN_BOOKING':
+      return LoyaltyTransactionType.earnBooking;
+    case 'EARN_REVIEW':
+      return LoyaltyTransactionType.earnReview;
+    case 'GRANT':
+      return LoyaltyTransactionType.grant;
+    case 'ADJUSTMENT':
+      return LoyaltyTransactionType.adjustment;
+    case 'REVERSAL':
+      return LoyaltyTransactionType.reversal;
+    case 'REDEMPTION_DEBIT':
+      return LoyaltyTransactionType.redemptionDebit;
+    case 'REDEMPTION_RELEASE':
+      return LoyaltyTransactionType.redemptionRelease;
+    case 'REDEMPTION_REFUND':
+      return LoyaltyTransactionType.redemptionRefund;
+    default:
+      return null;
+  }
+}
+
+/// Real-backend mirror of `LoyaltyDto.LoyaltyAccountResponse` (`GET /api/me/loyalty`,
+/// created lazily on first access). Points are integer counts (`long`), never
+/// money. `Map` decoding is confined to [fromJson].
+class RealLoyaltyAccount {
+  final int id;
+  final int userId;
+  final int currentBalance;
+  final int lifetimePointsEarned;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+
+  const RealLoyaltyAccount({
+    this.id = 0,
+    this.userId = 0,
+    this.currentBalance = 0,
+    this.lifetimePointsEarned = 0,
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  factory RealLoyaltyAccount.fromJson(Map<String, dynamic> json) {
+    return RealLoyaltyAccount(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      userId: (json['userId'] as num?)?.toInt() ?? 0,
+      currentBalance: (json['currentBalance'] as num?)?.toInt() ?? 0,
+      lifetimePointsEarned:
+          (json['lifetimePointsEarned'] as num?)?.toInt() ?? 0,
+      createdAt: _tryParseDate(json['createdAt']),
+      updatedAt: _tryParseDate(json['updatedAt']),
+    );
+  }
+}
+
+/// Real-backend mirror of `LoyaltyDto.LoyaltyTransactionResponse`
+/// (`GET /api/me/loyalty/transactions`, an immutable ledger row). `points` is
+/// always positive; direction is derived from [transactionType] (falling back to
+/// the balance delta). `Map` decoding is confined to [fromJson].
+class RealLoyaltyTransaction {
+  final int id;
+  final int accountId;
+  final String transactionType;
+  final int points;
+  final int balanceBefore;
+  final int balanceAfter;
+  final String description;
+  final String? referenceType;
+  final int? referenceId;
+  final DateTime? createdAt;
+
+  const RealLoyaltyTransaction({
+    required this.id,
+    this.accountId = 0,
+    this.transactionType = '',
+    this.points = 0,
+    this.balanceBefore = 0,
+    this.balanceAfter = 0,
+    this.description = '',
+    this.referenceType,
+    this.referenceId,
+    this.createdAt,
+  });
+
+  LoyaltyTransactionType? get typeView =>
+      loyaltyTransactionTypeFromCode(transactionType);
+
+  bool get increasesBalance =>
+      typeView?.knownIncrease ?? (balanceAfter > balanceBefore);
+
+  factory RealLoyaltyTransaction.fromJson(Map<String, dynamic> json) {
+    return RealLoyaltyTransaction(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      accountId: (json['accountId'] as num?)?.toInt() ?? 0,
+      transactionType: (json['transactionType'] as String?) ?? '',
+      points: (json['points'] as num?)?.toInt() ?? 0,
+      balanceBefore: (json['balanceBefore'] as num?)?.toInt() ?? 0,
+      balanceAfter: (json['balanceAfter'] as num?)?.toInt() ?? 0,
+      description: (json['description'] as String?) ?? '',
+      referenceType: json['referenceType'] as String?,
+      referenceId: (json['referenceId'] as num?)?.toInt(),
+      createdAt: _tryParseDate(json['createdAt']),
+    );
+  }
+}
+
+/// Typed page of loyalty transactions (`PageResponse<LoyaltyTransactionResponse>`).
+class RealLoyaltyTransactionsPage {
+  final List<RealLoyaltyTransaction> content;
+  final int page;
+  final int totalPages;
+
+  const RealLoyaltyTransactionsPage({
+    this.content = const [],
+    this.page = 0,
+    this.totalPages = 0,
+  });
+
+  factory RealLoyaltyTransactionsPage.fromJson(Map<String, dynamic> json) {
+    final raw = json['content'];
+    return RealLoyaltyTransactionsPage(
+      content: raw is List
+          ? raw
+              .map((e) =>
+                  RealLoyaltyTransaction.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : const [],
+      page: (json['page'] as num?)?.toInt() ?? 0,
+      totalPages: (json['totalPages'] as num?)?.toInt() ?? 0,
+    );
+  }
+}
+
+/// Outcome of a real loyalty read (`GET /api/me/loyalty[/transactions]`). The
+/// customer surface is read-only. [demoUnavailable] is the Demo Mode guard (zero
+/// HTTP); [sessionExpired] (401) never triggers auto-logout; [forbidden] 403,
+/// [notFound] 404, [serverError] 5xx, [network] transport/timeout.
+enum LoyaltyOutcome {
+  success,
+  demoUnavailable,
+  sessionExpired,
+  forbidden,
+  notFound,
+  network,
+  serverError,
+}
+
 class DemoBooking {
   final String code;
   final String ownerUserId;
