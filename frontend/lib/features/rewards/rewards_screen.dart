@@ -166,7 +166,14 @@ class TravelCreditsScreen extends StatelessWidget {
     final app = AppScope.of(context);
     final l10n = AppLocalizations.of(context)!;
     final account = app.travelCreditAccount;
-    if (!app.demoMode || account == null) {
+    if (!app.demoMode) {
+      // UI35: real travel credit is backend-connected. Demo Mode is byte-identical.
+      return _RewardsScaffold(
+        title: l10n.travelCreditsTitle,
+        child: const _RealTravelCreditBody(),
+      );
+    }
+    if (account == null) {
       return _RewardsScaffold(
         title: l10n.travelCreditsTitle,
         child: OceanEmptyState(
@@ -292,6 +299,151 @@ class LoyaltyScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+/// UI35 — Real Mode travel credit (`GET /api/me/travel-credits`, `/transactions`).
+/// Read-only promotional-credit balance + immutable, paginated ledger. Rendered
+/// inside the existing Travel Credits scaffold, replacing the real-mode
+/// placeholder. A 401 never logs the user out.
+class _RealTravelCreditBody extends StatefulWidget {
+  const _RealTravelCreditBody();
+
+  @override
+  State<_RealTravelCreditBody> createState() => _RealTravelCreditBodyState();
+}
+
+class _RealTravelCreditBodyState extends State<_RealTravelCreditBody> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) AppScope.of(context).loadRealTravelCredit();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final app = AppScope.of(context);
+    final l10n = AppLocalizations.of(context)!;
+
+    if (app.realTravelCreditError == TravelCreditOutcome.sessionExpired &&
+        !app.realTravelCreditLoaded) {
+      return OceanSessionExpiredState(
+        key: const Key('travel-credit-session-expired'),
+        onLogin: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+        ),
+        onReturnHome: () => Navigator.maybePop(context),
+      );
+    }
+    if (app.realTravelCreditLoading && !app.realTravelCreditLoaded) {
+      return Semantics(
+        liveRegion: true,
+        label: l10n.travelCreditRealLoadingMessage,
+        child: Column(
+          children: [
+            const SizedBox(height: AppSpacing.xxl),
+            const CircularProgressIndicator(key: Key('travel-credit-loading')),
+            const SizedBox(height: AppSpacing.md),
+            Text(l10n.travelCreditRealLoadingMessage),
+          ],
+        ),
+      );
+    }
+    if (app.realTravelCreditError != null && !app.realTravelCreditLoaded) {
+      return OceanRecoverableErrorState(
+        key: const Key('travel-credit-error'),
+        message: l10n.travelCreditRealErrorMessage,
+        onReload: () => app.loadRealTravelCredit(refresh: true),
+      );
+    }
+
+    final account = app.realTravelCreditAccount;
+    if (account == null) {
+      return const Padding(
+        padding: EdgeInsets.all(AppSpacing.xxl),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+    final transactions = app.realTravelCreditTransactions;
+    return Column(
+      key: const Key('travel-credit-content'),
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _BalanceCard(
+          icon: Icons.account_balance_wallet_rounded,
+          title: l10n.travelCreditsBalance,
+          value: realTravelCreditMoney(account.balance, account.currency),
+          semanticLabel: l10n.travelCreditsBalanceSemantic,
+          message: l10n.travelCreditsNoCashOut,
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        _SectionTitle(l10n.travelCreditsTransactions),
+        const SizedBox(height: AppSpacing.sm),
+        if (transactions.isEmpty)
+          OceanEmptyState(
+            key: const Key('travel-credit-transactions-empty'),
+            title: l10n.rewardsHistoryEmptyTitle,
+            message: l10n.rewardsHistoryEmptyMessage,
+          )
+        else ...[
+          for (final tx in transactions)
+            _RealCreditTransactionTile(
+              transaction: tx,
+              currency: account.currency,
+            ),
+          if (app.realTravelCreditTxHasMore) ...[
+            const SizedBox(height: AppSpacing.xs),
+            OceanSecondaryButton(
+              key: const Key('travel-credit-load-more'),
+              label: l10n.travelCreditRealLoadMore,
+              icon: Icons.expand_more_rounded,
+              onPressed: app.realTravelCreditTxLoadingMore
+                  ? null
+                  : () => app.loadMoreRealTravelCreditTransactions(),
+            ),
+          ],
+        ],
+      ],
+    );
+  }
+}
+
+class _RealCreditTransactionTile extends StatelessWidget {
+  final RealTravelCreditTransaction transaction;
+  final String currency;
+
+  const _RealCreditTransactionTile({
+    required this.transaction,
+    required this.currency,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final increase = transaction.increasesBalance;
+    final typeView = transaction.typeView;
+    final title = typeView != null
+        ? travelCreditTransactionLabel(l10n, typeView)
+        : transaction.transactionType;
+    return _LedgerTile(
+      title: title,
+      subtitle: transaction.description,
+      amount:
+          '${increase ? '+' : '-'}${realTravelCreditMoney(transaction.amount, currency)}',
+      color: increase ? AppColors.success : AppColors.danger,
+      footer: transaction.expiresAt == null
+          ? null
+          : l10n.rewardsExpiresOn(_date(context, transaction.expiresAt!)),
+    );
+  }
+}
+
+/// Formats a real travel-credit decimal amount with its currency (major units,
+/// backend `BigDecimal`). Mirrors the gift-card money helper (UI33).
+String realTravelCreditMoney(double amount, String currency) {
+  final value = amount.toStringAsFixed(2);
+  return currency.isEmpty ? value : '$value $currency';
 }
 
 /// UI34 — Real Mode loyalty (`GET /api/me/loyalty`, `/transactions`). Read-only

@@ -6993,4 +6993,15 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get loyaltyRealEarnNote =>
       'Điểm được tích lũy tự động từ các đặt phòng và đánh giá đã hoàn tất. Không thể quy đổi trực tiếp tại đây.';
+
+  @override
+  String get travelCreditRealLoadingMessage =>
+      'Đang tải tín dụng du lịch của bạn…';
+
+  @override
+  String get travelCreditRealErrorMessage =>
+      'Không thể tải tín dụng du lịch. Vui lòng thử lại.';
+
+  @override
+  String get travelCreditRealLoadMore => 'Tải thêm';
 }

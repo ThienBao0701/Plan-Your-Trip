@@ -3615,5 +3615,8 @@
   "loyaltyRealLoadingMessage": "Đang tải điểm thưởng của bạn…",
   "loyaltyRealErrorMessage": "Không thể tải điểm thưởng. Vui lòng thử lại.",
   "loyaltyRealLoadMore": "Tải thêm",
-  "loyaltyRealEarnNote": "Điểm được tích lũy tự động từ các đặt phòng và đánh giá đã hoàn tất. Không thể quy đổi trực tiếp tại đây."
+  "loyaltyRealEarnNote": "Điểm được tích lũy tự động từ các đặt phòng và đánh giá đã hoàn tất. Không thể quy đổi trực tiếp tại đây.",
+  "travelCreditRealLoadingMessage": "Đang tải tín dụng du lịch của bạn…",
+  "travelCreditRealErrorMessage": "Không thể tải tín dụng du lịch. Vui lòng thử lại.",
+  "travelCreditRealLoadMore": "Tải thêm"
 }

@@ -12183,6 +12183,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Points are earned automatically from completed bookings and reviews. They can\'t be redeemed directly here.'**
   String get loyaltyRealEarnNote;
+
+  /// No description provided for @travelCreditRealLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading your travel credit…'**
+  String get travelCreditRealLoadingMessage;
+
+  /// No description provided for @travelCreditRealErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load your travel credit. Please try again.'**
+  String get travelCreditRealErrorMessage;
+
+  /// No description provided for @travelCreditRealLoadMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Load more'**
+  String get travelCreditRealLoadMore;
 }
 
 class _AppLocalizationsDelegate

@@ -7160,4 +7160,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get loyaltyRealEarnNote =>
       'Points are earned automatically from completed bookings and reviews. They can\'t be redeemed directly here.';
+
+  @override
+  String get travelCreditRealLoadingMessage => 'Loading your travel credit…';
+
+  @override
+  String get travelCreditRealErrorMessage =>
+      'We couldn\'t load your travel credit. Please try again.';
+
+  @override
+  String get travelCreditRealLoadMore => 'Load more';
 }

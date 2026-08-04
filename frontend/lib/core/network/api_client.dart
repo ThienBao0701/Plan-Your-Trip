@@ -1914,6 +1914,80 @@ class ApiClient {
     }
   }
 
+  // ── Travel Credits (/api/me/travel-credits, UI-35) ───────────────────────────
+  // Customer READ-ONLY: account (balance + currency, created lazily) and an
+  // immutable transaction ledger (PageResponse, createdAt DESC). No customer
+  // mutation exists. All authenticated + owner-scoped. 8s timeout, no retry.
+
+  /// Reads the user's travel-credit account (`GET /api/me/travel-credits`).
+  Future<CollectionApiResult<RealTravelCreditAccount>>
+      getTravelCreditAccount() async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/me/travel-credits'), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(
+          RealTravelCreditAccount.fromJson(body),
+        );
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Lists the user's travel-credit transactions
+  /// (`GET /api/me/travel-credits/transactions`, paged).
+  Future<CollectionApiResult<RealTravelCreditTransactionsPage>>
+      getTravelCreditTransactions({int? page, int? size}) async {
+    try {
+      final uri = Uri.parse('$baseUrl/me/travel-credits/transactions').replace(
+        queryParameters: {
+          if (page != null) 'page': '$page',
+          if (size != null) 'size': '$size',
+        },
+      );
+      final res = await _client
+          .get(uri, headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(
+          RealTravelCreditTransactionsPage.fromJson(body),
+        );
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
   Map<String, dynamic> _failureForStatus(http.Response res) {
     Map<String, dynamic>? body;
     try {

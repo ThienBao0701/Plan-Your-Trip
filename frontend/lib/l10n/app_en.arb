@@ -3615,5 +3615,8 @@
   "loyaltyRealLoadingMessage": "Loading your loyalty points…",
   "loyaltyRealErrorMessage": "We couldn't load your loyalty points. Please try again.",
   "loyaltyRealLoadMore": "Load more",
-  "loyaltyRealEarnNote": "Points are earned automatically from completed bookings and reviews. They can't be redeemed directly here."
+  "loyaltyRealEarnNote": "Points are earned automatically from completed bookings and reviews. They can't be redeemed directly here.",
+  "travelCreditRealLoadingMessage": "Loading your travel credit…",
+  "travelCreditRealErrorMessage": "We couldn't load your travel credit. Please try again.",
+  "travelCreditRealLoadMore": "Load more"
 }

@@ -4549,6 +4549,161 @@ enum LoyaltyOutcome {
   serverError,
 }
 
+/// Maps a backend `TravelCreditTransactionType` wire string to the existing demo
+/// [TravelCreditTransactionType] view enum (reusing its label + [increasesBalance]
+/// direction logic). Returns null for any unrecognised code so the caller can
+/// fall back to the balance delta.
+TravelCreditTransactionType? travelCreditTransactionTypeFromCode(String? code) {
+  switch (code) {
+    case 'GRANT':
+      return TravelCreditTransactionType.grant;
+    case 'PROMOTION':
+      return TravelCreditTransactionType.promotion;
+    case 'REFUND_CREDIT':
+      return TravelCreditTransactionType.refundCredit;
+    case 'ADJUSTMENT':
+      return TravelCreditTransactionType.adjustment;
+    case 'REDEMPTION':
+      return TravelCreditTransactionType.redemption;
+    case 'EXPIRATION':
+      return TravelCreditTransactionType.expiration;
+    case 'REVERSAL':
+      return TravelCreditTransactionType.reversal;
+    default:
+      return null;
+  }
+}
+
+/// Real-backend mirror of `TravelCreditDto.TravelCreditAccountResponse`
+/// (`GET /api/me/travel-credits`, created lazily on first access). Promotional
+/// platform credit only — no withdrawal/transfer/cash-out. Money is a decimal
+/// (backend `BigDecimal`) with a [currency]. `Map` decoding is confined to
+/// [fromJson].
+class RealTravelCreditAccount {
+  final int id;
+  final int userId;
+  final double balance;
+  final String currency;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+
+  const RealTravelCreditAccount({
+    this.id = 0,
+    this.userId = 0,
+    this.balance = 0,
+    this.currency = '',
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  factory RealTravelCreditAccount.fromJson(Map<String, dynamic> json) {
+    return RealTravelCreditAccount(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      userId: (json['userId'] as num?)?.toInt() ?? 0,
+      balance: (json['balance'] as num?)?.toDouble() ?? 0,
+      currency: (json['currency'] as String?) ?? '',
+      createdAt: _tryParseDate(json['createdAt']),
+      updatedAt: _tryParseDate(json['updatedAt']),
+    );
+  }
+}
+
+/// Real-backend mirror of `TravelCreditDto.TravelCreditTransactionResponse`
+/// (`GET /api/me/travel-credits/transactions`, an immutable ledger row). `amount`
+/// is always positive; direction is derived from [transactionType] (falling back
+/// to the balance delta). `Map` decoding is confined to [fromJson].
+class RealTravelCreditTransaction {
+  final int id;
+  final int accountId;
+  final String transactionType;
+  final double amount;
+  final double balanceBefore;
+  final double balanceAfter;
+  final String description;
+  final String? referenceType;
+  final int? referenceId;
+  final DateTime? expiresAt;
+  final DateTime? createdAt;
+
+  const RealTravelCreditTransaction({
+    required this.id,
+    this.accountId = 0,
+    this.transactionType = '',
+    this.amount = 0,
+    this.balanceBefore = 0,
+    this.balanceAfter = 0,
+    this.description = '',
+    this.referenceType,
+    this.referenceId,
+    this.expiresAt,
+    this.createdAt,
+  });
+
+  TravelCreditTransactionType? get typeView =>
+      travelCreditTransactionTypeFromCode(transactionType);
+
+  bool get increasesBalance =>
+      typeView?.increasesBalance ?? (balanceAfter > balanceBefore);
+
+  factory RealTravelCreditTransaction.fromJson(Map<String, dynamic> json) {
+    return RealTravelCreditTransaction(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      accountId: (json['accountId'] as num?)?.toInt() ?? 0,
+      transactionType: (json['transactionType'] as String?) ?? '',
+      amount: (json['amount'] as num?)?.toDouble() ?? 0,
+      balanceBefore: (json['balanceBefore'] as num?)?.toDouble() ?? 0,
+      balanceAfter: (json['balanceAfter'] as num?)?.toDouble() ?? 0,
+      description: (json['description'] as String?) ?? '',
+      referenceType: json['referenceType'] as String?,
+      referenceId: (json['referenceId'] as num?)?.toInt(),
+      expiresAt: _tryParseDate(json['expiresAt']),
+      createdAt: _tryParseDate(json['createdAt']),
+    );
+  }
+}
+
+/// Typed page of travel-credit transactions
+/// (`PageResponse<TravelCreditTransactionResponse>`).
+class RealTravelCreditTransactionsPage {
+  final List<RealTravelCreditTransaction> content;
+  final int page;
+  final int totalPages;
+
+  const RealTravelCreditTransactionsPage({
+    this.content = const [],
+    this.page = 0,
+    this.totalPages = 0,
+  });
+
+  factory RealTravelCreditTransactionsPage.fromJson(Map<String, dynamic> json) {
+    final raw = json['content'];
+    return RealTravelCreditTransactionsPage(
+      content: raw is List
+          ? raw
+              .map((e) => RealTravelCreditTransaction.fromJson(
+                  e as Map<String, dynamic>))
+              .toList()
+          : const [],
+      page: (json['page'] as num?)?.toInt() ?? 0,
+      totalPages: (json['totalPages'] as num?)?.toInt() ?? 0,
+    );
+  }
+}
+
+/// Outcome of a real travel-credit read (`GET /api/me/travel-credits[/transactions]`).
+/// The customer surface is read-only. [demoUnavailable] is the Demo Mode guard
+/// (zero HTTP); [sessionExpired] (401) never triggers auto-logout; [forbidden]
+/// 403, [notFound] 404, [serverError] 5xx, [network] transport/timeout.
+enum TravelCreditOutcome {
+  success,
+  demoUnavailable,
+  sessionExpired,
+  forbidden,
+  notFound,
+  network,
+  serverError,
+}
+
 class DemoBooking {
   final String code;
   final String ownerUserId;

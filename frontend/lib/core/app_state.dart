@@ -321,6 +321,24 @@ class AppState extends ChangeNotifier {
   bool get realLoyaltyTxHasMore =>
       realLoyaltyTxPage + 1 < realLoyaltyTxTotalPages;
 
+  // ── Real Mode Travel Credit (/api/me/travel-credits, UI-35) ───────────────
+  // Read-only: the customer's promotional credit account (balance + currency) and
+  // an immutable transaction ledger (paged). A 401 never calls logout(). Cleared
+  // on logout / mode / user change via [_resetRealTravelCreditState]. Zero HTTP in
+  // Demo Mode.
+  RealTravelCreditAccount? realTravelCreditAccount;
+  bool realTravelCreditLoading = false;
+  bool realTravelCreditLoaded = false;
+  bool realTravelCreditRefreshing = false;
+  TravelCreditOutcome? realTravelCreditError;
+  List<RealTravelCreditTransaction> realTravelCreditTransactions = [];
+  int realTravelCreditTxPage = 0;
+  int realTravelCreditTxTotalPages = 0;
+  bool realTravelCreditTxLoadingMore = false;
+
+  bool get realTravelCreditTxHasMore =>
+      realTravelCreditTxPage + 1 < realTravelCreditTxTotalPages;
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -418,6 +436,7 @@ class AppState extends ChangeNotifier {
     _resetRealProfileState();
     _resetRealGiftCardsState();
     _resetRealLoyaltyState();
+    _resetRealTravelCreditState();
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -553,6 +572,18 @@ class AppState extends ChangeNotifier {
     realLoyaltyTxPage = 0;
     realLoyaltyTxTotalPages = 0;
     realLoyaltyTxLoadingMore = false;
+  }
+
+  void _resetRealTravelCreditState() {
+    realTravelCreditAccount = null;
+    realTravelCreditLoading = false;
+    realTravelCreditLoaded = false;
+    realTravelCreditRefreshing = false;
+    realTravelCreditError = null;
+    realTravelCreditTransactions = [];
+    realTravelCreditTxPage = 0;
+    realTravelCreditTxTotalPages = 0;
+    realTravelCreditTxLoadingMore = false;
   }
 
   void _resetRealNotificationsState() {
@@ -694,6 +725,7 @@ class AppState extends ChangeNotifier {
     _resetRealProfileState();
     _resetRealGiftCardsState();
     _resetRealLoyaltyState();
+    _resetRealTravelCreditState();
     timeline = [];
     expenses = [];
     demoBookings = [];
@@ -3608,6 +3640,97 @@ class AppState extends ChangeNotifier {
       return LoyaltyOutcome.success;
     }
     final outcome = _mapLoyaltyError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  // ── Real Mode Travel Credit (UI-35) ──────────────────────────────────────
+
+  static const int _travelCreditPageSize = 20;
+
+  TravelCreditOutcome _mapTravelCreditError(ApiErrorKind? kind) {
+    return switch (kind) {
+      ApiErrorKind.unauthorized => TravelCreditOutcome.sessionExpired,
+      ApiErrorKind.forbidden => TravelCreditOutcome.forbidden,
+      ApiErrorKind.notFound => TravelCreditOutcome.notFound,
+      ApiErrorKind.network => TravelCreditOutcome.network,
+      ApiErrorKind.timeout => TravelCreditOutcome.network,
+      ApiErrorKind.server => TravelCreditOutcome.serverError,
+      _ => TravelCreditOutcome.serverError,
+    };
+  }
+
+  /// Loads the travel-credit account (`GET /api/me/travel-credits`) plus the first
+  /// page of the transaction ledger (`GET /api/me/travel-credits/transactions`).
+  /// Both must succeed to commit; on failure the prior state is preserved.
+  /// [refresh] forces a re-fetch. Zero HTTP in Demo Mode.
+  Future<TravelCreditOutcome> loadRealTravelCredit(
+      {bool refresh = false}) async {
+    if (demoMode) return TravelCreditOutcome.demoUnavailable;
+    if (realTravelCreditLoading || realTravelCreditRefreshing) {
+      return TravelCreditOutcome.success;
+    }
+    if (realTravelCreditLoaded && !refresh) return TravelCreditOutcome.success;
+    if (refresh) {
+      realTravelCreditRefreshing = true;
+    } else {
+      realTravelCreditLoading = true;
+    }
+    realTravelCreditError = null;
+    notifyListeners();
+    final accountResult = await api.getTravelCreditAccount();
+    if (!accountResult.success || accountResult.data == null) {
+      realTravelCreditLoading = false;
+      realTravelCreditRefreshing = false;
+      final outcome = _mapTravelCreditError(accountResult.errorKind);
+      realTravelCreditError = outcome;
+      notifyListeners();
+      return outcome;
+    }
+    final txResult = await api.getTravelCreditTransactions(
+        page: 0, size: _travelCreditPageSize);
+    realTravelCreditLoading = false;
+    realTravelCreditRefreshing = false;
+    if (!txResult.success || txResult.data == null) {
+      final outcome = _mapTravelCreditError(txResult.errorKind);
+      realTravelCreditError = outcome;
+      notifyListeners();
+      return outcome;
+    }
+    realTravelCreditAccount = accountResult.data!;
+    realTravelCreditTransactions = txResult.data!.content;
+    realTravelCreditTxPage = txResult.data!.page;
+    realTravelCreditTxTotalPages = txResult.data!.totalPages;
+    realTravelCreditLoaded = true;
+    realTravelCreditError = null;
+    notifyListeners();
+    return TravelCreditOutcome.success;
+  }
+
+  /// Appends the next page of travel-credit transactions (real backend paging).
+  Future<TravelCreditOutcome> loadMoreRealTravelCreditTransactions() async {
+    if (demoMode) return TravelCreditOutcome.demoUnavailable;
+    if (!realTravelCreditLoaded || realTravelCreditTxLoadingMore) {
+      return TravelCreditOutcome.success;
+    }
+    if (!realTravelCreditTxHasMore) return TravelCreditOutcome.success;
+    realTravelCreditTxLoadingMore = true;
+    notifyListeners();
+    final next = realTravelCreditTxPage + 1;
+    final result = await api.getTravelCreditTransactions(
+        page: next, size: _travelCreditPageSize);
+    realTravelCreditTxLoadingMore = false;
+    if (result.success && result.data != null) {
+      realTravelCreditTransactions = [
+        ...realTravelCreditTransactions,
+        ...result.data!.content,
+      ];
+      realTravelCreditTxPage = result.data!.page;
+      realTravelCreditTxTotalPages = result.data!.totalPages;
+      notifyListeners();
+      return TravelCreditOutcome.success;
+    }
+    final outcome = _mapTravelCreditError(result.errorKind);
     notifyListeners();
     return outcome;
   }
