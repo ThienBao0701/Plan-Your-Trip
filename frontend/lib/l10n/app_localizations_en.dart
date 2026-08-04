@@ -7089,4 +7089,61 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get profileEditEmptyPreferences =>
       'Add your travel preferences to personalise your trips.';
+
+  @override
+  String get giftCardsRealClaimTitle => 'Claim a gift card';
+
+  @override
+  String get giftCardsRealClaimHelper =>
+      'Enter a gift-card code you received to add it to your account.';
+
+  @override
+  String get giftCardsRealClaimSuccess => 'Gift card claimed.';
+
+  @override
+  String get giftCardsRealLoadingMessage => 'Loading your gift cards…';
+
+  @override
+  String get giftCardsRealErrorMessage =>
+      'We couldn\'t load your gift cards. Please try again.';
+
+  @override
+  String get giftCardsRealEmptyMessage =>
+      'Gift cards you purchase or receive will appear here.';
+
+  @override
+  String get giftCardsRealLoadMore => 'Load more';
+
+  @override
+  String get giftCardsRealActivateAction => 'Activate gift card';
+
+  @override
+  String get giftCardsRealActivateSuccess => 'Gift card activated.';
+
+  @override
+  String get giftCardsRealActionError =>
+      'Something went wrong. Please try again.';
+
+  @override
+  String get giftCardsRealNotFound => 'That gift card could not be found.';
+
+  @override
+  String get giftCardsRealConflict =>
+      'This gift card can\'t be used in its current state.';
+
+  @override
+  String get giftCardsRealNetwork =>
+      'We couldn\'t reach the server. Please check your connection and try again.';
+
+  @override
+  String get giftCardsRealValidation =>
+      'Please check the gift-card code and try again.';
+
+  @override
+  String get giftCardStatusUnknown => 'Unknown';
+
+  @override
+  String giftCardsRealBalanceSemantic(String balance) {
+    return 'Current balance $balance';
+  }
 }

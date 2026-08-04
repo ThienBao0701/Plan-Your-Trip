@@ -3590,5 +3590,26 @@
       "role": { "type": "String" }
     }
   },
-  "profileEditEmptyPreferences": "Thêm tùy chọn du lịch để cá nhân hóa chuyến đi của bạn."
+  "profileEditEmptyPreferences": "Thêm tùy chọn du lịch để cá nhân hóa chuyến đi của bạn.",
+  "giftCardsRealClaimTitle": "Đổi thẻ quà tặng",
+  "giftCardsRealClaimHelper": "Nhập mã thẻ quà tặng bạn nhận được để thêm vào tài khoản.",
+  "giftCardsRealClaimSuccess": "Đã đổi thẻ quà tặng.",
+  "giftCardsRealLoadingMessage": "Đang tải thẻ quà tặng của bạn…",
+  "giftCardsRealErrorMessage": "Không thể tải thẻ quà tặng. Vui lòng thử lại.",
+  "giftCardsRealEmptyMessage": "Thẻ quà tặng bạn mua hoặc nhận sẽ hiển thị ở đây.",
+  "giftCardsRealLoadMore": "Tải thêm",
+  "giftCardsRealActivateAction": "Kích hoạt thẻ quà tặng",
+  "giftCardsRealActivateSuccess": "Đã kích hoạt thẻ quà tặng.",
+  "giftCardsRealActionError": "Đã xảy ra lỗi. Vui lòng thử lại.",
+  "giftCardsRealNotFound": "Không tìm thấy thẻ quà tặng đó.",
+  "giftCardsRealConflict": "Không thể sử dụng thẻ quà tặng này ở trạng thái hiện tại.",
+  "giftCardsRealNetwork": "Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối và thử lại.",
+  "giftCardsRealValidation": "Vui lòng kiểm tra mã thẻ quà tặng và thử lại.",
+  "giftCardStatusUnknown": "Không xác định",
+  "giftCardsRealBalanceSemantic": "Số dư hiện tại {balance}",
+  "@giftCardsRealBalanceSemantic": {
+    "placeholders": {
+      "balance": { "type": "String" }
+    }
+  }
 }

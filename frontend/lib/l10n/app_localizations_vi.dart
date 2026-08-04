@@ -6923,4 +6923,60 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get profileEditEmptyPreferences =>
       'Thêm tùy chọn du lịch để cá nhân hóa chuyến đi của bạn.';
+
+  @override
+  String get giftCardsRealClaimTitle => 'Đổi thẻ quà tặng';
+
+  @override
+  String get giftCardsRealClaimHelper =>
+      'Nhập mã thẻ quà tặng bạn nhận được để thêm vào tài khoản.';
+
+  @override
+  String get giftCardsRealClaimSuccess => 'Đã đổi thẻ quà tặng.';
+
+  @override
+  String get giftCardsRealLoadingMessage => 'Đang tải thẻ quà tặng của bạn…';
+
+  @override
+  String get giftCardsRealErrorMessage =>
+      'Không thể tải thẻ quà tặng. Vui lòng thử lại.';
+
+  @override
+  String get giftCardsRealEmptyMessage =>
+      'Thẻ quà tặng bạn mua hoặc nhận sẽ hiển thị ở đây.';
+
+  @override
+  String get giftCardsRealLoadMore => 'Tải thêm';
+
+  @override
+  String get giftCardsRealActivateAction => 'Kích hoạt thẻ quà tặng';
+
+  @override
+  String get giftCardsRealActivateSuccess => 'Đã kích hoạt thẻ quà tặng.';
+
+  @override
+  String get giftCardsRealActionError => 'Đã xảy ra lỗi. Vui lòng thử lại.';
+
+  @override
+  String get giftCardsRealNotFound => 'Không tìm thấy thẻ quà tặng đó.';
+
+  @override
+  String get giftCardsRealConflict =>
+      'Không thể sử dụng thẻ quà tặng này ở trạng thái hiện tại.';
+
+  @override
+  String get giftCardsRealNetwork =>
+      'Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối và thử lại.';
+
+  @override
+  String get giftCardsRealValidation =>
+      'Vui lòng kiểm tra mã thẻ quà tặng và thử lại.';
+
+  @override
+  String get giftCardStatusUnknown => 'Không xác định';
+
+  @override
+  String giftCardsRealBalanceSemantic(String balance) {
+    return 'Số dư hiện tại $balance';
+  }
 }

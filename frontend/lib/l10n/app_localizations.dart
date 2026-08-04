@@ -12063,6 +12063,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add your travel preferences to personalise your trips.'**
   String get profileEditEmptyPreferences;
+
+  /// No description provided for @giftCardsRealClaimTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Claim a gift card'**
+  String get giftCardsRealClaimTitle;
+
+  /// No description provided for @giftCardsRealClaimHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a gift-card code you received to add it to your account.'**
+  String get giftCardsRealClaimHelper;
+
+  /// No description provided for @giftCardsRealClaimSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Gift card claimed.'**
+  String get giftCardsRealClaimSuccess;
+
+  /// No description provided for @giftCardsRealLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading your gift cards…'**
+  String get giftCardsRealLoadingMessage;
+
+  /// No description provided for @giftCardsRealErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load your gift cards. Please try again.'**
+  String get giftCardsRealErrorMessage;
+
+  /// No description provided for @giftCardsRealEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Gift cards you purchase or receive will appear here.'**
+  String get giftCardsRealEmptyMessage;
+
+  /// No description provided for @giftCardsRealLoadMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Load more'**
+  String get giftCardsRealLoadMore;
+
+  /// No description provided for @giftCardsRealActivateAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Activate gift card'**
+  String get giftCardsRealActivateAction;
+
+  /// No description provided for @giftCardsRealActivateSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Gift card activated.'**
+  String get giftCardsRealActivateSuccess;
+
+  /// No description provided for @giftCardsRealActionError.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get giftCardsRealActionError;
+
+  /// No description provided for @giftCardsRealNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'That gift card could not be found.'**
+  String get giftCardsRealNotFound;
+
+  /// No description provided for @giftCardsRealConflict.
+  ///
+  /// In en, this message translates to:
+  /// **'This gift card can\'t be used in its current state.'**
+  String get giftCardsRealConflict;
+
+  /// No description provided for @giftCardsRealNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t reach the server. Please check your connection and try again.'**
+  String get giftCardsRealNetwork;
+
+  /// No description provided for @giftCardsRealValidation.
+  ///
+  /// In en, this message translates to:
+  /// **'Please check the gift-card code and try again.'**
+  String get giftCardsRealValidation;
+
+  /// No description provided for @giftCardStatusUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get giftCardStatusUnknown;
+
+  /// No description provided for @giftCardsRealBalanceSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Current balance {balance}'**
+  String giftCardsRealBalanceSemantic(String balance);
 }
 
 class _AppLocalizationsDelegate

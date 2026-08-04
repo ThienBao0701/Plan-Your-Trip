@@ -3590,5 +3590,26 @@
       "role": { "type": "String" }
     }
   },
-  "profileEditEmptyPreferences": "Add your travel preferences to personalise your trips."
+  "profileEditEmptyPreferences": "Add your travel preferences to personalise your trips.",
+  "giftCardsRealClaimTitle": "Claim a gift card",
+  "giftCardsRealClaimHelper": "Enter a gift-card code you received to add it to your account.",
+  "giftCardsRealClaimSuccess": "Gift card claimed.",
+  "giftCardsRealLoadingMessage": "Loading your gift cards…",
+  "giftCardsRealErrorMessage": "We couldn't load your gift cards. Please try again.",
+  "giftCardsRealEmptyMessage": "Gift cards you purchase or receive will appear here.",
+  "giftCardsRealLoadMore": "Load more",
+  "giftCardsRealActivateAction": "Activate gift card",
+  "giftCardsRealActivateSuccess": "Gift card activated.",
+  "giftCardsRealActionError": "Something went wrong. Please try again.",
+  "giftCardsRealNotFound": "That gift card could not be found.",
+  "giftCardsRealConflict": "This gift card can't be used in its current state.",
+  "giftCardsRealNetwork": "We couldn't reach the server. Please check your connection and try again.",
+  "giftCardsRealValidation": "Please check the gift-card code and try again.",
+  "giftCardStatusUnknown": "Unknown",
+  "giftCardsRealBalanceSemantic": "Current balance {balance}",
+  "@giftCardsRealBalanceSemantic": {
+    "placeholders": {
+      "balance": { "type": "String" }
+    }
+  }
 }

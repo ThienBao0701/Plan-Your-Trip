@@ -12,6 +12,7 @@ import '../../design/app_spacing.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/glass_widgets.dart';
 import '../expenses/expenses_screen.dart';
+import 'real_gift_cards_view.dart';
 
 class RewardsHubScreen extends StatelessWidget {
   const RewardsHubScreen({super.key});
@@ -590,12 +591,10 @@ class _GiftCardsScreenState extends State<GiftCardsScreen> {
     final app = AppScope.of(context);
     final l10n = AppLocalizations.of(context)!;
     if (!app.demoMode) {
+      // UI33: real gift cards are backend-connected. Demo Mode is byte-identical.
       return _RewardsScaffold(
         title: l10n.giftCardsTitle,
-        child: OceanEmptyState(
-          title: l10n.rewardsRealEmptyTitle,
-          message: l10n.giftCardsRealUnavailable,
-        ),
+        child: const RealGiftCardsView(),
       );
     }
     return _RewardsScaffold(

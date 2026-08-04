@@ -280,6 +280,29 @@ class AppState extends ChangeNotifier {
   bool realProfileSaving = false;
   CustomerProfileOutcome? realProfileError;
 
+  // ── Real Mode Gift Cards (/api/me/gift-cards, UI-33) ──────────────────────
+  // The customer's prepaid promotional gift cards (paged list), per-card detail
+  // + ledger, plus claim/activate actions. A 401 never calls logout(). Cleared on
+  // logout / mode / user change via [_resetRealGiftCardsState]. Zero HTTP in Demo
+  // Mode.
+  List<RealGiftCardSummary> realGiftCards = [];
+  bool realGiftCardsLoading = false;
+  bool realGiftCardsLoaded = false;
+  bool realGiftCardsRefreshing = false;
+  bool realGiftCardsLoadingMore = false;
+  int realGiftCardsPage = 0;
+  int realGiftCardsTotalPages = 0;
+  GiftCardActionOutcome? realGiftCardsError;
+  final Map<int, RealGiftCardDetail> giftCardDetailCache = {};
+  int? giftCardDetailLoadingId;
+  GiftCardActionOutcome? giftCardDetailError;
+  final Map<int, List<RealGiftCardTransaction>> giftCardTransactionsCache = {};
+  int? giftCardTransactionsLoadingId;
+  final Set<int> giftCardActionInFlight = {};
+
+  bool get realGiftCardsHasMore =>
+      realGiftCardsPage + 1 < realGiftCardsTotalPages;
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -375,6 +398,7 @@ class AppState extends ChangeNotifier {
     _resetRealNotificationsState();
     _resetRealRecentlyViewedState();
     _resetRealProfileState();
+    _resetRealGiftCardsState();
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -481,6 +505,23 @@ class AppState extends ChangeNotifier {
     realProfileRefreshing = false;
     realProfileSaving = false;
     realProfileError = null;
+  }
+
+  void _resetRealGiftCardsState() {
+    realGiftCards = [];
+    realGiftCardsLoading = false;
+    realGiftCardsLoaded = false;
+    realGiftCardsRefreshing = false;
+    realGiftCardsLoadingMore = false;
+    realGiftCardsPage = 0;
+    realGiftCardsTotalPages = 0;
+    realGiftCardsError = null;
+    giftCardDetailCache.clear();
+    giftCardDetailLoadingId = null;
+    giftCardDetailError = null;
+    giftCardTransactionsCache.clear();
+    giftCardTransactionsLoadingId = null;
+    giftCardActionInFlight.clear();
   }
 
   void _resetRealNotificationsState() {
@@ -620,6 +661,7 @@ class AppState extends ChangeNotifier {
     _resetRealNotificationsState();
     _resetRealRecentlyViewedState();
     _resetRealProfileState();
+    _resetRealGiftCardsState();
     timeline = [];
     expenses = [];
     demoBookings = [];
@@ -3267,6 +3309,183 @@ class AppState extends ChangeNotifier {
     }
     final outcome = _mapProfileError(result.errorKind);
     realProfileError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  // ── Real Mode Gift Cards (UI-33) ─────────────────────────────────────────
+
+  static const int _giftCardsPageSize = 20;
+
+  GiftCardActionOutcome _mapGiftCardError(ApiErrorKind? kind) {
+    return switch (kind) {
+      ApiErrorKind.unauthorized => GiftCardActionOutcome.sessionExpired,
+      ApiErrorKind.forbidden => GiftCardActionOutcome.forbidden,
+      ApiErrorKind.notFound => GiftCardActionOutcome.notFound,
+      ApiErrorKind.conflict => GiftCardActionOutcome.conflict,
+      ApiErrorKind.validation => GiftCardActionOutcome.validation,
+      ApiErrorKind.unprocessable => GiftCardActionOutcome.validation,
+      ApiErrorKind.network => GiftCardActionOutcome.network,
+      ApiErrorKind.timeout => GiftCardActionOutcome.network,
+      ApiErrorKind.server => GiftCardActionOutcome.serverError,
+      _ => GiftCardActionOutcome.serverError,
+    };
+  }
+
+  /// Loads the first page of the user's gift cards (`GET /api/me/gift-cards`).
+  /// [refresh] forces a re-fetch and preserves the current list on failure.
+  Future<GiftCardActionOutcome> loadRealGiftCards(
+      {bool refresh = false}) async {
+    if (demoMode) return GiftCardActionOutcome.demoUnavailable;
+    if (realGiftCardsLoading || realGiftCardsRefreshing) {
+      return GiftCardActionOutcome.success;
+    }
+    if (realGiftCardsLoaded && !refresh) return GiftCardActionOutcome.success;
+    if (refresh) {
+      realGiftCardsRefreshing = true;
+    } else {
+      realGiftCardsLoading = true;
+    }
+    realGiftCardsError = null;
+    notifyListeners();
+    final result = await api.getMyGiftCards(page: 0, size: _giftCardsPageSize);
+    realGiftCardsLoading = false;
+    realGiftCardsRefreshing = false;
+    if (result.success && result.data != null) {
+      final data = result.data!;
+      realGiftCards = data.content;
+      realGiftCardsPage = data.page;
+      realGiftCardsTotalPages = data.totalPages;
+      realGiftCardsLoaded = true;
+      realGiftCardsError = null;
+      notifyListeners();
+      return GiftCardActionOutcome.success;
+    }
+    final outcome = _mapGiftCardError(result.errorKind);
+    realGiftCardsError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Appends the next page of gift cards (real backend pagination — never faked).
+  Future<GiftCardActionOutcome> loadMoreRealGiftCards() async {
+    if (demoMode) return GiftCardActionOutcome.demoUnavailable;
+    if (!realGiftCardsLoaded || realGiftCardsLoadingMore) {
+      return GiftCardActionOutcome.success;
+    }
+    if (!realGiftCardsHasMore) return GiftCardActionOutcome.success;
+    realGiftCardsLoadingMore = true;
+    notifyListeners();
+    final next = realGiftCardsPage + 1;
+    final result =
+        await api.getMyGiftCards(page: next, size: _giftCardsPageSize);
+    realGiftCardsLoadingMore = false;
+    if (result.success && result.data != null) {
+      final data = result.data!;
+      realGiftCards = [...realGiftCards, ...data.content];
+      realGiftCardsPage = data.page;
+      realGiftCardsTotalPages = data.totalPages;
+      notifyListeners();
+      return GiftCardActionOutcome.success;
+    }
+    final outcome = _mapGiftCardError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Loads one gift card's full detail (`GET /api/me/gift-cards/{id}`), cached.
+  Future<GiftCardActionOutcome> loadRealGiftCardDetail(
+    int id, {
+    bool refresh = false,
+  }) async {
+    if (demoMode) return GiftCardActionOutcome.demoUnavailable;
+    if (giftCardDetailLoadingId == id) return GiftCardActionOutcome.success;
+    if (giftCardDetailCache.containsKey(id) && !refresh) {
+      return GiftCardActionOutcome.success;
+    }
+    giftCardDetailLoadingId = id;
+    giftCardDetailError = null;
+    notifyListeners();
+    final result = await api.getGiftCard(id);
+    giftCardDetailLoadingId = null;
+    if (result.success && result.data != null) {
+      giftCardDetailCache[id] = result.data!;
+      giftCardDetailError = null;
+      notifyListeners();
+      return GiftCardActionOutcome.success;
+    }
+    final outcome = _mapGiftCardError(result.errorKind);
+    giftCardDetailError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Loads the first page of one gift card's ledger
+  /// (`GET /api/me/gift-cards/{id}/transactions`), cached.
+  Future<GiftCardActionOutcome> loadRealGiftCardTransactions(
+    int id, {
+    bool refresh = false,
+  }) async {
+    if (demoMode) return GiftCardActionOutcome.demoUnavailable;
+    if (giftCardTransactionsLoadingId == id) {
+      return GiftCardActionOutcome.success;
+    }
+    if (giftCardTransactionsCache.containsKey(id) && !refresh) {
+      return GiftCardActionOutcome.success;
+    }
+    giftCardTransactionsLoadingId = id;
+    notifyListeners();
+    final result = await api.getGiftCardTransactions(id,
+        page: 0, size: _giftCardsPageSize);
+    giftCardTransactionsLoadingId = null;
+    if (result.success && result.data != null) {
+      giftCardTransactionsCache[id] = result.data!.content;
+      notifyListeners();
+      return GiftCardActionOutcome.success;
+    }
+    final outcome = _mapGiftCardError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Claims a gift card by code (`POST /api/me/gift-cards/claim`) and, on success,
+  /// refreshes the list so the claimed card appears. Single-flight via a sentinel.
+  Future<GiftCardActionOutcome> claimRealGiftCard(String code) async {
+    if (demoMode) return GiftCardActionOutcome.demoUnavailable;
+    final trimmed = code.trim();
+    if (trimmed.isEmpty) return GiftCardActionOutcome.validation;
+    if (giftCardActionInFlight.contains(-1)) return GiftCardActionOutcome.busy;
+    giftCardActionInFlight.add(-1);
+    notifyListeners();
+    final result = await api.claimGiftCard(trimmed);
+    giftCardActionInFlight.remove(-1);
+    if (result.success && result.data != null) {
+      giftCardDetailCache[result.data!.id] = result.data!;
+      notifyListeners();
+      await loadRealGiftCards(refresh: true);
+      return GiftCardActionOutcome.success;
+    }
+    final outcome = _mapGiftCardError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Activates an ISSUED gift card (`POST /api/me/gift-cards/{id}/activate`) and,
+  /// on success, updates the cached detail and refreshes the list row.
+  Future<GiftCardActionOutcome> activateRealGiftCard(int id) async {
+    if (demoMode) return GiftCardActionOutcome.demoUnavailable;
+    if (giftCardActionInFlight.contains(id)) return GiftCardActionOutcome.busy;
+    giftCardActionInFlight.add(id);
+    notifyListeners();
+    final result = await api.activateGiftCard(id);
+    giftCardActionInFlight.remove(id);
+    if (result.success && result.data != null) {
+      giftCardDetailCache[id] = result.data!;
+      notifyListeners();
+      await loadRealGiftCards(refresh: true);
+      return GiftCardActionOutcome.success;
+    }
+    final outcome = _mapGiftCardError(result.errorKind);
     notifyListeners();
     return outcome;
   }

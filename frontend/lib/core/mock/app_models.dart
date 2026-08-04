@@ -4121,6 +4121,282 @@ enum CustomerProfileOutcome {
   serverError,
 }
 
+/// View classification of a backend gift-card `status`/`effectiveStatus` string
+/// (`GiftCardStatus` enum: ISSUED, ACTIVE, PARTIALLY_REDEEMED, FULLY_REDEEMED,
+/// EXPIRED, CANCELLED). [unknown] preserves forward-compatibility with any code
+/// this client does not recognise — the raw string is always kept alongside.
+enum GiftCardStatusView {
+  issued,
+  active,
+  partiallyRedeemed,
+  fullyRedeemed,
+  expired,
+  cancelled,
+  unknown,
+}
+
+GiftCardStatusView giftCardStatusViewFromCode(String? code) {
+  switch (code) {
+    case 'ISSUED':
+      return GiftCardStatusView.issued;
+    case 'ACTIVE':
+      return GiftCardStatusView.active;
+    case 'PARTIALLY_REDEEMED':
+      return GiftCardStatusView.partiallyRedeemed;
+    case 'FULLY_REDEEMED':
+      return GiftCardStatusView.fullyRedeemed;
+    case 'EXPIRED':
+      return GiftCardStatusView.expired;
+    case 'CANCELLED':
+      return GiftCardStatusView.cancelled;
+    default:
+      return GiftCardStatusView.unknown;
+  }
+}
+
+/// Real-backend mirror of `GiftCardDto.GiftCardSummaryResponse`
+/// (`GET /api/me/gift-cards`, a `PageResponse`). Prepaid promotional value only.
+/// Amounts are decimal major units (backend `BigDecimal`); [status] is kept raw
+/// with a [statusView] getter. `Map` decoding is confined to [fromJson].
+class RealGiftCardSummary {
+  final int id;
+  final String maskedCode;
+  final String productName;
+  final double originalAmount;
+  final double currentBalance;
+  final String currency;
+  final String status;
+  final String effectiveStatus;
+  final DateTime? issuedAt;
+  final DateTime? expiresAt;
+
+  const RealGiftCardSummary({
+    required this.id,
+    this.maskedCode = '',
+    this.productName = '',
+    this.originalAmount = 0,
+    this.currentBalance = 0,
+    this.currency = '',
+    this.status = '',
+    this.effectiveStatus = '',
+    this.issuedAt,
+    this.expiresAt,
+  });
+
+  GiftCardStatusView get statusView =>
+      giftCardStatusViewFromCode(effectiveStatus);
+
+  factory RealGiftCardSummary.fromJson(Map<String, dynamic> json) {
+    return RealGiftCardSummary(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      maskedCode: (json['maskedCode'] as String?) ?? '',
+      productName: (json['productName'] as String?) ?? '',
+      originalAmount: (json['originalAmount'] as num?)?.toDouble() ?? 0,
+      currentBalance: (json['currentBalance'] as num?)?.toDouble() ?? 0,
+      currency: (json['currency'] as String?) ?? '',
+      status: (json['status'] as String?) ?? '',
+      effectiveStatus: (json['effectiveStatus'] as String?) ?? '',
+      issuedAt: _tryParseDate(json['issuedAt']),
+      expiresAt: _tryParseDate(json['expiresAt']),
+    );
+  }
+}
+
+/// Real-backend mirror of `GiftCardDto.GiftCardResponse` (`GET /api/me/gift-cards/{id}`,
+/// and the response of claim/activate). `fullCode` is intentionally NOT stored —
+/// only the masked code is ever surfaced. Nested product/purchaser/recipient are
+/// flattened to their display fields. `Map` decoding is confined to [fromJson].
+class RealGiftCardDetail {
+  final int id;
+  final String maskedCode;
+  final String productName;
+  final double originalAmount;
+  final double currentBalance;
+  final String currency;
+  final String status;
+  final String effectiveStatus;
+  final String personalMessage;
+  final String purchaserName;
+  final String recipientName;
+  final String recipientEmail;
+  final DateTime? issuedAt;
+  final DateTime? activatedAt;
+  final DateTime? expiresAt;
+  final DateTime? cancelledAt;
+  final DateTime? fullyRedeemedAt;
+
+  const RealGiftCardDetail({
+    required this.id,
+    this.maskedCode = '',
+    this.productName = '',
+    this.originalAmount = 0,
+    this.currentBalance = 0,
+    this.currency = '',
+    this.status = '',
+    this.effectiveStatus = '',
+    this.personalMessage = '',
+    this.purchaserName = '',
+    this.recipientName = '',
+    this.recipientEmail = '',
+    this.issuedAt,
+    this.activatedAt,
+    this.expiresAt,
+    this.cancelledAt,
+    this.fullyRedeemedAt,
+  });
+
+  GiftCardStatusView get statusView =>
+      giftCardStatusViewFromCode(effectiveStatus);
+
+  factory RealGiftCardDetail.fromJson(Map<String, dynamic> json) {
+    final product = json['product'];
+    final purchaser = json['purchaser'];
+    final recipient = json['recipient'];
+    return RealGiftCardDetail(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      maskedCode: (json['maskedCode'] as String?) ?? '',
+      productName: product is Map<String, dynamic>
+          ? (product['name'] as String?) ?? ''
+          : '',
+      originalAmount: (json['originalAmount'] as num?)?.toDouble() ?? 0,
+      currentBalance: (json['currentBalance'] as num?)?.toDouble() ?? 0,
+      currency: (json['currency'] as String?) ?? '',
+      status: (json['status'] as String?) ?? '',
+      effectiveStatus: (json['effectiveStatus'] as String?) ?? '',
+      personalMessage: (json['personalMessage'] as String?) ?? '',
+      purchaserName: purchaser is Map<String, dynamic>
+          ? (purchaser['fullName'] as String?) ?? ''
+          : '',
+      recipientName: recipient is Map<String, dynamic>
+          ? (recipient['fullName'] as String?) ?? ''
+          : '',
+      recipientEmail: (json['recipientEmail'] as String?) ?? '',
+      issuedAt: _tryParseDate(json['issuedAt']),
+      activatedAt: _tryParseDate(json['activatedAt']),
+      expiresAt: _tryParseDate(json['expiresAt']),
+      cancelledAt: _tryParseDate(json['cancelledAt']),
+      fullyRedeemedAt: _tryParseDate(json['fullyRedeemedAt']),
+    );
+  }
+}
+
+/// Real-backend mirror of `GiftCardDto.GiftCardTransactionResponse`
+/// (`GET /api/me/gift-cards/{id}/transactions`, a `PageResponse`). Immutable
+/// ledger row. `Map` decoding is confined to [fromJson].
+class RealGiftCardTransaction {
+  final int id;
+  final String transactionType;
+  final double amount;
+  final double balanceBefore;
+  final double balanceAfter;
+  final String description;
+  final DateTime? createdAt;
+
+  const RealGiftCardTransaction({
+    required this.id,
+    this.transactionType = '',
+    this.amount = 0,
+    this.balanceBefore = 0,
+    this.balanceAfter = 0,
+    this.description = '',
+    this.createdAt,
+  });
+
+  bool get increasesBalance => balanceAfter > balanceBefore;
+
+  factory RealGiftCardTransaction.fromJson(Map<String, dynamic> json) {
+    return RealGiftCardTransaction(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      transactionType: (json['transactionType'] as String?) ?? '',
+      amount: (json['amount'] as num?)?.toDouble() ?? 0,
+      balanceBefore: (json['balanceBefore'] as num?)?.toDouble() ?? 0,
+      balanceAfter: (json['balanceAfter'] as num?)?.toDouble() ?? 0,
+      description: (json['description'] as String?) ?? '',
+      createdAt: _tryParseDate(json['createdAt']),
+    );
+  }
+}
+
+/// Typed page of gift-card summaries (`PageResponse<GiftCardSummaryResponse>`).
+class RealGiftCardsPage {
+  final List<RealGiftCardSummary> content;
+  final int page;
+  final int size;
+  final int totalElements;
+  final int totalPages;
+
+  const RealGiftCardsPage({
+    this.content = const [],
+    this.page = 0,
+    this.size = 0,
+    this.totalElements = 0,
+    this.totalPages = 0,
+  });
+
+  bool get hasMore => page + 1 < totalPages;
+
+  factory RealGiftCardsPage.fromJson(Map<String, dynamic> json) {
+    final raw = json['content'];
+    return RealGiftCardsPage(
+      content: raw is List
+          ? raw
+              .map((e) =>
+                  RealGiftCardSummary.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : const [],
+      page: (json['page'] as num?)?.toInt() ?? 0,
+      size: (json['size'] as num?)?.toInt() ?? 0,
+      totalElements: (json['totalElements'] as num?)?.toInt() ?? 0,
+      totalPages: (json['totalPages'] as num?)?.toInt() ?? 0,
+    );
+  }
+}
+
+/// Typed page of gift-card transactions (`PageResponse<GiftCardTransactionResponse>`).
+class RealGiftCardTransactionsPage {
+  final List<RealGiftCardTransaction> content;
+  final int page;
+  final int totalPages;
+
+  const RealGiftCardTransactionsPage({
+    this.content = const [],
+    this.page = 0,
+    this.totalPages = 0,
+  });
+
+  factory RealGiftCardTransactionsPage.fromJson(Map<String, dynamic> json) {
+    final raw = json['content'];
+    return RealGiftCardTransactionsPage(
+      content: raw is List
+          ? raw
+              .map((e) =>
+                  RealGiftCardTransaction.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : const [],
+      page: (json['page'] as num?)?.toInt() ?? 0,
+      totalPages: (json['totalPages'] as num?)?.toInt() ?? 0,
+    );
+  }
+}
+
+/// Outcome of a real gift-card action (`GET /api/me/gift-cards[/{id}[/transactions]]`,
+/// `POST /claim`, `POST /{id}/activate`). [demoUnavailable] is the Demo Mode guard
+/// (zero HTTP); [busy] the single-flight guard; [sessionExpired] (401) never
+/// triggers auto-logout; [validation] 400/422, [forbidden] 403, [notFound] 404,
+/// [conflict] 409, [serverError] 5xx, [network] transport/timeout.
+enum GiftCardActionOutcome {
+  success,
+  demoUnavailable,
+  busy,
+  sessionExpired,
+  validation,
+  forbidden,
+  notFound,
+  conflict,
+  network,
+  serverError,
+}
+
 class DemoBooking {
   final String code;
   final String ownerUserId;

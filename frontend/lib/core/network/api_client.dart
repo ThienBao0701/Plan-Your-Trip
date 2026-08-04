@@ -1669,6 +1669,180 @@ class ApiClient {
     }
   }
 
+  // ── Gift Cards (/api/me/gift-cards, UI-33) ───────────────────────────────────
+  // Prepaid promotional value only. List + transactions are PageResponse
+  // {content,page,size,totalElements,totalPages}. Claim/activate return the full
+  // GiftCardResponse (masked code only — the raw fullCode is never stored client
+  // side). All authenticated + owner-scoped (non-owned card → 404, not 403). 8s
+  // timeout, no retry.
+
+  /// Lists the user's gift cards (`GET /api/me/gift-cards`, paged).
+  Future<CollectionApiResult<RealGiftCardsPage>> getMyGiftCards({
+    int? page,
+    int? size,
+  }) async {
+    try {
+      final uri = Uri.parse('$baseUrl/me/gift-cards').replace(
+        queryParameters: {
+          if (page != null) 'page': '$page',
+          if (size != null) 'size': '$size',
+        },
+      );
+      final res = await _client
+          .get(uri, headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealGiftCardsPage.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Gets one of the user's gift cards by id (`GET /api/me/gift-cards/{id}`).
+  Future<CollectionApiResult<RealGiftCardDetail>> getGiftCard(int id) async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/me/gift-cards/$id'), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealGiftCardDetail.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Lists the immutable ledger for one gift card
+  /// (`GET /api/me/gift-cards/{id}/transactions`, paged).
+  Future<CollectionApiResult<RealGiftCardTransactionsPage>>
+      getGiftCardTransactions(int id, {int? page, int? size}) async {
+    try {
+      final uri = Uri.parse('$baseUrl/me/gift-cards/$id/transactions').replace(
+        queryParameters: {
+          if (page != null) 'page': '$page',
+          if (size != null) 'size': '$size',
+        },
+      );
+      final res = await _client
+          .get(uri, headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(
+          RealGiftCardTransactionsPage.fromJson(body),
+        );
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Claims an email-issued gift card by its code and activates it
+  /// (`POST /api/me/gift-cards/claim`, idempotent). Returns the claimed card.
+  Future<CollectionApiResult<RealGiftCardDetail>> claimGiftCard(
+    String code,
+  ) async {
+    try {
+      final res = await _client
+          .post(Uri.parse('$baseUrl/me/gift-cards/claim'),
+              headers: _jsonHeaders, body: jsonEncode({'code': code}))
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealGiftCardDetail.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Activates an ISSUED gift card the user owns
+  /// (`POST /api/me/gift-cards/{id}/activate`, idempotent).
+  Future<CollectionApiResult<RealGiftCardDetail>> activateGiftCard(
+    int id,
+  ) async {
+    try {
+      final res = await _client
+          .post(Uri.parse('$baseUrl/me/gift-cards/$id/activate'),
+              headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealGiftCardDetail.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
   Map<String, dynamic> _failureForStatus(http.Response res) {
     Map<String, dynamic>? body;
     try {
