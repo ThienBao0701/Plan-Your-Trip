@@ -331,7 +331,43 @@ void main() {
 
   testWidgets('profile separates real and demo account presentation',
       (tester) async {
-    final realApp = AppState()
+    // UI32: Real Mode now loads the signed-in identity (GET /api/me) and travel
+    // profile (GET /api/me/profile) from the backend instead of showing a "not
+    // connected" placeholder. Inject a deterministic client so the real header
+    // renders the backend full name.
+    final client = MockClient((request) async {
+      final path = request.url.path;
+      if (request.method == 'GET' && path.endsWith('/me/profile')) {
+        return http.Response(
+          jsonEncode({
+            'id': 5,
+            'userId': 9,
+            'preferredLanguage': 'en',
+            'preferredCurrency': 'VND',
+            'marketingConsent': false,
+            'profileCompleted': false,
+            'completionPercentage': 40,
+          }),
+          200,
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        );
+      }
+      if (request.method == 'GET' && path.endsWith('/me')) {
+        return http.Response(
+          jsonEncode({
+            'id': 9,
+            'fullName': 'Real Traveler',
+            'email': 'real@example.com',
+            'role': 'CUSTOMER',
+          }),
+          200,
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        );
+      }
+      return http.Response('{}', 200,
+          headers: {'content-type': 'application/json; charset=utf-8'});
+    });
+    final realApp = AppState(api: ApiClient(client: client)..demoMode = false)
       ..demoMode = false
       ..email = 'real@example.com';
 
@@ -341,11 +377,13 @@ void main() {
       const Size(390, 900),
     );
 
-    expect(find.text('Signed-in account'), findsOneWidget);
+    // Backend identity is shown; the old placeholder string is gone.
+    expect(find.text('Real Traveler'), findsOneWidget);
     expect(
       find.text('Profile details are not connected to a backend endpoint yet.'),
-      findsWidgets,
+      findsNothing,
     );
+    expect(find.byKey(const Key('profile-edit')), findsOneWidget);
     expect(find.text('Demo Traveler'), findsNothing);
 
     final demoApp = AppState()
@@ -359,6 +397,8 @@ void main() {
 
     expect(find.text('Demo Traveler'), findsOneWidget);
     expect(find.text('Demo data active'), findsOneWidget);
+    // The real-only profile-edit card never appears in Demo Mode.
+    expect(find.byKey(const Key('profile-edit')), findsNothing);
   });
 
   testWidgets('settings language selection updates local app locale',

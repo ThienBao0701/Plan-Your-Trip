@@ -265,6 +265,21 @@ class AppState extends ChangeNotifier {
   RecentlyViewedOutcome? realRecentlyViewedError;
   final Set<int> recentlyViewedActionInFlight = {};
 
+  // ── Real Mode Customer Profile (/api/me, /api/me/profile, UI-32) ──────────
+  // Read-only signed-in identity plus the editable travel profile. A 401 never
+  // calls logout(). Both are cleared on logout / mode / user change via
+  // [_resetRealProfileState]. Zero HTTP in Demo Mode.
+  AccountIdentityRecord? realIdentity;
+  bool realIdentityLoading = false;
+  bool realIdentityLoaded = false;
+  CustomerProfileOutcome? realIdentityError;
+  CustomerProfileRecord? realProfile;
+  bool realProfileLoading = false;
+  bool realProfileLoaded = false;
+  bool realProfileRefreshing = false;
+  bool realProfileSaving = false;
+  CustomerProfileOutcome? realProfileError;
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -359,6 +374,7 @@ class AppState extends ChangeNotifier {
     _resetRealReviewsState();
     _resetRealNotificationsState();
     _resetRealRecentlyViewedState();
+    _resetRealProfileState();
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -452,6 +468,19 @@ class AppState extends ChangeNotifier {
     realRecentlyViewedRefreshing = false;
     realRecentlyViewedError = null;
     recentlyViewedActionInFlight.clear();
+  }
+
+  void _resetRealProfileState() {
+    realIdentity = null;
+    realIdentityLoading = false;
+    realIdentityLoaded = false;
+    realIdentityError = null;
+    realProfile = null;
+    realProfileLoading = false;
+    realProfileLoaded = false;
+    realProfileRefreshing = false;
+    realProfileSaving = false;
+    realProfileError = null;
   }
 
   void _resetRealNotificationsState() {
@@ -590,6 +619,7 @@ class AppState extends ChangeNotifier {
     _resetRealReviewsState();
     _resetRealNotificationsState();
     _resetRealRecentlyViewedState();
+    _resetRealProfileState();
     timeline = [];
     expenses = [];
     demoBookings = [];
@@ -3138,6 +3168,105 @@ class AppState extends ChangeNotifier {
       return RecentlyViewedOutcome.success;
     }
     final outcome = _mapRecentlyViewedError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  // ── Real Mode Customer Profile (UI-32) ───────────────────────────────────
+
+  CustomerProfileOutcome _mapProfileError(ApiErrorKind? kind) {
+    return switch (kind) {
+      ApiErrorKind.unauthorized => CustomerProfileOutcome.sessionExpired,
+      ApiErrorKind.forbidden => CustomerProfileOutcome.forbidden,
+      ApiErrorKind.notFound => CustomerProfileOutcome.notFound,
+      ApiErrorKind.network => CustomerProfileOutcome.network,
+      ApiErrorKind.timeout => CustomerProfileOutcome.network,
+      ApiErrorKind.server => CustomerProfileOutcome.serverError,
+      _ => CustomerProfileOutcome.serverError,
+    };
+  }
+
+  /// Loads the signed-in user's identity (`GET /api/me`). Read-only; preserves
+  /// the current value on failure. Zero HTTP in Demo Mode.
+  Future<CustomerProfileOutcome> loadRealAccountIdentity({
+    bool refresh = false,
+  }) async {
+    if (demoMode) return CustomerProfileOutcome.demoUnavailable;
+    if (realIdentityLoading) return CustomerProfileOutcome.success;
+    if (realIdentityLoaded && !refresh) return CustomerProfileOutcome.success;
+    realIdentityLoading = true;
+    realIdentityError = null;
+    notifyListeners();
+    final result = await api.getAccountIdentity();
+    realIdentityLoading = false;
+    if (result.success && result.data != null) {
+      realIdentity = result.data!;
+      realIdentityLoaded = true;
+      realIdentityError = null;
+      notifyListeners();
+      return CustomerProfileOutcome.success;
+    }
+    final outcome = _mapProfileError(result.errorKind);
+    realIdentityError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Loads the signed-in user's travel profile (`GET /api/me/profile`).
+  /// [refresh] forces a re-fetch and preserves the current profile on failure.
+  Future<CustomerProfileOutcome> loadRealCustomerProfile({
+    bool refresh = false,
+  }) async {
+    if (demoMode) return CustomerProfileOutcome.demoUnavailable;
+    if (realProfileLoading || realProfileRefreshing) {
+      return CustomerProfileOutcome.success;
+    }
+    if (realProfileLoaded && !refresh) return CustomerProfileOutcome.success;
+    if (refresh) {
+      realProfileRefreshing = true;
+    } else {
+      realProfileLoading = true;
+    }
+    realProfileError = null;
+    notifyListeners();
+    final result = await api.getCustomerProfile();
+    realProfileLoading = false;
+    realProfileRefreshing = false;
+    if (result.success && result.data != null) {
+      realProfile = result.data!;
+      realProfileLoaded = true;
+      realProfileError = null;
+      notifyListeners();
+      return CustomerProfileOutcome.success;
+    }
+    final outcome = _mapProfileError(result.errorKind);
+    realProfileError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Full-replace update of the travel profile (`PUT /api/me/profile`). Stores
+  /// only the server's returned (masked) record — never optimistic. Single-flight
+  /// via [realProfileSaving]. Zero HTTP in Demo Mode.
+  Future<CustomerProfileOutcome> updateRealCustomerProfile(
+    CustomerProfileUpdate update,
+  ) async {
+    if (demoMode) return CustomerProfileOutcome.demoUnavailable;
+    if (realProfileSaving) return CustomerProfileOutcome.busy;
+    realProfileSaving = true;
+    realProfileError = null;
+    notifyListeners();
+    final result = await api.updateCustomerProfile(update);
+    realProfileSaving = false;
+    if (result.success && result.data != null) {
+      realProfile = result.data!;
+      realProfileLoaded = true;
+      realProfileError = null;
+      notifyListeners();
+      return CustomerProfileOutcome.success;
+    }
+    final outcome = _mapProfileError(result.errorKind);
+    realProfileError = outcome;
     notifyListeners();
     return outcome;
   }

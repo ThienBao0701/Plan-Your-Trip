@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/app_state.dart';
+import '../../core/mock/app_models.dart';
 import '../../core/mock/mock_data.dart';
 import '../../design/app_colors.dart';
 import '../../design/app_icon_sizes.dart';
@@ -15,6 +16,7 @@ import '../rewards/rewards_screen.dart';
 import '../reviews/reviews_screen.dart';
 import '../wallet/travel_wallet_screen.dart';
 import 'notifications_screen.dart';
+import 'real_customer_profile_screen.dart';
 import 'saved_places_screen.dart';
 import 'settings_screen.dart';
 import 'static_page.dart';
@@ -28,6 +30,25 @@ class ProfileScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final isDemo = app.demoMode;
     final unreadNotifications = isDemo ? app.unreadNotificationCount : 0;
+    // Real Mode: load the signed-in identity + travel profile exactly once.
+    // Only kick off when neither loaded, in-flight, nor already errored — so a
+    // failed load is NOT retried on every rebuild (no request storm), and Demo
+    // Mode never touches the network.
+    final needIdentity = !isDemo &&
+        !app.realIdentityLoaded &&
+        !app.realIdentityLoading &&
+        app.realIdentityError == null;
+    final needProfile = !isDemo &&
+        !app.realProfileLoaded &&
+        !app.realProfileLoading &&
+        app.realProfileError == null;
+    if (needIdentity || needProfile) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (needIdentity) app.loadRealAccountIdentity();
+        if (needProfile) app.loadRealCustomerProfile();
+      });
+    }
+    final identity = app.realIdentity;
     return ListView(
       key: const PageStorageKey('profile-scroll'),
       padding: const EdgeInsets.fromLTRB(20, 18, 20, 120),
@@ -69,31 +90,48 @@ class ProfileScreen extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.md),
               Text(
-                isDemo ? l10n.profileDemoName : l10n.profileRealAccountTitle,
+                isDemo
+                    ? l10n.profileDemoName
+                    : ((identity?.fullName ?? '').trim().isNotEmpty
+                        ? identity!.fullName
+                        : l10n.profileRealAccountTitle),
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
               const SizedBox(height: AppSpacing.xxs),
               Text(
-                app.email ??
-                    (isDemo ? MockData.demoEmail : l10n.profileEmailMissing),
+                isDemo
+                    ? (app.email ?? MockData.demoEmail)
+                    : ((identity?.email ?? '').trim().isNotEmpty
+                        ? identity!.email
+                        : (app.email ?? l10n.profileEmailMissing)),
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
               const SizedBox(height: AppSpacing.sm),
-              OceanStatusPill(
-                label: isDemo ? l10n.profileDemoStatus : l10n.profileRealStatus,
-                icon: isDemo ? Icons.science_rounded : Icons.cloud_done_rounded,
-                color: isDemo ? AppColors.ocean : AppColors.success,
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: AppSpacing.xs,
+                runSpacing: AppSpacing.xs,
+                children: [
+                  OceanStatusPill(
+                    label: isDemo
+                        ? l10n.profileDemoStatus
+                        : l10n.profileRealStatus,
+                    icon: isDemo
+                        ? Icons.science_rounded
+                        : Icons.cloud_done_rounded,
+                    color: isDemo ? AppColors.ocean : AppColors.success,
+                  ),
+                  if (!isDemo && (identity?.role ?? '').trim().isNotEmpty)
+                    OceanStatusPill(
+                      label: identity!.role,
+                      icon: Icons.badge_rounded,
+                      color: AppColors.ocean,
+                      semanticLabel: l10n.profileRoleSemantic(identity.role),
+                    ),
+                ],
               ),
-              if (!isDemo) ...[
-                const SizedBox(height: AppSpacing.md),
-                Text(
-                  l10n.profileBackendProfileUnavailable,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ],
             ],
           ),
         ),
@@ -150,12 +188,7 @@ class ProfileScreen extends StatelessWidget {
             ],
           )
         else
-          OceanGlassCard(
-            child: Text(
-              l10n.profileBackendProfileUnavailable,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ),
+          _RealPreferencesSummary(profile: app.realProfile),
         const SizedBox(height: AppSpacing.lg),
         _SectionHeader(l10n.profileAccountSection),
         _ProfileNavCard(
@@ -174,6 +207,20 @@ class ProfileScreen extends StatelessWidget {
             MaterialPageRoute(builder: (_) => const SavedPlacesScreen()),
           ),
         ),
+        // UI32: real customer profile edit lives on the backend only. Shown in
+        // Real Mode; Demo Mode is byte-identical (no extra card).
+        if (!isDemo)
+          _ProfileNavCard(
+            key: const Key('profile-edit'),
+            icon: Icons.manage_accounts_rounded,
+            title: l10n.profileEditTitle,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const RealCustomerProfileScreen(),
+              ),
+            ),
+          ),
         // UI31: real recently-viewed lives on the backend only. Shown in Real
         // Mode; Demo Mode is byte-identical (no extra card).
         if (!isDemo)
@@ -440,4 +487,59 @@ class _SectionHeader extends StatelessWidget {
           ),
         ),
       );
+}
+
+/// Real Mode read-only preview of the customer's travel preferences
+/// (`GET /api/me/profile`). Editing lives on [RealCustomerProfileScreen] via the
+/// dedicated nav card — this only surfaces the backend-provided values. Nothing
+/// is fabricated: an unloaded profile shows a neutral prompt.
+class _RealPreferencesSummary extends StatelessWidget {
+  final CustomerProfileRecord? profile;
+
+  const _RealPreferencesSummary({required this.profile});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final p = profile;
+    final pills = <Widget>[
+      if (p != null && (p.preferredLanguage ?? '').trim().isNotEmpty)
+        OceanStatusPill(
+          label: p.preferredLanguage!.trim(),
+          icon: Icons.translate_rounded,
+          color: AppColors.ocean,
+        ),
+      if (p != null && (p.preferredCurrency ?? '').trim().isNotEmpty)
+        OceanStatusPill(
+          label: p.preferredCurrency!.trim(),
+          icon: Icons.payments_rounded,
+          color: AppColors.turquoise600,
+        ),
+      if (p != null && (p.dietaryPreference ?? '').trim().isNotEmpty)
+        OceanStatusPill(
+          label: p.dietaryPreference!.trim(),
+          icon: Icons.restaurant_rounded,
+          color: AppColors.coral,
+        ),
+      if (p != null && (p.travelStyle ?? '').trim().isNotEmpty)
+        OceanStatusPill(
+          label: p.travelStyle!.trim(),
+          icon: Icons.explore_rounded,
+          color: AppColors.ocean,
+        ),
+    ];
+    return OceanGlassCard(
+      key: const Key('profile-real-preferences'),
+      child: pills.isEmpty
+          ? Text(
+              l10n.profileEditEmptyPreferences,
+              style: Theme.of(context).textTheme.bodyMedium,
+            )
+          : Wrap(
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
+              children: pills,
+            ),
+    );
+  }
 }

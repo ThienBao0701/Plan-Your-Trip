@@ -11883,6 +11883,186 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'We couldn\'t reach the server. Please check your connection and try again.'**
   String get recentlyViewedNetworkMessage;
+
+  /// No description provided for @profileEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile & preferences'**
+  String get profileEditTitle;
+
+  /// No description provided for @profileEditLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading your profile…'**
+  String get profileEditLoadingMessage;
+
+  /// No description provided for @profileEditErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load your profile. Please try again.'**
+  String get profileEditErrorMessage;
+
+  /// No description provided for @profileEditMissingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your profile isn\'t available.'**
+  String get profileEditMissingMessage;
+
+  /// No description provided for @profileEditSaveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get profileEditSaveAction;
+
+  /// No description provided for @profileEditSavedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated.'**
+  String get profileEditSavedMessage;
+
+  /// No description provided for @profileEditSaveErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t save your changes. Please try again.'**
+  String get profileEditSaveErrorMessage;
+
+  /// No description provided for @profileEditForbiddenMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have permission to do that.'**
+  String get profileEditForbiddenMessage;
+
+  /// No description provided for @profileEditNetworkMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t reach the server. Please check your connection and try again.'**
+  String get profileEditNetworkMessage;
+
+  /// No description provided for @profileEditIdentitySection.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get profileEditIdentitySection;
+
+  /// No description provided for @profileEditPreferencesSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Travel preferences'**
+  String get profileEditPreferencesSection;
+
+  /// No description provided for @profileEditContactSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact & documents'**
+  String get profileEditContactSection;
+
+  /// No description provided for @profileFieldAvatar.
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar image URL'**
+  String get profileFieldAvatar;
+
+  /// No description provided for @profileFieldLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferred language'**
+  String get profileFieldLanguage;
+
+  /// No description provided for @profileFieldCurrency.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferred currency'**
+  String get profileFieldCurrency;
+
+  /// No description provided for @profileFieldPaymentMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferred payment method'**
+  String get profileFieldPaymentMethod;
+
+  /// No description provided for @profileFieldNationality.
+  ///
+  /// In en, this message translates to:
+  /// **'Nationality'**
+  String get profileFieldNationality;
+
+  /// No description provided for @profileFieldEmergencyName.
+  ///
+  /// In en, this message translates to:
+  /// **'Emergency contact name'**
+  String get profileFieldEmergencyName;
+
+  /// No description provided for @profileFieldEmergencyPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Emergency contact phone'**
+  String get profileFieldEmergencyPhone;
+
+  /// No description provided for @profileFieldAccessibility.
+  ///
+  /// In en, this message translates to:
+  /// **'Accessibility needs'**
+  String get profileFieldAccessibility;
+
+  /// No description provided for @profileFieldDietaryPreference.
+  ///
+  /// In en, this message translates to:
+  /// **'Dietary preference'**
+  String get profileFieldDietaryPreference;
+
+  /// No description provided for @profileFieldTravelStyle.
+  ///
+  /// In en, this message translates to:
+  /// **'Travel style'**
+  String get profileFieldTravelStyle;
+
+  /// No description provided for @profileEditPassportLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Passport number'**
+  String get profileEditPassportLabel;
+
+  /// No description provided for @profileEditPassportWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Currently saved: {masked}. Re-enter it to keep it — leaving this blank removes the saved passport when you save.'**
+  String profileEditPassportWarning(String masked);
+
+  /// No description provided for @profileEditPassportHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional. Stored masked once saved.'**
+  String get profileEditPassportHint;
+
+  /// No description provided for @profileEditMarketingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Receive marketing updates'**
+  String get profileEditMarketingLabel;
+
+  /// No description provided for @profileEditOptionalHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional'**
+  String get profileEditOptionalHint;
+
+  /// No description provided for @profileCompletionSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile {percent}% complete'**
+  String profileCompletionSemantic(int percent);
+
+  /// No description provided for @profileRoleSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Account role: {role}'**
+  String profileRoleSemantic(String role);
+
+  /// No description provided for @profileEditEmptyPreferences.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your travel preferences to personalise your trips.'**
+  String get profileEditEmptyPreferences;
 }
 
 class _AppLocalizationsDelegate

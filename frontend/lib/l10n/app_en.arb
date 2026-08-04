@@ -3545,5 +3545,50 @@
   "recentlyViewedGoneMessage": "This place is no longer available.",
   "recentlyViewedForbiddenMessage": "You don't have permission to do that.",
   "recentlyViewedActionErrorMessage": "Something went wrong. Please try again.",
-  "recentlyViewedNetworkMessage": "We couldn't reach the server. Please check your connection and try again."
+  "recentlyViewedNetworkMessage": "We couldn't reach the server. Please check your connection and try again.",
+  "profileEditTitle": "Profile & preferences",
+  "profileEditLoadingMessage": "Loading your profile…",
+  "profileEditErrorMessage": "We couldn't load your profile. Please try again.",
+  "profileEditMissingMessage": "Your profile isn't available.",
+  "profileEditSaveAction": "Save changes",
+  "profileEditSavedMessage": "Profile updated.",
+  "profileEditSaveErrorMessage": "We couldn't save your changes. Please try again.",
+  "profileEditForbiddenMessage": "You don't have permission to do that.",
+  "profileEditNetworkMessage": "We couldn't reach the server. Please check your connection and try again.",
+  "profileEditIdentitySection": "Account",
+  "profileEditPreferencesSection": "Travel preferences",
+  "profileEditContactSection": "Contact & documents",
+  "profileFieldAvatar": "Avatar image URL",
+  "profileFieldLanguage": "Preferred language",
+  "profileFieldCurrency": "Preferred currency",
+  "profileFieldPaymentMethod": "Preferred payment method",
+  "profileFieldNationality": "Nationality",
+  "profileFieldEmergencyName": "Emergency contact name",
+  "profileFieldEmergencyPhone": "Emergency contact phone",
+  "profileFieldAccessibility": "Accessibility needs",
+  "profileFieldDietaryPreference": "Dietary preference",
+  "profileFieldTravelStyle": "Travel style",
+  "profileEditPassportLabel": "Passport number",
+  "profileEditPassportWarning": "Currently saved: {masked}. Re-enter it to keep it — leaving this blank removes the saved passport when you save.",
+  "@profileEditPassportWarning": {
+    "placeholders": {
+      "masked": { "type": "String" }
+    }
+  },
+  "profileEditPassportHint": "Optional. Stored masked once saved.",
+  "profileEditMarketingLabel": "Receive marketing updates",
+  "profileEditOptionalHint": "Optional",
+  "profileCompletionSemantic": "Profile {percent}% complete",
+  "@profileCompletionSemantic": {
+    "placeholders": {
+      "percent": { "type": "int" }
+    }
+  },
+  "profileRoleSemantic": "Account role: {role}",
+  "@profileRoleSemantic": {
+    "placeholders": {
+      "role": { "type": "String" }
+    }
+  },
+  "profileEditEmptyPreferences": "Add your travel preferences to personalise your trips."
 }

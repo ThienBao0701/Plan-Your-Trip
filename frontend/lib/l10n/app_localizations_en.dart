@@ -6988,4 +6988,105 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get recentlyViewedNetworkMessage =>
       'We couldn\'t reach the server. Please check your connection and try again.';
+
+  @override
+  String get profileEditTitle => 'Profile & preferences';
+
+  @override
+  String get profileEditLoadingMessage => 'Loading your profile…';
+
+  @override
+  String get profileEditErrorMessage =>
+      'We couldn\'t load your profile. Please try again.';
+
+  @override
+  String get profileEditMissingMessage => 'Your profile isn\'t available.';
+
+  @override
+  String get profileEditSaveAction => 'Save changes';
+
+  @override
+  String get profileEditSavedMessage => 'Profile updated.';
+
+  @override
+  String get profileEditSaveErrorMessage =>
+      'We couldn\'t save your changes. Please try again.';
+
+  @override
+  String get profileEditForbiddenMessage =>
+      'You don\'t have permission to do that.';
+
+  @override
+  String get profileEditNetworkMessage =>
+      'We couldn\'t reach the server. Please check your connection and try again.';
+
+  @override
+  String get profileEditIdentitySection => 'Account';
+
+  @override
+  String get profileEditPreferencesSection => 'Travel preferences';
+
+  @override
+  String get profileEditContactSection => 'Contact & documents';
+
+  @override
+  String get profileFieldAvatar => 'Avatar image URL';
+
+  @override
+  String get profileFieldLanguage => 'Preferred language';
+
+  @override
+  String get profileFieldCurrency => 'Preferred currency';
+
+  @override
+  String get profileFieldPaymentMethod => 'Preferred payment method';
+
+  @override
+  String get profileFieldNationality => 'Nationality';
+
+  @override
+  String get profileFieldEmergencyName => 'Emergency contact name';
+
+  @override
+  String get profileFieldEmergencyPhone => 'Emergency contact phone';
+
+  @override
+  String get profileFieldAccessibility => 'Accessibility needs';
+
+  @override
+  String get profileFieldDietaryPreference => 'Dietary preference';
+
+  @override
+  String get profileFieldTravelStyle => 'Travel style';
+
+  @override
+  String get profileEditPassportLabel => 'Passport number';
+
+  @override
+  String profileEditPassportWarning(String masked) {
+    return 'Currently saved: $masked. Re-enter it to keep it — leaving this blank removes the saved passport when you save.';
+  }
+
+  @override
+  String get profileEditPassportHint => 'Optional. Stored masked once saved.';
+
+  @override
+  String get profileEditMarketingLabel => 'Receive marketing updates';
+
+  @override
+  String get profileEditOptionalHint => 'Optional';
+
+  @override
+  String profileCompletionSemantic(int percent) {
+    return 'Profile $percent% complete';
+  }
+
+  @override
+  String profileRoleSemantic(String role) {
+    return 'Account role: $role';
+  }
+
+  @override
+  String get profileEditEmptyPreferences =>
+      'Add your travel preferences to personalise your trips.';
 }

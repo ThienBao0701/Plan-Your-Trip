@@ -6822,4 +6822,105 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get recentlyViewedNetworkMessage =>
       'Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối và thử lại.';
+
+  @override
+  String get profileEditTitle => 'Hồ sơ & tùy chọn';
+
+  @override
+  String get profileEditLoadingMessage => 'Đang tải hồ sơ của bạn…';
+
+  @override
+  String get profileEditErrorMessage =>
+      'Không thể tải hồ sơ. Vui lòng thử lại.';
+
+  @override
+  String get profileEditMissingMessage => 'Hồ sơ của bạn không khả dụng.';
+
+  @override
+  String get profileEditSaveAction => 'Lưu thay đổi';
+
+  @override
+  String get profileEditSavedMessage => 'Đã cập nhật hồ sơ.';
+
+  @override
+  String get profileEditSaveErrorMessage =>
+      'Không thể lưu thay đổi. Vui lòng thử lại.';
+
+  @override
+  String get profileEditForbiddenMessage =>
+      'Bạn không có quyền thực hiện thao tác này.';
+
+  @override
+  String get profileEditNetworkMessage =>
+      'Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối và thử lại.';
+
+  @override
+  String get profileEditIdentitySection => 'Tài khoản';
+
+  @override
+  String get profileEditPreferencesSection => 'Tùy chọn du lịch';
+
+  @override
+  String get profileEditContactSection => 'Liên hệ & giấy tờ';
+
+  @override
+  String get profileFieldAvatar => 'Liên kết ảnh đại diện';
+
+  @override
+  String get profileFieldLanguage => 'Ngôn ngữ ưu tiên';
+
+  @override
+  String get profileFieldCurrency => 'Tiền tệ ưu tiên';
+
+  @override
+  String get profileFieldPaymentMethod => 'Phương thức thanh toán ưu tiên';
+
+  @override
+  String get profileFieldNationality => 'Quốc tịch';
+
+  @override
+  String get profileFieldEmergencyName => 'Tên người liên hệ khẩn cấp';
+
+  @override
+  String get profileFieldEmergencyPhone => 'Số điện thoại liên hệ khẩn cấp';
+
+  @override
+  String get profileFieldAccessibility => 'Nhu cầu hỗ trợ tiếp cận';
+
+  @override
+  String get profileFieldDietaryPreference => 'Chế độ ăn uống';
+
+  @override
+  String get profileFieldTravelStyle => 'Phong cách du lịch';
+
+  @override
+  String get profileEditPassportLabel => 'Số hộ chiếu';
+
+  @override
+  String profileEditPassportWarning(String masked) {
+    return 'Đang lưu: $masked. Nhập lại để giữ nguyên — để trống sẽ xóa hộ chiếu đã lưu khi bạn lưu.';
+  }
+
+  @override
+  String get profileEditPassportHint => 'Không bắt buộc. Được che khi đã lưu.';
+
+  @override
+  String get profileEditMarketingLabel => 'Nhận thông tin tiếp thị';
+
+  @override
+  String get profileEditOptionalHint => 'Không bắt buộc';
+
+  @override
+  String profileCompletionSemantic(int percent) {
+    return 'Hồ sơ hoàn thành $percent%';
+  }
+
+  @override
+  String profileRoleSemantic(String role) {
+    return 'Vai trò tài khoản: $role';
+  }
+
+  @override
+  String get profileEditEmptyPreferences =>
+      'Thêm tùy chọn du lịch để cá nhân hóa chuyến đi của bạn.';
 }

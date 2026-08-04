@@ -1569,6 +1569,106 @@ class ApiClient {
     }
   }
 
+  // ── Profile (/api/me, /api/me/profile, UI-32) ────────────────────────────────
+  // GET /me → read-only signed-in identity (fullName/email/role). GET /me/profile
+  // → travel profile (server lazily creates a default row). PUT /me/profile is
+  // FULL-REPLACE: the body must carry every field or the omitted ones are wiped;
+  // passportNumber is write-only (echoed back only masked). All authenticated,
+  // 8s timeout, no retry.
+
+  /// Reads the signed-in user's identity (`GET /api/me`).
+  Future<CollectionApiResult<AccountIdentityRecord>>
+      getAccountIdentity() async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/me'), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(
+            AccountIdentityRecord.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Reads the signed-in user's travel profile (`GET /api/me/profile`).
+  Future<CollectionApiResult<CustomerProfileRecord>>
+      getCustomerProfile() async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/me/profile'), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(
+            CustomerProfileRecord.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Full-replace update of the travel profile (`PUT /api/me/profile`). Returns
+  /// the server's updated (masked) profile — never optimistic.
+  Future<CollectionApiResult<CustomerProfileRecord>> updateCustomerProfile(
+    CustomerProfileUpdate update,
+  ) async {
+    try {
+      final res = await _client
+          .put(Uri.parse('$baseUrl/me/profile'),
+              headers: _jsonHeaders, body: jsonEncode(update.toJson()))
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(
+            CustomerProfileRecord.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
   Map<String, dynamic> _failureForStatus(http.Response res) {
     Map<String, dynamic>? body;
     try {

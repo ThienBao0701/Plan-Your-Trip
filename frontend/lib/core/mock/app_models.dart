@@ -3951,6 +3951,176 @@ enum RecentlyViewedOutcome {
   serverError,
 }
 
+/// Real-backend mirror of `AuthDtos.UserDto` (`GET /api/me`). Read-only signed-in
+/// identity; the server derives it from the JWT subject (owner-scoped). `Map`
+/// decoding is confined to [fromJson].
+class AccountIdentityRecord {
+  final int id;
+  final String fullName;
+  final String email;
+  final String role;
+
+  const AccountIdentityRecord({
+    this.id = 0,
+    this.fullName = '',
+    this.email = '',
+    this.role = '',
+  });
+
+  factory AccountIdentityRecord.fromJson(Map<String, dynamic> json) {
+    return AccountIdentityRecord(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      fullName: (json['fullName'] as String?) ?? '',
+      email: (json['email'] as String?) ?? '',
+      role: (json['role'] as String?) ?? '',
+    );
+  }
+}
+
+/// Real-backend mirror of `CustomerProfileDto.CustomerProfileResponse`
+/// (`GET`/`PUT /api/me/profile`). Owner-scoped travel profile; the server lazily
+/// creates a default row on first access. `passportNumberMasked` is the ONLY
+/// representation of the passport that is ever read back — the raw number is
+/// write-only (see [CustomerProfileUpdate]). `profileCompleted` /
+/// `completionPercentage` are server-computed. `Map` decoding is confined to
+/// [fromJson].
+class CustomerProfileRecord {
+  final int? id;
+  final int? userId;
+  final String? avatarUrl;
+  final String? preferredLanguage;
+  final String? preferredCurrency;
+  final String? preferredPaymentMethod;
+  final String? nationality;
+  final String? passportNumberMasked;
+  final String? emergencyContactName;
+  final String? emergencyContactPhone;
+  final String? accessibilityNeeds;
+  final String? dietaryPreference;
+  final String? travelStyle;
+  final bool marketingConsent;
+  final bool profileCompleted;
+  final int completionPercentage;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+
+  const CustomerProfileRecord({
+    this.id,
+    this.userId,
+    this.avatarUrl,
+    this.preferredLanguage,
+    this.preferredCurrency,
+    this.preferredPaymentMethod,
+    this.nationality,
+    this.passportNumberMasked,
+    this.emergencyContactName,
+    this.emergencyContactPhone,
+    this.accessibilityNeeds,
+    this.dietaryPreference,
+    this.travelStyle,
+    this.marketingConsent = false,
+    this.profileCompleted = false,
+    this.completionPercentage = 0,
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  factory CustomerProfileRecord.fromJson(Map<String, dynamic> json) {
+    return CustomerProfileRecord(
+      id: (json['id'] as num?)?.toInt(),
+      userId: (json['userId'] as num?)?.toInt(),
+      avatarUrl: json['avatarUrl'] as String?,
+      preferredLanguage: json['preferredLanguage'] as String?,
+      preferredCurrency: json['preferredCurrency'] as String?,
+      preferredPaymentMethod: json['preferredPaymentMethod'] as String?,
+      nationality: json['nationality'] as String?,
+      passportNumberMasked: json['passportNumberMasked'] as String?,
+      emergencyContactName: json['emergencyContactName'] as String?,
+      emergencyContactPhone: json['emergencyContactPhone'] as String?,
+      accessibilityNeeds: json['accessibilityNeeds'] as String?,
+      dietaryPreference: json['dietaryPreference'] as String?,
+      travelStyle: json['travelStyle'] as String?,
+      marketingConsent: (json['marketingConsent'] as bool?) ?? false,
+      profileCompleted: (json['profileCompleted'] as bool?) ?? false,
+      completionPercentage:
+          (json['completionPercentage'] as num?)?.toInt() ?? 0,
+      createdAt: _tryParseDate(json['createdAt']),
+      updatedAt: _tryParseDate(json['updatedAt']),
+    );
+  }
+}
+
+/// Write payload for `PUT /api/me/profile`
+/// (`CustomerProfileDto.CustomerProfileRequest`). The endpoint is **full-replace**
+/// — a null/absent field wipes the stored value (except `preferredLanguage` /
+/// `preferredCurrency`, which the server preserves when blank). [passportNumber]
+/// is the raw number (write-only; echoed back only as
+/// [CustomerProfileRecord.passportNumberMasked]); leaving it null removes the
+/// stored passport. [toJson] therefore emits ALL 12 keys every time so callers
+/// resend the full record and only the fields they changed differ.
+class CustomerProfileUpdate {
+  final String? avatarUrl;
+  final String? preferredLanguage;
+  final String? preferredCurrency;
+  final String? preferredPaymentMethod;
+  final String? nationality;
+  final String? passportNumber;
+  final String? emergencyContactName;
+  final String? emergencyContactPhone;
+  final String? accessibilityNeeds;
+  final String? travelStyle;
+  final String? dietaryPreference;
+  final bool marketingConsent;
+
+  const CustomerProfileUpdate({
+    this.avatarUrl,
+    this.preferredLanguage,
+    this.preferredCurrency,
+    this.preferredPaymentMethod,
+    this.nationality,
+    this.passportNumber,
+    this.emergencyContactName,
+    this.emergencyContactPhone,
+    this.accessibilityNeeds,
+    this.travelStyle,
+    this.dietaryPreference,
+    this.marketingConsent = false,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'avatarUrl': avatarUrl,
+      'preferredLanguage': preferredLanguage,
+      'preferredCurrency': preferredCurrency,
+      'preferredPaymentMethod': preferredPaymentMethod,
+      'nationality': nationality,
+      'passportNumber': passportNumber,
+      'emergencyContactName': emergencyContactName,
+      'emergencyContactPhone': emergencyContactPhone,
+      'accessibilityNeeds': accessibilityNeeds,
+      'travelStyle': travelStyle,
+      'dietaryPreference': dietaryPreference,
+      'marketingConsent': marketingConsent,
+    };
+  }
+}
+
+/// Outcome of a real customer profile action (`GET /api/me`,
+/// `GET`/`PUT /api/me/profile`). [demoUnavailable] is the Demo Mode guard (zero
+/// HTTP); [busy] the single-flight guard; [sessionExpired] (401) never triggers
+/// auto-logout; [forbidden] 403, [notFound] 404, [serverError] 5xx, [network]
+/// transport/timeout.
+enum CustomerProfileOutcome {
+  success,
+  demoUnavailable,
+  busy,
+  sessionExpired,
+  forbidden,
+  notFound,
+  network,
+  serverError,
+}
+
 class DemoBooking {
   final String code;
   final String ownerUserId;

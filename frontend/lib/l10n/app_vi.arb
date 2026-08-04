@@ -3545,5 +3545,50 @@
   "recentlyViewedGoneMessage": "Địa điểm này không còn khả dụng.",
   "recentlyViewedForbiddenMessage": "Bạn không có quyền thực hiện điều đó.",
   "recentlyViewedActionErrorMessage": "Đã xảy ra lỗi. Vui lòng thử lại.",
-  "recentlyViewedNetworkMessage": "Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối và thử lại."
+  "recentlyViewedNetworkMessage": "Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối và thử lại.",
+  "profileEditTitle": "Hồ sơ & tùy chọn",
+  "profileEditLoadingMessage": "Đang tải hồ sơ của bạn…",
+  "profileEditErrorMessage": "Không thể tải hồ sơ. Vui lòng thử lại.",
+  "profileEditMissingMessage": "Hồ sơ của bạn không khả dụng.",
+  "profileEditSaveAction": "Lưu thay đổi",
+  "profileEditSavedMessage": "Đã cập nhật hồ sơ.",
+  "profileEditSaveErrorMessage": "Không thể lưu thay đổi. Vui lòng thử lại.",
+  "profileEditForbiddenMessage": "Bạn không có quyền thực hiện thao tác này.",
+  "profileEditNetworkMessage": "Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối và thử lại.",
+  "profileEditIdentitySection": "Tài khoản",
+  "profileEditPreferencesSection": "Tùy chọn du lịch",
+  "profileEditContactSection": "Liên hệ & giấy tờ",
+  "profileFieldAvatar": "Liên kết ảnh đại diện",
+  "profileFieldLanguage": "Ngôn ngữ ưu tiên",
+  "profileFieldCurrency": "Tiền tệ ưu tiên",
+  "profileFieldPaymentMethod": "Phương thức thanh toán ưu tiên",
+  "profileFieldNationality": "Quốc tịch",
+  "profileFieldEmergencyName": "Tên người liên hệ khẩn cấp",
+  "profileFieldEmergencyPhone": "Số điện thoại liên hệ khẩn cấp",
+  "profileFieldAccessibility": "Nhu cầu hỗ trợ tiếp cận",
+  "profileFieldDietaryPreference": "Chế độ ăn uống",
+  "profileFieldTravelStyle": "Phong cách du lịch",
+  "profileEditPassportLabel": "Số hộ chiếu",
+  "profileEditPassportWarning": "Đang lưu: {masked}. Nhập lại để giữ nguyên — để trống sẽ xóa hộ chiếu đã lưu khi bạn lưu.",
+  "@profileEditPassportWarning": {
+    "placeholders": {
+      "masked": { "type": "String" }
+    }
+  },
+  "profileEditPassportHint": "Không bắt buộc. Được che khi đã lưu.",
+  "profileEditMarketingLabel": "Nhận thông tin tiếp thị",
+  "profileEditOptionalHint": "Không bắt buộc",
+  "profileCompletionSemantic": "Hồ sơ hoàn thành {percent}%",
+  "@profileCompletionSemantic": {
+    "placeholders": {
+      "percent": { "type": "int" }
+    }
+  },
+  "profileRoleSemantic": "Vai trò tài khoản: {role}",
+  "@profileRoleSemantic": {
+    "placeholders": {
+      "role": { "type": "String" }
+    }
+  },
+  "profileEditEmptyPreferences": "Thêm tùy chọn du lịch để cá nhân hóa chuyến đi của bạn."
 }
