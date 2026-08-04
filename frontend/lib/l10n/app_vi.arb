@@ -3510,5 +3510,40 @@
   "notificationsRealSubtitle": "Cập nhật từ đặt phòng, thanh toán và đánh giá của bạn.",
   "notificationActionForbiddenMessage": "Bạn không có quyền thay đổi thông báo này.",
   "notificationActionServerErrorMessage": "Đã xảy ra lỗi khi cập nhật thông báo của bạn. Vui lòng thử lại.",
-  "notificationActionNetworkMessage": "Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối và thử lại."
+  "notificationActionNetworkMessage": "Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối và thử lại.",
+  "recentlyViewedTitle": "Đã xem gần đây",
+  "recentlyViewedLoadingMessage": "Đang tải mục đã xem gần đây…",
+  "recentlyViewedErrorMessage": "Không thể tải các địa điểm đã xem gần đây. Vui lòng thử lại.",
+  "recentlyViewedEmptyTitle": "Chưa có gì ở đây",
+  "recentlyViewedEmptyMessage": "Các địa điểm bạn xem sẽ xuất hiện ở đây.",
+  "recentlyViewedUnknownPlace": "Địa điểm",
+  "recentlyViewedCardSemantic": "Mở {name}",
+  "@recentlyViewedCardSemantic": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "recentlyViewedRatingSemantic": "Đánh giá {rating} từ {count} nhận xét",
+  "@recentlyViewedRatingSemantic": {
+    "placeholders": { "rating": { "type": "String" }, "count": { "type": "int" } }
+  },
+  "recentlyViewedRemoveSemantic": "Xóa {name} khỏi mục đã xem gần đây",
+  "@recentlyViewedRemoveSemantic": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "recentlyViewedClearSemantic": "Xóa mục đã xem gần đây",
+  "recentlyViewedClearConfirmTitle": "Xóa mục đã xem gần đây?",
+  "recentlyViewedClearConfirmMessage": "Thao tác này sẽ xóa mọi địa điểm khỏi danh sách đã xem gần đây của bạn.",
+  "recentlyViewedClearConfirmAction": "Xóa tất cả",
+  "recentlyViewedRemoveConfirmTitle": "Xóa khỏi mục đã xem gần đây?",
+  "recentlyViewedRemoveConfirmMessage": "Xóa {name} khỏi danh sách đã xem gần đây của bạn?",
+  "@recentlyViewedRemoveConfirmMessage": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "recentlyViewedRemoveConfirmAction": "Xóa",
+  "recentlyViewedClearedMessage": "Đã xóa mục đã xem gần đây.",
+  "recentlyViewedRemovedMessage": "Đã xóa khỏi mục đã xem gần đây.",
+  "recentlyViewedOpenErrorMessage": "Không thể mở địa điểm này. Vui lòng thử lại.",
+  "recentlyViewedGoneMessage": "Địa điểm này không còn khả dụng.",
+  "recentlyViewedForbiddenMessage": "Bạn không có quyền thực hiện điều đó.",
+  "recentlyViewedActionErrorMessage": "Đã xảy ra lỗi. Vui lòng thử lại.",
+  "recentlyViewedNetworkMessage": "Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối và thử lại."
 }

@@ -3510,5 +3510,40 @@
   "notificationsRealSubtitle": "Updates from your bookings, payments and reviews.",
   "notificationActionForbiddenMessage": "You don't have permission to change this notification.",
   "notificationActionServerErrorMessage": "Something went wrong updating your notifications. Please try again.",
-  "notificationActionNetworkMessage": "We couldn't reach the server. Please check your connection and try again."
+  "notificationActionNetworkMessage": "We couldn't reach the server. Please check your connection and try again.",
+  "recentlyViewedTitle": "Recently viewed",
+  "recentlyViewedLoadingMessage": "Loading recently viewed…",
+  "recentlyViewedErrorMessage": "We couldn't load your recently viewed places. Please try again.",
+  "recentlyViewedEmptyTitle": "Nothing here yet",
+  "recentlyViewedEmptyMessage": "Places you view will appear here.",
+  "recentlyViewedUnknownPlace": "Place",
+  "recentlyViewedCardSemantic": "Open {name}",
+  "@recentlyViewedCardSemantic": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "recentlyViewedRatingSemantic": "Rated {rating} from {count} reviews",
+  "@recentlyViewedRatingSemantic": {
+    "placeholders": { "rating": { "type": "String" }, "count": { "type": "int" } }
+  },
+  "recentlyViewedRemoveSemantic": "Remove {name} from recently viewed",
+  "@recentlyViewedRemoveSemantic": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "recentlyViewedClearSemantic": "Clear recently viewed",
+  "recentlyViewedClearConfirmTitle": "Clear recently viewed?",
+  "recentlyViewedClearConfirmMessage": "This removes every place from your recently viewed list.",
+  "recentlyViewedClearConfirmAction": "Clear all",
+  "recentlyViewedRemoveConfirmTitle": "Remove from recently viewed?",
+  "recentlyViewedRemoveConfirmMessage": "Remove {name} from your recently viewed list?",
+  "@recentlyViewedRemoveConfirmMessage": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "recentlyViewedRemoveConfirmAction": "Remove",
+  "recentlyViewedClearedMessage": "Recently viewed cleared.",
+  "recentlyViewedRemovedMessage": "Removed from recently viewed.",
+  "recentlyViewedOpenErrorMessage": "We couldn't open this place. Please try again.",
+  "recentlyViewedGoneMessage": "This place is no longer available.",
+  "recentlyViewedForbiddenMessage": "You don't have permission to do that.",
+  "recentlyViewedActionErrorMessage": "Something went wrong. Please try again.",
+  "recentlyViewedNetworkMessage": "We couldn't reach the server. Please check your connection and try again."
 }

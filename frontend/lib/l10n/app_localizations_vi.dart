@@ -6738,4 +6738,88 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get notificationActionNetworkMessage =>
       'Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối và thử lại.';
+
+  @override
+  String get recentlyViewedTitle => 'Đã xem gần đây';
+
+  @override
+  String get recentlyViewedLoadingMessage => 'Đang tải mục đã xem gần đây…';
+
+  @override
+  String get recentlyViewedErrorMessage =>
+      'Không thể tải các địa điểm đã xem gần đây. Vui lòng thử lại.';
+
+  @override
+  String get recentlyViewedEmptyTitle => 'Chưa có gì ở đây';
+
+  @override
+  String get recentlyViewedEmptyMessage =>
+      'Các địa điểm bạn xem sẽ xuất hiện ở đây.';
+
+  @override
+  String get recentlyViewedUnknownPlace => 'Địa điểm';
+
+  @override
+  String recentlyViewedCardSemantic(String name) {
+    return 'Mở $name';
+  }
+
+  @override
+  String recentlyViewedRatingSemantic(String rating, int count) {
+    return 'Đánh giá $rating từ $count nhận xét';
+  }
+
+  @override
+  String recentlyViewedRemoveSemantic(String name) {
+    return 'Xóa $name khỏi mục đã xem gần đây';
+  }
+
+  @override
+  String get recentlyViewedClearSemantic => 'Xóa mục đã xem gần đây';
+
+  @override
+  String get recentlyViewedClearConfirmTitle => 'Xóa mục đã xem gần đây?';
+
+  @override
+  String get recentlyViewedClearConfirmMessage =>
+      'Thao tác này sẽ xóa mọi địa điểm khỏi danh sách đã xem gần đây của bạn.';
+
+  @override
+  String get recentlyViewedClearConfirmAction => 'Xóa tất cả';
+
+  @override
+  String get recentlyViewedRemoveConfirmTitle => 'Xóa khỏi mục đã xem gần đây?';
+
+  @override
+  String recentlyViewedRemoveConfirmMessage(String name) {
+    return 'Xóa $name khỏi danh sách đã xem gần đây của bạn?';
+  }
+
+  @override
+  String get recentlyViewedRemoveConfirmAction => 'Xóa';
+
+  @override
+  String get recentlyViewedClearedMessage => 'Đã xóa mục đã xem gần đây.';
+
+  @override
+  String get recentlyViewedRemovedMessage => 'Đã xóa khỏi mục đã xem gần đây.';
+
+  @override
+  String get recentlyViewedOpenErrorMessage =>
+      'Không thể mở địa điểm này. Vui lòng thử lại.';
+
+  @override
+  String get recentlyViewedGoneMessage => 'Địa điểm này không còn khả dụng.';
+
+  @override
+  String get recentlyViewedForbiddenMessage =>
+      'Bạn không có quyền thực hiện điều đó.';
+
+  @override
+  String get recentlyViewedActionErrorMessage =>
+      'Đã xảy ra lỗi. Vui lòng thử lại.';
+
+  @override
+  String get recentlyViewedNetworkMessage =>
+      'Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối và thử lại.';
 }

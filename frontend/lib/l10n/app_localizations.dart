@@ -11745,6 +11745,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'We couldn\'t reach the server. Please check your connection and try again.'**
   String get notificationActionNetworkMessage;
+
+  /// No description provided for @recentlyViewedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recently viewed'**
+  String get recentlyViewedTitle;
+
+  /// No description provided for @recentlyViewedLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading recently viewed…'**
+  String get recentlyViewedLoadingMessage;
+
+  /// No description provided for @recentlyViewedErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load your recently viewed places. Please try again.'**
+  String get recentlyViewedErrorMessage;
+
+  /// No description provided for @recentlyViewedEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing here yet'**
+  String get recentlyViewedEmptyTitle;
+
+  /// No description provided for @recentlyViewedEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Places you view will appear here.'**
+  String get recentlyViewedEmptyMessage;
+
+  /// No description provided for @recentlyViewedUnknownPlace.
+  ///
+  /// In en, this message translates to:
+  /// **'Place'**
+  String get recentlyViewedUnknownPlace;
+
+  /// No description provided for @recentlyViewedCardSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Open {name}'**
+  String recentlyViewedCardSemantic(String name);
+
+  /// No description provided for @recentlyViewedRatingSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Rated {rating} from {count} reviews'**
+  String recentlyViewedRatingSemantic(String rating, int count);
+
+  /// No description provided for @recentlyViewedRemoveSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {name} from recently viewed'**
+  String recentlyViewedRemoveSemantic(String name);
+
+  /// No description provided for @recentlyViewedClearSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear recently viewed'**
+  String get recentlyViewedClearSemantic;
+
+  /// No description provided for @recentlyViewedClearConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear recently viewed?'**
+  String get recentlyViewedClearConfirmTitle;
+
+  /// No description provided for @recentlyViewedClearConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This removes every place from your recently viewed list.'**
+  String get recentlyViewedClearConfirmMessage;
+
+  /// No description provided for @recentlyViewedClearConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear all'**
+  String get recentlyViewedClearConfirmAction;
+
+  /// No description provided for @recentlyViewedRemoveConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from recently viewed?'**
+  String get recentlyViewedRemoveConfirmTitle;
+
+  /// No description provided for @recentlyViewedRemoveConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {name} from your recently viewed list?'**
+  String recentlyViewedRemoveConfirmMessage(String name);
+
+  /// No description provided for @recentlyViewedRemoveConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get recentlyViewedRemoveConfirmAction;
+
+  /// No description provided for @recentlyViewedClearedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Recently viewed cleared.'**
+  String get recentlyViewedClearedMessage;
+
+  /// No description provided for @recentlyViewedRemovedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed from recently viewed.'**
+  String get recentlyViewedRemovedMessage;
+
+  /// No description provided for @recentlyViewedOpenErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t open this place. Please try again.'**
+  String get recentlyViewedOpenErrorMessage;
+
+  /// No description provided for @recentlyViewedGoneMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This place is no longer available.'**
+  String get recentlyViewedGoneMessage;
+
+  /// No description provided for @recentlyViewedForbiddenMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have permission to do that.'**
+  String get recentlyViewedForbiddenMessage;
+
+  /// No description provided for @recentlyViewedActionErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get recentlyViewedActionErrorMessage;
+
+  /// No description provided for @recentlyViewedNetworkMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t reach the server. Please check your connection and try again.'**
+  String get recentlyViewedNetworkMessage;
 }
 
 class _AppLocalizationsDelegate

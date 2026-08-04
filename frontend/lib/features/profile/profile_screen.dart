@@ -10,6 +10,7 @@ import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/glass_widgets.dart';
 import '../auth/login_screen.dart';
 import '../bookings/my_bookings_screen.dart';
+import '../places/real_recently_viewed_screen.dart';
 import '../rewards/rewards_screen.dart';
 import '../reviews/reviews_screen.dart';
 import '../wallet/travel_wallet_screen.dart';
@@ -173,6 +174,20 @@ class ProfileScreen extends StatelessWidget {
             MaterialPageRoute(builder: (_) => const SavedPlacesScreen()),
           ),
         ),
+        // UI31: real recently-viewed lives on the backend only. Shown in Real
+        // Mode; Demo Mode is byte-identical (no extra card).
+        if (!isDemo)
+          _ProfileNavCard(
+            key: const Key('profile-recently-viewed'),
+            icon: Icons.history_rounded,
+            title: l10n.recentlyViewedTitle,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const RealRecentlyViewedScreen(),
+              ),
+            ),
+          ),
         _ProfileNavCard(
           icon: Icons.notifications_rounded,
           title: l10n.profileNotifications,

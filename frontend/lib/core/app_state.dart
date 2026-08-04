@@ -254,6 +254,17 @@ class AppState extends ChangeNotifier {
   int get realNotificationsUnreadCount =>
       realNotifications.where((n) => !n.read).length;
 
+  // ── Real Mode Recently Viewed (/api/me/recently-viewed, UI-31) ────────────
+  // The customer's real recently-viewed places (server-sorted viewedAt DESC,
+  // capped 50). A 401 never calls logout(). Cleared on logout / mode / user
+  // change via [_resetRealRecentlyViewedState]. Zero HTTP in Demo Mode.
+  List<RecentlyViewedRecord> realRecentlyViewed = [];
+  bool realRecentlyViewedLoading = false;
+  bool realRecentlyViewedLoaded = false;
+  bool realRecentlyViewedRefreshing = false;
+  RecentlyViewedOutcome? realRecentlyViewedError;
+  final Set<int> recentlyViewedActionInFlight = {};
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -347,6 +358,7 @@ class AppState extends ChangeNotifier {
     _resetRealPaymentState();
     _resetRealReviewsState();
     _resetRealNotificationsState();
+    _resetRealRecentlyViewedState();
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -431,6 +443,15 @@ class AppState extends ChangeNotifier {
     realPaymentLoading = false;
     realPaymentSubmitting = false;
     realPaymentError = null;
+  }
+
+  void _resetRealRecentlyViewedState() {
+    realRecentlyViewed = [];
+    realRecentlyViewedLoading = false;
+    realRecentlyViewedLoaded = false;
+    realRecentlyViewedRefreshing = false;
+    realRecentlyViewedError = null;
+    recentlyViewedActionInFlight.clear();
   }
 
   void _resetRealNotificationsState() {
@@ -568,6 +589,7 @@ class AppState extends ChangeNotifier {
     _resetRealPaymentState();
     _resetRealReviewsState();
     _resetRealNotificationsState();
+    _resetRealRecentlyViewedState();
     timeline = [];
     expenses = [];
     demoBookings = [];
@@ -3012,6 +3034,110 @@ class AppState extends ChangeNotifier {
       return RealNotificationOutcome.success;
     }
     final outcome = _mapNotificationError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  RecentlyViewedOutcome _mapRecentlyViewedError(ApiErrorKind? kind) {
+    return switch (kind) {
+      ApiErrorKind.unauthorized => RecentlyViewedOutcome.sessionExpired,
+      ApiErrorKind.forbidden => RecentlyViewedOutcome.forbidden,
+      ApiErrorKind.notFound => RecentlyViewedOutcome.notFound,
+      ApiErrorKind.network => RecentlyViewedOutcome.network,
+      ApiErrorKind.timeout => RecentlyViewedOutcome.network,
+      ApiErrorKind.server => RecentlyViewedOutcome.serverError,
+      _ => RecentlyViewedOutcome.serverError,
+    };
+  }
+
+  /// Loads the user's real recently-viewed places (`GET /api/me/recently-viewed`).
+  /// [refresh] forces a re-fetch and preserves the current list on failure.
+  Future<RecentlyViewedOutcome> loadRealRecentlyViewed({
+    bool refresh = false,
+  }) async {
+    if (demoMode) return RecentlyViewedOutcome.demoUnavailable;
+    if (realRecentlyViewedLoading || realRecentlyViewedRefreshing) {
+      return RecentlyViewedOutcome.success;
+    }
+    if (realRecentlyViewedLoaded && !refresh) {
+      return RecentlyViewedOutcome.success;
+    }
+    if (refresh) {
+      realRecentlyViewedRefreshing = true;
+    } else {
+      realRecentlyViewedLoading = true;
+    }
+    realRecentlyViewedError = null;
+    notifyListeners();
+    final result = await api.getRecentlyViewed();
+    realRecentlyViewedLoading = false;
+    realRecentlyViewedRefreshing = false;
+    if (result.success && result.data != null) {
+      realRecentlyViewed = result.data!;
+      realRecentlyViewedLoaded = true;
+      realRecentlyViewedError = null;
+      notifyListeners();
+      return RecentlyViewedOutcome.success;
+    }
+    final outcome = _mapRecentlyViewedError(result.errorKind);
+    realRecentlyViewedError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Records (or refreshes) a view of a published place
+  /// (`POST /api/me/recently-viewed/{placeId}`). Best-effort — the list is
+  /// invalidated so it re-fetches, but a failure is returned, not surfaced as an
+  /// error state. Zero HTTP in Demo Mode.
+  Future<RecentlyViewedOutcome> recordRealRecentlyView(int placeId) async {
+    if (demoMode) return RecentlyViewedOutcome.demoUnavailable;
+    final result = await api.recordRecentlyView(placeId);
+    if (result.success) {
+      // The list order changed server-side; invalidate for a fresh re-fetch.
+      realRecentlyViewedLoaded = false;
+      return RecentlyViewedOutcome.success;
+    }
+    return _mapRecentlyViewedError(result.errorKind);
+  }
+
+  /// Clears the entire recently-viewed list (`DELETE /api/me/recently-viewed`).
+  Future<RecentlyViewedOutcome> clearRealRecentlyViewed() async {
+    if (demoMode) return RecentlyViewedOutcome.demoUnavailable;
+    if (recentlyViewedActionInFlight.contains(-1)) {
+      return RecentlyViewedOutcome.busy;
+    }
+    recentlyViewedActionInFlight.add(-1);
+    notifyListeners();
+    final result = await api.clearRecentlyViewed();
+    recentlyViewedActionInFlight.remove(-1);
+    if (result.success) {
+      realRecentlyViewed = [];
+      notifyListeners();
+      return RecentlyViewedOutcome.success;
+    }
+    final outcome = _mapRecentlyViewedError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Removes one place from the list (`DELETE /api/me/recently-viewed/{placeId}`)
+  /// and drops it locally only after the server confirms.
+  Future<RecentlyViewedOutcome> removeRealRecentlyViewed(int placeId) async {
+    if (demoMode) return RecentlyViewedOutcome.demoUnavailable;
+    if (recentlyViewedActionInFlight.contains(placeId)) {
+      return RecentlyViewedOutcome.busy;
+    }
+    recentlyViewedActionInFlight.add(placeId);
+    notifyListeners();
+    final result = await api.removeRecentlyViewed(placeId);
+    recentlyViewedActionInFlight.remove(placeId);
+    if (result.success) {
+      realRecentlyViewed =
+          realRecentlyViewed.where((r) => r.placeId != placeId).toList();
+      notifyListeners();
+      return RecentlyViewedOutcome.success;
+    }
+    final outcome = _mapRecentlyViewedError(result.errorKind);
     notifyListeners();
     return outcome;
   }

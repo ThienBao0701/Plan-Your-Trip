@@ -1464,6 +1464,111 @@ class ApiClient {
     }
   }
 
+  // ── Recently Viewed (/api/me/recently-viewed, UI-31) ─────────────────────────
+  // GET returns a WRAPPED object {items:[...]} (not a bare array), server-sorted
+  // viewedAt DESC, capped to 50. Record is a POST; clear/remove are DELETEs (204).
+  // All authenticated, 8s timeout, no retry.
+
+  /// Lists the user's recently viewed places (`GET /api/me/recently-viewed`).
+  Future<CollectionApiResult<List<RecentlyViewedRecord>>>
+      getRecentlyViewed() async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/me/recently-viewed'), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        final items = body?['items'];
+        if (items is! List) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(
+          items
+              .map((e) =>
+                  RecentlyViewedRecord.fromJson(e as Map<String, dynamic>))
+              .toList(),
+        );
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Records (or refreshes) a view of a published place
+  /// (`POST /api/me/recently-viewed/{placeId}`, 201). 422 if the place is not
+  /// published, 404 if it does not exist — surfaced honestly.
+  Future<CollectionApiResult<RecentlyViewedRecord>> recordRecentlyView(
+    int placeId,
+  ) async {
+    try {
+      final res = await _client
+          .post(Uri.parse('$baseUrl/me/recently-viewed/$placeId'),
+              headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RecentlyViewedRecord.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Clears the entire recently-viewed list (`DELETE /api/me/recently-viewed`, 204).
+  Future<CollectionApiVoidResult> clearRecentlyViewed() =>
+      _deleteRecentlyViewed('$baseUrl/me/recently-viewed');
+
+  /// Removes one place from the list
+  /// (`DELETE /api/me/recently-viewed/{placeId}`, 204; 404 if not present).
+  Future<CollectionApiVoidResult> removeRecentlyViewed(int placeId) =>
+      _deleteRecentlyViewed('$baseUrl/me/recently-viewed/$placeId');
+
+  Future<CollectionApiVoidResult> _deleteRecentlyViewed(String url) async {
+    try {
+      final res = await _client
+          .delete(Uri.parse(url), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 204) {
+        return const CollectionApiVoidResult.success();
+      }
+      return CollectionApiVoidResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.network);
+    }
+  }
+
   Map<String, dynamic> _failureForStatus(http.Response res) {
     Map<String, dynamic>? body;
     try {

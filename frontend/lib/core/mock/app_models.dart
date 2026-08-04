@@ -3894,6 +3894,63 @@ enum RealNotificationOutcome {
   serverError,
 }
 
+/// Real-backend mirror of `RecentlyViewedDto.RecentlyViewedItemResponse`
+/// (`GET /api/me/recently-viewed`). One row per (user, place), server-sorted
+/// viewedAt DESC and capped to 50. `Map` decoding is confined to [fromJson].
+class RecentlyViewedRecord {
+  final int placeId;
+  final String name;
+  final String? slug;
+  final String? categoryName;
+  final String? address;
+  final String? shortDescription;
+  final double ratingAvg;
+  final int reviewCount;
+  final DateTime? viewedAt;
+
+  const RecentlyViewedRecord({
+    required this.placeId,
+    this.name = '',
+    this.slug,
+    this.categoryName,
+    this.address,
+    this.shortDescription,
+    this.ratingAvg = 0,
+    this.reviewCount = 0,
+    this.viewedAt,
+  });
+
+  factory RecentlyViewedRecord.fromJson(Map<String, dynamic> json) {
+    return RecentlyViewedRecord(
+      placeId: (json['placeId'] as num?)?.toInt() ?? 0,
+      name: (json['name'] as String?) ?? '',
+      slug: json['slug'] as String?,
+      categoryName: json['categoryName'] as String?,
+      address: json['address'] as String?,
+      shortDescription: json['shortDescription'] as String?,
+      ratingAvg: (json['ratingAvg'] as num?)?.toDouble() ?? 0,
+      reviewCount: (json['reviewCount'] as num?)?.toInt() ?? 0,
+      viewedAt: _tryParseDate(json['viewedAt']),
+    );
+  }
+}
+
+/// Outcome of a real recently-viewed action (`GET /api/me/recently-viewed`, the
+/// record POST, and the clear / remove DELETEs). [demoUnavailable] is the Demo
+/// Mode guard (zero HTTP); [busy] the single-flight guard; [sessionExpired] (401)
+/// never triggers auto-logout; [forbidden] 403, [notFound] 404, [serverError]
+/// 5xx, [network] transport/timeout.
+enum RecentlyViewedOutcome {
+  success,
+  demoUnavailable,
+  busy,
+  sessionExpired,
+  forbidden,
+  notFound,
+  network,
+  serverError,
+}
+
 class DemoBooking {
   final String code;
   final String ownerUserId;

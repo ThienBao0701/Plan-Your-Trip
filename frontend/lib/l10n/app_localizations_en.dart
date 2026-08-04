@@ -6905,4 +6905,87 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get notificationActionNetworkMessage =>
       'We couldn\'t reach the server. Please check your connection and try again.';
+
+  @override
+  String get recentlyViewedTitle => 'Recently viewed';
+
+  @override
+  String get recentlyViewedLoadingMessage => 'Loading recently viewed…';
+
+  @override
+  String get recentlyViewedErrorMessage =>
+      'We couldn\'t load your recently viewed places. Please try again.';
+
+  @override
+  String get recentlyViewedEmptyTitle => 'Nothing here yet';
+
+  @override
+  String get recentlyViewedEmptyMessage => 'Places you view will appear here.';
+
+  @override
+  String get recentlyViewedUnknownPlace => 'Place';
+
+  @override
+  String recentlyViewedCardSemantic(String name) {
+    return 'Open $name';
+  }
+
+  @override
+  String recentlyViewedRatingSemantic(String rating, int count) {
+    return 'Rated $rating from $count reviews';
+  }
+
+  @override
+  String recentlyViewedRemoveSemantic(String name) {
+    return 'Remove $name from recently viewed';
+  }
+
+  @override
+  String get recentlyViewedClearSemantic => 'Clear recently viewed';
+
+  @override
+  String get recentlyViewedClearConfirmTitle => 'Clear recently viewed?';
+
+  @override
+  String get recentlyViewedClearConfirmMessage =>
+      'This removes every place from your recently viewed list.';
+
+  @override
+  String get recentlyViewedClearConfirmAction => 'Clear all';
+
+  @override
+  String get recentlyViewedRemoveConfirmTitle => 'Remove from recently viewed?';
+
+  @override
+  String recentlyViewedRemoveConfirmMessage(String name) {
+    return 'Remove $name from your recently viewed list?';
+  }
+
+  @override
+  String get recentlyViewedRemoveConfirmAction => 'Remove';
+
+  @override
+  String get recentlyViewedClearedMessage => 'Recently viewed cleared.';
+
+  @override
+  String get recentlyViewedRemovedMessage => 'Removed from recently viewed.';
+
+  @override
+  String get recentlyViewedOpenErrorMessage =>
+      'We couldn\'t open this place. Please try again.';
+
+  @override
+  String get recentlyViewedGoneMessage => 'This place is no longer available.';
+
+  @override
+  String get recentlyViewedForbiddenMessage =>
+      'You don\'t have permission to do that.';
+
+  @override
+  String get recentlyViewedActionErrorMessage =>
+      'Something went wrong. Please try again.';
+
+  @override
+  String get recentlyViewedNetworkMessage =>
+      'We couldn\'t reach the server. Please check your connection and try again.';
 }
