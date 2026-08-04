@@ -339,6 +339,23 @@ class AppState extends ChangeNotifier {
   bool get realTravelCreditTxHasMore =>
       realTravelCreditTxPage + 1 < realTravelCreditTxTotalPages;
 
+  // ── Real Mode Membership (/api/me/membership, UI-36) ──────────────────────
+  // The customer's membership: live progress (works pre-enrollment), the
+  // membership row (null = never enrolled, a valid state), benefit metadata, tier
+  // history, plus an idempotent enroll action. A 401 never calls logout(). Cleared
+  // on logout / mode / user change via [_resetRealMembershipState]. Zero HTTP in
+  // Demo Mode.
+  RealMembership? realMembership;
+  bool realMembershipEnrolled = false;
+  RealMembershipProgress? realMembershipProgress;
+  List<RealMembershipBenefit> realMembershipBenefits = [];
+  List<RealMembershipHistoryItem> realMembershipHistory = [];
+  bool realMembershipLoading = false;
+  bool realMembershipLoaded = false;
+  bool realMembershipRefreshing = false;
+  bool realMembershipEnrolling = false;
+  MembershipOutcome? realMembershipError;
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -437,6 +454,7 @@ class AppState extends ChangeNotifier {
     _resetRealGiftCardsState();
     _resetRealLoyaltyState();
     _resetRealTravelCreditState();
+    _resetRealMembershipState();
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -586,6 +604,19 @@ class AppState extends ChangeNotifier {
     realTravelCreditTxLoadingMore = false;
   }
 
+  void _resetRealMembershipState() {
+    realMembership = null;
+    realMembershipEnrolled = false;
+    realMembershipProgress = null;
+    realMembershipBenefits = [];
+    realMembershipHistory = [];
+    realMembershipLoading = false;
+    realMembershipLoaded = false;
+    realMembershipRefreshing = false;
+    realMembershipEnrolling = false;
+    realMembershipError = null;
+  }
+
   void _resetRealNotificationsState() {
     realNotifications = [];
     realNotificationsLoading = false;
@@ -726,6 +757,7 @@ class AppState extends ChangeNotifier {
     _resetRealGiftCardsState();
     _resetRealLoyaltyState();
     _resetRealTravelCreditState();
+    _resetRealMembershipState();
     timeline = [];
     expenses = [];
     demoBookings = [];
@@ -3731,6 +3763,107 @@ class AppState extends ChangeNotifier {
       return TravelCreditOutcome.success;
     }
     final outcome = _mapTravelCreditError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  // ── Real Mode Membership (UI-36) ─────────────────────────────────────────
+
+  MembershipOutcome _mapMembershipError(ApiErrorKind? kind) {
+    return switch (kind) {
+      ApiErrorKind.unauthorized => MembershipOutcome.sessionExpired,
+      ApiErrorKind.forbidden => MembershipOutcome.forbidden,
+      ApiErrorKind.notFound => MembershipOutcome.notFound,
+      ApiErrorKind.validation => MembershipOutcome.validation,
+      ApiErrorKind.unprocessable => MembershipOutcome.validation,
+      ApiErrorKind.network => MembershipOutcome.network,
+      ApiErrorKind.timeout => MembershipOutcome.network,
+      ApiErrorKind.server => MembershipOutcome.serverError,
+      _ => MembershipOutcome.serverError,
+    };
+  }
+
+  /// Loads the customer's membership surface: live progress + benefits + history
+  /// (all always available), plus the membership row (a 404 is tolerated as the
+  /// "never enrolled" state, not an error). Commits atomically; on failure the
+  /// prior state is preserved. [refresh] forces a re-fetch. Zero HTTP in Demo Mode.
+  Future<MembershipOutcome> loadRealMembership({bool refresh = false}) async {
+    if (demoMode) return MembershipOutcome.demoUnavailable;
+    if (realMembershipLoading || realMembershipRefreshing) {
+      return MembershipOutcome.success;
+    }
+    if (realMembershipLoaded && !refresh) return MembershipOutcome.success;
+    if (refresh) {
+      realMembershipRefreshing = true;
+    } else {
+      realMembershipLoading = true;
+    }
+    realMembershipError = null;
+    notifyListeners();
+
+    MembershipOutcome fail(ApiErrorKind? kind) {
+      realMembershipLoading = false;
+      realMembershipRefreshing = false;
+      final outcome = _mapMembershipError(kind);
+      realMembershipError = outcome;
+      notifyListeners();
+      return outcome;
+    }
+
+    final progressResult = await api.getMembershipProgress();
+    if (!progressResult.success || progressResult.data == null) {
+      return fail(progressResult.errorKind);
+    }
+    // Membership row: 404 = never enrolled (a valid state), any other error fails.
+    final membershipResult = await api.getMembership();
+    RealMembership? membership;
+    var enrolled = false;
+    if (membershipResult.success && membershipResult.data != null) {
+      membership = membershipResult.data!;
+      enrolled = true;
+    } else if (membershipResult.errorKind != ApiErrorKind.notFound) {
+      return fail(membershipResult.errorKind);
+    }
+    final benefitsResult = await api.getMembershipBenefits();
+    if (!benefitsResult.success || benefitsResult.data == null) {
+      return fail(benefitsResult.errorKind);
+    }
+    final historyResult = await api.getMembershipHistory();
+    if (!historyResult.success || historyResult.data == null) {
+      return fail(historyResult.errorKind);
+    }
+
+    realMembershipLoading = false;
+    realMembershipRefreshing = false;
+    realMembershipProgress = progressResult.data!;
+    realMembership = membership;
+    realMembershipEnrolled = enrolled;
+    realMembershipBenefits = benefitsResult.data!;
+    realMembershipHistory = historyResult.data!;
+    realMembershipLoaded = true;
+    realMembershipError = null;
+    notifyListeners();
+    return MembershipOutcome.success;
+  }
+
+  /// Enrolls the customer in membership (`POST /api/me/membership/enroll`,
+  /// idempotent). On success reloads the membership surface. A 400 (no active
+  /// loyalty account) surfaces as [MembershipOutcome.validation].
+  Future<MembershipOutcome> enrollRealMembership() async {
+    if (demoMode) return MembershipOutcome.demoUnavailable;
+    if (realMembershipEnrolling) return MembershipOutcome.busy;
+    realMembershipEnrolling = true;
+    notifyListeners();
+    final result = await api.enrollMembership();
+    realMembershipEnrolling = false;
+    if (result.success && result.data != null) {
+      realMembership = result.data!;
+      realMembershipEnrolled = true;
+      notifyListeners();
+      await loadRealMembership(refresh: true);
+      return MembershipOutcome.success;
+    }
+    final outcome = _mapMembershipError(result.errorKind);
     notifyListeners();
     return outcome;
   }

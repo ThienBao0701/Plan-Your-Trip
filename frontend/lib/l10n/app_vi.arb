@@ -3618,5 +3618,28 @@
   "loyaltyRealEarnNote": "Điểm được tích lũy tự động từ các đặt phòng và đánh giá đã hoàn tất. Không thể quy đổi trực tiếp tại đây.",
   "travelCreditRealLoadingMessage": "Đang tải tín dụng du lịch của bạn…",
   "travelCreditRealErrorMessage": "Không thể tải tín dụng du lịch. Vui lòng thử lại.",
-  "travelCreditRealLoadMore": "Tải thêm"
+  "travelCreditRealLoadMore": "Tải thêm",
+  "membershipRealLoadingMessage": "Đang tải hạng thành viên của bạn…",
+  "membershipRealErrorMessage": "Không thể tải hạng thành viên. Vui lòng thử lại.",
+  "membershipRealActiveMessage": "Hạng thành viên của bạn đang hoạt động.",
+  "membershipRealPreviewMessage": "Đây là bản xem trước hạng bạn đủ điều kiện. Đăng ký để kích hoạt.",
+  "membershipRealEnrollAction": "Đăng ký ngay",
+  "membershipRealEnrolledAction": "Đã đăng ký",
+  "membershipRealEnrollSemantic": "Đăng ký hạng thành viên",
+  "membershipRealEnrollSuccess": "Bạn đã đăng ký hạng thành viên.",
+  "membershipRealEnrollError": "Không thể đăng ký. Vui lòng thử lại.",
+  "membershipRealEnrollNeedsLoyalty": "Cần có tài khoản điểm thưởng đang hoạt động để đăng ký hạng thành viên.",
+  "membershipRealNoBenefits": "Chưa có quyền lợi nào cho hạng này.",
+  "membershipRealPointsToNext": "Cần thêm {points} điểm để lên hạng tiếp theo",
+  "@membershipRealPointsToNext": {
+    "placeholders": {
+      "points": { "type": "int" }
+    }
+  },
+  "membershipRealBookingsToNext": "Cần thêm {bookings} lượt đặt hoàn tất để lên hạng tiếp theo",
+  "@membershipRealBookingsToNext": {
+    "placeholders": {
+      "bookings": { "type": "int" }
+    }
+  }
 }

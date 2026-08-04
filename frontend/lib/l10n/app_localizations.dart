@@ -12201,6 +12201,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Load more'**
   String get travelCreditRealLoadMore;
+
+  /// No description provided for @membershipRealLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading your membership…'**
+  String get membershipRealLoadingMessage;
+
+  /// No description provided for @membershipRealErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load your membership. Please try again.'**
+  String get membershipRealErrorMessage;
+
+  /// No description provided for @membershipRealActiveMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your membership is active.'**
+  String get membershipRealActiveMessage;
+
+  /// No description provided for @membershipRealPreviewMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This is a live preview of the tier you qualify for. Enroll to activate it.'**
+  String get membershipRealPreviewMessage;
+
+  /// No description provided for @membershipRealEnrollAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Enroll now'**
+  String get membershipRealEnrollAction;
+
+  /// No description provided for @membershipRealEnrolledAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Enrolled'**
+  String get membershipRealEnrolledAction;
+
+  /// No description provided for @membershipRealEnrollSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Enroll in membership'**
+  String get membershipRealEnrollSemantic;
+
+  /// No description provided for @membershipRealEnrollSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re enrolled in membership.'**
+  String get membershipRealEnrollSuccess;
+
+  /// No description provided for @membershipRealEnrollError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t enroll you. Please try again.'**
+  String get membershipRealEnrollError;
+
+  /// No description provided for @membershipRealEnrollNeedsLoyalty.
+  ///
+  /// In en, this message translates to:
+  /// **'An active loyalty account is required to enroll in membership.'**
+  String get membershipRealEnrollNeedsLoyalty;
+
+  /// No description provided for @membershipRealNoBenefits.
+  ///
+  /// In en, this message translates to:
+  /// **'No benefits are listed for this tier yet.'**
+  String get membershipRealNoBenefits;
+
+  /// No description provided for @membershipRealPointsToNext.
+  ///
+  /// In en, this message translates to:
+  /// **'{points} more points to the next tier'**
+  String membershipRealPointsToNext(int points);
+
+  /// No description provided for @membershipRealBookingsToNext.
+  ///
+  /// In en, this message translates to:
+  /// **'{bookings} more completed bookings to the next tier'**
+  String membershipRealBookingsToNext(int bookings);
 }
 
 class _AppLocalizationsDelegate

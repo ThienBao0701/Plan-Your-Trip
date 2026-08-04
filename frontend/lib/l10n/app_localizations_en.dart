@@ -7170,4 +7170,52 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get travelCreditRealLoadMore => 'Load more';
+
+  @override
+  String get membershipRealLoadingMessage => 'Loading your membership…';
+
+  @override
+  String get membershipRealErrorMessage =>
+      'We couldn\'t load your membership. Please try again.';
+
+  @override
+  String get membershipRealActiveMessage => 'Your membership is active.';
+
+  @override
+  String get membershipRealPreviewMessage =>
+      'This is a live preview of the tier you qualify for. Enroll to activate it.';
+
+  @override
+  String get membershipRealEnrollAction => 'Enroll now';
+
+  @override
+  String get membershipRealEnrolledAction => 'Enrolled';
+
+  @override
+  String get membershipRealEnrollSemantic => 'Enroll in membership';
+
+  @override
+  String get membershipRealEnrollSuccess => 'You\'re enrolled in membership.';
+
+  @override
+  String get membershipRealEnrollError =>
+      'We couldn\'t enroll you. Please try again.';
+
+  @override
+  String get membershipRealEnrollNeedsLoyalty =>
+      'An active loyalty account is required to enroll in membership.';
+
+  @override
+  String get membershipRealNoBenefits =>
+      'No benefits are listed for this tier yet.';
+
+  @override
+  String membershipRealPointsToNext(int points) {
+    return '$points more points to the next tier';
+  }
+
+  @override
+  String membershipRealBookingsToNext(int bookings) {
+    return '$bookings more completed bookings to the next tier';
+  }
 }

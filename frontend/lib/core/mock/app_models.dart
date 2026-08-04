@@ -4704,6 +4704,276 @@ enum TravelCreditOutcome {
   serverError,
 }
 
+/// Maps a backend `MembershipTier` wire string to the existing demo
+/// [MembershipTier] enum (reusing its label). Null for any unrecognised code.
+MembershipTier? membershipTierFromCode(String? code) {
+  switch (code) {
+    case 'BRONZE':
+      return MembershipTier.bronze;
+    case 'SILVER':
+      return MembershipTier.silver;
+    case 'GOLD':
+      return MembershipTier.gold;
+    case 'PLATINUM':
+      return MembershipTier.platinum;
+    case 'DIAMOND':
+      return MembershipTier.diamond;
+    default:
+      return null;
+  }
+}
+
+/// Maps a backend `MembershipBenefitType` wire string to the existing demo
+/// [MembershipBenefitType] enum (reusing its label). Null for any unrecognised
+/// code.
+MembershipBenefitType? membershipBenefitTypeFromCode(String? code) {
+  switch (code) {
+    case 'POINTS_MULTIPLIER':
+      return MembershipBenefitType.pointsMultiplier;
+    case 'MEMBER_ONLY_COUPONS':
+      return MembershipBenefitType.memberOnlyCoupons;
+    case 'PRIORITY_SUPPORT':
+      return MembershipBenefitType.prioritySupport;
+    case 'EARLY_ACCESS':
+      return MembershipBenefitType.earlyAccess;
+    case 'LATE_CHECKOUT':
+      return MembershipBenefitType.lateCheckout;
+    case 'EARLY_CHECKIN':
+      return MembershipBenefitType.earlyCheckin;
+    case 'ROOM_UPGRADE':
+      return MembershipBenefitType.roomUpgrade;
+    case 'FREE_BREAKFAST':
+      return MembershipBenefitType.freeBreakfast;
+    case 'AIRPORT_TRANSFER':
+      return MembershipBenefitType.airportTransfer;
+    case 'CUSTOM':
+      return MembershipBenefitType.custom;
+    default:
+      return null;
+  }
+}
+
+/// Real-backend mirror of `MembershipDto.CustomerMembershipResponse`
+/// (`GET`/`POST /api/me/membership`). `currentTier` is stored;
+/// `effectiveTier` accounts for expiry. Tiers are kept raw with view getters.
+/// `Map` decoding is confined to [fromJson].
+class RealMembership {
+  final int id;
+  final int userId;
+  final String currentTier;
+  final String effectiveTier;
+  final DateTime? qualifiedAt;
+  final DateTime? validFrom;
+  final DateTime? validUntil;
+  final bool manuallyAssigned;
+  final bool active;
+  final bool expired;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+
+  const RealMembership({
+    this.id = 0,
+    this.userId = 0,
+    this.currentTier = '',
+    this.effectiveTier = '',
+    this.qualifiedAt,
+    this.validFrom,
+    this.validUntil,
+    this.manuallyAssigned = false,
+    this.active = false,
+    this.expired = false,
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  MembershipTier? get currentTierView => membershipTierFromCode(currentTier);
+  MembershipTier? get effectiveTierView =>
+      membershipTierFromCode(effectiveTier);
+
+  factory RealMembership.fromJson(Map<String, dynamic> json) {
+    return RealMembership(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      userId: (json['userId'] as num?)?.toInt() ?? 0,
+      currentTier: (json['currentTier'] as String?) ?? '',
+      effectiveTier: (json['effectiveTier'] as String?) ?? '',
+      qualifiedAt: _tryParseDate(json['qualifiedAt']),
+      validFrom: _tryParseDate(json['validFrom']),
+      validUntil: _tryParseDate(json['validUntil']),
+      manuallyAssigned: (json['manuallyAssigned'] as bool?) ?? false,
+      active: (json['active'] as bool?) ?? false,
+      expired: (json['expired'] as bool?) ?? false,
+      createdAt: _tryParseDate(json['createdAt']),
+      updatedAt: _tryParseDate(json['updatedAt']),
+    );
+  }
+}
+
+/// Real-backend mirror of `MembershipDto.MembershipProgressResponse`
+/// (`GET /api/me/membership/progress`, a live preview that works even before
+/// enrolling). `progressPercentage` is bounded [0,100] by the backend.
+class RealMembershipProgress {
+  final String currentTier;
+  final String effectiveTier;
+  final int lifetimePointsEarned;
+  final int completedBookings;
+  final String? nextTier;
+  final int? pointsRequiredForNextTier;
+  final int? bookingsRequiredForNextTier;
+  final double progressPercentage;
+  final DateTime? validUntil;
+  final bool expired;
+  final bool manuallyAssigned;
+
+  const RealMembershipProgress({
+    this.currentTier = '',
+    this.effectiveTier = '',
+    this.lifetimePointsEarned = 0,
+    this.completedBookings = 0,
+    this.nextTier,
+    this.pointsRequiredForNextTier,
+    this.bookingsRequiredForNextTier,
+    this.progressPercentage = 0,
+    this.validUntil,
+    this.expired = false,
+    this.manuallyAssigned = false,
+  });
+
+  MembershipTier? get effectiveTierView =>
+      membershipTierFromCode(effectiveTier);
+  MembershipTier? get nextTierView => membershipTierFromCode(nextTier);
+  int get clampedProgress => progressPercentage.round().clamp(0, 100);
+  bool get isHighestTier => nextTier == null;
+
+  factory RealMembershipProgress.fromJson(Map<String, dynamic> json) {
+    return RealMembershipProgress(
+      currentTier: (json['currentTier'] as String?) ?? '',
+      effectiveTier: (json['effectiveTier'] as String?) ?? '',
+      lifetimePointsEarned:
+          (json['lifetimePointsEarned'] as num?)?.toInt() ?? 0,
+      completedBookings: (json['completedBookings'] as num?)?.toInt() ?? 0,
+      nextTier: json['nextTier'] as String?,
+      pointsRequiredForNextTier:
+          (json['pointsRequiredForNextTier'] as num?)?.toInt(),
+      bookingsRequiredForNextTier:
+          (json['bookingsRequiredForNextTier'] as num?)?.toInt(),
+      progressPercentage: (json['progressPercentage'] as num?)?.toDouble() ?? 0,
+      validUntil: _tryParseDate(json['validUntil']),
+      expired: (json['expired'] as bool?) ?? false,
+      manuallyAssigned: (json['manuallyAssigned'] as bool?) ?? false,
+    );
+  }
+}
+
+/// Real-backend mirror of `MembershipDto.MembershipBenefitResponse`
+/// (`GET /api/me/membership/benefits`, metadata for the effective tier).
+class RealMembershipBenefit {
+  final int id;
+  final String tier;
+  final String benefitType;
+  final String name;
+  final String description;
+  final double? numericValue;
+  final String? textValue;
+  final bool active;
+  final int sortOrder;
+
+  const RealMembershipBenefit({
+    this.id = 0,
+    this.tier = '',
+    this.benefitType = '',
+    this.name = '',
+    this.description = '',
+    this.numericValue,
+    this.textValue,
+    this.active = false,
+    this.sortOrder = 0,
+  });
+
+  MembershipTier? get tierView => membershipTierFromCode(tier);
+  MembershipBenefitType? get benefitTypeView =>
+      membershipBenefitTypeFromCode(benefitType);
+
+  factory RealMembershipBenefit.fromJson(Map<String, dynamic> json) {
+    return RealMembershipBenefit(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      tier: (json['tier'] as String?) ?? '',
+      benefitType: (json['benefitType'] as String?) ?? '',
+      name: (json['name'] as String?) ?? '',
+      description: (json['description'] as String?) ?? '',
+      numericValue: (json['numericValue'] as num?)?.toDouble(),
+      textValue: json['textValue'] as String?,
+      active: (json['active'] as bool?) ?? false,
+      sortOrder: (json['sortOrder'] as num?)?.toInt() ?? 0,
+    );
+  }
+}
+
+/// Real-backend mirror of `MembershipDto.MembershipTierHistoryResponse`
+/// (`GET /api/me/membership/history`, newest first, immutable).
+class RealMembershipHistoryItem {
+  final int id;
+  final int membershipId;
+  final String? previousTier;
+  final String newTier;
+  final String changeType;
+  final String reason;
+  final DateTime? effectiveAt;
+  final DateTime? expiresAt;
+  final String? referenceType;
+  final int? referenceId;
+  final DateTime? createdAt;
+
+  const RealMembershipHistoryItem({
+    required this.id,
+    this.membershipId = 0,
+    this.previousTier,
+    this.newTier = '',
+    this.changeType = '',
+    this.reason = '',
+    this.effectiveAt,
+    this.expiresAt,
+    this.referenceType,
+    this.referenceId,
+    this.createdAt,
+  });
+
+  MembershipTier? get newTierView => membershipTierFromCode(newTier);
+
+  factory RealMembershipHistoryItem.fromJson(Map<String, dynamic> json) {
+    return RealMembershipHistoryItem(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      membershipId: (json['membershipId'] as num?)?.toInt() ?? 0,
+      previousTier: json['previousTier'] as String?,
+      newTier: (json['newTier'] as String?) ?? '',
+      changeType: (json['changeType'] as String?) ?? '',
+      reason: (json['reason'] as String?) ?? '',
+      effectiveAt: _tryParseDate(json['effectiveAt']),
+      expiresAt: _tryParseDate(json['expiresAt']),
+      referenceType: json['referenceType'] as String?,
+      referenceId: (json['referenceId'] as num?)?.toInt(),
+      createdAt: _tryParseDate(json['createdAt']),
+    );
+  }
+}
+
+/// Outcome of a real membership action (`GET /api/me/membership[/progress|
+/// /benefits|/history]`, `POST /enroll`). [demoUnavailable] is the Demo Mode
+/// guard (zero HTTP); [busy] the single-flight guard; [sessionExpired] (401)
+/// never triggers auto-logout; [validation] 400 (e.g. enroll needs an active
+/// loyalty account); [forbidden] 403, [notFound] 404, [serverError] 5xx,
+/// [network] transport/timeout.
+enum MembershipOutcome {
+  success,
+  demoUnavailable,
+  busy,
+  sessionExpired,
+  validation,
+  forbidden,
+  notFound,
+  network,
+  serverError,
+}
+
 class DemoBooking {
   final String code;
   final String ownerUserId;

@@ -7004,4 +7004,53 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get travelCreditRealLoadMore => 'Tải thêm';
+
+  @override
+  String get membershipRealLoadingMessage =>
+      'Đang tải hạng thành viên của bạn…';
+
+  @override
+  String get membershipRealErrorMessage =>
+      'Không thể tải hạng thành viên. Vui lòng thử lại.';
+
+  @override
+  String get membershipRealActiveMessage =>
+      'Hạng thành viên của bạn đang hoạt động.';
+
+  @override
+  String get membershipRealPreviewMessage =>
+      'Đây là bản xem trước hạng bạn đủ điều kiện. Đăng ký để kích hoạt.';
+
+  @override
+  String get membershipRealEnrollAction => 'Đăng ký ngay';
+
+  @override
+  String get membershipRealEnrolledAction => 'Đã đăng ký';
+
+  @override
+  String get membershipRealEnrollSemantic => 'Đăng ký hạng thành viên';
+
+  @override
+  String get membershipRealEnrollSuccess => 'Bạn đã đăng ký hạng thành viên.';
+
+  @override
+  String get membershipRealEnrollError =>
+      'Không thể đăng ký. Vui lòng thử lại.';
+
+  @override
+  String get membershipRealEnrollNeedsLoyalty =>
+      'Cần có tài khoản điểm thưởng đang hoạt động để đăng ký hạng thành viên.';
+
+  @override
+  String get membershipRealNoBenefits => 'Chưa có quyền lợi nào cho hạng này.';
+
+  @override
+  String membershipRealPointsToNext(int points) {
+    return 'Cần thêm $points điểm để lên hạng tiếp theo';
+  }
+
+  @override
+  String membershipRealBookingsToNext(int bookings) {
+    return 'Cần thêm $bookings lượt đặt hoàn tất để lên hạng tiếp theo';
+  }
 }

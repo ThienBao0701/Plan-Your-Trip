@@ -301,6 +301,316 @@ class LoyaltyScreen extends StatelessWidget {
   }
 }
 
+/// UI36 — Real Mode membership (`GET /api/me/membership[/progress|/benefits|
+/// /history]`, `POST /enroll`). Live progress + tier + benefits + history, plus an
+/// idempotent enroll action. Rendered inside the existing Membership scaffold,
+/// replacing the real-mode placeholder. A 401 never logs the user out.
+class _RealMembershipBody extends StatefulWidget {
+  const _RealMembershipBody();
+
+  @override
+  State<_RealMembershipBody> createState() => _RealMembershipBodyState();
+}
+
+class _RealMembershipBodyState extends State<_RealMembershipBody> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) AppScope.of(context).loadRealMembership();
+    });
+  }
+
+  void _reauth() {
+    showOceanSessionExpiredSheet(
+      context,
+      onLogin: () {
+        Navigator.of(context).pop();
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+        );
+      },
+      onReturnHome: () => Navigator.of(context).pop(),
+    );
+  }
+
+  Future<void> _enroll(AppState app) async {
+    final l10n = AppLocalizations.of(context)!;
+    final outcome = await app.enrollRealMembership();
+    if (!mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    void snack(String m) => messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(m)));
+    switch (outcome) {
+      case MembershipOutcome.success:
+        snack(l10n.membershipRealEnrollSuccess);
+      case MembershipOutcome.sessionExpired:
+        _reauth();
+      case MembershipOutcome.validation:
+        snack(l10n.membershipRealEnrollNeedsLoyalty);
+      case MembershipOutcome.busy:
+        break;
+      default:
+        snack(l10n.membershipRealEnrollError);
+    }
+  }
+
+  String _tierText(AppLocalizations l10n, MembershipTier? tier, String raw) =>
+      tier != null ? membershipTierLabel(l10n, tier) : raw;
+
+  @override
+  Widget build(BuildContext context) {
+    final app = AppScope.of(context);
+    final l10n = AppLocalizations.of(context)!;
+
+    if (app.realMembershipError == MembershipOutcome.sessionExpired &&
+        !app.realMembershipLoaded) {
+      return OceanSessionExpiredState(
+        key: const Key('membership-session-expired'),
+        onLogin: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+        ),
+        onReturnHome: () => Navigator.maybePop(context),
+      );
+    }
+    if (app.realMembershipLoading && !app.realMembershipLoaded) {
+      return Semantics(
+        liveRegion: true,
+        label: l10n.membershipRealLoadingMessage,
+        child: Column(
+          children: [
+            const SizedBox(height: AppSpacing.xxl),
+            const CircularProgressIndicator(key: Key('membership-loading')),
+            const SizedBox(height: AppSpacing.md),
+            Text(l10n.membershipRealLoadingMessage),
+          ],
+        ),
+      );
+    }
+    if (app.realMembershipError != null && !app.realMembershipLoaded) {
+      return OceanRecoverableErrorState(
+        key: const Key('membership-error'),
+        message: l10n.membershipRealErrorMessage,
+        onReload: () => app.loadRealMembership(refresh: true),
+      );
+    }
+
+    final progress = app.realMembershipProgress;
+    if (progress == null) {
+      return const Padding(
+        padding: EdgeInsets.all(AppSpacing.xxl),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+    final membership = app.realMembership;
+    final enrolled = app.realMembershipEnrolled;
+    final active =
+        membership != null && membership.active && !membership.expired;
+    final displayTier = active
+        ? _tierText(
+            l10n, membership.effectiveTierView, membership.effectiveTier)
+        : _tierText(l10n, progress.effectiveTierView, progress.effectiveTier);
+
+    return Column(
+      key: const Key('membership-content'),
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        OceanGlassCard(
+          semanticLabel: l10n.membershipTierSemantic,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Wrap(
+                spacing: AppSpacing.sm,
+                runSpacing: AppSpacing.sm,
+                children: [
+                  OceanStatusPill(
+                    label: active
+                        ? l10n.membershipActiveStatus
+                        : l10n.membershipPreviewStatus,
+                    icon: active
+                        ? Icons.verified_rounded
+                        : Icons.visibility_rounded,
+                    color: active ? AppColors.success : AppColors.ocean,
+                  ),
+                  if (membership != null && membership.expired)
+                    OceanStatusPill(
+                      label: l10n.membershipExpiredStatus,
+                      icon: Icons.timer_off_rounded,
+                      color: AppColors.danger,
+                    ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                displayTier,
+                style: Theme.of(context).textTheme.displaySmall,
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                active
+                    ? l10n.membershipRealActiveMessage
+                    : l10n.membershipRealPreviewMessage,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Semantics(
+                container: true,
+                label:
+                    l10n.membershipProgressSemantic(progress.clampedProgress),
+                excludeSemantics: true,
+                child: LinearProgressIndicator(
+                  key: const Key('membership-progress'),
+                  minHeight: 10,
+                  value: progress.clampedProgress / 100,
+                  backgroundColor: AppColors.mist,
+                  color: AppColors.ocean,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                progress.isHighestTier
+                    ? l10n.membershipHighestTier
+                    : l10n.membershipNextTier(
+                        _tierText(l10n, progress.nextTierView,
+                            progress.nextTier ?? ''),
+                      ),
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              if (!progress.isHighestTier) ...[
+                if ((progress.pointsRequiredForNextTier ?? 0) > 0)
+                  Text(
+                    l10n.membershipRealPointsToNext(
+                        progress.pointsRequiredForNextTier!),
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                if ((progress.bookingsRequiredForNextTier ?? 0) > 0)
+                  Text(
+                    l10n.membershipRealBookingsToNext(
+                        progress.bookingsRequiredForNextTier!),
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+              ],
+            ],
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        OceanPrimaryButton(
+          key: const Key('membership-enroll'),
+          label: enrolled
+              ? l10n.membershipRealEnrolledAction
+              : l10n.membershipRealEnrollAction,
+          icon: Icons.workspace_premium_rounded,
+          semanticLabel: l10n.membershipRealEnrollSemantic,
+          onPressed: (enrolled || app.realMembershipEnrolling)
+              ? null
+              : () => _enroll(app),
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        _SectionTitle(l10n.membershipBenefitsTitle),
+        const SizedBox(height: AppSpacing.sm),
+        if (app.realMembershipBenefits.isEmpty)
+          Text(
+            l10n.membershipRealNoBenefits,
+            key: const Key('membership-benefits-empty'),
+            style: Theme.of(context).textTheme.bodyMedium,
+          )
+        else
+          for (final benefit in app.realMembershipBenefits)
+            _RealBenefitTile(benefit: benefit),
+        const SizedBox(height: AppSpacing.lg),
+        _SectionTitle(l10n.membershipHistoryTitle),
+        const SizedBox(height: AppSpacing.sm),
+        if (app.realMembershipHistory.isEmpty)
+          Text(
+            l10n.rewardsHistoryEmptyMessage,
+            key: const Key('membership-history-empty'),
+            style: Theme.of(context).textTheme.bodyMedium,
+          )
+        else
+          for (final item in app.realMembershipHistory)
+            _RealMembershipHistoryTile(item: item),
+      ],
+    );
+  }
+}
+
+class _RealBenefitTile extends StatelessWidget {
+  final RealMembershipBenefit benefit;
+
+  const _RealBenefitTile({required this.benefit});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final tierView = benefit.tierView;
+    final typeView = benefit.benefitTypeView;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+      child: OceanGlassSurface(
+        blur: 0,
+        color: AppColors.surfaceOverlay,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Wrap(
+              spacing: AppSpacing.xs,
+              runSpacing: AppSpacing.xs,
+              children: [
+                OceanStatusPill(
+                  label: tierView != null
+                      ? membershipTierLabel(l10n, tierView)
+                      : benefit.tier,
+                  icon: Icons.workspace_premium_rounded,
+                ),
+                OceanStatusPill(
+                  label: typeView != null
+                      ? membershipBenefitTypeLabel(l10n, typeView)
+                      : benefit.benefitType,
+                  icon: Icons.info_outline_rounded,
+                  color: AppColors.turquoise600,
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(benefit.name, style: Theme.of(context).textTheme.titleMedium),
+            if (benefit.description.isNotEmpty) ...[
+              const SizedBox(height: AppSpacing.xxs),
+              Text(benefit.description,
+                  style: Theme.of(context).textTheme.bodyMedium),
+            ],
+            if ((benefit.textValue ?? '').isNotEmpty) ...[
+              const SizedBox(height: AppSpacing.xxs),
+              Text(benefit.textValue!,
+                  style: Theme.of(context).textTheme.bodySmall),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RealMembershipHistoryTile extends StatelessWidget {
+  final RealMembershipHistoryItem item;
+
+  const _RealMembershipHistoryTile({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final tierView = item.newTierView;
+    return _LedgerTile(
+      title:
+          tierView != null ? membershipTierLabel(l10n, tierView) : item.newTier,
+      subtitle: item.reason,
+      amount: item.effectiveAt == null ? '' : _date(context, item.effectiveAt!),
+      color: AppColors.ocean,
+    );
+  }
+}
+
 /// UI35 — Real Mode travel credit (`GET /api/me/travel-credits`, `/transactions`).
 /// Read-only promotional-credit balance + immutable, paginated ledger. Rendered
 /// inside the existing Travel Credits scaffold, replacing the real-mode
@@ -603,7 +913,14 @@ class MembershipScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final account = app.membershipAccount;
     final progress = app.membershipProgress;
-    if (!app.demoMode || account == null || progress == null) {
+    if (!app.demoMode) {
+      // UI36: real membership is backend-connected. Demo Mode is byte-identical.
+      return _RewardsScaffold(
+        title: l10n.membershipTitle,
+        child: const _RealMembershipBody(),
+      );
+    }
+    if (account == null || progress == null) {
       return _RewardsScaffold(
         title: l10n.membershipTitle,
         child: OceanEmptyState(

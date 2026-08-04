@@ -3618,5 +3618,28 @@
   "loyaltyRealEarnNote": "Points are earned automatically from completed bookings and reviews. They can't be redeemed directly here.",
   "travelCreditRealLoadingMessage": "Loading your travel credit…",
   "travelCreditRealErrorMessage": "We couldn't load your travel credit. Please try again.",
-  "travelCreditRealLoadMore": "Load more"
+  "travelCreditRealLoadMore": "Load more",
+  "membershipRealLoadingMessage": "Loading your membership…",
+  "membershipRealErrorMessage": "We couldn't load your membership. Please try again.",
+  "membershipRealActiveMessage": "Your membership is active.",
+  "membershipRealPreviewMessage": "This is a live preview of the tier you qualify for. Enroll to activate it.",
+  "membershipRealEnrollAction": "Enroll now",
+  "membershipRealEnrolledAction": "Enrolled",
+  "membershipRealEnrollSemantic": "Enroll in membership",
+  "membershipRealEnrollSuccess": "You're enrolled in membership.",
+  "membershipRealEnrollError": "We couldn't enroll you. Please try again.",
+  "membershipRealEnrollNeedsLoyalty": "An active loyalty account is required to enroll in membership.",
+  "membershipRealNoBenefits": "No benefits are listed for this tier yet.",
+  "membershipRealPointsToNext": "{points} more points to the next tier",
+  "@membershipRealPointsToNext": {
+    "placeholders": {
+      "points": { "type": "int" }
+    }
+  },
+  "membershipRealBookingsToNext": "{bookings} more completed bookings to the next tier",
+  "@membershipRealBookingsToNext": {
+    "placeholders": {
+      "bookings": { "type": "int" }
+    }
+  }
 }
