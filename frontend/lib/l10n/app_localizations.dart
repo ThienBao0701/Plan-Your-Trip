@@ -12279,6 +12279,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{bookings} more completed bookings to the next tier'**
   String membershipRealBookingsToNext(int bookings);
+
+  /// No description provided for @referralRealLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading your referral…'**
+  String get referralRealLoadingMessage;
+
+  /// No description provided for @referralRealErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load your referral. Please try again.'**
+  String get referralRealErrorMessage;
+
+  /// No description provided for @referralRealUseHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a friend\'s referral code. Rewards follow a qualifying booking.'**
+  String get referralRealUseHelper;
+
+  /// No description provided for @referralRealUseSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Referral code applied. Rewards follow a qualifying booking.'**
+  String get referralRealUseSuccess;
+
+  /// No description provided for @referralRealUseError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t apply that code. Please try again.'**
+  String get referralRealUseError;
+
+  /// No description provided for @referralRealAlreadyUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'You have already used a referral code and cannot use another.'**
+  String get referralRealAlreadyUsed;
+
+  /// No description provided for @referralRealCodeNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'That referral code was not found.'**
+  String get referralRealCodeNotFound;
+
+  /// No description provided for @referralRealNoHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'No referral activity yet. Share your code to get started.'**
+  String get referralRealNoHistory;
 }
 
 class _AppLocalizationsDelegate

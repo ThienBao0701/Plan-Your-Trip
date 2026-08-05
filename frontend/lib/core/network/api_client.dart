@@ -2155,6 +2155,105 @@ class ApiClient {
     }
   }
 
+  // ── Referral (/api/me/referral, UI-37) ───────────────────────────────────────
+  // Customer: my code + stats (lazy-created), history (bare array, inviter +
+  // invitee), and use-a-code (POST). The customer DTO carries no reward amount —
+  // only status. All authenticated + owner-scoped. 8s timeout, no retry.
+
+  /// Reads my referral code + basic stats (`GET /api/me/referral`).
+  Future<CollectionApiResult<RealReferralSummary>> getReferral() async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/me/referral'), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealReferralSummary.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Lists my referral activity (`GET /api/me/referral/history`, a bare array).
+  Future<CollectionApiResult<List<RealReferralReward>>>
+      getReferralHistory() async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/me/referral/history'), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final decoded = jsonDecode(utf8.decode(res.bodyBytes));
+        if (decoded is! List) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(
+          decoded
+              .map(
+                  (e) => RealReferralReward.fromJson(e as Map<String, dynamic>))
+              .toList(),
+        );
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Uses another user's referral code (`POST /api/me/referral/use`). 404 if the
+  /// code is unknown, 400 if it is your own, 409 if you already used one.
+  Future<CollectionApiResult<RealReferralReward>> useReferralCode(
+    String code,
+  ) async {
+    try {
+      final res = await _client
+          .post(Uri.parse('$baseUrl/me/referral/use'),
+              headers: _jsonHeaders, body: jsonEncode({'code': code}))
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealReferralReward.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
   Map<String, dynamic> _failureForStatus(http.Response res) {
     Map<String, dynamic>? body;
     try {

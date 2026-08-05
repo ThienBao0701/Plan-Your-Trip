@@ -7053,4 +7053,34 @@ class AppLocalizationsVi extends AppLocalizations {
   String membershipRealBookingsToNext(int bookings) {
     return 'Cần thêm $bookings lượt đặt hoàn tất để lên hạng tiếp theo';
   }
+
+  @override
+  String get referralRealLoadingMessage => 'Đang tải thông tin giới thiệu…';
+
+  @override
+  String get referralRealErrorMessage =>
+      'Không thể tải thông tin giới thiệu. Vui lòng thử lại.';
+
+  @override
+  String get referralRealUseHelper =>
+      'Nhập mã giới thiệu của bạn bè. Phần thưởng được trao sau một lượt đặt đủ điều kiện.';
+
+  @override
+  String get referralRealUseSuccess =>
+      'Đã áp dụng mã giới thiệu. Phần thưởng được trao sau một lượt đặt đủ điều kiện.';
+
+  @override
+  String get referralRealUseError =>
+      'Không thể áp dụng mã đó. Vui lòng thử lại.';
+
+  @override
+  String get referralRealAlreadyUsed =>
+      'Bạn đã sử dụng một mã giới thiệu và không thể dùng thêm.';
+
+  @override
+  String get referralRealCodeNotFound => 'Không tìm thấy mã giới thiệu đó.';
+
+  @override
+  String get referralRealNoHistory =>
+      'Chưa có hoạt động giới thiệu. Chia sẻ mã của bạn để bắt đầu.';
 }

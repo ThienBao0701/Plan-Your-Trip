@@ -3641,5 +3641,13 @@
     "placeholders": {
       "bookings": { "type": "int" }
     }
-  }
+  },
+  "referralRealLoadingMessage": "Loading your referral…",
+  "referralRealErrorMessage": "We couldn't load your referral. Please try again.",
+  "referralRealUseHelper": "Enter a friend's referral code. Rewards follow a qualifying booking.",
+  "referralRealUseSuccess": "Referral code applied. Rewards follow a qualifying booking.",
+  "referralRealUseError": "We couldn't apply that code. Please try again.",
+  "referralRealAlreadyUsed": "You have already used a referral code and cannot use another.",
+  "referralRealCodeNotFound": "That referral code was not found.",
+  "referralRealNoHistory": "No referral activity yet. Share your code to get started."
 }

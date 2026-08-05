@@ -4974,6 +4974,130 @@ enum MembershipOutcome {
   serverError,
 }
 
+/// Maps a backend referral `role` wire string ("INVITER"/"INVITEE") to the
+/// existing demo [ReferralRole] enum (reusing its label). Null when unrecognised.
+ReferralRole? referralRoleFromCode(String? code) {
+  switch (code) {
+    case 'INVITER':
+      return ReferralRole.inviter;
+    case 'INVITEE':
+      return ReferralRole.invitee;
+    default:
+      return null;
+  }
+}
+
+/// Maps a backend `ReferralRewardStatus` wire string ("USED"/"REWARDED") to the
+/// existing demo [ReferralStatus] enum (reusing its label). Null when
+/// unrecognised.
+ReferralStatus? referralStatusFromCode(String? code) {
+  switch (code) {
+    case 'USED':
+      return ReferralStatus.used;
+    case 'REWARDED':
+      return ReferralStatus.rewarded;
+    default:
+      return null;
+  }
+}
+
+/// Real-backend mirror of `ReferralDto.MyReferralResponse`
+/// (`GET /api/me/referral`, code created lazily). `Map` decoding is confined to
+/// [fromJson].
+class RealReferralSummary {
+  final String code;
+  final int successfulReferrals;
+  final int pendingReferrals;
+  final DateTime? createdAt;
+
+  const RealReferralSummary({
+    this.code = '',
+    this.successfulReferrals = 0,
+    this.pendingReferrals = 0,
+    this.createdAt,
+  });
+
+  factory RealReferralSummary.fromJson(Map<String, dynamic> json) {
+    return RealReferralSummary(
+      code: (json['code'] as String?) ?? '',
+      successfulReferrals: (json['successfulReferrals'] as num?)?.toInt() ?? 0,
+      pendingReferrals: (json['pendingReferrals'] as num?)?.toInt() ?? 0,
+      createdAt: _tryParseDate(json['createdAt']),
+    );
+  }
+}
+
+/// Real-backend mirror of `ReferralDto.ReferralRewardResponse`
+/// (`GET /api/me/referral/history`, `POST /api/me/referral/use`). [role] is
+/// "INVITER"/"INVITEE" relative to the requesting user; [status] is USED/REWARDED.
+/// The customer DTO carries NO reward amount — only status/role/timestamps.
+/// `Map` decoding is confined to [fromJson].
+class RealReferralReward {
+  final int id;
+  final String role;
+  final String campaignCode;
+  final int? inviterUserId;
+  final int? inviteeUserId;
+  final String status;
+  final DateTime? usedAt;
+  final DateTime? qualifiedAt;
+  final int? qualifyingBookingId;
+  final DateTime? rewardedAt;
+  final DateTime? createdAt;
+
+  const RealReferralReward({
+    required this.id,
+    this.role = '',
+    this.campaignCode = '',
+    this.inviterUserId,
+    this.inviteeUserId,
+    this.status = '',
+    this.usedAt,
+    this.qualifiedAt,
+    this.qualifyingBookingId,
+    this.rewardedAt,
+    this.createdAt,
+  });
+
+  ReferralRole? get roleView => referralRoleFromCode(role);
+  ReferralStatus? get statusView => referralStatusFromCode(status);
+
+  factory RealReferralReward.fromJson(Map<String, dynamic> json) {
+    return RealReferralReward(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      role: (json['role'] as String?) ?? '',
+      campaignCode: (json['campaignCode'] as String?) ?? '',
+      inviterUserId: (json['inviterUserId'] as num?)?.toInt(),
+      inviteeUserId: (json['inviteeUserId'] as num?)?.toInt(),
+      status: (json['status'] as String?) ?? '',
+      usedAt: _tryParseDate(json['usedAt']),
+      qualifiedAt: _tryParseDate(json['qualifiedAt']),
+      qualifyingBookingId: (json['qualifyingBookingId'] as num?)?.toInt(),
+      rewardedAt: _tryParseDate(json['rewardedAt']),
+      createdAt: _tryParseDate(json['createdAt']),
+    );
+  }
+}
+
+/// Outcome of a real referral action (`GET /api/me/referral[/history]`,
+/// `POST /use`). [demoUnavailable] is the Demo Mode guard (zero HTTP); [busy] the
+/// single-flight guard; [sessionExpired] (401) never triggers auto-logout;
+/// [validation] 400 (e.g. using your own code); [forbidden] 403, [notFound] 404
+/// (code not found), [conflict] 409 (already used a code), [serverError] 5xx,
+/// [network] transport/timeout.
+enum ReferralOutcome {
+  success,
+  demoUnavailable,
+  busy,
+  sessionExpired,
+  validation,
+  forbidden,
+  notFound,
+  conflict,
+  network,
+  serverError,
+}
+
 class DemoBooking {
   final String code;
   final String ownerUserId;

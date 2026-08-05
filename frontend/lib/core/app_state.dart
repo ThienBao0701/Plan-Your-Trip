@@ -356,6 +356,19 @@ class AppState extends ChangeNotifier {
   bool realMembershipEnrolling = false;
   MembershipOutcome? realMembershipError;
 
+  // ── Real Mode Referral (/api/me/referral, UI-37) ──────────────────────────
+  // The customer's referral code + stats, activity history (as inviter and/or
+  // invitee), plus a use-a-code action. A 401 never calls logout(). Cleared on
+  // logout / mode / user change via [_resetRealReferralState]. Zero HTTP in Demo
+  // Mode.
+  RealReferralSummary? realReferralSummary;
+  List<RealReferralReward> realReferralHistory = [];
+  bool realReferralLoading = false;
+  bool realReferralLoaded = false;
+  bool realReferralRefreshing = false;
+  bool realReferralUsing = false;
+  ReferralOutcome? realReferralError;
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -455,6 +468,7 @@ class AppState extends ChangeNotifier {
     _resetRealLoyaltyState();
     _resetRealTravelCreditState();
     _resetRealMembershipState();
+    _resetRealReferralState();
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -617,6 +631,16 @@ class AppState extends ChangeNotifier {
     realMembershipError = null;
   }
 
+  void _resetRealReferralState() {
+    realReferralSummary = null;
+    realReferralHistory = [];
+    realReferralLoading = false;
+    realReferralLoaded = false;
+    realReferralRefreshing = false;
+    realReferralUsing = false;
+    realReferralError = null;
+  }
+
   void _resetRealNotificationsState() {
     realNotifications = [];
     realNotificationsLoading = false;
@@ -758,6 +782,7 @@ class AppState extends ChangeNotifier {
     _resetRealLoyaltyState();
     _resetRealTravelCreditState();
     _resetRealMembershipState();
+    _resetRealReferralState();
     timeline = [];
     expenses = [];
     demoBookings = [];
@@ -3864,6 +3889,89 @@ class AppState extends ChangeNotifier {
       return MembershipOutcome.success;
     }
     final outcome = _mapMembershipError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  // ── Real Mode Referral (UI-37) ───────────────────────────────────────────
+
+  ReferralOutcome _mapReferralError(ApiErrorKind? kind) {
+    return switch (kind) {
+      ApiErrorKind.unauthorized => ReferralOutcome.sessionExpired,
+      ApiErrorKind.forbidden => ReferralOutcome.forbidden,
+      ApiErrorKind.notFound => ReferralOutcome.notFound,
+      ApiErrorKind.conflict => ReferralOutcome.conflict,
+      ApiErrorKind.validation => ReferralOutcome.validation,
+      ApiErrorKind.unprocessable => ReferralOutcome.validation,
+      ApiErrorKind.network => ReferralOutcome.network,
+      ApiErrorKind.timeout => ReferralOutcome.network,
+      ApiErrorKind.server => ReferralOutcome.serverError,
+      _ => ReferralOutcome.serverError,
+    };
+  }
+
+  /// Loads the referral code + stats (`GET /api/me/referral`) plus the activity
+  /// history (`GET /api/me/referral/history`). Both must succeed to commit; on
+  /// failure the prior state is preserved. [refresh] forces a re-fetch. Zero HTTP
+  /// in Demo Mode.
+  Future<ReferralOutcome> loadRealReferral({bool refresh = false}) async {
+    if (demoMode) return ReferralOutcome.demoUnavailable;
+    if (realReferralLoading || realReferralRefreshing) {
+      return ReferralOutcome.success;
+    }
+    if (realReferralLoaded && !refresh) return ReferralOutcome.success;
+    if (refresh) {
+      realReferralRefreshing = true;
+    } else {
+      realReferralLoading = true;
+    }
+    realReferralError = null;
+    notifyListeners();
+    final summaryResult = await api.getReferral();
+    if (!summaryResult.success || summaryResult.data == null) {
+      realReferralLoading = false;
+      realReferralRefreshing = false;
+      final outcome = _mapReferralError(summaryResult.errorKind);
+      realReferralError = outcome;
+      notifyListeners();
+      return outcome;
+    }
+    final historyResult = await api.getReferralHistory();
+    realReferralLoading = false;
+    realReferralRefreshing = false;
+    if (!historyResult.success || historyResult.data == null) {
+      final outcome = _mapReferralError(historyResult.errorKind);
+      realReferralError = outcome;
+      notifyListeners();
+      return outcome;
+    }
+    realReferralSummary = summaryResult.data!;
+    realReferralHistory = historyResult.data!;
+    realReferralLoaded = true;
+    realReferralError = null;
+    notifyListeners();
+    return ReferralOutcome.success;
+  }
+
+  /// Uses another user's referral code (`POST /api/me/referral/use`). On success
+  /// reloads the surface (stats + history change). A 400 (own code) maps to
+  /// [ReferralOutcome.validation], 404 to [ReferralOutcome.notFound], 409 (already
+  /// used) to [ReferralOutcome.conflict]. Single-flight via [realReferralUsing].
+  Future<ReferralOutcome> useRealReferralCode(String code) async {
+    if (demoMode) return ReferralOutcome.demoUnavailable;
+    final trimmed = code.trim();
+    if (trimmed.isEmpty) return ReferralOutcome.validation;
+    if (realReferralUsing) return ReferralOutcome.busy;
+    realReferralUsing = true;
+    notifyListeners();
+    final result = await api.useReferralCode(trimmed);
+    realReferralUsing = false;
+    if (result.success && result.data != null) {
+      notifyListeners();
+      await loadRealReferral(refresh: true);
+      return ReferralOutcome.success;
+    }
+    final outcome = _mapReferralError(result.errorKind);
     notifyListeners();
     return outcome;
   }

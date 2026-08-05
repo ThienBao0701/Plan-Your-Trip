@@ -3641,5 +3641,13 @@
     "placeholders": {
       "bookings": { "type": "int" }
     }
-  }
+  },
+  "referralRealLoadingMessage": "Đang tải thông tin giới thiệu…",
+  "referralRealErrorMessage": "Không thể tải thông tin giới thiệu. Vui lòng thử lại.",
+  "referralRealUseHelper": "Nhập mã giới thiệu của bạn bè. Phần thưởng được trao sau một lượt đặt đủ điều kiện.",
+  "referralRealUseSuccess": "Đã áp dụng mã giới thiệu. Phần thưởng được trao sau một lượt đặt đủ điều kiện.",
+  "referralRealUseError": "Không thể áp dụng mã đó. Vui lòng thử lại.",
+  "referralRealAlreadyUsed": "Bạn đã sử dụng một mã giới thiệu và không thể dùng thêm.",
+  "referralRealCodeNotFound": "Không tìm thấy mã giới thiệu đó.",
+  "referralRealNoHistory": "Chưa có hoạt động giới thiệu. Chia sẻ mã của bạn để bắt đầu."
 }

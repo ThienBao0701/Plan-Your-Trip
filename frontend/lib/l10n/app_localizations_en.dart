@@ -7218,4 +7218,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String membershipRealBookingsToNext(int bookings) {
     return '$bookings more completed bookings to the next tier';
   }
+
+  @override
+  String get referralRealLoadingMessage => 'Loading your referral…';
+
+  @override
+  String get referralRealErrorMessage =>
+      'We couldn\'t load your referral. Please try again.';
+
+  @override
+  String get referralRealUseHelper =>
+      'Enter a friend\'s referral code. Rewards follow a qualifying booking.';
+
+  @override
+  String get referralRealUseSuccess =>
+      'Referral code applied. Rewards follow a qualifying booking.';
+
+  @override
+  String get referralRealUseError =>
+      'We couldn\'t apply that code. Please try again.';
+
+  @override
+  String get referralRealAlreadyUsed =>
+      'You have already used a referral code and cannot use another.';
+
+  @override
+  String get referralRealCodeNotFound => 'That referral code was not found.';
+
+  @override
+  String get referralRealNoHistory =>
+      'No referral activity yet. Share your code to get started.';
 }

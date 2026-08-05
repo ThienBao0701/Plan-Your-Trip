@@ -301,6 +301,223 @@ class LoyaltyScreen extends StatelessWidget {
   }
 }
 
+/// UI37 — Real Mode referral (`GET /api/me/referral[/history]`, `POST /use`).
+/// Personal code + stats, activity history (as inviter and/or invitee), and a
+/// use-a-code action. Rendered inside the existing Referral scaffold, replacing
+/// the real-mode placeholder. A 401 never logs the user out. The customer DTO
+/// carries no reward amount, so none is shown — only status.
+class _RealReferralBody extends StatefulWidget {
+  const _RealReferralBody();
+
+  @override
+  State<_RealReferralBody> createState() => _RealReferralBodyState();
+}
+
+class _RealReferralBodyState extends State<_RealReferralBody> {
+  final _code = TextEditingController();
+  bool _copied = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) AppScope.of(context).loadRealReferral();
+    });
+  }
+
+  @override
+  void dispose() {
+    _code.dispose();
+    super.dispose();
+  }
+
+  void _reauth() {
+    showOceanSessionExpiredSheet(
+      context,
+      onLogin: () {
+        Navigator.of(context).pop();
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+        );
+      },
+      onReturnHome: () => Navigator.of(context).pop(),
+    );
+  }
+
+  Future<void> _use(AppState app) async {
+    final l10n = AppLocalizations.of(context)!;
+    final outcome = await app.useRealReferralCode(_code.text);
+    if (!mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    void snack(String m) => messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(m)));
+    switch (outcome) {
+      case ReferralOutcome.success:
+        _code.clear();
+        snack(l10n.referralRealUseSuccess);
+      case ReferralOutcome.sessionExpired:
+        _reauth();
+      case ReferralOutcome.validation:
+        snack(l10n.referralOwnCodeRejected);
+      case ReferralOutcome.notFound:
+        snack(l10n.referralRealCodeNotFound);
+      case ReferralOutcome.conflict:
+        snack(l10n.referralRealAlreadyUsed);
+      case ReferralOutcome.busy:
+        break;
+      default:
+        snack(l10n.referralRealUseError);
+    }
+    if (mounted) setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final app = AppScope.of(context);
+    final l10n = AppLocalizations.of(context)!;
+
+    if (app.realReferralError == ReferralOutcome.sessionExpired &&
+        !app.realReferralLoaded) {
+      return OceanSessionExpiredState(
+        key: const Key('referral-session-expired'),
+        onLogin: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+        ),
+        onReturnHome: () => Navigator.maybePop(context),
+      );
+    }
+    if (app.realReferralLoading && !app.realReferralLoaded) {
+      return Semantics(
+        liveRegion: true,
+        label: l10n.referralRealLoadingMessage,
+        child: Column(
+          children: [
+            const SizedBox(height: AppSpacing.xxl),
+            const CircularProgressIndicator(key: Key('referral-loading')),
+            const SizedBox(height: AppSpacing.md),
+            Text(l10n.referralRealLoadingMessage),
+          ],
+        ),
+      );
+    }
+    if (app.realReferralError != null && !app.realReferralLoaded) {
+      return OceanRecoverableErrorState(
+        key: const Key('referral-error'),
+        message: l10n.referralRealErrorMessage,
+        onReload: () => app.loadRealReferral(refresh: true),
+      );
+    }
+
+    final summary = app.realReferralSummary;
+    if (summary == null) {
+      return const Padding(
+        padding: EdgeInsets.all(AppSpacing.xxl),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+    final using = app.realReferralUsing;
+    return Column(
+      key: const Key('referral-content'),
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        OceanGlassCard(
+          semanticLabel: l10n.referralCodeSemantic,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.referralYourCode,
+                  style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: AppSpacing.xs),
+              SelectableText(
+                summary.code,
+                key: const Key('referral-code'),
+                style: Theme.of(context).textTheme.displaySmall,
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                l10n.referralStats(
+                  summary.successfulReferrals,
+                  summary.pendingReferrals,
+                ),
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+              const SizedBox(height: AppSpacing.md),
+              OceanSecondaryButton(
+                key: const Key('referral-copy'),
+                label: _copied
+                    ? l10n.referralCopiedAction
+                    : l10n.referralCopyAction,
+                icon: Icons.copy_rounded,
+                semanticLabel: l10n.referralCopySemantic,
+                onPressed: summary.code.isEmpty
+                    ? null
+                    : () async {
+                        await Clipboard.setData(
+                            ClipboardData(text: summary.code));
+                        if (mounted) setState(() => _copied = true);
+                      },
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        _CodeEntryCard(
+          controller: _code,
+          title: l10n.referralUseCodeTitle,
+          label: l10n.referralCodeLabel,
+          helper: l10n.referralRealUseHelper,
+          actionLabel: l10n.referralUseCodeAction,
+          semanticLabel: l10n.referralUseCodeSemantic,
+          onSubmit: using ? () {} : () => _use(app),
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        _SectionTitle(l10n.referralHistoryTitle),
+        const SizedBox(height: AppSpacing.sm),
+        if (app.realReferralHistory.isEmpty)
+          Text(
+            l10n.referralRealNoHistory,
+            key: const Key('referral-history-empty'),
+            style: Theme.of(context).textTheme.bodyMedium,
+          )
+        else
+          for (final item in app.realReferralHistory)
+            _RealReferralHistoryTile(item: item),
+      ],
+    );
+  }
+}
+
+class _RealReferralHistoryTile extends StatelessWidget {
+  final RealReferralReward item;
+
+  const _RealReferralHistoryTile({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final roleView = item.roleView;
+    final statusView = item.statusView;
+    final roleText =
+        roleView != null ? referralRoleLabel(l10n, roleView) : item.role;
+    final statusText = statusView != null
+        ? referralStatusLabel(l10n, statusView)
+        : item.status;
+    final rewarded = statusView == ReferralStatus.rewarded;
+    return _LedgerTile(
+      title: '$roleText · $statusText',
+      subtitle: item.campaignCode,
+      amount: item.usedAt == null ? '' : _date(context, item.usedAt!),
+      color: rewarded ? AppColors.success : AppColors.ocean,
+      footer: rewarded
+          ? (item.qualifyingBookingId == null
+              ? null
+              : '#${item.qualifyingBookingId}')
+          : l10n.referralUsedNoReward,
+    );
+  }
+}
+
 /// UI36 — Real Mode membership (`GET /api/me/membership[/progress|/benefits|
 /// /history]`, `POST /enroll`). Live progress + tier + benefits + history, plus an
 /// idempotent enroll action. Rendered inside the existing Membership scaffold,
@@ -1118,7 +1335,14 @@ class _ReferralScreenState extends State<ReferralScreen> {
     final app = AppScope.of(context);
     final l10n = AppLocalizations.of(context)!;
     final summary = app.referralSummary;
-    if (!app.demoMode || summary == null) {
+    if (!app.demoMode) {
+      // UI37: real referral is backend-connected. Demo Mode is byte-identical.
+      return _RewardsScaffold(
+        title: l10n.referralTitle,
+        child: const _RealReferralBody(),
+      );
+    }
+    if (summary == null) {
       return _RewardsScaffold(
         title: l10n.referralTitle,
         child: OceanEmptyState(
