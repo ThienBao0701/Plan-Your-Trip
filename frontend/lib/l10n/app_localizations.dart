@@ -12597,6 +12597,210 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Available until {date}'**
   String recommendationDetailExpires(String date);
+
+  /// No description provided for @expensesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Expenses'**
+  String get expensesTitle;
+
+  /// No description provided for @expensesLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading expenses…'**
+  String get expensesLoadingMessage;
+
+  /// No description provided for @expensesErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load this trip\'s expenses. Please try again.'**
+  String get expensesErrorMessage;
+
+  /// No description provided for @expensesGoneMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This trip or expense is no longer available.'**
+  String get expensesGoneMessage;
+
+  /// No description provided for @expensesForbiddenMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have permission to manage expenses for this trip.'**
+  String get expensesForbiddenMessage;
+
+  /// No description provided for @expensesInvalidMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Please check the amount, currency, title and date.'**
+  String get expensesInvalidMessage;
+
+  /// No description provided for @expensesNetworkMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You appear to be offline. Please check your connection.'**
+  String get expensesNetworkMessage;
+
+  /// No description provided for @expensesActionErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get expensesActionErrorMessage;
+
+  /// No description provided for @expensesEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No expenses yet'**
+  String get expensesEmptyTitle;
+
+  /// No description provided for @expensesEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Track what you spend on this trip — add your first expense.'**
+  String get expensesEmptyMessage;
+
+  /// No description provided for @expensesAddAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add expense'**
+  String get expensesAddAction;
+
+  /// No description provided for @expensesSaveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get expensesSaveAction;
+
+  /// No description provided for @expensesAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add expense'**
+  String get expensesAddTitle;
+
+  /// No description provided for @expensesEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit expense'**
+  String get expensesEditTitle;
+
+  /// No description provided for @expensesAddSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Add an expense'**
+  String get expensesAddSemantic;
+
+  /// No description provided for @expensesCreatedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense added.'**
+  String get expensesCreatedMessage;
+
+  /// No description provided for @expensesUpdatedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense updated.'**
+  String get expensesUpdatedMessage;
+
+  /// No description provided for @expensesDeletedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense deleted.'**
+  String get expensesDeletedMessage;
+
+  /// No description provided for @expensesDeleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete expense?'**
+  String get expensesDeleteConfirmTitle;
+
+  /// No description provided for @expensesDeleteConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get expensesDeleteConfirmAction;
+
+  /// No description provided for @expensesSummarySpent.
+  ///
+  /// In en, this message translates to:
+  /// **'Total spent'**
+  String get expensesSummarySpent;
+
+  /// No description provided for @expensesSummaryOverBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Over budget'**
+  String get expensesSummaryOverBudget;
+
+  /// No description provided for @expenseUntitled.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense'**
+  String get expenseUntitled;
+
+  /// No description provided for @expenseFieldTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get expenseFieldTitle;
+
+  /// No description provided for @expenseFieldAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get expenseFieldAmount;
+
+  /// No description provided for @expenseFieldCurrency.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency'**
+  String get expenseFieldCurrency;
+
+  /// No description provided for @expenseFieldCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get expenseFieldCategory;
+
+  /// No description provided for @expenseFieldDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get expenseFieldDate;
+
+  /// No description provided for @expenseFieldNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes (optional)'**
+  String get expenseFieldNotes;
+
+  /// No description provided for @expensesDeleteConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{title}\"? This can\'t be undone.'**
+  String expensesDeleteConfirmMessage(String title);
+
+  /// No description provided for @expensesDeleteSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {title}'**
+  String expensesDeleteSemantic(String title);
+
+  /// No description provided for @expenseCardSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense: {title}'**
+  String expenseCardSemantic(String title);
+
+  /// No description provided for @expensesSummaryBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget {amount}'**
+  String expensesSummaryBudget(String amount);
+
+  /// No description provided for @expensesSummaryRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} left'**
+  String expensesSummaryRemaining(String amount);
 }
 
 class _AppLocalizationsDelegate

@@ -7245,4 +7245,122 @@ class AppLocalizationsVi extends AppLocalizations {
   String recommendationDetailExpires(String date) {
     return 'Khả dụng đến $date';
   }
+
+  @override
+  String get expensesTitle => 'Chi phí';
+
+  @override
+  String get expensesLoadingMessage => 'Đang tải chi phí…';
+
+  @override
+  String get expensesErrorMessage =>
+      'Không thể tải chi phí của chuyến đi này. Vui lòng thử lại.';
+
+  @override
+  String get expensesGoneMessage =>
+      'Chuyến đi hoặc khoản chi này không còn khả dụng.';
+
+  @override
+  String get expensesForbiddenMessage =>
+      'Bạn không có quyền quản lý chi phí cho chuyến đi này.';
+
+  @override
+  String get expensesInvalidMessage =>
+      'Vui lòng kiểm tra số tiền, đơn vị tiền tệ, tiêu đề và ngày.';
+
+  @override
+  String get expensesNetworkMessage =>
+      'Bạn dường như đang ngoại tuyến. Vui lòng kiểm tra kết nối.';
+
+  @override
+  String get expensesActionErrorMessage => 'Đã xảy ra lỗi. Vui lòng thử lại.';
+
+  @override
+  String get expensesEmptyTitle => 'Chưa có chi phí nào';
+
+  @override
+  String get expensesEmptyMessage =>
+      'Theo dõi những gì bạn chi cho chuyến đi này — thêm khoản chi đầu tiên.';
+
+  @override
+  String get expensesAddAction => 'Thêm chi phí';
+
+  @override
+  String get expensesSaveAction => 'Lưu thay đổi';
+
+  @override
+  String get expensesAddTitle => 'Thêm chi phí';
+
+  @override
+  String get expensesEditTitle => 'Sửa chi phí';
+
+  @override
+  String get expensesAddSemantic => 'Thêm một khoản chi';
+
+  @override
+  String get expensesCreatedMessage => 'Đã thêm chi phí.';
+
+  @override
+  String get expensesUpdatedMessage => 'Đã cập nhật chi phí.';
+
+  @override
+  String get expensesDeletedMessage => 'Đã xóa chi phí.';
+
+  @override
+  String get expensesDeleteConfirmTitle => 'Xóa chi phí?';
+
+  @override
+  String get expensesDeleteConfirmAction => 'Xóa';
+
+  @override
+  String get expensesSummarySpent => 'Tổng chi';
+
+  @override
+  String get expensesSummaryOverBudget => 'Vượt ngân sách';
+
+  @override
+  String get expenseUntitled => 'Chi phí';
+
+  @override
+  String get expenseFieldTitle => 'Tiêu đề';
+
+  @override
+  String get expenseFieldAmount => 'Số tiền';
+
+  @override
+  String get expenseFieldCurrency => 'Tiền tệ';
+
+  @override
+  String get expenseFieldCategory => 'Danh mục';
+
+  @override
+  String get expenseFieldDate => 'Ngày';
+
+  @override
+  String get expenseFieldNotes => 'Ghi chú (tùy chọn)';
+
+  @override
+  String expensesDeleteConfirmMessage(String title) {
+    return 'Xóa \"$title\"? Không thể hoàn tác.';
+  }
+
+  @override
+  String expensesDeleteSemantic(String title) {
+    return 'Xóa $title';
+  }
+
+  @override
+  String expenseCardSemantic(String title) {
+    return 'Chi phí: $title';
+  }
+
+  @override
+  String expensesSummaryBudget(String amount) {
+    return 'Ngân sách $amount';
+  }
+
+  @override
+  String expensesSummaryRemaining(String amount) {
+    return 'Còn lại $amount';
+  }
 }

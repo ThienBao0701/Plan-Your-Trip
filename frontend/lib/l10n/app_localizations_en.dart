@@ -7411,4 +7411,123 @@ class AppLocalizationsEn extends AppLocalizations {
   String recommendationDetailExpires(String date) {
     return 'Available until $date';
   }
+
+  @override
+  String get expensesTitle => 'Expenses';
+
+  @override
+  String get expensesLoadingMessage => 'Loading expenses…';
+
+  @override
+  String get expensesErrorMessage =>
+      'We couldn\'t load this trip\'s expenses. Please try again.';
+
+  @override
+  String get expensesGoneMessage =>
+      'This trip or expense is no longer available.';
+
+  @override
+  String get expensesForbiddenMessage =>
+      'You don\'t have permission to manage expenses for this trip.';
+
+  @override
+  String get expensesInvalidMessage =>
+      'Please check the amount, currency, title and date.';
+
+  @override
+  String get expensesNetworkMessage =>
+      'You appear to be offline. Please check your connection.';
+
+  @override
+  String get expensesActionErrorMessage =>
+      'Something went wrong. Please try again.';
+
+  @override
+  String get expensesEmptyTitle => 'No expenses yet';
+
+  @override
+  String get expensesEmptyMessage =>
+      'Track what you spend on this trip — add your first expense.';
+
+  @override
+  String get expensesAddAction => 'Add expense';
+
+  @override
+  String get expensesSaveAction => 'Save changes';
+
+  @override
+  String get expensesAddTitle => 'Add expense';
+
+  @override
+  String get expensesEditTitle => 'Edit expense';
+
+  @override
+  String get expensesAddSemantic => 'Add an expense';
+
+  @override
+  String get expensesCreatedMessage => 'Expense added.';
+
+  @override
+  String get expensesUpdatedMessage => 'Expense updated.';
+
+  @override
+  String get expensesDeletedMessage => 'Expense deleted.';
+
+  @override
+  String get expensesDeleteConfirmTitle => 'Delete expense?';
+
+  @override
+  String get expensesDeleteConfirmAction => 'Delete';
+
+  @override
+  String get expensesSummarySpent => 'Total spent';
+
+  @override
+  String get expensesSummaryOverBudget => 'Over budget';
+
+  @override
+  String get expenseUntitled => 'Expense';
+
+  @override
+  String get expenseFieldTitle => 'Title';
+
+  @override
+  String get expenseFieldAmount => 'Amount';
+
+  @override
+  String get expenseFieldCurrency => 'Currency';
+
+  @override
+  String get expenseFieldCategory => 'Category';
+
+  @override
+  String get expenseFieldDate => 'Date';
+
+  @override
+  String get expenseFieldNotes => 'Notes (optional)';
+
+  @override
+  String expensesDeleteConfirmMessage(String title) {
+    return 'Delete \"$title\"? This can\'t be undone.';
+  }
+
+  @override
+  String expensesDeleteSemantic(String title) {
+    return 'Delete $title';
+  }
+
+  @override
+  String expenseCardSemantic(String title) {
+    return 'Expense: $title';
+  }
+
+  @override
+  String expensesSummaryBudget(String amount) {
+    return 'Budget $amount';
+  }
+
+  @override
+  String expensesSummaryRemaining(String amount) {
+    return '$amount left';
+  }
 }

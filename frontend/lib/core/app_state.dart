@@ -407,6 +407,30 @@ class AppState extends ChangeNotifier {
   bool get realRecommendationsHasMore =>
       realRecommendationsPage + 1 < realRecommendationsTotalPages;
 
+  // ── Real Mode Trip Expenses (/api/me/trips/.../expenses, UI-40) ───────────
+  // Expenses for a real TripPlan (UI-20). One trip's expenses are loaded at a
+  // time ([realExpensesTripId]); switching trips reloads. Full CRUD is
+  // owner-or-EDITOR; a 401 never calls logout(). Cleared on logout / mode / user
+  // change via [_resetRealExpensesState]. Zero HTTP in Demo Mode.
+  int? realExpensesTripId;
+  List<RealExpense> realExpenses = [];
+  RealExpenseSummary? realExpenseSummary;
+  bool realExpensesLoading = false;
+  bool realExpensesLoaded = false;
+  bool realExpensesRefreshing = false;
+  bool realExpenseMutationInFlight = false;
+  ExpenseOutcome? realExpensesError;
+
+  /// The loaded expenses for [tripId], or an empty list if a different trip
+  /// (or none) is currently loaded.
+  List<RealExpense> realExpensesFor(int tripId) =>
+      realExpensesTripId == tripId ? realExpenses : const [];
+
+  /// The loaded budget summary for [tripId], or null if a different trip (or
+  /// none) is currently loaded.
+  RealExpenseSummary? realExpenseSummaryFor(int tripId) =>
+      realExpensesTripId == tripId ? realExpenseSummary : null;
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -509,6 +533,7 @@ class AppState extends ChangeNotifier {
     _resetRealReferralState();
     _resetRealCouponsState();
     _resetRealRecommendationsState();
+    _resetRealExpensesState();
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -709,6 +734,17 @@ class AppState extends ChangeNotifier {
     recommendationActionInFlight.clear();
   }
 
+  void _resetRealExpensesState() {
+    realExpensesTripId = null;
+    realExpenses = [];
+    realExpenseSummary = null;
+    realExpensesLoading = false;
+    realExpensesLoaded = false;
+    realExpensesRefreshing = false;
+    realExpenseMutationInFlight = false;
+    realExpensesError = null;
+  }
+
   void _resetRealNotificationsState() {
     realNotifications = [];
     realNotificationsLoading = false;
@@ -853,6 +889,7 @@ class AppState extends ChangeNotifier {
     _resetRealReferralState();
     _resetRealCouponsState();
     _resetRealRecommendationsState();
+    _resetRealExpensesState();
     timeline = [];
     expenses = [];
     demoBookings = [];
@@ -4328,6 +4365,134 @@ class AppState extends ChangeNotifier {
       return RecommendationOutcome.success;
     }
     return _mapRecommendationError(result.errorKind);
+  }
+
+  // ── Real Mode Trip Expenses (UI-40) ──────────────────────────────────────
+
+  ExpenseOutcome _mapExpenseError(ApiErrorKind? kind) {
+    return switch (kind) {
+      ApiErrorKind.unauthorized => ExpenseOutcome.sessionExpired,
+      ApiErrorKind.forbidden => ExpenseOutcome.forbidden,
+      ApiErrorKind.notFound => ExpenseOutcome.notFound,
+      ApiErrorKind.validation => ExpenseOutcome.validation,
+      ApiErrorKind.unprocessable => ExpenseOutcome.validation,
+      ApiErrorKind.network => ExpenseOutcome.network,
+      ApiErrorKind.timeout => ExpenseOutcome.network,
+      ApiErrorKind.server => ExpenseOutcome.serverError,
+      _ => ExpenseOutcome.serverError,
+    };
+  }
+
+  /// Loads a trip's expenses (`GET .../expenses`) plus the server-computed budget
+  /// summary (best-effort). Switching [tripId] reloads. [refresh] forces a
+  /// re-fetch and preserves the current list on failure. Zero HTTP in Demo Mode.
+  Future<ExpenseOutcome> loadRealExpenses(int tripId,
+      {bool refresh = false}) async {
+    if (demoMode) return ExpenseOutcome.demoUnavailable;
+    if (realExpensesLoading || realExpensesRefreshing) {
+      return ExpenseOutcome.success;
+    }
+    final sameTrip = realExpensesTripId == tripId;
+    if (sameTrip && realExpensesLoaded && !refresh) {
+      return ExpenseOutcome.success;
+    }
+    if (sameTrip && refresh) {
+      realExpensesRefreshing = true;
+    } else {
+      realExpensesLoading = true;
+      if (!sameTrip) {
+        // Switching trips: drop the previous trip's data immediately.
+        realExpenses = [];
+        realExpenseSummary = null;
+        realExpensesLoaded = false;
+        realExpensesTripId = tripId;
+      }
+    }
+    realExpensesError = null;
+    notifyListeners();
+
+    final listResult = await api.getTripExpenses(tripId);
+    if (!(listResult.success && listResult.data != null)) {
+      realExpensesLoading = false;
+      realExpensesRefreshing = false;
+      final outcome = _mapExpenseError(listResult.errorKind);
+      realExpensesError = outcome;
+      notifyListeners();
+      return outcome;
+    }
+    // Summary is secondary context — a failure leaves it null, not an error.
+    final summaryResult = await api.getTripBudgetSummary(tripId);
+    realExpensesLoading = false;
+    realExpensesRefreshing = false;
+    realExpensesTripId = tripId;
+    realExpenses = listResult.data!;
+    realExpenseSummary = (summaryResult.success && summaryResult.data != null)
+        ? summaryResult.data
+        : null;
+    realExpensesLoaded = true;
+    realExpensesError = null;
+    notifyListeners();
+    return ExpenseOutcome.success;
+  }
+
+  /// Adds an expense to [tripId] (`POST .../expenses`) and reloads the trip's
+  /// expenses + summary from the backend (no optimistic insert). Single-flight
+  /// via [realExpenseMutationInFlight]. Zero HTTP in Demo Mode.
+  Future<ExpenseOutcome> createRealExpense(
+      int tripId, RealExpensePayload payload) async {
+    if (demoMode) return ExpenseOutcome.demoUnavailable;
+    if (realExpenseMutationInFlight) return ExpenseOutcome.busy;
+    realExpenseMutationInFlight = true;
+    notifyListeners();
+    final result = await api.createTripExpense(tripId, payload);
+    realExpenseMutationInFlight = false;
+    if (result.success && result.data != null) {
+      notifyListeners();
+      await loadRealExpenses(tripId, refresh: true);
+      return ExpenseOutcome.success;
+    }
+    final outcome = _mapExpenseError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Updates an expense (`PUT .../expenses/{expenseId}`) and reloads [tripId]'s
+  /// expenses + summary. No optimistic mutation. Zero HTTP in Demo Mode.
+  Future<ExpenseOutcome> updateRealExpense(
+      int tripId, int expenseId, RealExpensePayload payload) async {
+    if (demoMode) return ExpenseOutcome.demoUnavailable;
+    if (realExpenseMutationInFlight) return ExpenseOutcome.busy;
+    realExpenseMutationInFlight = true;
+    notifyListeners();
+    final result = await api.updateTripExpense(expenseId, payload);
+    realExpenseMutationInFlight = false;
+    if (result.success && result.data != null) {
+      notifyListeners();
+      await loadRealExpenses(tripId, refresh: true);
+      return ExpenseOutcome.success;
+    }
+    final outcome = _mapExpenseError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Deletes an expense (`DELETE .../expenses/{expenseId}`) and reloads [tripId]'s
+  /// expenses + summary only after the server confirms. Zero HTTP in Demo Mode.
+  Future<ExpenseOutcome> deleteRealExpense(int tripId, int expenseId) async {
+    if (demoMode) return ExpenseOutcome.demoUnavailable;
+    if (realExpenseMutationInFlight) return ExpenseOutcome.busy;
+    realExpenseMutationInFlight = true;
+    notifyListeners();
+    final result = await api.deleteTripExpense(expenseId);
+    realExpenseMutationInFlight = false;
+    if (result.success) {
+      notifyListeners();
+      await loadRealExpenses(tripId, refresh: true);
+      return ExpenseOutcome.success;
+    }
+    final outcome = _mapExpenseError(result.errorKind);
+    notifyListeners();
+    return outcome;
   }
 
   List<Place> filteredPlaces(PlaceQuery q) {

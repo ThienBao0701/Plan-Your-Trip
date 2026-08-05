@@ -3734,5 +3734,64 @@
     "placeholders": {
       "date": { "type": "String" }
     }
+  },
+  "expensesTitle": "Chi phí",
+  "expensesLoadingMessage": "Đang tải chi phí…",
+  "expensesErrorMessage": "Không thể tải chi phí của chuyến đi này. Vui lòng thử lại.",
+  "expensesGoneMessage": "Chuyến đi hoặc khoản chi này không còn khả dụng.",
+  "expensesForbiddenMessage": "Bạn không có quyền quản lý chi phí cho chuyến đi này.",
+  "expensesInvalidMessage": "Vui lòng kiểm tra số tiền, đơn vị tiền tệ, tiêu đề và ngày.",
+  "expensesNetworkMessage": "Bạn dường như đang ngoại tuyến. Vui lòng kiểm tra kết nối.",
+  "expensesActionErrorMessage": "Đã xảy ra lỗi. Vui lòng thử lại.",
+  "expensesEmptyTitle": "Chưa có chi phí nào",
+  "expensesEmptyMessage": "Theo dõi những gì bạn chi cho chuyến đi này — thêm khoản chi đầu tiên.",
+  "expensesAddAction": "Thêm chi phí",
+  "expensesSaveAction": "Lưu thay đổi",
+  "expensesAddTitle": "Thêm chi phí",
+  "expensesEditTitle": "Sửa chi phí",
+  "expensesAddSemantic": "Thêm một khoản chi",
+  "expensesCreatedMessage": "Đã thêm chi phí.",
+  "expensesUpdatedMessage": "Đã cập nhật chi phí.",
+  "expensesDeletedMessage": "Đã xóa chi phí.",
+  "expensesDeleteConfirmTitle": "Xóa chi phí?",
+  "expensesDeleteConfirmAction": "Xóa",
+  "expensesSummarySpent": "Tổng chi",
+  "expensesSummaryOverBudget": "Vượt ngân sách",
+  "expenseUntitled": "Chi phí",
+  "expenseFieldTitle": "Tiêu đề",
+  "expenseFieldAmount": "Số tiền",
+  "expenseFieldCurrency": "Tiền tệ",
+  "expenseFieldCategory": "Danh mục",
+  "expenseFieldDate": "Ngày",
+  "expenseFieldNotes": "Ghi chú (tùy chọn)",
+  "expensesDeleteConfirmMessage": "Xóa \"{title}\"? Không thể hoàn tác.",
+  "@expensesDeleteConfirmMessage": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  },
+  "expensesDeleteSemantic": "Xóa {title}",
+  "@expensesDeleteSemantic": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  },
+  "expenseCardSemantic": "Chi phí: {title}",
+  "@expenseCardSemantic": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  },
+  "expensesSummaryBudget": "Ngân sách {amount}",
+  "@expensesSummaryBudget": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "expensesSummaryRemaining": "Còn lại {amount}",
+  "@expensesSummaryRemaining": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
   }
 }

@@ -5515,6 +5515,262 @@ enum RecommendationOutcome {
   serverError,
 }
 
+// ── Trip expenses (/api/me/trips/{tripId}/expenses, UI-40) ───────────────────
+// Real-backend mirror of the Phase 7 Trip Budget & Expenses surface
+// (`TripBudgetController` / `TripPlanBudgetService`). Expenses hang off a real
+// TripPlan (UI-20); full CRUD is owner-or-EDITOR, reads are owner-or-collaborator.
+// `Map` decoding is confined to [fromJson]; request building to [toJson].
+
+/// The expense category (`TripPlanExpenseCategory`). [unknown] preserves
+/// forward-compat for any code this client does not recognise; it is never sent.
+enum RealExpenseCategory {
+  accommodation,
+  food,
+  transport,
+  attraction,
+  shopping,
+  health,
+  visa,
+  insurance,
+  other,
+  unknown,
+}
+
+/// The wire codes the backend accepts (`TripPlanExpenseCategory`). [unknown]
+/// falls back to `OTHER` so a create/edit never sends an invalid enum.
+const Map<RealExpenseCategory, String> _realExpenseCategoryWire = {
+  RealExpenseCategory.accommodation: 'ACCOMMODATION',
+  RealExpenseCategory.food: 'FOOD',
+  RealExpenseCategory.transport: 'TRANSPORT',
+  RealExpenseCategory.attraction: 'ATTRACTION',
+  RealExpenseCategory.shopping: 'SHOPPING',
+  RealExpenseCategory.health: 'HEALTH',
+  RealExpenseCategory.visa: 'VISA',
+  RealExpenseCategory.insurance: 'INSURANCE',
+  RealExpenseCategory.other: 'OTHER',
+  RealExpenseCategory.unknown: 'OTHER',
+};
+
+/// The 9 categories a customer may pick from (excludes [RealExpenseCategory.unknown]).
+const List<RealExpenseCategory> realExpenseCategoryChoices = [
+  RealExpenseCategory.accommodation,
+  RealExpenseCategory.food,
+  RealExpenseCategory.transport,
+  RealExpenseCategory.attraction,
+  RealExpenseCategory.shopping,
+  RealExpenseCategory.health,
+  RealExpenseCategory.visa,
+  RealExpenseCategory.insurance,
+  RealExpenseCategory.other,
+];
+
+String realExpenseCategoryWire(RealExpenseCategory c) =>
+    _realExpenseCategoryWire[c] ?? 'OTHER';
+
+/// Maps a backend `TripPlanExpenseCategory` wire string to [RealExpenseCategory];
+/// unrecognised codes map to [RealExpenseCategory.unknown].
+RealExpenseCategory realExpenseCategoryFromCode(String? code) {
+  switch (code) {
+    case 'ACCOMMODATION':
+      return RealExpenseCategory.accommodation;
+    case 'FOOD':
+      return RealExpenseCategory.food;
+    case 'TRANSPORT':
+      return RealExpenseCategory.transport;
+    case 'ATTRACTION':
+      return RealExpenseCategory.attraction;
+    case 'SHOPPING':
+      return RealExpenseCategory.shopping;
+    case 'HEALTH':
+      return RealExpenseCategory.health;
+    case 'VISA':
+      return RealExpenseCategory.visa;
+    case 'INSURANCE':
+      return RealExpenseCategory.insurance;
+    case 'OTHER':
+      return RealExpenseCategory.other;
+    default:
+      return RealExpenseCategory.unknown;
+  }
+}
+
+/// Real-backend mirror of `TripPlanExpenseResponse`. `amount` is a JSON number
+/// (BigDecimal server-side) surfaced as [double] for display only — the backend
+/// owns all budget math. `tripDayId`/`tripItemId` are optional links.
+class RealExpense {
+  final int id;
+  final int tripPlanId;
+  final int? tripDayId;
+  final int? tripItemId;
+  final int? paidByUserId;
+  final String? paidByUserName;
+  final String category; // raw wire code
+  final double amount;
+  final String currency;
+  final String title;
+  final String? notes;
+  final DateTime? expenseDate;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+
+  const RealExpense({
+    required this.id,
+    this.tripPlanId = 0,
+    this.tripDayId,
+    this.tripItemId,
+    this.paidByUserId,
+    this.paidByUserName,
+    this.category = '',
+    this.amount = 0,
+    this.currency = 'VND',
+    this.title = '',
+    this.notes,
+    this.expenseDate,
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  RealExpenseCategory get categoryView => realExpenseCategoryFromCode(category);
+
+  factory RealExpense.fromJson(Map<String, dynamic> json) {
+    return RealExpense(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      tripPlanId: (json['tripPlanId'] as num?)?.toInt() ?? 0,
+      tripDayId: (json['tripDayId'] as num?)?.toInt(),
+      tripItemId: (json['tripItemId'] as num?)?.toInt(),
+      paidByUserId: (json['paidByUserId'] as num?)?.toInt(),
+      paidByUserName: json['paidByUserName'] as String?,
+      category: (json['category'] as String?) ?? '',
+      amount: (json['amount'] as num?)?.toDouble() ?? 0,
+      currency: (json['currency'] as String?) ?? 'VND',
+      title: (json['title'] as String?) ?? '',
+      notes: json['notes'] as String?,
+      expenseDate: _tryParseDate(json['expenseDate']),
+      createdAt: _tryParseDate(json['createdAt']),
+      updatedAt: _tryParseDate(json['updatedAt']),
+    );
+  }
+}
+
+/// Real-backend mirror of `ExpenseCategoryBreakdown`.
+class RealExpenseCategoryBreakdown {
+  final String category; // raw wire code
+  final double totalAmount;
+
+  const RealExpenseCategoryBreakdown({
+    this.category = '',
+    this.totalAmount = 0,
+  });
+
+  RealExpenseCategory get categoryView => realExpenseCategoryFromCode(category);
+
+  factory RealExpenseCategoryBreakdown.fromJson(Map<String, dynamic> json) {
+    return RealExpenseCategoryBreakdown(
+      category: (json['category'] as String?) ?? '',
+      totalAmount: (json['totalAmount'] as num?)?.toDouble() ?? 0,
+    );
+  }
+}
+
+/// Real-backend mirror of `TripPlanBudgetSummaryResponse` (server-computed budget
+/// vs. actual). [hasBudget] distinguishes "no budget set" (totalBudget 0) from a
+/// real budget, so the UI never frames a budget-less trip as "over budget".
+class RealExpenseSummary {
+  final int tripPlanId;
+  final double totalBudget;
+  final double totalSpent;
+  final double remainingBudget;
+  final bool overBudget;
+  final List<RealExpenseCategoryBreakdown> categoryBreakdown;
+
+  const RealExpenseSummary({
+    this.tripPlanId = 0,
+    this.totalBudget = 0,
+    this.totalSpent = 0,
+    this.remainingBudget = 0,
+    this.overBudget = false,
+    this.categoryBreakdown = const [],
+  });
+
+  bool get hasBudget => totalBudget > 0;
+
+  factory RealExpenseSummary.fromJson(Map<String, dynamic> json) {
+    final raw = json['categoryBreakdown'];
+    return RealExpenseSummary(
+      tripPlanId: (json['tripPlanId'] as num?)?.toInt() ?? 0,
+      totalBudget: (json['totalBudget'] as num?)?.toDouble() ?? 0,
+      totalSpent: (json['totalSpent'] as num?)?.toDouble() ?? 0,
+      remainingBudget: (json['remainingBudget'] as num?)?.toDouble() ?? 0,
+      overBudget: (json['overBudget'] as bool?) ?? false,
+      categoryBreakdown: raw is List
+          ? raw
+              .map((e) => RealExpenseCategoryBreakdown.fromJson(
+                  e as Map<String, dynamic>))
+              .toList()
+          : const [],
+    );
+  }
+}
+
+/// Request payload for creating/updating an expense (`TripPlanExpenseRequest`).
+/// [toJson] emits every backend field each time (create and update share the
+/// same shape); optional day/item links are sent as null when absent.
+class RealExpensePayload {
+  final RealExpenseCategory category;
+  final double amount;
+  final String currency;
+  final String title;
+  final String? notes;
+  final DateTime expenseDate;
+  final int? tripDayId;
+  final int? tripItemId;
+
+  const RealExpensePayload({
+    required this.category,
+    required this.amount,
+    required this.currency,
+    required this.title,
+    required this.expenseDate,
+    this.notes,
+    this.tripDayId,
+    this.tripItemId,
+  });
+
+  Map<String, dynamic> toJson() {
+    final d = expenseDate;
+    final iso =
+        '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+    return {
+      'tripDayId': tripDayId,
+      'tripItemId': tripItemId,
+      'category': realExpenseCategoryWire(category),
+      'amount': amount,
+      'currency': currency,
+      'title': title,
+      'notes': notes,
+      'expenseDate': iso,
+    };
+  }
+}
+
+/// Outcome of a real expense action (list/create/update/delete + budget summary).
+/// [demoUnavailable] is the Demo Mode guard (zero HTTP); [busy] the single-flight
+/// guard; [sessionExpired] (401) never triggers auto-logout; [forbidden] 403 (a
+/// VIEWER collaborator can't mutate); [notFound] 404 (trip/expense gone or not
+/// yours); [validation] 400 (amount/currency/title/date); [serverError] 5xx;
+/// [network] transport/timeout.
+enum ExpenseOutcome {
+  success,
+  demoUnavailable,
+  busy,
+  sessionExpired,
+  forbidden,
+  notFound,
+  validation,
+  network,
+  serverError,
+}
+
 class DemoBooking {
   final String code;
   final String ownerUserId;
