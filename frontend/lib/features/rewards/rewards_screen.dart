@@ -301,6 +301,329 @@ class LoyaltyScreen extends StatelessWidget {
   }
 }
 
+/// UI38 — Real Mode coupons (`GET /api/me/coupons[/{id}]`, `POST /claim`). List
+/// my claimed coupons, view one, and claim by code. No checkout/apply integration
+/// (preview/eligibility deferred). Rendered inside the existing Coupons scaffold,
+/// replacing the real-mode placeholder. A 401 never logs the user out.
+class _RealCouponsBody extends StatefulWidget {
+  const _RealCouponsBody();
+
+  @override
+  State<_RealCouponsBody> createState() => _RealCouponsBodyState();
+}
+
+class _RealCouponsBodyState extends State<_RealCouponsBody> {
+  final _code = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) AppScope.of(context).loadRealCoupons();
+    });
+  }
+
+  @override
+  void dispose() {
+    _code.dispose();
+    super.dispose();
+  }
+
+  void _reauth() {
+    showOceanSessionExpiredSheet(
+      context,
+      onLogin: () {
+        Navigator.of(context).pop();
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+        );
+      },
+      onReturnHome: () => Navigator.of(context).pop(),
+    );
+  }
+
+  Future<void> _claim(AppState app) async {
+    final l10n = AppLocalizations.of(context)!;
+    final outcome = await app.claimRealCoupon(_code.text);
+    if (!mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    void snack(String m) => messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(m)));
+    switch (outcome) {
+      case CouponOutcome.success:
+        _code.clear();
+        snack(l10n.couponsRealClaimSuccess);
+      case CouponOutcome.sessionExpired:
+        _reauth();
+      case CouponOutcome.notFound:
+        snack(l10n.couponsRealNotFound);
+      case CouponOutcome.validation:
+        snack(l10n.couponsRealInvalidCode);
+      case CouponOutcome.conflict:
+        snack(l10n.couponsRealLimitReached);
+      case CouponOutcome.busy:
+        break;
+      default:
+        snack(l10n.couponsRealClaimError);
+    }
+  }
+
+  void _openDetail(AppState app, RealCoupon coupon) {
+    app.loadRealCouponDetail(coupon.id);
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _CouponDetailSheet(couponId: coupon.id, fallback: coupon),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final app = AppScope.of(context);
+    final l10n = AppLocalizations.of(context)!;
+
+    if (app.realCouponsError == CouponOutcome.sessionExpired &&
+        !app.realCouponsLoaded) {
+      return OceanSessionExpiredState(
+        key: const Key('coupons-session-expired'),
+        onLogin: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+        ),
+        onReturnHome: () => Navigator.maybePop(context),
+      );
+    }
+    if (app.realCouponsLoading && !app.realCouponsLoaded) {
+      return Semantics(
+        liveRegion: true,
+        label: l10n.couponsRealLoadingMessage,
+        child: Column(
+          children: [
+            const SizedBox(height: AppSpacing.xxl),
+            const CircularProgressIndicator(key: Key('coupons-loading')),
+            const SizedBox(height: AppSpacing.md),
+            Text(l10n.couponsRealLoadingMessage),
+          ],
+        ),
+      );
+    }
+    if (app.realCouponsError != null && !app.realCouponsLoaded) {
+      return OceanRecoverableErrorState(
+        key: const Key('coupons-error'),
+        message: l10n.couponsRealErrorMessage,
+        onReload: () => app.loadRealCoupons(refresh: true),
+      );
+    }
+
+    final claiming = app.realCouponsClaiming;
+    return Column(
+      key: const Key('coupons-content'),
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _CodeEntryCard(
+          controller: _code,
+          title: l10n.couponClaimTitle,
+          label: l10n.couponCodeLabel,
+          helper: l10n.couponsRealClaimHelper,
+          actionLabel: l10n.couponClaimAction,
+          semanticLabel: l10n.couponClaimSemantic,
+          onSubmit: claiming ? () {} : () => _claim(app),
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        _SectionTitle(l10n.couponsTitle),
+        const SizedBox(height: AppSpacing.sm),
+        if (app.realCoupons.isEmpty)
+          OceanEmptyState(
+            key: const Key('coupons-empty'),
+            title: l10n.couponsEmptyTitle,
+            message: l10n.couponsEmptyMessage,
+          )
+        else
+          for (final coupon in app.realCoupons)
+            _RealCouponTile(
+              coupon: coupon,
+              onTap: () => _openDetail(app, coupon),
+            ),
+      ],
+    );
+  }
+}
+
+String realCouponStatusLabel(AppLocalizations l10n, CouponStatusView v) {
+  return switch (v) {
+    CouponStatusView.available => l10n.couponStatusAvailable,
+    CouponStatusView.used => l10n.couponStatusUsed,
+    CouponStatusView.expired => l10n.couponStatusExpired,
+    CouponStatusView.revoked => l10n.couponStatusRevoked,
+    CouponStatusView.unknown => l10n.couponStatusUnknown,
+  };
+}
+
+Color realCouponStatusColor(CouponStatusView v) {
+  return switch (v) {
+    CouponStatusView.available => AppColors.success,
+    CouponStatusView.used => AppColors.slate,
+    CouponStatusView.expired => AppColors.warning,
+    CouponStatusView.revoked => AppColors.danger,
+    CouponStatusView.unknown => AppColors.slate,
+  };
+}
+
+String realCouponDiscountLabel(
+  AppLocalizations l10n,
+  RealCouponDefinition def,
+) {
+  switch (def.discountTypeView) {
+    case CouponDiscountType.percentage:
+      return l10n
+          .couponPercentageValue(def.discountValue.clamp(0, 100).toInt());
+    case CouponDiscountType.fixedAmount:
+      if (def.discountValue <= 0) return l10n.couponAmountUnavailable;
+      return l10n.couponFixedValue(def.discountValue.toStringAsFixed(2));
+    case null:
+      return l10n.couponAmountUnavailable;
+  }
+}
+
+class _RealCouponTile extends StatelessWidget {
+  final RealCoupon coupon;
+  final VoidCallback onTap;
+
+  const _RealCouponTile({required this.coupon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final def = coupon.coupon;
+    final statusView = coupon.statusView;
+    final targetView = def.targetTypeView;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+      child: OceanGlassCard(
+        key: Key('coupon-tile-${coupon.id}'),
+        onTap: onTap,
+        semanticLabel: l10n.couponCardSemantic(def.code),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Wrap(
+              spacing: AppSpacing.xs,
+              runSpacing: AppSpacing.xs,
+              children: [
+                OceanStatusPill(
+                  label: realCouponStatusLabel(l10n, statusView),
+                  icon: Icons.verified_rounded,
+                  color: realCouponStatusColor(statusView),
+                ),
+                OceanStatusPill(
+                  label: targetView != null
+                      ? couponTargetLabel(l10n, targetView)
+                      : def.targetType,
+                  icon: Icons.sell_rounded,
+                  color: AppColors.turquoise600,
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              def.name.isEmpty ? def.code : def.name,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            if (def.description.isNotEmpty) ...[
+              const SizedBox(height: AppSpacing.xxs),
+              Text(def.description,
+                  style: Theme.of(context).textTheme.bodyMedium),
+            ],
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              realCouponDiscountLabel(l10n, def),
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium
+                  ?.copyWith(color: AppColors.ocean),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CouponDetailSheet extends StatelessWidget {
+  final int couponId;
+  final RealCoupon fallback;
+
+  const _CouponDetailSheet({required this.couponId, required this.fallback});
+
+  @override
+  Widget build(BuildContext context) {
+    final app = AppScope.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final coupon = app.couponDetailCache[couponId] ?? fallback;
+    final def = coupon.coupon;
+    final statusView = coupon.statusView;
+    final df = DateFormat.yMMMd(Localizations.localeOf(context).toString());
+    return OceanGlassBottomSheet(
+      child: SingleChildScrollView(
+        child: Column(
+          key: const Key('coupon-detail-content'),
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            OceanStatusPill(
+              label: realCouponStatusLabel(l10n, statusView),
+              icon: Icons.verified_rounded,
+              color: realCouponStatusColor(statusView),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(def.name.isEmpty ? def.code : def.name,
+                style: Theme.of(context).textTheme.headlineSmall),
+            const SizedBox(height: AppSpacing.xxs),
+            SelectableText(def.code,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(color: AppColors.textSecondary)),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              realCouponDiscountLabel(l10n, def),
+              style: Theme.of(context)
+                  .textTheme
+                  .titleLarge
+                  ?.copyWith(color: AppColors.ocean),
+            ),
+            if (def.description.isNotEmpty) ...[
+              const SizedBox(height: AppSpacing.sm),
+              Text(def.description,
+                  style: Theme.of(context).textTheme.bodyMedium),
+            ],
+            const SizedBox(height: AppSpacing.md),
+            if ((def.minimumSpend ?? 0) > 0)
+              Text(
+                l10n.couponDetailMinimumSpend(
+                    def.minimumSpend!.toStringAsFixed(2)),
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            if (coupon.effectiveExpiresAt != null)
+              Text(
+                l10n.couponDetailValidUntil(
+                    df.format(coupon.effectiveExpiresAt!.toLocal())),
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            if (def.usageLimitPerUser > 0)
+              Text(
+                l10n.couponDetailUsagePerUser(def.usageLimitPerUser),
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            const SizedBox(height: AppSpacing.sm),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 /// UI37 — Real Mode referral (`GET /api/me/referral[/history]`, `POST /use`).
 /// Personal code + stats, activity history (as inviter and/or invitee), and a
 /// use-a-code action. Rendered inside the existing Referral scaffold, replacing
@@ -1270,12 +1593,10 @@ class _CouponsScreenState extends State<CouponsScreen> {
     final app = AppScope.of(context);
     final l10n = AppLocalizations.of(context)!;
     if (!app.demoMode) {
+      // UI38: real coupons are backend-connected. Demo Mode is byte-identical.
       return _RewardsScaffold(
         title: l10n.couponsTitle,
-        child: OceanEmptyState(
-          title: l10n.rewardsRealEmptyTitle,
-          message: l10n.couponsRealUnavailable,
-        ),
+        child: const _RealCouponsBody(),
       );
     }
     return _RewardsScaffold(

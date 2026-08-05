@@ -7083,4 +7083,63 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get referralRealNoHistory =>
       'Chưa có hoạt động giới thiệu. Chia sẻ mã của bạn để bắt đầu.';
+
+  @override
+  String get couponsRealLoadingMessage => 'Đang tải phiếu giảm giá của bạn…';
+
+  @override
+  String get couponsRealErrorMessage =>
+      'Không thể tải phiếu giảm giá. Vui lòng thử lại.';
+
+  @override
+  String get couponsRealClaimHelper =>
+      'Nhập mã phiếu giảm giá để thêm vào tài khoản của bạn.';
+
+  @override
+  String get couponsRealClaimSuccess => 'Đã nhận phiếu giảm giá.';
+
+  @override
+  String get couponsRealClaimError =>
+      'Không thể nhận phiếu giảm giá đó. Vui lòng thử lại.';
+
+  @override
+  String get couponsRealNotFound => 'Không tìm thấy mã phiếu giảm giá đó.';
+
+  @override
+  String get couponsRealInvalidCode =>
+      'Phiếu giảm giá đã ngừng hoạt động, hết hạn hoặc chưa có hiệu lực.';
+
+  @override
+  String get couponsRealLimitReached =>
+      'Bạn đã đạt giới hạn sử dụng cho phiếu giảm giá này.';
+
+  @override
+  String get couponStatusAvailable => 'Có thể dùng';
+
+  @override
+  String get couponStatusUsed => 'Đã dùng';
+
+  @override
+  String get couponStatusExpired => 'Hết hạn';
+
+  @override
+  String get couponStatusRevoked => 'Đã thu hồi';
+
+  @override
+  String get couponStatusUnknown => 'Không xác định';
+
+  @override
+  String couponDetailMinimumSpend(String amount) {
+    return 'Chi tiêu tối thiểu $amount';
+  }
+
+  @override
+  String couponDetailValidUntil(String date) {
+    return 'Có hiệu lực đến $date';
+  }
+
+  @override
+  String couponDetailUsagePerUser(int count) {
+    return 'Tối đa $count lượt dùng mỗi khách hàng';
+  }
 }

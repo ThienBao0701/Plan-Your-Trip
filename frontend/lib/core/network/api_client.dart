@@ -2254,6 +2254,102 @@ class ApiClient {
     }
   }
 
+  // ── Coupons (/api/me/coupons, UI-38) ─────────────────────────────────────────
+  // Customer: list my claimed coupons (bare array, createdAt DESC), get one, and
+  // claim by code. No checkout/apply integration exists (preview/eligibility are
+  // deferred — they require order/booking context). All authenticated +
+  // owner-scoped. 8s timeout, no retry.
+
+  /// Lists my claimed coupons (`GET /api/me/coupons`, a bare array).
+  Future<CollectionApiResult<List<RealCoupon>>> getCoupons() async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/me/coupons'), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final decoded = jsonDecode(utf8.decode(res.bodyBytes));
+        if (decoded is! List) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(
+          decoded
+              .map((e) => RealCoupon.fromJson(e as Map<String, dynamic>))
+              .toList(),
+        );
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Gets one of my claimed coupons (`GET /api/me/coupons/{id}`; 404 if not mine).
+  Future<CollectionApiResult<RealCoupon>> getCoupon(int id) async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/me/coupons/$id'), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealCoupon.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Claims a coupon by code (`POST /api/me/coupons/claim`, 201). 404 unknown,
+  /// 400 inactive/expired/not-yet-valid, 409 usage limit reached.
+  Future<CollectionApiResult<RealCoupon>> claimCoupon(String code) async {
+    try {
+      final res = await _client
+          .post(Uri.parse('$baseUrl/me/coupons/claim'),
+              headers: _jsonHeaders, body: jsonEncode({'code': code}))
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealCoupon.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
   Map<String, dynamic> _failureForStatus(http.Response res) {
     Map<String, dynamic>? body;
     try {

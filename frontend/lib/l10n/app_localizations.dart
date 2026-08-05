@@ -12327,6 +12327,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No referral activity yet. Share your code to get started.'**
   String get referralRealNoHistory;
+
+  /// No description provided for @couponsRealLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading your coupons…'**
+  String get couponsRealLoadingMessage;
+
+  /// No description provided for @couponsRealErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load your coupons. Please try again.'**
+  String get couponsRealErrorMessage;
+
+  /// No description provided for @couponsRealClaimHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a coupon code to add it to your account.'**
+  String get couponsRealClaimHelper;
+
+  /// No description provided for @couponsRealClaimSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Coupon claimed.'**
+  String get couponsRealClaimSuccess;
+
+  /// No description provided for @couponsRealClaimError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t claim that coupon. Please try again.'**
+  String get couponsRealClaimError;
+
+  /// No description provided for @couponsRealNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'That coupon code was not found.'**
+  String get couponsRealNotFound;
+
+  /// No description provided for @couponsRealInvalidCode.
+  ///
+  /// In en, this message translates to:
+  /// **'That coupon is inactive, expired, or not yet valid.'**
+  String get couponsRealInvalidCode;
+
+  /// No description provided for @couponsRealLimitReached.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve reached the usage limit for this coupon.'**
+  String get couponsRealLimitReached;
+
+  /// No description provided for @couponStatusAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Available'**
+  String get couponStatusAvailable;
+
+  /// No description provided for @couponStatusUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'Used'**
+  String get couponStatusUsed;
+
+  /// No description provided for @couponStatusExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get couponStatusExpired;
+
+  /// No description provided for @couponStatusRevoked.
+  ///
+  /// In en, this message translates to:
+  /// **'Revoked'**
+  String get couponStatusRevoked;
+
+  /// No description provided for @couponStatusUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get couponStatusUnknown;
+
+  /// No description provided for @couponDetailMinimumSpend.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum spend {amount}'**
+  String couponDetailMinimumSpend(String amount);
+
+  /// No description provided for @couponDetailValidUntil.
+  ///
+  /// In en, this message translates to:
+  /// **'Valid until {date}'**
+  String couponDetailValidUntil(String date);
+
+  /// No description provided for @couponDetailUsagePerUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Up to {count} use(s) per customer'**
+  String couponDetailUsagePerUser(int count);
 }
 
 class _AppLocalizationsDelegate

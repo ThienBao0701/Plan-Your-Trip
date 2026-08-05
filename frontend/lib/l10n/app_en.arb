@@ -3649,5 +3649,36 @@
   "referralRealUseError": "We couldn't apply that code. Please try again.",
   "referralRealAlreadyUsed": "You have already used a referral code and cannot use another.",
   "referralRealCodeNotFound": "That referral code was not found.",
-  "referralRealNoHistory": "No referral activity yet. Share your code to get started."
+  "referralRealNoHistory": "No referral activity yet. Share your code to get started.",
+  "couponsRealLoadingMessage": "Loading your coupons…",
+  "couponsRealErrorMessage": "We couldn't load your coupons. Please try again.",
+  "couponsRealClaimHelper": "Enter a coupon code to add it to your account.",
+  "couponsRealClaimSuccess": "Coupon claimed.",
+  "couponsRealClaimError": "We couldn't claim that coupon. Please try again.",
+  "couponsRealNotFound": "That coupon code was not found.",
+  "couponsRealInvalidCode": "That coupon is inactive, expired, or not yet valid.",
+  "couponsRealLimitReached": "You've reached the usage limit for this coupon.",
+  "couponStatusAvailable": "Available",
+  "couponStatusUsed": "Used",
+  "couponStatusExpired": "Expired",
+  "couponStatusRevoked": "Revoked",
+  "couponStatusUnknown": "Unknown",
+  "couponDetailMinimumSpend": "Minimum spend {amount}",
+  "@couponDetailMinimumSpend": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "couponDetailValidUntil": "Valid until {date}",
+  "@couponDetailValidUntil": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "couponDetailUsagePerUser": "Up to {count} use(s) per customer",
+  "@couponDetailUsagePerUser": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  }
 }

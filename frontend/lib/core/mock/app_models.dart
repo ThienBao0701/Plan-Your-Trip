@@ -5098,6 +5098,210 @@ enum ReferralOutcome {
   serverError,
 }
 
+/// Maps a backend `DiscountType` wire string to the existing demo
+/// [CouponDiscountType] enum. Null when unrecognised.
+CouponDiscountType? couponDiscountTypeFromCode(String? code) {
+  switch (code) {
+    case 'PERCENTAGE':
+      return CouponDiscountType.percentage;
+    case 'FIXED_AMOUNT':
+      return CouponDiscountType.fixedAmount;
+    default:
+      return null;
+  }
+}
+
+/// Maps a backend `CouponTargetType` wire string to the existing demo
+/// [CouponTargetType] enum (reusing its label). Null when unrecognised.
+CouponTargetType? couponTargetTypeFromCode(String? code) {
+  switch (code) {
+    case 'ALL':
+      return CouponTargetType.all;
+    case 'HOTEL':
+      return CouponTargetType.hotel;
+    case 'ROOM':
+      return CouponTargetType.room;
+    case 'PLACE_TYPE':
+      return CouponTargetType.placeType;
+    default:
+      return null;
+  }
+}
+
+/// View classification of a backend `CustomerCouponStatus` string (AVAILABLE,
+/// USED, EXPIRED, REVOKED). [unknown] preserves forward-compatibility.
+enum CouponStatusView { available, used, expired, revoked, unknown }
+
+CouponStatusView couponStatusViewFromCode(String? code) {
+  switch (code) {
+    case 'AVAILABLE':
+      return CouponStatusView.available;
+    case 'USED':
+      return CouponStatusView.used;
+    case 'EXPIRED':
+      return CouponStatusView.expired;
+    case 'REVOKED':
+      return CouponStatusView.revoked;
+    default:
+      return CouponStatusView.unknown;
+  }
+}
+
+/// Real-backend mirror of `CouponDto.CouponDefinitionResponse` (the nested coupon
+/// metadata inside a claimed customer coupon). The coupon definition has no
+/// currency field — fixed amounts are shown as plain decimals. `Map` decoding is
+/// confined to [fromJson].
+class RealCouponDefinition {
+  final int id;
+  final String code;
+  final String name;
+  final String description;
+  final String discountType;
+  final double discountValue;
+  final double? maxDiscountAmount;
+  final double? minimumSpend;
+  final DateTime? validFrom;
+  final DateTime? validUntil;
+  final bool active;
+  final int? totalUsageLimit;
+  final int usageLimitPerUser;
+  final int currentUsageCount;
+  final String targetType;
+  final int? minimumStayNights;
+  final bool firstBookingOnly;
+  final bool combinableWithPromotions;
+  final bool combinableWithTravelCredits;
+  final String? minimumTier;
+
+  const RealCouponDefinition({
+    this.id = 0,
+    this.code = '',
+    this.name = '',
+    this.description = '',
+    this.discountType = '',
+    this.discountValue = 0,
+    this.maxDiscountAmount,
+    this.minimumSpend,
+    this.validFrom,
+    this.validUntil,
+    this.active = false,
+    this.totalUsageLimit,
+    this.usageLimitPerUser = 0,
+    this.currentUsageCount = 0,
+    this.targetType = '',
+    this.minimumStayNights,
+    this.firstBookingOnly = false,
+    this.combinableWithPromotions = false,
+    this.combinableWithTravelCredits = false,
+    this.minimumTier,
+  });
+
+  CouponDiscountType? get discountTypeView =>
+      couponDiscountTypeFromCode(discountType);
+  CouponTargetType? get targetTypeView => couponTargetTypeFromCode(targetType);
+
+  factory RealCouponDefinition.fromJson(Map<String, dynamic> json) {
+    return RealCouponDefinition(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      code: (json['code'] as String?) ?? '',
+      name: (json['name'] as String?) ?? '',
+      description: (json['description'] as String?) ?? '',
+      discountType: (json['discountType'] as String?) ?? '',
+      discountValue: (json['discountValue'] as num?)?.toDouble() ?? 0,
+      maxDiscountAmount: (json['maxDiscountAmount'] as num?)?.toDouble(),
+      minimumSpend: (json['minimumSpend'] as num?)?.toDouble(),
+      validFrom: _tryParseDate(json['validFrom']),
+      validUntil: _tryParseDate(json['validUntil']),
+      active: (json['active'] as bool?) ?? false,
+      totalUsageLimit: (json['totalUsageLimit'] as num?)?.toInt(),
+      usageLimitPerUser: (json['usageLimitPerUser'] as num?)?.toInt() ?? 0,
+      currentUsageCount: (json['currentUsageCount'] as num?)?.toInt() ?? 0,
+      targetType: (json['targetType'] as String?) ?? '',
+      minimumStayNights: (json['minimumStayNights'] as num?)?.toInt(),
+      firstBookingOnly: (json['firstBookingOnly'] as bool?) ?? false,
+      combinableWithPromotions:
+          (json['combinableWithPromotions'] as bool?) ?? false,
+      combinableWithTravelCredits:
+          (json['combinableWithTravelCredits'] as bool?) ?? false,
+      minimumTier: json['minimumTier'] as String?,
+    );
+  }
+}
+
+/// Real-backend mirror of `CouponDto.CustomerCouponResponse`
+/// (`GET`/`POST /api/me/coupons`). Wraps the nested [coupon] definition with the
+/// claimed instance's status/expiry. `Map` decoding is confined to [fromJson].
+class RealCoupon {
+  final int id;
+  final int userId;
+  final RealCouponDefinition coupon;
+  final String status;
+  final String effectiveStatus;
+  final DateTime? claimedAt;
+  final DateTime? usedAt;
+  final DateTime? expiresAt;
+  final DateTime? effectiveExpiresAt;
+  final int? bookingId;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+
+  const RealCoupon({
+    required this.id,
+    this.userId = 0,
+    this.coupon = const RealCouponDefinition(),
+    this.status = '',
+    this.effectiveStatus = '',
+    this.claimedAt,
+    this.usedAt,
+    this.expiresAt,
+    this.effectiveExpiresAt,
+    this.bookingId,
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  CouponStatusView get statusView => couponStatusViewFromCode(effectiveStatus);
+
+  factory RealCoupon.fromJson(Map<String, dynamic> json) {
+    final def = json['coupon'];
+    return RealCoupon(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      userId: (json['userId'] as num?)?.toInt() ?? 0,
+      coupon: def is Map<String, dynamic>
+          ? RealCouponDefinition.fromJson(def)
+          : const RealCouponDefinition(),
+      status: (json['status'] as String?) ?? '',
+      effectiveStatus: (json['effectiveStatus'] as String?) ?? '',
+      claimedAt: _tryParseDate(json['claimedAt']),
+      usedAt: _tryParseDate(json['usedAt']),
+      expiresAt: _tryParseDate(json['expiresAt']),
+      effectiveExpiresAt: _tryParseDate(json['effectiveExpiresAt']),
+      bookingId: (json['bookingId'] as num?)?.toInt(),
+      createdAt: _tryParseDate(json['createdAt']),
+      updatedAt: _tryParseDate(json['updatedAt']),
+    );
+  }
+}
+
+/// Outcome of a real coupon action (`GET /api/me/coupons[/{id}]`,
+/// `POST /claim`). [demoUnavailable] is the Demo Mode guard (zero HTTP); [busy]
+/// the single-flight guard; [sessionExpired] (401) never triggers auto-logout;
+/// [validation] 400 (inactive/expired/not-yet-valid code), [forbidden] 403,
+/// [notFound] 404 (unknown code), [conflict] 409 (usage limit reached),
+/// [serverError] 5xx, [network] transport/timeout.
+enum CouponOutcome {
+  success,
+  demoUnavailable,
+  busy,
+  sessionExpired,
+  validation,
+  forbidden,
+  notFound,
+  conflict,
+  network,
+  serverError,
+}
+
 class DemoBooking {
   final String code;
   final String ownerUserId;

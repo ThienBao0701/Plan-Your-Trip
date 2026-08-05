@@ -369,6 +369,21 @@ class AppState extends ChangeNotifier {
   bool realReferralUsing = false;
   ReferralOutcome? realReferralError;
 
+  // ── Real Mode Coupons (/api/me/coupons, UI-38) ────────────────────────────
+  // The customer's claimed coupons (list + per-id detail) plus a claim-by-code
+  // action. No checkout/apply integration (preview/eligibility deferred). A 401
+  // never calls logout(). Cleared on logout / mode / user change via
+  // [_resetRealCouponsState]. Zero HTTP in Demo Mode.
+  List<RealCoupon> realCoupons = [];
+  bool realCouponsLoading = false;
+  bool realCouponsLoaded = false;
+  bool realCouponsRefreshing = false;
+  bool realCouponsClaiming = false;
+  CouponOutcome? realCouponsError;
+  final Map<int, RealCoupon> couponDetailCache = {};
+  int? couponDetailLoadingId;
+  CouponOutcome? couponDetailError;
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -469,6 +484,7 @@ class AppState extends ChangeNotifier {
     _resetRealTravelCreditState();
     _resetRealMembershipState();
     _resetRealReferralState();
+    _resetRealCouponsState();
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -641,6 +657,18 @@ class AppState extends ChangeNotifier {
     realReferralError = null;
   }
 
+  void _resetRealCouponsState() {
+    realCoupons = [];
+    realCouponsLoading = false;
+    realCouponsLoaded = false;
+    realCouponsRefreshing = false;
+    realCouponsClaiming = false;
+    realCouponsError = null;
+    couponDetailCache.clear();
+    couponDetailLoadingId = null;
+    couponDetailError = null;
+  }
+
   void _resetRealNotificationsState() {
     realNotifications = [];
     realNotificationsLoading = false;
@@ -783,6 +811,7 @@ class AppState extends ChangeNotifier {
     _resetRealTravelCreditState();
     _resetRealMembershipState();
     _resetRealReferralState();
+    _resetRealCouponsState();
     timeline = [];
     expenses = [];
     demoBookings = [];
@@ -3972,6 +4001,104 @@ class AppState extends ChangeNotifier {
       return ReferralOutcome.success;
     }
     final outcome = _mapReferralError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  // ── Real Mode Coupons (UI-38) ────────────────────────────────────────────
+
+  CouponOutcome _mapCouponError(ApiErrorKind? kind) {
+    return switch (kind) {
+      ApiErrorKind.unauthorized => CouponOutcome.sessionExpired,
+      ApiErrorKind.forbidden => CouponOutcome.forbidden,
+      ApiErrorKind.notFound => CouponOutcome.notFound,
+      ApiErrorKind.conflict => CouponOutcome.conflict,
+      ApiErrorKind.validation => CouponOutcome.validation,
+      ApiErrorKind.unprocessable => CouponOutcome.validation,
+      ApiErrorKind.network => CouponOutcome.network,
+      ApiErrorKind.timeout => CouponOutcome.network,
+      ApiErrorKind.server => CouponOutcome.serverError,
+      _ => CouponOutcome.serverError,
+    };
+  }
+
+  /// Loads the customer's claimed coupons (`GET /api/me/coupons`). [refresh]
+  /// forces a re-fetch and preserves the current list on failure. Zero HTTP in
+  /// Demo Mode.
+  Future<CouponOutcome> loadRealCoupons({bool refresh = false}) async {
+    if (demoMode) return CouponOutcome.demoUnavailable;
+    if (realCouponsLoading || realCouponsRefreshing) {
+      return CouponOutcome.success;
+    }
+    if (realCouponsLoaded && !refresh) return CouponOutcome.success;
+    if (refresh) {
+      realCouponsRefreshing = true;
+    } else {
+      realCouponsLoading = true;
+    }
+    realCouponsError = null;
+    notifyListeners();
+    final result = await api.getCoupons();
+    realCouponsLoading = false;
+    realCouponsRefreshing = false;
+    if (result.success && result.data != null) {
+      realCoupons = result.data!;
+      realCouponsLoaded = true;
+      realCouponsError = null;
+      notifyListeners();
+      return CouponOutcome.success;
+    }
+    final outcome = _mapCouponError(result.errorKind);
+    realCouponsError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Loads one coupon's detail (`GET /api/me/coupons/{id}`), cached.
+  Future<CouponOutcome> loadRealCouponDetail(int id,
+      {bool refresh = false}) async {
+    if (demoMode) return CouponOutcome.demoUnavailable;
+    if (couponDetailLoadingId == id) return CouponOutcome.success;
+    if (couponDetailCache.containsKey(id) && !refresh) {
+      return CouponOutcome.success;
+    }
+    couponDetailLoadingId = id;
+    couponDetailError = null;
+    notifyListeners();
+    final result = await api.getCoupon(id);
+    couponDetailLoadingId = null;
+    if (result.success && result.data != null) {
+      couponDetailCache[id] = result.data!;
+      couponDetailError = null;
+      notifyListeners();
+      return CouponOutcome.success;
+    }
+    final outcome = _mapCouponError(result.errorKind);
+    couponDetailError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Claims a coupon by code (`POST /api/me/coupons/claim`). On success refreshes
+  /// the list so the claimed coupon appears. Maps 400→validation (inactive/
+  /// expired/not-yet-valid), 404→notFound (unknown code), 409→conflict (usage
+  /// limit reached). Single-flight via [realCouponsClaiming].
+  Future<CouponOutcome> claimRealCoupon(String code) async {
+    if (demoMode) return CouponOutcome.demoUnavailable;
+    final trimmed = code.trim();
+    if (trimmed.isEmpty) return CouponOutcome.validation;
+    if (realCouponsClaiming) return CouponOutcome.busy;
+    realCouponsClaiming = true;
+    notifyListeners();
+    final result = await api.claimCoupon(trimmed);
+    realCouponsClaiming = false;
+    if (result.success && result.data != null) {
+      couponDetailCache[result.data!.id] = result.data!;
+      notifyListeners();
+      await loadRealCoupons(refresh: true);
+      return CouponOutcome.success;
+    }
+    final outcome = _mapCouponError(result.errorKind);
     notifyListeners();
     return outcome;
   }

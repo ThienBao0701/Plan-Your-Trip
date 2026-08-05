@@ -3649,5 +3649,36 @@
   "referralRealUseError": "Không thể áp dụng mã đó. Vui lòng thử lại.",
   "referralRealAlreadyUsed": "Bạn đã sử dụng một mã giới thiệu và không thể dùng thêm.",
   "referralRealCodeNotFound": "Không tìm thấy mã giới thiệu đó.",
-  "referralRealNoHistory": "Chưa có hoạt động giới thiệu. Chia sẻ mã của bạn để bắt đầu."
+  "referralRealNoHistory": "Chưa có hoạt động giới thiệu. Chia sẻ mã của bạn để bắt đầu.",
+  "couponsRealLoadingMessage": "Đang tải phiếu giảm giá của bạn…",
+  "couponsRealErrorMessage": "Không thể tải phiếu giảm giá. Vui lòng thử lại.",
+  "couponsRealClaimHelper": "Nhập mã phiếu giảm giá để thêm vào tài khoản của bạn.",
+  "couponsRealClaimSuccess": "Đã nhận phiếu giảm giá.",
+  "couponsRealClaimError": "Không thể nhận phiếu giảm giá đó. Vui lòng thử lại.",
+  "couponsRealNotFound": "Không tìm thấy mã phiếu giảm giá đó.",
+  "couponsRealInvalidCode": "Phiếu giảm giá đã ngừng hoạt động, hết hạn hoặc chưa có hiệu lực.",
+  "couponsRealLimitReached": "Bạn đã đạt giới hạn sử dụng cho phiếu giảm giá này.",
+  "couponStatusAvailable": "Có thể dùng",
+  "couponStatusUsed": "Đã dùng",
+  "couponStatusExpired": "Hết hạn",
+  "couponStatusRevoked": "Đã thu hồi",
+  "couponStatusUnknown": "Không xác định",
+  "couponDetailMinimumSpend": "Chi tiêu tối thiểu {amount}",
+  "@couponDetailMinimumSpend": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "couponDetailValidUntil": "Có hiệu lực đến {date}",
+  "@couponDetailValidUntil": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "couponDetailUsagePerUser": "Tối đa {count} lượt dùng mỗi khách hàng",
+  "@couponDetailUsagePerUser": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  }
 }

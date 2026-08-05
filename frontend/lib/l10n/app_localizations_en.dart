@@ -7248,4 +7248,63 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get referralRealNoHistory =>
       'No referral activity yet. Share your code to get started.';
+
+  @override
+  String get couponsRealLoadingMessage => 'Loading your coupons…';
+
+  @override
+  String get couponsRealErrorMessage =>
+      'We couldn\'t load your coupons. Please try again.';
+
+  @override
+  String get couponsRealClaimHelper =>
+      'Enter a coupon code to add it to your account.';
+
+  @override
+  String get couponsRealClaimSuccess => 'Coupon claimed.';
+
+  @override
+  String get couponsRealClaimError =>
+      'We couldn\'t claim that coupon. Please try again.';
+
+  @override
+  String get couponsRealNotFound => 'That coupon code was not found.';
+
+  @override
+  String get couponsRealInvalidCode =>
+      'That coupon is inactive, expired, or not yet valid.';
+
+  @override
+  String get couponsRealLimitReached =>
+      'You\'ve reached the usage limit for this coupon.';
+
+  @override
+  String get couponStatusAvailable => 'Available';
+
+  @override
+  String get couponStatusUsed => 'Used';
+
+  @override
+  String get couponStatusExpired => 'Expired';
+
+  @override
+  String get couponStatusRevoked => 'Revoked';
+
+  @override
+  String get couponStatusUnknown => 'Unknown';
+
+  @override
+  String couponDetailMinimumSpend(String amount) {
+    return 'Minimum spend $amount';
+  }
+
+  @override
+  String couponDetailValidUntil(String date) {
+    return 'Valid until $date';
+  }
+
+  @override
+  String couponDetailUsagePerUser(int count) {
+    return 'Up to $count use(s) per customer';
+  }
 }
