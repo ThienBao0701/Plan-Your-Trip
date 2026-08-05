@@ -9,6 +9,7 @@ import '../../design/app_spacing.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/glass_widgets.dart';
 import '../auth/login_screen.dart';
+import '../conversations/real_conversation_thread_screen.dart';
 import '../hotels/booking_widgets.dart';
 import '../payments/real_payment_screen.dart';
 import '../reviews/real_my_reviews_screen.dart';
@@ -40,6 +41,58 @@ class _RealBookingDetailScreenState extends State<RealBookingDetailScreen> {
     });
   }
 
+  Future<void> _messageHost(AppState app) async {
+    final l10n = AppLocalizations.of(context)!;
+    final navigator = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final outcome = await app.createRealConversation(widget.bookingId);
+    if (!mounted) return;
+    switch (outcome) {
+      case ConversationOutcome.success:
+        final id = app.realConversationDetailId;
+        if (id != null) {
+          navigator.push(
+            MaterialPageRoute(
+              builder: (_) => RealConversationThreadScreen(conversationId: id),
+            ),
+          );
+        }
+      case ConversationOutcome.sessionExpired:
+        showOceanSessionExpiredSheet(
+          context,
+          onLogin: () {
+            navigator.pop();
+            navigator.push(
+              MaterialPageRoute(builder: (_) => const LoginScreen()),
+            );
+          },
+          onReturnHome: () => navigator.pop(),
+        );
+      case ConversationOutcome.busy:
+        break;
+      case ConversationOutcome.unprocessable:
+        messenger.showSnackBar(
+          SnackBar(content: Text(l10n.conversationNoPartnerMessage)),
+        );
+      case ConversationOutcome.forbidden:
+        messenger.showSnackBar(
+          SnackBar(content: Text(l10n.conversationForbiddenMessage)),
+        );
+      case ConversationOutcome.notFound:
+        messenger.showSnackBar(
+          SnackBar(content: Text(l10n.conversationGoneMessage)),
+        );
+      case ConversationOutcome.network:
+        messenger.showSnackBar(
+          SnackBar(content: Text(l10n.conversationNetworkMessage)),
+        );
+      default:
+        messenger.showSnackBar(
+          SnackBar(content: Text(l10n.conversationActionErrorMessage)),
+        );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final app = AppScope.of(context);
@@ -52,6 +105,15 @@ class _RealBookingDetailScreenState extends State<RealBookingDetailScreen> {
           icon: const Icon(Icons.arrow_back_rounded),
         ),
         title: Text(l10n.bookingDetailsTitle),
+        actions: [
+          IconButton(
+            key: const Key('booking-message-host'),
+            tooltip: l10n.conversationMessageHostAction,
+            onPressed:
+                app.realConversationMutating ? null : () => _messageHost(app),
+            icon: const Icon(Icons.forum_rounded),
+          ),
+        ],
       ),
       body: BubbleBackground(
         child: SafeArea(

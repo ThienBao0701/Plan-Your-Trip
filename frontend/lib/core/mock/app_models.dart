@@ -5771,6 +5771,215 @@ enum ExpenseOutcome {
   serverError,
 }
 
+// ── Conversations (/api/me/conversations, UI-41) ─────────────────────────────
+// Real-backend mirror of the guest↔partner messaging surface
+// (`UserConversationController` / `ConversationService`). Request/response only —
+// there is NO websocket/realtime, typing, or attachments; the client refreshes
+// on demand. `Map` decoding is confined to [fromJson].
+
+/// Conversation lifecycle (`ConversationStatus`). Users can OPEN (implicitly, by
+/// sending) and CLOSE; ARCHIVED is admin-only. [unknown] is forward-compat.
+enum ConversationStatusView { open, closed, archived, unknown }
+
+ConversationStatusView conversationStatusViewFromCode(String? code) {
+  switch (code) {
+    case 'OPEN':
+      return ConversationStatusView.open;
+    case 'CLOSED':
+      return ConversationStatusView.closed;
+    case 'ARCHIVED':
+      return ConversationStatusView.archived;
+    default:
+      return ConversationStatusView.unknown;
+  }
+}
+
+/// Who authored a message (`MessageSenderRole`). The signed-in guest is [user];
+/// the host is [partner]; [admin]/[system] are support/automated. [unknown] is
+/// forward-compat.
+enum MessageSenderRoleView { user, partner, admin, system, unknown }
+
+MessageSenderRoleView messageSenderRoleViewFromCode(String? code) {
+  switch (code) {
+    case 'USER':
+      return MessageSenderRoleView.user;
+    case 'PARTNER':
+      return MessageSenderRoleView.partner;
+    case 'ADMIN':
+      return MessageSenderRoleView.admin;
+    case 'SYSTEM':
+      return MessageSenderRoleView.system;
+    default:
+      return MessageSenderRoleView.unknown;
+  }
+}
+
+/// Real-backend mirror of `MessageResponse`. [readByPartner] on a user-authored
+/// message is the honest "seen by host" receipt the backend exposes.
+class RealMessage {
+  final int id;
+  final int conversationId;
+  final int? senderUserId;
+  final String? senderName;
+  final String senderRole; // raw wire code
+  final String body;
+  final bool readByUser;
+  final bool readByPartner;
+  final DateTime? createdAt;
+
+  const RealMessage({
+    required this.id,
+    this.conversationId = 0,
+    this.senderUserId,
+    this.senderName,
+    this.senderRole = '',
+    this.body = '',
+    this.readByUser = false,
+    this.readByPartner = false,
+    this.createdAt,
+  });
+
+  MessageSenderRoleView get senderRoleView =>
+      messageSenderRoleViewFromCode(senderRole);
+
+  bool get isFromUser => senderRoleView == MessageSenderRoleView.user;
+
+  factory RealMessage.fromJson(Map<String, dynamic> json) {
+    return RealMessage(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      conversationId: (json['conversationId'] as num?)?.toInt() ?? 0,
+      senderUserId: (json['senderUserId'] as num?)?.toInt(),
+      senderName: json['senderName'] as String?,
+      senderRole: (json['senderRole'] as String?) ?? '',
+      body: (json['body'] as String?) ?? '',
+      readByUser: (json['readByUser'] as bool?) ?? false,
+      readByPartner: (json['readByPartner'] as bool?) ?? false,
+      createdAt: _tryParseDate(json['createdAt']),
+    );
+  }
+}
+
+/// Real-backend mirror of `ConversationResponse` (a thread + its messages,
+/// ordered oldest-first by the backend).
+class RealConversation {
+  final int id;
+  final int? bookingId;
+  final String? bookingCode;
+  final int? userId;
+  final String? userName;
+  final int? partnerProfileId;
+  final String? partnerBusinessName;
+  final String status; // raw wire code
+  final String? subject;
+  final DateTime? lastMessageAt;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+  final List<RealMessage> messages;
+
+  const RealConversation({
+    required this.id,
+    this.bookingId,
+    this.bookingCode,
+    this.userId,
+    this.userName,
+    this.partnerProfileId,
+    this.partnerBusinessName,
+    this.status = '',
+    this.subject,
+    this.lastMessageAt,
+    this.createdAt,
+    this.updatedAt,
+    this.messages = const [],
+  });
+
+  ConversationStatusView get statusView =>
+      conversationStatusViewFromCode(status);
+
+  factory RealConversation.fromJson(Map<String, dynamic> json) {
+    final raw = json['messages'];
+    return RealConversation(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      bookingId: (json['bookingId'] as num?)?.toInt(),
+      bookingCode: json['bookingCode'] as String?,
+      userId: (json['userId'] as num?)?.toInt(),
+      userName: json['userName'] as String?,
+      partnerProfileId: (json['partnerProfileId'] as num?)?.toInt(),
+      partnerBusinessName: json['partnerBusinessName'] as String?,
+      status: (json['status'] as String?) ?? '',
+      subject: json['subject'] as String?,
+      lastMessageAt: _tryParseDate(json['lastMessageAt']),
+      createdAt: _tryParseDate(json['createdAt']),
+      updatedAt: _tryParseDate(json['updatedAt']),
+      messages: raw is List
+          ? raw
+              .map((e) => RealMessage.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : const [],
+    );
+  }
+}
+
+/// Real-backend mirror of `ConversationSummaryResponse` (inbox row).
+class RealConversationSummary {
+  final int id;
+  final int? bookingId;
+  final String? bookingCode;
+  final String? subject;
+  final String status; // raw wire code
+  final DateTime? lastMessageAt;
+  final String? lastMessagePreview;
+  final int unreadCount;
+  final DateTime? createdAt;
+
+  const RealConversationSummary({
+    required this.id,
+    this.bookingId,
+    this.bookingCode,
+    this.subject,
+    this.status = '',
+    this.lastMessageAt,
+    this.lastMessagePreview,
+    this.unreadCount = 0,
+    this.createdAt,
+  });
+
+  ConversationStatusView get statusView =>
+      conversationStatusViewFromCode(status);
+
+  factory RealConversationSummary.fromJson(Map<String, dynamic> json) {
+    return RealConversationSummary(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      bookingId: (json['bookingId'] as num?)?.toInt(),
+      bookingCode: json['bookingCode'] as String?,
+      subject: json['subject'] as String?,
+      status: (json['status'] as String?) ?? '',
+      lastMessageAt: _tryParseDate(json['lastMessageAt']),
+      lastMessagePreview: json['lastMessagePreview'] as String?,
+      unreadCount: (json['unreadCount'] as num?)?.toInt() ?? 0,
+      createdAt: _tryParseDate(json['createdAt']),
+    );
+  }
+}
+
+/// Outcome of a real conversation action (list/detail/create/send/read/close).
+/// [demoUnavailable] is the Demo Mode guard (zero HTTP); [busy] the single-flight
+/// guard; [sessionExpired] (401) never triggers auto-logout; [forbidden] 403 (not
+/// your conversation/booking); [notFound] 404; [validation] 400 (blank body /
+/// missing bookingId); [unprocessable] 422 (archived thread / hotel has no
+/// partner); [serverError] 5xx; [network] transport/timeout.
+enum ConversationOutcome {
+  success,
+  demoUnavailable,
+  busy,
+  sessionExpired,
+  forbidden,
+  notFound,
+  validation,
+  unprocessable,
+  network,
+  serverError,
+}
+
 class DemoBooking {
   final String code;
   final String ownerUserId;

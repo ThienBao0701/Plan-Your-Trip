@@ -2669,6 +2669,191 @@ class ApiClient {
     }
   }
 
+  // ── Conversations (/api/me/conversations, UI-41) ─────────────────────────────
+  // Guest↔partner messaging about a booking. GET list → bare array (lastMessageAt
+  // desc). GET /{id} → thread with messages (createdAt asc). POST create (201,
+  // reuses an existing thread for the booking). POST /{id}/messages (201). PATCH
+  // /{id}/read and /{id}/close → updated conversation. No websocket/realtime; the
+  // client refreshes on demand. All authenticated, 8s timeout, no retry.
+
+  /// Lists the user's conversations (`GET /api/me/conversations`).
+  Future<CollectionApiResult<List<RealConversationSummary>>>
+      getConversations() async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/me/conversations'), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final decoded = jsonDecode(utf8.decode(res.bodyBytes));
+        if (decoded is! List) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(
+          decoded
+              .map((e) =>
+                  RealConversationSummary.fromJson(e as Map<String, dynamic>))
+              .toList(),
+        );
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Gets one conversation with its messages
+  /// (`GET /api/me/conversations/{id}`, 403 if not mine).
+  Future<CollectionApiResult<RealConversation>> getConversation(
+    int id,
+  ) async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/me/conversations/$id'),
+              headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealConversation.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Starts (or reuses) a conversation for one of the user's bookings
+  /// (`POST /api/me/conversations`, 201). 404 booking not found, 403 not the
+  /// booking owner, 422 the hotel has no partner to message.
+  Future<CollectionApiResult<RealConversation>> createConversation(
+    int bookingId, {
+    String? subject,
+  }) async {
+    try {
+      final res = await _client
+          .post(Uri.parse('$baseUrl/me/conversations'),
+              headers: _jsonHeaders,
+              body: jsonEncode({
+                'bookingId': bookingId,
+                if (subject != null && subject.isNotEmpty) 'subject': subject,
+              }))
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealConversation.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Sends a message as the guest
+  /// (`POST /api/me/conversations/{id}/messages`, 201). 422 if the thread is
+  /// archived, 400 if the body is blank.
+  Future<CollectionApiResult<RealMessage>> sendConversationMessage(
+    int id,
+    String body,
+  ) async {
+    try {
+      final res = await _client
+          .post(Uri.parse('$baseUrl/me/conversations/$id/messages'),
+              headers: _jsonHeaders, body: jsonEncode({'body': body}))
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final data = _decodeJsonMap(res).data;
+        if (data == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealMessage.fromJson(data));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Marks the user's incoming messages read
+  /// (`PATCH /api/me/conversations/{id}/read`).
+  Future<CollectionApiResult<RealConversation>> markConversationRead(
+    int id,
+  ) =>
+      _patchConversation('$baseUrl/me/conversations/$id/read');
+
+  /// Closes a conversation (`PATCH /api/me/conversations/{id}/close`).
+  Future<CollectionApiResult<RealConversation>> closeConversation(int id) =>
+      _patchConversation('$baseUrl/me/conversations/$id/close');
+
+  Future<CollectionApiResult<RealConversation>> _patchConversation(
+    String url,
+  ) async {
+    try {
+      final res = await _client
+          .patch(Uri.parse(url), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealConversation.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
   Map<String, dynamic> _failureForStatus(http.Response res) {
     Map<String, dynamic>? body;
     try {

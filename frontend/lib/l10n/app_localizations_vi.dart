@@ -7363,4 +7363,134 @@ class AppLocalizationsVi extends AppLocalizations {
   String expensesSummaryRemaining(String amount) {
     return 'Còn lại $amount';
   }
+
+  @override
+  String get conversationsTitle => 'Tin nhắn';
+
+  @override
+  String get conversationsLoadingMessage => 'Đang tải tin nhắn của bạn…';
+
+  @override
+  String get conversationsErrorMessage =>
+      'Không thể tải tin nhắn của bạn. Vui lòng thử lại.';
+
+  @override
+  String get conversationsEmptyTitle => 'Chưa có tin nhắn nào';
+
+  @override
+  String get conversationsEmptyMessage =>
+      'Mở một đặt phòng và chạm biểu tượng tin nhắn để trò chuyện với chủ nhà.';
+
+  @override
+  String get conversationStatusOpen => 'Đang mở';
+
+  @override
+  String get conversationStatusClosed => 'Đã đóng';
+
+  @override
+  String get conversationStatusArchived => 'Đã lưu trữ';
+
+  @override
+  String get conversationUntitled => 'Cuộc trò chuyện';
+
+  @override
+  String get conversationLoadingMessage => 'Đang tải cuộc trò chuyện…';
+
+  @override
+  String get conversationErrorMessage =>
+      'Không thể tải cuộc trò chuyện này. Vui lòng thử lại.';
+
+  @override
+  String get conversationForbiddenMessage =>
+      'Cuộc trò chuyện này không khả dụng với bạn.';
+
+  @override
+  String get conversationGoneMessage =>
+      'Cuộc trò chuyện này không còn khả dụng.';
+
+  @override
+  String get conversationArchivedMessage =>
+      'Cuộc trò chuyện này đã được lưu trữ và không thể nhận tin nhắn mới.';
+
+  @override
+  String get conversationEmptyBodyMessage => 'Nhập một tin nhắn để gửi.';
+
+  @override
+  String get conversationNetworkMessage =>
+      'Bạn dường như đang ngoại tuyến. Vui lòng kiểm tra kết nối.';
+
+  @override
+  String get conversationActionErrorMessage =>
+      'Đã xảy ra lỗi. Vui lòng thử lại.';
+
+  @override
+  String get conversationNoPartnerMessage =>
+      'Chủ nhà của đặt phòng này chưa thể nhận tin nhắn.';
+
+  @override
+  String get conversationCloseConfirmTitle => 'Đóng cuộc trò chuyện?';
+
+  @override
+  String get conversationCloseConfirmMessage =>
+      'Bạn có thể mở lại sau bằng cách gửi một tin nhắn mới.';
+
+  @override
+  String get conversationCloseAction => 'Đóng';
+
+  @override
+  String get conversationClosedMessage => 'Đã đóng cuộc trò chuyện.';
+
+  @override
+  String get conversationArchivedNote => 'Cuộc trò chuyện này đã được lưu trữ.';
+
+  @override
+  String get conversationNoMessagesTitle => 'Chưa có tin nhắn nào';
+
+  @override
+  String get conversationNoMessagesMessage =>
+      'Chào một câu để bắt đầu cuộc trò chuyện.';
+
+  @override
+  String get conversationSenderYou => 'Bạn';
+
+  @override
+  String get conversationSenderHost => 'Chủ nhà';
+
+  @override
+  String get conversationSenderSupport => 'Hỗ trợ';
+
+  @override
+  String get conversationSenderSystem => 'Hệ thống';
+
+  @override
+  String get conversationSeen => 'Đã xem';
+
+  @override
+  String get conversationComposerHint => 'Viết một tin nhắn…';
+
+  @override
+  String get conversationSendSemantic => 'Gửi tin nhắn';
+
+  @override
+  String get conversationMessageHostAction => 'Nhắn cho chủ nhà';
+
+  @override
+  String conversationBookingLabel(String code) {
+    return 'Đặt phòng $code';
+  }
+
+  @override
+  String conversationUnreadBadge(int count) {
+    return '$count chưa đọc';
+  }
+
+  @override
+  String conversationTileSemantic(String title, int count) {
+    return 'Cuộc trò chuyện $title, $count chưa đọc';
+  }
+
+  @override
+  String conversationMessageSemantic(String sender, String body) {
+    return '$sender đã nói: $body';
+  }
 }

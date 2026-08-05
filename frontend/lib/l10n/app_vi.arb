@@ -3793,5 +3793,64 @@
     "placeholders": {
       "amount": { "type": "String" }
     }
+  },
+  "conversationsTitle": "Tin nhắn",
+  "conversationsLoadingMessage": "Đang tải tin nhắn của bạn…",
+  "conversationsErrorMessage": "Không thể tải tin nhắn của bạn. Vui lòng thử lại.",
+  "conversationsEmptyTitle": "Chưa có tin nhắn nào",
+  "conversationsEmptyMessage": "Mở một đặt phòng và chạm biểu tượng tin nhắn để trò chuyện với chủ nhà.",
+  "conversationStatusOpen": "Đang mở",
+  "conversationStatusClosed": "Đã đóng",
+  "conversationStatusArchived": "Đã lưu trữ",
+  "conversationUntitled": "Cuộc trò chuyện",
+  "conversationLoadingMessage": "Đang tải cuộc trò chuyện…",
+  "conversationErrorMessage": "Không thể tải cuộc trò chuyện này. Vui lòng thử lại.",
+  "conversationForbiddenMessage": "Cuộc trò chuyện này không khả dụng với bạn.",
+  "conversationGoneMessage": "Cuộc trò chuyện này không còn khả dụng.",
+  "conversationArchivedMessage": "Cuộc trò chuyện này đã được lưu trữ và không thể nhận tin nhắn mới.",
+  "conversationEmptyBodyMessage": "Nhập một tin nhắn để gửi.",
+  "conversationNetworkMessage": "Bạn dường như đang ngoại tuyến. Vui lòng kiểm tra kết nối.",
+  "conversationActionErrorMessage": "Đã xảy ra lỗi. Vui lòng thử lại.",
+  "conversationNoPartnerMessage": "Chủ nhà của đặt phòng này chưa thể nhận tin nhắn.",
+  "conversationCloseConfirmTitle": "Đóng cuộc trò chuyện?",
+  "conversationCloseConfirmMessage": "Bạn có thể mở lại sau bằng cách gửi một tin nhắn mới.",
+  "conversationCloseAction": "Đóng",
+  "conversationClosedMessage": "Đã đóng cuộc trò chuyện.",
+  "conversationArchivedNote": "Cuộc trò chuyện này đã được lưu trữ.",
+  "conversationNoMessagesTitle": "Chưa có tin nhắn nào",
+  "conversationNoMessagesMessage": "Chào một câu để bắt đầu cuộc trò chuyện.",
+  "conversationSenderYou": "Bạn",
+  "conversationSenderHost": "Chủ nhà",
+  "conversationSenderSupport": "Hỗ trợ",
+  "conversationSenderSystem": "Hệ thống",
+  "conversationSeen": "Đã xem",
+  "conversationComposerHint": "Viết một tin nhắn…",
+  "conversationSendSemantic": "Gửi tin nhắn",
+  "conversationMessageHostAction": "Nhắn cho chủ nhà",
+  "conversationBookingLabel": "Đặt phòng {code}",
+  "@conversationBookingLabel": {
+    "placeholders": {
+      "code": { "type": "String" }
+    }
+  },
+  "conversationUnreadBadge": "{count} chưa đọc",
+  "@conversationUnreadBadge": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "conversationTileSemantic": "Cuộc trò chuyện {title}, {count} chưa đọc",
+  "@conversationTileSemantic": {
+    "placeholders": {
+      "title": { "type": "String" },
+      "count": { "type": "int" }
+    }
+  },
+  "conversationMessageSemantic": "{sender} đã nói: {body}",
+  "@conversationMessageSemantic": {
+    "placeholders": {
+      "sender": { "type": "String" },
+      "body": { "type": "String" }
+    }
   }
 }

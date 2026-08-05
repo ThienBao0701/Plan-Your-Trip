@@ -11,6 +11,7 @@ import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/glass_widgets.dart';
 import '../auth/login_screen.dart';
 import '../bookings/my_bookings_screen.dart';
+import '../conversations/real_conversations_screen.dart';
 import '../places/real_recently_viewed_screen.dart';
 import '../recommendations/real_recommendations_screen.dart';
 import '../rewards/rewards_screen.dart';
@@ -247,6 +248,20 @@ class ProfileScreen extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (_) => const RealRecommendationsScreen(),
+              ),
+            ),
+          ),
+        // UI41: real guest↔partner conversations live on the backend only.
+        // Shown in Real Mode; Demo Mode is byte-identical (no extra card).
+        if (!isDemo)
+          _ProfileNavCard(
+            key: const Key('profile-conversations'),
+            icon: Icons.forum_rounded,
+            title: l10n.conversationsTitle,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const RealConversationsScreen(),
               ),
             ),
           ),

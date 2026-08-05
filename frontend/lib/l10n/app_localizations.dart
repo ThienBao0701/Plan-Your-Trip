@@ -12801,6 +12801,228 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{amount} left'**
   String expensesSummaryRemaining(String amount);
+
+  /// No description provided for @conversationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Messages'**
+  String get conversationsTitle;
+
+  /// No description provided for @conversationsLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading your messages…'**
+  String get conversationsLoadingMessage;
+
+  /// No description provided for @conversationsErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load your messages. Please try again.'**
+  String get conversationsErrorMessage;
+
+  /// No description provided for @conversationsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No messages yet'**
+  String get conversationsEmptyTitle;
+
+  /// No description provided for @conversationsEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Open a booking and tap the message icon to chat with your host.'**
+  String get conversationsEmptyMessage;
+
+  /// No description provided for @conversationStatusOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get conversationStatusOpen;
+
+  /// No description provided for @conversationStatusClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed'**
+  String get conversationStatusClosed;
+
+  /// No description provided for @conversationStatusArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived'**
+  String get conversationStatusArchived;
+
+  /// No description provided for @conversationUntitled.
+  ///
+  /// In en, this message translates to:
+  /// **'Conversation'**
+  String get conversationUntitled;
+
+  /// No description provided for @conversationLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading conversation…'**
+  String get conversationLoadingMessage;
+
+  /// No description provided for @conversationErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load this conversation. Please try again.'**
+  String get conversationErrorMessage;
+
+  /// No description provided for @conversationForbiddenMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This conversation isn\'t available to you.'**
+  String get conversationForbiddenMessage;
+
+  /// No description provided for @conversationGoneMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This conversation is no longer available.'**
+  String get conversationGoneMessage;
+
+  /// No description provided for @conversationArchivedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This conversation is archived and can\'t receive new messages.'**
+  String get conversationArchivedMessage;
+
+  /// No description provided for @conversationEmptyBodyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a message to send.'**
+  String get conversationEmptyBodyMessage;
+
+  /// No description provided for @conversationNetworkMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You appear to be offline. Please check your connection.'**
+  String get conversationNetworkMessage;
+
+  /// No description provided for @conversationActionErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get conversationActionErrorMessage;
+
+  /// No description provided for @conversationNoPartnerMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This booking\'s host can\'t be messaged yet.'**
+  String get conversationNoPartnerMessage;
+
+  /// No description provided for @conversationCloseConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Close conversation?'**
+  String get conversationCloseConfirmTitle;
+
+  /// No description provided for @conversationCloseConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You can reopen it later by sending a new message.'**
+  String get conversationCloseConfirmMessage;
+
+  /// No description provided for @conversationCloseAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get conversationCloseAction;
+
+  /// No description provided for @conversationClosedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Conversation closed.'**
+  String get conversationClosedMessage;
+
+  /// No description provided for @conversationArchivedNote.
+  ///
+  /// In en, this message translates to:
+  /// **'This conversation is archived.'**
+  String get conversationArchivedNote;
+
+  /// No description provided for @conversationNoMessagesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No messages yet'**
+  String get conversationNoMessagesTitle;
+
+  /// No description provided for @conversationNoMessagesMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Say hello to start the conversation.'**
+  String get conversationNoMessagesMessage;
+
+  /// No description provided for @conversationSenderYou.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get conversationSenderYou;
+
+  /// No description provided for @conversationSenderHost.
+  ///
+  /// In en, this message translates to:
+  /// **'Host'**
+  String get conversationSenderHost;
+
+  /// No description provided for @conversationSenderSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Support'**
+  String get conversationSenderSupport;
+
+  /// No description provided for @conversationSenderSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get conversationSenderSystem;
+
+  /// No description provided for @conversationSeen.
+  ///
+  /// In en, this message translates to:
+  /// **'Seen'**
+  String get conversationSeen;
+
+  /// No description provided for @conversationComposerHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a message…'**
+  String get conversationComposerHint;
+
+  /// No description provided for @conversationSendSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Send message'**
+  String get conversationSendSemantic;
+
+  /// No description provided for @conversationMessageHostAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Message host'**
+  String get conversationMessageHostAction;
+
+  /// No description provided for @conversationBookingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking {code}'**
+  String conversationBookingLabel(String code);
+
+  /// No description provided for @conversationUnreadBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} unread'**
+  String conversationUnreadBadge(int count);
+
+  /// No description provided for @conversationTileSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Conversation {title}, {count} unread'**
+  String conversationTileSemantic(String title, int count);
+
+  /// No description provided for @conversationMessageSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{sender} said: {body}'**
+  String conversationMessageSemantic(String sender, String body);
 }
 
 class _AppLocalizationsDelegate

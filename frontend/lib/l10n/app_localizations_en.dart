@@ -7530,4 +7530,134 @@ class AppLocalizationsEn extends AppLocalizations {
   String expensesSummaryRemaining(String amount) {
     return '$amount left';
   }
+
+  @override
+  String get conversationsTitle => 'Messages';
+
+  @override
+  String get conversationsLoadingMessage => 'Loading your messages…';
+
+  @override
+  String get conversationsErrorMessage =>
+      'We couldn\'t load your messages. Please try again.';
+
+  @override
+  String get conversationsEmptyTitle => 'No messages yet';
+
+  @override
+  String get conversationsEmptyMessage =>
+      'Open a booking and tap the message icon to chat with your host.';
+
+  @override
+  String get conversationStatusOpen => 'Open';
+
+  @override
+  String get conversationStatusClosed => 'Closed';
+
+  @override
+  String get conversationStatusArchived => 'Archived';
+
+  @override
+  String get conversationUntitled => 'Conversation';
+
+  @override
+  String get conversationLoadingMessage => 'Loading conversation…';
+
+  @override
+  String get conversationErrorMessage =>
+      'We couldn\'t load this conversation. Please try again.';
+
+  @override
+  String get conversationForbiddenMessage =>
+      'This conversation isn\'t available to you.';
+
+  @override
+  String get conversationGoneMessage =>
+      'This conversation is no longer available.';
+
+  @override
+  String get conversationArchivedMessage =>
+      'This conversation is archived and can\'t receive new messages.';
+
+  @override
+  String get conversationEmptyBodyMessage => 'Enter a message to send.';
+
+  @override
+  String get conversationNetworkMessage =>
+      'You appear to be offline. Please check your connection.';
+
+  @override
+  String get conversationActionErrorMessage =>
+      'Something went wrong. Please try again.';
+
+  @override
+  String get conversationNoPartnerMessage =>
+      'This booking\'s host can\'t be messaged yet.';
+
+  @override
+  String get conversationCloseConfirmTitle => 'Close conversation?';
+
+  @override
+  String get conversationCloseConfirmMessage =>
+      'You can reopen it later by sending a new message.';
+
+  @override
+  String get conversationCloseAction => 'Close';
+
+  @override
+  String get conversationClosedMessage => 'Conversation closed.';
+
+  @override
+  String get conversationArchivedNote => 'This conversation is archived.';
+
+  @override
+  String get conversationNoMessagesTitle => 'No messages yet';
+
+  @override
+  String get conversationNoMessagesMessage =>
+      'Say hello to start the conversation.';
+
+  @override
+  String get conversationSenderYou => 'You';
+
+  @override
+  String get conversationSenderHost => 'Host';
+
+  @override
+  String get conversationSenderSupport => 'Support';
+
+  @override
+  String get conversationSenderSystem => 'System';
+
+  @override
+  String get conversationSeen => 'Seen';
+
+  @override
+  String get conversationComposerHint => 'Write a message…';
+
+  @override
+  String get conversationSendSemantic => 'Send message';
+
+  @override
+  String get conversationMessageHostAction => 'Message host';
+
+  @override
+  String conversationBookingLabel(String code) {
+    return 'Booking $code';
+  }
+
+  @override
+  String conversationUnreadBadge(int count) {
+    return '$count unread';
+  }
+
+  @override
+  String conversationTileSemantic(String title, int count) {
+    return 'Conversation $title, $count unread';
+  }
+
+  @override
+  String conversationMessageSemantic(String sender, String body) {
+    return '$sender said: $body';
+  }
 }

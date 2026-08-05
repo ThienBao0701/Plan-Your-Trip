@@ -431,6 +431,36 @@ class AppState extends ChangeNotifier {
   RealExpenseSummary? realExpenseSummaryFor(int tripId) =>
       realExpensesTripId == tripId ? realExpenseSummary : null;
 
+  // ── Real Mode Conversations (/api/me/conversations, UI-41) ────────────────
+  // Guest↔partner messaging about a booking. The inbox ([realConversations]) and
+  // one active thread ([realConversationDetail]) are loaded independently. No
+  // websocket/realtime — the client refreshes on demand. A 401 never calls
+  // logout(). Cleared on logout / mode / user change via
+  // [_resetRealConversationsState]. Zero HTTP in Demo Mode.
+  List<RealConversationSummary> realConversations = [];
+  bool realConversationsLoading = false;
+  bool realConversationsLoaded = false;
+  bool realConversationsRefreshing = false;
+  ConversationOutcome? realConversationsError;
+  int? realConversationDetailId;
+  RealConversation? realConversationDetail;
+  bool realConversationDetailLoading = false;
+  ConversationOutcome? realConversationDetailError;
+  bool realConversationSending = false;
+  bool realConversationMutating = false;
+
+  /// The loaded thread for [conversationId], or null if a different thread (or
+  /// none) is currently loaded.
+  RealConversation? realConversationDetailFor(int conversationId) =>
+      realConversationDetailId == conversationId
+          ? realConversationDetail
+          : null;
+
+  /// Total unread across the loaded inbox (sums the backend-provided per-thread
+  /// counts; display only).
+  int get realConversationsUnreadTotal =>
+      realConversations.fold(0, (sum, c) => sum + c.unreadCount);
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -534,6 +564,7 @@ class AppState extends ChangeNotifier {
     _resetRealCouponsState();
     _resetRealRecommendationsState();
     _resetRealExpensesState();
+    _resetRealConversationsState();
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -745,6 +776,20 @@ class AppState extends ChangeNotifier {
     realExpensesError = null;
   }
 
+  void _resetRealConversationsState() {
+    realConversations = [];
+    realConversationsLoading = false;
+    realConversationsLoaded = false;
+    realConversationsRefreshing = false;
+    realConversationsError = null;
+    realConversationDetailId = null;
+    realConversationDetail = null;
+    realConversationDetailLoading = false;
+    realConversationDetailError = null;
+    realConversationSending = false;
+    realConversationMutating = false;
+  }
+
   void _resetRealNotificationsState() {
     realNotifications = [];
     realNotificationsLoading = false;
@@ -890,6 +935,7 @@ class AppState extends ChangeNotifier {
     _resetRealCouponsState();
     _resetRealRecommendationsState();
     _resetRealExpensesState();
+    _resetRealConversationsState();
     timeline = [];
     expenses = [];
     demoBookings = [];
@@ -4491,6 +4537,194 @@ class AppState extends ChangeNotifier {
       return ExpenseOutcome.success;
     }
     final outcome = _mapExpenseError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  // ── Real Mode Conversations (UI-41) ──────────────────────────────────────
+
+  ConversationOutcome _mapConversationError(ApiErrorKind? kind) {
+    return switch (kind) {
+      ApiErrorKind.unauthorized => ConversationOutcome.sessionExpired,
+      ApiErrorKind.forbidden => ConversationOutcome.forbidden,
+      ApiErrorKind.notFound => ConversationOutcome.notFound,
+      ApiErrorKind.validation => ConversationOutcome.validation,
+      ApiErrorKind.unprocessable => ConversationOutcome.unprocessable,
+      ApiErrorKind.network => ConversationOutcome.network,
+      ApiErrorKind.timeout => ConversationOutcome.network,
+      ApiErrorKind.server => ConversationOutcome.serverError,
+      _ => ConversationOutcome.serverError,
+    };
+  }
+
+  /// Loads the user's conversation inbox (`GET /api/me/conversations`). [refresh]
+  /// forces a re-fetch and preserves the current list on failure. Zero HTTP in
+  /// Demo Mode.
+  Future<ConversationOutcome> loadRealConversations({
+    bool refresh = false,
+  }) async {
+    if (demoMode) return ConversationOutcome.demoUnavailable;
+    if (realConversationsLoading || realConversationsRefreshing) {
+      return ConversationOutcome.success;
+    }
+    if (realConversationsLoaded && !refresh) {
+      return ConversationOutcome.success;
+    }
+    if (refresh) {
+      realConversationsRefreshing = true;
+    } else {
+      realConversationsLoading = true;
+    }
+    realConversationsError = null;
+    notifyListeners();
+    final result = await api.getConversations();
+    realConversationsLoading = false;
+    realConversationsRefreshing = false;
+    if (result.success && result.data != null) {
+      realConversations = result.data!;
+      realConversationsLoaded = true;
+      realConversationsError = null;
+      notifyListeners();
+      return ConversationOutcome.success;
+    }
+    final outcome = _mapConversationError(result.errorKind);
+    realConversationsError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Loads one conversation thread (`GET /api/me/conversations/{id}`). Switching
+  /// [conversationId] reloads. Zero HTTP in Demo Mode.
+  Future<ConversationOutcome> loadRealConversationDetail(
+    int conversationId, {
+    bool refresh = false,
+  }) async {
+    if (demoMode) return ConversationOutcome.demoUnavailable;
+    if (realConversationDetailLoading) return ConversationOutcome.success;
+    final same = realConversationDetailId == conversationId;
+    if (same && realConversationDetail != null && !refresh) {
+      return ConversationOutcome.success;
+    }
+    realConversationDetailLoading = true;
+    if (!same) {
+      realConversationDetail = null;
+      realConversationDetailId = conversationId;
+    }
+    realConversationDetailError = null;
+    notifyListeners();
+    final result = await api.getConversation(conversationId);
+    realConversationDetailLoading = false;
+    if (result.success && result.data != null) {
+      realConversationDetailId = conversationId;
+      realConversationDetail = result.data;
+      realConversationDetailError = null;
+      notifyListeners();
+      return ConversationOutcome.success;
+    }
+    final outcome = _mapConversationError(result.errorKind);
+    realConversationDetailError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Marks a thread's incoming messages read (`PATCH .../read`) and refreshes the
+  /// inbox so unread counts update. Best-effort — a failure is returned, not
+  /// surfaced as an error state. Zero HTTP in Demo Mode.
+  Future<ConversationOutcome> markRealConversationRead(
+    int conversationId,
+  ) async {
+    if (demoMode) return ConversationOutcome.demoUnavailable;
+    final result = await api.markConversationRead(conversationId);
+    if (result.success && result.data != null) {
+      if (realConversationDetailId == conversationId) {
+        realConversationDetail = result.data;
+      }
+      notifyListeners();
+      if (realConversationsLoaded) {
+        await loadRealConversations(refresh: true);
+      }
+      return ConversationOutcome.success;
+    }
+    return _mapConversationError(result.errorKind);
+  }
+
+  /// Sends a guest message (`POST .../messages`) and reloads the thread + inbox
+  /// from the backend (no optimistic insert). Single-flight via
+  /// [realConversationSending]. Zero HTTP in Demo Mode.
+  Future<ConversationOutcome> sendRealMessage(
+    int conversationId,
+    String body,
+  ) async {
+    if (demoMode) return ConversationOutcome.demoUnavailable;
+    final trimmed = body.trim();
+    if (trimmed.isEmpty) return ConversationOutcome.validation;
+    if (realConversationSending) return ConversationOutcome.busy;
+    realConversationSending = true;
+    notifyListeners();
+    final result = await api.sendConversationMessage(conversationId, trimmed);
+    realConversationSending = false;
+    if (result.success && result.data != null) {
+      notifyListeners();
+      await loadRealConversationDetail(conversationId, refresh: true);
+      if (realConversationsLoaded) {
+        await loadRealConversations(refresh: true);
+      }
+      return ConversationOutcome.success;
+    }
+    final outcome = _mapConversationError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Closes a conversation (`PATCH .../close`) and updates the thread + inbox.
+  /// Single-flight via [realConversationMutating]. Zero HTTP in Demo Mode.
+  Future<ConversationOutcome> closeRealConversation(int conversationId) async {
+    if (demoMode) return ConversationOutcome.demoUnavailable;
+    if (realConversationMutating) return ConversationOutcome.busy;
+    realConversationMutating = true;
+    notifyListeners();
+    final result = await api.closeConversation(conversationId);
+    realConversationMutating = false;
+    if (result.success && result.data != null) {
+      if (realConversationDetailId == conversationId) {
+        realConversationDetail = result.data;
+      }
+      notifyListeners();
+      if (realConversationsLoaded) {
+        await loadRealConversations(refresh: true);
+      }
+      return ConversationOutcome.success;
+    }
+    final outcome = _mapConversationError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Starts (or reuses) a conversation for a booking (`POST /api/me/conversations`).
+  /// On success stores it as the active thread ([realConversationDetailId] carries
+  /// the new/reused id for navigation) and refreshes the inbox. Single-flight via
+  /// [realConversationMutating]. Zero HTTP in Demo Mode.
+  Future<ConversationOutcome> createRealConversation(
+    int bookingId, {
+    String? subject,
+  }) async {
+    if (demoMode) return ConversationOutcome.demoUnavailable;
+    if (realConversationMutating) return ConversationOutcome.busy;
+    realConversationMutating = true;
+    notifyListeners();
+    final result = await api.createConversation(bookingId, subject: subject);
+    realConversationMutating = false;
+    if (result.success && result.data != null) {
+      realConversationDetail = result.data;
+      realConversationDetailId = result.data!.id;
+      realConversationDetailError = null;
+      notifyListeners();
+      if (realConversationsLoaded) {
+        await loadRealConversations(refresh: true);
+      }
+      return ConversationOutcome.success;
+    }
+    final outcome = _mapConversationError(result.errorKind);
     notifyListeners();
     return outcome;
   }
