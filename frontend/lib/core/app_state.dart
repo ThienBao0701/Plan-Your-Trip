@@ -384,6 +384,29 @@ class AppState extends ChangeNotifier {
   int? couponDetailLoadingId;
   CouponOutcome? couponDetailError;
 
+  // ── Real Mode Recommendations (/api/me/recommendations, UI-39) ────────────
+  // The customer's personalized recommendation feed (Phase 7.23): a paginated
+  // list, a regenerate action, and per-item dismiss/click engagement. The
+  // backend never claims/reserves anything. A 401 never calls logout(). Cleared
+  // on logout / mode / user change via [_resetRealRecommendationsState]. Zero
+  // HTTP in Demo Mode.
+  List<RealRecommendation> realRecommendations = [];
+  bool realRecommendationsLoading = false;
+  bool realRecommendationsLoaded = false;
+  bool realRecommendationsRefreshing = false;
+  bool realRecommendationsLoadingMore = false;
+  bool realRecommendationsGenerating = false;
+  int realRecommendationsPage = 0;
+  int realRecommendationsTotalPages = 0;
+  RecommendationOutcome? realRecommendationsError;
+  final Map<int, RealRecommendation> recommendationDetailCache = {};
+  int? recommendationDetailLoadingId;
+  RecommendationOutcome? recommendationDetailError;
+  final Set<int> recommendationActionInFlight = {};
+
+  bool get realRecommendationsHasMore =>
+      realRecommendationsPage + 1 < realRecommendationsTotalPages;
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -485,6 +508,7 @@ class AppState extends ChangeNotifier {
     _resetRealMembershipState();
     _resetRealReferralState();
     _resetRealCouponsState();
+    _resetRealRecommendationsState();
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -669,6 +693,22 @@ class AppState extends ChangeNotifier {
     couponDetailError = null;
   }
 
+  void _resetRealRecommendationsState() {
+    realRecommendations = [];
+    realRecommendationsLoading = false;
+    realRecommendationsLoaded = false;
+    realRecommendationsRefreshing = false;
+    realRecommendationsLoadingMore = false;
+    realRecommendationsGenerating = false;
+    realRecommendationsPage = 0;
+    realRecommendationsTotalPages = 0;
+    realRecommendationsError = null;
+    recommendationDetailCache.clear();
+    recommendationDetailLoadingId = null;
+    recommendationDetailError = null;
+    recommendationActionInFlight.clear();
+  }
+
   void _resetRealNotificationsState() {
     realNotifications = [];
     realNotificationsLoading = false;
@@ -812,6 +852,7 @@ class AppState extends ChangeNotifier {
     _resetRealMembershipState();
     _resetRealReferralState();
     _resetRealCouponsState();
+    _resetRealRecommendationsState();
     timeline = [];
     expenses = [];
     demoBookings = [];
@@ -4101,6 +4142,192 @@ class AppState extends ChangeNotifier {
     final outcome = _mapCouponError(result.errorKind);
     notifyListeners();
     return outcome;
+  }
+
+  // ── Real Mode Recommendations (UI-39) ────────────────────────────────────
+
+  static const int _recommendationsPageSize = 20;
+
+  RecommendationOutcome _mapRecommendationError(ApiErrorKind? kind) {
+    return switch (kind) {
+      ApiErrorKind.unauthorized => RecommendationOutcome.sessionExpired,
+      ApiErrorKind.forbidden => RecommendationOutcome.forbidden,
+      ApiErrorKind.notFound => RecommendationOutcome.notFound,
+      ApiErrorKind.network => RecommendationOutcome.network,
+      ApiErrorKind.timeout => RecommendationOutcome.network,
+      ApiErrorKind.server => RecommendationOutcome.serverError,
+      _ => RecommendationOutcome.serverError,
+    };
+  }
+
+  /// Loads the customer's active recommendation feed
+  /// (`GET /api/me/recommendations`, page 0). [refresh] forces a re-fetch and
+  /// preserves the current list on failure. Zero HTTP in Demo Mode.
+  Future<RecommendationOutcome> loadRealRecommendations({
+    bool refresh = false,
+  }) async {
+    if (demoMode) return RecommendationOutcome.demoUnavailable;
+    if (realRecommendationsLoading || realRecommendationsRefreshing) {
+      return RecommendationOutcome.success;
+    }
+    if (realRecommendationsLoaded && !refresh) {
+      return RecommendationOutcome.success;
+    }
+    if (refresh) {
+      realRecommendationsRefreshing = true;
+    } else {
+      realRecommendationsLoading = true;
+    }
+    realRecommendationsError = null;
+    notifyListeners();
+    final result = await api.getRecommendations(
+      page: 0,
+      size: _recommendationsPageSize,
+    );
+    realRecommendationsLoading = false;
+    realRecommendationsRefreshing = false;
+    if (result.success && result.data != null) {
+      realRecommendations = result.data!.content;
+      realRecommendationsPage = result.data!.page;
+      realRecommendationsTotalPages = result.data!.totalPages;
+      realRecommendationsLoaded = true;
+      realRecommendationsError = null;
+      notifyListeners();
+      return RecommendationOutcome.success;
+    }
+    final outcome = _mapRecommendationError(result.errorKind);
+    realRecommendationsError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Appends the next page of recommendations (`GET ...?page=n+1`).
+  Future<RecommendationOutcome> loadMoreRealRecommendations() async {
+    if (demoMode) return RecommendationOutcome.demoUnavailable;
+    if (!realRecommendationsLoaded || realRecommendationsLoadingMore) {
+      return RecommendationOutcome.success;
+    }
+    if (!realRecommendationsHasMore) return RecommendationOutcome.success;
+    realRecommendationsLoadingMore = true;
+    notifyListeners();
+    final next = realRecommendationsPage + 1;
+    final result = await api.getRecommendations(
+      page: next,
+      size: _recommendationsPageSize,
+    );
+    realRecommendationsLoadingMore = false;
+    if (result.success && result.data != null) {
+      realRecommendations = [
+        ...realRecommendations,
+        ...result.data!.content,
+      ];
+      realRecommendationsPage = result.data!.page;
+      realRecommendationsTotalPages = result.data!.totalPages;
+      notifyListeners();
+      return RecommendationOutcome.success;
+    }
+    final outcome = _mapRecommendationError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Loads one recommendation's detail (`GET /api/me/recommendations/{id}`),
+  /// cached. Zero HTTP in Demo Mode.
+  Future<RecommendationOutcome> loadRealRecommendationDetail(
+    int id, {
+    bool refresh = false,
+  }) async {
+    if (demoMode) return RecommendationOutcome.demoUnavailable;
+    if (recommendationDetailLoadingId == id) {
+      return RecommendationOutcome.success;
+    }
+    if (recommendationDetailCache.containsKey(id) && !refresh) {
+      return RecommendationOutcome.success;
+    }
+    recommendationDetailLoadingId = id;
+    recommendationDetailError = null;
+    notifyListeners();
+    final result = await api.getRecommendation(id);
+    recommendationDetailLoadingId = null;
+    if (result.success && result.data != null) {
+      recommendationDetailCache[id] = result.data!;
+      recommendationDetailError = null;
+      notifyListeners();
+      return RecommendationOutcome.success;
+    }
+    final outcome = _mapRecommendationError(result.errorKind);
+    recommendationDetailError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Regenerates the active recommendation set
+  /// (`POST /api/me/recommendations/generate`) and reloads the feed. Read-only
+  /// snapshots — nothing is claimed or reserved. Single-flight via
+  /// [realRecommendationsGenerating]. Zero HTTP in Demo Mode.
+  Future<RecommendationOutcome> generateRealRecommendations() async {
+    if (demoMode) return RecommendationOutcome.demoUnavailable;
+    if (realRecommendationsGenerating) return RecommendationOutcome.busy;
+    realRecommendationsGenerating = true;
+    notifyListeners();
+    final result = await api.generateRecommendations();
+    realRecommendationsGenerating = false;
+    if (result.success) {
+      notifyListeners();
+      await loadRealRecommendations(refresh: true);
+      return RecommendationOutcome.success;
+    }
+    final outcome = _mapRecommendationError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Dismisses a recommendation (`PATCH /api/me/recommendations/{id}/dismiss`)
+  /// and removes it from the local feed only after the server confirms. Per-id
+  /// single-flight via [recommendationActionInFlight]. Zero HTTP in Demo Mode.
+  Future<RecommendationOutcome> dismissRealRecommendation(int id) async {
+    if (demoMode) return RecommendationOutcome.demoUnavailable;
+    if (recommendationActionInFlight.contains(id)) {
+      return RecommendationOutcome.busy;
+    }
+    recommendationActionInFlight.add(id);
+    notifyListeners();
+    final result = await api.dismissRecommendation(id);
+    recommendationActionInFlight.remove(id);
+    if (result.success && result.data != null) {
+      realRecommendations =
+          realRecommendations.where((r) => r.id != id).toList();
+      recommendationDetailCache[id] = result.data!;
+      notifyListeners();
+      return RecommendationOutcome.success;
+    }
+    final outcome = _mapRecommendationError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Tracks a click on a recommendation
+  /// (`PATCH /api/me/recommendations/{id}/click`, idempotent). Best-effort — the
+  /// updated snapshot is merged into the local feed/cache, but a failure is
+  /// returned, not surfaced as an error state. Zero HTTP in Demo Mode.
+  Future<RecommendationOutcome> trackRealRecommendationClick(int id) async {
+    if (demoMode) return RecommendationOutcome.demoUnavailable;
+    if (recommendationActionInFlight.contains(id)) {
+      return RecommendationOutcome.busy;
+    }
+    recommendationActionInFlight.add(id);
+    final result = await api.clickRecommendation(id);
+    recommendationActionInFlight.remove(id);
+    if (result.success && result.data != null) {
+      final updated = result.data!;
+      recommendationDetailCache[id] = updated;
+      realRecommendations = [
+        for (final r in realRecommendations) r.id == id ? updated : r,
+      ];
+      notifyListeners();
+      return RecommendationOutcome.success;
+    }
+    return _mapRecommendationError(result.errorKind);
   }
 
   List<Place> filteredPlaces(PlaceQuery q) {

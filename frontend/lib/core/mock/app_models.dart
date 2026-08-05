@@ -5302,6 +5302,219 @@ enum CouponOutcome {
   serverError,
 }
 
+// ── Recommendations (/api/me/recommendations, UI-39) ─────────────────────────
+// Real-backend mirror of the Phase 7.23 personalized recommendation feed
+// (`CustomerRecommendationResponse` / `PageResponse`). Read + engagement only;
+// the backend never claims/reserves anything. `Map` decoding is confined to
+// [fromJson]. Nested targets are captured selectively (place/hotel id+name for
+// navigation/label); [targetSummary] covers room/promotion/coupon labels.
+
+/// The kind of resource a recommendation points at (`RecommendationType`). One
+/// matching target is populated per type. [unknown] preserves forward-compat for
+/// any code this client does not recognise.
+enum RecommendationTypeView {
+  place,
+  hotel,
+  room,
+  promotion,
+  coupon,
+  tripIdea,
+  unknown
+}
+
+/// Maps a backend `RecommendationType` wire string to [RecommendationTypeView];
+/// unrecognised codes map to [RecommendationTypeView.unknown].
+RecommendationTypeView recommendationTypeViewFromCode(String? code) {
+  switch (code) {
+    case 'PLACE':
+      return RecommendationTypeView.place;
+    case 'HOTEL':
+      return RecommendationTypeView.hotel;
+    case 'ROOM':
+      return RecommendationTypeView.room;
+    case 'PROMOTION':
+      return RecommendationTypeView.promotion;
+    case 'COUPON':
+      return RecommendationTypeView.coupon;
+    case 'TRIP_IDEA':
+      return RecommendationTypeView.tripIdea;
+    default:
+      return RecommendationTypeView.unknown;
+  }
+}
+
+/// Server-computed engagement state of a recommendation snapshot
+/// (`engagementState`: ACTIVE / CLICKED / CONVERTED / DISMISSED / EXPIRED).
+enum RecommendationEngagementView {
+  active,
+  clicked,
+  converted,
+  dismissed,
+  expired,
+  unknown,
+}
+
+/// Maps a backend `engagementState` wire string to [RecommendationEngagementView];
+/// unrecognised codes map to [RecommendationEngagementView.unknown].
+RecommendationEngagementView recommendationEngagementViewFromCode(
+    String? code) {
+  switch (code) {
+    case 'ACTIVE':
+      return RecommendationEngagementView.active;
+    case 'CLICKED':
+      return RecommendationEngagementView.clicked;
+    case 'CONVERTED':
+      return RecommendationEngagementView.converted;
+    case 'DISMISSED':
+      return RecommendationEngagementView.dismissed;
+    case 'EXPIRED':
+      return RecommendationEngagementView.expired;
+    default:
+      return RecommendationEngagementView.unknown;
+  }
+}
+
+/// Real-backend mirror of `CustomerRecommendationResponse` (Phase 7.23). Top-level
+/// snapshot fields plus a selectively-parsed target: [placeId]/[placeName]/
+/// [placeSlug] and [hotelId]/[hotelName]/[hotelSlug] when present, with
+/// [targetSummary] as the human label for any type (incl. room/promotion/coupon).
+/// [reasonText] is backend-authored display copy (no client-side scoring).
+class RealRecommendation {
+  final int id;
+  final String type; // raw RecommendationType wire code
+  final int score; // 0–100, backend-computed
+  final String? reasonCode;
+  final String? reasonText;
+  final DateTime? generatedAt;
+  final DateTime? expiresAt;
+  final String engagementState; // raw wire code
+  final DateTime? dismissedAt;
+  final DateTime? clickedAt;
+  final DateTime? convertedAt;
+  final int? sourceRuleId;
+  final String? sourceRuleCode;
+  final String? targetSummary;
+  final int? placeId;
+  final String? placeName;
+  final String? placeSlug;
+  final int? hotelId;
+  final String? hotelName;
+  final String? hotelSlug;
+  final String? metadataJson;
+
+  const RealRecommendation({
+    required this.id,
+    this.type = '',
+    this.score = 0,
+    this.reasonCode,
+    this.reasonText,
+    this.generatedAt,
+    this.expiresAt,
+    this.engagementState = '',
+    this.dismissedAt,
+    this.clickedAt,
+    this.convertedAt,
+    this.sourceRuleId,
+    this.sourceRuleCode,
+    this.targetSummary,
+    this.placeId,
+    this.placeName,
+    this.placeSlug,
+    this.hotelId,
+    this.hotelName,
+    this.hotelSlug,
+    this.metadataJson,
+  });
+
+  RecommendationTypeView get typeView => recommendationTypeViewFromCode(type);
+
+  RecommendationEngagementView get engagementView =>
+      recommendationEngagementViewFromCode(engagementState);
+
+  factory RealRecommendation.fromJson(Map<String, dynamic> json) {
+    final place = json['place'];
+    final hotel = json['hotel'];
+    return RealRecommendation(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      type: (json['type'] as String?) ?? '',
+      score: (json['score'] as num?)?.toInt() ?? 0,
+      reasonCode: json['reasonCode'] as String?,
+      reasonText: json['reasonText'] as String?,
+      generatedAt: _tryParseDate(json['generatedAt']),
+      expiresAt: _tryParseDate(json['expiresAt']),
+      engagementState: (json['engagementState'] as String?) ?? '',
+      dismissedAt: _tryParseDate(json['dismissedAt']),
+      clickedAt: _tryParseDate(json['clickedAt']),
+      convertedAt: _tryParseDate(json['convertedAt']),
+      sourceRuleId: (json['sourceRuleId'] as num?)?.toInt(),
+      sourceRuleCode: json['sourceRuleCode'] as String?,
+      targetSummary: json['targetSummary'] as String?,
+      placeId:
+          place is Map<String, dynamic> ? (place['id'] as num?)?.toInt() : null,
+      placeName:
+          place is Map<String, dynamic> ? place['name'] as String? : null,
+      placeSlug:
+          place is Map<String, dynamic> ? place['slug'] as String? : null,
+      hotelId:
+          hotel is Map<String, dynamic> ? (hotel['id'] as num?)?.toInt() : null,
+      hotelName:
+          hotel is Map<String, dynamic> ? hotel['name'] as String? : null,
+      hotelSlug:
+          hotel is Map<String, dynamic> ? hotel['slug'] as String? : null,
+      metadataJson: json['metadataJson'] as String?,
+    );
+  }
+}
+
+/// Typed page of recommendations (`PageResponse<CustomerRecommendationResponse>`).
+class RealRecommendationPage {
+  final List<RealRecommendation> content;
+  final int page;
+  final int size;
+  final int totalElements;
+  final int totalPages;
+
+  const RealRecommendationPage({
+    this.content = const [],
+    this.page = 0,
+    this.size = 0,
+    this.totalElements = 0,
+    this.totalPages = 0,
+  });
+
+  factory RealRecommendationPage.fromJson(Map<String, dynamic> json) {
+    final raw = json['content'];
+    return RealRecommendationPage(
+      content: raw is List
+          ? raw
+              .map(
+                  (e) => RealRecommendation.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : const [],
+      page: (json['page'] as num?)?.toInt() ?? 0,
+      size: (json['size'] as num?)?.toInt() ?? 0,
+      totalElements: (json['totalElements'] as num?)?.toInt() ?? 0,
+      totalPages: (json['totalPages'] as num?)?.toInt() ?? 0,
+    );
+  }
+}
+
+/// Outcome of a real recommendation action (`GET /api/me/recommendations[/{id}]`,
+/// the `POST /generate` regenerate, and the `PATCH /{id}/dismiss|click` engagement
+/// updates). [demoUnavailable] is the Demo Mode guard (zero HTTP); [busy] the
+/// single-flight guard; [sessionExpired] (401) never triggers auto-logout;
+/// [forbidden] 403, [notFound] 404, [serverError] 5xx, [network] transport/timeout.
+enum RecommendationOutcome {
+  success,
+  demoUnavailable,
+  busy,
+  sessionExpired,
+  forbidden,
+  notFound,
+  network,
+  serverError,
+}
+
 class DemoBooking {
   final String code;
   final String ownerUserId;

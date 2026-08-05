@@ -3680,5 +3680,59 @@
     "placeholders": {
       "count": { "type": "int" }
     }
+  },
+  "recommendationsTitle": "Gợi ý cho bạn",
+  "recommendationsLoadingMessage": "Đang tải gợi ý của bạn…",
+  "recommendationsErrorMessage": "Không thể tải gợi ý của bạn. Vui lòng thử lại.",
+  "recommendationsEmptyTitle": "Chưa có gợi ý nào",
+  "recommendationsEmptyMessage": "Hãy lưu địa điểm, xem khách sạn và đặt chuyến đi — sau đó tạo lại để nhận gợi ý dành riêng cho bạn.",
+  "recommendationsGenerateSemantic": "Tạo lại gợi ý",
+  "recommendationsGeneratedMessage": "Gợi ý của bạn đã được cập nhật.",
+  "recommendationsGenerateErrorMessage": "Không thể làm mới gợi ý của bạn. Vui lòng thử lại.",
+  "recommendationsLoadMore": "Tải thêm",
+  "recommendationsDismissedMessage": "Đã bỏ qua gợi ý.",
+  "recommendationsActionErrorMessage": "Đã xảy ra lỗi. Vui lòng thử lại.",
+  "recommendationsNetworkMessage": "Bạn dường như đang ngoại tuyến. Vui lòng kiểm tra kết nối.",
+  "recommendationsGoneMessage": "Gợi ý này không còn khả dụng.",
+  "recommendationUntitled": "Gợi ý",
+  "recommendationsDismissSemantic": "Bỏ qua {name}",
+  "@recommendationsDismissSemantic": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "recommendationCardSemantic": "Gợi ý: {name}",
+  "@recommendationCardSemantic": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "recommendationScoreSemantic": "Điểm phù hợp {score} trên 100",
+  "@recommendationScoreSemantic": {
+    "placeholders": {
+      "score": { "type": "int" }
+    }
+  },
+  "recommendationTypePlace": "Địa điểm",
+  "recommendationTypeHotel": "Khách sạn",
+  "recommendationTypeRoom": "Phòng",
+  "recommendationTypePromotion": "Khuyến mãi",
+  "recommendationTypeCoupon": "Mã giảm giá",
+  "recommendationTypeTripIdea": "Ý tưởng chuyến đi",
+  "recommendationTypeOther": "Đề xuất",
+  "recommendationStateClicked": "Đã xem",
+  "recommendationStateConverted": "Đã đặt",
+  "recommendationDetailReason": "Vì sao chúng tôi chọn mục này",
+  "recommendationDetailGenerated": "Gợi ý ngày {date}",
+  "@recommendationDetailGenerated": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "recommendationDetailExpires": "Khả dụng đến {date}",
+  "@recommendationDetailExpires": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
   }
 }

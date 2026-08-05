@@ -2350,6 +2350,161 @@ class ApiClient {
     }
   }
 
+  // ── Recommendations (/api/me/recommendations, UI-39) ─────────────────────────
+  // Phase 7.23 personalized feed. GET list → PageResponse (paged, active-only by
+  // default). GET /{id} → one snapshot (404 if not mine). POST /generate →
+  // regenerate (read-only snapshots; never claims/reserves). PATCH /{id}/dismiss
+  // and /{id}/click update engagement (idempotent). All authenticated, 8s
+  // timeout, no retry.
+
+  /// Lists the user's active recommendations
+  /// (`GET /api/me/recommendations`, paged, score desc).
+  Future<CollectionApiResult<RealRecommendationPage>> getRecommendations({
+    int? page,
+    int? size,
+  }) async {
+    try {
+      final uri = Uri.parse('$baseUrl/me/recommendations').replace(
+        queryParameters: {
+          if (page != null) 'page': '$page',
+          if (size != null) 'size': '$size',
+        },
+      );
+      final res = await _client
+          .get(uri, headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(
+          RealRecommendationPage.fromJson(body),
+        );
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Gets one of the user's recommendations
+  /// (`GET /api/me/recommendations/{id}`, 404 if not mine).
+  Future<CollectionApiResult<RealRecommendation>> getRecommendation(
+    int id,
+  ) async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/me/recommendations/$id'),
+              headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealRecommendation.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Regenerates the user's active recommendations
+  /// (`POST /api/me/recommendations/generate`). Read-only snapshots — never
+  /// claims/reserves anything. Returns the number newly generated.
+  Future<CollectionApiResult<int>> generateRecommendations() async {
+    try {
+      final res = await _client
+          .post(Uri.parse('$baseUrl/me/recommendations/generate'),
+              headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(
+          (body['generatedCount'] as num?)?.toInt() ?? 0,
+        );
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Dismisses a recommendation (`PATCH /api/me/recommendations/{id}/dismiss`),
+  /// hiding it from the default feed (404 if not mine).
+  Future<CollectionApiResult<RealRecommendation>> dismissRecommendation(
+    int id,
+  ) =>
+      _patchRecommendation('$baseUrl/me/recommendations/$id/dismiss');
+
+  /// Tracks a click on a recommendation
+  /// (`PATCH /api/me/recommendations/{id}/click`, idempotent).
+  Future<CollectionApiResult<RealRecommendation>> clickRecommendation(
+    int id,
+  ) =>
+      _patchRecommendation('$baseUrl/me/recommendations/$id/click');
+
+  Future<CollectionApiResult<RealRecommendation>> _patchRecommendation(
+    String url,
+  ) async {
+    try {
+      final res = await _client
+          .patch(Uri.parse(url), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealRecommendation.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
   Map<String, dynamic> _failureForStatus(http.Response res) {
     Map<String, dynamic>? body;
     try {

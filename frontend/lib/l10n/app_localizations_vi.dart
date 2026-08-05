@@ -7142,4 +7142,107 @@ class AppLocalizationsVi extends AppLocalizations {
   String couponDetailUsagePerUser(int count) {
     return 'Tối đa $count lượt dùng mỗi khách hàng';
   }
+
+  @override
+  String get recommendationsTitle => 'Gợi ý cho bạn';
+
+  @override
+  String get recommendationsLoadingMessage => 'Đang tải gợi ý của bạn…';
+
+  @override
+  String get recommendationsErrorMessage =>
+      'Không thể tải gợi ý của bạn. Vui lòng thử lại.';
+
+  @override
+  String get recommendationsEmptyTitle => 'Chưa có gợi ý nào';
+
+  @override
+  String get recommendationsEmptyMessage =>
+      'Hãy lưu địa điểm, xem khách sạn và đặt chuyến đi — sau đó tạo lại để nhận gợi ý dành riêng cho bạn.';
+
+  @override
+  String get recommendationsGenerateSemantic => 'Tạo lại gợi ý';
+
+  @override
+  String get recommendationsGeneratedMessage =>
+      'Gợi ý của bạn đã được cập nhật.';
+
+  @override
+  String get recommendationsGenerateErrorMessage =>
+      'Không thể làm mới gợi ý của bạn. Vui lòng thử lại.';
+
+  @override
+  String get recommendationsLoadMore => 'Tải thêm';
+
+  @override
+  String get recommendationsDismissedMessage => 'Đã bỏ qua gợi ý.';
+
+  @override
+  String get recommendationsActionErrorMessage =>
+      'Đã xảy ra lỗi. Vui lòng thử lại.';
+
+  @override
+  String get recommendationsNetworkMessage =>
+      'Bạn dường như đang ngoại tuyến. Vui lòng kiểm tra kết nối.';
+
+  @override
+  String get recommendationsGoneMessage => 'Gợi ý này không còn khả dụng.';
+
+  @override
+  String get recommendationUntitled => 'Gợi ý';
+
+  @override
+  String recommendationsDismissSemantic(String name) {
+    return 'Bỏ qua $name';
+  }
+
+  @override
+  String recommendationCardSemantic(String name) {
+    return 'Gợi ý: $name';
+  }
+
+  @override
+  String recommendationScoreSemantic(int score) {
+    return 'Điểm phù hợp $score trên 100';
+  }
+
+  @override
+  String get recommendationTypePlace => 'Địa điểm';
+
+  @override
+  String get recommendationTypeHotel => 'Khách sạn';
+
+  @override
+  String get recommendationTypeRoom => 'Phòng';
+
+  @override
+  String get recommendationTypePromotion => 'Khuyến mãi';
+
+  @override
+  String get recommendationTypeCoupon => 'Mã giảm giá';
+
+  @override
+  String get recommendationTypeTripIdea => 'Ý tưởng chuyến đi';
+
+  @override
+  String get recommendationTypeOther => 'Đề xuất';
+
+  @override
+  String get recommendationStateClicked => 'Đã xem';
+
+  @override
+  String get recommendationStateConverted => 'Đã đặt';
+
+  @override
+  String get recommendationDetailReason => 'Vì sao chúng tôi chọn mục này';
+
+  @override
+  String recommendationDetailGenerated(String date) {
+    return 'Gợi ý ngày $date';
+  }
+
+  @override
+  String recommendationDetailExpires(String date) {
+    return 'Khả dụng đến $date';
+  }
 }

@@ -12,6 +12,7 @@ import '../../shared/widgets/glass_widgets.dart';
 import '../auth/login_screen.dart';
 import '../bookings/my_bookings_screen.dart';
 import '../places/real_recently_viewed_screen.dart';
+import '../recommendations/real_recommendations_screen.dart';
 import '../rewards/rewards_screen.dart';
 import '../reviews/reviews_screen.dart';
 import '../wallet/travel_wallet_screen.dart';
@@ -232,6 +233,20 @@ class ProfileScreen extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (_) => const RealRecentlyViewedScreen(),
+              ),
+            ),
+          ),
+        // UI39: real personalized recommendations live on the backend only.
+        // Shown in Real Mode; Demo Mode is byte-identical (no extra card).
+        if (!isDemo)
+          _ProfileNavCard(
+            key: const Key('profile-recommendations'),
+            icon: Icons.recommend_rounded,
+            title: l10n.recommendationsTitle,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const RealRecommendationsScreen(),
               ),
             ),
           ),

@@ -7307,4 +7307,108 @@ class AppLocalizationsEn extends AppLocalizations {
   String couponDetailUsagePerUser(int count) {
     return 'Up to $count use(s) per customer';
   }
+
+  @override
+  String get recommendationsTitle => 'Recommended for you';
+
+  @override
+  String get recommendationsLoadingMessage => 'Loading your recommendations…';
+
+  @override
+  String get recommendationsErrorMessage =>
+      'We couldn\'t load your recommendations. Please try again.';
+
+  @override
+  String get recommendationsEmptyTitle => 'No recommendations yet';
+
+  @override
+  String get recommendationsEmptyMessage =>
+      'Save places, browse hotels, and book trips — then regenerate to see picks tailored to you.';
+
+  @override
+  String get recommendationsGenerateSemantic => 'Regenerate recommendations';
+
+  @override
+  String get recommendationsGeneratedMessage =>
+      'Your recommendations are up to date.';
+
+  @override
+  String get recommendationsGenerateErrorMessage =>
+      'We couldn\'t refresh your recommendations. Please try again.';
+
+  @override
+  String get recommendationsLoadMore => 'Load more';
+
+  @override
+  String get recommendationsDismissedMessage => 'Recommendation dismissed.';
+
+  @override
+  String get recommendationsActionErrorMessage =>
+      'Something went wrong. Please try again.';
+
+  @override
+  String get recommendationsNetworkMessage =>
+      'You appear to be offline. Please check your connection.';
+
+  @override
+  String get recommendationsGoneMessage =>
+      'This recommendation is no longer available.';
+
+  @override
+  String get recommendationUntitled => 'Recommendation';
+
+  @override
+  String recommendationsDismissSemantic(String name) {
+    return 'Dismiss $name';
+  }
+
+  @override
+  String recommendationCardSemantic(String name) {
+    return 'Recommendation: $name';
+  }
+
+  @override
+  String recommendationScoreSemantic(int score) {
+    return 'Match score $score out of 100';
+  }
+
+  @override
+  String get recommendationTypePlace => 'Place';
+
+  @override
+  String get recommendationTypeHotel => 'Hotel';
+
+  @override
+  String get recommendationTypeRoom => 'Room';
+
+  @override
+  String get recommendationTypePromotion => 'Promotion';
+
+  @override
+  String get recommendationTypeCoupon => 'Coupon';
+
+  @override
+  String get recommendationTypeTripIdea => 'Trip idea';
+
+  @override
+  String get recommendationTypeOther => 'Suggestion';
+
+  @override
+  String get recommendationStateClicked => 'Viewed';
+
+  @override
+  String get recommendationStateConverted => 'Booked';
+
+  @override
+  String get recommendationDetailReason => 'Why we picked this';
+
+  @override
+  String recommendationDetailGenerated(String date) {
+    return 'Suggested $date';
+  }
+
+  @override
+  String recommendationDetailExpires(String date) {
+    return 'Available until $date';
+  }
 }

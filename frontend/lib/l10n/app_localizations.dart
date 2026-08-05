@@ -12423,6 +12423,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Up to {count} use(s) per customer'**
   String couponDetailUsagePerUser(int count);
+
+  /// No description provided for @recommendationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended for you'**
+  String get recommendationsTitle;
+
+  /// No description provided for @recommendationsLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading your recommendations…'**
+  String get recommendationsLoadingMessage;
+
+  /// No description provided for @recommendationsErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load your recommendations. Please try again.'**
+  String get recommendationsErrorMessage;
+
+  /// No description provided for @recommendationsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No recommendations yet'**
+  String get recommendationsEmptyTitle;
+
+  /// No description provided for @recommendationsEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Save places, browse hotels, and book trips — then regenerate to see picks tailored to you.'**
+  String get recommendationsEmptyMessage;
+
+  /// No description provided for @recommendationsGenerateSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Regenerate recommendations'**
+  String get recommendationsGenerateSemantic;
+
+  /// No description provided for @recommendationsGeneratedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your recommendations are up to date.'**
+  String get recommendationsGeneratedMessage;
+
+  /// No description provided for @recommendationsGenerateErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t refresh your recommendations. Please try again.'**
+  String get recommendationsGenerateErrorMessage;
+
+  /// No description provided for @recommendationsLoadMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Load more'**
+  String get recommendationsLoadMore;
+
+  /// No description provided for @recommendationsDismissedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommendation dismissed.'**
+  String get recommendationsDismissedMessage;
+
+  /// No description provided for @recommendationsActionErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get recommendationsActionErrorMessage;
+
+  /// No description provided for @recommendationsNetworkMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You appear to be offline. Please check your connection.'**
+  String get recommendationsNetworkMessage;
+
+  /// No description provided for @recommendationsGoneMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This recommendation is no longer available.'**
+  String get recommendationsGoneMessage;
+
+  /// No description provided for @recommendationUntitled.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommendation'**
+  String get recommendationUntitled;
+
+  /// No description provided for @recommendationsDismissSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss {name}'**
+  String recommendationsDismissSemantic(String name);
+
+  /// No description provided for @recommendationCardSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommendation: {name}'**
+  String recommendationCardSemantic(String name);
+
+  /// No description provided for @recommendationScoreSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Match score {score} out of 100'**
+  String recommendationScoreSemantic(int score);
+
+  /// No description provided for @recommendationTypePlace.
+  ///
+  /// In en, this message translates to:
+  /// **'Place'**
+  String get recommendationTypePlace;
+
+  /// No description provided for @recommendationTypeHotel.
+  ///
+  /// In en, this message translates to:
+  /// **'Hotel'**
+  String get recommendationTypeHotel;
+
+  /// No description provided for @recommendationTypeRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Room'**
+  String get recommendationTypeRoom;
+
+  /// No description provided for @recommendationTypePromotion.
+  ///
+  /// In en, this message translates to:
+  /// **'Promotion'**
+  String get recommendationTypePromotion;
+
+  /// No description provided for @recommendationTypeCoupon.
+  ///
+  /// In en, this message translates to:
+  /// **'Coupon'**
+  String get recommendationTypeCoupon;
+
+  /// No description provided for @recommendationTypeTripIdea.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip idea'**
+  String get recommendationTypeTripIdea;
+
+  /// No description provided for @recommendationTypeOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggestion'**
+  String get recommendationTypeOther;
+
+  /// No description provided for @recommendationStateClicked.
+  ///
+  /// In en, this message translates to:
+  /// **'Viewed'**
+  String get recommendationStateClicked;
+
+  /// No description provided for @recommendationStateConverted.
+  ///
+  /// In en, this message translates to:
+  /// **'Booked'**
+  String get recommendationStateConverted;
+
+  /// No description provided for @recommendationDetailReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Why we picked this'**
+  String get recommendationDetailReason;
+
+  /// No description provided for @recommendationDetailGenerated.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggested {date}'**
+  String recommendationDetailGenerated(String date);
+
+  /// No description provided for @recommendationDetailExpires.
+  ///
+  /// In en, this message translates to:
+  /// **'Available until {date}'**
+  String recommendationDetailExpires(String date);
 }
 
 class _AppLocalizationsDelegate
