@@ -11,6 +11,7 @@ import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/glass_widgets.dart';
 import '../auth/login_screen.dart';
 import '../bookings/my_bookings_screen.dart';
+import '../ai/real_ai_context_screen.dart';
 import '../conversations/real_conversations_screen.dart';
 import '../places/real_recently_viewed_screen.dart';
 import '../recommendations/real_recommendations_screen.dart';
@@ -262,6 +263,20 @@ class ProfileScreen extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (_) => const RealConversationsScreen(),
+              ),
+            ),
+          ),
+        // UI42: read-only aggregated AI trip context lives on the backend only.
+        // Shown in Real Mode; Demo Mode is byte-identical (no extra card).
+        if (!isDemo)
+          _ProfileNavCard(
+            key: const Key('profile-ai-context'),
+            icon: Icons.auto_awesome_rounded,
+            title: l10n.aiContextTitle,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const RealAiContextScreen(),
               ),
             ),
           ),

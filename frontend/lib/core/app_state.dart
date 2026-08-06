@@ -461,6 +461,16 @@ class AppState extends ChangeNotifier {
   int get realConversationsUnreadTotal =>
       realConversations.fold(0, (sum, c) => sum + c.unreadCount);
 
+  // ── Real Mode AI Context (/api/me/ai/context, UI-42) ──────────────────────
+  // A single read-only aggregate snapshot (no persistence, no AI generation).
+  // A 401 never calls logout(). Cleared on logout / mode / user change via
+  // [_resetRealAiContextState]. Zero HTTP in Demo Mode.
+  RealAiContext? realAiContext;
+  bool realAiContextLoading = false;
+  bool realAiContextLoaded = false;
+  bool realAiContextRefreshing = false;
+  AiContextOutcome? realAiContextError;
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -565,6 +575,7 @@ class AppState extends ChangeNotifier {
     _resetRealRecommendationsState();
     _resetRealExpensesState();
     _resetRealConversationsState();
+    _resetRealAiContextState();
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -790,6 +801,14 @@ class AppState extends ChangeNotifier {
     realConversationMutating = false;
   }
 
+  void _resetRealAiContextState() {
+    realAiContext = null;
+    realAiContextLoading = false;
+    realAiContextLoaded = false;
+    realAiContextRefreshing = false;
+    realAiContextError = null;
+  }
+
   void _resetRealNotificationsState() {
     realNotifications = [];
     realNotificationsLoading = false;
@@ -936,6 +955,7 @@ class AppState extends ChangeNotifier {
     _resetRealRecommendationsState();
     _resetRealExpensesState();
     _resetRealConversationsState();
+    _resetRealAiContextState();
     timeline = [];
     expenses = [];
     demoBookings = [];
@@ -4725,6 +4745,52 @@ class AppState extends ChangeNotifier {
       return ConversationOutcome.success;
     }
     final outcome = _mapConversationError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  // ── Real Mode AI Context (UI-42) ─────────────────────────────────────────
+
+  AiContextOutcome _mapAiContextError(ApiErrorKind? kind) {
+    return switch (kind) {
+      ApiErrorKind.unauthorized => AiContextOutcome.sessionExpired,
+      ApiErrorKind.forbidden => AiContextOutcome.forbidden,
+      ApiErrorKind.notFound => AiContextOutcome.notFound,
+      ApiErrorKind.network => AiContextOutcome.network,
+      ApiErrorKind.timeout => AiContextOutcome.network,
+      ApiErrorKind.server => AiContextOutcome.serverError,
+      _ => AiContextOutcome.serverError,
+    };
+  }
+
+  /// Loads the user's aggregated AI trip context (`GET /api/me/ai/context`).
+  /// [refresh] forces a re-fetch and preserves the current snapshot on failure.
+  /// Zero HTTP in Demo Mode.
+  Future<AiContextOutcome> loadRealAiContext({bool refresh = false}) async {
+    if (demoMode) return AiContextOutcome.demoUnavailable;
+    if (realAiContextLoading || realAiContextRefreshing) {
+      return AiContextOutcome.success;
+    }
+    if (realAiContextLoaded && !refresh) return AiContextOutcome.success;
+    if (refresh) {
+      realAiContextRefreshing = true;
+    } else {
+      realAiContextLoading = true;
+    }
+    realAiContextError = null;
+    notifyListeners();
+    final result = await api.getAiContext();
+    realAiContextLoading = false;
+    realAiContextRefreshing = false;
+    if (result.success && result.data != null) {
+      realAiContext = result.data;
+      realAiContextLoaded = true;
+      realAiContextError = null;
+      notifyListeners();
+      return AiContextOutcome.success;
+    }
+    final outcome = _mapAiContextError(result.errorKind);
+    realAiContextError = outcome;
     notifyListeners();
     return outcome;
   }

@@ -3852,5 +3852,62 @@
       "sender": { "type": "String" },
       "body": { "type": "String" }
     }
+  },
+  "aiContextTitle": "Bối cảnh chuyến đi AI",
+  "aiContextLoadingMessage": "Đang tải bối cảnh chuyến đi của bạn…",
+  "aiContextErrorMessage": "Không thể tải bối cảnh chuyến đi của bạn. Vui lòng thử lại.",
+  "aiContextExplainer": "Ảnh chụp chỉ đọc dữ liệu du lịch của bạn mà một trợ lý AI sẽ sử dụng. Không có tin nhắn nào được tạo ở đây.",
+  "aiContextActivityTitle": "Hoạt động của bạn",
+  "aiContextCurrentTripTitle": "Chuyến đi hiện tại",
+  "aiContextBudgetTitle": "Ngân sách chuyến đi hiện tại",
+  "aiContextUpcomingTripsTitle": "Chuyến đi sắp tới",
+  "aiContextUntitledTrip": "Chuyến đi chưa đặt tên",
+  "aiContextOverBudget": "Vượt ngân sách",
+  "aiContextStatTrips": "Chuyến đi",
+  "aiContextStatActiveTrips": "Đang diễn ra",
+  "aiContextStatUpcomingTrips": "Sắp tới",
+  "aiContextStatCompletedTrips": "Đã hoàn thành",
+  "aiContextStatPlannedDays": "Ngày đã lên kế hoạch",
+  "aiContextStatBookings": "Đặt chỗ",
+  "aiContextStatCollections": "Bộ sưu tập",
+  "aiContextStatWishlist": "Yêu thích",
+  "aiContextStatReviews": "Đánh giá",
+  "aiContextStatRecommendations": "Gợi ý",
+  "aiContextGeneratedAt": "Ảnh chụp lúc {date}",
+  "@aiContextGeneratedAt": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "aiContextTripDays": "{count} ngày",
+  "@aiContextTripDays": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "aiContextStatSemantic": "{label}: {value}",
+  "@aiContextStatSemantic": {
+    "placeholders": {
+      "label": { "type": "String" },
+      "value": { "type": "int" }
+    }
+  },
+  "aiContextSpent": "Đã chi {amount}",
+  "@aiContextSpent": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "aiContextBudget": "Ngân sách {amount}",
+  "@aiContextBudget": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "aiContextRemaining": "Còn lại {amount}",
+  "@aiContextRemaining": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
   }
 }

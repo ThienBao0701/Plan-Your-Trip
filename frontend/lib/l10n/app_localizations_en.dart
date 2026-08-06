@@ -7660,4 +7660,96 @@ class AppLocalizationsEn extends AppLocalizations {
   String conversationMessageSemantic(String sender, String body) {
     return '$sender said: $body';
   }
+
+  @override
+  String get aiContextTitle => 'AI trip context';
+
+  @override
+  String get aiContextLoadingMessage => 'Loading your trip context…';
+
+  @override
+  String get aiContextErrorMessage =>
+      'We couldn\'t load your trip context. Please try again.';
+
+  @override
+  String get aiContextExplainer =>
+      'A read-only snapshot of your travel data that an AI assistant would use. No message is generated here.';
+
+  @override
+  String get aiContextActivityTitle => 'Your activity';
+
+  @override
+  String get aiContextCurrentTripTitle => 'Current trip';
+
+  @override
+  String get aiContextBudgetTitle => 'Current trip budget';
+
+  @override
+  String get aiContextUpcomingTripsTitle => 'Upcoming trips';
+
+  @override
+  String get aiContextUntitledTrip => 'Untitled trip';
+
+  @override
+  String get aiContextOverBudget => 'Over budget';
+
+  @override
+  String get aiContextStatTrips => 'Trips';
+
+  @override
+  String get aiContextStatActiveTrips => 'Active';
+
+  @override
+  String get aiContextStatUpcomingTrips => 'Upcoming';
+
+  @override
+  String get aiContextStatCompletedTrips => 'Completed';
+
+  @override
+  String get aiContextStatPlannedDays => 'Planned days';
+
+  @override
+  String get aiContextStatBookings => 'Bookings';
+
+  @override
+  String get aiContextStatCollections => 'Collections';
+
+  @override
+  String get aiContextStatWishlist => 'Wishlist';
+
+  @override
+  String get aiContextStatReviews => 'Reviews';
+
+  @override
+  String get aiContextStatRecommendations => 'Recommendations';
+
+  @override
+  String aiContextGeneratedAt(String date) {
+    return 'Snapshot taken $date';
+  }
+
+  @override
+  String aiContextTripDays(int count) {
+    return '$count days';
+  }
+
+  @override
+  String aiContextStatSemantic(String label, int value) {
+    return '$label: $value';
+  }
+
+  @override
+  String aiContextSpent(String amount) {
+    return 'Spent $amount';
+  }
+
+  @override
+  String aiContextBudget(String amount) {
+    return 'Budget $amount';
+  }
+
+  @override
+  String aiContextRemaining(String amount) {
+    return '$amount left';
+  }
 }

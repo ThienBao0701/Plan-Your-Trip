@@ -2854,6 +2854,38 @@ class ApiClient {
     }
   }
 
+  // ── AI Context (/api/me/ai/context, UI-42) ───────────────────────────────────
+  // A single read-only aggregate snapshot (no persistence, no AI generation).
+  // Authenticated, 8s timeout, no retry.
+
+  /// Reads the user's aggregated AI trip context (`GET /api/me/ai/context`).
+  Future<CollectionApiResult<RealAiContext>> getAiContext() async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/me/ai/context'), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealAiContext.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
   Map<String, dynamic> _failureForStatus(http.Response res) {
     Map<String, dynamic>? body;
     try {

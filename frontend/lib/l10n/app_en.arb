@@ -3852,5 +3852,62 @@
       "sender": { "type": "String" },
       "body": { "type": "String" }
     }
+  },
+  "aiContextTitle": "AI trip context",
+  "aiContextLoadingMessage": "Loading your trip context…",
+  "aiContextErrorMessage": "We couldn't load your trip context. Please try again.",
+  "aiContextExplainer": "A read-only snapshot of your travel data that an AI assistant would use. No message is generated here.",
+  "aiContextActivityTitle": "Your activity",
+  "aiContextCurrentTripTitle": "Current trip",
+  "aiContextBudgetTitle": "Current trip budget",
+  "aiContextUpcomingTripsTitle": "Upcoming trips",
+  "aiContextUntitledTrip": "Untitled trip",
+  "aiContextOverBudget": "Over budget",
+  "aiContextStatTrips": "Trips",
+  "aiContextStatActiveTrips": "Active",
+  "aiContextStatUpcomingTrips": "Upcoming",
+  "aiContextStatCompletedTrips": "Completed",
+  "aiContextStatPlannedDays": "Planned days",
+  "aiContextStatBookings": "Bookings",
+  "aiContextStatCollections": "Collections",
+  "aiContextStatWishlist": "Wishlist",
+  "aiContextStatReviews": "Reviews",
+  "aiContextStatRecommendations": "Recommendations",
+  "aiContextGeneratedAt": "Snapshot taken {date}",
+  "@aiContextGeneratedAt": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "aiContextTripDays": "{count} days",
+  "@aiContextTripDays": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "aiContextStatSemantic": "{label}: {value}",
+  "@aiContextStatSemantic": {
+    "placeholders": {
+      "label": { "type": "String" },
+      "value": { "type": "int" }
+    }
+  },
+  "aiContextSpent": "Spent {amount}",
+  "@aiContextSpent": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "aiContextBudget": "Budget {amount}",
+  "@aiContextBudget": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "aiContextRemaining": "{amount} left",
+  "@aiContextRemaining": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
   }
 }

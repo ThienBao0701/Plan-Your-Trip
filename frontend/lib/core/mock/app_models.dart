@@ -5980,6 +5980,157 @@ enum ConversationOutcome {
   serverError,
 }
 
+// ── AI Context (/api/me/ai/context, UI-42) ───────────────────────────────────
+// Real-backend mirror of the Phase 7.50 AI Trip Context aggregate
+// (`AIContextController` / `AITripContextService`). A single read-only snapshot,
+// NOT persisted and NOT an AI generation — it is the data an AI capability would
+// consume. The client surfaces the summary-level fields it displays (activity
+// counts, current/upcoming trips, the budget summary, wishlist count, generated
+// time); the large embedded profile/recommendation/booking lists are represented
+// by their backend-provided counts rather than re-mapped. `Map` decoding is
+// confined to [fromJson].
+
+/// A light trip reference from the context (`TripSummaryResponse`), carrying only
+/// the fields the snapshot screen displays.
+class RealAiTripRef {
+  final int id;
+  final String title;
+  final String? destination;
+  final String status; // raw wire code
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final int dayCount;
+
+  const RealAiTripRef({
+    required this.id,
+    this.title = '',
+    this.destination,
+    this.status = '',
+    this.startDate,
+    this.endDate,
+    this.dayCount = 0,
+  });
+
+  factory RealAiTripRef.fromJson(Map<String, dynamic> json) {
+    return RealAiTripRef(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      title: (json['title'] as String?) ?? '',
+      destination: json['destination'] as String?,
+      status: (json['status'] as String?) ?? '',
+      startDate: _tryParseDate(json['startDate']),
+      endDate: _tryParseDate(json['endDate']),
+      dayCount: (json['dayCount'] as num?)?.toInt() ?? 0,
+    );
+  }
+}
+
+/// Real-backend mirror of `AITripContextDto.ActivitySummary` — cross-section
+/// counts the backend computes (never recomputed client-side).
+class RealAiActivitySummary {
+  final int totalTrips;
+  final int activeTrips;
+  final int upcomingTrips;
+  final int completedTrips;
+  final int totalPlannedDays;
+  final int totalBookings;
+  final int savedCollections;
+  final int wishlistItems;
+  final int reviews;
+  final int recommendations;
+
+  const RealAiActivitySummary({
+    this.totalTrips = 0,
+    this.activeTrips = 0,
+    this.upcomingTrips = 0,
+    this.completedTrips = 0,
+    this.totalPlannedDays = 0,
+    this.totalBookings = 0,
+    this.savedCollections = 0,
+    this.wishlistItems = 0,
+    this.reviews = 0,
+    this.recommendations = 0,
+  });
+
+  factory RealAiActivitySummary.fromJson(Map<String, dynamic> json) {
+    return RealAiActivitySummary(
+      totalTrips: (json['totalTrips'] as num?)?.toInt() ?? 0,
+      activeTrips: (json['activeTrips'] as num?)?.toInt() ?? 0,
+      upcomingTrips: (json['upcomingTrips'] as num?)?.toInt() ?? 0,
+      completedTrips: (json['completedTrips'] as num?)?.toInt() ?? 0,
+      totalPlannedDays: (json['totalPlannedDays'] as num?)?.toInt() ?? 0,
+      totalBookings: (json['totalBookings'] as num?)?.toInt() ?? 0,
+      savedCollections: (json['savedCollections'] as num?)?.toInt() ?? 0,
+      wishlistItems: (json['wishlistItems'] as num?)?.toInt() ?? 0,
+      reviews: (json['reviews'] as num?)?.toInt() ?? 0,
+      recommendations: (json['recommendations'] as num?)?.toInt() ?? 0,
+    );
+  }
+}
+
+/// Real-backend mirror of `AITripContextResponse` (the read-only snapshot). The
+/// nested `budgetSummary` reuses [RealExpenseSummary] (UI-40); `wishlistSummary`
+/// is surfaced by its item count. Embedded profile/interest/recommendation/
+/// booking/collection/review lists are represented by [activitySummary] counts.
+class RealAiContext {
+  final RealAiTripRef? currentTrip;
+  final List<RealAiTripRef> upcomingTrips;
+  final RealExpenseSummary? budgetSummary;
+  final RealAiActivitySummary activitySummary;
+  final int wishlistItemCount;
+  final DateTime? contextGeneratedAt;
+
+  const RealAiContext({
+    this.currentTrip,
+    this.upcomingTrips = const [],
+    this.budgetSummary,
+    this.activitySummary = const RealAiActivitySummary(),
+    this.wishlistItemCount = 0,
+    this.contextGeneratedAt,
+  });
+
+  factory RealAiContext.fromJson(Map<String, dynamic> json) {
+    final current = json['currentTrip'];
+    final upcoming = json['upcomingTrips'];
+    final budget = json['budgetSummary'];
+    final activity = json['activitySummary'];
+    final wishlist = json['wishlistSummary'];
+    return RealAiContext(
+      currentTrip: current is Map<String, dynamic>
+          ? RealAiTripRef.fromJson(current)
+          : null,
+      upcomingTrips: upcoming is List
+          ? upcoming
+              .map((e) => RealAiTripRef.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : const [],
+      budgetSummary: budget is Map<String, dynamic>
+          ? RealExpenseSummary.fromJson(budget)
+          : null,
+      activitySummary: activity is Map<String, dynamic>
+          ? RealAiActivitySummary.fromJson(activity)
+          : const RealAiActivitySummary(),
+      wishlistItemCount: wishlist is Map<String, dynamic>
+          ? (wishlist['itemCount'] as num?)?.toInt() ?? 0
+          : 0,
+      contextGeneratedAt: _tryParseDate(json['contextGeneratedAt']),
+    );
+  }
+}
+
+/// Outcome of the real AI context read (`GET /api/me/ai/context`). Read-only.
+/// [demoUnavailable] is the Demo Mode guard (zero HTTP); [sessionExpired] (401)
+/// never triggers auto-logout; [forbidden] 403, [notFound] 404 (the JWT user no
+/// longer exists), [serverError] 5xx, [network] transport/timeout.
+enum AiContextOutcome {
+  success,
+  demoUnavailable,
+  sessionExpired,
+  forbidden,
+  notFound,
+  network,
+  serverError,
+}
+
 class DemoBooking {
   final String code;
   final String ownerUserId;

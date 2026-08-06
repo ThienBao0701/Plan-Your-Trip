@@ -13023,6 +13023,162 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{sender} said: {body}'**
   String conversationMessageSemantic(String sender, String body);
+
+  /// No description provided for @aiContextTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'AI trip context'**
+  String get aiContextTitle;
+
+  /// No description provided for @aiContextLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading your trip context…'**
+  String get aiContextLoadingMessage;
+
+  /// No description provided for @aiContextErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load your trip context. Please try again.'**
+  String get aiContextErrorMessage;
+
+  /// No description provided for @aiContextExplainer.
+  ///
+  /// In en, this message translates to:
+  /// **'A read-only snapshot of your travel data that an AI assistant would use. No message is generated here.'**
+  String get aiContextExplainer;
+
+  /// No description provided for @aiContextActivityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your activity'**
+  String get aiContextActivityTitle;
+
+  /// No description provided for @aiContextCurrentTripTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Current trip'**
+  String get aiContextCurrentTripTitle;
+
+  /// No description provided for @aiContextBudgetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Current trip budget'**
+  String get aiContextBudgetTitle;
+
+  /// No description provided for @aiContextUpcomingTripsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming trips'**
+  String get aiContextUpcomingTripsTitle;
+
+  /// No description provided for @aiContextUntitledTrip.
+  ///
+  /// In en, this message translates to:
+  /// **'Untitled trip'**
+  String get aiContextUntitledTrip;
+
+  /// No description provided for @aiContextOverBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Over budget'**
+  String get aiContextOverBudget;
+
+  /// No description provided for @aiContextStatTrips.
+  ///
+  /// In en, this message translates to:
+  /// **'Trips'**
+  String get aiContextStatTrips;
+
+  /// No description provided for @aiContextStatActiveTrips.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get aiContextStatActiveTrips;
+
+  /// No description provided for @aiContextStatUpcomingTrips.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get aiContextStatUpcomingTrips;
+
+  /// No description provided for @aiContextStatCompletedTrips.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get aiContextStatCompletedTrips;
+
+  /// No description provided for @aiContextStatPlannedDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Planned days'**
+  String get aiContextStatPlannedDays;
+
+  /// No description provided for @aiContextStatBookings.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookings'**
+  String get aiContextStatBookings;
+
+  /// No description provided for @aiContextStatCollections.
+  ///
+  /// In en, this message translates to:
+  /// **'Collections'**
+  String get aiContextStatCollections;
+
+  /// No description provided for @aiContextStatWishlist.
+  ///
+  /// In en, this message translates to:
+  /// **'Wishlist'**
+  String get aiContextStatWishlist;
+
+  /// No description provided for @aiContextStatReviews.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviews'**
+  String get aiContextStatReviews;
+
+  /// No description provided for @aiContextStatRecommendations.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommendations'**
+  String get aiContextStatRecommendations;
+
+  /// No description provided for @aiContextGeneratedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Snapshot taken {date}'**
+  String aiContextGeneratedAt(String date);
+
+  /// No description provided for @aiContextTripDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} days'**
+  String aiContextTripDays(int count);
+
+  /// No description provided for @aiContextStatSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{label}: {value}'**
+  String aiContextStatSemantic(String label, int value);
+
+  /// No description provided for @aiContextSpent.
+  ///
+  /// In en, this message translates to:
+  /// **'Spent {amount}'**
+  String aiContextSpent(String amount);
+
+  /// No description provided for @aiContextBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget {amount}'**
+  String aiContextBudget(String amount);
+
+  /// No description provided for @aiContextRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} left'**
+  String aiContextRemaining(String amount);
 }
 
 class _AppLocalizationsDelegate

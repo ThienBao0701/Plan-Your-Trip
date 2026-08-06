@@ -7493,4 +7493,96 @@ class AppLocalizationsVi extends AppLocalizations {
   String conversationMessageSemantic(String sender, String body) {
     return '$sender đã nói: $body';
   }
+
+  @override
+  String get aiContextTitle => 'Bối cảnh chuyến đi AI';
+
+  @override
+  String get aiContextLoadingMessage => 'Đang tải bối cảnh chuyến đi của bạn…';
+
+  @override
+  String get aiContextErrorMessage =>
+      'Không thể tải bối cảnh chuyến đi của bạn. Vui lòng thử lại.';
+
+  @override
+  String get aiContextExplainer =>
+      'Ảnh chụp chỉ đọc dữ liệu du lịch của bạn mà một trợ lý AI sẽ sử dụng. Không có tin nhắn nào được tạo ở đây.';
+
+  @override
+  String get aiContextActivityTitle => 'Hoạt động của bạn';
+
+  @override
+  String get aiContextCurrentTripTitle => 'Chuyến đi hiện tại';
+
+  @override
+  String get aiContextBudgetTitle => 'Ngân sách chuyến đi hiện tại';
+
+  @override
+  String get aiContextUpcomingTripsTitle => 'Chuyến đi sắp tới';
+
+  @override
+  String get aiContextUntitledTrip => 'Chuyến đi chưa đặt tên';
+
+  @override
+  String get aiContextOverBudget => 'Vượt ngân sách';
+
+  @override
+  String get aiContextStatTrips => 'Chuyến đi';
+
+  @override
+  String get aiContextStatActiveTrips => 'Đang diễn ra';
+
+  @override
+  String get aiContextStatUpcomingTrips => 'Sắp tới';
+
+  @override
+  String get aiContextStatCompletedTrips => 'Đã hoàn thành';
+
+  @override
+  String get aiContextStatPlannedDays => 'Ngày đã lên kế hoạch';
+
+  @override
+  String get aiContextStatBookings => 'Đặt chỗ';
+
+  @override
+  String get aiContextStatCollections => 'Bộ sưu tập';
+
+  @override
+  String get aiContextStatWishlist => 'Yêu thích';
+
+  @override
+  String get aiContextStatReviews => 'Đánh giá';
+
+  @override
+  String get aiContextStatRecommendations => 'Gợi ý';
+
+  @override
+  String aiContextGeneratedAt(String date) {
+    return 'Ảnh chụp lúc $date';
+  }
+
+  @override
+  String aiContextTripDays(int count) {
+    return '$count ngày';
+  }
+
+  @override
+  String aiContextStatSemantic(String label, int value) {
+    return '$label: $value';
+  }
+
+  @override
+  String aiContextSpent(String amount) {
+    return 'Đã chi $amount';
+  }
+
+  @override
+  String aiContextBudget(String amount) {
+    return 'Ngân sách $amount';
+  }
+
+  @override
+  String aiContextRemaining(String amount) {
+    return 'Còn lại $amount';
+  }
 }
