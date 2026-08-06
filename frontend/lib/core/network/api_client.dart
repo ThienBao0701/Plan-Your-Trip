@@ -3225,6 +3225,173 @@ class ApiClient {
     }
   }
 
+  // ── Trip Packing (/api/me/trips/.../packing, UI-45) ──────────────────────────
+  // Per-trip packing checklist on a real TripPlan (UI-20). GET list → bare array
+  // (unchecked first, then sortOrder). POST create (201), PUT update, DELETE
+  // (204), PATCH check/uncheck. Reads need owner/collaborator; mutations need
+  // owner/EDITOR (403 for a VIEWER). All authenticated, 8s timeout, no retry.
+
+  /// Lists a trip's packing checklist (`GET /api/me/trips/{tripId}/packing`).
+  Future<CollectionApiResult<List<RealPackingItem>>> getPackingItems(
+    int tripId,
+  ) async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/me/trips/$tripId/packing'),
+              headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final decoded = jsonDecode(utf8.decode(res.bodyBytes));
+        if (decoded is! List) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(
+          decoded
+              .map((e) => RealPackingItem.fromJson(e as Map<String, dynamic>))
+              .toList(),
+        );
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Adds a packing item (`POST /api/me/trips/{tripId}/packing`, 201).
+  Future<CollectionApiResult<RealPackingItem>> createPackingItem(
+    int tripId,
+    RealPackingItemPayload payload,
+  ) async {
+    try {
+      final res = await _client
+          .post(Uri.parse('$baseUrl/me/trips/$tripId/packing'),
+              headers: _jsonHeaders, body: jsonEncode(payload.toJson()))
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealPackingItem.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Updates a packing item (`PUT /api/me/trips/packing/{id}`).
+  Future<CollectionApiResult<RealPackingItem>> updatePackingItem(
+    int itemId,
+    RealPackingItemPayload payload,
+  ) async {
+    try {
+      final res = await _client
+          .put(Uri.parse('$baseUrl/me/trips/packing/$itemId'),
+              headers: _jsonHeaders, body: jsonEncode(payload.toJson()))
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealPackingItem.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Deletes a packing item (`DELETE /api/me/trips/packing/{id}`, 204).
+  Future<CollectionApiVoidResult> deletePackingItem(int itemId) async {
+    try {
+      final res = await _client
+          .delete(Uri.parse('$baseUrl/me/trips/packing/$itemId'),
+              headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 204) {
+        return const CollectionApiVoidResult.success();
+      }
+      return CollectionApiVoidResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Marks a packing item checked (`PATCH /api/me/trips/packing/{id}/check`).
+  Future<CollectionApiResult<RealPackingItem>> checkPackingItem(int itemId) =>
+      _patchPackingItem('$baseUrl/me/trips/packing/$itemId/check');
+
+  /// Marks a packing item unchecked (`PATCH /api/me/trips/packing/{id}/uncheck`).
+  Future<CollectionApiResult<RealPackingItem>> uncheckPackingItem(int itemId) =>
+      _patchPackingItem('$baseUrl/me/trips/packing/$itemId/uncheck');
+
+  Future<CollectionApiResult<RealPackingItem>> _patchPackingItem(
+    String url,
+  ) async {
+    try {
+      final res = await _client
+          .patch(Uri.parse(url), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealPackingItem.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
   Map<String, dynamic> _failureForStatus(http.Response res) {
     Map<String, dynamic>? body;
     try {

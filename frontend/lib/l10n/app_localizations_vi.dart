@@ -7685,4 +7685,76 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get notesRealEditTitle => 'Sửa ghi chú';
+
+  @override
+  String get packingRealTitle => 'Hành lý';
+
+  @override
+  String get packingRealLoadingMessage => 'Đang tải danh sách hành lý…';
+
+  @override
+  String get packingRealErrorMessage =>
+      'Không thể tải danh sách hành lý của chuyến đi này. Vui lòng thử lại.';
+
+  @override
+  String get packingRealForbiddenMessage =>
+      'Bạn không có quyền quản lý danh sách hành lý cho chuyến đi này.';
+
+  @override
+  String get packingRealGoneMessage =>
+      'Chuyến đi hoặc mục hành lý này không còn khả dụng.';
+
+  @override
+  String get packingRealNetworkMessage =>
+      'Bạn dường như đang ngoại tuyến. Vui lòng kiểm tra kết nối.';
+
+  @override
+  String get packingRealActionErrorMessage =>
+      'Đã xảy ra lỗi. Vui lòng thử lại.';
+
+  @override
+  String get packingRealCreatedMessage => 'Đã thêm mục hành lý.';
+
+  @override
+  String get packingRealUpdatedMessage => 'Đã cập nhật mục hành lý.';
+
+  @override
+  String get packingRealDeletedMessage => 'Đã xóa mục hành lý.';
+
+  @override
+  String get packingRealLabelRequiredMessage => 'Nhập tên cho mục này.';
+
+  @override
+  String get packingRealQuantityInvalidMessage => 'Số lượng phải từ 1 trở lên.';
+
+  @override
+  String get packingRealAddSemantic => 'Thêm mục hành lý';
+
+  @override
+  String get packingRealCreateTitle => 'Mục hành lý mới';
+
+  @override
+  String get packingRealEditTitle => 'Sửa mục hành lý';
+
+  @override
+  String get packingRealEmptyTitle => 'Chưa có gì để đóng gói';
+
+  @override
+  String get packingRealEmptyMessage =>
+      'Thêm những thứ bạn cần mang theo trong chuyến đi này.';
+
+  @override
+  String packingRealDeleteConfirmMessage(String label) {
+    return 'Xóa $label khỏi danh sách này?';
+  }
+
+  @override
+  String packingRealCheckSemantic(String label) {
+    return 'Đánh dấu $label đã đóng gói';
+  }
+
+  @override
+  String packingRealUncheckSemantic(String label) {
+    return 'Đánh dấu $label chưa đóng gói';
+  }
 }

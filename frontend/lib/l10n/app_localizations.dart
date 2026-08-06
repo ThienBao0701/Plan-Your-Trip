@@ -13359,6 +13359,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Edit note'**
   String get notesRealEditTitle;
+
+  /// No description provided for @packingRealTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Packing'**
+  String get packingRealTitle;
+
+  /// No description provided for @packingRealLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading packing checklist…'**
+  String get packingRealLoadingMessage;
+
+  /// No description provided for @packingRealErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load this trip\'s packing checklist. Please try again.'**
+  String get packingRealErrorMessage;
+
+  /// No description provided for @packingRealForbiddenMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have permission to manage the packing list for this trip.'**
+  String get packingRealForbiddenMessage;
+
+  /// No description provided for @packingRealGoneMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This trip or packing item is no longer available.'**
+  String get packingRealGoneMessage;
+
+  /// No description provided for @packingRealNetworkMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You appear to be offline. Please check your connection.'**
+  String get packingRealNetworkMessage;
+
+  /// No description provided for @packingRealActionErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get packingRealActionErrorMessage;
+
+  /// No description provided for @packingRealCreatedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Packing item added.'**
+  String get packingRealCreatedMessage;
+
+  /// No description provided for @packingRealUpdatedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Packing item updated.'**
+  String get packingRealUpdatedMessage;
+
+  /// No description provided for @packingRealDeletedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Packing item deleted.'**
+  String get packingRealDeletedMessage;
+
+  /// No description provided for @packingRealLabelRequiredMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a name for this item.'**
+  String get packingRealLabelRequiredMessage;
+
+  /// No description provided for @packingRealQuantityInvalidMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity must be 1 or more.'**
+  String get packingRealQuantityInvalidMessage;
+
+  /// No description provided for @packingRealAddSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a packing item'**
+  String get packingRealAddSemantic;
+
+  /// No description provided for @packingRealCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New packing item'**
+  String get packingRealCreateTitle;
+
+  /// No description provided for @packingRealEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit packing item'**
+  String get packingRealEditTitle;
+
+  /// No description provided for @packingRealEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to pack yet'**
+  String get packingRealEmptyTitle;
+
+  /// No description provided for @packingRealEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Add what you need to bring on this trip.'**
+  String get packingRealEmptyMessage;
+
+  /// No description provided for @packingRealDeleteConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {label} from this checklist?'**
+  String packingRealDeleteConfirmMessage(String label);
+
+  /// No description provided for @packingRealCheckSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark {label} as packed'**
+  String packingRealCheckSemantic(String label);
+
+  /// No description provided for @packingRealUncheckSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark {label} as not packed'**
+  String packingRealUncheckSemantic(String label);
 }
 
 class _AppLocalizationsDelegate

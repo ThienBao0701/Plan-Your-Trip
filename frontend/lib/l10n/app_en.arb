@@ -3939,5 +3939,40 @@
   "notesRealAddSemantic": "Add a note",
   "notesRealMoodNone": "No mood",
   "notesRealCreateTitle": "New note",
-  "notesRealEditTitle": "Edit note"
+  "notesRealEditTitle": "Edit note",
+  "packingRealTitle": "Packing",
+  "packingRealLoadingMessage": "Loading packing checklist…",
+  "packingRealErrorMessage": "We couldn't load this trip's packing checklist. Please try again.",
+  "packingRealForbiddenMessage": "You don't have permission to manage the packing list for this trip.",
+  "packingRealGoneMessage": "This trip or packing item is no longer available.",
+  "packingRealNetworkMessage": "You appear to be offline. Please check your connection.",
+  "packingRealActionErrorMessage": "Something went wrong. Please try again.",
+  "packingRealCreatedMessage": "Packing item added.",
+  "packingRealUpdatedMessage": "Packing item updated.",
+  "packingRealDeletedMessage": "Packing item deleted.",
+  "packingRealLabelRequiredMessage": "Enter a name for this item.",
+  "packingRealQuantityInvalidMessage": "Quantity must be 1 or more.",
+  "packingRealAddSemantic": "Add a packing item",
+  "packingRealCreateTitle": "New packing item",
+  "packingRealEditTitle": "Edit packing item",
+  "packingRealEmptyTitle": "Nothing to pack yet",
+  "packingRealEmptyMessage": "Add what you need to bring on this trip.",
+  "packingRealDeleteConfirmMessage": "Delete {label} from this checklist?",
+  "@packingRealDeleteConfirmMessage": {
+    "placeholders": {
+      "label": { "type": "String" }
+    }
+  },
+  "packingRealCheckSemantic": "Mark {label} as packed",
+  "@packingRealCheckSemantic": {
+    "placeholders": {
+      "label": { "type": "String" }
+    }
+  },
+  "packingRealUncheckSemantic": "Mark {label} as not packed",
+  "@packingRealUncheckSemantic": {
+    "placeholders": {
+      "label": { "type": "String" }
+    }
+  }
 }

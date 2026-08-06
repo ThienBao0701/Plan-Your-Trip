@@ -3939,5 +3939,40 @@
   "notesRealAddSemantic": "Thêm ghi chú",
   "notesRealMoodNone": "Không có tâm trạng",
   "notesRealCreateTitle": "Ghi chú mới",
-  "notesRealEditTitle": "Sửa ghi chú"
+  "notesRealEditTitle": "Sửa ghi chú",
+  "packingRealTitle": "Hành lý",
+  "packingRealLoadingMessage": "Đang tải danh sách hành lý…",
+  "packingRealErrorMessage": "Không thể tải danh sách hành lý của chuyến đi này. Vui lòng thử lại.",
+  "packingRealForbiddenMessage": "Bạn không có quyền quản lý danh sách hành lý cho chuyến đi này.",
+  "packingRealGoneMessage": "Chuyến đi hoặc mục hành lý này không còn khả dụng.",
+  "packingRealNetworkMessage": "Bạn dường như đang ngoại tuyến. Vui lòng kiểm tra kết nối.",
+  "packingRealActionErrorMessage": "Đã xảy ra lỗi. Vui lòng thử lại.",
+  "packingRealCreatedMessage": "Đã thêm mục hành lý.",
+  "packingRealUpdatedMessage": "Đã cập nhật mục hành lý.",
+  "packingRealDeletedMessage": "Đã xóa mục hành lý.",
+  "packingRealLabelRequiredMessage": "Nhập tên cho mục này.",
+  "packingRealQuantityInvalidMessage": "Số lượng phải từ 1 trở lên.",
+  "packingRealAddSemantic": "Thêm mục hành lý",
+  "packingRealCreateTitle": "Mục hành lý mới",
+  "packingRealEditTitle": "Sửa mục hành lý",
+  "packingRealEmptyTitle": "Chưa có gì để đóng gói",
+  "packingRealEmptyMessage": "Thêm những thứ bạn cần mang theo trong chuyến đi này.",
+  "packingRealDeleteConfirmMessage": "Xóa {label} khỏi danh sách này?",
+  "@packingRealDeleteConfirmMessage": {
+    "placeholders": {
+      "label": { "type": "String" }
+    }
+  },
+  "packingRealCheckSemantic": "Đánh dấu {label} đã đóng gói",
+  "@packingRealCheckSemantic": {
+    "placeholders": {
+      "label": { "type": "String" }
+    }
+  },
+  "packingRealUncheckSemantic": "Đánh dấu {label} chưa đóng gói",
+  "@packingRealUncheckSemantic": {
+    "placeholders": {
+      "label": { "type": "String" }
+    }
+  }
 }

@@ -508,6 +508,25 @@ class AppState extends ChangeNotifier {
   List<RealTripNote> realNotesFor(int tripId) =>
       realNotesTripId == tripId ? realNotes : const [];
 
+  // ── Real Mode Trip Packing (/api/me/trips/.../packing, UI-45) ─────────────
+  // Per-trip packing checklist for a real TripPlan (UI-20). One trip's items are
+  // loaded at a time ([realPackingTripId]); switching trips reloads. Full CRUD +
+  // check/uncheck is owner-or-EDITOR; a 401 never calls logout(). Cleared on
+  // logout / mode / user change via [_resetRealPackingState]. Zero HTTP in Demo
+  // Mode.
+  int? realPackingTripId;
+  List<RealPackingItem> realPackingItems = [];
+  bool realPackingLoading = false;
+  bool realPackingLoaded = false;
+  bool realPackingRefreshing = false;
+  bool realPackingMutationInFlight = false;
+  PackingOutcome? realPackingError;
+
+  /// The loaded packing items for [tripId], or an empty list if a different trip
+  /// (or none) is currently loaded.
+  List<RealPackingItem> realPackingItemsFor(int tripId) =>
+      realPackingTripId == tripId ? realPackingItems : const [];
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -615,6 +634,7 @@ class AppState extends ChangeNotifier {
     _resetRealAiContextState();
     _resetRealDocumentsState();
     _resetRealNotesState();
+    _resetRealPackingState();
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -868,6 +888,16 @@ class AppState extends ChangeNotifier {
     realNotesError = null;
   }
 
+  void _resetRealPackingState() {
+    realPackingTripId = null;
+    realPackingItems = [];
+    realPackingLoading = false;
+    realPackingLoaded = false;
+    realPackingRefreshing = false;
+    realPackingMutationInFlight = false;
+    realPackingError = null;
+  }
+
   void _resetRealNotificationsState() {
     realNotifications = [];
     realNotificationsLoading = false;
@@ -1017,6 +1047,7 @@ class AppState extends ChangeNotifier {
     _resetRealAiContextState();
     _resetRealDocumentsState();
     _resetRealNotesState();
+    _resetRealPackingState();
     timeline = [];
     expenses = [];
     demoBookings = [];
@@ -5133,6 +5164,156 @@ class AppState extends ChangeNotifier {
       return NoteOutcome.success;
     }
     final outcome = _mapNoteError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  // ── Real Mode Trip Packing (UI-45) ───────────────────────────────────────
+
+  PackingOutcome _mapPackingError(ApiErrorKind? kind) {
+    return switch (kind) {
+      ApiErrorKind.unauthorized => PackingOutcome.sessionExpired,
+      ApiErrorKind.forbidden => PackingOutcome.forbidden,
+      ApiErrorKind.notFound => PackingOutcome.notFound,
+      ApiErrorKind.validation => PackingOutcome.validation,
+      ApiErrorKind.unprocessable => PackingOutcome.validation,
+      ApiErrorKind.network => PackingOutcome.network,
+      ApiErrorKind.timeout => PackingOutcome.network,
+      ApiErrorKind.server => PackingOutcome.serverError,
+      _ => PackingOutcome.serverError,
+    };
+  }
+
+  /// Loads a trip's packing checklist (`GET .../packing`, unchecked first then by
+  /// order). Switching [tripId] reloads. [refresh] forces a re-fetch and
+  /// preserves the current list on failure. Zero HTTP in Demo Mode.
+  Future<PackingOutcome> loadRealPacking(int tripId,
+      {bool refresh = false}) async {
+    if (demoMode) return PackingOutcome.demoUnavailable;
+    if (realPackingLoading || realPackingRefreshing) {
+      return PackingOutcome.success;
+    }
+    final sameTrip = realPackingTripId == tripId;
+    if (sameTrip && realPackingLoaded && !refresh) {
+      return PackingOutcome.success;
+    }
+    if (sameTrip && refresh) {
+      realPackingRefreshing = true;
+    } else {
+      realPackingLoading = true;
+      if (!sameTrip) {
+        realPackingItems = [];
+        realPackingLoaded = false;
+        realPackingTripId = tripId;
+      }
+    }
+    realPackingError = null;
+    notifyListeners();
+    final result = await api.getPackingItems(tripId);
+    realPackingLoading = false;
+    realPackingRefreshing = false;
+    if (result.success && result.data != null) {
+      realPackingTripId = tripId;
+      realPackingItems = result.data!;
+      realPackingLoaded = true;
+      realPackingError = null;
+      notifyListeners();
+      return PackingOutcome.success;
+    }
+    final outcome = _mapPackingError(result.errorKind);
+    realPackingError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Adds a packing item to [tripId] (`POST .../packing`) and reloads the trip's
+  /// checklist from the backend (no optimistic insert). Blank label / quantity
+  /// < 1 are rejected client-side (the backend requires them). Single-flight via
+  /// [realPackingMutationInFlight]. Zero HTTP in Demo Mode.
+  Future<PackingOutcome> createRealPackingItem(
+      int tripId, RealPackingItemPayload payload) async {
+    if (demoMode) return PackingOutcome.demoUnavailable;
+    if (payload.label.trim().isEmpty || payload.quantity < 1) {
+      return PackingOutcome.validation;
+    }
+    if (realPackingMutationInFlight) return PackingOutcome.busy;
+    realPackingMutationInFlight = true;
+    notifyListeners();
+    final result = await api.createPackingItem(tripId, payload);
+    realPackingMutationInFlight = false;
+    if (result.success && result.data != null) {
+      notifyListeners();
+      await loadRealPacking(tripId, refresh: true);
+      return PackingOutcome.success;
+    }
+    final outcome = _mapPackingError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Updates a packing item (`PUT .../packing/{id}`) and reloads [tripId]'s
+  /// checklist. Blank label / quantity < 1 are rejected client-side. No
+  /// optimistic mutation. Zero HTTP in Demo Mode.
+  Future<PackingOutcome> updateRealPackingItem(
+      int tripId, int itemId, RealPackingItemPayload payload) async {
+    if (demoMode) return PackingOutcome.demoUnavailable;
+    if (payload.label.trim().isEmpty || payload.quantity < 1) {
+      return PackingOutcome.validation;
+    }
+    if (realPackingMutationInFlight) return PackingOutcome.busy;
+    realPackingMutationInFlight = true;
+    notifyListeners();
+    final result = await api.updatePackingItem(itemId, payload);
+    realPackingMutationInFlight = false;
+    if (result.success && result.data != null) {
+      notifyListeners();
+      await loadRealPacking(tripId, refresh: true);
+      return PackingOutcome.success;
+    }
+    final outcome = _mapPackingError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Deletes a packing item (`DELETE .../packing/{id}`) and reloads [tripId]'s
+  /// checklist only after the server confirms. Zero HTTP in Demo Mode.
+  Future<PackingOutcome> deleteRealPackingItem(int tripId, int itemId) async {
+    if (demoMode) return PackingOutcome.demoUnavailable;
+    if (realPackingMutationInFlight) return PackingOutcome.busy;
+    realPackingMutationInFlight = true;
+    notifyListeners();
+    final result = await api.deletePackingItem(itemId);
+    realPackingMutationInFlight = false;
+    if (result.success) {
+      notifyListeners();
+      await loadRealPacking(tripId, refresh: true);
+      return PackingOutcome.success;
+    }
+    final outcome = _mapPackingError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Checks or unchecks a packing item
+  /// (`PATCH .../packing/{id}/check|uncheck`) and reloads [tripId]'s checklist so
+  /// ordering updates (checked items sink). No optimistic mutation. Zero HTTP in
+  /// Demo Mode.
+  Future<PackingOutcome> setRealPackingItemChecked(
+      int tripId, int itemId, bool checked) async {
+    if (demoMode) return PackingOutcome.demoUnavailable;
+    if (realPackingMutationInFlight) return PackingOutcome.busy;
+    realPackingMutationInFlight = true;
+    notifyListeners();
+    final result = checked
+        ? await api.checkPackingItem(itemId)
+        : await api.uncheckPackingItem(itemId);
+    realPackingMutationInFlight = false;
+    if (result.success && result.data != null) {
+      notifyListeners();
+      await loadRealPacking(tripId, refresh: true);
+      return PackingOutcome.success;
+    }
+    final outcome = _mapPackingError(result.errorKind);
     notifyListeners();
     return outcome;
   }

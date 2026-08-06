@@ -7853,4 +7853,76 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notesRealEditTitle => 'Edit note';
+
+  @override
+  String get packingRealTitle => 'Packing';
+
+  @override
+  String get packingRealLoadingMessage => 'Loading packing checklist…';
+
+  @override
+  String get packingRealErrorMessage =>
+      'We couldn\'t load this trip\'s packing checklist. Please try again.';
+
+  @override
+  String get packingRealForbiddenMessage =>
+      'You don\'t have permission to manage the packing list for this trip.';
+
+  @override
+  String get packingRealGoneMessage =>
+      'This trip or packing item is no longer available.';
+
+  @override
+  String get packingRealNetworkMessage =>
+      'You appear to be offline. Please check your connection.';
+
+  @override
+  String get packingRealActionErrorMessage =>
+      'Something went wrong. Please try again.';
+
+  @override
+  String get packingRealCreatedMessage => 'Packing item added.';
+
+  @override
+  String get packingRealUpdatedMessage => 'Packing item updated.';
+
+  @override
+  String get packingRealDeletedMessage => 'Packing item deleted.';
+
+  @override
+  String get packingRealLabelRequiredMessage => 'Enter a name for this item.';
+
+  @override
+  String get packingRealQuantityInvalidMessage => 'Quantity must be 1 or more.';
+
+  @override
+  String get packingRealAddSemantic => 'Add a packing item';
+
+  @override
+  String get packingRealCreateTitle => 'New packing item';
+
+  @override
+  String get packingRealEditTitle => 'Edit packing item';
+
+  @override
+  String get packingRealEmptyTitle => 'Nothing to pack yet';
+
+  @override
+  String get packingRealEmptyMessage =>
+      'Add what you need to bring on this trip.';
+
+  @override
+  String packingRealDeleteConfirmMessage(String label) {
+    return 'Delete $label from this checklist?';
+  }
+
+  @override
+  String packingRealCheckSemantic(String label) {
+    return 'Mark $label as packed';
+  }
+
+  @override
+  String packingRealUncheckSemantic(String label) {
+    return 'Mark $label as not packed';
+  }
 }

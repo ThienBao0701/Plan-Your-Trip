@@ -6461,6 +6461,147 @@ enum NoteOutcome {
   serverError,
 }
 
+// ── Trip packing (/api/me/trips/.../packing, UI-45) ──────────────────────────
+// Real-backend mirror of the per-trip Packing Checklist (`TripPackingController`
+// / `TripPlanPackingService`). Items attach to a real TripPlan (UI-20); full CRUD
+// + check/uncheck is owner-or-EDITOR, reads are owner-or-collaborator. The
+// category REUSES the demo [PackingCategory] enum (identical 10 values + wire
+// codes via its `.code` getter). `Map` decoding is confined to [fromJson];
+// request building to [toJson].
+
+/// Maps a backend `TripPlanPackingCategory` wire string to the shared
+/// [PackingCategory] view enum. Returns null for any unrecognised code so the
+/// caller can fall back to the raw string.
+PackingCategory? packingCategoryFromCode(String? code) {
+  switch (code) {
+    case 'DOCUMENTS':
+      return PackingCategory.documents;
+    case 'CLOTHES':
+      return PackingCategory.clothes;
+    case 'TOILETRIES':
+      return PackingCategory.toiletries;
+    case 'ELECTRONICS':
+      return PackingCategory.electronics;
+    case 'MEDICINE':
+      return PackingCategory.medicine;
+    case 'MONEY':
+      return PackingCategory.money;
+    case 'FOOD':
+      return PackingCategory.food;
+    case 'BABY':
+      return PackingCategory.baby;
+    case 'PET':
+      return PackingCategory.pet;
+    case 'OTHER':
+      return PackingCategory.other;
+    default:
+      return null;
+  }
+}
+
+/// Real-backend mirror of `TripPlanPackingItemResponse`. `label` is always
+/// present (@NotBlank server-side); `assignedTo*` and `notes` are optional.
+class RealPackingItem {
+  final int id;
+  final int tripPlanId;
+  final String label;
+  final String category; // raw wire code
+  final int quantity;
+  final bool checked;
+  final int? assignedToUserId;
+  final String? assignedToUserName;
+  final String? notes;
+  final int sortOrder;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+  final DateTime? checkedAt;
+
+  const RealPackingItem({
+    required this.id,
+    this.tripPlanId = 0,
+    this.label = '',
+    this.category = '',
+    this.quantity = 1,
+    this.checked = false,
+    this.assignedToUserId,
+    this.assignedToUserName,
+    this.notes,
+    this.sortOrder = 0,
+    this.createdAt,
+    this.updatedAt,
+    this.checkedAt,
+  });
+
+  /// The mapped category, or null if the backend sent an unrecognised code.
+  PackingCategory? get categoryView => packingCategoryFromCode(category);
+
+  factory RealPackingItem.fromJson(Map<String, dynamic> json) {
+    return RealPackingItem(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      tripPlanId: (json['tripPlanId'] as num?)?.toInt() ?? 0,
+      label: (json['label'] as String?) ?? '',
+      category: (json['category'] as String?) ?? '',
+      quantity: (json['quantity'] as num?)?.toInt() ?? 1,
+      checked: (json['checked'] as bool?) ?? false,
+      assignedToUserId: (json['assignedToUserId'] as num?)?.toInt(),
+      assignedToUserName: json['assignedToUserName'] as String?,
+      notes: json['notes'] as String?,
+      sortOrder: (json['sortOrder'] as num?)?.toInt() ?? 0,
+      createdAt: _tryParseDate(json['createdAt']),
+      updatedAt: _tryParseDate(json['updatedAt']),
+      checkedAt: _tryParseDate(json['checkedAt']),
+    );
+  }
+}
+
+/// Request payload for creating/updating a packing item
+/// (`TripPlanPackingItemRequest`). [toJson] emits every backend field each time
+/// (create and update share the same shape); [label] is required and [quantity]
+/// must be >= 1 server-side.
+class RealPackingItemPayload {
+  final String label;
+  final PackingCategory category;
+  final int quantity;
+  final String? notes;
+  final int? assignedToUserId;
+
+  const RealPackingItemPayload({
+    required this.label,
+    required this.category,
+    this.quantity = 1,
+    this.notes,
+    this.assignedToUserId,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'label': label,
+      'category': category.code,
+      'quantity': quantity,
+      'notes': notes,
+      'assignedToUserId': assignedToUserId,
+    };
+  }
+}
+
+/// Outcome of a real packing action (list/create/update/delete/check/uncheck).
+/// [demoUnavailable] is the Demo Mode guard (zero HTTP); [busy] the single-flight
+/// guard; [sessionExpired] (401) never triggers auto-logout; [forbidden] 403 (a
+/// VIEWER collaborator can't mutate); [notFound] 404 (trip/item gone or not
+/// yours); [validation] 400 (blank label / quantity < 1 / bad assignee);
+/// [serverError] 5xx; [network] transport/timeout.
+enum PackingOutcome {
+  success,
+  demoUnavailable,
+  busy,
+  sessionExpired,
+  forbidden,
+  notFound,
+  validation,
+  network,
+  serverError,
+}
+
 class DemoBooking {
   final String code;
   final String ownerUserId;
