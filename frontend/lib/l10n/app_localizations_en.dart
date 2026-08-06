@@ -7752,4 +7752,48 @@ class AppLocalizationsEn extends AppLocalizations {
   String aiContextRemaining(String amount) {
     return '$amount left';
   }
+
+  @override
+  String get documentsRealLoadingMessage => 'Loading documents…';
+
+  @override
+  String get documentsRealErrorMessage =>
+      'We couldn\'t load this trip\'s documents. Please try again.';
+
+  @override
+  String get documentsRealForbiddenMessage =>
+      'You don\'t have permission to manage documents for this trip.';
+
+  @override
+  String get documentsRealGoneMessage =>
+      'This trip or document is no longer available.';
+
+  @override
+  String get documentsRealNetworkMessage =>
+      'You appear to be offline. Please check your connection.';
+
+  @override
+  String get documentsRealActionErrorMessage =>
+      'Something went wrong. Please try again.';
+
+  @override
+  String get documentsRealCreatedMessage => 'Document attached.';
+
+  @override
+  String get documentsRealUpdatedMessage => 'Document updated.';
+
+  @override
+  String get documentsRealPinnedMessage => 'Document pinned.';
+
+  @override
+  String get documentsRealUnpinnedMessage => 'Document unpinned.';
+
+  @override
+  String get documentsRealUrlRequiredMessage => 'Enter a link to the document.';
+
+  @override
+  String get documentsRealAddSemantic => 'Attach a document';
+
+  @override
+  String get documentsRealTypeUnknown => 'Document';
 }

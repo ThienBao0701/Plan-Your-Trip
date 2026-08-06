@@ -3909,5 +3909,18 @@
     "placeholders": {
       "amount": { "type": "String" }
     }
-  }
+  },
+  "documentsRealLoadingMessage": "Đang tải tài liệu…",
+  "documentsRealErrorMessage": "Không thể tải tài liệu của chuyến đi này. Vui lòng thử lại.",
+  "documentsRealForbiddenMessage": "Bạn không có quyền quản lý tài liệu cho chuyến đi này.",
+  "documentsRealGoneMessage": "Chuyến đi hoặc tài liệu này không còn khả dụng.",
+  "documentsRealNetworkMessage": "Bạn dường như đang ngoại tuyến. Vui lòng kiểm tra kết nối.",
+  "documentsRealActionErrorMessage": "Đã xảy ra lỗi. Vui lòng thử lại.",
+  "documentsRealCreatedMessage": "Đã đính kèm tài liệu.",
+  "documentsRealUpdatedMessage": "Đã cập nhật tài liệu.",
+  "documentsRealPinnedMessage": "Đã ghim tài liệu.",
+  "documentsRealUnpinnedMessage": "Đã bỏ ghim tài liệu.",
+  "documentsRealUrlRequiredMessage": "Nhập liên kết đến tài liệu.",
+  "documentsRealAddSemantic": "Đính kèm tài liệu",
+  "documentsRealTypeUnknown": "Tài liệu"
 }

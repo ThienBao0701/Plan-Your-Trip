@@ -471,6 +471,24 @@ class AppState extends ChangeNotifier {
   bool realAiContextRefreshing = false;
   AiContextOutcome? realAiContextError;
 
+  // ── Real Mode Trip Documents (/api/me/trips/.../documents, UI-43) ─────────
+  // Travel documents for a real TripPlan (UI-20). One trip's documents are
+  // loaded at a time ([realDocumentsTripId]); switching trips reloads. Full CRUD
+  // + pin/unpin is owner-or-EDITOR; a 401 never calls logout(). Cleared on logout
+  // / mode / user change via [_resetRealDocumentsState]. Zero HTTP in Demo Mode.
+  int? realDocumentsTripId;
+  List<RealTripDocument> realDocuments = [];
+  bool realDocumentsLoading = false;
+  bool realDocumentsLoaded = false;
+  bool realDocumentsRefreshing = false;
+  bool realDocumentMutationInFlight = false;
+  DocumentOutcome? realDocumentsError;
+
+  /// The loaded documents for [tripId], or an empty list if a different trip (or
+  /// none) is currently loaded.
+  List<RealTripDocument> realDocumentsFor(int tripId) =>
+      realDocumentsTripId == tripId ? realDocuments : const [];
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -576,6 +594,7 @@ class AppState extends ChangeNotifier {
     _resetRealExpensesState();
     _resetRealConversationsState();
     _resetRealAiContextState();
+    _resetRealDocumentsState();
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -809,6 +828,16 @@ class AppState extends ChangeNotifier {
     realAiContextError = null;
   }
 
+  void _resetRealDocumentsState() {
+    realDocumentsTripId = null;
+    realDocuments = [];
+    realDocumentsLoading = false;
+    realDocumentsLoaded = false;
+    realDocumentsRefreshing = false;
+    realDocumentMutationInFlight = false;
+    realDocumentsError = null;
+  }
+
   void _resetRealNotificationsState() {
     realNotifications = [];
     realNotificationsLoading = false;
@@ -956,6 +985,7 @@ class AppState extends ChangeNotifier {
     _resetRealExpensesState();
     _resetRealConversationsState();
     _resetRealAiContextState();
+    _resetRealDocumentsState();
     timeline = [];
     expenses = [];
     demoBookings = [];
@@ -4791,6 +4821,147 @@ class AppState extends ChangeNotifier {
     }
     final outcome = _mapAiContextError(result.errorKind);
     realAiContextError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  // ── Real Mode Trip Documents (UI-43) ─────────────────────────────────────
+
+  DocumentOutcome _mapDocumentError(ApiErrorKind? kind) {
+    return switch (kind) {
+      ApiErrorKind.unauthorized => DocumentOutcome.sessionExpired,
+      ApiErrorKind.forbidden => DocumentOutcome.forbidden,
+      ApiErrorKind.notFound => DocumentOutcome.notFound,
+      ApiErrorKind.validation => DocumentOutcome.validation,
+      ApiErrorKind.unprocessable => DocumentOutcome.validation,
+      ApiErrorKind.network => DocumentOutcome.network,
+      ApiErrorKind.timeout => DocumentOutcome.network,
+      ApiErrorKind.server => DocumentOutcome.serverError,
+      _ => DocumentOutcome.serverError,
+    };
+  }
+
+  /// Loads a trip's documents (`GET .../documents`, pinned first then newest).
+  /// Switching [tripId] reloads. [refresh] forces a re-fetch and preserves the
+  /// current list on failure. Zero HTTP in Demo Mode.
+  Future<DocumentOutcome> loadRealDocuments(int tripId,
+      {bool refresh = false}) async {
+    if (demoMode) return DocumentOutcome.demoUnavailable;
+    if (realDocumentsLoading || realDocumentsRefreshing) {
+      return DocumentOutcome.success;
+    }
+    final sameTrip = realDocumentsTripId == tripId;
+    if (sameTrip && realDocumentsLoaded && !refresh) {
+      return DocumentOutcome.success;
+    }
+    if (sameTrip && refresh) {
+      realDocumentsRefreshing = true;
+    } else {
+      realDocumentsLoading = true;
+      if (!sameTrip) {
+        realDocuments = [];
+        realDocumentsLoaded = false;
+        realDocumentsTripId = tripId;
+      }
+    }
+    realDocumentsError = null;
+    notifyListeners();
+    final result = await api.getTripDocuments(tripId);
+    realDocumentsLoading = false;
+    realDocumentsRefreshing = false;
+    if (result.success && result.data != null) {
+      realDocumentsTripId = tripId;
+      realDocuments = result.data!;
+      realDocumentsLoaded = true;
+      realDocumentsError = null;
+      notifyListeners();
+      return DocumentOutcome.success;
+    }
+    final outcome = _mapDocumentError(result.errorKind);
+    realDocumentsError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Attaches a document to [tripId] (`POST .../documents`) and reloads the trip's
+  /// documents from the backend (no optimistic insert). Single-flight via
+  /// [realDocumentMutationInFlight]. Zero HTTP in Demo Mode.
+  Future<DocumentOutcome> createRealDocument(
+      int tripId, RealTripDocumentPayload payload) async {
+    if (demoMode) return DocumentOutcome.demoUnavailable;
+    if (realDocumentMutationInFlight) return DocumentOutcome.busy;
+    realDocumentMutationInFlight = true;
+    notifyListeners();
+    final result = await api.createTripDocument(tripId, payload);
+    realDocumentMutationInFlight = false;
+    if (result.success && result.data != null) {
+      notifyListeners();
+      await loadRealDocuments(tripId, refresh: true);
+      return DocumentOutcome.success;
+    }
+    final outcome = _mapDocumentError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Updates a document's metadata (`PUT .../documents/{id}`) and reloads
+  /// [tripId]'s documents. No optimistic mutation. Zero HTTP in Demo Mode.
+  Future<DocumentOutcome> updateRealDocument(
+      int tripId, int documentId, RealTripDocumentPayload payload) async {
+    if (demoMode) return DocumentOutcome.demoUnavailable;
+    if (realDocumentMutationInFlight) return DocumentOutcome.busy;
+    realDocumentMutationInFlight = true;
+    notifyListeners();
+    final result = await api.updateTripDocument(documentId, payload);
+    realDocumentMutationInFlight = false;
+    if (result.success && result.data != null) {
+      notifyListeners();
+      await loadRealDocuments(tripId, refresh: true);
+      return DocumentOutcome.success;
+    }
+    final outcome = _mapDocumentError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Deletes a document (`DELETE .../documents/{id}`) and reloads [tripId]'s
+  /// documents only after the server confirms. Zero HTTP in Demo Mode.
+  Future<DocumentOutcome> deleteRealDocument(int tripId, int documentId) async {
+    if (demoMode) return DocumentOutcome.demoUnavailable;
+    if (realDocumentMutationInFlight) return DocumentOutcome.busy;
+    realDocumentMutationInFlight = true;
+    notifyListeners();
+    final result = await api.deleteTripDocument(documentId);
+    realDocumentMutationInFlight = false;
+    if (result.success) {
+      notifyListeners();
+      await loadRealDocuments(tripId, refresh: true);
+      return DocumentOutcome.success;
+    }
+    final outcome = _mapDocumentError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Pins or unpins a document (`PATCH .../documents/{id}/pin|unpin`) and reloads
+  /// [tripId]'s documents so ordering updates. No optimistic mutation. Zero HTTP
+  /// in Demo Mode.
+  Future<DocumentOutcome> setRealDocumentPinned(
+      int tripId, int documentId, bool pinned) async {
+    if (demoMode) return DocumentOutcome.demoUnavailable;
+    if (realDocumentMutationInFlight) return DocumentOutcome.busy;
+    realDocumentMutationInFlight = true;
+    notifyListeners();
+    final result = pinned
+        ? await api.pinTripDocument(documentId)
+        : await api.unpinTripDocument(documentId);
+    realDocumentMutationInFlight = false;
+    if (result.success && result.data != null) {
+      notifyListeners();
+      await loadRealDocuments(tripId, refresh: true);
+      return DocumentOutcome.success;
+    }
+    final outcome = _mapDocumentError(result.errorKind);
     notifyListeners();
     return outcome;
   }

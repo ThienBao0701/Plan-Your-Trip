@@ -13179,6 +13179,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{amount} left'**
   String aiContextRemaining(String amount);
+
+  /// No description provided for @documentsRealLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading documents…'**
+  String get documentsRealLoadingMessage;
+
+  /// No description provided for @documentsRealErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load this trip\'s documents. Please try again.'**
+  String get documentsRealErrorMessage;
+
+  /// No description provided for @documentsRealForbiddenMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have permission to manage documents for this trip.'**
+  String get documentsRealForbiddenMessage;
+
+  /// No description provided for @documentsRealGoneMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This trip or document is no longer available.'**
+  String get documentsRealGoneMessage;
+
+  /// No description provided for @documentsRealNetworkMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You appear to be offline. Please check your connection.'**
+  String get documentsRealNetworkMessage;
+
+  /// No description provided for @documentsRealActionErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get documentsRealActionErrorMessage;
+
+  /// No description provided for @documentsRealCreatedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Document attached.'**
+  String get documentsRealCreatedMessage;
+
+  /// No description provided for @documentsRealUpdatedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Document updated.'**
+  String get documentsRealUpdatedMessage;
+
+  /// No description provided for @documentsRealPinnedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Document pinned.'**
+  String get documentsRealPinnedMessage;
+
+  /// No description provided for @documentsRealUnpinnedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Document unpinned.'**
+  String get documentsRealUnpinnedMessage;
+
+  /// No description provided for @documentsRealUrlRequiredMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a link to the document.'**
+  String get documentsRealUrlRequiredMessage;
+
+  /// No description provided for @documentsRealAddSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Attach a document'**
+  String get documentsRealAddSemantic;
+
+  /// No description provided for @documentsRealTypeUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Document'**
+  String get documentsRealTypeUnknown;
 }
 
 class _AppLocalizationsDelegate

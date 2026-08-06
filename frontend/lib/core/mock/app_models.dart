@@ -6131,6 +6131,173 @@ enum AiContextOutcome {
   serverError,
 }
 
+// ── Trip documents (/api/me/trips/.../documents, UI-43) ──────────────────────
+// Real-backend mirror of the Trip Documents & Attachments surface
+// (`TripDocumentController` / `TripPlanDocumentService`). Documents attach to a
+// real TripPlan (UI-20); full CRUD + pin/unpin is owner-or-EDITOR, reads are
+// owner-or-collaborator. The document type REUSES the demo [TripDocumentType]
+// enum (identical 12 values + wire codes via its `.code` getter). `Map` decoding
+// is confined to [fromJson]; request building to [toJson].
+
+/// Maps a backend `TripPlanDocumentType` wire string to the shared
+/// [TripDocumentType] view enum. Returns null for any unrecognised code so the
+/// caller can fall back to the raw string.
+TripDocumentType? tripDocumentTypeFromCode(String? code) {
+  switch (code) {
+    case 'FLIGHT_TICKET':
+      return TripDocumentType.flightTicket;
+    case 'HOTEL_BOOKING':
+      return TripDocumentType.hotelBooking;
+    case 'TRAIN_TICKET':
+      return TripDocumentType.trainTicket;
+    case 'BUS_TICKET':
+      return TripDocumentType.busTicket;
+    case 'PASSPORT':
+      return TripDocumentType.passport;
+    case 'VISA':
+      return TripDocumentType.visa;
+    case 'INSURANCE':
+      return TripDocumentType.insurance;
+    case 'TOUR':
+      return TripDocumentType.tour;
+    case 'RECEIPT':
+      return TripDocumentType.receipt;
+    case 'PDF':
+      return TripDocumentType.pdf;
+    case 'IMAGE':
+      return TripDocumentType.image;
+    case 'OTHER':
+      return TripDocumentType.other;
+    default:
+      return null;
+  }
+}
+
+/// Real-backend mirror of `TripPlanDocumentResponse`. The nested `mediaAsset` is
+/// parsed selectively (url/thumbnail/type) — the document points at a media asset
+/// registered by URL or reused by id; the client never uploads a file.
+class RealTripDocument {
+  final int id;
+  final int tripPlanId;
+  final int? tripDayId;
+  final int? tripItemId;
+  final int? mediaAssetId;
+  final String? mediaUrl;
+  final String? mediaThumbnailUrl;
+  final String? mediaType; // raw MediaType code
+  final int? uploadedByUserId;
+  final String? uploadedByUserName;
+  final String documentType; // raw wire code
+  final String? title;
+  final String? notes;
+  final bool pinned;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+
+  const RealTripDocument({
+    required this.id,
+    this.tripPlanId = 0,
+    this.tripDayId,
+    this.tripItemId,
+    this.mediaAssetId,
+    this.mediaUrl,
+    this.mediaThumbnailUrl,
+    this.mediaType,
+    this.uploadedByUserId,
+    this.uploadedByUserName,
+    this.documentType = '',
+    this.title,
+    this.notes,
+    this.pinned = false,
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  /// The mapped document type, or null if the backend sent an unrecognised code.
+  TripDocumentType? get typeView => tripDocumentTypeFromCode(documentType);
+
+  factory RealTripDocument.fromJson(Map<String, dynamic> json) {
+    final media = json['mediaAsset'];
+    final mediaMap = media is Map<String, dynamic> ? media : null;
+    return RealTripDocument(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      tripPlanId: (json['tripPlanId'] as num?)?.toInt() ?? 0,
+      tripDayId: (json['tripDayId'] as num?)?.toInt(),
+      tripItemId: (json['tripItemId'] as num?)?.toInt(),
+      mediaAssetId: (mediaMap?['id'] as num?)?.toInt(),
+      mediaUrl: mediaMap?['url'] as String?,
+      mediaThumbnailUrl: mediaMap?['thumbnailUrl'] as String?,
+      mediaType: mediaMap?['mediaType'] as String?,
+      uploadedByUserId: (json['uploadedByUserId'] as num?)?.toInt(),
+      uploadedByUserName: json['uploadedByUserName'] as String?,
+      documentType: (json['documentType'] as String?) ?? '',
+      title: json['title'] as String?,
+      notes: json['notes'] as String?,
+      pinned: (json['pinned'] as bool?) ?? false,
+      createdAt: _tryParseDate(json['createdAt']),
+      updatedAt: _tryParseDate(json['updatedAt']),
+    );
+  }
+}
+
+/// Request payload for creating/updating a document (`TripPlanDocumentRequest`).
+/// On create, [url] registers a new media asset (the client never uploads a raw
+/// file). On update the backend ignores media fields — only type/title/notes
+/// change — but [toJson] emits the same shape for both.
+class RealTripDocumentPayload {
+  final TripDocumentType documentType;
+  final String? title;
+  final String? notes;
+  final String? url;
+  final String? thumbnailUrl;
+  final String? altText;
+  final int? tripDayId;
+  final int? tripItemId;
+
+  const RealTripDocumentPayload({
+    required this.documentType,
+    this.title,
+    this.notes,
+    this.url,
+    this.thumbnailUrl,
+    this.altText,
+    this.tripDayId,
+    this.tripItemId,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'tripDayId': tripDayId,
+      'tripItemId': tripItemId,
+      'documentType': documentType.code,
+      'title': title,
+      'notes': notes,
+      if (url != null && url!.isNotEmpty) 'url': url,
+      if (thumbnailUrl != null && thumbnailUrl!.isNotEmpty)
+        'thumbnailUrl': thumbnailUrl,
+      if (altText != null && altText!.isNotEmpty) 'altText': altText,
+    };
+  }
+}
+
+/// Outcome of a real trip-document action (list/create/update/delete/pin/unpin).
+/// [demoUnavailable] is the Demo Mode guard (zero HTTP); [busy] the single-flight
+/// guard; [sessionExpired] (401) never triggers auto-logout; [forbidden] 403 (a
+/// VIEWER collaborator can't mutate); [notFound] 404 (trip/document gone or not
+/// yours); [validation] 400 (missing url/type or a bad day/item link);
+/// [serverError] 5xx; [network] transport/timeout.
+enum DocumentOutcome {
+  success,
+  demoUnavailable,
+  busy,
+  sessionExpired,
+  forbidden,
+  notFound,
+  validation,
+  network,
+  serverError,
+}
+
 class DemoBooking {
   final String code;
   final String ownerUserId;

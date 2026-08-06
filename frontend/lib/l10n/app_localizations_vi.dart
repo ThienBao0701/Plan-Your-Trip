@@ -7585,4 +7585,48 @@ class AppLocalizationsVi extends AppLocalizations {
   String aiContextRemaining(String amount) {
     return 'Còn lại $amount';
   }
+
+  @override
+  String get documentsRealLoadingMessage => 'Đang tải tài liệu…';
+
+  @override
+  String get documentsRealErrorMessage =>
+      'Không thể tải tài liệu của chuyến đi này. Vui lòng thử lại.';
+
+  @override
+  String get documentsRealForbiddenMessage =>
+      'Bạn không có quyền quản lý tài liệu cho chuyến đi này.';
+
+  @override
+  String get documentsRealGoneMessage =>
+      'Chuyến đi hoặc tài liệu này không còn khả dụng.';
+
+  @override
+  String get documentsRealNetworkMessage =>
+      'Bạn dường như đang ngoại tuyến. Vui lòng kiểm tra kết nối.';
+
+  @override
+  String get documentsRealActionErrorMessage =>
+      'Đã xảy ra lỗi. Vui lòng thử lại.';
+
+  @override
+  String get documentsRealCreatedMessage => 'Đã đính kèm tài liệu.';
+
+  @override
+  String get documentsRealUpdatedMessage => 'Đã cập nhật tài liệu.';
+
+  @override
+  String get documentsRealPinnedMessage => 'Đã ghim tài liệu.';
+
+  @override
+  String get documentsRealUnpinnedMessage => 'Đã bỏ ghim tài liệu.';
+
+  @override
+  String get documentsRealUrlRequiredMessage => 'Nhập liên kết đến tài liệu.';
+
+  @override
+  String get documentsRealAddSemantic => 'Đính kèm tài liệu';
+
+  @override
+  String get documentsRealTypeUnknown => 'Tài liệu';
 }
