@@ -3922,5 +3922,22 @@
   "documentsRealUnpinnedMessage": "Document unpinned.",
   "documentsRealUrlRequiredMessage": "Enter a link to the document.",
   "documentsRealAddSemantic": "Attach a document",
-  "documentsRealTypeUnknown": "Document"
+  "documentsRealTypeUnknown": "Document",
+  "notesRealTitle": "Notes",
+  "notesRealLoadingMessage": "Loading notes…",
+  "notesRealErrorMessage": "We couldn't load this trip's notes. Please try again.",
+  "notesRealForbiddenMessage": "You don't have permission to manage notes for this trip.",
+  "notesRealGoneMessage": "This trip or note is no longer available.",
+  "notesRealNetworkMessage": "You appear to be offline. Please check your connection.",
+  "notesRealActionErrorMessage": "Something went wrong. Please try again.",
+  "notesRealCreatedMessage": "Note added.",
+  "notesRealUpdatedMessage": "Note updated.",
+  "notesRealDeletedMessage": "Note deleted.",
+  "notesRealPinnedMessage": "Note pinned.",
+  "notesRealUnpinnedMessage": "Note unpinned.",
+  "notesRealContentRequiredMessage": "Enter some content for this note.",
+  "notesRealAddSemantic": "Add a note",
+  "notesRealMoodNone": "No mood",
+  "notesRealCreateTitle": "New note",
+  "notesRealEditTitle": "Edit note"
 }

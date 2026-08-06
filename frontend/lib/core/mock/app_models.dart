@@ -6298,6 +6298,169 @@ enum DocumentOutcome {
   serverError,
 }
 
+// ── Trip notes (/api/me/trips/.../notes, UI-44) ──────────────────────────────
+// Real-backend mirror of the Trip Notes & Journal surface (`TripNoteController`
+// / `TripPlanNoteService`). Notes attach to a real TripPlan (UI-20); full CRUD +
+// pin/unpin is owner-or-EDITOR, reads are owner-or-collaborator. The note type
+// REUSES the demo [TripNoteType] enum and the mood REUSES the demo [TripMood]
+// enum (identical values + wire codes via their `.code` getters). `Map` decoding
+// is confined to [fromJson]; request building to [toJson].
+
+/// Maps a backend `TripPlanNoteType` wire string to the shared [TripNoteType]
+/// view enum. Returns null for any unrecognised code so the caller can fall back
+/// to the raw string.
+TripNoteType? tripNoteTypeFromCode(String? code) {
+  switch (code) {
+    case 'NOTE':
+      return TripNoteType.note;
+    case 'JOURNAL':
+      return TripNoteType.journal;
+    case 'REMINDER':
+      return TripNoteType.reminder;
+    case 'IDEA':
+      return TripNoteType.idea;
+    case 'MEMORY':
+      return TripNoteType.memory;
+    default:
+      return null;
+  }
+}
+
+/// Maps a backend `TripPlanMood` wire string to the shared [TripMood] view enum.
+/// Returns null for a missing or unrecognised code (mood is optional).
+TripMood? tripMoodFromCode(String? code) {
+  switch (code) {
+    case 'HAPPY':
+      return TripMood.happy;
+    case 'EXCITED':
+      return TripMood.excited;
+    case 'CALM':
+      return TripMood.calm;
+    case 'TIRED':
+      return TripMood.tired;
+    case 'STRESSED':
+      return TripMood.stressed;
+    case 'NEUTRAL':
+      return TripMood.neutral;
+    default:
+      return null;
+  }
+}
+
+/// Real-backend mirror of `TripPlanNoteResponse`. `content` is always present
+/// (@NotBlank server-side); `title`, `mood` and `photoUrl` are optional.
+class RealTripNote {
+  final int id;
+  final int tripPlanId;
+  final int? tripDayId;
+  final int? tripItemId;
+  final int? authorUserId;
+  final String? authorUserName;
+  final String noteType; // raw wire code
+  final String? title;
+  final String content;
+  final String? mood; // raw wire code
+  final String? photoUrl;
+  final bool pinned;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+
+  const RealTripNote({
+    required this.id,
+    this.tripPlanId = 0,
+    this.tripDayId,
+    this.tripItemId,
+    this.authorUserId,
+    this.authorUserName,
+    this.noteType = '',
+    this.title,
+    this.content = '',
+    this.mood,
+    this.photoUrl,
+    this.pinned = false,
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  /// The mapped note type, or null if the backend sent an unrecognised code.
+  TripNoteType? get typeView => tripNoteTypeFromCode(noteType);
+
+  /// The mapped mood, or null when absent/unrecognised.
+  TripMood? get moodView => tripMoodFromCode(mood);
+
+  factory RealTripNote.fromJson(Map<String, dynamic> json) {
+    return RealTripNote(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      tripPlanId: (json['tripPlanId'] as num?)?.toInt() ?? 0,
+      tripDayId: (json['tripDayId'] as num?)?.toInt(),
+      tripItemId: (json['tripItemId'] as num?)?.toInt(),
+      authorUserId: (json['authorUserId'] as num?)?.toInt(),
+      authorUserName: json['authorUserName'] as String?,
+      noteType: (json['noteType'] as String?) ?? '',
+      title: json['title'] as String?,
+      content: (json['content'] as String?) ?? '',
+      mood: json['mood'] as String?,
+      photoUrl: json['photoUrl'] as String?,
+      pinned: (json['pinned'] as bool?) ?? false,
+      createdAt: _tryParseDate(json['createdAt']),
+      updatedAt: _tryParseDate(json['updatedAt']),
+    );
+  }
+}
+
+/// Request payload for creating/updating a note (`TripPlanNoteRequest`). [toJson]
+/// emits every backend field each time (create and update share the same shape);
+/// [content] is required server-side, [mood]/[title]/[photoUrl] are optional.
+class RealTripNotePayload {
+  final TripNoteType noteType;
+  final String content;
+  final String? title;
+  final TripMood? mood;
+  final String? photoUrl;
+  final int? tripDayId;
+  final int? tripItemId;
+
+  const RealTripNotePayload({
+    required this.noteType,
+    required this.content,
+    this.title,
+    this.mood,
+    this.photoUrl,
+    this.tripDayId,
+    this.tripItemId,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'tripDayId': tripDayId,
+      'tripItemId': tripItemId,
+      'noteType': noteType.code,
+      'title': title,
+      'content': content,
+      'mood': mood?.code,
+      if (photoUrl != null && photoUrl!.isNotEmpty) 'photoUrl': photoUrl,
+    };
+  }
+}
+
+/// Outcome of a real trip-note action (list/create/update/delete/pin/unpin).
+/// [demoUnavailable] is the Demo Mode guard (zero HTTP); [busy] the single-flight
+/// guard; [sessionExpired] (401) never triggers auto-logout; [forbidden] 403 (a
+/// VIEWER collaborator can't mutate); [notFound] 404 (trip/note gone or not
+/// yours); [validation] 400 (blank content / bad day-item link); [serverError]
+/// 5xx; [network] transport/timeout.
+enum NoteOutcome {
+  success,
+  demoUnavailable,
+  busy,
+  sessionExpired,
+  forbidden,
+  notFound,
+  validation,
+  network,
+  serverError,
+}
+
 class DemoBooking {
   final String code;
   final String ownerUserId;

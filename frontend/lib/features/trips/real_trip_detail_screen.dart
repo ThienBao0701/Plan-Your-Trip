@@ -12,6 +12,7 @@ import '../auth/login_screen.dart';
 import '../expenses/real_trip_expenses_screen.dart';
 import '../places/place_detail_screen.dart';
 import 'real_trip_documents_screen.dart';
+import 'real_trip_notes_screen.dart';
 import 'trips_screen.dart' show realTripStatusLabel;
 
 /// Read-only Real Mode trip detail. Renders the backend `TripResponse`
@@ -95,6 +96,19 @@ class _RealTripDetailScreenState extends State<RealTripDetailScreen> {
         ),
         title: Text(detail?.title ?? l10n.tripDetailRealTitle),
         actions: [
+          IconButton(
+            key: const Key('real-trip-notes'),
+            tooltip: l10n.notesRealTitle,
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => RealTripNotesScreen(
+                  tripId: widget.tripId,
+                  tripTitle: detail?.title,
+                ),
+              ),
+            ),
+            icon: const Icon(Icons.edit_note_rounded),
+          ),
           IconButton(
             key: const Key('real-trip-documents'),
             tooltip: l10n.tripDocumentsTitle,

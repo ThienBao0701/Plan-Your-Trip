@@ -7796,4 +7796,61 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get documentsRealTypeUnknown => 'Document';
+
+  @override
+  String get notesRealTitle => 'Notes';
+
+  @override
+  String get notesRealLoadingMessage => 'Loading notes…';
+
+  @override
+  String get notesRealErrorMessage =>
+      'We couldn\'t load this trip\'s notes. Please try again.';
+
+  @override
+  String get notesRealForbiddenMessage =>
+      'You don\'t have permission to manage notes for this trip.';
+
+  @override
+  String get notesRealGoneMessage =>
+      'This trip or note is no longer available.';
+
+  @override
+  String get notesRealNetworkMessage =>
+      'You appear to be offline. Please check your connection.';
+
+  @override
+  String get notesRealActionErrorMessage =>
+      'Something went wrong. Please try again.';
+
+  @override
+  String get notesRealCreatedMessage => 'Note added.';
+
+  @override
+  String get notesRealUpdatedMessage => 'Note updated.';
+
+  @override
+  String get notesRealDeletedMessage => 'Note deleted.';
+
+  @override
+  String get notesRealPinnedMessage => 'Note pinned.';
+
+  @override
+  String get notesRealUnpinnedMessage => 'Note unpinned.';
+
+  @override
+  String get notesRealContentRequiredMessage =>
+      'Enter some content for this note.';
+
+  @override
+  String get notesRealAddSemantic => 'Add a note';
+
+  @override
+  String get notesRealMoodNone => 'No mood';
+
+  @override
+  String get notesRealCreateTitle => 'New note';
+
+  @override
+  String get notesRealEditTitle => 'Edit note';
 }

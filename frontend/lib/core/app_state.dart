@@ -489,6 +489,25 @@ class AppState extends ChangeNotifier {
   List<RealTripDocument> realDocumentsFor(int tripId) =>
       realDocumentsTripId == tripId ? realDocuments : const [];
 
+  // ── Real Mode Trip Notes (/api/me/trips/.../notes, UI-44) ─────────────────
+  // Freeform notes & journal entries for a real TripPlan (UI-20). One trip's
+  // notes are loaded at a time ([realNotesTripId]); switching trips reloads. Full
+  // CRUD + pin/unpin is owner-or-EDITOR; a 401 never calls logout(). Cleared on
+  // logout / mode / user change via [_resetRealNotesState]. Zero HTTP in Demo
+  // Mode.
+  int? realNotesTripId;
+  List<RealTripNote> realNotes = [];
+  bool realNotesLoading = false;
+  bool realNotesLoaded = false;
+  bool realNotesRefreshing = false;
+  bool realNoteMutationInFlight = false;
+  NoteOutcome? realNotesError;
+
+  /// The loaded notes for [tripId], or an empty list if a different trip (or
+  /// none) is currently loaded.
+  List<RealTripNote> realNotesFor(int tripId) =>
+      realNotesTripId == tripId ? realNotes : const [];
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -595,6 +614,7 @@ class AppState extends ChangeNotifier {
     _resetRealConversationsState();
     _resetRealAiContextState();
     _resetRealDocumentsState();
+    _resetRealNotesState();
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -838,6 +858,16 @@ class AppState extends ChangeNotifier {
     realDocumentsError = null;
   }
 
+  void _resetRealNotesState() {
+    realNotesTripId = null;
+    realNotes = [];
+    realNotesLoading = false;
+    realNotesLoaded = false;
+    realNotesRefreshing = false;
+    realNoteMutationInFlight = false;
+    realNotesError = null;
+  }
+
   void _resetRealNotificationsState() {
     realNotifications = [];
     realNotificationsLoading = false;
@@ -986,6 +1016,7 @@ class AppState extends ChangeNotifier {
     _resetRealConversationsState();
     _resetRealAiContextState();
     _resetRealDocumentsState();
+    _resetRealNotesState();
     timeline = [];
     expenses = [];
     demoBookings = [];
@@ -4962,6 +4993,146 @@ class AppState extends ChangeNotifier {
       return DocumentOutcome.success;
     }
     final outcome = _mapDocumentError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  // ── Real Mode Trip Notes (UI-44) ─────────────────────────────────────────
+
+  NoteOutcome _mapNoteError(ApiErrorKind? kind) {
+    return switch (kind) {
+      ApiErrorKind.unauthorized => NoteOutcome.sessionExpired,
+      ApiErrorKind.forbidden => NoteOutcome.forbidden,
+      ApiErrorKind.notFound => NoteOutcome.notFound,
+      ApiErrorKind.validation => NoteOutcome.validation,
+      ApiErrorKind.unprocessable => NoteOutcome.validation,
+      ApiErrorKind.network => NoteOutcome.network,
+      ApiErrorKind.timeout => NoteOutcome.network,
+      ApiErrorKind.server => NoteOutcome.serverError,
+      _ => NoteOutcome.serverError,
+    };
+  }
+
+  /// Loads a trip's notes (`GET .../notes`, pinned first then newest updated).
+  /// Switching [tripId] reloads. [refresh] forces a re-fetch and preserves the
+  /// current list on failure. Zero HTTP in Demo Mode.
+  Future<NoteOutcome> loadRealNotes(int tripId, {bool refresh = false}) async {
+    if (demoMode) return NoteOutcome.demoUnavailable;
+    if (realNotesLoading || realNotesRefreshing) return NoteOutcome.success;
+    final sameTrip = realNotesTripId == tripId;
+    if (sameTrip && realNotesLoaded && !refresh) return NoteOutcome.success;
+    if (sameTrip && refresh) {
+      realNotesRefreshing = true;
+    } else {
+      realNotesLoading = true;
+      if (!sameTrip) {
+        realNotes = [];
+        realNotesLoaded = false;
+        realNotesTripId = tripId;
+      }
+    }
+    realNotesError = null;
+    notifyListeners();
+    final result = await api.getTripNotes(tripId);
+    realNotesLoading = false;
+    realNotesRefreshing = false;
+    if (result.success && result.data != null) {
+      realNotesTripId = tripId;
+      realNotes = result.data!;
+      realNotesLoaded = true;
+      realNotesError = null;
+      notifyListeners();
+      return NoteOutcome.success;
+    }
+    final outcome = _mapNoteError(result.errorKind);
+    realNotesError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Adds a note to [tripId] (`POST .../notes`) and reloads the trip's notes from
+  /// the backend (no optimistic insert). Blank content is rejected client-side
+  /// (the backend requires it). Single-flight via [realNoteMutationInFlight].
+  /// Zero HTTP in Demo Mode.
+  Future<NoteOutcome> createRealNote(
+      int tripId, RealTripNotePayload payload) async {
+    if (demoMode) return NoteOutcome.demoUnavailable;
+    if (payload.content.trim().isEmpty) return NoteOutcome.validation;
+    if (realNoteMutationInFlight) return NoteOutcome.busy;
+    realNoteMutationInFlight = true;
+    notifyListeners();
+    final result = await api.createTripNote(tripId, payload);
+    realNoteMutationInFlight = false;
+    if (result.success && result.data != null) {
+      notifyListeners();
+      await loadRealNotes(tripId, refresh: true);
+      return NoteOutcome.success;
+    }
+    final outcome = _mapNoteError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Updates a note (`PUT .../notes/{id}`) and reloads [tripId]'s notes. Blank
+  /// content is rejected client-side. No optimistic mutation. Zero HTTP in Demo
+  /// Mode.
+  Future<NoteOutcome> updateRealNote(
+      int tripId, int noteId, RealTripNotePayload payload) async {
+    if (demoMode) return NoteOutcome.demoUnavailable;
+    if (payload.content.trim().isEmpty) return NoteOutcome.validation;
+    if (realNoteMutationInFlight) return NoteOutcome.busy;
+    realNoteMutationInFlight = true;
+    notifyListeners();
+    final result = await api.updateTripNote(noteId, payload);
+    realNoteMutationInFlight = false;
+    if (result.success && result.data != null) {
+      notifyListeners();
+      await loadRealNotes(tripId, refresh: true);
+      return NoteOutcome.success;
+    }
+    final outcome = _mapNoteError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Deletes a note (`DELETE .../notes/{id}`) and reloads [tripId]'s notes only
+  /// after the server confirms. Zero HTTP in Demo Mode.
+  Future<NoteOutcome> deleteRealNote(int tripId, int noteId) async {
+    if (demoMode) return NoteOutcome.demoUnavailable;
+    if (realNoteMutationInFlight) return NoteOutcome.busy;
+    realNoteMutationInFlight = true;
+    notifyListeners();
+    final result = await api.deleteTripNote(noteId);
+    realNoteMutationInFlight = false;
+    if (result.success) {
+      notifyListeners();
+      await loadRealNotes(tripId, refresh: true);
+      return NoteOutcome.success;
+    }
+    final outcome = _mapNoteError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Pins or unpins a note (`PATCH .../notes/{id}/pin|unpin`) and reloads
+  /// [tripId]'s notes so ordering updates. No optimistic mutation. Zero HTTP in
+  /// Demo Mode.
+  Future<NoteOutcome> setRealNotePinned(
+      int tripId, int noteId, bool pinned) async {
+    if (demoMode) return NoteOutcome.demoUnavailable;
+    if (realNoteMutationInFlight) return NoteOutcome.busy;
+    realNoteMutationInFlight = true;
+    notifyListeners();
+    final result = pinned
+        ? await api.pinTripNote(noteId)
+        : await api.unpinTripNote(noteId);
+    realNoteMutationInFlight = false;
+    if (result.success && result.data != null) {
+      notifyListeners();
+      await loadRealNotes(tripId, refresh: true);
+      return NoteOutcome.success;
+    }
+    final outcome = _mapNoteError(result.errorKind);
     notifyListeners();
     return outcome;
   }

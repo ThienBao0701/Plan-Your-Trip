@@ -3060,6 +3060,171 @@ class ApiClient {
     }
   }
 
+  // ── Trip Notes (/api/me/trips/.../notes, UI-44) ──────────────────────────────
+  // Notes attach to a real TripPlan (UI-20). GET list → bare array (pinned first,
+  // then newest updated). POST create (201), PUT update, DELETE (204), PATCH
+  // pin/unpin. Reads need owner/collaborator; mutations need owner/EDITOR (403
+  // for a VIEWER). All authenticated, 8s timeout, no retry.
+
+  /// Lists a trip's notes (`GET /api/me/trips/{tripId}/notes`).
+  Future<CollectionApiResult<List<RealTripNote>>> getTripNotes(
+    int tripId,
+  ) async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/me/trips/$tripId/notes'),
+              headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final decoded = jsonDecode(utf8.decode(res.bodyBytes));
+        if (decoded is! List) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(
+          decoded
+              .map((e) => RealTripNote.fromJson(e as Map<String, dynamic>))
+              .toList(),
+        );
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Adds a note to a trip (`POST /api/me/trips/{tripId}/notes`, 201).
+  Future<CollectionApiResult<RealTripNote>> createTripNote(
+    int tripId,
+    RealTripNotePayload payload,
+  ) async {
+    try {
+      final res = await _client
+          .post(Uri.parse('$baseUrl/me/trips/$tripId/notes'),
+              headers: _jsonHeaders, body: jsonEncode(payload.toJson()))
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealTripNote.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Updates a note (`PUT /api/me/trips/notes/{id}`).
+  Future<CollectionApiResult<RealTripNote>> updateTripNote(
+    int noteId,
+    RealTripNotePayload payload,
+  ) async {
+    try {
+      final res = await _client
+          .put(Uri.parse('$baseUrl/me/trips/notes/$noteId'),
+              headers: _jsonHeaders, body: jsonEncode(payload.toJson()))
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealTripNote.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Deletes a note (`DELETE /api/me/trips/notes/{id}`, 204).
+  Future<CollectionApiVoidResult> deleteTripNote(int noteId) async {
+    try {
+      final res = await _client
+          .delete(Uri.parse('$baseUrl/me/trips/notes/$noteId'),
+              headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 204) {
+        return const CollectionApiVoidResult.success();
+      }
+      return CollectionApiVoidResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Pins a note (`PATCH /api/me/trips/notes/{id}/pin`).
+  Future<CollectionApiResult<RealTripNote>> pinTripNote(int noteId) =>
+      _patchTripNote('$baseUrl/me/trips/notes/$noteId/pin');
+
+  /// Unpins a note (`PATCH /api/me/trips/notes/{id}/unpin`).
+  Future<CollectionApiResult<RealTripNote>> unpinTripNote(int noteId) =>
+      _patchTripNote('$baseUrl/me/trips/notes/$noteId/unpin');
+
+  Future<CollectionApiResult<RealTripNote>> _patchTripNote(String url) async {
+    try {
+      final res = await _client
+          .patch(Uri.parse(url), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealTripNote.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
   Map<String, dynamic> _failureForStatus(http.Response res) {
     Map<String, dynamic>? body;
     try {

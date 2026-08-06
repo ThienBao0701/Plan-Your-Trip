@@ -7629,4 +7629,60 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get documentsRealTypeUnknown => 'Tài liệu';
+
+  @override
+  String get notesRealTitle => 'Ghi chú';
+
+  @override
+  String get notesRealLoadingMessage => 'Đang tải ghi chú…';
+
+  @override
+  String get notesRealErrorMessage =>
+      'Không thể tải ghi chú của chuyến đi này. Vui lòng thử lại.';
+
+  @override
+  String get notesRealForbiddenMessage =>
+      'Bạn không có quyền quản lý ghi chú cho chuyến đi này.';
+
+  @override
+  String get notesRealGoneMessage =>
+      'Chuyến đi hoặc ghi chú này không còn khả dụng.';
+
+  @override
+  String get notesRealNetworkMessage =>
+      'Bạn dường như đang ngoại tuyến. Vui lòng kiểm tra kết nối.';
+
+  @override
+  String get notesRealActionErrorMessage => 'Đã xảy ra lỗi. Vui lòng thử lại.';
+
+  @override
+  String get notesRealCreatedMessage => 'Đã thêm ghi chú.';
+
+  @override
+  String get notesRealUpdatedMessage => 'Đã cập nhật ghi chú.';
+
+  @override
+  String get notesRealDeletedMessage => 'Đã xóa ghi chú.';
+
+  @override
+  String get notesRealPinnedMessage => 'Đã ghim ghi chú.';
+
+  @override
+  String get notesRealUnpinnedMessage => 'Đã bỏ ghim ghi chú.';
+
+  @override
+  String get notesRealContentRequiredMessage =>
+      'Nhập nội dung cho ghi chú này.';
+
+  @override
+  String get notesRealAddSemantic => 'Thêm ghi chú';
+
+  @override
+  String get notesRealMoodNone => 'Không có tâm trạng';
+
+  @override
+  String get notesRealCreateTitle => 'Ghi chú mới';
+
+  @override
+  String get notesRealEditTitle => 'Sửa ghi chú';
 }

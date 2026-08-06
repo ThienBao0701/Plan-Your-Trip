@@ -13257,6 +13257,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Document'**
   String get documentsRealTypeUnknown;
+
+  /// No description provided for @notesRealTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get notesRealTitle;
+
+  /// No description provided for @notesRealLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading notes…'**
+  String get notesRealLoadingMessage;
+
+  /// No description provided for @notesRealErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load this trip\'s notes. Please try again.'**
+  String get notesRealErrorMessage;
+
+  /// No description provided for @notesRealForbiddenMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have permission to manage notes for this trip.'**
+  String get notesRealForbiddenMessage;
+
+  /// No description provided for @notesRealGoneMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This trip or note is no longer available.'**
+  String get notesRealGoneMessage;
+
+  /// No description provided for @notesRealNetworkMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You appear to be offline. Please check your connection.'**
+  String get notesRealNetworkMessage;
+
+  /// No description provided for @notesRealActionErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get notesRealActionErrorMessage;
+
+  /// No description provided for @notesRealCreatedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Note added.'**
+  String get notesRealCreatedMessage;
+
+  /// No description provided for @notesRealUpdatedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Note updated.'**
+  String get notesRealUpdatedMessage;
+
+  /// No description provided for @notesRealDeletedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Note deleted.'**
+  String get notesRealDeletedMessage;
+
+  /// No description provided for @notesRealPinnedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Note pinned.'**
+  String get notesRealPinnedMessage;
+
+  /// No description provided for @notesRealUnpinnedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Note unpinned.'**
+  String get notesRealUnpinnedMessage;
+
+  /// No description provided for @notesRealContentRequiredMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter some content for this note.'**
+  String get notesRealContentRequiredMessage;
+
+  /// No description provided for @notesRealAddSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a note'**
+  String get notesRealAddSemantic;
+
+  /// No description provided for @notesRealMoodNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No mood'**
+  String get notesRealMoodNone;
+
+  /// No description provided for @notesRealCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New note'**
+  String get notesRealCreateTitle;
+
+  /// No description provided for @notesRealEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit note'**
+  String get notesRealEditTitle;
 }
 
 class _AppLocalizationsDelegate

@@ -3922,5 +3922,22 @@
   "documentsRealUnpinnedMessage": "Đã bỏ ghim tài liệu.",
   "documentsRealUrlRequiredMessage": "Nhập liên kết đến tài liệu.",
   "documentsRealAddSemantic": "Đính kèm tài liệu",
-  "documentsRealTypeUnknown": "Tài liệu"
+  "documentsRealTypeUnknown": "Tài liệu",
+  "notesRealTitle": "Ghi chú",
+  "notesRealLoadingMessage": "Đang tải ghi chú…",
+  "notesRealErrorMessage": "Không thể tải ghi chú của chuyến đi này. Vui lòng thử lại.",
+  "notesRealForbiddenMessage": "Bạn không có quyền quản lý ghi chú cho chuyến đi này.",
+  "notesRealGoneMessage": "Chuyến đi hoặc ghi chú này không còn khả dụng.",
+  "notesRealNetworkMessage": "Bạn dường như đang ngoại tuyến. Vui lòng kiểm tra kết nối.",
+  "notesRealActionErrorMessage": "Đã xảy ra lỗi. Vui lòng thử lại.",
+  "notesRealCreatedMessage": "Đã thêm ghi chú.",
+  "notesRealUpdatedMessage": "Đã cập nhật ghi chú.",
+  "notesRealDeletedMessage": "Đã xóa ghi chú.",
+  "notesRealPinnedMessage": "Đã ghim ghi chú.",
+  "notesRealUnpinnedMessage": "Đã bỏ ghim ghi chú.",
+  "notesRealContentRequiredMessage": "Nhập nội dung cho ghi chú này.",
+  "notesRealAddSemantic": "Thêm ghi chú",
+  "notesRealMoodNone": "Không có tâm trạng",
+  "notesRealCreateTitle": "Ghi chú mới",
+  "notesRealEditTitle": "Sửa ghi chú"
 }
