@@ -7833,4 +7833,71 @@ class AppLocalizationsVi extends AppLocalizations {
   String remindersRealCancelSemantic(String title) {
     return 'Hủy $title';
   }
+
+  @override
+  String get budgetRealTitle => 'Ngân sách chuyến đi';
+
+  @override
+  String get budgetRealLoadingMessage => 'Đang tải ngân sách…';
+
+  @override
+  String get budgetRealErrorMessage =>
+      'Không thể tải ngân sách này. Kéo để làm mới hoặc thử lại.';
+
+  @override
+  String get budgetRealForbiddenMessage =>
+      'Chỉ chủ chuyến đi mới có thể đặt hoặc thay đổi ngân sách.';
+
+  @override
+  String get budgetRealGoneMessage => 'Chuyến đi này không còn khả dụng.';
+
+  @override
+  String get budgetRealNetworkMessage =>
+      'Không có kết nối. Hãy kiểm tra mạng và thử lại.';
+
+  @override
+  String get budgetRealActionErrorMessage =>
+      'Không thành công. Vui lòng thử lại.';
+
+  @override
+  String get budgetRealSavedMessage => 'Đã lưu ngân sách.';
+
+  @override
+  String get budgetRealDeletedMessage => 'Đã xóa ngân sách.';
+
+  @override
+  String get budgetRealAmountInvalidMessage =>
+      'Hãy nhập số tiền ngân sách từ 0 trở lên.';
+
+  @override
+  String get budgetRealCurrencyRequiredMessage => 'Hãy nhập loại tiền tệ.';
+
+  @override
+  String get budgetRealEmptyTitle => 'Chưa đặt ngân sách';
+
+  @override
+  String get budgetRealEmptyMessage =>
+      'Đặt tổng ngân sách để theo dõi chi tiêu cho chuyến đi này.';
+
+  @override
+  String get budgetRealSetTitle => 'Đặt ngân sách chuyến đi';
+
+  @override
+  String get budgetRealEditTitle => 'Sửa ngân sách chuyến đi';
+
+  @override
+  String get budgetRealSaveAction => 'Lưu ngân sách';
+
+  @override
+  String get budgetRealEditAction => 'Sửa';
+
+  @override
+  String get budgetRealDeleteAction => 'Xóa ngân sách';
+
+  @override
+  String get budgetRealDeleteConfirmTitle => 'Xóa ngân sách?';
+
+  @override
+  String get budgetRealDeleteConfirmMessage =>
+      'Xóa tổng ngân sách của chuyến đi này? Các khoản chi vẫn được giữ nguyên.';
 }

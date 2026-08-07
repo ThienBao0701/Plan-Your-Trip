@@ -548,6 +548,34 @@ class AppState extends ChangeNotifier {
   List<RealReminder> realRemindersFor(int tripId) =>
       realRemindersTripId == tripId ? realReminders : const [];
 
+  // ── Real Mode Trip Budget (/api/me/trips/.../budget, UI-47) ───────────────
+  // The single per-trip budget entity for a real TripPlan (UI-20). One trip is
+  // loaded at a time ([realBudgetTripId]); switching trips reloads. Setting the
+  // budget (PUT) and deleting it is owner-only (403 for a collaborator); a 401
+  // never calls logout(). [realBudget] is null when the trip has no budget yet
+  // (backend 404). Spent/remaining/over-budget come from [realBudgetSummary]
+  // ([RealExpenseSummary], reused from UI-40's budget-summary — nothing is
+  // computed client-side). Cleared on logout / mode / user change via
+  // [_resetRealBudgetState]. Zero HTTP in Demo Mode.
+  int? realBudgetTripId;
+  RealBudget? realBudget;
+  RealExpenseSummary? realBudgetSummary;
+  bool realBudgetLoading = false;
+  bool realBudgetLoaded = false;
+  bool realBudgetRefreshing = false;
+  bool realBudgetMutationInFlight = false;
+  BudgetOutcome? realBudgetError;
+
+  /// The loaded budget for [tripId], or null if a different trip (or none) is
+  /// loaded, or the trip has no budget set.
+  RealBudget? realBudgetFor(int tripId) =>
+      realBudgetTripId == tripId ? realBudget : null;
+
+  /// The loaded budget summary for [tripId] (spent/remaining/over-budget), or
+  /// null if a different trip (or none) is loaded.
+  RealExpenseSummary? realBudgetSummaryFor(int tripId) =>
+      realBudgetTripId == tripId ? realBudgetSummary : null;
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -657,6 +685,7 @@ class AppState extends ChangeNotifier {
     _resetRealNotesState();
     _resetRealPackingState();
     _resetRealReminderState();
+    _resetRealBudgetState();
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -931,6 +960,17 @@ class AppState extends ChangeNotifier {
     realRemindersError = null;
   }
 
+  void _resetRealBudgetState() {
+    realBudgetTripId = null;
+    realBudget = null;
+    realBudgetSummary = null;
+    realBudgetLoading = false;
+    realBudgetLoaded = false;
+    realBudgetRefreshing = false;
+    realBudgetMutationInFlight = false;
+    realBudgetError = null;
+  }
+
   void _resetRealNotificationsState() {
     realNotifications = [];
     realNotificationsLoading = false;
@@ -1082,6 +1122,7 @@ class AppState extends ChangeNotifier {
     _resetRealNotesState();
     _resetRealPackingState();
     _resetRealReminderState();
+    _resetRealBudgetState();
     timeline = [];
     expenses = [];
     demoBookings = [];
@@ -5506,6 +5547,119 @@ class AppState extends ChangeNotifier {
       return ReminderOutcome.success;
     }
     final outcome = _mapReminderError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  // ── Real Mode Trip Budget (UI-47) ────────────────────────────────────────
+
+  BudgetOutcome _mapBudgetError(ApiErrorKind? kind) {
+    return switch (kind) {
+      ApiErrorKind.unauthorized => BudgetOutcome.sessionExpired,
+      ApiErrorKind.forbidden => BudgetOutcome.forbidden,
+      ApiErrorKind.notFound => BudgetOutcome.notFound,
+      ApiErrorKind.validation => BudgetOutcome.validation,
+      ApiErrorKind.unprocessable => BudgetOutcome.validation,
+      ApiErrorKind.network => BudgetOutcome.network,
+      ApiErrorKind.timeout => BudgetOutcome.network,
+      ApiErrorKind.server => BudgetOutcome.serverError,
+      _ => BudgetOutcome.serverError,
+    };
+  }
+
+  /// Loads a trip's budget + spend summary. The summary
+  /// (`GET .../budget-summary`) is the primary trip-accessibility signal; the
+  /// budget entity (`GET .../budget`) is secondary — a 404 there means "no
+  /// budget set yet" (a normal empty state, [realBudget] stays null), not an
+  /// error. Switching [tripId] reloads. [refresh] forces a re-fetch and
+  /// preserves prior state on failure. Zero HTTP in Demo Mode.
+  Future<BudgetOutcome> loadRealBudget(int tripId,
+      {bool refresh = false}) async {
+    if (demoMode) return BudgetOutcome.demoUnavailable;
+    if (realBudgetLoading || realBudgetRefreshing) return BudgetOutcome.success;
+    final sameTrip = realBudgetTripId == tripId;
+    if (sameTrip && realBudgetLoaded && !refresh) return BudgetOutcome.success;
+    if (sameTrip && refresh) {
+      realBudgetRefreshing = true;
+    } else {
+      realBudgetLoading = true;
+      if (!sameTrip) {
+        realBudget = null;
+        realBudgetSummary = null;
+        realBudgetLoaded = false;
+        realBudgetTripId = tripId;
+      }
+    }
+    realBudgetError = null;
+    notifyListeners();
+
+    final summaryResult = await api.getTripBudgetSummary(tripId);
+    if (!(summaryResult.success && summaryResult.data != null)) {
+      realBudgetLoading = false;
+      realBudgetRefreshing = false;
+      final outcome = _mapBudgetError(summaryResult.errorKind);
+      realBudgetError = outcome;
+      notifyListeners();
+      return outcome;
+    }
+    final budgetResult = await api.getBudget(tripId);
+    realBudgetLoading = false;
+    realBudgetRefreshing = false;
+    realBudgetTripId = tripId;
+    realBudgetSummary = summaryResult.data;
+    if (budgetResult.success && budgetResult.data != null) {
+      realBudget = budgetResult.data;
+    } else {
+      // 404 = budget not set (normal); any other error here is non-fatal since
+      // the summary already loaded — surface an empty budget rather than block.
+      realBudget = null;
+    }
+    realBudgetLoaded = true;
+    realBudgetError = null;
+    notifyListeners();
+    return BudgetOutcome.success;
+  }
+
+  /// Creates or updates a trip's budget (`PUT .../budget`, owner-only) and
+  /// reloads from the backend (no optimistic mutation). A negative amount or a
+  /// blank currency is rejected client-side. Single-flight via
+  /// [realBudgetMutationInFlight]. Zero HTTP in Demo Mode.
+  Future<BudgetOutcome> saveRealBudget(
+      int tripId, RealBudgetPayload payload) async {
+    if (demoMode) return BudgetOutcome.demoUnavailable;
+    if (payload.totalBudget < 0 || payload.currency.trim().isEmpty) {
+      return BudgetOutcome.validation;
+    }
+    if (realBudgetMutationInFlight) return BudgetOutcome.busy;
+    realBudgetMutationInFlight = true;
+    notifyListeners();
+    final result = await api.upsertBudget(tripId, payload);
+    realBudgetMutationInFlight = false;
+    if (result.success && result.data != null) {
+      notifyListeners();
+      await loadRealBudget(tripId, refresh: true);
+      return BudgetOutcome.success;
+    }
+    final outcome = _mapBudgetError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Deletes a trip's budget (`DELETE .../budget`, owner-only) and reloads only
+  /// after the server confirms. Zero HTTP in Demo Mode.
+  Future<BudgetOutcome> deleteRealBudget(int tripId) async {
+    if (demoMode) return BudgetOutcome.demoUnavailable;
+    if (realBudgetMutationInFlight) return BudgetOutcome.busy;
+    realBudgetMutationInFlight = true;
+    notifyListeners();
+    final result = await api.deleteBudget(tripId);
+    realBudgetMutationInFlight = false;
+    if (result.success) {
+      notifyListeners();
+      await loadRealBudget(tripId, refresh: true);
+      return BudgetOutcome.success;
+    }
+    final outcome = _mapBudgetError(result.errorKind);
     notifyListeners();
     return outcome;
   }

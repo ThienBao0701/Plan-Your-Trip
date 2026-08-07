@@ -2579,6 +2579,100 @@ class ApiClient {
     }
   }
 
+  // ── Trip Budget entity (/api/me/trips/.../budget, UI-47) ─────────────────────
+  // The single per-trip budget row. GET → 404 when unset; PUT create-or-update
+  // (owner-only, 403 for a non-owner collaborator); DELETE (204, owner-only).
+  // Spent/remaining/over-budget come from getTripBudgetSummary above. All
+  // authenticated, 8s timeout, no retry.
+
+  /// Gets a trip's budget (`GET /api/me/trips/{tripId}/budget`); 404 when unset.
+  Future<CollectionApiResult<RealBudget>> getBudget(int tripId) async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/me/trips/$tripId/budget'),
+              headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealBudget.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Creates or updates a trip's budget
+  /// (`PUT /api/me/trips/{tripId}/budget`, owner-only).
+  Future<CollectionApiResult<RealBudget>> upsertBudget(
+    int tripId,
+    RealBudgetPayload payload,
+  ) async {
+    try {
+      final res = await _client
+          .put(Uri.parse('$baseUrl/me/trips/$tripId/budget'),
+              headers: _jsonHeaders, body: jsonEncode(payload.toJson()))
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealBudget.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Deletes a trip's budget
+  /// (`DELETE /api/me/trips/{tripId}/budget`, 204, owner-only).
+  Future<CollectionApiVoidResult> deleteBudget(int tripId) async {
+    try {
+      final res = await _client
+          .delete(Uri.parse('$baseUrl/me/trips/$tripId/budget'),
+              headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 204) {
+        return const CollectionApiVoidResult.success();
+      }
+      return CollectionApiVoidResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.network);
+    }
+  }
+
   /// Adds an expense to a trip
   /// (`POST /api/me/trips/{tripId}/expenses`, 201).
   Future<CollectionApiResult<RealExpense>> createTripExpense(

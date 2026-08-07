@@ -13605,6 +13605,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cancel {title}'**
   String remindersRealCancelSemantic(String title);
+
+  /// No description provided for @budgetRealTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip budget'**
+  String get budgetRealTitle;
+
+  /// No description provided for @budgetRealLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading budget…'**
+  String get budgetRealLoadingMessage;
+
+  /// No description provided for @budgetRealErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load this budget. Pull to refresh or try again.'**
+  String get budgetRealErrorMessage;
+
+  /// No description provided for @budgetRealForbiddenMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the trip owner can set or change the budget.'**
+  String get budgetRealForbiddenMessage;
+
+  /// No description provided for @budgetRealGoneMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This trip is no longer available.'**
+  String get budgetRealGoneMessage;
+
+  /// No description provided for @budgetRealNetworkMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No connection. Check your network and try again.'**
+  String get budgetRealNetworkMessage;
+
+  /// No description provided for @budgetRealActionErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'That didn\'t work. Please try again.'**
+  String get budgetRealActionErrorMessage;
+
+  /// No description provided for @budgetRealSavedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget saved.'**
+  String get budgetRealSavedMessage;
+
+  /// No description provided for @budgetRealDeletedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget deleted.'**
+  String get budgetRealDeletedMessage;
+
+  /// No description provided for @budgetRealAmountInvalidMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a budget amount of 0 or more.'**
+  String get budgetRealAmountInvalidMessage;
+
+  /// No description provided for @budgetRealCurrencyRequiredMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a currency.'**
+  String get budgetRealCurrencyRequiredMessage;
+
+  /// No description provided for @budgetRealEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No budget set'**
+  String get budgetRealEmptyTitle;
+
+  /// No description provided for @budgetRealEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a total budget to track spending against it for this trip.'**
+  String get budgetRealEmptyMessage;
+
+  /// No description provided for @budgetRealSetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set trip budget'**
+  String get budgetRealSetTitle;
+
+  /// No description provided for @budgetRealEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit trip budget'**
+  String get budgetRealEditTitle;
+
+  /// No description provided for @budgetRealSaveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Save budget'**
+  String get budgetRealSaveAction;
+
+  /// No description provided for @budgetRealEditAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get budgetRealEditAction;
+
+  /// No description provided for @budgetRealDeleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete budget'**
+  String get budgetRealDeleteAction;
+
+  /// No description provided for @budgetRealDeleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete budget?'**
+  String get budgetRealDeleteConfirmTitle;
+
+  /// No description provided for @budgetRealDeleteConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove the total budget for this trip? Expenses stay unchanged.'**
+  String get budgetRealDeleteConfirmMessage;
 }
 
 class _AppLocalizationsDelegate

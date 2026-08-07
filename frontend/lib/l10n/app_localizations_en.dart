@@ -8000,4 +8000,71 @@ class AppLocalizationsEn extends AppLocalizations {
   String remindersRealCancelSemantic(String title) {
     return 'Cancel $title';
   }
+
+  @override
+  String get budgetRealTitle => 'Trip budget';
+
+  @override
+  String get budgetRealLoadingMessage => 'Loading budget…';
+
+  @override
+  String get budgetRealErrorMessage =>
+      'We couldn\'t load this budget. Pull to refresh or try again.';
+
+  @override
+  String get budgetRealForbiddenMessage =>
+      'Only the trip owner can set or change the budget.';
+
+  @override
+  String get budgetRealGoneMessage => 'This trip is no longer available.';
+
+  @override
+  String get budgetRealNetworkMessage =>
+      'No connection. Check your network and try again.';
+
+  @override
+  String get budgetRealActionErrorMessage =>
+      'That didn\'t work. Please try again.';
+
+  @override
+  String get budgetRealSavedMessage => 'Budget saved.';
+
+  @override
+  String get budgetRealDeletedMessage => 'Budget deleted.';
+
+  @override
+  String get budgetRealAmountInvalidMessage =>
+      'Enter a budget amount of 0 or more.';
+
+  @override
+  String get budgetRealCurrencyRequiredMessage => 'Enter a currency.';
+
+  @override
+  String get budgetRealEmptyTitle => 'No budget set';
+
+  @override
+  String get budgetRealEmptyMessage =>
+      'Set a total budget to track spending against it for this trip.';
+
+  @override
+  String get budgetRealSetTitle => 'Set trip budget';
+
+  @override
+  String get budgetRealEditTitle => 'Edit trip budget';
+
+  @override
+  String get budgetRealSaveAction => 'Save budget';
+
+  @override
+  String get budgetRealEditAction => 'Edit';
+
+  @override
+  String get budgetRealDeleteAction => 'Delete budget';
+
+  @override
+  String get budgetRealDeleteConfirmTitle => 'Delete budget?';
+
+  @override
+  String get budgetRealDeleteConfirmMessage =>
+      'Remove the total budget for this trip? Expenses stay unchanged.';
 }

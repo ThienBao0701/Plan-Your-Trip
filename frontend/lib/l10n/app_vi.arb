@@ -4010,5 +4010,25 @@
     "placeholders": {
       "title": { "type": "String" }
     }
-  }
+  },
+  "budgetRealTitle": "Ngân sách chuyến đi",
+  "budgetRealLoadingMessage": "Đang tải ngân sách…",
+  "budgetRealErrorMessage": "Không thể tải ngân sách này. Kéo để làm mới hoặc thử lại.",
+  "budgetRealForbiddenMessage": "Chỉ chủ chuyến đi mới có thể đặt hoặc thay đổi ngân sách.",
+  "budgetRealGoneMessage": "Chuyến đi này không còn khả dụng.",
+  "budgetRealNetworkMessage": "Không có kết nối. Hãy kiểm tra mạng và thử lại.",
+  "budgetRealActionErrorMessage": "Không thành công. Vui lòng thử lại.",
+  "budgetRealSavedMessage": "Đã lưu ngân sách.",
+  "budgetRealDeletedMessage": "Đã xóa ngân sách.",
+  "budgetRealAmountInvalidMessage": "Hãy nhập số tiền ngân sách từ 0 trở lên.",
+  "budgetRealCurrencyRequiredMessage": "Hãy nhập loại tiền tệ.",
+  "budgetRealEmptyTitle": "Chưa đặt ngân sách",
+  "budgetRealEmptyMessage": "Đặt tổng ngân sách để theo dõi chi tiêu cho chuyến đi này.",
+  "budgetRealSetTitle": "Đặt ngân sách chuyến đi",
+  "budgetRealEditTitle": "Sửa ngân sách chuyến đi",
+  "budgetRealSaveAction": "Lưu ngân sách",
+  "budgetRealEditAction": "Sửa",
+  "budgetRealDeleteAction": "Xóa ngân sách",
+  "budgetRealDeleteConfirmTitle": "Xóa ngân sách?",
+  "budgetRealDeleteConfirmMessage": "Xóa tổng ngân sách của chuyến đi này? Các khoản chi vẫn được giữ nguyên."
 }

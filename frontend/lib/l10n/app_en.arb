@@ -4010,5 +4010,25 @@
     "placeholders": {
       "title": { "type": "String" }
     }
-  }
+  },
+  "budgetRealTitle": "Trip budget",
+  "budgetRealLoadingMessage": "Loading budget…",
+  "budgetRealErrorMessage": "We couldn't load this budget. Pull to refresh or try again.",
+  "budgetRealForbiddenMessage": "Only the trip owner can set or change the budget.",
+  "budgetRealGoneMessage": "This trip is no longer available.",
+  "budgetRealNetworkMessage": "No connection. Check your network and try again.",
+  "budgetRealActionErrorMessage": "That didn't work. Please try again.",
+  "budgetRealSavedMessage": "Budget saved.",
+  "budgetRealDeletedMessage": "Budget deleted.",
+  "budgetRealAmountInvalidMessage": "Enter a budget amount of 0 or more.",
+  "budgetRealCurrencyRequiredMessage": "Enter a currency.",
+  "budgetRealEmptyTitle": "No budget set",
+  "budgetRealEmptyMessage": "Set a total budget to track spending against it for this trip.",
+  "budgetRealSetTitle": "Set trip budget",
+  "budgetRealEditTitle": "Edit trip budget",
+  "budgetRealSaveAction": "Save budget",
+  "budgetRealEditAction": "Edit",
+  "budgetRealDeleteAction": "Delete budget",
+  "budgetRealDeleteConfirmTitle": "Delete budget?",
+  "budgetRealDeleteConfirmMessage": "Remove the total budget for this trip? Expenses stay unchanged."
 }

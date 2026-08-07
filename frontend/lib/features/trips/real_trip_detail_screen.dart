@@ -11,6 +11,7 @@ import '../../shared/widgets/glass_widgets.dart';
 import '../auth/login_screen.dart';
 import '../expenses/real_trip_expenses_screen.dart';
 import '../places/place_detail_screen.dart';
+import 'real_trip_budget_screen.dart';
 import 'real_trip_documents_screen.dart';
 import 'real_trip_notes_screen.dart';
 import 'real_trip_packing_screen.dart';
@@ -162,6 +163,19 @@ class _RealTripDetailScreenState extends State<RealTripDetailScreen> {
               ),
             ),
             icon: const Icon(Icons.account_balance_wallet_rounded),
+          ),
+          IconButton(
+            key: const Key('real-trip-budget'),
+            tooltip: l10n.budgetRealTitle,
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => RealTripBudgetScreen(
+                  tripId: widget.tripId,
+                  tripTitle: detail?.title,
+                ),
+              ),
+            ),
+            icon: const Icon(Icons.savings_rounded),
           ),
         ],
       ),

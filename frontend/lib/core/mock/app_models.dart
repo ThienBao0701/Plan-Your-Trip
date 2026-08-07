@@ -6772,6 +6772,87 @@ enum ReminderOutcome {
   serverError,
 }
 
+// ── Trip Budget (UI-47) ──────────────────────────────────────────────────────
+// The budget *entity* (`GET/PUT/DELETE /api/me/trips/{tripId}/budget`) — a single
+// per-trip total. The spent/remaining/over-budget totals come from the existing
+// UI-40 [RealExpenseSummary] (`GET .../budget-summary`); the budget screen reuses
+// it rather than recomputing anything client-side.
+
+/// Real-backend mirror of `TripPlanBudgetDto.TripPlanBudgetResponse`. A trip has
+/// at most one budget row (or none — the backend returns 404 when unset).
+class RealBudget {
+  final int id;
+  final int tripPlanId;
+  final double totalBudget;
+  final String currency;
+  final String? notes;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+
+  const RealBudget({
+    required this.id,
+    this.tripPlanId = 0,
+    this.totalBudget = 0,
+    this.currency = '',
+    this.notes,
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  factory RealBudget.fromJson(Map<String, dynamic> json) {
+    return RealBudget(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      tripPlanId: (json['tripPlanId'] as num?)?.toInt() ?? 0,
+      totalBudget: (json['totalBudget'] as num?)?.toDouble() ?? 0,
+      currency: (json['currency'] as String?) ?? '',
+      notes: json['notes'] as String?,
+      createdAt: _tryParseDate(json['createdAt']),
+      updatedAt: _tryParseDate(json['updatedAt']),
+    );
+  }
+}
+
+/// Request payload for creating/updating a budget (`TripPlanBudgetRequest`).
+/// [toJson] emits every backend field each time; [totalBudget] is @NotNull and
+/// must be >= 0, [currency] is @NotBlank server-side.
+class RealBudgetPayload {
+  final double totalBudget;
+  final String currency;
+  final String? notes;
+
+  const RealBudgetPayload({
+    required this.totalBudget,
+    required this.currency,
+    this.notes,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'totalBudget': totalBudget,
+      'currency': currency,
+      'notes': notes,
+    };
+  }
+}
+
+/// Outcome of a real budget action (load/save/delete). [demoUnavailable] is the
+/// Demo Mode guard (zero HTTP); [busy] the single-flight guard; [sessionExpired]
+/// (401) never triggers auto-logout; [forbidden] 403 (budget mutation is
+/// owner-only — an EDITOR collaborator cannot set it); [notFound] 404 (trip gone
+/// or not yours); [validation] 400 (amount < 0 / blank currency); [serverError]
+/// 5xx; [network] transport/timeout.
+enum BudgetOutcome {
+  success,
+  demoUnavailable,
+  busy,
+  sessionExpired,
+  forbidden,
+  notFound,
+  validation,
+  network,
+  serverError,
+}
+
 class DemoBooking {
   final String code;
   final String ownerUserId;
