@@ -7757,4 +7757,80 @@ class AppLocalizationsVi extends AppLocalizations {
   String packingRealUncheckSemantic(String label) {
     return 'Đánh dấu $label chưa đóng gói';
   }
+
+  @override
+  String get remindersRealTitle => 'Nhắc nhở chuyến đi';
+
+  @override
+  String get remindersRealLoadingMessage => 'Đang tải nhắc nhở…';
+
+  @override
+  String get remindersRealErrorMessage =>
+      'Không thể tải các nhắc nhở này. Kéo để làm mới hoặc thử lại.';
+
+  @override
+  String get remindersRealForbiddenMessage =>
+      'Bạn có thể xem các nhắc nhở này nhưng chỉ chủ chuyến đi hoặc người chỉnh sửa mới có thể thay đổi.';
+
+  @override
+  String get remindersRealGoneMessage =>
+      'Nhắc nhở hoặc chuyến đi này không còn khả dụng.';
+
+  @override
+  String get remindersRealNetworkMessage =>
+      'Không có kết nối. Hãy kiểm tra mạng và thử lại.';
+
+  @override
+  String get remindersRealActionErrorMessage =>
+      'Không thành công. Vui lòng thử lại.';
+
+  @override
+  String get remindersRealCreatedMessage => 'Đã thêm nhắc nhở.';
+
+  @override
+  String get remindersRealUpdatedMessage => 'Đã cập nhật nhắc nhở.';
+
+  @override
+  String get remindersRealCompletedMessage =>
+      'Đã đánh dấu nhắc nhở hoàn thành.';
+
+  @override
+  String get remindersRealCancelledMessage => 'Đã hủy nhắc nhở.';
+
+  @override
+  String get remindersRealDeletedMessage => 'Đã xóa nhắc nhở.';
+
+  @override
+  String get remindersRealTitleRequiredMessage => 'Hãy nhập tiêu đề nhắc nhở.';
+
+  @override
+  String get remindersRealAddSemantic => 'Thêm nhắc nhở';
+
+  @override
+  String get remindersRealCreateTitle => 'Nhắc nhở mới';
+
+  @override
+  String get remindersRealEditTitle => 'Sửa nhắc nhở';
+
+  @override
+  String get remindersRealEmptyTitle => 'Chưa có nhắc nhở';
+
+  @override
+  String get remindersRealEmptyMessage =>
+      'Thêm nhắc nhở để theo dõi việc nhận phòng, chuyến bay, thanh toán và đóng gói cho chuyến đi này.';
+
+  @override
+  String remindersRealDeleteConfirmMessage(String title) {
+    return 'Xóa $title khỏi chuyến đi này?';
+  }
+
+  @override
+  String remindersRealCompleteSemantic(String title) {
+    return 'Đánh dấu $title hoàn thành';
+  }
+
+  @override
+  String remindersRealCancelSemantic(String title) {
+    return 'Hủy $title';
+  }
 }

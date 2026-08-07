@@ -527,6 +527,27 @@ class AppState extends ChangeNotifier {
   List<RealPackingItem> realPackingItemsFor(int tripId) =>
       realPackingTripId == tripId ? realPackingItems : const [];
 
+  // ── Real Mode Trip Reminders (/api/me/trips/.../reminders, UI-46) ─────────
+  // Per-trip in-app reminder records for a real TripPlan (UI-20). One trip's
+  // reminders are loaded at a time ([realRemindersTripId]); switching trips (or
+  // toggling [realRemindersIncludeCancelled]) reloads. Create/update/complete/
+  // cancel/delete is owner-or-EDITOR; a 401 never calls logout(). There is no
+  // delivery/scheduler — storage + CRUD only. Cleared on logout / mode / user
+  // change via [_resetRealReminderState]. Zero HTTP in Demo Mode.
+  int? realRemindersTripId;
+  List<RealReminder> realReminders = [];
+  bool realRemindersIncludeCancelled = false;
+  bool realRemindersLoading = false;
+  bool realRemindersLoaded = false;
+  bool realRemindersRefreshing = false;
+  bool realRemindersMutationInFlight = false;
+  ReminderOutcome? realRemindersError;
+
+  /// The loaded reminders for [tripId], or an empty list if a different trip
+  /// (or none) is currently loaded.
+  List<RealReminder> realRemindersFor(int tripId) =>
+      realRemindersTripId == tripId ? realReminders : const [];
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -635,6 +656,7 @@ class AppState extends ChangeNotifier {
     _resetRealDocumentsState();
     _resetRealNotesState();
     _resetRealPackingState();
+    _resetRealReminderState();
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -898,6 +920,17 @@ class AppState extends ChangeNotifier {
     realPackingError = null;
   }
 
+  void _resetRealReminderState() {
+    realRemindersTripId = null;
+    realReminders = [];
+    realRemindersIncludeCancelled = false;
+    realRemindersLoading = false;
+    realRemindersLoaded = false;
+    realRemindersRefreshing = false;
+    realRemindersMutationInFlight = false;
+    realRemindersError = null;
+  }
+
   void _resetRealNotificationsState() {
     realNotifications = [];
     realNotificationsLoading = false;
@@ -1048,6 +1081,7 @@ class AppState extends ChangeNotifier {
     _resetRealDocumentsState();
     _resetRealNotesState();
     _resetRealPackingState();
+    _resetRealReminderState();
     timeline = [];
     expenses = [];
     demoBookings = [];
@@ -5314,6 +5348,164 @@ class AppState extends ChangeNotifier {
       return PackingOutcome.success;
     }
     final outcome = _mapPackingError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  // ── Real Mode Trip Reminders (UI-46) ─────────────────────────────────────
+
+  ReminderOutcome _mapReminderError(ApiErrorKind? kind) {
+    return switch (kind) {
+      ApiErrorKind.unauthorized => ReminderOutcome.sessionExpired,
+      ApiErrorKind.forbidden => ReminderOutcome.forbidden,
+      ApiErrorKind.notFound => ReminderOutcome.notFound,
+      ApiErrorKind.validation => ReminderOutcome.validation,
+      ApiErrorKind.unprocessable => ReminderOutcome.validation,
+      ApiErrorKind.network => ReminderOutcome.network,
+      ApiErrorKind.timeout => ReminderOutcome.network,
+      ApiErrorKind.server => ReminderOutcome.serverError,
+      _ => ReminderOutcome.serverError,
+    };
+  }
+
+  /// Loads a trip's reminders (`GET .../reminders`, soonest first). Switching
+  /// [tripId] — or changing [includeCancelled] — reloads. [refresh] forces a
+  /// re-fetch and preserves the current list on failure. Zero HTTP in Demo Mode.
+  Future<ReminderOutcome> loadRealReminders(int tripId,
+      {bool refresh = false, bool? includeCancelled}) async {
+    if (demoMode) return ReminderOutcome.demoUnavailable;
+    if (realRemindersLoading || realRemindersRefreshing) {
+      return ReminderOutcome.success;
+    }
+    final wantCancelled = includeCancelled ?? realRemindersIncludeCancelled;
+    final sameTrip = realRemindersTripId == tripId;
+    final sameFilter = realRemindersIncludeCancelled == wantCancelled;
+    if (sameTrip && sameFilter && realRemindersLoaded && !refresh) {
+      return ReminderOutcome.success;
+    }
+    if (sameTrip && sameFilter && refresh) {
+      realRemindersRefreshing = true;
+    } else {
+      realRemindersLoading = true;
+      if (!sameTrip || !sameFilter) {
+        realReminders = [];
+        realRemindersLoaded = false;
+        realRemindersTripId = tripId;
+        realRemindersIncludeCancelled = wantCancelled;
+      }
+    }
+    realRemindersError = null;
+    notifyListeners();
+    final result =
+        await api.getReminders(tripId, includeCancelled: wantCancelled);
+    realRemindersLoading = false;
+    realRemindersRefreshing = false;
+    if (result.success && result.data != null) {
+      realRemindersTripId = tripId;
+      realRemindersIncludeCancelled = wantCancelled;
+      realReminders = result.data!;
+      realRemindersLoaded = true;
+      realRemindersError = null;
+      notifyListeners();
+      return ReminderOutcome.success;
+    }
+    final outcome = _mapReminderError(result.errorKind);
+    realRemindersError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Adds a reminder to [tripId] (`POST .../reminders`) and reloads the trip's
+  /// list from the backend (no optimistic insert). A blank title is rejected
+  /// client-side (the backend requires it). Single-flight via
+  /// [realRemindersMutationInFlight]. Zero HTTP in Demo Mode.
+  Future<ReminderOutcome> createRealReminder(
+      int tripId, RealReminderPayload payload) async {
+    if (demoMode) return ReminderOutcome.demoUnavailable;
+    if (payload.title.trim().isEmpty) return ReminderOutcome.validation;
+    if (realRemindersMutationInFlight) return ReminderOutcome.busy;
+    realRemindersMutationInFlight = true;
+    notifyListeners();
+    final result = await api.createReminder(tripId, payload);
+    realRemindersMutationInFlight = false;
+    if (result.success && result.data != null) {
+      notifyListeners();
+      await loadRealReminders(tripId, refresh: true);
+      return ReminderOutcome.success;
+    }
+    final outcome = _mapReminderError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Updates a reminder (`PUT .../reminders/{id}`) and reloads [tripId]'s list.
+  /// A blank title is rejected client-side. No optimistic mutation. Zero HTTP in
+  /// Demo Mode.
+  Future<ReminderOutcome> updateRealReminder(
+      int tripId, int reminderId, RealReminderPayload payload) async {
+    if (demoMode) return ReminderOutcome.demoUnavailable;
+    if (payload.title.trim().isEmpty) return ReminderOutcome.validation;
+    if (realRemindersMutationInFlight) return ReminderOutcome.busy;
+    realRemindersMutationInFlight = true;
+    notifyListeners();
+    final result = await api.updateReminder(reminderId, payload);
+    realRemindersMutationInFlight = false;
+    if (result.success && result.data != null) {
+      notifyListeners();
+      await loadRealReminders(tripId, refresh: true);
+      return ReminderOutcome.success;
+    }
+    final outcome = _mapReminderError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Marks a reminder completed (`PATCH .../reminders/{id}/complete`) and reloads
+  /// [tripId]'s list. No optimistic mutation. Zero HTTP in Demo Mode.
+  Future<ReminderOutcome> completeRealReminder(int tripId, int reminderId) =>
+      _patchRealReminder(tripId, reminderId, complete: true);
+
+  /// Cancels a reminder (`PATCH .../reminders/{id}/cancel`) and reloads
+  /// [tripId]'s list (a cancelled reminder disappears unless the include-cancelled
+  /// filter is on). No optimistic mutation. Zero HTTP in Demo Mode.
+  Future<ReminderOutcome> cancelRealReminder(int tripId, int reminderId) =>
+      _patchRealReminder(tripId, reminderId, complete: false);
+
+  Future<ReminderOutcome> _patchRealReminder(int tripId, int reminderId,
+      {required bool complete}) async {
+    if (demoMode) return ReminderOutcome.demoUnavailable;
+    if (realRemindersMutationInFlight) return ReminderOutcome.busy;
+    realRemindersMutationInFlight = true;
+    notifyListeners();
+    final result = complete
+        ? await api.completeReminder(reminderId)
+        : await api.cancelReminder(reminderId);
+    realRemindersMutationInFlight = false;
+    if (result.success && result.data != null) {
+      notifyListeners();
+      await loadRealReminders(tripId, refresh: true);
+      return ReminderOutcome.success;
+    }
+    final outcome = _mapReminderError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Deletes a reminder (`DELETE .../reminders/{id}`) and reloads [tripId]'s list
+  /// only after the server confirms. Zero HTTP in Demo Mode.
+  Future<ReminderOutcome> deleteRealReminder(int tripId, int reminderId) async {
+    if (demoMode) return ReminderOutcome.demoUnavailable;
+    if (realRemindersMutationInFlight) return ReminderOutcome.busy;
+    realRemindersMutationInFlight = true;
+    notifyListeners();
+    final result = await api.deleteReminder(reminderId);
+    realRemindersMutationInFlight = false;
+    if (result.success) {
+      notifyListeners();
+      await loadRealReminders(tripId, refresh: true);
+      return ReminderOutcome.success;
+    }
+    final outcome = _mapReminderError(result.errorKind);
     notifyListeners();
     return outcome;
   }

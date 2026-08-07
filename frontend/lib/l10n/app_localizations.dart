@@ -13479,6 +13479,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Mark {label} as not packed'**
   String packingRealUncheckSemantic(String label);
+
+  /// No description provided for @remindersRealTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip reminders'**
+  String get remindersRealTitle;
+
+  /// No description provided for @remindersRealLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading reminders…'**
+  String get remindersRealLoadingMessage;
+
+  /// No description provided for @remindersRealErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load these reminders. Pull to refresh or try again.'**
+  String get remindersRealErrorMessage;
+
+  /// No description provided for @remindersRealForbiddenMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You can view these reminders but only the trip owner or an editor can change them.'**
+  String get remindersRealForbiddenMessage;
+
+  /// No description provided for @remindersRealGoneMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This reminder or trip is no longer available.'**
+  String get remindersRealGoneMessage;
+
+  /// No description provided for @remindersRealNetworkMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No connection. Check your network and try again.'**
+  String get remindersRealNetworkMessage;
+
+  /// No description provided for @remindersRealActionErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'That didn\'t work. Please try again.'**
+  String get remindersRealActionErrorMessage;
+
+  /// No description provided for @remindersRealCreatedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder added.'**
+  String get remindersRealCreatedMessage;
+
+  /// No description provided for @remindersRealUpdatedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder updated.'**
+  String get remindersRealUpdatedMessage;
+
+  /// No description provided for @remindersRealCompletedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder marked complete.'**
+  String get remindersRealCompletedMessage;
+
+  /// No description provided for @remindersRealCancelledMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder cancelled.'**
+  String get remindersRealCancelledMessage;
+
+  /// No description provided for @remindersRealDeletedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder deleted.'**
+  String get remindersRealDeletedMessage;
+
+  /// No description provided for @remindersRealTitleRequiredMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a reminder title.'**
+  String get remindersRealTitleRequiredMessage;
+
+  /// No description provided for @remindersRealAddSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a reminder'**
+  String get remindersRealAddSemantic;
+
+  /// No description provided for @remindersRealCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New reminder'**
+  String get remindersRealCreateTitle;
+
+  /// No description provided for @remindersRealEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit reminder'**
+  String get remindersRealEditTitle;
+
+  /// No description provided for @remindersRealEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No reminders yet'**
+  String get remindersRealEmptyTitle;
+
+  /// No description provided for @remindersRealEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a reminder to keep track of check-ins, flights, payments, and packing for this trip.'**
+  String get remindersRealEmptyMessage;
+
+  /// No description provided for @remindersRealDeleteConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {title} from this trip?'**
+  String remindersRealDeleteConfirmMessage(String title);
+
+  /// No description provided for @remindersRealCompleteSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark {title} as complete'**
+  String remindersRealCompleteSemantic(String title);
+
+  /// No description provided for @remindersRealCancelSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel {title}'**
+  String remindersRealCancelSemantic(String title);
 }
 
 class _AppLocalizationsDelegate

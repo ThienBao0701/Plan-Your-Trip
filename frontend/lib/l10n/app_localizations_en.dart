@@ -7925,4 +7925,79 @@ class AppLocalizationsEn extends AppLocalizations {
   String packingRealUncheckSemantic(String label) {
     return 'Mark $label as not packed';
   }
+
+  @override
+  String get remindersRealTitle => 'Trip reminders';
+
+  @override
+  String get remindersRealLoadingMessage => 'Loading reminders…';
+
+  @override
+  String get remindersRealErrorMessage =>
+      'We couldn\'t load these reminders. Pull to refresh or try again.';
+
+  @override
+  String get remindersRealForbiddenMessage =>
+      'You can view these reminders but only the trip owner or an editor can change them.';
+
+  @override
+  String get remindersRealGoneMessage =>
+      'This reminder or trip is no longer available.';
+
+  @override
+  String get remindersRealNetworkMessage =>
+      'No connection. Check your network and try again.';
+
+  @override
+  String get remindersRealActionErrorMessage =>
+      'That didn\'t work. Please try again.';
+
+  @override
+  String get remindersRealCreatedMessage => 'Reminder added.';
+
+  @override
+  String get remindersRealUpdatedMessage => 'Reminder updated.';
+
+  @override
+  String get remindersRealCompletedMessage => 'Reminder marked complete.';
+
+  @override
+  String get remindersRealCancelledMessage => 'Reminder cancelled.';
+
+  @override
+  String get remindersRealDeletedMessage => 'Reminder deleted.';
+
+  @override
+  String get remindersRealTitleRequiredMessage => 'Enter a reminder title.';
+
+  @override
+  String get remindersRealAddSemantic => 'Add a reminder';
+
+  @override
+  String get remindersRealCreateTitle => 'New reminder';
+
+  @override
+  String get remindersRealEditTitle => 'Edit reminder';
+
+  @override
+  String get remindersRealEmptyTitle => 'No reminders yet';
+
+  @override
+  String get remindersRealEmptyMessage =>
+      'Add a reminder to keep track of check-ins, flights, payments, and packing for this trip.';
+
+  @override
+  String remindersRealDeleteConfirmMessage(String title) {
+    return 'Delete $title from this trip?';
+  }
+
+  @override
+  String remindersRealCompleteSemantic(String title) {
+    return 'Mark $title as complete';
+  }
+
+  @override
+  String remindersRealCancelSemantic(String title) {
+    return 'Cancel $title';
+  }
 }

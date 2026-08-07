@@ -3392,6 +3392,180 @@ class ApiClient {
     }
   }
 
+  // ── Trip Reminders (/api/me/trips/.../reminders, UI-46) ──────────────────────
+  // Per-trip in-app reminder records on a real TripPlan (UI-20). GET list → bare
+  // array (reminderAt ASC, CANCELLED hidden unless includeCancelled=true). POST
+  // create (201), PUT update, PATCH complete/cancel (no body), DELETE (204).
+  // Reads need owner/collaborator; mutations need owner/EDITOR (403 for a
+  // VIEWER). No delivery/scheduler exists — storage + CRUD only. All
+  // authenticated, 8s timeout, no retry.
+
+  /// Lists a trip's reminders (`GET /api/me/trips/{tripId}/reminders`), soonest
+  /// first. Cancelled reminders are hidden unless [includeCancelled] is true.
+  Future<CollectionApiResult<List<RealReminder>>> getReminders(
+    int tripId, {
+    bool includeCancelled = false,
+  }) async {
+    try {
+      final res = await _client
+          .get(
+            Uri.parse('$baseUrl/me/trips/$tripId/reminders')
+                .replace(queryParameters: {
+              'includeCancelled': includeCancelled.toString(),
+            }),
+            headers: _jsonHeaders,
+          )
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final decoded = jsonDecode(utf8.decode(res.bodyBytes));
+        if (decoded is! List) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(
+          decoded
+              .map((e) => RealReminder.fromJson(e as Map<String, dynamic>))
+              .toList(),
+        );
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Adds a reminder (`POST /api/me/trips/{tripId}/reminders`, 201).
+  Future<CollectionApiResult<RealReminder>> createReminder(
+    int tripId,
+    RealReminderPayload payload,
+  ) async {
+    try {
+      final res = await _client
+          .post(Uri.parse('$baseUrl/me/trips/$tripId/reminders'),
+              headers: _jsonHeaders, body: jsonEncode(payload.toJson()))
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealReminder.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Updates a reminder (`PUT /api/me/trips/reminders/{id}`).
+  Future<CollectionApiResult<RealReminder>> updateReminder(
+    int reminderId,
+    RealReminderPayload payload,
+  ) async {
+    try {
+      final res = await _client
+          .put(Uri.parse('$baseUrl/me/trips/reminders/$reminderId'),
+              headers: _jsonHeaders, body: jsonEncode(payload.toJson()))
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealReminder.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Deletes a reminder (`DELETE /api/me/trips/reminders/{id}`, 204).
+  Future<CollectionApiVoidResult> deleteReminder(int reminderId) async {
+    try {
+      final res = await _client
+          .delete(Uri.parse('$baseUrl/me/trips/reminders/$reminderId'),
+              headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 204) {
+        return const CollectionApiVoidResult.success();
+      }
+      return CollectionApiVoidResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Marks a reminder completed (`PATCH /api/me/trips/reminders/{id}/complete`).
+  Future<CollectionApiResult<RealReminder>> completeReminder(int reminderId) =>
+      _patchReminder('$baseUrl/me/trips/reminders/$reminderId/complete');
+
+  /// Cancels a reminder (`PATCH /api/me/trips/reminders/{id}/cancel`).
+  Future<CollectionApiResult<RealReminder>> cancelReminder(int reminderId) =>
+      _patchReminder('$baseUrl/me/trips/reminders/$reminderId/cancel');
+
+  Future<CollectionApiResult<RealReminder>> _patchReminder(String url) async {
+    try {
+      final res = await _client
+          .patch(Uri.parse(url), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealReminder.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
   Map<String, dynamic> _failureForStatus(http.Response res) {
     Map<String, dynamic>? body;
     try {

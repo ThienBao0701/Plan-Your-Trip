@@ -6602,6 +6602,176 @@ enum PackingOutcome {
   serverError,
 }
 
+// ── Trip Reminders (UI-46) ──────────────────────────────────────────────────
+// Maps the backend `TripPlanReminderType` / `TripPlanReminderStatus` wire codes
+// onto the demo enums already defined for the Trip Companion checklist
+// (`TripReminderType` / `TripReminderStatus`, both with a `.code` getter), so
+// the real reminder surface reuses the existing enums + `reminderTypeLabel`
+// helper rather than duplicating them. Returns null on an unrecognised code.
+
+TripReminderType? reminderTypeFromCode(String? code) {
+  switch (code) {
+    case 'CUSTOM':
+      return TripReminderType.custom;
+    case 'DOCUMENT':
+      return TripReminderType.document;
+    case 'CHECK_IN':
+      return TripReminderType.checkIn;
+    case 'FLIGHT':
+      return TripReminderType.flight;
+    case 'ACTIVITY':
+      return TripReminderType.activity;
+    case 'PAYMENT':
+      return TripReminderType.payment;
+    case 'PACKING':
+      return TripReminderType.packing;
+    case 'OTHER':
+      return TripReminderType.other;
+    default:
+      return null;
+  }
+}
+
+TripReminderStatus? reminderStatusFromCode(String? code) {
+  switch (code) {
+    case 'PENDING':
+      return TripReminderStatus.pending;
+    case 'COMPLETED':
+      return TripReminderStatus.completed;
+    case 'CANCELLED':
+      return TripReminderStatus.cancelled;
+    default:
+      return null;
+  }
+}
+
+/// Real-backend mirror of `TripPlanTimelineDto.TripPlanReminderResponse`.
+/// `title` is always present (@NotBlank server-side) and `reminderAt` is always
+/// set (@NotNull); the optional day/item/document link ids are surfaced but not
+/// yet editable (no picker UI — see the UI-46 deferred notes).
+class RealReminder {
+  final int id;
+  final int? tripPlanId;
+  final int? tripDayId;
+  final int? tripItemId;
+  final int? documentId;
+  final int userId;
+  final String userName;
+  final String reminderType; // raw wire code
+  final String title;
+  final String? message;
+  final DateTime reminderAt;
+  final String status; // raw wire code
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+  final DateTime? completedAt;
+
+  const RealReminder({
+    required this.id,
+    this.tripPlanId,
+    this.tripDayId,
+    this.tripItemId,
+    this.documentId,
+    this.userId = 0,
+    this.userName = '',
+    this.reminderType = '',
+    this.title = '',
+    this.message,
+    required this.reminderAt,
+    this.status = '',
+    this.createdAt,
+    this.updatedAt,
+    this.completedAt,
+  });
+
+  /// The mapped type, or null if the backend sent an unrecognised code.
+  TripReminderType? get typeView => reminderTypeFromCode(reminderType);
+
+  /// The mapped status, or null if the backend sent an unrecognised code.
+  TripReminderStatus? get statusView => reminderStatusFromCode(status);
+
+  /// A PENDING reminder whose time has already passed (compared in UTC).
+  bool isOverdue(DateTime now) =>
+      statusView == TripReminderStatus.pending &&
+      reminderAt.isBefore(now.toUtc());
+
+  factory RealReminder.fromJson(Map<String, dynamic> json) {
+    return RealReminder(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      tripPlanId: (json['tripPlanId'] as num?)?.toInt(),
+      tripDayId: (json['tripDayId'] as num?)?.toInt(),
+      tripItemId: (json['tripItemId'] as num?)?.toInt(),
+      documentId: (json['documentId'] as num?)?.toInt(),
+      userId: (json['userId'] as num?)?.toInt() ?? 0,
+      userName: (json['userName'] as String?) ?? '',
+      reminderType: (json['reminderType'] as String?) ?? '',
+      title: (json['title'] as String?) ?? '',
+      message: json['message'] as String?,
+      reminderAt: _tryParseDate(json['reminderAt']) ??
+          DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
+      status: (json['status'] as String?) ?? '',
+      createdAt: _tryParseDate(json['createdAt']),
+      updatedAt: _tryParseDate(json['updatedAt']),
+      completedAt: _tryParseDate(json['completedAt']),
+    );
+  }
+}
+
+/// Request payload for creating/updating a reminder
+/// (`TripPlanTimelineDto.TripPlanReminderRequest`). [toJson] emits every backend
+/// field each time (create and update share the same shape); [title] is required
+/// and [reminderAt] is @NotNull server-side. The day/item/document link ids are
+/// carried for completeness but sent as null (no picker UI yet — deferred).
+class RealReminderPayload {
+  final TripReminderType reminderType;
+  final String title;
+  final String? message;
+  final DateTime reminderAt;
+  final int? tripDayId;
+  final int? tripItemId;
+  final int? documentId;
+
+  const RealReminderPayload({
+    required this.reminderType,
+    required this.title,
+    this.message,
+    required this.reminderAt,
+    this.tripDayId,
+    this.tripItemId,
+    this.documentId,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'reminderType': reminderType.code,
+      'title': title,
+      'message': message,
+      'reminderAt': reminderAt.toUtc().toIso8601String(),
+      'tripDayId': tripDayId,
+      'tripItemId': tripItemId,
+      'documentId': documentId,
+    };
+  }
+}
+
+/// Outcome of a real reminder action (list/create/update/complete/cancel/delete).
+/// [demoUnavailable] is the Demo Mode guard (zero HTTP); [busy] the single-flight
+/// guard; [sessionExpired] (401) never triggers auto-logout; [forbidden] 403 (a
+/// VIEWER collaborator can't mutate); [notFound] 404 (trip/reminder gone or not
+/// yours); [validation] 400 (blank title / null type / null reminderAt);
+/// [serverError] 5xx; [network] transport/timeout.
+enum ReminderOutcome {
+  success,
+  demoUnavailable,
+  busy,
+  sessionExpired,
+  forbidden,
+  notFound,
+  validation,
+  network,
+  serverError,
+}
+
 class DemoBooking {
   final String code;
   final String ownerUserId;

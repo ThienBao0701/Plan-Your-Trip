@@ -3974,5 +3974,41 @@
     "placeholders": {
       "label": { "type": "String" }
     }
+  },
+  "remindersRealTitle": "Trip reminders",
+  "remindersRealLoadingMessage": "Loading reminders…",
+  "remindersRealErrorMessage": "We couldn't load these reminders. Pull to refresh or try again.",
+  "remindersRealForbiddenMessage": "You can view these reminders but only the trip owner or an editor can change them.",
+  "remindersRealGoneMessage": "This reminder or trip is no longer available.",
+  "remindersRealNetworkMessage": "No connection. Check your network and try again.",
+  "remindersRealActionErrorMessage": "That didn't work. Please try again.",
+  "remindersRealCreatedMessage": "Reminder added.",
+  "remindersRealUpdatedMessage": "Reminder updated.",
+  "remindersRealCompletedMessage": "Reminder marked complete.",
+  "remindersRealCancelledMessage": "Reminder cancelled.",
+  "remindersRealDeletedMessage": "Reminder deleted.",
+  "remindersRealTitleRequiredMessage": "Enter a reminder title.",
+  "remindersRealAddSemantic": "Add a reminder",
+  "remindersRealCreateTitle": "New reminder",
+  "remindersRealEditTitle": "Edit reminder",
+  "remindersRealEmptyTitle": "No reminders yet",
+  "remindersRealEmptyMessage": "Add a reminder to keep track of check-ins, flights, payments, and packing for this trip.",
+  "remindersRealDeleteConfirmMessage": "Delete {title} from this trip?",
+  "@remindersRealDeleteConfirmMessage": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  },
+  "remindersRealCompleteSemantic": "Mark {title} as complete",
+  "@remindersRealCompleteSemantic": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  },
+  "remindersRealCancelSemantic": "Cancel {title}",
+  "@remindersRealCancelSemantic": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
   }
 }

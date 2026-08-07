@@ -3974,5 +3974,41 @@
     "placeholders": {
       "label": { "type": "String" }
     }
+  },
+  "remindersRealTitle": "Nhắc nhở chuyến đi",
+  "remindersRealLoadingMessage": "Đang tải nhắc nhở…",
+  "remindersRealErrorMessage": "Không thể tải các nhắc nhở này. Kéo để làm mới hoặc thử lại.",
+  "remindersRealForbiddenMessage": "Bạn có thể xem các nhắc nhở này nhưng chỉ chủ chuyến đi hoặc người chỉnh sửa mới có thể thay đổi.",
+  "remindersRealGoneMessage": "Nhắc nhở hoặc chuyến đi này không còn khả dụng.",
+  "remindersRealNetworkMessage": "Không có kết nối. Hãy kiểm tra mạng và thử lại.",
+  "remindersRealActionErrorMessage": "Không thành công. Vui lòng thử lại.",
+  "remindersRealCreatedMessage": "Đã thêm nhắc nhở.",
+  "remindersRealUpdatedMessage": "Đã cập nhật nhắc nhở.",
+  "remindersRealCompletedMessage": "Đã đánh dấu nhắc nhở hoàn thành.",
+  "remindersRealCancelledMessage": "Đã hủy nhắc nhở.",
+  "remindersRealDeletedMessage": "Đã xóa nhắc nhở.",
+  "remindersRealTitleRequiredMessage": "Hãy nhập tiêu đề nhắc nhở.",
+  "remindersRealAddSemantic": "Thêm nhắc nhở",
+  "remindersRealCreateTitle": "Nhắc nhở mới",
+  "remindersRealEditTitle": "Sửa nhắc nhở",
+  "remindersRealEmptyTitle": "Chưa có nhắc nhở",
+  "remindersRealEmptyMessage": "Thêm nhắc nhở để theo dõi việc nhận phòng, chuyến bay, thanh toán và đóng gói cho chuyến đi này.",
+  "remindersRealDeleteConfirmMessage": "Xóa {title} khỏi chuyến đi này?",
+  "@remindersRealDeleteConfirmMessage": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  },
+  "remindersRealCompleteSemantic": "Đánh dấu {title} hoàn thành",
+  "@remindersRealCompleteSemantic": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  },
+  "remindersRealCancelSemantic": "Hủy {title}",
+  "@remindersRealCancelSemantic": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
   }
 }
