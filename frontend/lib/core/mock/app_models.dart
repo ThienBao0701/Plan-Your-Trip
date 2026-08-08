@@ -6973,6 +6973,73 @@ enum CollaborationOutcome {
   serverError,
 }
 
+// ── Shared Trips (UI-49) ─────────────────────────────────────────────────────
+// The invitee-side "shared with me" list (`GET /api/me/trips/shared`) — trips
+// the authenticated user collaborates on. Read-only summary rows; the full
+// itinerary loads on tap via the existing RealTripDetailScreen (getById is
+// collaborator-viewable). Reuses the trip status mapper + UI-48 role mapper.
+
+/// Real-backend mirror of `TripCollaborationDto.SharedTripResponse`. Summary
+/// row only (no days). [status]/[role] are raw enum names; the `*View` getters
+/// map them to typed enums (never crashing on an unknown code).
+class RealSharedTrip {
+  final int tripId;
+  final String title;
+  final String? destination;
+  final String? coverImage;
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final String status; // raw wire code
+  final String ownerName;
+  final String role; // raw wire code
+
+  const RealSharedTrip({
+    required this.tripId,
+    this.title = '',
+    this.destination,
+    this.coverImage,
+    this.startDate,
+    this.endDate,
+    this.status = '',
+    this.ownerName = '',
+    this.role = '',
+  });
+
+  /// The mapped trip status ([TripPlanStatusValue.unknown] on an unknown code).
+  TripPlanStatusValue get statusView => _tripStatusFromString(status);
+
+  /// The mapped collaborator role, or null on an unrecognised code.
+  TripCollaboratorRole? get roleView => collaboratorRoleFromCode(role);
+
+  factory RealSharedTrip.fromJson(Map<String, dynamic> json) {
+    return RealSharedTrip(
+      tripId: (json['tripId'] as num?)?.toInt() ?? 0,
+      title: (json['title'] as String?) ?? '',
+      destination: json['destination'] as String?,
+      coverImage: json['coverImage'] as String?,
+      startDate: _tryParseDate(json['startDate']),
+      endDate: _tryParseDate(json['endDate']),
+      status: (json['status'] as String?) ?? '',
+      ownerName: (json['ownerName'] as String?) ?? '',
+      role: (json['role'] as String?) ?? '',
+    );
+  }
+}
+
+/// Outcome of loading the real shared-trips list. [demoUnavailable] is the Demo
+/// Mode guard (zero HTTP); [sessionExpired] (401) never triggers auto-logout;
+/// [forbidden] 403; [notFound] 404; [serverError] 5xx; [network] transport/
+/// timeout. It is a pure read — no busy/validation/conflict states.
+enum SharedTripsOutcome {
+  success,
+  demoUnavailable,
+  sessionExpired,
+  forbidden,
+  notFound,
+  network,
+  serverError,
+}
+
 class DemoBooking {
   final String code;
   final String ownerUserId;

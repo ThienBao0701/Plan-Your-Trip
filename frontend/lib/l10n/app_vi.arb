@@ -4059,5 +4059,15 @@
     "placeholders": {
       "name": { "type": "String" }
     }
-  }
+  },
+  "sharedTripsRealLoadingMessage": "Đang tải chuyến đi được chia sẻ…",
+  "sharedTripsRealErrorMessage": "Không thể tải các chuyến đi được chia sẻ. Kéo để làm mới hoặc thử lại.",
+  "sharedTripsRealForbiddenMessage": "Bạn không có quyền truy cập các chuyến đi được chia sẻ này.",
+  "sharedTripsRealGoneMessage": "Các chuyến đi được chia sẻ này không còn khả dụng.",
+  "sharedTripsRealEmptyTitle": "Chưa có chuyến đi được chia sẻ",
+  "sharedTripsRealEmptyMessage": "Những chuyến đi mà người khác mời bạn cùng cộng tác sẽ xuất hiện ở đây.",
+  "sharedTripsRealUntitled": "Chuyến đi chưa đặt tên",
+  "sharedTripsRealEntryTitle": "Được chia sẻ với tôi",
+  "sharedTripsRealEntrySubtitle": "Mở những chuyến đi mà người khác đã mời bạn.",
+  "sharedTripsRealEntrySemantic": "Được chia sẻ với tôi — những chuyến đi mà người khác đã mời bạn cùng cộng tác"
 }

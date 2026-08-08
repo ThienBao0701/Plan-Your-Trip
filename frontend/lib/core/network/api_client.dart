@@ -3703,6 +3703,39 @@ class ApiClient {
     }
   }
 
+  /// Lists trips shared with the authenticated user as an active collaborator
+  /// (`GET /api/me/trips/shared`, createdAt DESC).
+  Future<CollectionApiResult<List<RealSharedTrip>>> getSharedTrips() async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/me/trips/shared'), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final decoded = jsonDecode(utf8.decode(res.bodyBytes));
+        if (decoded is! List) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(
+          decoded
+              .map((e) => RealSharedTrip.fromJson(e as Map<String, dynamic>))
+              .toList(),
+        );
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
   /// Invites a collaborator by email
   /// (`POST /api/me/trips/{tripId}/collaborators`, 201, owner-only).
   Future<CollectionApiResult<RealCollaborator>> inviteCollaborator(

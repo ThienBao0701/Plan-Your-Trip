@@ -7985,4 +7985,41 @@ class AppLocalizationsVi extends AppLocalizations {
   String collaborationRealRemoveConfirmMessage(String name) {
     return 'Xóa $name khỏi chuyến đi này? Họ sẽ mất quyền truy cập ngay lập tức.';
   }
+
+  @override
+  String get sharedTripsRealLoadingMessage =>
+      'Đang tải chuyến đi được chia sẻ…';
+
+  @override
+  String get sharedTripsRealErrorMessage =>
+      'Không thể tải các chuyến đi được chia sẻ. Kéo để làm mới hoặc thử lại.';
+
+  @override
+  String get sharedTripsRealForbiddenMessage =>
+      'Bạn không có quyền truy cập các chuyến đi được chia sẻ này.';
+
+  @override
+  String get sharedTripsRealGoneMessage =>
+      'Các chuyến đi được chia sẻ này không còn khả dụng.';
+
+  @override
+  String get sharedTripsRealEmptyTitle => 'Chưa có chuyến đi được chia sẻ';
+
+  @override
+  String get sharedTripsRealEmptyMessage =>
+      'Những chuyến đi mà người khác mời bạn cùng cộng tác sẽ xuất hiện ở đây.';
+
+  @override
+  String get sharedTripsRealUntitled => 'Chuyến đi chưa đặt tên';
+
+  @override
+  String get sharedTripsRealEntryTitle => 'Được chia sẻ với tôi';
+
+  @override
+  String get sharedTripsRealEntrySubtitle =>
+      'Mở những chuyến đi mà người khác đã mời bạn.';
+
+  @override
+  String get sharedTripsRealEntrySemantic =>
+      'Được chia sẻ với tôi — những chuyến đi mà người khác đã mời bạn cùng cộng tác';
 }

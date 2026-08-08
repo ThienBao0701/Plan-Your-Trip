@@ -13,6 +13,7 @@ import '../../shared/widgets/glass_widgets.dart';
 import '../auth/login_screen.dart';
 import 'create_trip_screen.dart';
 import 'edit_trip_screen.dart';
+import 'real_shared_trips_screen.dart';
 import 'real_trip_detail_screen.dart';
 import 'trip_companion_screen.dart';
 import 'trip_detail_screen.dart';
@@ -264,9 +265,75 @@ class _RealTripsViewState extends State<_RealTripsView> {
                   ],
                 ),
                 const SizedBox(height: AppSpacing.lg),
+                _RealSharedWithMeEntry(
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const RealSharedTripsScreen(),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
                 content,
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Real Mode entry point into the "shared with me" trips surface
+/// (`GET /api/me/trips/shared`). Kept separate from the demo `_SharedWithMeEntry`
+/// (which shows a local demo count) — this one carries no count and always opens
+/// the backend-backed list.
+class _RealSharedWithMeEntry extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _RealSharedWithMeEntry({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return OceanGlassCard(
+      key: const Key('real-shared-trips-entry'),
+      onTap: onTap,
+      semanticLabel: l10n.sharedTripsRealEntrySemantic,
+      child: Row(
+        children: [
+          Container(
+            width: AppSpacing.minTouchTarget,
+            height: AppSpacing.minTouchTarget,
+            decoration: BoxDecoration(
+              color: AppColors.ocean.withValues(alpha: .10),
+              borderRadius: BorderRadius.circular(AppRadii.md),
+            ),
+            child: const Icon(
+              Icons.group_rounded,
+              color: AppColors.ocean,
+              size: AppIconSizes.sm,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.sharedTripsRealEntryTitle,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                Text(
+                  l10n.sharedTripsRealEntrySubtitle,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ],
+            ),
+          ),
+          const Icon(
+            Icons.chevron_right_rounded,
+            color: AppColors.textSecondary,
           ),
         ],
       ),

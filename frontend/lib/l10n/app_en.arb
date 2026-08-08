@@ -4059,5 +4059,15 @@
     "placeholders": {
       "name": { "type": "String" }
     }
-  }
+  },
+  "sharedTripsRealLoadingMessage": "Loading shared trips…",
+  "sharedTripsRealErrorMessage": "We couldn't load your shared trips. Pull to refresh or try again.",
+  "sharedTripsRealForbiddenMessage": "You don't have access to these shared trips.",
+  "sharedTripsRealGoneMessage": "These shared trips are no longer available.",
+  "sharedTripsRealEmptyTitle": "No shared trips",
+  "sharedTripsRealEmptyMessage": "Trips that others invite you to collaborate on will appear here.",
+  "sharedTripsRealUntitled": "Untitled trip",
+  "sharedTripsRealEntryTitle": "Shared with me",
+  "sharedTripsRealEntrySubtitle": "Open trips others have invited you to.",
+  "sharedTripsRealEntrySemantic": "Shared with me — trips others have invited you to collaborate on"
 }

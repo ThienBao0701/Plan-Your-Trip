@@ -602,6 +602,18 @@ class AppState extends ChangeNotifier {
   bool? realCollabIsPublicFor(int tripId) =>
       realCollabTripId == tripId ? realCollabIsPublic : null;
 
+  // ── Real Mode Shared Trips (/api/me/trips/shared, UI-49) ──────────────────
+  // The invitee-side "shared with me" list — trips the authenticated user
+  // collaborates on (active only, createdAt DESC). Global (not trip-scoped),
+  // read-only; tapping a row opens the existing RealTripDetailScreen (getById is
+  // collaborator-viewable). A 401 never calls logout(). Cleared on logout /
+  // mode / user change via [_resetRealSharedTripsState]. Zero HTTP in Demo Mode.
+  List<RealSharedTrip> realSharedTrips = [];
+  bool realSharedTripsLoading = false;
+  bool realSharedTripsLoaded = false;
+  bool realSharedTripsRefreshing = false;
+  SharedTripsOutcome? realSharedTripsError;
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -713,6 +725,7 @@ class AppState extends ChangeNotifier {
     _resetRealReminderState();
     _resetRealBudgetState();
     _resetRealCollaborationState();
+    _resetRealSharedTripsState();
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -1009,6 +1022,14 @@ class AppState extends ChangeNotifier {
     realCollabError = null;
   }
 
+  void _resetRealSharedTripsState() {
+    realSharedTrips = [];
+    realSharedTripsLoading = false;
+    realSharedTripsLoaded = false;
+    realSharedTripsRefreshing = false;
+    realSharedTripsError = null;
+  }
+
   void _resetRealNotificationsState() {
     realNotifications = [];
     realNotificationsLoading = false;
@@ -1162,6 +1183,7 @@ class AppState extends ChangeNotifier {
     _resetRealReminderState();
     _resetRealBudgetState();
     _resetRealCollaborationState();
+    _resetRealSharedTripsState();
     timeline = [];
     expenses = [];
     demoBookings = [];
@@ -5852,6 +5874,52 @@ class AppState extends ChangeNotifier {
       return CollaborationOutcome.success;
     }
     final outcome = _mapCollabError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  // ── Real Mode Shared Trips (UI-49) ───────────────────────────────────────
+
+  SharedTripsOutcome _mapSharedTripsError(ApiErrorKind? kind) {
+    return switch (kind) {
+      ApiErrorKind.unauthorized => SharedTripsOutcome.sessionExpired,
+      ApiErrorKind.forbidden => SharedTripsOutcome.forbidden,
+      ApiErrorKind.notFound => SharedTripsOutcome.notFound,
+      ApiErrorKind.network => SharedTripsOutcome.network,
+      ApiErrorKind.timeout => SharedTripsOutcome.network,
+      ApiErrorKind.server => SharedTripsOutcome.serverError,
+      _ => SharedTripsOutcome.serverError,
+    };
+  }
+
+  /// Loads the "shared with me" list (`GET .../trips/shared`, createdAt DESC).
+  /// [refresh] forces a re-fetch and preserves the current list on failure.
+  /// Single-flight; cached after first success. Zero HTTP in Demo Mode.
+  Future<SharedTripsOutcome> loadRealSharedTrips({bool refresh = false}) async {
+    if (demoMode) return SharedTripsOutcome.demoUnavailable;
+    if (realSharedTripsLoading || realSharedTripsRefreshing) {
+      return SharedTripsOutcome.success;
+    }
+    if (realSharedTripsLoaded && !refresh) return SharedTripsOutcome.success;
+    if (realSharedTripsLoaded && refresh) {
+      realSharedTripsRefreshing = true;
+    } else {
+      realSharedTripsLoading = true;
+    }
+    realSharedTripsError = null;
+    notifyListeners();
+    final result = await api.getSharedTrips();
+    realSharedTripsLoading = false;
+    realSharedTripsRefreshing = false;
+    if (result.success && result.data != null) {
+      realSharedTrips = result.data!;
+      realSharedTripsLoaded = true;
+      realSharedTripsError = null;
+      notifyListeners();
+      return SharedTripsOutcome.success;
+    }
+    final outcome = _mapSharedTripsError(result.errorKind);
+    realSharedTripsError = outcome;
     notifyListeners();
     return outcome;
   }

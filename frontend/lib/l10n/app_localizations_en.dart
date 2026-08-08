@@ -8150,4 +8150,40 @@ class AppLocalizationsEn extends AppLocalizations {
   String collaborationRealRemoveConfirmMessage(String name) {
     return 'Remove $name from this trip? They lose access immediately.';
   }
+
+  @override
+  String get sharedTripsRealLoadingMessage => 'Loading shared trips…';
+
+  @override
+  String get sharedTripsRealErrorMessage =>
+      'We couldn\'t load your shared trips. Pull to refresh or try again.';
+
+  @override
+  String get sharedTripsRealForbiddenMessage =>
+      'You don\'t have access to these shared trips.';
+
+  @override
+  String get sharedTripsRealGoneMessage =>
+      'These shared trips are no longer available.';
+
+  @override
+  String get sharedTripsRealEmptyTitle => 'No shared trips';
+
+  @override
+  String get sharedTripsRealEmptyMessage =>
+      'Trips that others invite you to collaborate on will appear here.';
+
+  @override
+  String get sharedTripsRealUntitled => 'Untitled trip';
+
+  @override
+  String get sharedTripsRealEntryTitle => 'Shared with me';
+
+  @override
+  String get sharedTripsRealEntrySubtitle =>
+      'Open trips others have invited you to.';
+
+  @override
+  String get sharedTripsRealEntrySemantic =>
+      'Shared with me — trips others have invited you to collaborate on';
 }

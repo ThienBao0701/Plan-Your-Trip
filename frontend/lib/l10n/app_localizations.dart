@@ -13869,6 +13869,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remove {name} from this trip? They lose access immediately.'**
   String collaborationRealRemoveConfirmMessage(String name);
+
+  /// No description provided for @sharedTripsRealLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading shared trips…'**
+  String get sharedTripsRealLoadingMessage;
+
+  /// No description provided for @sharedTripsRealErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load your shared trips. Pull to refresh or try again.'**
+  String get sharedTripsRealErrorMessage;
+
+  /// No description provided for @sharedTripsRealForbiddenMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have access to these shared trips.'**
+  String get sharedTripsRealForbiddenMessage;
+
+  /// No description provided for @sharedTripsRealGoneMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'These shared trips are no longer available.'**
+  String get sharedTripsRealGoneMessage;
+
+  /// No description provided for @sharedTripsRealEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No shared trips'**
+  String get sharedTripsRealEmptyTitle;
+
+  /// No description provided for @sharedTripsRealEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Trips that others invite you to collaborate on will appear here.'**
+  String get sharedTripsRealEmptyMessage;
+
+  /// No description provided for @sharedTripsRealUntitled.
+  ///
+  /// In en, this message translates to:
+  /// **'Untitled trip'**
+  String get sharedTripsRealUntitled;
+
+  /// No description provided for @sharedTripsRealEntryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared with me'**
+  String get sharedTripsRealEntryTitle;
+
+  /// No description provided for @sharedTripsRealEntrySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Open trips others have invited you to.'**
+  String get sharedTripsRealEntrySubtitle;
+
+  /// No description provided for @sharedTripsRealEntrySemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared with me — trips others have invited you to collaborate on'**
+  String get sharedTripsRealEntrySemantic;
 }
 
 class _AppLocalizationsDelegate
