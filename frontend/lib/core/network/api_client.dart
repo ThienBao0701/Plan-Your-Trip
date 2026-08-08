@@ -3873,6 +3873,172 @@ class ApiClient {
     }
   }
 
+  // ── Travel Wallet (/api/me/travel-wallet, UI-50) ─────────────────────────────
+  // Per-user organizer of documents/vouchers/tickets. GET list → bare array
+  // (default sort). POST create (201), PUT update, DELETE (204). PATCH
+  // favorite/unfavorite/archive/restore. Every item is strictly owner-only
+  // (404 for a non-owner or missing id — never 403). All authenticated, 8s
+  // timeout, no retry.
+
+  /// Lists my wallet items (`GET /api/me/travel-wallet`, default sort).
+  Future<CollectionApiResult<List<RealWalletItem>>> getWalletItems() async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/me/travel-wallet'), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final decoded = jsonDecode(utf8.decode(res.bodyBytes));
+        if (decoded is! List) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(
+          decoded
+              .map((e) => RealWalletItem.fromJson(e as Map<String, dynamic>))
+              .toList(),
+        );
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Creates a wallet item (`POST /api/me/travel-wallet`, 201).
+  Future<CollectionApiResult<RealWalletItem>> createWalletItem(
+    RealWalletItemPayload payload,
+  ) async {
+    try {
+      final res = await _client
+          .post(Uri.parse('$baseUrl/me/travel-wallet'),
+              headers: _jsonHeaders, body: jsonEncode(payload.toJson()))
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealWalletItem.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Updates a wallet item's metadata (`PUT /api/me/travel-wallet/{id}`).
+  Future<CollectionApiResult<RealWalletItem>> updateWalletItem(
+    int id,
+    RealWalletItemPayload payload,
+  ) async {
+    try {
+      final res = await _client
+          .put(Uri.parse('$baseUrl/me/travel-wallet/$id'),
+              headers: _jsonHeaders, body: jsonEncode(payload.toJson()))
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealWalletItem.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Hard-deletes a wallet item (`DELETE /api/me/travel-wallet/{id}`, 204).
+  Future<CollectionApiVoidResult> deleteWalletItem(int id) async {
+    try {
+      final res = await _client
+          .delete(Uri.parse('$baseUrl/me/travel-wallet/$id'),
+              headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 204) {
+        return const CollectionApiVoidResult.success();
+      }
+      return CollectionApiVoidResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Marks a wallet item favorite (`PATCH /travel-wallet/{id}/favorite`).
+  Future<CollectionApiVoidResult> favoriteWalletItem(int id) =>
+      _patchWalletItem('$baseUrl/me/travel-wallet/$id/favorite');
+
+  /// Unmarks a wallet item favorite (`PATCH /travel-wallet/{id}/unfavorite`).
+  Future<CollectionApiVoidResult> unfavoriteWalletItem(int id) =>
+      _patchWalletItem('$baseUrl/me/travel-wallet/$id/unfavorite');
+
+  /// Archives a wallet item (`PATCH /travel-wallet/{id}/archive`).
+  Future<CollectionApiVoidResult> archiveWalletItem(int id) =>
+      _patchWalletItem('$baseUrl/me/travel-wallet/$id/archive');
+
+  /// Restores an archived wallet item (`PATCH /travel-wallet/{id}/restore`).
+  Future<CollectionApiVoidResult> restoreWalletItem(int id) =>
+      _patchWalletItem('$baseUrl/me/travel-wallet/$id/restore');
+
+  Future<CollectionApiVoidResult> _patchWalletItem(String url) async {
+    try {
+      final res = await _client
+          .patch(Uri.parse(url), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 204) {
+        return const CollectionApiVoidResult.success();
+      }
+      return CollectionApiVoidResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.network);
+    }
+  }
+
   Map<String, dynamic> _failureForStatus(http.Response res) {
     Map<String, dynamic>? body;
     try {

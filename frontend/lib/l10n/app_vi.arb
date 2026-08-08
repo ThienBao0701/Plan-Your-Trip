@@ -4069,5 +4069,62 @@
   "sharedTripsRealUntitled": "Chuyến đi chưa đặt tên",
   "sharedTripsRealEntryTitle": "Được chia sẻ với tôi",
   "sharedTripsRealEntrySubtitle": "Mở những chuyến đi mà người khác đã mời bạn.",
-  "sharedTripsRealEntrySemantic": "Được chia sẻ với tôi — những chuyến đi mà người khác đã mời bạn cùng cộng tác"
+  "sharedTripsRealEntrySemantic": "Được chia sẻ với tôi — những chuyến đi mà người khác đã mời bạn cùng cộng tác",
+  "walletRealLoadingMessage": "Đang tải ví của bạn…",
+  "walletRealErrorMessage": "Không thể tải ví của bạn. Kéo để làm mới hoặc thử lại.",
+  "walletRealForbiddenMessage": "Bạn không có quyền truy cập mục ví này.",
+  "walletRealGoneMessage": "Mục ví này không còn khả dụng.",
+  "walletRealNetworkMessage": "Không có kết nối. Hãy kiểm tra mạng và thử lại.",
+  "walletRealActionErrorMessage": "Không thành công. Vui lòng thử lại.",
+  "walletRealCreatedMessage": "Đã thêm mục ví.",
+  "walletRealUpdatedMessage": "Đã cập nhật mục ví.",
+  "walletRealDeletedMessage": "Đã xóa mục ví.",
+  "walletRealFavoritedMessage": "Đã thêm vào mục yêu thích.",
+  "walletRealUnfavoritedMessage": "Đã xóa khỏi mục yêu thích.",
+  "walletRealArchivedMessage": "Đã lưu trữ mục ví.",
+  "walletRealRestoredMessage": "Đã khôi phục mục ví.",
+  "walletRealTitleRequiredMessage": "Hãy nhập tiêu đề cho mục ví này.",
+  "walletRealAddSemantic": "Thêm mục ví",
+  "walletRealCreateTitle": "Mục ví mới",
+  "walletRealEditTitle": "Sửa mục ví",
+  "walletRealUntitled": "Mục chưa đặt tên",
+  "walletRealListEmptyTitle": "Ví của bạn đang trống",
+  "walletRealListEmptyMessage": "Thêm hộ chiếu, thị thực, vé, voucher hoặc biên lai để luôn sẵn sàng cho chuyến đi.",
+  "walletRealTitleField": "Tiêu đề",
+  "walletRealIssuerField": "Đơn vị phát hành (tùy chọn)",
+  "walletRealReferenceField": "Số tham chiếu (tùy chọn)",
+  "walletRealReferenceNote": "Số tham chiếu được lưu ở dạng che và không thể hiển thị lại.",
+  "walletRealReferenceHint": "Hiện tại: {masked}. Để trống để giữ nguyên trạng thái đã xóa; nhập lại để thay thế.",
+  "@walletRealReferenceHint": {
+    "placeholders": {
+      "masked": { "type": "String" }
+    }
+  },
+  "walletRealValidFromField": "Có hiệu lực từ",
+  "walletRealValidUntilField": "Có hiệu lực đến",
+  "walletRealDateNone": "Chưa đặt",
+  "walletRealSaveAction": "Lưu mục",
+  "walletRealEditAction": "Sửa",
+  "walletRealDeleteAction": "Xóa",
+  "walletRealArchiveAction": "Lưu trữ",
+  "walletRealRestoreAction": "Khôi phục",
+  "walletRealDeleteConfirmTitle": "Xóa mục ví?",
+  "walletRealDeleteConfirmMessage": "Xóa {title} khỏi ví của bạn? Tài liệu, đặt chỗ hoặc hóa đơn được liên kết sẽ không bị ảnh hưởng.",
+  "@walletRealDeleteConfirmMessage": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  },
+  "walletRealFavoriteSemantic": "Thêm {title} vào mục yêu thích",
+  "@walletRealFavoriteSemantic": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  },
+  "walletRealUnfavoriteSemantic": "Xóa {title} khỏi mục yêu thích",
+  "@walletRealUnfavoriteSemantic": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  }
 }

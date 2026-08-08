@@ -13929,6 +13929,228 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Shared with me — trips others have invited you to collaborate on'**
   String get sharedTripsRealEntrySemantic;
+
+  /// No description provided for @walletRealLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading your wallet…'**
+  String get walletRealLoadingMessage;
+
+  /// No description provided for @walletRealErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load your wallet. Pull to refresh or try again.'**
+  String get walletRealErrorMessage;
+
+  /// No description provided for @walletRealForbiddenMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have access to this wallet item.'**
+  String get walletRealForbiddenMessage;
+
+  /// No description provided for @walletRealGoneMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This wallet item is no longer available.'**
+  String get walletRealGoneMessage;
+
+  /// No description provided for @walletRealNetworkMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No connection. Check your network and try again.'**
+  String get walletRealNetworkMessage;
+
+  /// No description provided for @walletRealActionErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'That didn\'t work. Please try again.'**
+  String get walletRealActionErrorMessage;
+
+  /// No description provided for @walletRealCreatedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet item added.'**
+  String get walletRealCreatedMessage;
+
+  /// No description provided for @walletRealUpdatedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet item updated.'**
+  String get walletRealUpdatedMessage;
+
+  /// No description provided for @walletRealDeletedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet item deleted.'**
+  String get walletRealDeletedMessage;
+
+  /// No description provided for @walletRealFavoritedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to favorites.'**
+  String get walletRealFavoritedMessage;
+
+  /// No description provided for @walletRealUnfavoritedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed from favorites.'**
+  String get walletRealUnfavoritedMessage;
+
+  /// No description provided for @walletRealArchivedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet item archived.'**
+  String get walletRealArchivedMessage;
+
+  /// No description provided for @walletRealRestoredMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet item restored.'**
+  String get walletRealRestoredMessage;
+
+  /// No description provided for @walletRealTitleRequiredMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a title for this wallet item.'**
+  String get walletRealTitleRequiredMessage;
+
+  /// No description provided for @walletRealAddSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a wallet item'**
+  String get walletRealAddSemantic;
+
+  /// No description provided for @walletRealCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New wallet item'**
+  String get walletRealCreateTitle;
+
+  /// No description provided for @walletRealEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit wallet item'**
+  String get walletRealEditTitle;
+
+  /// No description provided for @walletRealUntitled.
+  ///
+  /// In en, this message translates to:
+  /// **'Untitled item'**
+  String get walletRealUntitled;
+
+  /// No description provided for @walletRealListEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your wallet is empty'**
+  String get walletRealListEmptyTitle;
+
+  /// No description provided for @walletRealListEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a passport, visa, ticket, voucher, or receipt to keep it handy for your trips.'**
+  String get walletRealListEmptyMessage;
+
+  /// No description provided for @walletRealTitleField.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get walletRealTitleField;
+
+  /// No description provided for @walletRealIssuerField.
+  ///
+  /// In en, this message translates to:
+  /// **'Issuer (optional)'**
+  String get walletRealIssuerField;
+
+  /// No description provided for @walletRealReferenceField.
+  ///
+  /// In en, this message translates to:
+  /// **'Reference number (optional)'**
+  String get walletRealReferenceField;
+
+  /// No description provided for @walletRealReferenceNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The reference number is stored masked and cannot be shown again.'**
+  String get walletRealReferenceNote;
+
+  /// No description provided for @walletRealReferenceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Current: {masked}. Leave blank to keep it removed; re-enter to replace.'**
+  String walletRealReferenceHint(String masked);
+
+  /// No description provided for @walletRealValidFromField.
+  ///
+  /// In en, this message translates to:
+  /// **'Valid from'**
+  String get walletRealValidFromField;
+
+  /// No description provided for @walletRealValidUntilField.
+  ///
+  /// In en, this message translates to:
+  /// **'Valid until'**
+  String get walletRealValidUntilField;
+
+  /// No description provided for @walletRealDateNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set'**
+  String get walletRealDateNone;
+
+  /// No description provided for @walletRealSaveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Save item'**
+  String get walletRealSaveAction;
+
+  /// No description provided for @walletRealEditAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get walletRealEditAction;
+
+  /// No description provided for @walletRealDeleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get walletRealDeleteAction;
+
+  /// No description provided for @walletRealArchiveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive'**
+  String get walletRealArchiveAction;
+
+  /// No description provided for @walletRealRestoreAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get walletRealRestoreAction;
+
+  /// No description provided for @walletRealDeleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete wallet item?'**
+  String get walletRealDeleteConfirmTitle;
+
+  /// No description provided for @walletRealDeleteConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {title} from your wallet? The linked document, booking, or invoice is not affected.'**
+  String walletRealDeleteConfirmMessage(String title);
+
+  /// No description provided for @walletRealFavoriteSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Add {title} to favorites'**
+  String walletRealFavoriteSemantic(String title);
+
+  /// No description provided for @walletRealUnfavoriteSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {title} from favorites'**
+  String walletRealUnfavoriteSemantic(String title);
 }
 
 class _AppLocalizationsDelegate

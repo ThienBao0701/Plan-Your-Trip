@@ -8022,4 +8022,130 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get sharedTripsRealEntrySemantic =>
       'Được chia sẻ với tôi — những chuyến đi mà người khác đã mời bạn cùng cộng tác';
+
+  @override
+  String get walletRealLoadingMessage => 'Đang tải ví của bạn…';
+
+  @override
+  String get walletRealErrorMessage =>
+      'Không thể tải ví của bạn. Kéo để làm mới hoặc thử lại.';
+
+  @override
+  String get walletRealForbiddenMessage =>
+      'Bạn không có quyền truy cập mục ví này.';
+
+  @override
+  String get walletRealGoneMessage => 'Mục ví này không còn khả dụng.';
+
+  @override
+  String get walletRealNetworkMessage =>
+      'Không có kết nối. Hãy kiểm tra mạng và thử lại.';
+
+  @override
+  String get walletRealActionErrorMessage =>
+      'Không thành công. Vui lòng thử lại.';
+
+  @override
+  String get walletRealCreatedMessage => 'Đã thêm mục ví.';
+
+  @override
+  String get walletRealUpdatedMessage => 'Đã cập nhật mục ví.';
+
+  @override
+  String get walletRealDeletedMessage => 'Đã xóa mục ví.';
+
+  @override
+  String get walletRealFavoritedMessage => 'Đã thêm vào mục yêu thích.';
+
+  @override
+  String get walletRealUnfavoritedMessage => 'Đã xóa khỏi mục yêu thích.';
+
+  @override
+  String get walletRealArchivedMessage => 'Đã lưu trữ mục ví.';
+
+  @override
+  String get walletRealRestoredMessage => 'Đã khôi phục mục ví.';
+
+  @override
+  String get walletRealTitleRequiredMessage =>
+      'Hãy nhập tiêu đề cho mục ví này.';
+
+  @override
+  String get walletRealAddSemantic => 'Thêm mục ví';
+
+  @override
+  String get walletRealCreateTitle => 'Mục ví mới';
+
+  @override
+  String get walletRealEditTitle => 'Sửa mục ví';
+
+  @override
+  String get walletRealUntitled => 'Mục chưa đặt tên';
+
+  @override
+  String get walletRealListEmptyTitle => 'Ví của bạn đang trống';
+
+  @override
+  String get walletRealListEmptyMessage =>
+      'Thêm hộ chiếu, thị thực, vé, voucher hoặc biên lai để luôn sẵn sàng cho chuyến đi.';
+
+  @override
+  String get walletRealTitleField => 'Tiêu đề';
+
+  @override
+  String get walletRealIssuerField => 'Đơn vị phát hành (tùy chọn)';
+
+  @override
+  String get walletRealReferenceField => 'Số tham chiếu (tùy chọn)';
+
+  @override
+  String get walletRealReferenceNote =>
+      'Số tham chiếu được lưu ở dạng che và không thể hiển thị lại.';
+
+  @override
+  String walletRealReferenceHint(String masked) {
+    return 'Hiện tại: $masked. Để trống để giữ nguyên trạng thái đã xóa; nhập lại để thay thế.';
+  }
+
+  @override
+  String get walletRealValidFromField => 'Có hiệu lực từ';
+
+  @override
+  String get walletRealValidUntilField => 'Có hiệu lực đến';
+
+  @override
+  String get walletRealDateNone => 'Chưa đặt';
+
+  @override
+  String get walletRealSaveAction => 'Lưu mục';
+
+  @override
+  String get walletRealEditAction => 'Sửa';
+
+  @override
+  String get walletRealDeleteAction => 'Xóa';
+
+  @override
+  String get walletRealArchiveAction => 'Lưu trữ';
+
+  @override
+  String get walletRealRestoreAction => 'Khôi phục';
+
+  @override
+  String get walletRealDeleteConfirmTitle => 'Xóa mục ví?';
+
+  @override
+  String walletRealDeleteConfirmMessage(String title) {
+    return 'Xóa $title khỏi ví của bạn? Tài liệu, đặt chỗ hoặc hóa đơn được liên kết sẽ không bị ảnh hưởng.';
+  }
+
+  @override
+  String walletRealFavoriteSemantic(String title) {
+    return 'Thêm $title vào mục yêu thích';
+  }
+
+  @override
+  String walletRealUnfavoriteSemantic(String title) {
+    return 'Xóa $title khỏi mục yêu thích';
+  }
 }

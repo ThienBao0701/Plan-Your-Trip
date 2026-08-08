@@ -7040,6 +7040,209 @@ enum SharedTripsOutcome {
   serverError,
 }
 
+// ── Travel Wallet (UI-50) ────────────────────────────────────────────────────
+// The customer's Travel Wallet (`/api/me/travel-wallet`) — a per-user organizer
+// of documents/vouchers/tickets. Owner-only CRUD + favorite/archive toggles.
+// Reuses the demo `WalletItemType`/`WalletItemStatus` enums (identical wire
+// codes, each with a `.code` getter) and their label helpers.
+
+/// Maps the backend `TravelWalletItemType` wire code onto the demo enum; null on
+/// an unrecognised code.
+WalletItemType? walletItemTypeFromCode(String? code) {
+  switch (code) {
+    case 'PASSPORT':
+      return WalletItemType.passport;
+    case 'VISA':
+      return WalletItemType.visa;
+    case 'BOARDING_PASS':
+      return WalletItemType.boardingPass;
+    case 'FLIGHT_TICKET':
+      return WalletItemType.flightTicket;
+    case 'TRAIN_TICKET':
+      return WalletItemType.trainTicket;
+    case 'BUS_TICKET':
+      return WalletItemType.busTicket;
+    case 'HOTEL_VOUCHER':
+      return WalletItemType.hotelVoucher;
+    case 'TOUR_VOUCHER':
+      return WalletItemType.tourVoucher;
+    case 'INSURANCE':
+      return WalletItemType.insurance;
+    case 'BOOKING_CONFIRMATION':
+      return WalletItemType.bookingConfirmation;
+    case 'INVOICE':
+      return WalletItemType.invoice;
+    case 'RECEIPT':
+      return WalletItemType.receipt;
+    case 'ITINERARY':
+      return WalletItemType.itinerary;
+    case 'OTHER':
+      return WalletItemType.other;
+    default:
+      return null;
+  }
+}
+
+/// Maps the backend `TravelWalletItemStatus` wire code onto the demo enum; null
+/// on an unrecognised code.
+WalletItemStatus? walletItemStatusFromCode(String? code) {
+  switch (code) {
+    case 'ACTIVE':
+      return WalletItemStatus.active;
+    case 'UPCOMING':
+      return WalletItemStatus.upcoming;
+    case 'EXPIRED':
+      return WalletItemStatus.expired;
+    case 'CANCELLED':
+      return WalletItemStatus.cancelled;
+    case 'ARCHIVED':
+      return WalletItemStatus.archived;
+    default:
+      return null;
+  }
+}
+
+/// Real-backend mirror of `TravelWalletDto.TravelWalletSummaryResponse` (the
+/// list-view projection). `walletItemType`/`status`/`effectiveStatus` are raw
+/// wire codes; the `*View` getters map them (null/unknown never crashes).
+/// `referenceNumber` is write-only server-side — only [referenceNumberMasked] is
+/// ever returned.
+class RealWalletItem {
+  final int id;
+  final int? tripPlanId;
+  final String? tripPlanTitle;
+  final String walletItemType; // raw wire code
+  final String displayTitle;
+  final String? issuer;
+  final String? referenceNumberMasked;
+  final DateTime? validFrom;
+  final DateTime? validUntil;
+  final String status; // raw wire code (stored)
+  final String effectiveStatus; // raw wire code (computed)
+  final bool expired;
+  final bool favorite;
+  final bool archived;
+  final bool expiryReminderEnabled;
+  final String organizerCategory;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+
+  const RealWalletItem({
+    required this.id,
+    this.tripPlanId,
+    this.tripPlanTitle,
+    this.walletItemType = '',
+    this.displayTitle = '',
+    this.issuer,
+    this.referenceNumberMasked,
+    this.validFrom,
+    this.validUntil,
+    this.status = '',
+    this.effectiveStatus = '',
+    this.expired = false,
+    this.favorite = false,
+    this.archived = false,
+    this.expiryReminderEnabled = false,
+    this.organizerCategory = '',
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  /// The mapped item type, or null on an unrecognised code.
+  WalletItemType? get typeView => walletItemTypeFromCode(walletItemType);
+
+  /// The mapped effective status (what clients should display), or null on an
+  /// unrecognised code.
+  WalletItemStatus? get effectiveStatusView =>
+      walletItemStatusFromCode(effectiveStatus);
+
+  factory RealWalletItem.fromJson(Map<String, dynamic> json) {
+    return RealWalletItem(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      tripPlanId: (json['tripPlanId'] as num?)?.toInt(),
+      tripPlanTitle: json['tripPlanTitle'] as String?,
+      walletItemType: (json['walletItemType'] as String?) ?? '',
+      displayTitle: (json['displayTitle'] as String?) ?? '',
+      issuer: json['issuer'] as String?,
+      referenceNumberMasked: json['referenceNumberMasked'] as String?,
+      validFrom: _tryParseDate(json['validFrom']),
+      validUntil: _tryParseDate(json['validUntil']),
+      status: (json['status'] as String?) ?? '',
+      effectiveStatus: (json['effectiveStatus'] as String?) ?? '',
+      expired: (json['expired'] as bool?) ?? false,
+      favorite: (json['favorite'] as bool?) ?? false,
+      archived: (json['archived'] as bool?) ?? false,
+      expiryReminderEnabled: (json['expiryReminderEnabled'] as bool?) ?? false,
+      organizerCategory: (json['organizerCategory'] as String?) ?? '',
+      createdAt: _tryParseDate(json['createdAt']),
+      updatedAt: _tryParseDate(json['updatedAt']),
+    );
+  }
+}
+
+/// Request payload for creating/updating a standalone (metadata-only) wallet
+/// item (`TravelWalletItemRequest`). [toJson] emits the metadata fields only;
+/// link ids (tripPlan/document/booking/invoice) are never sent, so the backend
+/// requires a non-blank [displayTitle]. [referenceNumber] is the raw value
+/// (masked server-side; never read back) — a blank value clears the stored
+/// masked reference on update. Dates serialise as `yyyy-MM-dd` (LocalDate) or
+/// null.
+class RealWalletItemPayload {
+  final WalletItemType walletItemType;
+  final String displayTitle;
+  final String? issuer;
+  final String? referenceNumber;
+  final DateTime? validFrom;
+  final DateTime? validUntil;
+
+  const RealWalletItemPayload({
+    required this.walletItemType,
+    required this.displayTitle,
+    this.issuer,
+    this.referenceNumber,
+    this.validFrom,
+    this.validUntil,
+  });
+
+  static String? _localDate(DateTime? d) {
+    if (d == null) return null;
+    final l = d.toLocal();
+    final mm = l.month.toString().padLeft(2, '0');
+    final dd = l.day.toString().padLeft(2, '0');
+    return '${l.year.toString().padLeft(4, '0')}-$mm-$dd';
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'walletItemType': walletItemType.code,
+      'displayTitle': displayTitle,
+      'issuer': issuer,
+      'referenceNumber': referenceNumber,
+      'validFrom': _localDate(validFrom),
+      'validUntil': _localDate(validUntil),
+    };
+  }
+}
+
+/// Outcome of a real travel-wallet action (load/create/update/delete/favorite/
+/// archive). [demoUnavailable] is the Demo Mode guard (zero HTTP); [busy] the
+/// single-flight guard; [sessionExpired] (401) never triggers auto-logout;
+/// [forbidden] 403; [notFound] 404 (wallet items are owner-only — a non-owner
+/// or missing id both surface as notFound); [validation] 400 (blank title /
+/// EXPIRED status / missing link+title); [serverError] 5xx; [network]
+/// transport/timeout.
+enum WalletOutcome {
+  success,
+  demoUnavailable,
+  busy,
+  sessionExpired,
+  forbidden,
+  notFound,
+  validation,
+  network,
+  serverError,
+}
+
 class DemoBooking {
   final String code;
   final String ownerUserId;

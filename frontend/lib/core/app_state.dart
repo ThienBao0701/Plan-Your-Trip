@@ -614,6 +614,18 @@ class AppState extends ChangeNotifier {
   bool realSharedTripsRefreshing = false;
   SharedTripsOutcome? realSharedTripsError;
 
+  // ── Real Mode Travel Wallet (/api/me/travel-wallet, UI-50) ────────────────
+  // The customer's per-user organizer of documents/vouchers/tickets. Global
+  // (not trip-scoped); owner-only CRUD + favorite/archive toggles. A 401 never
+  // calls logout(). Cleared on logout / mode / user change via
+  // [_resetRealWalletState]. Zero HTTP in Demo Mode.
+  List<RealWalletItem> realWalletItems = [];
+  bool realWalletLoading = false;
+  bool realWalletLoaded = false;
+  bool realWalletRefreshing = false;
+  bool realWalletMutationInFlight = false;
+  WalletOutcome? realWalletError;
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -726,6 +738,7 @@ class AppState extends ChangeNotifier {
     _resetRealBudgetState();
     _resetRealCollaborationState();
     _resetRealSharedTripsState();
+    _resetRealWalletState();
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -1030,6 +1043,15 @@ class AppState extends ChangeNotifier {
     realSharedTripsError = null;
   }
 
+  void _resetRealWalletState() {
+    realWalletItems = [];
+    realWalletLoading = false;
+    realWalletLoaded = false;
+    realWalletRefreshing = false;
+    realWalletMutationInFlight = false;
+    realWalletError = null;
+  }
+
   void _resetRealNotificationsState() {
     realNotifications = [];
     realNotificationsLoading = false;
@@ -1184,6 +1206,7 @@ class AppState extends ChangeNotifier {
     _resetRealBudgetState();
     _resetRealCollaborationState();
     _resetRealSharedTripsState();
+    _resetRealWalletState();
     timeline = [];
     expenses = [];
     demoBookings = [];
@@ -5920,6 +5943,149 @@ class AppState extends ChangeNotifier {
     }
     final outcome = _mapSharedTripsError(result.errorKind);
     realSharedTripsError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  // ── Real Mode Travel Wallet (UI-50) ──────────────────────────────────────
+
+  WalletOutcome _mapWalletError(ApiErrorKind? kind) {
+    return switch (kind) {
+      ApiErrorKind.unauthorized => WalletOutcome.sessionExpired,
+      ApiErrorKind.forbidden => WalletOutcome.forbidden,
+      ApiErrorKind.notFound => WalletOutcome.notFound,
+      ApiErrorKind.validation => WalletOutcome.validation,
+      ApiErrorKind.unprocessable => WalletOutcome.validation,
+      ApiErrorKind.network => WalletOutcome.network,
+      ApiErrorKind.timeout => WalletOutcome.network,
+      ApiErrorKind.server => WalletOutcome.serverError,
+      _ => WalletOutcome.serverError,
+    };
+  }
+
+  /// Loads my travel wallet (`GET .../travel-wallet`, default sort). [refresh]
+  /// forces a re-fetch and preserves the current list on failure. Single-flight;
+  /// cached after first success. Zero HTTP in Demo Mode.
+  Future<WalletOutcome> loadRealWallet({bool refresh = false}) async {
+    if (demoMode) return WalletOutcome.demoUnavailable;
+    if (realWalletLoading || realWalletRefreshing) return WalletOutcome.success;
+    if (realWalletLoaded && !refresh) return WalletOutcome.success;
+    if (realWalletLoaded && refresh) {
+      realWalletRefreshing = true;
+    } else {
+      realWalletLoading = true;
+    }
+    realWalletError = null;
+    notifyListeners();
+    final result = await api.getWalletItems();
+    realWalletLoading = false;
+    realWalletRefreshing = false;
+    if (result.success && result.data != null) {
+      realWalletItems = result.data!;
+      realWalletLoaded = true;
+      realWalletError = null;
+      notifyListeners();
+      return WalletOutcome.success;
+    }
+    final outcome = _mapWalletError(result.errorKind);
+    realWalletError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Adds a wallet item (`POST .../travel-wallet`) and reloads the list from the
+  /// backend (no optimistic insert). A blank display title is rejected
+  /// client-side (required for a standalone item). Single-flight via
+  /// [realWalletMutationInFlight]. Zero HTTP in Demo Mode.
+  Future<WalletOutcome> createRealWalletItem(
+      RealWalletItemPayload payload) async {
+    if (demoMode) return WalletOutcome.demoUnavailable;
+    if (payload.displayTitle.trim().isEmpty) return WalletOutcome.validation;
+    if (realWalletMutationInFlight) return WalletOutcome.busy;
+    realWalletMutationInFlight = true;
+    notifyListeners();
+    final result = await api.createWalletItem(payload);
+    realWalletMutationInFlight = false;
+    if (result.success && result.data != null) {
+      notifyListeners();
+      await loadRealWallet(refresh: true);
+      return WalletOutcome.success;
+    }
+    final outcome = _mapWalletError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Updates a wallet item (`PUT .../travel-wallet/{id}`) and reloads the list.
+  /// A blank display title is rejected client-side. No optimistic mutation.
+  /// Zero HTTP in Demo Mode.
+  Future<WalletOutcome> updateRealWalletItem(
+      int id, RealWalletItemPayload payload) async {
+    if (demoMode) return WalletOutcome.demoUnavailable;
+    if (payload.displayTitle.trim().isEmpty) return WalletOutcome.validation;
+    if (realWalletMutationInFlight) return WalletOutcome.busy;
+    realWalletMutationInFlight = true;
+    notifyListeners();
+    final result = await api.updateWalletItem(id, payload);
+    realWalletMutationInFlight = false;
+    if (result.success && result.data != null) {
+      notifyListeners();
+      await loadRealWallet(refresh: true);
+      return WalletOutcome.success;
+    }
+    final outcome = _mapWalletError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Deletes a wallet item (`DELETE .../travel-wallet/{id}`) and reloads only
+  /// after the server confirms. Zero HTTP in Demo Mode.
+  Future<WalletOutcome> deleteRealWalletItem(int id) async {
+    if (demoMode) return WalletOutcome.demoUnavailable;
+    if (realWalletMutationInFlight) return WalletOutcome.busy;
+    realWalletMutationInFlight = true;
+    notifyListeners();
+    final result = await api.deleteWalletItem(id);
+    realWalletMutationInFlight = false;
+    if (result.success) {
+      notifyListeners();
+      await loadRealWallet(refresh: true);
+      return WalletOutcome.success;
+    }
+    final outcome = _mapWalletError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Favorites or unfavorites a wallet item (`PATCH .../favorite|unfavorite`)
+  /// and reloads the list so ordering updates. No optimistic mutation. Zero HTTP
+  /// in Demo Mode.
+  Future<WalletOutcome> setRealWalletItemFavorite(int id, bool favorite) =>
+      _mutateRealWalletItem(favorite
+          ? () => api.favoriteWalletItem(id)
+          : () => api.unfavoriteWalletItem(id));
+
+  /// Archives or restores a wallet item (`PATCH .../archive|restore`) and
+  /// reloads the list. No optimistic mutation. Zero HTTP in Demo Mode.
+  Future<WalletOutcome> setRealWalletItemArchived(int id, bool archived) =>
+      _mutateRealWalletItem(archived
+          ? () => api.archiveWalletItem(id)
+          : () => api.restoreWalletItem(id));
+
+  Future<WalletOutcome> _mutateRealWalletItem(
+      Future<CollectionApiVoidResult> Function() action) async {
+    if (demoMode) return WalletOutcome.demoUnavailable;
+    if (realWalletMutationInFlight) return WalletOutcome.busy;
+    realWalletMutationInFlight = true;
+    notifyListeners();
+    final result = await action();
+    realWalletMutationInFlight = false;
+    if (result.success) {
+      notifyListeners();
+      await loadRealWallet(refresh: true);
+      return WalletOutcome.success;
+    }
+    final outcome = _mapWalletError(result.errorKind);
     notifyListeners();
     return outcome;
   }

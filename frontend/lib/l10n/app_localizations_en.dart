@@ -8186,4 +8186,131 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get sharedTripsRealEntrySemantic =>
       'Shared with me — trips others have invited you to collaborate on';
+
+  @override
+  String get walletRealLoadingMessage => 'Loading your wallet…';
+
+  @override
+  String get walletRealErrorMessage =>
+      'We couldn\'t load your wallet. Pull to refresh or try again.';
+
+  @override
+  String get walletRealForbiddenMessage =>
+      'You don\'t have access to this wallet item.';
+
+  @override
+  String get walletRealGoneMessage =>
+      'This wallet item is no longer available.';
+
+  @override
+  String get walletRealNetworkMessage =>
+      'No connection. Check your network and try again.';
+
+  @override
+  String get walletRealActionErrorMessage =>
+      'That didn\'t work. Please try again.';
+
+  @override
+  String get walletRealCreatedMessage => 'Wallet item added.';
+
+  @override
+  String get walletRealUpdatedMessage => 'Wallet item updated.';
+
+  @override
+  String get walletRealDeletedMessage => 'Wallet item deleted.';
+
+  @override
+  String get walletRealFavoritedMessage => 'Added to favorites.';
+
+  @override
+  String get walletRealUnfavoritedMessage => 'Removed from favorites.';
+
+  @override
+  String get walletRealArchivedMessage => 'Wallet item archived.';
+
+  @override
+  String get walletRealRestoredMessage => 'Wallet item restored.';
+
+  @override
+  String get walletRealTitleRequiredMessage =>
+      'Enter a title for this wallet item.';
+
+  @override
+  String get walletRealAddSemantic => 'Add a wallet item';
+
+  @override
+  String get walletRealCreateTitle => 'New wallet item';
+
+  @override
+  String get walletRealEditTitle => 'Edit wallet item';
+
+  @override
+  String get walletRealUntitled => 'Untitled item';
+
+  @override
+  String get walletRealListEmptyTitle => 'Your wallet is empty';
+
+  @override
+  String get walletRealListEmptyMessage =>
+      'Add a passport, visa, ticket, voucher, or receipt to keep it handy for your trips.';
+
+  @override
+  String get walletRealTitleField => 'Title';
+
+  @override
+  String get walletRealIssuerField => 'Issuer (optional)';
+
+  @override
+  String get walletRealReferenceField => 'Reference number (optional)';
+
+  @override
+  String get walletRealReferenceNote =>
+      'The reference number is stored masked and cannot be shown again.';
+
+  @override
+  String walletRealReferenceHint(String masked) {
+    return 'Current: $masked. Leave blank to keep it removed; re-enter to replace.';
+  }
+
+  @override
+  String get walletRealValidFromField => 'Valid from';
+
+  @override
+  String get walletRealValidUntilField => 'Valid until';
+
+  @override
+  String get walletRealDateNone => 'Not set';
+
+  @override
+  String get walletRealSaveAction => 'Save item';
+
+  @override
+  String get walletRealEditAction => 'Edit';
+
+  @override
+  String get walletRealDeleteAction => 'Delete';
+
+  @override
+  String get walletRealArchiveAction => 'Archive';
+
+  @override
+  String get walletRealRestoreAction => 'Restore';
+
+  @override
+  String get walletRealDeleteConfirmTitle => 'Delete wallet item?';
+
+  @override
+  String walletRealDeleteConfirmMessage(String title) {
+    return 'Delete $title from your wallet? The linked document, booking, or invoice is not affected.';
+  }
+
+  @override
+  String walletRealFavoriteSemantic(String title) {
+    return 'Add $title to favorites';
+  }
+
+  @override
+  String walletRealUnfavoriteSemantic(String title) {
+    return 'Remove $title from favorites';
+  }
 }

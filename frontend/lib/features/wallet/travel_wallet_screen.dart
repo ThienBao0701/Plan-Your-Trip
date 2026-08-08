@@ -9,6 +9,7 @@ import '../../design/app_radii.dart';
 import '../../design/app_spacing.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/glass_widgets.dart';
+import 'real_travel_wallet_screen.dart';
 
 class TravelWalletScreen extends StatefulWidget {
   final DateTime? today;
@@ -37,6 +38,9 @@ class _TravelWalletScreenState extends State<TravelWalletScreen> {
   @override
   Widget build(BuildContext context) {
     final app = AppScope.of(context);
+    // Real Mode is fetch-backed and has its own loading/empty/error/refresh
+    // lifecycle; Demo Mode keeps the exact local behaviour below.
+    if (!app.demoMode) return const RealTravelWalletScreen();
     final l10n = AppLocalizations.of(context)!;
     final today = dateOnly(widget.today ?? app.now());
     final allItems = app.sortedWalletItems(today: today);
@@ -66,80 +70,73 @@ class _TravelWalletScreenState extends State<TravelWalletScreen> {
             children: [
               OceanContentConstraint(
                 maxWidth: AppBreakpoints.maxContentWidth,
-                child: !app.demoMode
-                    ? OceanEmptyState(
-                        title: l10n.walletRealEmptyTitle,
-                        message: l10n.walletRealEmptyMessage,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const _WalletHeader(),
+                    const SizedBox(height: AppSpacing.md),
+                    _SummaryWrap(summary: summary),
+                    const SizedBox(height: AppSpacing.lg),
+                    _WalletFilters(
+                      search: _search,
+                      category: _category,
+                      type: _type,
+                      status: _status,
+                      linkedTripId: _linkedTripId,
+                      favoritesOnly: _favoritesOnly,
+                      archivedOnly: _archivedOnly,
+                      trips: app.trips,
+                      onSearchChanged: (_) => setState(() {}),
+                      onClearSearch: () => setState(() => _search.clear()),
+                      onCategoryChanged: (value) =>
+                          setState(() => _category = value),
+                      onTypeChanged: (value) => setState(() => _type = value),
+                      onStatusChanged: (value) =>
+                          setState(() => _status = value),
+                      onLinkedTripChanged: (value) =>
+                          setState(() => _linkedTripId = value),
+                      onFavoritesChanged: (value) =>
+                          setState(() => _favoritesOnly = value),
+                      onArchivedChanged: (value) =>
+                          setState(() => _archivedOnly = value),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    Wrap(
+                      spacing: AppSpacing.sm,
+                      runSpacing: AppSpacing.sm,
+                      children: [
+                        OceanPrimaryButton(
+                          key: const Key('wallet-create-item'),
+                          label: l10n.walletCreateItemAction,
+                          icon: Icons.add_card_rounded,
+                          semanticLabel: l10n.walletCreateItemAction,
+                          fullWidth: false,
+                          onPressed: () => _showItemEditor(),
+                        ),
+                        OceanSecondaryButton(
+                          key: const Key('wallet-import-booking'),
+                          label: l10n.walletImportBookingAction,
+                          icon: Icons.hotel_rounded,
+                          semanticLabel: l10n.walletImportBookingAction,
+                          fullWidth: false,
+                          onPressed: _showBookingImport,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    if (filtered.isEmpty)
+                      OceanEmptyState(
+                        title: l10n.walletEmptyTitle,
+                        message: l10n.walletEmptyMessage,
                       )
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          const _WalletHeader(),
-                          const SizedBox(height: AppSpacing.md),
-                          _SummaryWrap(summary: summary),
-                          const SizedBox(height: AppSpacing.lg),
-                          _WalletFilters(
-                            search: _search,
-                            category: _category,
-                            type: _type,
-                            status: _status,
-                            linkedTripId: _linkedTripId,
-                            favoritesOnly: _favoritesOnly,
-                            archivedOnly: _archivedOnly,
-                            trips: app.trips,
-                            onSearchChanged: (_) => setState(() {}),
-                            onClearSearch: () =>
-                                setState(() => _search.clear()),
-                            onCategoryChanged: (value) =>
-                                setState(() => _category = value),
-                            onTypeChanged: (value) =>
-                                setState(() => _type = value),
-                            onStatusChanged: (value) =>
-                                setState(() => _status = value),
-                            onLinkedTripChanged: (value) =>
-                                setState(() => _linkedTripId = value),
-                            onFavoritesChanged: (value) =>
-                                setState(() => _favoritesOnly = value),
-                            onArchivedChanged: (value) =>
-                                setState(() => _archivedOnly = value),
-                          ),
-                          const SizedBox(height: AppSpacing.md),
-                          Wrap(
-                            spacing: AppSpacing.sm,
-                            runSpacing: AppSpacing.sm,
-                            children: [
-                              OceanPrimaryButton(
-                                key: const Key('wallet-create-item'),
-                                label: l10n.walletCreateItemAction,
-                                icon: Icons.add_card_rounded,
-                                semanticLabel: l10n.walletCreateItemAction,
-                                fullWidth: false,
-                                onPressed: () => _showItemEditor(),
-                              ),
-                              OceanSecondaryButton(
-                                key: const Key('wallet-import-booking'),
-                                label: l10n.walletImportBookingAction,
-                                icon: Icons.hotel_rounded,
-                                semanticLabel: l10n.walletImportBookingAction,
-                                fullWidth: false,
-                                onPressed: _showBookingImport,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: AppSpacing.lg),
-                          if (filtered.isEmpty)
-                            OceanEmptyState(
-                              title: l10n.walletEmptyTitle,
-                              message: l10n.walletEmptyMessage,
-                            )
-                          else
-                            _WalletSections(
-                              items: filtered,
-                              today: today,
-                              onTap: _showItemDetail,
-                            ),
-                        ],
+                    else
+                      _WalletSections(
+                        items: filtered,
+                        today: today,
+                        onTap: _showItemDetail,
                       ),
+                  ],
+                ),
               ),
             ],
           ),

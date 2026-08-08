@@ -3,14 +3,18 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:planyourtrip_frontend/core/app_state.dart';
 import 'package:planyourtrip_frontend/core/mock/app_models.dart';
 import 'package:planyourtrip_frontend/core/mock/mock_data.dart';
+import 'package:planyourtrip_frontend/core/network/api_client.dart';
 import 'package:planyourtrip_frontend/design/app_theme.dart';
 import 'package:planyourtrip_frontend/features/home/app_shell.dart';
 import 'package:planyourtrip_frontend/features/hotels/hotel_utils.dart';
 import 'package:planyourtrip_frontend/features/profile/profile_screen.dart';
 import 'package:planyourtrip_frontend/features/trips/trip_detail_screen.dart';
+import 'package:planyourtrip_frontend/features/wallet/real_travel_wallet_screen.dart';
 import 'package:planyourtrip_frontend/features/wallet/travel_wallet_screen.dart';
 import 'package:planyourtrip_frontend/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -425,17 +429,42 @@ void main() {
     expect(find.text('Passport'), findsWidgets);
   });
 
-  testWidgets('Travel Wallet renders real empty state and localized Vietnamese',
+  testWidgets(
+      'Travel Wallet delegates to the real screen in Real Mode; demo localized Vietnamese',
       (tester) async {
+    // UI-50: in Real Mode the wallet is backend-backed — TravelWalletScreen
+    // delegates to RealTravelWalletScreen (which loads /api/me/travel-wallet).
+    final realApp = AppState(
+      now: () => today,
+      api: ApiClient(
+        client: MockClient(
+          (_) async => http.Response(
+            '[]',
+            200,
+            headers: {'content-type': 'application/json; charset=utf-8'},
+          ),
+        ),
+      )..demoMode = false,
+    )
+      ..demoMode = false
+      ..email = 'real@example.com'
+      ..trips = []
+      ..timeline = []
+      ..expenses = []
+      ..demoBookings = []
+      ..travelWalletItems = []
+      ..tripDocuments = [];
+
     await pumpSize(
       tester,
       TravelWalletScreen(today: DateTime(2026, 7, 16)),
       const Size(430, 932),
-      app: realState(),
+      app: realApp,
     );
 
-    expect(find.text('Travel Wallet is not connected yet'), findsOneWidget);
-    expect(find.text('Passport'), findsNothing);
+    expect(find.byType(RealTravelWalletScreen), findsOneWidget);
+    expect(find.byKey(const Key('wallet-empty')), findsOneWidget);
+    expect(find.text('Travel Wallet is not connected yet'), findsNothing);
 
     await pumpSize(
       tester,

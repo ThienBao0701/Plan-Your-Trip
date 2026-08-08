@@ -4069,5 +4069,62 @@
   "sharedTripsRealUntitled": "Untitled trip",
   "sharedTripsRealEntryTitle": "Shared with me",
   "sharedTripsRealEntrySubtitle": "Open trips others have invited you to.",
-  "sharedTripsRealEntrySemantic": "Shared with me — trips others have invited you to collaborate on"
+  "sharedTripsRealEntrySemantic": "Shared with me — trips others have invited you to collaborate on",
+  "walletRealLoadingMessage": "Loading your wallet…",
+  "walletRealErrorMessage": "We couldn't load your wallet. Pull to refresh or try again.",
+  "walletRealForbiddenMessage": "You don't have access to this wallet item.",
+  "walletRealGoneMessage": "This wallet item is no longer available.",
+  "walletRealNetworkMessage": "No connection. Check your network and try again.",
+  "walletRealActionErrorMessage": "That didn't work. Please try again.",
+  "walletRealCreatedMessage": "Wallet item added.",
+  "walletRealUpdatedMessage": "Wallet item updated.",
+  "walletRealDeletedMessage": "Wallet item deleted.",
+  "walletRealFavoritedMessage": "Added to favorites.",
+  "walletRealUnfavoritedMessage": "Removed from favorites.",
+  "walletRealArchivedMessage": "Wallet item archived.",
+  "walletRealRestoredMessage": "Wallet item restored.",
+  "walletRealTitleRequiredMessage": "Enter a title for this wallet item.",
+  "walletRealAddSemantic": "Add a wallet item",
+  "walletRealCreateTitle": "New wallet item",
+  "walletRealEditTitle": "Edit wallet item",
+  "walletRealUntitled": "Untitled item",
+  "walletRealListEmptyTitle": "Your wallet is empty",
+  "walletRealListEmptyMessage": "Add a passport, visa, ticket, voucher, or receipt to keep it handy for your trips.",
+  "walletRealTitleField": "Title",
+  "walletRealIssuerField": "Issuer (optional)",
+  "walletRealReferenceField": "Reference number (optional)",
+  "walletRealReferenceNote": "The reference number is stored masked and cannot be shown again.",
+  "walletRealReferenceHint": "Current: {masked}. Leave blank to keep it removed; re-enter to replace.",
+  "@walletRealReferenceHint": {
+    "placeholders": {
+      "masked": { "type": "String" }
+    }
+  },
+  "walletRealValidFromField": "Valid from",
+  "walletRealValidUntilField": "Valid until",
+  "walletRealDateNone": "Not set",
+  "walletRealSaveAction": "Save item",
+  "walletRealEditAction": "Edit",
+  "walletRealDeleteAction": "Delete",
+  "walletRealArchiveAction": "Archive",
+  "walletRealRestoreAction": "Restore",
+  "walletRealDeleteConfirmTitle": "Delete wallet item?",
+  "walletRealDeleteConfirmMessage": "Delete {title} from your wallet? The linked document, booking, or invoice is not affected.",
+  "@walletRealDeleteConfirmMessage": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  },
+  "walletRealFavoriteSemantic": "Add {title} to favorites",
+  "@walletRealFavoriteSemantic": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  },
+  "walletRealUnfavoriteSemantic": "Remove {title} from favorites",
+  "@walletRealUnfavoriteSemantic": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  }
 }
