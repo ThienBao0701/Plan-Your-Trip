@@ -576,6 +576,32 @@ class AppState extends ChangeNotifier {
   RealExpenseSummary? realBudgetSummaryFor(int tripId) =>
       realBudgetTripId == tripId ? realBudgetSummary : null;
 
+  // ── Real Mode Trip Collaboration (/api/me/trips/.../collaborators, UI-48) ──
+  // Owner-only collaborator management + public/private toggle for a real
+  // TripPlan (UI-20). One trip is loaded at a time ([realCollabTripId]);
+  // switching trips reloads. Invite / role change / remove / publish is
+  // owner-only — a collaborator gets 403 and a stranger 404; a 401 never calls
+  // logout(). [realCollabIsPublic] is seeded from the trip detail and updated
+  // from the publish toggle's response. Cleared on logout / mode / user change
+  // via [_resetRealCollaborationState]. Zero HTTP in Demo Mode.
+  int? realCollabTripId;
+  List<RealCollaborator> realCollaborators = [];
+  bool? realCollabIsPublic;
+  bool realCollabLoading = false;
+  bool realCollabLoaded = false;
+  bool realCollabRefreshing = false;
+  bool realCollabMutationInFlight = false;
+  CollaborationOutcome? realCollabError;
+
+  /// The loaded collaborators for [tripId], or an empty list if a different
+  /// trip (or none) is currently loaded.
+  List<RealCollaborator> realCollaboratorsFor(int tripId) =>
+      realCollabTripId == tripId ? realCollaborators : const [];
+
+  /// The known public/private state for [tripId], or null if unknown.
+  bool? realCollabIsPublicFor(int tripId) =>
+      realCollabTripId == tripId ? realCollabIsPublic : null;
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -686,6 +712,7 @@ class AppState extends ChangeNotifier {
     _resetRealPackingState();
     _resetRealReminderState();
     _resetRealBudgetState();
+    _resetRealCollaborationState();
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -971,6 +998,17 @@ class AppState extends ChangeNotifier {
     realBudgetError = null;
   }
 
+  void _resetRealCollaborationState() {
+    realCollabTripId = null;
+    realCollaborators = [];
+    realCollabIsPublic = null;
+    realCollabLoading = false;
+    realCollabLoaded = false;
+    realCollabRefreshing = false;
+    realCollabMutationInFlight = false;
+    realCollabError = null;
+  }
+
   void _resetRealNotificationsState() {
     realNotifications = [];
     realNotificationsLoading = false;
@@ -1123,6 +1161,7 @@ class AppState extends ChangeNotifier {
     _resetRealPackingState();
     _resetRealReminderState();
     _resetRealBudgetState();
+    _resetRealCollaborationState();
     timeline = [];
     expenses = [];
     demoBookings = [];
@@ -5660,6 +5699,159 @@ class AppState extends ChangeNotifier {
       return BudgetOutcome.success;
     }
     final outcome = _mapBudgetError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  // ── Real Mode Trip Collaboration (UI-48) ─────────────────────────────────
+
+  CollaborationOutcome _mapCollabError(ApiErrorKind? kind) {
+    return switch (kind) {
+      ApiErrorKind.unauthorized => CollaborationOutcome.sessionExpired,
+      ApiErrorKind.forbidden => CollaborationOutcome.forbidden,
+      ApiErrorKind.notFound => CollaborationOutcome.notFound,
+      ApiErrorKind.conflict => CollaborationOutcome.conflict,
+      ApiErrorKind.validation => CollaborationOutcome.validation,
+      ApiErrorKind.unprocessable => CollaborationOutcome.validation,
+      ApiErrorKind.network => CollaborationOutcome.network,
+      ApiErrorKind.timeout => CollaborationOutcome.network,
+      ApiErrorKind.server => CollaborationOutcome.serverError,
+      _ => CollaborationOutcome.serverError,
+    };
+  }
+
+  /// Loads a trip's collaborators (`GET .../collaborators`, owner-only, createdAt
+  /// ASC). Switching [tripId] reloads. [seedIsPublic] seeds the public/private
+  /// toggle from the trip detail on first load (the collaborators endpoint does
+  /// not carry it). [refresh] forces a re-fetch and preserves the current list
+  /// on failure. Zero HTTP in Demo Mode.
+  Future<CollaborationOutcome> loadRealCollaborators(int tripId,
+      {bool refresh = false, bool? seedIsPublic}) async {
+    if (demoMode) return CollaborationOutcome.demoUnavailable;
+    if (realCollabLoading || realCollabRefreshing) {
+      return CollaborationOutcome.success;
+    }
+    final sameTrip = realCollabTripId == tripId;
+    if (sameTrip && realCollabLoaded && !refresh) {
+      return CollaborationOutcome.success;
+    }
+    if (sameTrip && refresh) {
+      realCollabRefreshing = true;
+    } else {
+      realCollabLoading = true;
+      if (!sameTrip) {
+        realCollaborators = [];
+        realCollabIsPublic = null;
+        realCollabLoaded = false;
+        realCollabTripId = tripId;
+      }
+    }
+    if (seedIsPublic != null && realCollabIsPublic == null) {
+      realCollabIsPublic = seedIsPublic;
+    }
+    realCollabError = null;
+    notifyListeners();
+    final result = await api.getCollaborators(tripId);
+    realCollabLoading = false;
+    realCollabRefreshing = false;
+    if (result.success && result.data != null) {
+      realCollabTripId = tripId;
+      realCollaborators = result.data!;
+      realCollabLoaded = true;
+      realCollabError = null;
+      notifyListeners();
+      return CollaborationOutcome.success;
+    }
+    final outcome = _mapCollabError(result.errorKind);
+    realCollabError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Invites a collaborator by email (`POST .../collaborators`, owner-only) and
+  /// reloads the list from the backend (no optimistic insert). A blank email is
+  /// rejected client-side. Single-flight via [realCollabMutationInFlight]. Zero
+  /// HTTP in Demo Mode.
+  Future<CollaborationOutcome> inviteRealCollaborator(
+      int tripId, RealCollaboratorPayload payload) async {
+    if (demoMode) return CollaborationOutcome.demoUnavailable;
+    if (payload.email.trim().isEmpty) return CollaborationOutcome.validation;
+    if (realCollabMutationInFlight) return CollaborationOutcome.busy;
+    realCollabMutationInFlight = true;
+    notifyListeners();
+    final result = await api.inviteCollaborator(tripId, payload);
+    realCollabMutationInFlight = false;
+    if (result.success && result.data != null) {
+      notifyListeners();
+      await loadRealCollaborators(tripId, refresh: true);
+      return CollaborationOutcome.success;
+    }
+    final outcome = _mapCollabError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Updates a collaborator's role (`PATCH .../collaborators/{id}`, owner-only)
+  /// and reloads the list. No optimistic mutation. Zero HTTP in Demo Mode.
+  Future<CollaborationOutcome> updateRealCollaboratorRole(
+      int tripId, int collaboratorId, RealCollaboratorPayload payload) async {
+    if (demoMode) return CollaborationOutcome.demoUnavailable;
+    if (payload.email.trim().isEmpty) return CollaborationOutcome.validation;
+    if (realCollabMutationInFlight) return CollaborationOutcome.busy;
+    realCollabMutationInFlight = true;
+    notifyListeners();
+    final result =
+        await api.updateCollaboratorRole(tripId, collaboratorId, payload);
+    realCollabMutationInFlight = false;
+    if (result.success && result.data != null) {
+      notifyListeners();
+      await loadRealCollaborators(tripId, refresh: true);
+      return CollaborationOutcome.success;
+    }
+    final outcome = _mapCollabError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Removes a collaborator (`DELETE .../collaborators/{id}`, owner-only) and
+  /// reloads only after the server confirms. Zero HTTP in Demo Mode.
+  Future<CollaborationOutcome> removeRealCollaborator(
+      int tripId, int collaboratorId) async {
+    if (demoMode) return CollaborationOutcome.demoUnavailable;
+    if (realCollabMutationInFlight) return CollaborationOutcome.busy;
+    realCollabMutationInFlight = true;
+    notifyListeners();
+    final result = await api.removeCollaborator(tripId, collaboratorId);
+    realCollabMutationInFlight = false;
+    if (result.success) {
+      notifyListeners();
+      await loadRealCollaborators(tripId, refresh: true);
+      return CollaborationOutcome.success;
+    }
+    final outcome = _mapCollabError(result.errorKind);
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Toggles a trip's public visibility (`PATCH .../public|private`, owner-only).
+  /// The new state comes from the server response (not an optimistic guess); the
+  /// collaborator list is reloaded afterwards. Zero HTTP in Demo Mode.
+  Future<CollaborationOutcome> setRealTripPublic(
+      int tripId, bool makePublic) async {
+    if (demoMode) return CollaborationOutcome.demoUnavailable;
+    if (realCollabMutationInFlight) return CollaborationOutcome.busy;
+    realCollabMutationInFlight = true;
+    notifyListeners();
+    final result = await api.setTripPublic(tripId, makePublic);
+    realCollabMutationInFlight = false;
+    if (result.success && result.data != null) {
+      realCollabTripId = tripId;
+      realCollabIsPublic = result.data!.isPublic;
+      notifyListeners();
+      await loadRealCollaborators(tripId, refresh: true);
+      return CollaborationOutcome.success;
+    }
+    final outcome = _mapCollabError(result.errorKind);
     notifyListeners();
     return outcome;
   }

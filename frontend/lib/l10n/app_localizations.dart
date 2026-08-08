@@ -13725,6 +13725,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remove the total budget for this trip? Expenses stay unchanged.'**
   String get budgetRealDeleteConfirmMessage;
+
+  /// No description provided for @collaborationRealTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Collaboration'**
+  String get collaborationRealTitle;
+
+  /// No description provided for @collaborationRealLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading collaborators…'**
+  String get collaborationRealLoadingMessage;
+
+  /// No description provided for @collaborationRealErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load collaborators. Pull to refresh or try again.'**
+  String get collaborationRealErrorMessage;
+
+  /// No description provided for @collaborationRealForbiddenMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the trip owner can manage collaborators.'**
+  String get collaborationRealForbiddenMessage;
+
+  /// No description provided for @collaborationRealGoneMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This trip is no longer available.'**
+  String get collaborationRealGoneMessage;
+
+  /// No description provided for @collaborationRealNetworkMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No connection. Check your network and try again.'**
+  String get collaborationRealNetworkMessage;
+
+  /// No description provided for @collaborationRealActionErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'That didn\'t work. Please try again.'**
+  String get collaborationRealActionErrorMessage;
+
+  /// No description provided for @collaborationRealInvitedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Collaborator invited.'**
+  String get collaborationRealInvitedMessage;
+
+  /// No description provided for @collaborationRealRoleUpdatedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Role updated.'**
+  String get collaborationRealRoleUpdatedMessage;
+
+  /// No description provided for @collaborationRealRemovedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Collaborator removed.'**
+  String get collaborationRealRemovedMessage;
+
+  /// No description provided for @collaborationRealPublicOnMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This trip is now public.'**
+  String get collaborationRealPublicOnMessage;
+
+  /// No description provided for @collaborationRealPublicOffMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This trip is private.'**
+  String get collaborationRealPublicOffMessage;
+
+  /// No description provided for @collaborationRealInvalidMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid collaborator email that isn\'t your own.'**
+  String get collaborationRealInvalidMessage;
+
+  /// No description provided for @collaborationRealUserNotFoundMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No registered user has that email.'**
+  String get collaborationRealUserNotFoundMessage;
+
+  /// No description provided for @collaborationRealAlreadyMemberMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This user is already a collaborator.'**
+  String get collaborationRealAlreadyMemberMessage;
+
+  /// No description provided for @collaborationRealEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No collaborators yet'**
+  String get collaborationRealEmptyTitle;
+
+  /// No description provided for @collaborationRealEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite someone by email to view or edit this trip together.'**
+  String get collaborationRealEmptyMessage;
+
+  /// No description provided for @collaborationRealEmailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Collaborator email'**
+  String get collaborationRealEmailLabel;
+
+  /// No description provided for @collaborationRealRoleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Role'**
+  String get collaborationRealRoleLabel;
+
+  /// No description provided for @collaborationRealEditRoleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Change role'**
+  String get collaborationRealEditRoleTitle;
+
+  /// No description provided for @collaborationRealOwnerBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'You own this trip'**
+  String get collaborationRealOwnerBadge;
+
+  /// No description provided for @collaborationRealPublicLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Public visibility'**
+  String get collaborationRealPublicLabel;
+
+  /// No description provided for @collaborationRealAddSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite a collaborator'**
+  String get collaborationRealAddSemantic;
+
+  /// No description provided for @collaborationRealRemoveConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {name} from this trip? They lose access immediately.'**
+  String collaborationRealRemoveConfirmMessage(String name);
 }
 
 class _AppLocalizationsDelegate

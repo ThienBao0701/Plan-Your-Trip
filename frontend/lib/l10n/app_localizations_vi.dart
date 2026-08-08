@@ -7900,4 +7900,89 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get budgetRealDeleteConfirmMessage =>
       'Xóa tổng ngân sách của chuyến đi này? Các khoản chi vẫn được giữ nguyên.';
+
+  @override
+  String get collaborationRealTitle => 'Cộng tác';
+
+  @override
+  String get collaborationRealLoadingMessage => 'Đang tải cộng tác viên…';
+
+  @override
+  String get collaborationRealErrorMessage =>
+      'Không thể tải cộng tác viên. Kéo để làm mới hoặc thử lại.';
+
+  @override
+  String get collaborationRealForbiddenMessage =>
+      'Chỉ chủ chuyến đi mới có thể quản lý cộng tác viên.';
+
+  @override
+  String get collaborationRealGoneMessage =>
+      'Chuyến đi này không còn khả dụng.';
+
+  @override
+  String get collaborationRealNetworkMessage =>
+      'Không có kết nối. Hãy kiểm tra mạng và thử lại.';
+
+  @override
+  String get collaborationRealActionErrorMessage =>
+      'Không thành công. Vui lòng thử lại.';
+
+  @override
+  String get collaborationRealInvitedMessage => 'Đã mời cộng tác viên.';
+
+  @override
+  String get collaborationRealRoleUpdatedMessage => 'Đã cập nhật vai trò.';
+
+  @override
+  String get collaborationRealRemovedMessage => 'Đã xóa cộng tác viên.';
+
+  @override
+  String get collaborationRealPublicOnMessage =>
+      'Chuyến đi này hiện đang công khai.';
+
+  @override
+  String get collaborationRealPublicOffMessage =>
+      'Chuyến đi này ở chế độ riêng tư.';
+
+  @override
+  String get collaborationRealInvalidMessage =>
+      'Hãy nhập email cộng tác viên hợp lệ và không phải của bạn.';
+
+  @override
+  String get collaborationRealUserNotFoundMessage =>
+      'Không có người dùng đã đăng ký nào với email đó.';
+
+  @override
+  String get collaborationRealAlreadyMemberMessage =>
+      'Người dùng này đã là cộng tác viên.';
+
+  @override
+  String get collaborationRealEmptyTitle => 'Chưa có cộng tác viên';
+
+  @override
+  String get collaborationRealEmptyMessage =>
+      'Mời ai đó qua email để cùng xem hoặc chỉnh sửa chuyến đi này.';
+
+  @override
+  String get collaborationRealEmailLabel => 'Email cộng tác viên';
+
+  @override
+  String get collaborationRealRoleLabel => 'Vai trò';
+
+  @override
+  String get collaborationRealEditRoleTitle => 'Đổi vai trò';
+
+  @override
+  String get collaborationRealOwnerBadge => 'Bạn là chủ chuyến đi này';
+
+  @override
+  String get collaborationRealPublicLabel => 'Hiển thị công khai';
+
+  @override
+  String get collaborationRealAddSemantic => 'Mời cộng tác viên';
+
+  @override
+  String collaborationRealRemoveConfirmMessage(String name) {
+    return 'Xóa $name khỏi chuyến đi này? Họ sẽ mất quyền truy cập ngay lập tức.';
+  }
 }

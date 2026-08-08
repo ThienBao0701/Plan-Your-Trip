@@ -12,6 +12,7 @@ import '../auth/login_screen.dart';
 import '../expenses/real_trip_expenses_screen.dart';
 import '../places/place_detail_screen.dart';
 import 'real_trip_budget_screen.dart';
+import 'real_trip_collaboration_screen.dart';
 import 'real_trip_documents_screen.dart';
 import 'real_trip_notes_screen.dart';
 import 'real_trip_packing_screen.dart';
@@ -176,6 +177,20 @@ class _RealTripDetailScreenState extends State<RealTripDetailScreen> {
               ),
             ),
             icon: const Icon(Icons.savings_rounded),
+          ),
+          IconButton(
+            key: const Key('real-trip-collaboration'),
+            tooltip: l10n.collaborationRealTitle,
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => RealTripCollaborationScreen(
+                  tripId: widget.tripId,
+                  tripTitle: detail?.title,
+                  isPublic: detail?.isPublic,
+                ),
+              ),
+            ),
+            icon: const Icon(Icons.group_rounded),
           ),
         ],
       ),

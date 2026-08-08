@@ -8067,4 +8067,87 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get budgetRealDeleteConfirmMessage =>
       'Remove the total budget for this trip? Expenses stay unchanged.';
+
+  @override
+  String get collaborationRealTitle => 'Collaboration';
+
+  @override
+  String get collaborationRealLoadingMessage => 'Loading collaborators…';
+
+  @override
+  String get collaborationRealErrorMessage =>
+      'We couldn\'t load collaborators. Pull to refresh or try again.';
+
+  @override
+  String get collaborationRealForbiddenMessage =>
+      'Only the trip owner can manage collaborators.';
+
+  @override
+  String get collaborationRealGoneMessage =>
+      'This trip is no longer available.';
+
+  @override
+  String get collaborationRealNetworkMessage =>
+      'No connection. Check your network and try again.';
+
+  @override
+  String get collaborationRealActionErrorMessage =>
+      'That didn\'t work. Please try again.';
+
+  @override
+  String get collaborationRealInvitedMessage => 'Collaborator invited.';
+
+  @override
+  String get collaborationRealRoleUpdatedMessage => 'Role updated.';
+
+  @override
+  String get collaborationRealRemovedMessage => 'Collaborator removed.';
+
+  @override
+  String get collaborationRealPublicOnMessage => 'This trip is now public.';
+
+  @override
+  String get collaborationRealPublicOffMessage => 'This trip is private.';
+
+  @override
+  String get collaborationRealInvalidMessage =>
+      'Enter a valid collaborator email that isn\'t your own.';
+
+  @override
+  String get collaborationRealUserNotFoundMessage =>
+      'No registered user has that email.';
+
+  @override
+  String get collaborationRealAlreadyMemberMessage =>
+      'This user is already a collaborator.';
+
+  @override
+  String get collaborationRealEmptyTitle => 'No collaborators yet';
+
+  @override
+  String get collaborationRealEmptyMessage =>
+      'Invite someone by email to view or edit this trip together.';
+
+  @override
+  String get collaborationRealEmailLabel => 'Collaborator email';
+
+  @override
+  String get collaborationRealRoleLabel => 'Role';
+
+  @override
+  String get collaborationRealEditRoleTitle => 'Change role';
+
+  @override
+  String get collaborationRealOwnerBadge => 'You own this trip';
+
+  @override
+  String get collaborationRealPublicLabel => 'Public visibility';
+
+  @override
+  String get collaborationRealAddSemantic => 'Invite a collaborator';
+
+  @override
+  String collaborationRealRemoveConfirmMessage(String name) {
+    return 'Remove $name from this trip? They lose access immediately.';
+  }
 }

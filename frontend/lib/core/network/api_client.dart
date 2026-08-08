@@ -3660,6 +3660,186 @@ class ApiClient {
     }
   }
 
+  // ── Trip Collaboration (/api/me/trips/.../collaborators, UI-48) ──────────────
+  // Owner-only collaborator management + public/private toggle on a real
+  // TripPlan (UI-20). GET list → bare array (createdAt ASC). POST invite (201),
+  // PATCH role, DELETE (204). PATCH public/private → share state. Every
+  // operation here is owner-only (403 for a collaborator, 404 for a stranger).
+  // All authenticated, 8s timeout, no retry.
+
+  /// Lists a trip's collaborators
+  /// (`GET /api/me/trips/{tripId}/collaborators`, owner-only).
+  Future<CollectionApiResult<List<RealCollaborator>>> getCollaborators(
+    int tripId,
+  ) async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/me/trips/$tripId/collaborators'),
+              headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final decoded = jsonDecode(utf8.decode(res.bodyBytes));
+        if (decoded is! List) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(
+          decoded
+              .map((e) => RealCollaborator.fromJson(e as Map<String, dynamic>))
+              .toList(),
+        );
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Invites a collaborator by email
+  /// (`POST /api/me/trips/{tripId}/collaborators`, 201, owner-only).
+  Future<CollectionApiResult<RealCollaborator>> inviteCollaborator(
+    int tripId,
+    RealCollaboratorPayload payload,
+  ) async {
+    try {
+      final res = await _client
+          .post(Uri.parse('$baseUrl/me/trips/$tripId/collaborators'),
+              headers: _jsonHeaders, body: jsonEncode(payload.toJson()))
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealCollaborator.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Updates a collaborator's role
+  /// (`PATCH /api/me/trips/{tripId}/collaborators/{collaboratorId}`, owner-only).
+  Future<CollectionApiResult<RealCollaborator>> updateCollaboratorRole(
+    int tripId,
+    int collaboratorId,
+    RealCollaboratorPayload payload,
+  ) async {
+    try {
+      final res = await _client
+          .patch(
+              Uri.parse(
+                  '$baseUrl/me/trips/$tripId/collaborators/$collaboratorId'),
+              headers: _jsonHeaders,
+              body: jsonEncode(payload.toJson()))
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealCollaborator.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Removes a collaborator
+  /// (`DELETE /api/me/trips/{tripId}/collaborators/{collaboratorId}`, 204,
+  /// owner-only).
+  Future<CollectionApiVoidResult> removeCollaborator(
+    int tripId,
+    int collaboratorId,
+  ) async {
+    try {
+      final res = await _client
+          .delete(
+              Uri.parse(
+                  '$baseUrl/me/trips/$tripId/collaborators/$collaboratorId'),
+              headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 204) {
+        return const CollectionApiVoidResult.success();
+      }
+      return CollectionApiVoidResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Toggles a trip's public visibility
+  /// (`PATCH /api/me/trips/{tripId}/public` or `.../private`, owner-only).
+  Future<CollectionApiResult<RealTripShare>> setTripPublic(
+    int tripId,
+    bool makePublic,
+  ) async {
+    try {
+      final res = await _client
+          .patch(
+              Uri.parse(
+                  '$baseUrl/me/trips/$tripId/${makePublic ? 'public' : 'private'}'),
+              headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealTripShare.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
   Map<String, dynamic> _failureForStatus(http.Response res) {
     Map<String, dynamic>? body;
     try {

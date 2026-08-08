@@ -6853,6 +6853,126 @@ enum BudgetOutcome {
   serverError,
 }
 
+// ── Trip Collaboration (UI-48) ───────────────────────────────────────────────
+// Owner-only collaborator management for a real TripPlan
+// (`/api/me/trips/{tripId}/collaborators` + public/private toggle). Reuses the
+// demo `TripCollaboratorRole` enum (VIEWER/EDITOR, with a `.code` getter).
+
+/// Maps the backend `TripCollaboratorRole` wire code onto the demo enum; null on
+/// an unrecognised code.
+TripCollaboratorRole? collaboratorRoleFromCode(String? code) {
+  switch (code) {
+    case 'VIEWER':
+      return TripCollaboratorRole.viewer;
+    case 'EDITOR':
+      return TripCollaboratorRole.editor;
+    default:
+      return null;
+  }
+}
+
+/// Real-backend mirror of `TripCollaborationDto.TripCollaboratorResponse`.
+class RealCollaborator {
+  final int id;
+  final int tripPlanId;
+  final int userId;
+  final String userEmail;
+  final String userFullName;
+  final String role; // raw wire code
+  final bool active;
+  final DateTime? invitedAt;
+  final DateTime? acceptedAt;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+
+  const RealCollaborator({
+    required this.id,
+    this.tripPlanId = 0,
+    this.userId = 0,
+    this.userEmail = '',
+    this.userFullName = '',
+    this.role = '',
+    this.active = true,
+    this.invitedAt,
+    this.acceptedAt,
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  /// The mapped role, or null if the backend sent an unrecognised code.
+  TripCollaboratorRole? get roleView => collaboratorRoleFromCode(role);
+
+  factory RealCollaborator.fromJson(Map<String, dynamic> json) {
+    return RealCollaborator(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      tripPlanId: (json['tripPlanId'] as num?)?.toInt() ?? 0,
+      userId: (json['userId'] as num?)?.toInt() ?? 0,
+      userEmail: (json['userEmail'] as String?) ?? '',
+      userFullName: (json['userFullName'] as String?) ?? '',
+      role: (json['role'] as String?) ?? '',
+      active: (json['active'] as bool?) ?? true,
+      invitedAt: _tryParseDate(json['invitedAt']),
+      acceptedAt: _tryParseDate(json['acceptedAt']),
+      createdAt: _tryParseDate(json['createdAt']),
+      updatedAt: _tryParseDate(json['updatedAt']),
+    );
+  }
+}
+
+/// Request payload for inviting a collaborator / updating a role
+/// (`TripCollaboratorRequest`). Both `email` (@NotBlank) and `role` (@NotNull)
+/// are required server-side even for a role update, so [toJson] always emits
+/// both (a role update passes the collaborator's existing email).
+class RealCollaboratorPayload {
+  final String email;
+  final TripCollaboratorRole role;
+
+  const RealCollaboratorPayload({required this.email, required this.role});
+
+  Map<String, dynamic> toJson() {
+    return {
+      'email': email,
+      'role': role.code,
+    };
+  }
+}
+
+/// Real-backend mirror of `TripCollaborationDto.TripShareResponse` (the result
+/// of the public/private toggle).
+class RealTripShare {
+  final int tripId;
+  final bool isPublic;
+
+  const RealTripShare({this.tripId = 0, this.isPublic = false});
+
+  factory RealTripShare.fromJson(Map<String, dynamic> json) {
+    return RealTripShare(
+      tripId: (json['tripId'] as num?)?.toInt() ?? 0,
+      isPublic: (json['isPublic'] as bool?) ?? false,
+    );
+  }
+}
+
+/// Outcome of a real collaboration action (load/invite/role/remove/publish).
+/// [demoUnavailable] is the Demo Mode guard (zero HTTP); [busy] the single-flight
+/// guard; [sessionExpired] (401) never triggers auto-logout; [forbidden] 403
+/// (collaborator management is owner-only); [notFound] 404 (trip/collaborator
+/// gone, invited email not registered, or the caller is a stranger);
+/// [conflict] 409 (already a collaborator); [validation] 400 (blank email /
+/// inviting yourself); [serverError] 5xx; [network] transport/timeout.
+enum CollaborationOutcome {
+  success,
+  demoUnavailable,
+  busy,
+  sessionExpired,
+  forbidden,
+  notFound,
+  conflict,
+  validation,
+  network,
+  serverError,
+}
+
 class DemoBooking {
   final String code;
   final String ownerUserId;

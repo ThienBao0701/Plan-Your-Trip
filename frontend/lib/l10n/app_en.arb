@@ -4030,5 +4030,34 @@
   "budgetRealEditAction": "Edit",
   "budgetRealDeleteAction": "Delete budget",
   "budgetRealDeleteConfirmTitle": "Delete budget?",
-  "budgetRealDeleteConfirmMessage": "Remove the total budget for this trip? Expenses stay unchanged."
+  "budgetRealDeleteConfirmMessage": "Remove the total budget for this trip? Expenses stay unchanged.",
+  "collaborationRealTitle": "Collaboration",
+  "collaborationRealLoadingMessage": "Loading collaborators…",
+  "collaborationRealErrorMessage": "We couldn't load collaborators. Pull to refresh or try again.",
+  "collaborationRealForbiddenMessage": "Only the trip owner can manage collaborators.",
+  "collaborationRealGoneMessage": "This trip is no longer available.",
+  "collaborationRealNetworkMessage": "No connection. Check your network and try again.",
+  "collaborationRealActionErrorMessage": "That didn't work. Please try again.",
+  "collaborationRealInvitedMessage": "Collaborator invited.",
+  "collaborationRealRoleUpdatedMessage": "Role updated.",
+  "collaborationRealRemovedMessage": "Collaborator removed.",
+  "collaborationRealPublicOnMessage": "This trip is now public.",
+  "collaborationRealPublicOffMessage": "This trip is private.",
+  "collaborationRealInvalidMessage": "Enter a valid collaborator email that isn't your own.",
+  "collaborationRealUserNotFoundMessage": "No registered user has that email.",
+  "collaborationRealAlreadyMemberMessage": "This user is already a collaborator.",
+  "collaborationRealEmptyTitle": "No collaborators yet",
+  "collaborationRealEmptyMessage": "Invite someone by email to view or edit this trip together.",
+  "collaborationRealEmailLabel": "Collaborator email",
+  "collaborationRealRoleLabel": "Role",
+  "collaborationRealEditRoleTitle": "Change role",
+  "collaborationRealOwnerBadge": "You own this trip",
+  "collaborationRealPublicLabel": "Public visibility",
+  "collaborationRealAddSemantic": "Invite a collaborator",
+  "collaborationRealRemoveConfirmMessage": "Remove {name} from this trip? They lose access immediately.",
+  "@collaborationRealRemoveConfirmMessage": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  }
 }
