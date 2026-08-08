@@ -3832,6 +3832,50 @@ enum ReviewActionOutcome {
 /// [notificationType]/[priority] are kept raw and mapped to the existing
 /// [UserNotificationType]/[UserNotificationPriority] view enums via the shared
 /// wire mappers. `Map` decoding is confined to [fromJson].
+/// Typed view of a notification's `relatedEntityType` (`RelatedEntityType` on the
+/// backend). Only the values that resolve to an existing real customer screen are
+/// acted on by the frontend (see [RealNotificationRecord.hasNavigableTarget]); the
+/// rest are surfaced but not navigable. `null` (from [notificationRelatedEntityFromWire])
+/// means the field was absent or an unrecognised code — never crashes.
+enum NotificationRelatedEntity {
+  booking,
+  payment,
+  hotel,
+  room,
+  promotion,
+  system,
+  partner,
+  message,
+  trip,
+}
+
+/// Maps the backend `RelatedEntityType` wire code onto [NotificationRelatedEntity];
+/// null on an absent or unrecognised code.
+NotificationRelatedEntity? notificationRelatedEntityFromWire(String? code) {
+  switch (code) {
+    case 'BOOKING':
+      return NotificationRelatedEntity.booking;
+    case 'PAYMENT':
+      return NotificationRelatedEntity.payment;
+    case 'HOTEL':
+      return NotificationRelatedEntity.hotel;
+    case 'ROOM':
+      return NotificationRelatedEntity.room;
+    case 'PROMOTION':
+      return NotificationRelatedEntity.promotion;
+    case 'SYSTEM':
+      return NotificationRelatedEntity.system;
+    case 'PARTNER':
+      return NotificationRelatedEntity.partner;
+    case 'MESSAGE':
+      return NotificationRelatedEntity.message;
+    case 'TRIP':
+      return NotificationRelatedEntity.trip;
+    default:
+      return null;
+  }
+}
+
 class RealNotificationRecord {
   final int id;
   final String title;
@@ -3861,6 +3905,21 @@ class RealNotificationRecord {
       userNotificationTypeFromWire(notificationType);
   UserNotificationPriority? get priorityView =>
       userNotificationPriorityFromWire(priority);
+
+  /// The typed related entity, or null if absent/unrecognised. Only populated
+  /// once the backend has returned the full `NotificationResponse` (i.e. after a
+  /// mark-read); the summary list endpoint does not carry it.
+  NotificationRelatedEntity? get relatedEntityView =>
+      notificationRelatedEntityFromWire(relatedEntityType);
+
+  /// Whether this notification links to a real customer screen the app can open
+  /// by id — a [NotificationRelatedEntity.trip] (RealTripDetailScreen) or
+  /// [NotificationRelatedEntity.booking] (RealBookingDetailScreen). Other related
+  /// entity types have no by-id customer destination and are not navigable.
+  bool get hasNavigableTarget =>
+      relatedEntityId != null &&
+      (relatedEntityView == NotificationRelatedEntity.trip ||
+          relatedEntityView == NotificationRelatedEntity.booking);
 
   factory RealNotificationRecord.fromJson(Map<String, dynamic> json) {
     return RealNotificationRecord(

@@ -9,6 +9,8 @@ import '../../design/app_spacing.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/glass_widgets.dart';
 import '../auth/login_screen.dart';
+import '../bookings/real_booking_detail_screen.dart';
+import '../trips/real_trip_detail_screen.dart';
 import 'notifications_screen.dart'
     show notificationTypeLabel, notificationPriorityLabel;
 
@@ -86,6 +88,10 @@ class _RealNotificationsBodyState extends State<RealNotificationsBody> {
       builder: (_) => OceanGlassBottomSheet(
         child: _RealNotificationDetailSheet(
           notificationId: n.id,
+          onOpenTarget: () {
+            Navigator.pop(context);
+            _openTarget(n.id);
+          },
           onDelete: () {
             Navigator.pop(context);
             _confirmDelete(app, n.id);
@@ -93,6 +99,41 @@ class _RealNotificationsBodyState extends State<RealNotificationsBody> {
         ),
       ),
     );
+  }
+
+  /// UI51 — Notifications → actions journey. Opens the real customer screen a
+  /// notification links to. The target ([relatedEntityType]/[relatedEntityId])
+  /// only exists once the notification has been read (the `NotificationResponse`
+  /// carries it; the summary list does not), so this is invoked from the detail
+  /// sheet after [_open] has marked it read. Only TRIP/BOOKING resolve to an
+  /// existing real screen by id; nothing is fabricated for other types.
+  void _openTarget(int id) {
+    final app = AppScope.of(context);
+    RealNotificationRecord? record;
+    for (final item in app.realNotifications) {
+      if (item.id == id) {
+        record = item;
+        break;
+      }
+    }
+    final targetId = record?.relatedEntityId;
+    if (record == null || targetId == null) return;
+    switch (record.relatedEntityView) {
+      case NotificationRelatedEntity.trip:
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => RealTripDetailScreen(tripId: targetId),
+          ),
+        );
+      case NotificationRelatedEntity.booking:
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => RealBookingDetailScreen(bookingId: targetId),
+          ),
+        );
+      default:
+        break;
+    }
   }
 
   Future<void> _confirmDelete(AppState app, int id) async {
@@ -398,12 +439,25 @@ class _RealNotificationCard extends StatelessWidget {
 
 class _RealNotificationDetailSheet extends StatelessWidget {
   final int notificationId;
+  final VoidCallback onOpenTarget;
   final VoidCallback onDelete;
 
   const _RealNotificationDetailSheet({
     required this.notificationId,
+    required this.onOpenTarget,
     required this.onDelete,
   });
+
+  String _openTargetLabel(AppLocalizations l10n, RealNotificationRecord n) {
+    switch (n.relatedEntityView) {
+      case NotificationRelatedEntity.trip:
+        return l10n.notificationOpenTrip;
+      case NotificationRelatedEntity.booking:
+        return l10n.notificationOpenBooking;
+      default:
+        return l10n.notificationOpenTrip;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -478,6 +532,17 @@ class _RealNotificationDetailSheet extends StatelessWidget {
               value: _formatDateTime(context, n.readAt!),
             ),
           const SizedBox(height: AppSpacing.md),
+          if (n.hasNavigableTarget)
+            OceanPrimaryButton(
+              key: const Key('real-notification-open-target'),
+              label: _openTargetLabel(l10n, n),
+              icon: n.relatedEntityView == NotificationRelatedEntity.booking
+                  ? Icons.hotel_rounded
+                  : Icons.map_rounded,
+              semanticLabel: l10n.notificationOpenTargetSemantic,
+              onPressed: onOpenTarget,
+            ),
+          if (n.hasNavigableTarget) const SizedBox(height: AppSpacing.sm),
           OceanSecondaryButton(
             key: const Key('real-notification-delete'),
             label: l10n.notificationDeleteAction,
