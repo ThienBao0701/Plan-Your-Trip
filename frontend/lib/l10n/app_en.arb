@@ -4070,6 +4070,43 @@
   "sharedTripsRealEntryTitle": "Shared with me",
   "sharedTripsRealEntrySubtitle": "Open trips others have invited you to.",
   "sharedTripsRealEntrySemantic": "Shared with me — trips others have invited you to collaborate on",
+  "interestRealTitle": "My travel interests",
+  "interestRealEntryTitle": "Travel interests",
+  "interestRealLoadingMessage": "Loading your interests…",
+  "interestRealErrorMessage": "We couldn't load your interests. Pull to refresh or try again.",
+  "interestRealForbiddenMessage": "You don't have access to this interest profile.",
+  "interestRealGoneMessage": "This interest profile is no longer available.",
+  "interestRealNetworkMessage": "No connection. Check your network and try again.",
+  "interestRealEmptyTitle": "No interests yet",
+  "interestRealEmptyMessage": "Recalculate to build your interest profile from your bookings, wishlist, saved collections and reviews.",
+  "interestRealRecalculateAction": "Recalculate",
+  "interestRealRecalculateSemantic": "Recalculate my interest profile from my activity",
+  "interestRealRecalculatedMessage": "Interests updated.",
+  "interestRealRecalculateErrorMessage": "We couldn't update your interests. Please try again.",
+  "interestRealSignalCount": "{count, plural, =0{No signals yet} =1{Derived from 1 signal} other{Derived from {count} signals}}",
+  "@interestRealSignalCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "interestRealLastUpdated": "Last updated {when}",
+  "@interestRealLastUpdated": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "interestRealTravelStyles": "Travel styles",
+  "interestRealWeather": "Preferred weather",
+  "interestRealBudget": "Budget level",
+  "interestRealCrowd": "Crowd level",
+  "interestRealAccessibility": "Accessibility",
+  "interestRealProvinces": "Favorite destinations",
+  "interestRealCategories": "Favorite categories",
+  "interestRealTags": "Favorite tags",
   "walletRealLoadingMessage": "Loading your wallet…",
   "walletRealErrorMessage": "We couldn't load your wallet. Pull to refresh or try again.",
   "walletRealForbiddenMessage": "You don't have access to this wallet item.",

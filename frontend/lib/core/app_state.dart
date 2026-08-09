@@ -626,6 +626,18 @@ class AppState extends ChangeNotifier {
   bool realWalletMutationInFlight = false;
   WalletOutcome? realWalletError;
 
+  // ── Real Mode Interest Profile (/api/me/interests, UI-52) ─────────────────
+  // The customer's derived, read-only travel-interest profile. Global (not
+  // trip-scoped); a single [recalculateRealInterestProfile] safely re-derives it
+  // from the user's own activity. A 401 never calls logout(). Cleared on logout /
+  // mode / user change via [_resetRealInterestState]. Zero HTTP in Demo Mode.
+  RealInterestProfile? realInterestProfile;
+  bool realInterestLoading = false;
+  bool realInterestLoaded = false;
+  bool realInterestRefreshing = false;
+  bool realInterestRecalculating = false;
+  InterestProfileOutcome? realInterestError;
+
   List<Trip> trips = List.from(MockData.trips);
   List<TimelineItem> timeline = List.from(MockData.timeline);
   List<Expense> expenses = List.from(MockData.expenses);
@@ -739,6 +751,7 @@ class AppState extends ChangeNotifier {
     _resetRealCollaborationState();
     _resetRealSharedTripsState();
     _resetRealWalletState();
+    _resetRealInterestState();
     trips = List.from(MockData.trips);
     timeline = List.from(MockData.timeline);
     expenses = List.from(MockData.expenses);
@@ -1052,6 +1065,15 @@ class AppState extends ChangeNotifier {
     realWalletError = null;
   }
 
+  void _resetRealInterestState() {
+    realInterestProfile = null;
+    realInterestLoading = false;
+    realInterestLoaded = false;
+    realInterestRefreshing = false;
+    realInterestRecalculating = false;
+    realInterestError = null;
+  }
+
   void _resetRealNotificationsState() {
     realNotifications = [];
     realNotificationsLoading = false;
@@ -1207,6 +1229,7 @@ class AppState extends ChangeNotifier {
     _resetRealCollaborationState();
     _resetRealSharedTripsState();
     _resetRealWalletState();
+    _resetRealInterestState();
     timeline = [];
     expenses = [];
     demoBookings = [];
@@ -5943,6 +5966,84 @@ class AppState extends ChangeNotifier {
     }
     final outcome = _mapSharedTripsError(result.errorKind);
     realSharedTripsError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  // ── Real Mode Interest Profile (UI-52) ───────────────────────────────────
+
+  InterestProfileOutcome _mapInterestError(ApiErrorKind? kind) {
+    return switch (kind) {
+      ApiErrorKind.unauthorized => InterestProfileOutcome.sessionExpired,
+      ApiErrorKind.forbidden => InterestProfileOutcome.forbidden,
+      ApiErrorKind.notFound => InterestProfileOutcome.notFound,
+      ApiErrorKind.network => InterestProfileOutcome.network,
+      ApiErrorKind.timeout => InterestProfileOutcome.network,
+      ApiErrorKind.server => InterestProfileOutcome.serverError,
+      _ => InterestProfileOutcome.serverError,
+    };
+  }
+
+  /// Loads the derived interest profile (`GET /api/me/interests`). [refresh]
+  /// forces a re-fetch and preserves the current profile on failure.
+  /// Single-flight; cached after first success. Zero HTTP in Demo Mode.
+  Future<InterestProfileOutcome> loadRealInterestProfile(
+      {bool refresh = false}) async {
+    if (demoMode) return InterestProfileOutcome.demoUnavailable;
+    if (realInterestLoading ||
+        realInterestRefreshing ||
+        realInterestRecalculating) {
+      return InterestProfileOutcome.busy;
+    }
+    if (realInterestLoaded && !refresh) return InterestProfileOutcome.success;
+    if (realInterestLoaded && refresh) {
+      realInterestRefreshing = true;
+    } else {
+      realInterestLoading = true;
+    }
+    realInterestError = null;
+    notifyListeners();
+    final result = await api.getInterestProfile();
+    realInterestLoading = false;
+    realInterestRefreshing = false;
+    if (result.success && result.data != null) {
+      realInterestProfile = result.data;
+      realInterestLoaded = true;
+      realInterestError = null;
+      notifyListeners();
+      return InterestProfileOutcome.success;
+    }
+    final outcome = _mapInterestError(result.errorKind);
+    realInterestError = outcome;
+    notifyListeners();
+    return outcome;
+  }
+
+  /// Re-derives the interest profile (`POST /api/me/interests/recalculate`).
+  /// Single-flight via [realInterestRecalculating]; on success replaces the
+  /// stored profile with the returned one (no optimistic update). Preserves the
+  /// current profile on failure. Zero HTTP in Demo Mode.
+  Future<InterestProfileOutcome> recalculateRealInterestProfile() async {
+    if (demoMode) return InterestProfileOutcome.demoUnavailable;
+    if (realInterestLoading ||
+        realInterestRefreshing ||
+        realInterestRecalculating) {
+      return InterestProfileOutcome.busy;
+    }
+    realInterestRecalculating = true;
+    realInterestError = null;
+    notifyListeners();
+    final result = await api.recalculateInterestProfile();
+    realInterestRecalculating = false;
+    if (result.success && result.data != null) {
+      realInterestProfile = result.data;
+      realInterestLoaded = true;
+      realInterestError = null;
+      notifyListeners();
+      return InterestProfileOutcome.success;
+    }
+    final outcome = _mapInterestError(result.errorKind);
+    realInterestError = outcome;
     notifyListeners();
     return outcome;
   }

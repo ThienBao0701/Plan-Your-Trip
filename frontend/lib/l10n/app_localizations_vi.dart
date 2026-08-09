@@ -8024,6 +8024,92 @@ class AppLocalizationsVi extends AppLocalizations {
       'Được chia sẻ với tôi — những chuyến đi mà người khác đã mời bạn cùng cộng tác';
 
   @override
+  String get interestRealTitle => 'Sở thích du lịch của tôi';
+
+  @override
+  String get interestRealEntryTitle => 'Sở thích du lịch';
+
+  @override
+  String get interestRealLoadingMessage => 'Đang tải sở thích của bạn…';
+
+  @override
+  String get interestRealErrorMessage =>
+      'Chúng tôi không thể tải sở thích của bạn. Kéo để làm mới hoặc thử lại.';
+
+  @override
+  String get interestRealForbiddenMessage =>
+      'Bạn không có quyền truy cập hồ sơ sở thích này.';
+
+  @override
+  String get interestRealGoneMessage =>
+      'Hồ sơ sở thích này không còn khả dụng.';
+
+  @override
+  String get interestRealNetworkMessage =>
+      'Không có kết nối. Kiểm tra mạng và thử lại.';
+
+  @override
+  String get interestRealEmptyTitle => 'Chưa có sở thích nào';
+
+  @override
+  String get interestRealEmptyMessage =>
+      'Tính toán lại để xây dựng hồ sơ sở thích của bạn từ các đặt chỗ, danh sách yêu thích, bộ sưu tập đã lưu và đánh giá.';
+
+  @override
+  String get interestRealRecalculateAction => 'Tính toán lại';
+
+  @override
+  String get interestRealRecalculateSemantic =>
+      'Tính toán lại hồ sơ sở thích của tôi từ hoạt động của tôi';
+
+  @override
+  String get interestRealRecalculatedMessage => 'Đã cập nhật sở thích.';
+
+  @override
+  String get interestRealRecalculateErrorMessage =>
+      'Chúng tôi không thể cập nhật sở thích của bạn. Vui lòng thử lại.';
+
+  @override
+  String interestRealSignalCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Suy ra từ $count tín hiệu',
+      zero: 'Chưa có tín hiệu nào',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String interestRealLastUpdated(String when) {
+    return 'Cập nhật lần cuối $when';
+  }
+
+  @override
+  String get interestRealTravelStyles => 'Phong cách du lịch';
+
+  @override
+  String get interestRealWeather => 'Thời tiết ưa thích';
+
+  @override
+  String get interestRealBudget => 'Mức ngân sách';
+
+  @override
+  String get interestRealCrowd => 'Mức độ đông đúc';
+
+  @override
+  String get interestRealAccessibility => 'Khả năng tiếp cận';
+
+  @override
+  String get interestRealProvinces => 'Điểm đến yêu thích';
+
+  @override
+  String get interestRealCategories => 'Danh mục yêu thích';
+
+  @override
+  String get interestRealTags => 'Thẻ yêu thích';
+
+  @override
   String get walletRealLoadingMessage => 'Đang tải ví của bạn…';
 
   @override

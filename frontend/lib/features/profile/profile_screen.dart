@@ -20,6 +20,7 @@ import '../reviews/reviews_screen.dart';
 import '../wallet/travel_wallet_screen.dart';
 import 'notifications_screen.dart';
 import 'real_customer_profile_screen.dart';
+import 'real_interest_profile_screen.dart';
 import 'saved_places_screen.dart';
 import 'settings_screen.dart';
 import 'static_page.dart';
@@ -277,6 +278,20 @@ class ProfileScreen extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (_) => const RealAiContextScreen(),
+              ),
+            ),
+          ),
+        // UI52: read-only derived interest profile lives on the backend only.
+        // Shown in Real Mode; Demo Mode is byte-identical (no extra card).
+        if (!isDemo)
+          _ProfileNavCard(
+            key: const Key('profile-interest'),
+            icon: Icons.interests_rounded,
+            title: l10n.interestRealEntryTitle,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const RealInterestProfileScreen(),
               ),
             ),
           ),

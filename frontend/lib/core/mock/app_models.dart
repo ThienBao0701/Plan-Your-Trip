@@ -7099,6 +7099,97 @@ enum SharedTripsOutcome {
   serverError,
 }
 
+// ── Interest Profile (UI-52) ─────────────────────────────────────────────────
+// The customer's derived, read-only travel-interest profile
+// (`GET /api/me/interests`). Deterministically aggregated by the backend from the
+// user's own completed bookings, wishlist, saved collections and approved reviews.
+// A single safe `POST /recalculate` re-derives it. Enum-mode fields are raw wire
+// tokens (nullable when no signal carried that dimension); the shared
+// `travelStyleLabel`/`weatherTypeLabel`/… helpers (shared/enum_labels.dart) map
+// them for display, falling back to a humanized token on any unknown value.
+
+/// Real-backend mirror of `UserInterestDto.InterestProfileResponse`. Read-only
+/// (no `toJson` — recalculate carries no body). List fields are the backend's
+/// deterministic, de-duplicated top-N summaries; enum fields are raw tokens.
+class RealInterestProfile {
+  final int? userId;
+  final List<String> preferredTravelStyles; // raw wire tokens
+  final List<String> preferredWeatherTypes; // raw wire tokens
+  final String? preferredBudgetLevel; // raw wire token, null if no signal
+  final String? preferredCrowdLevel; // raw wire token, null if no signal
+  final String?
+      preferredAccessibilityLevel; // raw wire token, null if no signal
+  final List<String> favoriteProvinces;
+  final List<String> favoriteCategories;
+  final List<String> favoriteTags;
+  final int signalCount;
+  final DateTime? lastRecalculatedAt;
+
+  const RealInterestProfile({
+    this.userId,
+    this.preferredTravelStyles = const [],
+    this.preferredWeatherTypes = const [],
+    this.preferredBudgetLevel,
+    this.preferredCrowdLevel,
+    this.preferredAccessibilityLevel,
+    this.favoriteProvinces = const [],
+    this.favoriteCategories = const [],
+    this.favoriteTags = const [],
+    this.signalCount = 0,
+    this.lastRecalculatedAt,
+  });
+
+  /// True when the profile carries no signal at all (fresh account or before the
+  /// first recalculation) — drives the "recalculate to build your profile" state.
+  bool get isEmpty =>
+      signalCount == 0 &&
+      preferredTravelStyles.isEmpty &&
+      preferredWeatherTypes.isEmpty &&
+      preferredBudgetLevel == null &&
+      preferredCrowdLevel == null &&
+      preferredAccessibilityLevel == null &&
+      favoriteProvinces.isEmpty &&
+      favoriteCategories.isEmpty &&
+      favoriteTags.isEmpty;
+
+  static List<String> _stringList(Object? raw) {
+    if (raw is! List) return const [];
+    return raw.map((e) => e.toString()).toList();
+  }
+
+  factory RealInterestProfile.fromJson(Map<String, dynamic> json) {
+    return RealInterestProfile(
+      userId: (json['userId'] as num?)?.toInt(),
+      preferredTravelStyles: _stringList(json['preferredTravelStyles']),
+      preferredWeatherTypes: _stringList(json['preferredWeatherTypes']),
+      preferredBudgetLevel: json['preferredBudgetLevel'] as String?,
+      preferredCrowdLevel: json['preferredCrowdLevel'] as String?,
+      preferredAccessibilityLevel:
+          json['preferredAccessibilityLevel'] as String?,
+      favoriteProvinces: _stringList(json['favoriteProvinces']),
+      favoriteCategories: _stringList(json['favoriteCategories']),
+      favoriteTags: _stringList(json['favoriteTags']),
+      signalCount: (json['signalCount'] as num?)?.toInt() ?? 0,
+      lastRecalculatedAt: _tryParseDate(json['lastRecalculatedAt']),
+    );
+  }
+}
+
+/// Outcome of loading or recalculating the real interest profile. [demoUnavailable]
+/// is the Demo Mode guard (zero HTTP); [busy] is the single-flight guard;
+/// [sessionExpired] (401) never triggers auto-logout; [forbidden] 403; [notFound]
+/// 404; [serverError] 5xx/malformed; [network] transport/timeout.
+enum InterestProfileOutcome {
+  success,
+  demoUnavailable,
+  busy,
+  sessionExpired,
+  forbidden,
+  notFound,
+  network,
+  serverError,
+}
+
 // ── Travel Wallet (UI-50) ────────────────────────────────────────────────────
 // The customer's Travel Wallet (`/api/me/travel-wallet`) — a per-user organizer
 // of documents/vouchers/tickets. Owner-only CRUD + favorite/archive toggles.

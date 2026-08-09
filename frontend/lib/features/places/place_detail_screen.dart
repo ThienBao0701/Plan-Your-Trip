@@ -8,6 +8,7 @@ import '../../design/app_icon_sizes.dart';
 import '../../design/app_radii.dart';
 import '../../design/app_spacing.dart';
 import '../../l10n/app_localizations.dart';
+import '../../shared/enum_labels.dart';
 import '../../shared/widgets/add_to_trip_sheet.dart';
 import '../../shared/widgets/bookmark_button.dart';
 import '../../shared/widgets/glass_widgets.dart';
@@ -1516,36 +1517,13 @@ class _RealRoomPreviewCard extends StatelessWidget {
 
 // ── Localized enum labels (raw backend UPPER token → l10n; humanized fallback) ─
 
-String _humanizeEnum(String raw) {
-  final cleaned = raw.replaceAll('_', ' ').trim().toLowerCase();
-  if (cleaned.isEmpty) return raw;
-  return cleaned
-      .split(' ')
-      .where((w) => w.isNotEmpty)
-      .map((w) => '${w[0].toUpperCase()}${w.substring(1)}')
-      .join(' ');
-}
+// Shared personalization-dimension labels live in `shared/enum_labels.dart`
+// (reused by the real Interest Profile, UI-52). These thin wrappers keep the
+// existing call sites unchanged while routing to the single source of truth.
+String _humanizeEnum(String raw) => humanizeEnumToken(raw);
 
-String _travelStyleLabel(AppLocalizations l10n, String raw) {
-  switch (raw.toUpperCase()) {
-    case 'SOLO':
-      return l10n.travelStyleSolo;
-    case 'COUPLE':
-      return l10n.travelStyleCouple;
-    case 'FAMILY':
-      return l10n.travelStyleFamily;
-    case 'FRIENDS':
-      return l10n.travelStyleFriends;
-    case 'BUSINESS':
-      return l10n.travelStyleBusiness;
-    case 'BACKPACKER':
-      return l10n.travelStyleBackpacker;
-    case 'LUXURY':
-      return l10n.travelStyleLuxury;
-    default:
-      return _humanizeEnum(raw);
-  }
-}
+String _travelStyleLabel(AppLocalizations l10n, String raw) =>
+    travelStyleLabel(l10n, raw);
 
 String _bestVisitTimeLabel(AppLocalizations l10n, String raw) {
   switch (raw.toUpperCase()) {
@@ -1583,39 +1561,11 @@ String _bestSeasonLabel(AppLocalizations l10n, String raw) {
   }
 }
 
-String _weatherLabel(AppLocalizations l10n, String raw) {
-  switch (raw.toUpperCase()) {
-    case 'SUNNY':
-      return l10n.weatherSunny;
-    case 'CLOUDY':
-      return l10n.weatherCloudy;
-    case 'RAINY':
-      return l10n.weatherRainy;
-    case 'COOL':
-      return l10n.weatherCool;
-    case 'ANY':
-      return l10n.weatherAny;
-    default:
-      return _humanizeEnum(raw);
-  }
-}
+String _weatherLabel(AppLocalizations l10n, String raw) =>
+    weatherTypeLabel(l10n, raw);
 
-String _budgetLabel(AppLocalizations l10n, String raw) {
-  switch (raw.toUpperCase()) {
-    case 'FREE':
-      return l10n.budgetFree;
-    case 'LOW':
-      return l10n.budgetLow;
-    case 'MEDIUM':
-      return l10n.budgetMedium;
-    case 'HIGH':
-      return l10n.budgetHigh;
-    case 'LUXURY':
-      return l10n.budgetLuxury;
-    default:
-      return _humanizeEnum(raw);
-  }
-}
+String _budgetLabel(AppLocalizations l10n, String raw) =>
+    budgetLevelLabel(l10n, raw);
 
 String _difficultyLabel(AppLocalizations l10n, String raw) {
   switch (raw.toUpperCase()) {
@@ -1630,31 +1580,11 @@ String _difficultyLabel(AppLocalizations l10n, String raw) {
   }
 }
 
-String _accessibilityLabel(AppLocalizations l10n, String raw) {
-  switch (raw.toUpperCase()) {
-    case 'LOW':
-      return l10n.accessibilityLow;
-    case 'MEDIUM':
-      return l10n.accessibilityMedium;
-    case 'HIGH':
-      return l10n.accessibilityHigh;
-    default:
-      return _humanizeEnum(raw);
-  }
-}
+String _accessibilityLabel(AppLocalizations l10n, String raw) =>
+    accessibilityLevelLabel(l10n, raw);
 
-String _crowdLabel(AppLocalizations l10n, String raw) {
-  switch (raw.toUpperCase()) {
-    case 'LOW':
-      return l10n.crowdLow;
-    case 'MEDIUM':
-      return l10n.crowdMedium;
-    case 'HIGH':
-      return l10n.crowdHigh;
-    default:
-      return _humanizeEnum(raw);
-  }
-}
+String _crowdLabel(AppLocalizations l10n, String raw) =>
+    crowdLevelLabel(l10n, raw);
 
 String _flagLabel(AppLocalizations l10n, String flag) {
   switch (flag) {

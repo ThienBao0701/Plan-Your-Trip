@@ -13930,6 +13930,144 @@ abstract class AppLocalizations {
   /// **'Shared with me — trips others have invited you to collaborate on'**
   String get sharedTripsRealEntrySemantic;
 
+  /// No description provided for @interestRealTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My travel interests'**
+  String get interestRealTitle;
+
+  /// No description provided for @interestRealEntryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Travel interests'**
+  String get interestRealEntryTitle;
+
+  /// No description provided for @interestRealLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading your interests…'**
+  String get interestRealLoadingMessage;
+
+  /// No description provided for @interestRealErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load your interests. Pull to refresh or try again.'**
+  String get interestRealErrorMessage;
+
+  /// No description provided for @interestRealForbiddenMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have access to this interest profile.'**
+  String get interestRealForbiddenMessage;
+
+  /// No description provided for @interestRealGoneMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This interest profile is no longer available.'**
+  String get interestRealGoneMessage;
+
+  /// No description provided for @interestRealNetworkMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No connection. Check your network and try again.'**
+  String get interestRealNetworkMessage;
+
+  /// No description provided for @interestRealEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No interests yet'**
+  String get interestRealEmptyTitle;
+
+  /// No description provided for @interestRealEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Recalculate to build your interest profile from your bookings, wishlist, saved collections and reviews.'**
+  String get interestRealEmptyMessage;
+
+  /// No description provided for @interestRealRecalculateAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Recalculate'**
+  String get interestRealRecalculateAction;
+
+  /// No description provided for @interestRealRecalculateSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Recalculate my interest profile from my activity'**
+  String get interestRealRecalculateSemantic;
+
+  /// No description provided for @interestRealRecalculatedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Interests updated.'**
+  String get interestRealRecalculatedMessage;
+
+  /// No description provided for @interestRealRecalculateErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t update your interests. Please try again.'**
+  String get interestRealRecalculateErrorMessage;
+
+  /// No description provided for @interestRealSignalCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No signals yet} =1{Derived from 1 signal} other{Derived from {count} signals}}'**
+  String interestRealSignalCount(int count);
+
+  /// No description provided for @interestRealLastUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Last updated {when}'**
+  String interestRealLastUpdated(String when);
+
+  /// No description provided for @interestRealTravelStyles.
+  ///
+  /// In en, this message translates to:
+  /// **'Travel styles'**
+  String get interestRealTravelStyles;
+
+  /// No description provided for @interestRealWeather.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferred weather'**
+  String get interestRealWeather;
+
+  /// No description provided for @interestRealBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget level'**
+  String get interestRealBudget;
+
+  /// No description provided for @interestRealCrowd.
+  ///
+  /// In en, this message translates to:
+  /// **'Crowd level'**
+  String get interestRealCrowd;
+
+  /// No description provided for @interestRealAccessibility.
+  ///
+  /// In en, this message translates to:
+  /// **'Accessibility'**
+  String get interestRealAccessibility;
+
+  /// No description provided for @interestRealProvinces.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorite destinations'**
+  String get interestRealProvinces;
+
+  /// No description provided for @interestRealCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorite categories'**
+  String get interestRealCategories;
+
+  /// No description provided for @interestRealTags.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorite tags'**
+  String get interestRealTags;
+
   /// No description provided for @walletRealLoadingMessage.
   ///
   /// In en, this message translates to:

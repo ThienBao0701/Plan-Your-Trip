@@ -8188,6 +8188,93 @@ class AppLocalizationsEn extends AppLocalizations {
       'Shared with me — trips others have invited you to collaborate on';
 
   @override
+  String get interestRealTitle => 'My travel interests';
+
+  @override
+  String get interestRealEntryTitle => 'Travel interests';
+
+  @override
+  String get interestRealLoadingMessage => 'Loading your interests…';
+
+  @override
+  String get interestRealErrorMessage =>
+      'We couldn\'t load your interests. Pull to refresh or try again.';
+
+  @override
+  String get interestRealForbiddenMessage =>
+      'You don\'t have access to this interest profile.';
+
+  @override
+  String get interestRealGoneMessage =>
+      'This interest profile is no longer available.';
+
+  @override
+  String get interestRealNetworkMessage =>
+      'No connection. Check your network and try again.';
+
+  @override
+  String get interestRealEmptyTitle => 'No interests yet';
+
+  @override
+  String get interestRealEmptyMessage =>
+      'Recalculate to build your interest profile from your bookings, wishlist, saved collections and reviews.';
+
+  @override
+  String get interestRealRecalculateAction => 'Recalculate';
+
+  @override
+  String get interestRealRecalculateSemantic =>
+      'Recalculate my interest profile from my activity';
+
+  @override
+  String get interestRealRecalculatedMessage => 'Interests updated.';
+
+  @override
+  String get interestRealRecalculateErrorMessage =>
+      'We couldn\'t update your interests. Please try again.';
+
+  @override
+  String interestRealSignalCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Derived from $count signals',
+      one: 'Derived from 1 signal',
+      zero: 'No signals yet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String interestRealLastUpdated(String when) {
+    return 'Last updated $when';
+  }
+
+  @override
+  String get interestRealTravelStyles => 'Travel styles';
+
+  @override
+  String get interestRealWeather => 'Preferred weather';
+
+  @override
+  String get interestRealBudget => 'Budget level';
+
+  @override
+  String get interestRealCrowd => 'Crowd level';
+
+  @override
+  String get interestRealAccessibility => 'Accessibility';
+
+  @override
+  String get interestRealProvinces => 'Favorite destinations';
+
+  @override
+  String get interestRealCategories => 'Favorite categories';
+
+  @override
+  String get interestRealTags => 'Favorite tags';
+
+  @override
   String get walletRealLoadingMessage => 'Loading your wallet…';
 
   @override

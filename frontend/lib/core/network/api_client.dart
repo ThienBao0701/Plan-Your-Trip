@@ -3736,6 +3736,76 @@ class ApiClient {
     }
   }
 
+  // ── Interest Profile (/api/me/interests, UI-52) ──────────────────────────
+
+  /// Fetches the authenticated user's derived interest profile
+  /// (`GET /api/me/interests`). Returns an empty snapshot until the first
+  /// recalculation; own-scoped (401 unauthenticated).
+  Future<CollectionApiResult<RealInterestProfile>> getInterestProfile() async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/me/interests'), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final decoded = jsonDecode(utf8.decode(res.bodyBytes));
+        if (decoded is! Map<String, dynamic>) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(
+          RealInterestProfile.fromJson(decoded),
+        );
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Re-derives the authenticated user's interest profile from their current
+  /// bookings/wishlist/collections/reviews (`POST /api/me/interests/recalculate`,
+  /// no body). Deterministic backend aggregation; returns the refreshed profile.
+  Future<CollectionApiResult<RealInterestProfile>>
+      recalculateInterestProfile() async {
+    try {
+      final res = await _client
+          .post(
+            Uri.parse('$baseUrl/me/interests/recalculate'),
+            headers: _jsonHeaders,
+          )
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final decoded = jsonDecode(utf8.decode(res.bodyBytes));
+        if (decoded is! Map<String, dynamic>) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(
+          RealInterestProfile.fromJson(decoded),
+        );
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
   /// Invites a collaborator by email
   /// (`POST /api/me/trips/{tripId}/collaborators`, 201, owner-only).
   Future<CollectionApiResult<RealCollaborator>> inviteCollaborator(

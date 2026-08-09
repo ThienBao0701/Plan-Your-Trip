@@ -4070,6 +4070,43 @@
   "sharedTripsRealEntryTitle": "Được chia sẻ với tôi",
   "sharedTripsRealEntrySubtitle": "Mở những chuyến đi mà người khác đã mời bạn.",
   "sharedTripsRealEntrySemantic": "Được chia sẻ với tôi — những chuyến đi mà người khác đã mời bạn cùng cộng tác",
+  "interestRealTitle": "Sở thích du lịch của tôi",
+  "interestRealEntryTitle": "Sở thích du lịch",
+  "interestRealLoadingMessage": "Đang tải sở thích của bạn…",
+  "interestRealErrorMessage": "Chúng tôi không thể tải sở thích của bạn. Kéo để làm mới hoặc thử lại.",
+  "interestRealForbiddenMessage": "Bạn không có quyền truy cập hồ sơ sở thích này.",
+  "interestRealGoneMessage": "Hồ sơ sở thích này không còn khả dụng.",
+  "interestRealNetworkMessage": "Không có kết nối. Kiểm tra mạng và thử lại.",
+  "interestRealEmptyTitle": "Chưa có sở thích nào",
+  "interestRealEmptyMessage": "Tính toán lại để xây dựng hồ sơ sở thích của bạn từ các đặt chỗ, danh sách yêu thích, bộ sưu tập đã lưu và đánh giá.",
+  "interestRealRecalculateAction": "Tính toán lại",
+  "interestRealRecalculateSemantic": "Tính toán lại hồ sơ sở thích của tôi từ hoạt động của tôi",
+  "interestRealRecalculatedMessage": "Đã cập nhật sở thích.",
+  "interestRealRecalculateErrorMessage": "Chúng tôi không thể cập nhật sở thích của bạn. Vui lòng thử lại.",
+  "interestRealSignalCount": "{count, plural, =0{Chưa có tín hiệu nào} other{Suy ra từ {count} tín hiệu}}",
+  "@interestRealSignalCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "interestRealLastUpdated": "Cập nhật lần cuối {when}",
+  "@interestRealLastUpdated": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "interestRealTravelStyles": "Phong cách du lịch",
+  "interestRealWeather": "Thời tiết ưa thích",
+  "interestRealBudget": "Mức ngân sách",
+  "interestRealCrowd": "Mức độ đông đúc",
+  "interestRealAccessibility": "Khả năng tiếp cận",
+  "interestRealProvinces": "Điểm đến yêu thích",
+  "interestRealCategories": "Danh mục yêu thích",
+  "interestRealTags": "Thẻ yêu thích",
   "walletRealLoadingMessage": "Đang tải ví của bạn…",
   "walletRealErrorMessage": "Không thể tải ví của bạn. Kéo để làm mới hoặc thử lại.",
   "walletRealForbiddenMessage": "Bạn không có quyền truy cập mục ví này.",
