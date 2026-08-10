@@ -3,6 +3,8 @@ package com.example.planyourtrip.config;
 import com.example.planyourtrip.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -30,24 +32,35 @@ public class SecurityConfig {
     }
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwt) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwt,
+                                            Environment env) throws Exception {
+        // DB-06 — API docs (springdoc) and the H2 console are dev/test surfaces only. springdoc is
+        // additionally disabled in application-prod.properties; here we ALSO refuse to permitAll their
+        // paths under the prod profile (defense-in-depth) so they can never be publicly reachable in
+        // production even if a docs bean were re-enabled by mistake.
+        boolean prod = env.acceptsProfiles(Profiles.of("prod"));
         return http
             .csrf(csrf -> csrf.disable())
             .cors(c -> {})
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(a -> a
-                .requestMatchers(
+            .authorizeHttpRequests(a -> {
+                a.requestMatchers(
                     "/api/auth/**",
-                    "/api/health",
+                    // /api/health (liveness) + /api/health/ready (DB-06 readiness) — both public.
+                    "/api/health/**",
                     // Phase 7.27 — real provider webhooks are unauthenticated but
                     // signature-verified inside PaymentGatewayService.processWebhook.
-                    "/api/webhooks/payments/**",
-                    "/swagger-ui/**",
-                    "/swagger-ui.html",
-                    "/v3/api-docs/**",
-                    "/h2-console/**"
-                ).permitAll()
-                .requestMatchers(HttpMethod.GET,
+                    "/api/webhooks/payments/**"
+                ).permitAll();
+                if (!prod) {
+                    a.requestMatchers(
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/v3/api-docs/**",
+                        "/h2-console/**"
+                    ).permitAll();
+                }
+                a.requestMatchers(HttpMethod.GET,
                     "/api/locations/**",
                     "/api/categories/**",
                     "/api/amenities/**",
@@ -58,15 +71,15 @@ public class SecurityConfig {
                     "/api/rooms/*/rate-plans",
                     "/api/rooms/*/rate-plans/**",
                     "/api/trips/public/**"
-                ).permitAll()
+                ).permitAll();
                 // Phase 7.32 — public canonical pricing quote (POST body). Read-only; same
                 // public visibility as the legacy GET /api/rooms/{roomId}/pricing endpoint.
-                .requestMatchers(HttpMethod.POST, "/api/rooms/*/pricing/quote").permitAll()
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .requestMatchers("/api/partner/profile/**").authenticated()
-                .requestMatchers("/api/partner/**").hasAnyRole("PARTNER", "ADMIN")
-                .anyRequest().authenticated()
-            )
+                a.requestMatchers(HttpMethod.POST, "/api/rooms/*/pricing/quote").permitAll();
+                a.requestMatchers("/api/admin/**").hasRole("ADMIN");
+                a.requestMatchers("/api/partner/profile/**").authenticated();
+                a.requestMatchers("/api/partner/**").hasAnyRole("PARTNER", "ADMIN");
+                a.anyRequest().authenticated();
+            })
             .headers(h -> h.frameOptions(f -> f.sameOrigin()))
             .exceptionHandling(e -> e
                 .authenticationEntryPoint((req, res, ex) -> {
