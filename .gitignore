@@ -39,3 +39,18 @@ app.log.err
 app_err.txt
 app_out.txt
 logs/
+
+### INFRA-02 — infrastructure secrets & artifacts ###
+# Host-only environment file with real secrets — NEVER commit it (the template .env.example is tracked).
+.env
+*.env
+!.env.example
+# Built Flutter Web bundle served by Nginx (produced by `flutter build web`, not source).
+web/build/
+frontend/build/
+# SQL Server native backups / certs.
+*.bak
+backups/
+*.pem
+*.key
+*.crt

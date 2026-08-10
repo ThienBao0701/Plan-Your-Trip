@@ -1,0 +1,36 @@
+# INFRA-02 — keep the backend build context small and secret-free.
+# NOTE: do NOT exclude .mvn/, mvnw, pom.xml, or src/ — the multi-stage build needs them.
+.git
+.github
+target/
+build/
+**/build/
+.idea
+.vscode
+*.iml
+*.iws
+*.ipr
+
+# Secrets / local env — never send these into a build context or image layer.
+.env
+*.env
+!.env.example
+
+# Logs / temp
+*.log
+*.log.*
+logs/
+app_out.txt
+app_err.txt
+
+# Docs / infra that the image does not need
+DEPLOYMENT.md
+HELP.md
+docker-compose.yml
+nginx/
+scripts/
+db/init/
+
+# Built Flutter web output (served by nginx, not baked into the backend image)
+web/build/
+frontend/build/

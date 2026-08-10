@@ -1,0 +1,56 @@
+# INFRA-02 — Continuous Integration (test/build only; NO automatic deployment).
+#
+# Two independent jobs because the monorepo currently splits work across two branches:
+#   - backend on `develop`               (this worktree: pom.xml + src at repo root)
+#   - frontend on `feature/frontend-ui-v2` (frontend/ package)
+# Each job checks out its authoritative branch explicitly, so CI works regardless of which branch
+# triggered it and no job fails merely because the other side's files are absent on this branch.
+# When the branches are unified, the `ref:` pins can be dropped.
+#
+# No real production secrets are used. The DB-05 SQL Server chain test stays gated by
+# DB05_SQLSERVER_VERIFY (unset here) and self-skips — it must never fail ordinary CI.
+
+name: CI
+
+on:
+  push:
+    branches: [develop, feature/frontend-ui-v2]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  backend:
+    name: Backend (mvnw test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: develop
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Run backend test suite (H2; DB-05 SQL Server test stays gated/skipped)
+        run: ./mvnw -B test
+      - name: Build production jar
+        run: ./mvnw -B -DskipTests package
+
+  frontend:
+    name: Frontend (analyze + test + web build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/frontend-ui-v2
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+      - name: Build same-origin web bundle
+        run: flutter build web --release --dart-define=API_BASE_URL=/api
