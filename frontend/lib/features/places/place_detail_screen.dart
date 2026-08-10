@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../core/app_state.dart';
@@ -491,6 +493,10 @@ class _RealPlaceDetailViewState extends State<_RealPlaceDetailView> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       final app = AppScope.of(context);
+      // Record the view so the real "Recently viewed" list populates from
+      // normal browsing (the backend does not auto-record on GET). Fire and
+      // forget; the method guards demo mode and swallows its own errors.
+      unawaited(app.recordRealRecentlyView(widget.place.id));
       if (app.getHydratedRealPlaceDetail(widget.place.id) == null &&
           !app.isRealPlaceHydrationInFlight(widget.place.id)) {
         _load();

@@ -598,6 +598,12 @@ void main() {
       ignoreNetworkImageErrors();
       var calls = 0;
       final app = realApp(MockClient((request) async {
+        // The place-detail view records a recently-viewed POST on open; it is
+        // independent of hydration, so don't let it consume the retry counter.
+        if (request.method == 'POST' &&
+            request.url.path.contains('/me/recently-viewed')) {
+          return jsonResponse(const <String, dynamic>{}, 200);
+        }
         calls++;
         if (calls == 1) {
           return jsonResponse(errorBody(500, 'boom', '/api/places/7'), 500);

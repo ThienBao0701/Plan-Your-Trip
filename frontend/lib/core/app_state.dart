@@ -1171,12 +1171,42 @@ class AppState extends ChangeNotifier {
       savedPlaces = List.from(MockData.demoSavedPlaces);
       savedCollections = List.from(MockData.demoSavedCollections);
       savedCollectionPlaces = List.from(MockData.demoSavedCollectionPlaces);
+      // Clear every real-backend state on entering Demo Mode too, so the demo
+      // branch honours the same "clear all real state on every mode boundary"
+      // invariant as the real branch and logout() (session isolation). These
+      // fields have no demo equivalent, so clearing them is a pure safety no-op
+      // for the demo dataset seeded below.
       _resetRealSavedCollectionsState();
       _resetRealWishlistState();
       clearRealPlaceHydrationCache();
       _resetRealTripsState();
       _resetRealSearchState();
       _resetRealAvailabilityState();
+      _resetRealBookingHistoryState();
+      _resetRealPaymentState();
+      _resetRealReviewsState();
+      _resetRealNotificationsState();
+      _resetRealRecentlyViewedState();
+      _resetRealProfileState();
+      _resetRealGiftCardsState();
+      _resetRealLoyaltyState();
+      _resetRealTravelCreditState();
+      _resetRealMembershipState();
+      _resetRealReferralState();
+      _resetRealCouponsState();
+      _resetRealRecommendationsState();
+      _resetRealExpensesState();
+      _resetRealConversationsState();
+      _resetRealAiContextState();
+      _resetRealDocumentsState();
+      _resetRealNotesState();
+      _resetRealPackingState();
+      _resetRealReminderState();
+      _resetRealBudgetState();
+      _resetRealCollaborationState();
+      _resetRealSharedTripsState();
+      _resetRealWalletState();
+      _resetRealInterestState();
       trips = List.from(MockData.trips);
       timeline = List.from(MockData.timeline);
       expenses = List.from(MockData.expenses);

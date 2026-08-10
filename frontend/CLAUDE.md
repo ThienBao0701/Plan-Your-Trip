@@ -17,12 +17,15 @@ more than speed of feature count.
 ## 2. Current repository state
 
 - Working branch: `feature/frontend-ui-v2`.
-- The frontend has shipped UI-1 through UI-15 as individual commits (see `git log`).
-  **UI-16 (Saved Places & Collections)** is the latest phase and, as of this writing, is
-  implemented but **uncommitted** (`test/ui16_saved_places_collections_test.dart` is
-  untracked; `AppState`, models, mock data, several screens, and l10n files are modified).
-  Treat UI-16 as the current dirty phase — see the workflow rules in §11 before starting
-  UI-17 or any new phase.
+- The frontend has shipped UI-1 through **UI-52** as individual commits (see `git log`; latest
+  HEAD is UI-52 real interest profile). UI-29 onward progressively migrated customer surfaces
+  from demo/mock to real backend integrations, culminating in the UI-40→UI-52 series (real trip
+  expenses/budget/documents/notes/packing/reminders/collaboration, shared trips, travel wallet,
+  conversations, AI context, notification actions, interest profile). A subsequent **final user
+  audit** (post UI-52) wired the last real review entry points and recently-viewed recording, and
+  concluded the customer-facing real integration is complete — the next track is Database /
+  Production Integration, not new UI phases. Before starting any new phase, check `git status` and
+  the workflow rules in §11/§12.
 - Backend Foundation v1.0: referenced as complete. Note — no `backend-v1.0-foundation` git
   tag exists in this monorepo as of this writing (only `phase-7.30`, `v0.6.0`, `v0.7.18`
   are present). Do not assume the tag exists; verify with `git tag -l` before relying on it.
@@ -73,10 +76,16 @@ Follow this pattern for new mutations rather than introducing exceptions.
   to a fake `demo-token` without hitting the network.
 - `AppState.demoMode` (persisted via `SessionStorage`) controls which data source every
   other feature uses: when `true`, all lists are seeded from `lib/core/mock/mock_data.dart`
-  (`MockData.*`, in-memory only, resets on logout); when `false` (a real, non-demo login),
-  those same lists are simply empty — there's no real backend wiring yet for
-  trips/bookings/wallet/etc. Most `AppState` mutators explicitly check `demoMode` and
-  return `*.unavailable` when it's off.
+  (`MockData.*`, in-memory only, resets on logout). When `false` (a real, non-demo login),
+  the demo lists are empty and the many **migrated** features instead call the real backend via
+  `ApiClient` and store typed results in dedicated `real*`/`Real*` state fields — see the
+  `lib/features/**/real_*.dart` screens and the `_resetReal*State()` helpers in `AppState`
+  (trips, bookings, payments, reviews, notifications, recently-viewed, profile, recommendations,
+  gift cards, loyalty, travel credit, membership, referral, coupons, conversations, AI context,
+  trip expenses/budget/documents/notes/packing/reminders/collaboration, shared trips, travel
+  wallet, interest profile, …). Features that have **not** been migrated still return
+  `*.unavailable`/`*.demoUnavailable` in real mode rather than fabricating data. Real Mode must
+  never report fake success (see §6).
 - When adding a feature, check whether it should follow this demo/mock convention or is
   genuinely wiring up a new backend endpoint via `ApiClient`. Preserve Demo Mode until a
   feature is explicitly migrated to real APIs (see §5).

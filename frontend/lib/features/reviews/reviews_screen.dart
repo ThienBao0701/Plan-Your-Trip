@@ -9,6 +9,8 @@ import '../../design/app_radii.dart';
 import '../../design/app_spacing.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/glass_widgets.dart';
+import 'real_my_reviews_screen.dart';
+import 'real_place_reviews_screen.dart';
 
 class PlaceReviewSummaryCard extends StatelessWidget {
   final Place place;
@@ -19,6 +21,59 @@ class PlaceReviewSummaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final app = AppScope.of(context);
     final l10n = AppLocalizations.of(context)!;
+    // Real Mode: the backend serves public approved reviews for any place via
+    // GET /api/places/{id}/reviews. Surface a compact entry into the real
+    // reviews list; the demo aggregate/preview + write-review affordance below
+    // stays byte-identical for Demo Mode.
+    if (!app.demoMode) {
+      return OceanGlassCard(
+        key: const Key('place-review-summary'),
+        semanticLabel: l10n.reviewSummarySemantic(place.name),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(Icons.reviews_rounded, color: AppColors.ocean),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.reviewSummaryTitle,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: AppSpacing.xxs),
+                      Text(
+                        l10n.reviewPublicVisibilityNotice,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.md),
+            OceanSecondaryButton(
+              key: const Key('place-see-all-reviews'),
+              label: l10n.reviewSeeAllAction,
+              icon: Icons.list_alt_rounded,
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => RealPlaceReviewsScreen(
+                    placeId: place.id,
+                    placeName: place.name,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
     final summary = app.reviewSummaryForPlace(place.id);
     if (place.hotelDetail == null && summary.total == 0) {
       return const SizedBox.shrink();
@@ -155,6 +210,13 @@ class _PlaceReviewsScreenState extends State<PlaceReviewsScreen> {
   Widget build(BuildContext context) {
     final app = AppScope.of(context);
     final l10n = AppLocalizations.of(context)!;
+    // Real Mode delegates to the backend-backed reviews list.
+    if (!app.demoMode) {
+      return RealPlaceReviewsScreen(
+        placeId: widget.place.id,
+        placeName: widget.place.name,
+      );
+    }
     final reviews = app.publicReviewsForPlace(
       widget.place.id,
       sort: _sort,
@@ -248,6 +310,10 @@ class MyReviewsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final app = AppScope.of(context);
     final l10n = AppLocalizations.of(context)!;
+    // Real Mode delegates to the backend-backed "my reviews" list.
+    if (!app.demoMode) {
+      return const RealMyReviewsScreen();
+    }
     final reviews = app.myReviews();
     final grouped = {
       for (final status in ReviewStatus.values)

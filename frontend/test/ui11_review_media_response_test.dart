@@ -3,9 +3,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:planyourtrip_frontend/core/app_state.dart';
 import 'package:planyourtrip_frontend/core/mock/app_models.dart';
 import 'package:planyourtrip_frontend/core/mock/mock_data.dart';
+import 'package:planyourtrip_frontend/core/network/api_client.dart';
 import 'package:planyourtrip_frontend/design/app_theme.dart';
 import 'package:planyourtrip_frontend/features/home/app_shell.dart';
 import 'package:planyourtrip_frontend/features/reviews/reviews_screen.dart';
@@ -32,22 +35,19 @@ void main() {
     ..demoMode = true
     ..email = MockData.demoEmail;
 
-  AppState realState() => AppState(now: () => fixedNow)
-    ..demoMode = false
-    ..email = 'real@example.com'
-    ..trips = []
-    ..timeline = []
-    ..expenses = []
-    ..demoBookings = []
-    ..travelWalletItems = []
-    ..tripDocuments = []
-    ..tripCollaborators = []
-    ..sharedTrips = []
-    ..tripNotes = []
-    ..packingItems = []
-    ..tripReminders = []
-    ..reviews = []
-    ..publicTripIds = {};
+  // Real-mode AppState whose ApiClient returns an empty reviews list so the
+  // real review screen (delegated to by the wrapper in real mode) resolves to
+  // its empty state deterministically instead of hitting the network.
+  AppState realStateWithEmptyReviews() => AppState(
+        now: () => fixedNow,
+        api: ApiClient(
+          client: MockClient((request) async => http.Response(
+                '[]',
+                200,
+                headers: {'content-type': 'application/json; charset=utf-8'},
+              )),
+        )..demoMode = false,
+      )..demoMode = false;
 
   Widget harness({
     required Widget child,
@@ -454,14 +454,17 @@ void main() {
 
   testWidgets('real mode does not expose seeded personal media or fake actions',
       (tester) async {
+    // Real Mode delegates to RealMyReviewsScreen, which loads from the backend
+    // (empty here) and never shows seeded demo media or fabricated actions.
     await pumpSize(
       tester,
       const MyReviewsScreen(),
       const Size(900, 1400),
-      app: realState(),
+      app: realStateWithEmptyReviews(),
     );
 
-    expect(find.text('My Reviews is not connected yet'), findsOneWidget);
+    expect(find.text('My Reviews is not connected yet'), findsNothing);
+    expect(find.byKey(const Key('my-reviews-empty')), findsOneWidget);
     expect(find.text('Review media'), findsNothing);
     expect(find.text('Property response'), findsNothing);
   });

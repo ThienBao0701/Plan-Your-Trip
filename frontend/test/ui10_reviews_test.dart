@@ -3,15 +3,19 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:planyourtrip_frontend/core/app_state.dart';
 import 'package:planyourtrip_frontend/core/mock/app_models.dart';
 import 'package:planyourtrip_frontend/core/mock/mock_data.dart';
+import 'package:planyourtrip_frontend/core/network/api_client.dart';
 import 'package:planyourtrip_frontend/design/app_theme.dart';
 import 'package:planyourtrip_frontend/features/bookings/my_bookings_screen.dart';
 import 'package:planyourtrip_frontend/features/home/app_shell.dart';
 import 'package:planyourtrip_frontend/features/hotels/hotel_utils.dart';
 import 'package:planyourtrip_frontend/features/places/place_detail_screen.dart';
 import 'package:planyourtrip_frontend/features/profile/profile_screen.dart';
+import 'package:planyourtrip_frontend/features/reviews/real_place_reviews_screen.dart';
 import 'package:planyourtrip_frontend/features/reviews/reviews_screen.dart';
 import 'package:planyourtrip_frontend/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -52,6 +56,20 @@ void main() {
     ..tripReminders = []
     ..reviews = []
     ..publicTripIds = {};
+
+  // A real-mode AppState whose ApiClient returns an empty reviews list, so the
+  // real review screens (which the wrappers delegate to in real mode) resolve
+  // deterministically to their empty state instead of hitting the network.
+  AppState realStateWithEmptyReviews() => AppState(
+        now: () => fixedNow,
+        api: ApiClient(
+          client: MockClient((request) async => http.Response(
+                '[]',
+                200,
+                headers: {'content-type': 'application/json; charset=utf-8'},
+              )),
+        )..demoMode = false,
+      )..demoMode = false;
 
   Widget harness({
     required Widget child,
@@ -633,7 +651,7 @@ void main() {
     expect(app.reviews.length, MockData.reviews.length);
   });
 
-  testWidgets('Profile opens My Reviews and real sessions stay unavailable',
+  testWidgets('Profile opens My Reviews; real sessions load the real screen',
       (tester) async {
     final app = demoState();
 
@@ -651,13 +669,81 @@ void main() {
     expect(find.text('Pending (1)'), findsOneWidget);
     expect(find.text('Approved (2)'), findsOneWidget);
 
+    // Real Mode delegates the wrapper to the backend-backed RealMyReviewsScreen,
+    // which renders its own empty state (no demo "not connected" placeholder).
     await pumpSize(
       tester,
       const MyReviewsScreen(),
       const Size(900, 1400),
-      app: realState(),
+      app: realStateWithEmptyReviews(),
     );
-    expect(find.text('My Reviews is not connected yet'), findsOneWidget);
+    expect(find.text('My Reviews is not connected yet'), findsNothing);
+    expect(find.byKey(const Key('my-reviews-empty')), findsOneWidget);
+  });
+
+  testWidgets('real mode place reviews wrapper delegates to the real list',
+      (tester) async {
+    await pumpSize(
+      tester,
+      PlaceReviewsScreen(place: MockData.places.first),
+      const Size(900, 1400),
+      app: realStateWithEmptyReviews(),
+    );
+    // The demo "unavailable" copy is gone; the real reviews list renders.
+    expect(find.text('Reviews are not connected yet'), findsNothing);
+    expect(find.byKey(const Key('place-reviews-empty')), findsOneWidget);
+  });
+
+  testWidgets('real mode place review card opens the real reviews list',
+      (tester) async {
+    await pumpSize(
+      tester,
+      PlaceReviewSummaryCard(place: MockData.places.first),
+      const Size(900, 1400),
+      app: realStateWithEmptyReviews(),
+    );
+    // Real card offers a working "See all reviews" entry (no demo write action).
+    expect(find.byKey(const Key('place-see-all-reviews')), findsOneWidget);
+    expect(find.byKey(const Key('place-write-review')), findsNothing);
+
+    await tester.tap(find.byKey(const Key('place-see-all-reviews')));
+    await tester.pumpAndSettle();
+    expect(find.byType(RealPlaceReviewsScreen), findsOneWidget);
+    expect(find.byKey(const Key('place-reviews-empty')), findsOneWidget);
+  });
+
+  testWidgets('opening a real place records a recently-viewed view',
+      (tester) async {
+    ignoreNetworkImageErrors();
+    final requests = <http.Request>[];
+    final app = AppState(
+      now: () => fixedNow,
+      api: ApiClient(
+        client: MockClient((request) async {
+          requests.add(request);
+          return http.Response(
+            '{}',
+            200,
+            headers: {'content-type': 'application/json; charset=utf-8'},
+          );
+        }),
+      )..demoMode = false,
+    )..demoMode = false;
+
+    await pumpSize(
+      tester,
+      PlaceDetailScreen(place: MockData.places.first),
+      const Size(900, 1400),
+      app: app,
+    );
+
+    // The real place-detail view records the view so "Recently viewed" populates
+    // from normal browsing (backend does not auto-record on GET).
+    expect(
+      requests.any((r) =>
+          r.method == 'POST' && r.url.path.contains('/me/recently-viewed')),
+      isTrue,
+    );
   });
 
   testWidgets('author review detail masks booking code and shows safe status',
