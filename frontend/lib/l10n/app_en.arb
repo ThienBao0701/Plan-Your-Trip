@@ -4163,5 +4163,114 @@
     "placeholders": {
       "title": { "type": "String" }
     }
-  }
+  },
+  "partnerExtranetTitle": "Partner Extranet",
+  "partnerWorkspaceUnnamed": "Your workspace",
+  "partnerNavGroupOverview": "Overview",
+  "partnerNavGroupProperty": "Property",
+  "partnerNavGroupOperations": "Operations",
+  "partnerNavGroupGrowth": "Growth",
+  "partnerNavGroupBusiness": "Business",
+  "partnerNavGroupAccount": "Account",
+  "partnerNavDashboard": "Dashboard",
+  "partnerNavHotels": "Hotels",
+  "partnerNavRooms": "Rooms",
+  "partnerNavCalendar": "Calendar",
+  "partnerNavPricing": "Pricing",
+  "partnerNavPromotions": "Promotions",
+  "partnerNavBookings": "Bookings",
+  "partnerNavMessages": "Messages",
+  "partnerNavAnalytics": "Analytics",
+  "partnerNavFinance": "Finance",
+  "partnerNavReviews": "Reviews",
+  "partnerNavNotifications": "Notifications",
+  "partnerNavSettings": "Settings",
+  "partnerNavMenuTooltip": "Open partner menu",
+  "partnerNavBadgeSemantic": "{label}, {count} pending",
+  "@partnerNavBadgeSemantic": {
+    "placeholders": {
+      "label": { "type": "String" },
+      "count": { "type": "int" }
+    }
+  },
+  "partnerTeamRoleLabel": "Your team role: {role}",
+  "@partnerTeamRoleLabel": {
+    "placeholders": {
+      "role": { "type": "String" }
+    }
+  },
+  "partnerTeamRoleOwner": "Owner",
+  "partnerTeamRoleManager": "Manager",
+  "partnerTeamRoleFrontDesk": "Front desk",
+  "partnerTeamRoleFinance": "Finance",
+  "partnerTeamRoleViewer": "Viewer",
+  "partnerTeamRoleUnknown": "Not determined",
+  "partnerActionRetry": "Try again",
+  "partnerActionRefresh": "Refresh",
+  "partnerActionBack": "Go back",
+  "partnerActionExitToTravellerApp": "Exit to traveller app",
+  "partnerShellMobileHint": "Use a larger screen for the full operations console.",
+  "partnerStatusLoadingTitle": "Loading your workspace",
+  "partnerStatusLoadingMessage": "Fetching your partner profile and today's activity.",
+  "partnerStatusReadyTitle": "Workspace ready",
+  "partnerStatusReadyMessage": "Your partner workspace is up to date.",
+  "partnerStatusDemoTitle": "Not available in demo mode",
+  "partnerStatusDemoMessage": "The Partner Extranet works only against the real backend. Sign in with a partner account to open it.",
+  "partnerStatusNotPartnerTitle": "Partner access required",
+  "partnerStatusNotPartnerMessage": "This account is not a partner account, so the Partner Extranet is unavailable.",
+  "partnerStatusOnboardingTitle": "No partner profile yet",
+  "partnerStatusOnboardingMessage": "This account has no partner business profile. One must be created and approved before the workspace opens.",
+  "partnerStatusAwaitingApprovalTitle": "Waiting for approval",
+  "partnerStatusAwaitingApprovalMessage": "Your partner profile is submitted. The workspace opens once an administrator approves it.",
+  "partnerStatusRejectedTitle": "Partner profile rejected",
+  "partnerStatusRejectedMessage": "Your partner application was rejected, so the workspace is closed.",
+  "partnerStatusSuspendedTitle": "Partner account suspended",
+  "partnerStatusSuspendedMessage": "An administrator suspended this partner account. Contact support to restore access.",
+  "partnerStatusTeamMemberTitle": "Team access not supported yet",
+  "partnerStatusTeamMemberMessage": "You belong to a partner team but do not own its profile. The extranet overview is currently available to the profile owner only.",
+  "partnerStatusUnauthorizedTitle": "Sign in again",
+  "partnerStatusUnauthorizedMessage": "Your session expired. Sign in again to reopen the workspace.",
+  "partnerStatusForbiddenTitle": "Access refused",
+  "partnerStatusForbiddenMessage": "The server refused this request for your account.",
+  "partnerStatusErrorTitle": "Could not load the workspace",
+  "partnerStatusErrorMessage": "We could not reach the partner service. Check your connection and try again.",
+  "partnerVerificationApproved": "Approved",
+  "partnerVerificationSubmitted": "Submitted",
+  "partnerVerificationDraft": "Draft",
+  "partnerVerificationRejected": "Rejected",
+  "partnerVerificationSuspended": "Suspended",
+  "partnerVerificationUnknown": "Unknown",
+  "partnerDashboardTodayHeading": "Today at a glance",
+  "partnerDashboardRepresentative": "Represented by {name}",
+  "@partnerDashboardRepresentative": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "partnerMetricArrivals": "Arrivals today",
+  "partnerMetricDepartures": "Departures today",
+  "partnerMetricUnreadMessages": "Unread messages",
+  "partnerMetricPendingReviews": "Pending reviews",
+  "partnerMetricActivePromotions": "Active promotions",
+  "partnerMetricNotifications": "Notifications",
+  "partnerMetricProperties": "Properties",
+  "partnerMetricActiveRooms": "Active rooms",
+  "partnerPropertyScopeHeading": "Property scope",
+  "partnerPropertyScopeEmpty": "No properties are assigned to this partner account yet.",
+  "partnerPropertyScopeUnavailable": "The property list could not be loaded. Refresh to try again.",
+  "partnerPropertyInactiveSemantic": "{name}, inactive",
+  "@partnerPropertyInactiveSemantic": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "partnerModulePlannedBadge": "Planned",
+  "partnerModulePlannedMessage": "This module is not built yet. It will be wired to the existing partner endpoints in a later phase; no data is shown until then.",
+  "partnerModuleEndpointHint": "Route: {route}",
+  "@partnerModuleEndpointHint": {
+    "placeholders": {
+      "route": { "type": "String" }
+    }
+  },
+  "partnerModuleReadOnlyForRole": "Your team role will not be able to change settings in this module."
 }

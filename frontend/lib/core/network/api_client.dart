@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import '../config/app_config.dart';
 import '../mock/app_models.dart';
 import '../mock/mock_data.dart';
+import '../partner/partner_models.dart';
 
 /// Machine-readable outcome classification for the typed Saved Collections
 /// endpoints — deliberately distinct from the legacy `Map<String, dynamic>`
@@ -73,7 +74,9 @@ class ApiClient {
     if (email == MockData.demoEmail && password == MockData.demoPassword) {
       demoMode = true;
       token = 'demo-token';
-      return {'success': true, 'demo': true, 'token': token};
+      // The demo account is a traveller account; it never reaches a backend and
+      // must never be treated as a partner or admin.
+      return {'success': true, 'demo': true, 'token': token, 'role': 'USER'};
     }
     try {
       final res = await _client
@@ -90,7 +93,17 @@ class ApiClient {
         }
         token = body['token'] as String;
         demoMode = false;
-        return {'success': true, 'demo': false, 'token': token};
+        // `AuthDtos.AuthResponse` is `(token, UserDto(id, fullName, email, role))`.
+        // The role was previously parsed and discarded; it is surfaced here so
+        // the client can route by role. Absent/unrecognised values stay null and
+        // fail closed in `AppRole.parse`.
+        final user = body['user'];
+        return {
+          'success': true,
+          'demo': false,
+          'token': token,
+          'role': user is Map<String, dynamic> ? user['role'] : null,
+        };
       }
       return _failureForStatus(res);
     } on TimeoutException {
@@ -4106,6 +4119,172 @@ class ApiClient {
       return const CollectionApiVoidResult.failure(ApiErrorKind.malformed);
     } catch (_) {
       return const CollectionApiVoidResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  // ── Partner Extranet (/api/partner/**, C0 foundation) ───────────────────
+  //
+  // Read-only endpoints only. Every one of these already exists in the backend
+  // (`Partner*Controller`) — nothing here is speculative. Authorization is
+  // enforced server-side twice over: `SecurityConfig` gates `/api/partner/**`
+  // on `hasAnyRole("PARTNER","ADMIN")`, and each partner service then
+  // self-scopes via `partnerProfileRepo.findByUserId(uid)`. The client's role
+  // check is UX routing only and grants nothing.
+  //
+  // Status codes these can return, and what they mean:
+  //   401 — no/expired token.
+  //   403 — role admitted but the partner profile is not APPROVED
+  //         (`requireApproved`), or the caller's PartnerTeamRole is too low.
+  //   404 — the caller has no partner profile at all (and, for the extranet
+  //         endpoints, also when the caller is only a *team member* rather than
+  //         the profile owner — see `PartnerState` for how that is handled).
+
+  /// Fetches the caller's own partner profile (`GET /api/partner/profile`).
+  ///
+  /// This is the one partner route `SecurityConfig` gates as merely
+  /// `authenticated` rather than `hasAnyRole("PARTNER","ADMIN")`, because it is
+  /// also the onboarding entry point. A caller with no profile gets 404, which
+  /// is a legitimate state, not an error.
+  Future<CollectionApiResult<PartnerProfile>> getPartnerProfile() async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/partner/profile'), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        final profile = PartnerProfile.fromJson(body);
+        if (profile == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(profile);
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Fetches the partner workspace overview
+  /// (`GET /api/partner/extranet/home`) — profile summary plus the operational
+  /// counts the dashboard renders. Requires an APPROVED profile owned by the
+  /// caller; `PartnerExtranetService` is owner-only by design.
+  Future<CollectionApiResult<PartnerWorkspaceOverview>>
+      getPartnerWorkspaceOverview() async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/partner/extranet/home'),
+              headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(
+          PartnerWorkspaceOverview.fromJson(body),
+        );
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Lists the properties the caller is authorized to operate
+  /// (`GET /api/partner/hotels`, bare array). This is the workspace's property
+  /// scope — the client never widens it, and never asks for a property the
+  /// backend did not return here.
+  Future<CollectionApiResult<List<PartnerProperty>>>
+      getPartnerProperties() async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/partner/hotels'), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final decoded = jsonDecode(utf8.decode(res.bodyBytes));
+        if (decoded is! List) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        final properties = <PartnerProperty>[];
+        for (final entry in decoded) {
+          if (entry is! Map<String, dynamic>) continue;
+          final property = PartnerProperty.fromJson(entry);
+          if (property != null) properties.add(property);
+        }
+        return CollectionApiResult.success(properties);
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Lists the caller's partner team (`GET /api/partner/team`, bare array).
+  ///
+  /// `PartnerSettingsService.resolveAccess` is the only partner resolver that
+  /// is team-aware, so this is also the sole way the client can learn a
+  /// non-owner's `PartnerTeamRole`. Used for permission-aware UX only.
+  Future<CollectionApiResult<List<PartnerTeamMember>>>
+      getPartnerTeamMembers() async {
+    try {
+      final res = await _client
+          .get(Uri.parse('$baseUrl/partner/team'), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final decoded = jsonDecode(utf8.decode(res.bodyBytes));
+        if (decoded is! List) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        final members = <PartnerTeamMember>[];
+        for (final entry in decoded) {
+          if (entry is! Map<String, dynamic>) continue;
+          final member = PartnerTeamMember.fromJson(entry);
+          if (member != null) members.add(member);
+        }
+        return CollectionApiResult.success(members);
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
     }
   }
 

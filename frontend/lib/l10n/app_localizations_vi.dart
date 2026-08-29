@@ -8234,4 +8234,280 @@ class AppLocalizationsVi extends AppLocalizations {
   String walletRealUnfavoriteSemantic(String title) {
     return 'Xóa $title khỏi mục yêu thích';
   }
+
+  @override
+  String get partnerExtranetTitle => 'Cổng đối tác';
+
+  @override
+  String get partnerWorkspaceUnnamed => 'Không gian làm việc của bạn';
+
+  @override
+  String get partnerNavGroupOverview => 'Tổng quan';
+
+  @override
+  String get partnerNavGroupProperty => 'Cơ sở lưu trú';
+
+  @override
+  String get partnerNavGroupOperations => 'Vận hành';
+
+  @override
+  String get partnerNavGroupGrowth => 'Tăng trưởng';
+
+  @override
+  String get partnerNavGroupBusiness => 'Kinh doanh';
+
+  @override
+  String get partnerNavGroupAccount => 'Tài khoản';
+
+  @override
+  String get partnerNavDashboard => 'Bảng điều khiển';
+
+  @override
+  String get partnerNavHotels => 'Khách sạn';
+
+  @override
+  String get partnerNavRooms => 'Phòng';
+
+  @override
+  String get partnerNavCalendar => 'Lịch';
+
+  @override
+  String get partnerNavPricing => 'Giá';
+
+  @override
+  String get partnerNavPromotions => 'Khuyến mãi';
+
+  @override
+  String get partnerNavBookings => 'Đặt phòng';
+
+  @override
+  String get partnerNavMessages => 'Tin nhắn';
+
+  @override
+  String get partnerNavAnalytics => 'Phân tích';
+
+  @override
+  String get partnerNavFinance => 'Tài chính';
+
+  @override
+  String get partnerNavReviews => 'Đánh giá';
+
+  @override
+  String get partnerNavNotifications => 'Thông báo';
+
+  @override
+  String get partnerNavSettings => 'Cài đặt';
+
+  @override
+  String get partnerNavMenuTooltip => 'Mở menu đối tác';
+
+  @override
+  String partnerNavBadgeSemantic(String label, int count) {
+    return '$label, $count mục đang chờ';
+  }
+
+  @override
+  String partnerTeamRoleLabel(String role) {
+    return 'Vai trò của bạn: $role';
+  }
+
+  @override
+  String get partnerTeamRoleOwner => 'Chủ sở hữu';
+
+  @override
+  String get partnerTeamRoleManager => 'Quản lý';
+
+  @override
+  String get partnerTeamRoleFrontDesk => 'Lễ tân';
+
+  @override
+  String get partnerTeamRoleFinance => 'Tài chính';
+
+  @override
+  String get partnerTeamRoleViewer => 'Người xem';
+
+  @override
+  String get partnerTeamRoleUnknown => 'Chưa xác định';
+
+  @override
+  String get partnerActionRetry => 'Thử lại';
+
+  @override
+  String get partnerActionRefresh => 'Làm mới';
+
+  @override
+  String get partnerActionBack => 'Quay lại';
+
+  @override
+  String get partnerActionExitToTravellerApp => 'Thoát về ứng dụng du khách';
+
+  @override
+  String get partnerShellMobileHint =>
+      'Hãy dùng màn hình lớn hơn để có đầy đủ bảng vận hành.';
+
+  @override
+  String get partnerStatusLoadingTitle => 'Đang tải không gian làm việc';
+
+  @override
+  String get partnerStatusLoadingMessage =>
+      'Đang lấy hồ sơ đối tác và hoạt động hôm nay của bạn.';
+
+  @override
+  String get partnerStatusReadyTitle => 'Đã sẵn sàng';
+
+  @override
+  String get partnerStatusReadyMessage =>
+      'Không gian làm việc đối tác của bạn đã được cập nhật.';
+
+  @override
+  String get partnerStatusDemoTitle => 'Không khả dụng ở chế độ demo';
+
+  @override
+  String get partnerStatusDemoMessage =>
+      'Cổng đối tác chỉ hoạt động với backend thật. Hãy đăng nhập bằng tài khoản đối tác để mở.';
+
+  @override
+  String get partnerStatusNotPartnerTitle => 'Cần quyền đối tác';
+
+  @override
+  String get partnerStatusNotPartnerMessage =>
+      'Tài khoản này không phải tài khoản đối tác nên không thể mở Cổng đối tác.';
+
+  @override
+  String get partnerStatusOnboardingTitle => 'Chưa có hồ sơ đối tác';
+
+  @override
+  String get partnerStatusOnboardingMessage =>
+      'Tài khoản này chưa có hồ sơ doanh nghiệp đối tác. Hồ sơ phải được tạo và phê duyệt trước khi mở không gian làm việc.';
+
+  @override
+  String get partnerStatusAwaitingApprovalTitle => 'Đang chờ phê duyệt';
+
+  @override
+  String get partnerStatusAwaitingApprovalMessage =>
+      'Hồ sơ đối tác của bạn đã được gửi. Không gian làm việc sẽ mở khi quản trị viên phê duyệt.';
+
+  @override
+  String get partnerStatusRejectedTitle => 'Hồ sơ đối tác bị từ chối';
+
+  @override
+  String get partnerStatusRejectedMessage =>
+      'Đơn đăng ký đối tác của bạn đã bị từ chối nên không gian làm việc đang đóng.';
+
+  @override
+  String get partnerStatusSuspendedTitle => 'Tài khoản đối tác bị tạm ngưng';
+
+  @override
+  String get partnerStatusSuspendedMessage =>
+      'Quản trị viên đã tạm ngưng tài khoản đối tác này. Hãy liên hệ bộ phận hỗ trợ để khôi phục quyền truy cập.';
+
+  @override
+  String get partnerStatusTeamMemberTitle => 'Chưa hỗ trợ truy cập theo nhóm';
+
+  @override
+  String get partnerStatusTeamMemberMessage =>
+      'Bạn thuộc một nhóm đối tác nhưng không sở hữu hồ sơ đó. Hiện tại chỉ chủ sở hữu hồ sơ mới xem được tổng quan cổng đối tác.';
+
+  @override
+  String get partnerStatusUnauthorizedTitle => 'Hãy đăng nhập lại';
+
+  @override
+  String get partnerStatusUnauthorizedMessage =>
+      'Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại để mở lại không gian làm việc.';
+
+  @override
+  String get partnerStatusForbiddenTitle => 'Truy cập bị từ chối';
+
+  @override
+  String get partnerStatusForbiddenMessage =>
+      'Máy chủ đã từ chối yêu cầu này với tài khoản của bạn.';
+
+  @override
+  String get partnerStatusErrorTitle => 'Không tải được không gian làm việc';
+
+  @override
+  String get partnerStatusErrorMessage =>
+      'Chúng tôi không kết nối được tới dịch vụ đối tác. Hãy kiểm tra kết nối và thử lại.';
+
+  @override
+  String get partnerVerificationApproved => 'Đã duyệt';
+
+  @override
+  String get partnerVerificationSubmitted => 'Đã gửi';
+
+  @override
+  String get partnerVerificationDraft => 'Bản nháp';
+
+  @override
+  String get partnerVerificationRejected => 'Bị từ chối';
+
+  @override
+  String get partnerVerificationSuspended => 'Tạm ngưng';
+
+  @override
+  String get partnerVerificationUnknown => 'Không xác định';
+
+  @override
+  String get partnerDashboardTodayHeading => 'Hôm nay';
+
+  @override
+  String partnerDashboardRepresentative(String name) {
+    return 'Người đại diện: $name';
+  }
+
+  @override
+  String get partnerMetricArrivals => 'Nhận phòng hôm nay';
+
+  @override
+  String get partnerMetricDepartures => 'Trả phòng hôm nay';
+
+  @override
+  String get partnerMetricUnreadMessages => 'Tin nhắn chưa đọc';
+
+  @override
+  String get partnerMetricPendingReviews => 'Đánh giá chờ xử lý';
+
+  @override
+  String get partnerMetricActivePromotions => 'Khuyến mãi đang chạy';
+
+  @override
+  String get partnerMetricNotifications => 'Thông báo';
+
+  @override
+  String get partnerMetricProperties => 'Cơ sở lưu trú';
+
+  @override
+  String get partnerMetricActiveRooms => 'Phòng đang hoạt động';
+
+  @override
+  String get partnerPropertyScopeHeading => 'Phạm vi cơ sở lưu trú';
+
+  @override
+  String get partnerPropertyScopeEmpty =>
+      'Chưa có cơ sở lưu trú nào được gán cho tài khoản đối tác này.';
+
+  @override
+  String get partnerPropertyScopeUnavailable =>
+      'Không tải được danh sách cơ sở lưu trú. Hãy làm mới để thử lại.';
+
+  @override
+  String partnerPropertyInactiveSemantic(String name) {
+    return '$name, ngừng hoạt động';
+  }
+
+  @override
+  String get partnerModulePlannedBadge => 'Dự kiến';
+
+  @override
+  String get partnerModulePlannedMessage =>
+      'Mô-đun này chưa được xây dựng. Nó sẽ được kết nối với các endpoint đối tác hiện có ở giai đoạn sau; trước đó không hiển thị dữ liệu nào.';
+
+  @override
+  String partnerModuleEndpointHint(String route) {
+    return 'Tuyến: $route';
+  }
+
+  @override
+  String get partnerModuleReadOnlyForRole =>
+      'Vai trò nhóm của bạn sẽ không thể thay đổi cài đặt trong mô-đun này.';
 }

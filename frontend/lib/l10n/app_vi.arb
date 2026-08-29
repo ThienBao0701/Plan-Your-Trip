@@ -4163,5 +4163,114 @@
     "placeholders": {
       "title": { "type": "String" }
     }
-  }
+  },
+  "partnerExtranetTitle": "Cổng đối tác",
+  "partnerWorkspaceUnnamed": "Không gian làm việc của bạn",
+  "partnerNavGroupOverview": "Tổng quan",
+  "partnerNavGroupProperty": "Cơ sở lưu trú",
+  "partnerNavGroupOperations": "Vận hành",
+  "partnerNavGroupGrowth": "Tăng trưởng",
+  "partnerNavGroupBusiness": "Kinh doanh",
+  "partnerNavGroupAccount": "Tài khoản",
+  "partnerNavDashboard": "Bảng điều khiển",
+  "partnerNavHotels": "Khách sạn",
+  "partnerNavRooms": "Phòng",
+  "partnerNavCalendar": "Lịch",
+  "partnerNavPricing": "Giá",
+  "partnerNavPromotions": "Khuyến mãi",
+  "partnerNavBookings": "Đặt phòng",
+  "partnerNavMessages": "Tin nhắn",
+  "partnerNavAnalytics": "Phân tích",
+  "partnerNavFinance": "Tài chính",
+  "partnerNavReviews": "Đánh giá",
+  "partnerNavNotifications": "Thông báo",
+  "partnerNavSettings": "Cài đặt",
+  "partnerNavMenuTooltip": "Mở menu đối tác",
+  "partnerNavBadgeSemantic": "{label}, {count} mục đang chờ",
+  "@partnerNavBadgeSemantic": {
+    "placeholders": {
+      "label": { "type": "String" },
+      "count": { "type": "int" }
+    }
+  },
+  "partnerTeamRoleLabel": "Vai trò của bạn: {role}",
+  "@partnerTeamRoleLabel": {
+    "placeholders": {
+      "role": { "type": "String" }
+    }
+  },
+  "partnerTeamRoleOwner": "Chủ sở hữu",
+  "partnerTeamRoleManager": "Quản lý",
+  "partnerTeamRoleFrontDesk": "Lễ tân",
+  "partnerTeamRoleFinance": "Tài chính",
+  "partnerTeamRoleViewer": "Người xem",
+  "partnerTeamRoleUnknown": "Chưa xác định",
+  "partnerActionRetry": "Thử lại",
+  "partnerActionRefresh": "Làm mới",
+  "partnerActionBack": "Quay lại",
+  "partnerActionExitToTravellerApp": "Thoát về ứng dụng du khách",
+  "partnerShellMobileHint": "Hãy dùng màn hình lớn hơn để có đầy đủ bảng vận hành.",
+  "partnerStatusLoadingTitle": "Đang tải không gian làm việc",
+  "partnerStatusLoadingMessage": "Đang lấy hồ sơ đối tác và hoạt động hôm nay của bạn.",
+  "partnerStatusReadyTitle": "Đã sẵn sàng",
+  "partnerStatusReadyMessage": "Không gian làm việc đối tác của bạn đã được cập nhật.",
+  "partnerStatusDemoTitle": "Không khả dụng ở chế độ demo",
+  "partnerStatusDemoMessage": "Cổng đối tác chỉ hoạt động với backend thật. Hãy đăng nhập bằng tài khoản đối tác để mở.",
+  "partnerStatusNotPartnerTitle": "Cần quyền đối tác",
+  "partnerStatusNotPartnerMessage": "Tài khoản này không phải tài khoản đối tác nên không thể mở Cổng đối tác.",
+  "partnerStatusOnboardingTitle": "Chưa có hồ sơ đối tác",
+  "partnerStatusOnboardingMessage": "Tài khoản này chưa có hồ sơ doanh nghiệp đối tác. Hồ sơ phải được tạo và phê duyệt trước khi mở không gian làm việc.",
+  "partnerStatusAwaitingApprovalTitle": "Đang chờ phê duyệt",
+  "partnerStatusAwaitingApprovalMessage": "Hồ sơ đối tác của bạn đã được gửi. Không gian làm việc sẽ mở khi quản trị viên phê duyệt.",
+  "partnerStatusRejectedTitle": "Hồ sơ đối tác bị từ chối",
+  "partnerStatusRejectedMessage": "Đơn đăng ký đối tác của bạn đã bị từ chối nên không gian làm việc đang đóng.",
+  "partnerStatusSuspendedTitle": "Tài khoản đối tác bị tạm ngưng",
+  "partnerStatusSuspendedMessage": "Quản trị viên đã tạm ngưng tài khoản đối tác này. Hãy liên hệ bộ phận hỗ trợ để khôi phục quyền truy cập.",
+  "partnerStatusTeamMemberTitle": "Chưa hỗ trợ truy cập theo nhóm",
+  "partnerStatusTeamMemberMessage": "Bạn thuộc một nhóm đối tác nhưng không sở hữu hồ sơ đó. Hiện tại chỉ chủ sở hữu hồ sơ mới xem được tổng quan cổng đối tác.",
+  "partnerStatusUnauthorizedTitle": "Hãy đăng nhập lại",
+  "partnerStatusUnauthorizedMessage": "Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại để mở lại không gian làm việc.",
+  "partnerStatusForbiddenTitle": "Truy cập bị từ chối",
+  "partnerStatusForbiddenMessage": "Máy chủ đã từ chối yêu cầu này với tài khoản của bạn.",
+  "partnerStatusErrorTitle": "Không tải được không gian làm việc",
+  "partnerStatusErrorMessage": "Chúng tôi không kết nối được tới dịch vụ đối tác. Hãy kiểm tra kết nối và thử lại.",
+  "partnerVerificationApproved": "Đã duyệt",
+  "partnerVerificationSubmitted": "Đã gửi",
+  "partnerVerificationDraft": "Bản nháp",
+  "partnerVerificationRejected": "Bị từ chối",
+  "partnerVerificationSuspended": "Tạm ngưng",
+  "partnerVerificationUnknown": "Không xác định",
+  "partnerDashboardTodayHeading": "Hôm nay",
+  "partnerDashboardRepresentative": "Người đại diện: {name}",
+  "@partnerDashboardRepresentative": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "partnerMetricArrivals": "Nhận phòng hôm nay",
+  "partnerMetricDepartures": "Trả phòng hôm nay",
+  "partnerMetricUnreadMessages": "Tin nhắn chưa đọc",
+  "partnerMetricPendingReviews": "Đánh giá chờ xử lý",
+  "partnerMetricActivePromotions": "Khuyến mãi đang chạy",
+  "partnerMetricNotifications": "Thông báo",
+  "partnerMetricProperties": "Cơ sở lưu trú",
+  "partnerMetricActiveRooms": "Phòng đang hoạt động",
+  "partnerPropertyScopeHeading": "Phạm vi cơ sở lưu trú",
+  "partnerPropertyScopeEmpty": "Chưa có cơ sở lưu trú nào được gán cho tài khoản đối tác này.",
+  "partnerPropertyScopeUnavailable": "Không tải được danh sách cơ sở lưu trú. Hãy làm mới để thử lại.",
+  "partnerPropertyInactiveSemantic": "{name}, ngừng hoạt động",
+  "@partnerPropertyInactiveSemantic": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "partnerModulePlannedBadge": "Dự kiến",
+  "partnerModulePlannedMessage": "Mô-đun này chưa được xây dựng. Nó sẽ được kết nối với các endpoint đối tác hiện có ở giai đoạn sau; trước đó không hiển thị dữ liệu nào.",
+  "partnerModuleEndpointHint": "Tuyến: {route}",
+  "@partnerModuleEndpointHint": {
+    "placeholders": {
+      "route": { "type": "String" }
+    }
+  },
+  "partnerModuleReadOnlyForRole": "Vai trò nhóm của bạn sẽ không thể thay đổi cài đặt trong mô-đun này."
 }

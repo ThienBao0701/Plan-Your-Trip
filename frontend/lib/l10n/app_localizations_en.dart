@@ -8400,4 +8400,280 @@ class AppLocalizationsEn extends AppLocalizations {
   String walletRealUnfavoriteSemantic(String title) {
     return 'Remove $title from favorites';
   }
+
+  @override
+  String get partnerExtranetTitle => 'Partner Extranet';
+
+  @override
+  String get partnerWorkspaceUnnamed => 'Your workspace';
+
+  @override
+  String get partnerNavGroupOverview => 'Overview';
+
+  @override
+  String get partnerNavGroupProperty => 'Property';
+
+  @override
+  String get partnerNavGroupOperations => 'Operations';
+
+  @override
+  String get partnerNavGroupGrowth => 'Growth';
+
+  @override
+  String get partnerNavGroupBusiness => 'Business';
+
+  @override
+  String get partnerNavGroupAccount => 'Account';
+
+  @override
+  String get partnerNavDashboard => 'Dashboard';
+
+  @override
+  String get partnerNavHotels => 'Hotels';
+
+  @override
+  String get partnerNavRooms => 'Rooms';
+
+  @override
+  String get partnerNavCalendar => 'Calendar';
+
+  @override
+  String get partnerNavPricing => 'Pricing';
+
+  @override
+  String get partnerNavPromotions => 'Promotions';
+
+  @override
+  String get partnerNavBookings => 'Bookings';
+
+  @override
+  String get partnerNavMessages => 'Messages';
+
+  @override
+  String get partnerNavAnalytics => 'Analytics';
+
+  @override
+  String get partnerNavFinance => 'Finance';
+
+  @override
+  String get partnerNavReviews => 'Reviews';
+
+  @override
+  String get partnerNavNotifications => 'Notifications';
+
+  @override
+  String get partnerNavSettings => 'Settings';
+
+  @override
+  String get partnerNavMenuTooltip => 'Open partner menu';
+
+  @override
+  String partnerNavBadgeSemantic(String label, int count) {
+    return '$label, $count pending';
+  }
+
+  @override
+  String partnerTeamRoleLabel(String role) {
+    return 'Your team role: $role';
+  }
+
+  @override
+  String get partnerTeamRoleOwner => 'Owner';
+
+  @override
+  String get partnerTeamRoleManager => 'Manager';
+
+  @override
+  String get partnerTeamRoleFrontDesk => 'Front desk';
+
+  @override
+  String get partnerTeamRoleFinance => 'Finance';
+
+  @override
+  String get partnerTeamRoleViewer => 'Viewer';
+
+  @override
+  String get partnerTeamRoleUnknown => 'Not determined';
+
+  @override
+  String get partnerActionRetry => 'Try again';
+
+  @override
+  String get partnerActionRefresh => 'Refresh';
+
+  @override
+  String get partnerActionBack => 'Go back';
+
+  @override
+  String get partnerActionExitToTravellerApp => 'Exit to traveller app';
+
+  @override
+  String get partnerShellMobileHint =>
+      'Use a larger screen for the full operations console.';
+
+  @override
+  String get partnerStatusLoadingTitle => 'Loading your workspace';
+
+  @override
+  String get partnerStatusLoadingMessage =>
+      'Fetching your partner profile and today\'s activity.';
+
+  @override
+  String get partnerStatusReadyTitle => 'Workspace ready';
+
+  @override
+  String get partnerStatusReadyMessage =>
+      'Your partner workspace is up to date.';
+
+  @override
+  String get partnerStatusDemoTitle => 'Not available in demo mode';
+
+  @override
+  String get partnerStatusDemoMessage =>
+      'The Partner Extranet works only against the real backend. Sign in with a partner account to open it.';
+
+  @override
+  String get partnerStatusNotPartnerTitle => 'Partner access required';
+
+  @override
+  String get partnerStatusNotPartnerMessage =>
+      'This account is not a partner account, so the Partner Extranet is unavailable.';
+
+  @override
+  String get partnerStatusOnboardingTitle => 'No partner profile yet';
+
+  @override
+  String get partnerStatusOnboardingMessage =>
+      'This account has no partner business profile. One must be created and approved before the workspace opens.';
+
+  @override
+  String get partnerStatusAwaitingApprovalTitle => 'Waiting for approval';
+
+  @override
+  String get partnerStatusAwaitingApprovalMessage =>
+      'Your partner profile is submitted. The workspace opens once an administrator approves it.';
+
+  @override
+  String get partnerStatusRejectedTitle => 'Partner profile rejected';
+
+  @override
+  String get partnerStatusRejectedMessage =>
+      'Your partner application was rejected, so the workspace is closed.';
+
+  @override
+  String get partnerStatusSuspendedTitle => 'Partner account suspended';
+
+  @override
+  String get partnerStatusSuspendedMessage =>
+      'An administrator suspended this partner account. Contact support to restore access.';
+
+  @override
+  String get partnerStatusTeamMemberTitle => 'Team access not supported yet';
+
+  @override
+  String get partnerStatusTeamMemberMessage =>
+      'You belong to a partner team but do not own its profile. The extranet overview is currently available to the profile owner only.';
+
+  @override
+  String get partnerStatusUnauthorizedTitle => 'Sign in again';
+
+  @override
+  String get partnerStatusUnauthorizedMessage =>
+      'Your session expired. Sign in again to reopen the workspace.';
+
+  @override
+  String get partnerStatusForbiddenTitle => 'Access refused';
+
+  @override
+  String get partnerStatusForbiddenMessage =>
+      'The server refused this request for your account.';
+
+  @override
+  String get partnerStatusErrorTitle => 'Could not load the workspace';
+
+  @override
+  String get partnerStatusErrorMessage =>
+      'We could not reach the partner service. Check your connection and try again.';
+
+  @override
+  String get partnerVerificationApproved => 'Approved';
+
+  @override
+  String get partnerVerificationSubmitted => 'Submitted';
+
+  @override
+  String get partnerVerificationDraft => 'Draft';
+
+  @override
+  String get partnerVerificationRejected => 'Rejected';
+
+  @override
+  String get partnerVerificationSuspended => 'Suspended';
+
+  @override
+  String get partnerVerificationUnknown => 'Unknown';
+
+  @override
+  String get partnerDashboardTodayHeading => 'Today at a glance';
+
+  @override
+  String partnerDashboardRepresentative(String name) {
+    return 'Represented by $name';
+  }
+
+  @override
+  String get partnerMetricArrivals => 'Arrivals today';
+
+  @override
+  String get partnerMetricDepartures => 'Departures today';
+
+  @override
+  String get partnerMetricUnreadMessages => 'Unread messages';
+
+  @override
+  String get partnerMetricPendingReviews => 'Pending reviews';
+
+  @override
+  String get partnerMetricActivePromotions => 'Active promotions';
+
+  @override
+  String get partnerMetricNotifications => 'Notifications';
+
+  @override
+  String get partnerMetricProperties => 'Properties';
+
+  @override
+  String get partnerMetricActiveRooms => 'Active rooms';
+
+  @override
+  String get partnerPropertyScopeHeading => 'Property scope';
+
+  @override
+  String get partnerPropertyScopeEmpty =>
+      'No properties are assigned to this partner account yet.';
+
+  @override
+  String get partnerPropertyScopeUnavailable =>
+      'The property list could not be loaded. Refresh to try again.';
+
+  @override
+  String partnerPropertyInactiveSemantic(String name) {
+    return '$name, inactive';
+  }
+
+  @override
+  String get partnerModulePlannedBadge => 'Planned';
+
+  @override
+  String get partnerModulePlannedMessage =>
+      'This module is not built yet. It will be wired to the existing partner endpoints in a later phase; no data is shown until then.';
+
+  @override
+  String partnerModuleEndpointHint(String route) {
+    return 'Route: $route';
+  }
+
+  @override
+  String get partnerModuleReadOnlyForRole =>
+      'Your team role will not be able to change settings in this module.';
 }

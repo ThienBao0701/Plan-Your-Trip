@@ -14289,6 +14289,504 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remove {title} from favorites'**
   String walletRealUnfavoriteSemantic(String title);
+
+  /// No description provided for @partnerExtranetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Partner Extranet'**
+  String get partnerExtranetTitle;
+
+  /// No description provided for @partnerWorkspaceUnnamed.
+  ///
+  /// In en, this message translates to:
+  /// **'Your workspace'**
+  String get partnerWorkspaceUnnamed;
+
+  /// No description provided for @partnerNavGroupOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'Overview'**
+  String get partnerNavGroupOverview;
+
+  /// No description provided for @partnerNavGroupProperty.
+  ///
+  /// In en, this message translates to:
+  /// **'Property'**
+  String get partnerNavGroupProperty;
+
+  /// No description provided for @partnerNavGroupOperations.
+  ///
+  /// In en, this message translates to:
+  /// **'Operations'**
+  String get partnerNavGroupOperations;
+
+  /// No description provided for @partnerNavGroupGrowth.
+  ///
+  /// In en, this message translates to:
+  /// **'Growth'**
+  String get partnerNavGroupGrowth;
+
+  /// No description provided for @partnerNavGroupBusiness.
+  ///
+  /// In en, this message translates to:
+  /// **'Business'**
+  String get partnerNavGroupBusiness;
+
+  /// No description provided for @partnerNavGroupAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get partnerNavGroupAccount;
+
+  /// No description provided for @partnerNavDashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Dashboard'**
+  String get partnerNavDashboard;
+
+  /// No description provided for @partnerNavHotels.
+  ///
+  /// In en, this message translates to:
+  /// **'Hotels'**
+  String get partnerNavHotels;
+
+  /// No description provided for @partnerNavRooms.
+  ///
+  /// In en, this message translates to:
+  /// **'Rooms'**
+  String get partnerNavRooms;
+
+  /// No description provided for @partnerNavCalendar.
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar'**
+  String get partnerNavCalendar;
+
+  /// No description provided for @partnerNavPricing.
+  ///
+  /// In en, this message translates to:
+  /// **'Pricing'**
+  String get partnerNavPricing;
+
+  /// No description provided for @partnerNavPromotions.
+  ///
+  /// In en, this message translates to:
+  /// **'Promotions'**
+  String get partnerNavPromotions;
+
+  /// No description provided for @partnerNavBookings.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookings'**
+  String get partnerNavBookings;
+
+  /// No description provided for @partnerNavMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'Messages'**
+  String get partnerNavMessages;
+
+  /// No description provided for @partnerNavAnalytics.
+  ///
+  /// In en, this message translates to:
+  /// **'Analytics'**
+  String get partnerNavAnalytics;
+
+  /// No description provided for @partnerNavFinance.
+  ///
+  /// In en, this message translates to:
+  /// **'Finance'**
+  String get partnerNavFinance;
+
+  /// No description provided for @partnerNavReviews.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviews'**
+  String get partnerNavReviews;
+
+  /// No description provided for @partnerNavNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get partnerNavNotifications;
+
+  /// No description provided for @partnerNavSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get partnerNavSettings;
+
+  /// No description provided for @partnerNavMenuTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Open partner menu'**
+  String get partnerNavMenuTooltip;
+
+  /// No description provided for @partnerNavBadgeSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{label}, {count} pending'**
+  String partnerNavBadgeSemantic(String label, int count);
+
+  /// No description provided for @partnerTeamRoleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Your team role: {role}'**
+  String partnerTeamRoleLabel(String role);
+
+  /// No description provided for @partnerTeamRoleOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner'**
+  String get partnerTeamRoleOwner;
+
+  /// No description provided for @partnerTeamRoleManager.
+  ///
+  /// In en, this message translates to:
+  /// **'Manager'**
+  String get partnerTeamRoleManager;
+
+  /// No description provided for @partnerTeamRoleFrontDesk.
+  ///
+  /// In en, this message translates to:
+  /// **'Front desk'**
+  String get partnerTeamRoleFrontDesk;
+
+  /// No description provided for @partnerTeamRoleFinance.
+  ///
+  /// In en, this message translates to:
+  /// **'Finance'**
+  String get partnerTeamRoleFinance;
+
+  /// No description provided for @partnerTeamRoleViewer.
+  ///
+  /// In en, this message translates to:
+  /// **'Viewer'**
+  String get partnerTeamRoleViewer;
+
+  /// No description provided for @partnerTeamRoleUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Not determined'**
+  String get partnerTeamRoleUnknown;
+
+  /// No description provided for @partnerActionRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get partnerActionRetry;
+
+  /// No description provided for @partnerActionRefresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get partnerActionRefresh;
+
+  /// No description provided for @partnerActionBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Go back'**
+  String get partnerActionBack;
+
+  /// No description provided for @partnerActionExitToTravellerApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit to traveller app'**
+  String get partnerActionExitToTravellerApp;
+
+  /// No description provided for @partnerShellMobileHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Use a larger screen for the full operations console.'**
+  String get partnerShellMobileHint;
+
+  /// No description provided for @partnerStatusLoadingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading your workspace'**
+  String get partnerStatusLoadingTitle;
+
+  /// No description provided for @partnerStatusLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetching your partner profile and today\'s activity.'**
+  String get partnerStatusLoadingMessage;
+
+  /// No description provided for @partnerStatusReadyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Workspace ready'**
+  String get partnerStatusReadyTitle;
+
+  /// No description provided for @partnerStatusReadyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your partner workspace is up to date.'**
+  String get partnerStatusReadyMessage;
+
+  /// No description provided for @partnerStatusDemoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Not available in demo mode'**
+  String get partnerStatusDemoTitle;
+
+  /// No description provided for @partnerStatusDemoMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The Partner Extranet works only against the real backend. Sign in with a partner account to open it.'**
+  String get partnerStatusDemoMessage;
+
+  /// No description provided for @partnerStatusNotPartnerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Partner access required'**
+  String get partnerStatusNotPartnerTitle;
+
+  /// No description provided for @partnerStatusNotPartnerMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This account is not a partner account, so the Partner Extranet is unavailable.'**
+  String get partnerStatusNotPartnerMessage;
+
+  /// No description provided for @partnerStatusOnboardingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No partner profile yet'**
+  String get partnerStatusOnboardingTitle;
+
+  /// No description provided for @partnerStatusOnboardingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This account has no partner business profile. One must be created and approved before the workspace opens.'**
+  String get partnerStatusOnboardingMessage;
+
+  /// No description provided for @partnerStatusAwaitingApprovalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for approval'**
+  String get partnerStatusAwaitingApprovalTitle;
+
+  /// No description provided for @partnerStatusAwaitingApprovalMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your partner profile is submitted. The workspace opens once an administrator approves it.'**
+  String get partnerStatusAwaitingApprovalMessage;
+
+  /// No description provided for @partnerStatusRejectedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Partner profile rejected'**
+  String get partnerStatusRejectedTitle;
+
+  /// No description provided for @partnerStatusRejectedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your partner application was rejected, so the workspace is closed.'**
+  String get partnerStatusRejectedMessage;
+
+  /// No description provided for @partnerStatusSuspendedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Partner account suspended'**
+  String get partnerStatusSuspendedTitle;
+
+  /// No description provided for @partnerStatusSuspendedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'An administrator suspended this partner account. Contact support to restore access.'**
+  String get partnerStatusSuspendedMessage;
+
+  /// No description provided for @partnerStatusTeamMemberTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Team access not supported yet'**
+  String get partnerStatusTeamMemberTitle;
+
+  /// No description provided for @partnerStatusTeamMemberMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You belong to a partner team but do not own its profile. The extranet overview is currently available to the profile owner only.'**
+  String get partnerStatusTeamMemberMessage;
+
+  /// No description provided for @partnerStatusUnauthorizedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in again'**
+  String get partnerStatusUnauthorizedTitle;
+
+  /// No description provided for @partnerStatusUnauthorizedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your session expired. Sign in again to reopen the workspace.'**
+  String get partnerStatusUnauthorizedMessage;
+
+  /// No description provided for @partnerStatusForbiddenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Access refused'**
+  String get partnerStatusForbiddenTitle;
+
+  /// No description provided for @partnerStatusForbiddenMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The server refused this request for your account.'**
+  String get partnerStatusForbiddenMessage;
+
+  /// No description provided for @partnerStatusErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load the workspace'**
+  String get partnerStatusErrorTitle;
+
+  /// No description provided for @partnerStatusErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We could not reach the partner service. Check your connection and try again.'**
+  String get partnerStatusErrorMessage;
+
+  /// No description provided for @partnerVerificationApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved'**
+  String get partnerVerificationApproved;
+
+  /// No description provided for @partnerVerificationSubmitted.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitted'**
+  String get partnerVerificationSubmitted;
+
+  /// No description provided for @partnerVerificationDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft'**
+  String get partnerVerificationDraft;
+
+  /// No description provided for @partnerVerificationRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get partnerVerificationRejected;
+
+  /// No description provided for @partnerVerificationSuspended.
+  ///
+  /// In en, this message translates to:
+  /// **'Suspended'**
+  String get partnerVerificationSuspended;
+
+  /// No description provided for @partnerVerificationUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get partnerVerificationUnknown;
+
+  /// No description provided for @partnerDashboardTodayHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Today at a glance'**
+  String get partnerDashboardTodayHeading;
+
+  /// No description provided for @partnerDashboardRepresentative.
+  ///
+  /// In en, this message translates to:
+  /// **'Represented by {name}'**
+  String partnerDashboardRepresentative(String name);
+
+  /// No description provided for @partnerMetricArrivals.
+  ///
+  /// In en, this message translates to:
+  /// **'Arrivals today'**
+  String get partnerMetricArrivals;
+
+  /// No description provided for @partnerMetricDepartures.
+  ///
+  /// In en, this message translates to:
+  /// **'Departures today'**
+  String get partnerMetricDepartures;
+
+  /// No description provided for @partnerMetricUnreadMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'Unread messages'**
+  String get partnerMetricUnreadMessages;
+
+  /// No description provided for @partnerMetricPendingReviews.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending reviews'**
+  String get partnerMetricPendingReviews;
+
+  /// No description provided for @partnerMetricActivePromotions.
+  ///
+  /// In en, this message translates to:
+  /// **'Active promotions'**
+  String get partnerMetricActivePromotions;
+
+  /// No description provided for @partnerMetricNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get partnerMetricNotifications;
+
+  /// No description provided for @partnerMetricProperties.
+  ///
+  /// In en, this message translates to:
+  /// **'Properties'**
+  String get partnerMetricProperties;
+
+  /// No description provided for @partnerMetricActiveRooms.
+  ///
+  /// In en, this message translates to:
+  /// **'Active rooms'**
+  String get partnerMetricActiveRooms;
+
+  /// No description provided for @partnerPropertyScopeHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Property scope'**
+  String get partnerPropertyScopeHeading;
+
+  /// No description provided for @partnerPropertyScopeEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No properties are assigned to this partner account yet.'**
+  String get partnerPropertyScopeEmpty;
+
+  /// No description provided for @partnerPropertyScopeUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The property list could not be loaded. Refresh to try again.'**
+  String get partnerPropertyScopeUnavailable;
+
+  /// No description provided for @partnerPropertyInactiveSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}, inactive'**
+  String partnerPropertyInactiveSemantic(String name);
+
+  /// No description provided for @partnerModulePlannedBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Planned'**
+  String get partnerModulePlannedBadge;
+
+  /// No description provided for @partnerModulePlannedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This module is not built yet. It will be wired to the existing partner endpoints in a later phase; no data is shown until then.'**
+  String get partnerModulePlannedMessage;
+
+  /// No description provided for @partnerModuleEndpointHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Route: {route}'**
+  String partnerModuleEndpointHint(String route);
+
+  /// No description provided for @partnerModuleReadOnlyForRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Your team role will not be able to change settings in this module.'**
+  String get partnerModuleReadOnlyForRole;
 }
 
 class _AppLocalizationsDelegate

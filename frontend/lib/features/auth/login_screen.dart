@@ -9,10 +9,10 @@ import '../../design/app_radii.dart';
 import '../../design/app_spacing.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/glass_widgets.dart';
-import '../home/app_shell.dart';
 import 'email_verification_screen.dart';
 import 'forgot_password_screen.dart';
 import 'register_screen.dart';
+import 'role_home.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -114,7 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => loading = false);
 
     if (result['success'] == true) {
-      nav.pushReplacement(MaterialPageRoute(builder: (_) => const AppShell()));
+      nav.pushReplacement(MaterialPageRoute(builder: (_) => const RoleHome()));
       return;
     }
 

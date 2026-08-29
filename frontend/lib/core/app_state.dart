@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'app_role.dart';
 import 'mock/app_models.dart';
 import 'mock/mock_data.dart';
 import 'network/api_client.dart';
@@ -28,6 +29,17 @@ class AppState extends ChangeNotifier {
 
   bool demoMode = true;
   String? email;
+
+  /// The signed-in account's system role, as reported by the backend's
+  /// `AuthResponse.user.role` and persisted alongside the session. Defaults to
+  /// [AppRole.unknown] — an unauthenticated or unrecognised session gets no
+  /// elevated surface anywhere (fail closed).
+  ///
+  /// This drives **routing and affordances only**. Every partner/admin request
+  /// is still authorized by the backend against the JWT, so changing this value
+  /// on the client grants nothing.
+  AppRole role = AppRole.unknown;
+
   Locale? localeOverride;
   bool tripRemindersEnabled = true;
   bool bookingUpdatesEnabled = true;
@@ -686,6 +698,10 @@ class AppState extends ChangeNotifier {
     api.demoMode = savedDemo;
     demoMode = savedDemo;
     email = savedDemo || savedToken != null ? savedEmail : null;
+    // A role only means anything while a session actually exists; a restored
+    // session with no email is anonymous and gets AppRole.unknown.
+    role =
+        email == null ? AppRole.unknown : AppRole.parse(await storage.role());
     _applyPersonalDataMode();
     localeOverride = await preferences.locale();
     tripRemindersEnabled = await preferences.tripReminders();
@@ -700,9 +716,14 @@ class AppState extends ChangeNotifier {
     if (r['success'] == true) {
       email = e.trim();
       demoMode = r['demo'] == true;
+      role = AppRole.parse(r['role']);
       _applyPersonalDataMode();
       await storage.save(
-          email: email!, token: r['token'] as String?, demo: demoMode);
+        email: email!,
+        token: r['token'] as String?,
+        demo: demoMode,
+        role: role.wireValue,
+      );
       notifyListeners();
     }
     return r;
@@ -717,6 +738,7 @@ class AppState extends ChangeNotifier {
     api.demoMode = true;
     email = null;
     demoMode = true;
+    role = AppRole.unknown;
     places = List.from(MockData.places);
     savedPlaces = List.from(MockData.demoSavedPlaces);
     savedCollections = List.from(MockData.demoSavedCollections);
