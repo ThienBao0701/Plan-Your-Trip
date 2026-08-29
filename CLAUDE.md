@@ -31,7 +31,8 @@ Work on one side at a time and stay inside its directory unless a task explicitl
 ### Commands
 
 ```sh
-./mvnw spring-boot:run                 # run the API (defaults to H2 in-memory, port 8080)
+./mvnw spring-boot:run                 # run the API (H2 in-memory; binds ${PORT:8080}, so 8080 unless overridden)
+SERVER_PORT=8081 ./mvnw spring-boot:run  # local dev port — the launcher sets this (8080 is taken by Windows AgentService)
 ./mvnw test                            # run the full test suite
 ./mvnw test -Dtest=BookingTest          # run a single test class
 ./mvnw test -Dtest=BookingTest#createsBookingWithValidPayload   # single test method
@@ -93,7 +94,7 @@ orientation only:
 ```sh
 cd frontend
 flutter pub get
-flutter run -d chrome --dart-define=API_BASE_URL=http://localhost:8080/api
+flutter run -d chrome --dart-define=API_BASE_URL=http://localhost:8081/api
 flutter analyze
 flutter test
 flutter test test/some_test.dart

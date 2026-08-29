@@ -9,9 +9,9 @@ The frontend reads the backend URL from `API_BASE_URL`.
 Examples:
 
 ```sh
-flutter run -d chrome --dart-define=API_BASE_URL=http://localhost:8080/api
-flutter run -d android --dart-define=API_BASE_URL=http://10.0.2.2:8080/api
-flutter run --dart-define=API_BASE_URL=http://192.168.1.10:8080/api
+flutter run -d chrome --dart-define=API_BASE_URL=http://localhost:8081/api
+flutter run -d android --dart-define=API_BASE_URL=http://10.0.2.2:8081/api
+flutter run --dart-define=API_BASE_URL=http://192.168.1.10:8081/api
 ```
 
 Use `localhost` for Flutter Web on the same computer as the backend. Use

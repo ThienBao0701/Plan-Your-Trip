@@ -37,9 +37,9 @@ more than speed of feature count.
 
 ```sh
 flutter pub get                                   # install deps
-flutter run -d chrome --dart-define=API_BASE_URL=http://localhost:8080/api
-flutter run -d android --dart-define=API_BASE_URL=http://10.0.2.2:8080/api   # Android emulator
-flutter run --dart-define=API_BASE_URL=http://192.168.1.10:8080/api          # physical device (LAN IP)
+flutter run -d chrome --dart-define=API_BASE_URL=http://localhost:8081/api
+flutter run -d android --dart-define=API_BASE_URL=http://10.0.2.2:8081/api   # Android emulator
+flutter run --dart-define=API_BASE_URL=http://192.168.1.10:8081/api          # physical device (LAN IP)
 
 flutter analyze                                   # static analysis (flutter_lints)
 flutter test                                      # run all tests
@@ -50,7 +50,12 @@ flutter gen-l10n                                  # regenerate lib/l10n/app_loca
 dart format .                                     # format before reporting a phase done
 ```
 
-`API_BASE_URL` defaults to `http://localhost:8080/api` (`lib/core/config/app_config.dart`) when not passed via `--dart-define`.
+`API_BASE_URL` defaults to `http://localhost:8081/api` (`lib/core/config/app_config.dart`) when not passed via `--dart-define`.
+
+Local development uses port **8081**, not 8080: port 8080 is occupied by Windows AgentService on the
+development machine, so local Spring Boot is started with `SERVER_PORT=8081` by the launcher. This is
+a local-development concern only — the Dockerised app still listens on **8080** inside its own network
+(`docker-compose.yml`, `nginx/nginx.conf`, `Dockerfile`), and that must not be changed.
 
 ## 4. Existing Flutter architecture
 
