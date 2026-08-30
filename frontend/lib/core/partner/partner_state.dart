@@ -289,6 +289,41 @@ class PartnerState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Republishes the authorized property list from a fresh
+  /// `GET /api/partner/hotels` (C2's Properties module reloads it whenever that
+  /// screen is opened or refreshed).
+  ///
+  /// This is the single, controlled way the list is replaced after the initial
+  /// workspace load, so property scope keeps exactly one owner. Two invariants
+  /// are enforced here rather than at each call site:
+  ///
+  ///  * a selection that is no longer in the authorized list is **dropped**, so
+  ///    a property removed or unassigned server-side cannot linger as stale
+  ///    scope for a later module;
+  ///  * when nothing is selected and exactly one property exists, it becomes
+  ///    the selection — a single-property partner should never have to pick.
+  void replaceProperties(List<PartnerProperty> properties) {
+    _properties = List.unmodifiable(properties);
+    _propertiesUnavailable = false;
+
+    final selected = _selectedPropertyId;
+    if (selected != null && !properties.any((p) => p.id == selected)) {
+      _selectedPropertyId = null;
+    }
+    if (_selectedPropertyId == null && properties.length == 1) {
+      _selectedPropertyId = properties.first.id;
+    }
+    notifyListeners();
+  }
+
+  /// Clears the property selection without touching the authorized list — used
+  /// when the workspace widens back to "all properties".
+  void clearSelectedProperty() {
+    if (_selectedPropertyId == null) return;
+    _selectedPropertyId = null;
+    notifyListeners();
+  }
+
   /// Drops every partner value. Called on any session identity change and
   /// whenever the workspace is left.
   void reset() {

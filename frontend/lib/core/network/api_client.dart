@@ -4,7 +4,18 @@ import 'package:http/http.dart' as http;
 import '../config/app_config.dart';
 import '../mock/app_models.dart';
 import '../mock/mock_data.dart';
+import '../partner/partner_account_models.dart';
+import '../partner/partner_analytics_models.dart';
+import '../partner/partner_booking_models.dart';
+import '../partner/partner_finance_models.dart';
+import '../partner/partner_dashboard_models.dart';
 import '../partner/partner_models.dart';
+import '../partner/partner_inventory_models.dart';
+import '../partner/partner_policy_models.dart';
+import '../partner/partner_promotion_models.dart';
+import '../partner/partner_property_models.dart';
+import '../partner/partner_rate_models.dart';
+import '../partner/partner_room_models.dart';
 
 /// Machine-readable outcome classification for the typed Saved Collections
 /// endpoints — deliberately distinct from the legacy `Map<String, dynamic>`
@@ -4287,6 +4298,1457 @@ class ApiClient {
       return const CollectionApiResult.failure(ApiErrorKind.network);
     }
   }
+
+  // ── Partner Dashboard (C1) ──────────────────────────────────────────────
+  //
+  // All read-only, all verified present in backend-v1/develop. Scope rules:
+  //   * `/partner/dashboard` takes NO parameters — `PartnerBookingService`
+  //     computes it over every owned hotel, anchored on today.
+  //   * `/partner/analytics/**` and `/partner/finance/overview` accept
+  //     `hotelId`, `from` and `to`. `hotelId` must be one the backend already
+  //     returned from `/partner/hotels`; an unowned id is a uniform 404.
+  //     `from` after `to` is a 400 (`resolveRange`).
+  //   * `/partner/extranet/**` take no parameters and are owner-only.
+  //
+  // Every one of these returns 404 when the caller has no partner profile and
+  // 403 when the profile is not APPROVED (`myApprovedProfileOrThrow`).
+
+  /// Builds the `hotelId` / `from` / `to` query the analytics and finance
+  /// endpoints accept. Dates are sent as ISO `yyyy-MM-dd`, matching the
+  /// controllers' `@DateTimeFormat(iso = DATE)`.
+  Map<String, String> _partnerScopeQuery({
+    int? hotelId,
+    DateTime? from,
+    DateTime? to,
+  }) =>
+      {
+        if (hotelId != null) 'hotelId': '$hotelId',
+        if (from != null) 'from': _isoDate(from),
+        if (to != null) 'to': _isoDate(to),
+      };
+
+  Uri _partnerUri(String path, [Map<String, String>? query]) {
+    final uri = Uri.parse('$baseUrl$path');
+    if (query == null || query.isEmpty) return uri;
+    return uri.replace(queryParameters: {...uri.queryParameters, ...query});
+  }
+
+  /// Shared request/decode path for the partner GETs that return a JSON object.
+  Future<CollectionApiResult<T>> _partnerGetObject<T>(
+    Uri uri,
+    T Function(Map<String, dynamic>) parse,
+  ) async {
+    try {
+      final res = await _client
+          .get(uri, headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(parse(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Shared request/decode path for the partner GETs that return a bare array.
+  Future<CollectionApiResult<List<T>>> _partnerGetList<T>(
+    Uri uri,
+    T? Function(Map<String, dynamic>) parse,
+  ) async {
+    try {
+      final res = await _client
+          .get(uri, headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final decoded = jsonDecode(utf8.decode(res.bodyBytes));
+        if (decoded is! List) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        final items = <T>[];
+        for (final entry in decoded) {
+          if (entry is! Map<String, dynamic>) continue;
+          final item = parse(entry);
+          if (item != null) items.add(item);
+        }
+        return CollectionApiResult.success(items);
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// `GET /api/partner/dashboard` — today's booking operations across every
+  /// owned hotel. Takes no parameters by design (see `PartnerBookingService`).
+  Future<CollectionApiResult<PartnerBookingDashboard>>
+      getPartnerBookingDashboard() => _partnerGetObject(
+          _partnerUri('/partner/dashboard'), PartnerBookingDashboard.fromJson);
+
+  /// `GET /api/partner/analytics/overview` for the given scope.
+  Future<CollectionApiResult<PartnerAnalyticsOverview>>
+      getPartnerAnalyticsOverview({
+    int? hotelId,
+    DateTime? from,
+    DateTime? to,
+  }) =>
+          _partnerGetObject(
+            _partnerUri('/partner/analytics/overview',
+                _partnerScopeQuery(hotelId: hotelId, from: from, to: to)),
+            PartnerAnalyticsOverview.fromJson,
+          );
+
+  /// `GET /api/partner/analytics/occupancy` for the given scope.
+  Future<CollectionApiResult<PartnerOccupancyAnalytics>>
+      getPartnerOccupancyAnalytics({
+    int? hotelId,
+    DateTime? from,
+    DateTime? to,
+  }) =>
+          _partnerGetObject(
+            _partnerUri('/partner/analytics/occupancy',
+                _partnerScopeQuery(hotelId: hotelId, from: from, to: to)),
+            PartnerOccupancyAnalytics.fromJson,
+          );
+
+  /// `GET /api/partner/analytics/revenue` for the given scope.
+  Future<CollectionApiResult<PartnerRevenueAnalytics>>
+      getPartnerRevenueAnalytics({
+    int? hotelId,
+    DateTime? from,
+    DateTime? to,
+  }) =>
+          _partnerGetObject(
+            _partnerUri('/partner/analytics/revenue',
+                _partnerScopeQuery(hotelId: hotelId, from: from, to: to)),
+            PartnerRevenueAnalytics.fromJson,
+          );
+
+  /// `GET /api/partner/finance/overview` for the given scope.
+  ///
+  /// Only called when the dashboard scope differs from the default; at the
+  /// default scope the identical record is already embedded in
+  /// `/partner/extranet/home` as `financeSummary`.
+  Future<CollectionApiResult<PartnerFinanceOverview>>
+      getPartnerFinanceOverview({
+    int? hotelId,
+    DateTime? from,
+    DateTime? to,
+  }) =>
+          _partnerGetObject(
+            _partnerUri('/partner/finance/overview',
+                _partnerScopeQuery(hotelId: hotelId, from: from, to: to)),
+            PartnerFinanceOverview.fromJson,
+          );
+
+  /// `GET /api/partner/extranet/activity-logs` — the caller's own audit trail,
+  /// newest first (`findByPartnerProfileIdOrderByCreatedAtDesc`).
+  Future<CollectionApiResult<List<PartnerActivityLogEntry>>>
+      getPartnerActivityLogs() => _partnerGetList(
+            _partnerUri('/partner/extranet/activity-logs'),
+            PartnerActivityLogEntry.fromJson,
+          );
+
+  /// `GET /api/partner/extranet/menu` — the backend's own navigation contract:
+  /// key, label, route, enabled and a nullable badge count per entry.
+  Future<CollectionApiResult<List<PartnerMenuItem>>> getPartnerMenu() async {
+    final result = await _partnerGetObject<List<PartnerMenuItem>>(
+      _partnerUri('/partner/extranet/menu'),
+      (body) {
+        final sections = body['sections'];
+        if (sections is! List) return const <PartnerMenuItem>[];
+        final items = <PartnerMenuItem>[];
+        for (final entry in sections) {
+          if (entry is! Map<String, dynamic>) continue;
+          final item = PartnerMenuItem.fromJson(entry);
+          if (item != null) items.add(item);
+        }
+        return items;
+      },
+    );
+    return result;
+  }
+
+  // ── Partner Properties (C2) ─────────────────────────────────────────────
+  //
+  // `PartnerHotelController` exposes GET list, GET detail, four PUT edit
+  // endpoints and PATCH activate/deactivate. There is **no create and no
+  // delete** — a partner's properties are assigned to them by an admin
+  // (`PartnerPropertyService.assignOwner`), so no client-side create exists.
+  //
+  // Ownership: every method resolves through
+  // `ownedPlaceOrThrow` → `places.findByIdAndOwnerId`, which returns a uniform
+  // 404 for an unknown id AND for a real property owned by someone else. That
+  // is deliberate — it leaks no existence. Verified against the running
+  // backend: place id 2 is publicly readable at /api/places/2 (200) yet
+  // /api/partner/hotels/2 returns 404 for a partner who does not own it.
+
+  /// `GET /api/partner/hotels/{id}` — one owned property in full.
+  ///
+  /// 404 means "not yours or not there" and the two are indistinguishable by
+  /// design; the client must not present it as "this property exists but you
+  /// lack permission".
+  Future<CollectionApiResult<PartnerPropertyDetail>> getPartnerProperty(
+          int propertyId) =>
+      _partnerGetObject(
+        _partnerUri('/partner/hotels/$propertyId'),
+        (body) => PartnerPropertyDetail.fromJson(body),
+      ).then(_requireDetail);
+
+  /// `PATCH /api/partner/hotels/{id}/activate` — publish the listing to guests.
+  ///
+  /// Returns the full updated `PartnerHotelResponse`, so state is refreshed
+  /// from the server's own answer rather than optimistically guessed.
+  Future<CollectionApiResult<PartnerPropertyDetail>> activatePartnerProperty(
+          int propertyId) =>
+      _partnerPatchDetail('/partner/hotels/$propertyId/activate');
+
+  /// `PATCH /api/partner/hotels/{id}/deactivate` — withdraw the listing.
+  Future<CollectionApiResult<PartnerPropertyDetail>> deactivatePartnerProperty(
+          int propertyId) =>
+      _partnerPatchDetail('/partner/hotels/$propertyId/deactivate');
+
+  Future<CollectionApiResult<PartnerPropertyDetail>> _partnerPatchDetail(
+      String path) async {
+    try {
+      final res = await _client
+          .patch(_partnerUri(path), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        final detail = PartnerPropertyDetail.fromJson(body);
+        if (detail == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(detail);
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      // A mutation that timed out may still have been committed server-side.
+      return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  CollectionApiResult<PartnerPropertyDetail> _requireDetail(
+          CollectionApiResult<PartnerPropertyDetail?> result) =>
+      result.success
+          ? (result.data == null
+              ? const CollectionApiResult.failure(ApiErrorKind.malformed)
+              : CollectionApiResult.success(
+                  result.data as PartnerPropertyDetail))
+          : CollectionApiResult.failure(result.errorKind, result.message);
+
+  // ── Partner Rooms (C3) ──────────────────────────────────────────────────
+  //
+  // `PartnerRoomController` exposes GET list, GET detail, PUT update and
+  // PATCH activate/deactivate. There is **no create and no delete**.
+  //
+  // The list endpoint takes a **required** `hotelId` query parameter
+  // (`@RequestParam Long hotelId`, no `required = false`), so the property
+  // context is mandatory — this client never calls it without one. Omitting it
+  // produces a 500 from the running backend rather than a 400; see the C3
+  // report. Callers are therefore required to pass a property id.
+  //
+  // Ownership, verified live:
+  //   * list  — `ownedPlaceOrThrow(hotelId)` → 404 for an unknown *or* unowned
+  //     hotel, then a further 404 if the place has no `HotelDetail` row.
+  //   * detail/mutations — `ownedRoomOrThrow` walks
+  //     room → hotelDetail → place → owner and returns a uniform 404 when the
+  //     owner does not match. Rooms 1–4 resolve for the seeded partner; 5+ are
+  //     404, with no way to tell "absent" from "someone else's".
+
+  /// `GET /api/partner/rooms?hotelId={id}` — every room of one owned property,
+  /// **including inactive ones** (`getByHotelDetail(detailId, false)`).
+  Future<CollectionApiResult<List<PartnerRoom>>> getPartnerRooms(int hotelId) =>
+      _partnerGetList(
+        _partnerUri('/partner/rooms', {'hotelId': '$hotelId'}),
+        PartnerRoom.fromJson,
+      );
+
+  /// `GET /api/partner/rooms/{roomId}` — one owned room in full.
+  Future<CollectionApiResult<PartnerRoom>> getPartnerRoom(int roomId) =>
+      _partnerGetObject(
+        _partnerUri('/partner/rooms/$roomId'),
+        (body) => PartnerRoom.fromJson(body),
+      ).then(_requireRoom);
+
+  /// `PATCH /api/partner/rooms/{roomId}/activate` — list this room type.
+  Future<CollectionApiResult<PartnerRoom>> activatePartnerRoom(int roomId) =>
+      _partnerPatchRoom('/partner/rooms/$roomId/activate');
+
+  /// `PATCH /api/partner/rooms/{roomId}/deactivate` — stop listing it.
+  Future<CollectionApiResult<PartnerRoom>> deactivatePartnerRoom(int roomId) =>
+      _partnerPatchRoom('/partner/rooms/$roomId/deactivate');
+
+  Future<CollectionApiResult<PartnerRoom>> _partnerPatchRoom(
+      String path) async {
+    try {
+      final res = await _client
+          .patch(_partnerUri(path), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        final room = PartnerRoom.fromJson(body);
+        if (room == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(room);
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      // The mutation may already have been committed server-side.
+      return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  CollectionApiResult<PartnerRoom> _requireRoom(
+          CollectionApiResult<PartnerRoom?> result) =>
+      result.success
+          ? (result.data == null
+              ? const CollectionApiResult.failure(ApiErrorKind.malformed)
+              : CollectionApiResult.success(result.data as PartnerRoom))
+          : CollectionApiResult.failure(result.errorKind, result.message);
+
+  // ── Partner Inventory / Calendar (C4) ───────────────────────────────────
+  //
+  // Namespace is `/api/partner/calendar/**` — the backend calls this surface
+  // "calendar", not "inventory". `PartnerCalendarController` also exposes
+  // `/rooms/{roomId}/price` (GET/PUT), which is **rate plans** and belongs to a
+  // later phase; it is deliberately absent here.
+  //
+  // Ownership: `PartnerCalendarService.ownedRoomOrThrow` walks
+  // room → hotelDetail → place → owner and returns a uniform 404 for an unknown
+  // room and for another partner's room. Verified live: room 5 → 404.
+  //
+  // Date range: `from`/`to` are **inclusive on both ends** and are only applied
+  // when *both* are present — sending one silently returns the room's entire
+  // history. An inverted range returns 200 with an empty list rather than 400,
+  // so callers must validate it themselves.
+
+  /// `GET /api/partner/calendar/rooms/{roomId}` for an inclusive `[from, to]`.
+  ///
+  /// Both bounds are required by this client even though the endpoint accepts
+  /// neither: a partial range is ignored server-side, which would quietly
+  /// return every row the room has ever had.
+  Future<CollectionApiResult<PartnerInventoryCalendar>> getPartnerInventory({
+    required int roomId,
+    required DateTime from,
+    required DateTime to,
+  }) =>
+      _partnerGetObject(
+        _partnerUri('/partner/calendar/rooms/$roomId', {
+          'from': _isoDate(from),
+          'to': _isoDate(to),
+        }),
+        (body) => PartnerInventoryCalendar.fromJson(body),
+      ).then(_requireCalendar);
+
+  /// Toggles one per-day flag.
+  ///
+  /// Each flag has its own PATCH endpoint taking `{"value": bool}`
+  /// (`PartnerCalendarDto.InventoryFlagRequest`) and returns the full updated
+  /// `RoomInventoryResponse`. These touch exactly one boolean and never the
+  /// quantities, so they cannot clobber a concurrent booking's decrement.
+  ///
+  /// A date with no inventory row returns **404** — only the bulk endpoint
+  /// creates rows.
+  Future<CollectionApiResult<PartnerInventoryDay>> setPartnerInventoryFlag({
+    required int roomId,
+    required DateTime date,
+    required PartnerInventoryFlag flag,
+    required bool value,
+  }) async {
+    final segment = switch (flag) {
+      PartnerInventoryFlag.stopSell => 'stop-sell',
+      PartnerInventoryFlag.closedArrival => 'closed-arrival',
+      PartnerInventoryFlag.closedDeparture => 'closed-departure',
+    };
+    final uri = _partnerUri(
+        '/partner/calendar/rooms/$roomId/${_isoDate(date)}/$segment');
+    try {
+      final res = await _client
+          .patch(uri, headers: _jsonHeaders, body: jsonEncode({'value': value}))
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        final day = PartnerInventoryDay.fromJson(body);
+        if (day == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(day);
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      // The flag may already have been persisted before the connection dropped.
+      return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  CollectionApiResult<PartnerInventoryCalendar> _requireCalendar(
+          CollectionApiResult<PartnerInventoryCalendar?> result) =>
+      result.success
+          ? (result.data == null
+              ? const CollectionApiResult.failure(ApiErrorKind.malformed)
+              : CollectionApiResult.success(
+                  result.data as PartnerInventoryCalendar))
+          : CollectionApiResult.failure(result.errorKind, result.message);
+
+  // ── Partner Rates (C5) ──────────────────────────────────────────────────
+  //
+  // `PartnerPricingController` spans two paths:
+  //   /api/partner/rooms/{roomId}/rate-plans        (list, create)
+  //   /api/partner/rate-plans/{id}/**               (update, delete, activate,
+  //                                                  deactivate, duplicate,
+  //                                                  occupancy prices, preview,
+  //                                                  validate)
+  //
+  // C5 exposes the reads plus activate/deactivate only. Create, `PUT` update,
+  // delete, duplicate and occupancy-price writes are deliberately absent:
+  //   * `PUT /rate-plans/{id}` is a **full replace** — `applyAndValidate` nulls
+  //     `code`, `description`, cancellation fields, stay limits and advance-
+  //     booking limits when omitted, so a partial form would erase them.
+  //   * `DELETE` is irreversible and 409s when the plan parents derived plans.
+  //   * Duplicate is a create.
+  // Activate/deactivate take no body, flip one boolean and return the full
+  // record, so they cannot corrupt a plan's configuration.
+  //
+  // Ownership: `PartnerPricingService.ownedRoomOrThrow` / `ownedRatePlanOrThrow`
+  // walk to the owning profile and return a uniform 404. Verified live: room 5
+  // and rate plan 9999 both 404.
+
+  /// `GET /api/partner/rooms/{roomId}/rate-plans`.
+  Future<CollectionApiResult<List<PartnerRatePlan>>> getPartnerRatePlans(
+          int roomId) =>
+      _partnerGetList(
+        _partnerUri('/partner/rooms/$roomId/rate-plans'),
+        PartnerRatePlan.fromJson,
+      );
+
+  /// `GET /api/partner/rate-plans/{id}/occupancy-prices`.
+  Future<CollectionApiResult<List<PartnerOccupancyPrice>>>
+      getPartnerOccupancyPrices(int ratePlanId) => _partnerGetList(
+            _partnerUri('/partner/rate-plans/$ratePlanId/occupancy-prices'),
+            PartnerOccupancyPrice.fromJson,
+          );
+
+  /// `GET /api/partner/rate-plans/{id}/preview` — backend-computed pricing and
+  /// eligibility for one stay.
+  ///
+  /// `checkIn`/`checkOut` are a half-open **night** range (nights =
+  /// checkOut − checkIn), unlike the rate plan's own inclusive validity window.
+  /// The endpoint does not reject `checkOut <= checkIn` (verified live: 200),
+  /// so callers validate it first.
+  Future<CollectionApiResult<PartnerRatePreview>> getPartnerRatePreview({
+    required int ratePlanId,
+    required DateTime checkIn,
+    required DateTime checkOut,
+    int adults = 2,
+    int children = 0,
+    int extraBeds = 0,
+  }) =>
+      _partnerGetObject(
+        _partnerUri('/partner/rate-plans/$ratePlanId/preview', {
+          'checkIn': _isoDate(checkIn),
+          'checkOut': _isoDate(checkOut),
+          'adults': '$adults',
+          'children': '$children',
+          'extraBeds': '$extraBeds',
+        }),
+        (body) => PartnerRatePreview.fromJson(body),
+      ).then(_requirePreview);
+
+  /// `POST /api/partner/rate-plans/{id}/activate`.
+  Future<CollectionApiResult<PartnerRatePlan>> activatePartnerRatePlan(
+          int ratePlanId) =>
+      _partnerPostRatePlan('/partner/rate-plans/$ratePlanId/activate');
+
+  /// `POST /api/partner/rate-plans/{id}/deactivate`.
+  Future<CollectionApiResult<PartnerRatePlan>> deactivatePartnerRatePlan(
+          int ratePlanId) =>
+      _partnerPostRatePlan('/partner/rate-plans/$ratePlanId/deactivate');
+
+  Future<CollectionApiResult<PartnerRatePlan>> _partnerPostRatePlan(
+      String path) async {
+    try {
+      final res = await _client
+          .post(_partnerUri(path), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        final plan = PartnerRatePlan.fromJson(body);
+        if (plan == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(plan);
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      // May already have been committed before the connection dropped.
+      return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  CollectionApiResult<PartnerRatePreview> _requirePreview(
+          CollectionApiResult<PartnerRatePreview?> result) =>
+      result.success
+          ? (result.data == null
+              ? const CollectionApiResult.failure(ApiErrorKind.malformed)
+              : CollectionApiResult.success(result.data as PartnerRatePreview))
+          : CollectionApiResult.failure(result.errorKind, result.message);
+
+  // ── Partner Policies & Settings (C6) ────────────────────────────────────
+  //
+  // Two domains with two different authorization rules:
+  //   * `PUT /api/partner/hotels/{id}/policies` — `PartnerPropertyService` is
+  //     **owner-only** (`partnerProfileRepo.findByUserId`), no team-role check.
+  //   * `GET/PUT /api/partner/settings` — `PartnerSettingsService.resolveAccess`
+  //     is the one **team-aware** resolver in the partner API; writes require
+  //     OWNER or MANAGER (`SETTINGS_WRITE_ROLES`) and 403 otherwise.
+  //
+  // Both request records carry every field the form shows (5 and 9), so unlike
+  // the property and rate-plan PUTs there is no omitted-field erasure.
+  //
+  // There is deliberately **no asset/media method here**: every media mutation
+  // lives under `/api/admin/**` (`hasRole("ADMIN")`), and a PARTNER receives 403
+  // — verified live. See the C6 report.
+
+  /// `PUT /api/partner/hotels/{id}/policies`.
+  ///
+  /// `checkIn`/`checkOut` are `@NotNull`; omitting either is a 400
+  /// (`"checkIn: must not be null"`). The three house-rule strings may be null,
+  /// and sending null genuinely clears them.
+  Future<CollectionApiResult<PartnerPropertyDetail>> updatePartnerPolicies({
+    required int propertyId,
+    required PartnerPropertyPolicies policies,
+  }) async {
+    try {
+      final res = await _client
+          .put(
+            _partnerUri('/partner/hotels/$propertyId/policies'),
+            headers: _jsonHeaders,
+            body: jsonEncode(policies.toRequestJson()),
+          )
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        final detail = PartnerPropertyDetail.fromJson(body);
+        if (detail == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(detail);
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// `GET /api/partner/settings` — created with defaults on first access.
+  Future<CollectionApiResult<PartnerWorkspaceSettings>>
+      getPartnerWorkspaceSettings() => _partnerGetObject(
+            _partnerUri('/partner/settings'),
+            (body) => PartnerWorkspaceSettings.fromJson(body),
+          ).then(_requireSettings);
+
+  /// `PUT /api/partner/settings` — OWNER or MANAGER only; 403 for any other
+  /// team role, with the server's own explanation.
+  Future<CollectionApiResult<PartnerWorkspaceSettings>>
+      updatePartnerWorkspaceSettings(PartnerWorkspaceSettings settings) async {
+    try {
+      final res = await _client
+          .put(
+            _partnerUri('/partner/settings'),
+            headers: _jsonHeaders,
+            body: jsonEncode(settings.toRequestJson()),
+          )
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        final updated = PartnerWorkspaceSettings.fromJson(body);
+        if (updated == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(updated);
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  CollectionApiResult<PartnerWorkspaceSettings> _requireSettings(
+          CollectionApiResult<PartnerWorkspaceSettings?> result) =>
+      result.success
+          ? (result.data == null
+              ? const CollectionApiResult.failure(ApiErrorKind.malformed)
+              : CollectionApiResult.success(
+                  result.data as PartnerWorkspaceSettings))
+          : CollectionApiResult.failure(result.errorKind, result.message);
+
+  // ── Partner Promotions & Vouchers (C7) ──────────────────────────────────
+  //
+  // Promotions: `/api/partner/promotions` — GET list, GET detail, POST, PUT,
+  // DELETE. Owner-only (`PartnerPromotionService` is not team-aware).
+  // Ownership is by **target**: a promotion is "mine" when its `targetId`
+  // resolves to a HotelDetail or HotelRoom I own. An `ALL`-targeted promotion is
+  // never mine, and creating one is a 403.
+  //
+  // C7 exposes the reads plus an activate/deactivate that is implemented as a
+  // **lossless full PUT** — there is no command endpoint for activation, and
+  // `PromotionService.fill` replaces all sixteen request fields, so the only
+  // safe write echoes the entire stored record and changes one flag. Create,
+  // free-form edit and delete are deliberately absent; see the C7 report.
+  //
+  // Vouchers: `POST /api/partner/bookings/voucher/verify` is the *only* partner
+  // voucher endpoint, and it is read-only. There is no partner coupon or
+  // gift-card API at all — those are admin/customer surfaces.
+
+  /// `GET /api/partner/promotions` — promotions targeting a hotel or room I own.
+  Future<CollectionApiResult<List<PartnerPromotion>>> getPartnerPromotions() =>
+      _partnerGetList(
+        _partnerUri('/partner/promotions'),
+        PartnerPromotion.fromJson,
+      );
+
+  /// `GET /api/partner/promotions/{id}` — uniform 404 for unknown or unowned.
+  Future<CollectionApiResult<PartnerPromotion>> getPartnerPromotion(int id) =>
+      _partnerGetObject(
+        _partnerUri('/partner/promotions/$id'),
+        (body) => PartnerPromotion.fromJson(body),
+      ).then(_requirePromotion);
+
+  /// `PUT /api/partner/promotions/{id}` carrying the **complete** record with
+  /// only `active` changed.
+  ///
+  /// [promotion] must be the record just read from the server; the body echoes
+  /// all sixteen request fields so the full replace cannot erase anything.
+  /// Note `Promotion` has no `@Version`, so a concurrent edit elsewhere would be
+  /// overwritten — reported rather than papered over.
+  Future<CollectionApiResult<PartnerPromotion>> setPartnerPromotionActive({
+    required PartnerPromotion promotion,
+    required bool active,
+  }) async {
+    try {
+      final res = await _client
+          .put(
+            _partnerUri('/partner/promotions/${promotion.id}'),
+            headers: _jsonHeaders,
+            body: jsonEncode(promotion.toRequestJson(activeOverride: active)),
+          )
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        final updated = PartnerPromotion.fromJson(body);
+        if (updated == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(updated);
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// `GET /api/partner/rooms/{roomId}/pricing-preview` — the engine's own
+  /// breakdown for a stay, including which promotions it applied and the
+  /// resulting amounts.
+  ///
+  /// Every figure is backend-computed; the client never recomputes pricing.
+  /// `checkIn`/`checkOut` are a half-open night range.
+  Future<CollectionApiResult<PartnerPricingPreview>> getPartnerPricingPreview({
+    required int roomId,
+    required DateTime checkIn,
+    required DateTime checkOut,
+  }) =>
+      _partnerGetObject(
+        _partnerUri('/partner/rooms/$roomId/pricing-preview', {
+          'checkIn': _isoDate(checkIn),
+          'checkOut': _isoDate(checkOut),
+        }),
+        (body) => PartnerPricingPreview.fromJson(body),
+      ).then(_requirePreviewBreakdown);
+
+  /// `POST /api/partner/bookings/voucher/verify` — read-only booking-voucher
+  /// verification.
+  ///
+  /// An invalid signature, an unknown booking and another partner's booking all
+  /// collapse to a uniform **404**, so the client must not claim to know which.
+  /// A verified-but-ineligible booking returns 200 with `eligible = false` and a
+  /// reason.
+  Future<CollectionApiResult<PartnerVoucherVerification>> verifyPartnerVoucher(
+      String voucherPayload) async {
+    try {
+      final res = await _client
+          .post(
+            _partnerUri('/partner/bookings/voucher/verify'),
+            headers: _jsonHeaders,
+            body: jsonEncode({'voucherPayload': voucherPayload}),
+          )
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        final result = PartnerVoucherVerification.fromJson(body);
+        if (result == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(result);
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      // Verification mutates nothing, so a timeout is a plain failure — there is
+      // no uncertain committed state to warn about.
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  CollectionApiResult<PartnerPromotion> _requirePromotion(
+          CollectionApiResult<PartnerPromotion?> result) =>
+      result.success
+          ? (result.data == null
+              ? const CollectionApiResult.failure(ApiErrorKind.malformed)
+              : CollectionApiResult.success(result.data as PartnerPromotion))
+          : CollectionApiResult.failure(result.errorKind, result.message);
+
+  CollectionApiResult<PartnerPricingPreview> _requirePreviewBreakdown(
+          CollectionApiResult<PartnerPricingPreview?> result) =>
+      result.success
+          ? (result.data == null
+              ? const CollectionApiResult.failure(ApiErrorKind.malformed)
+              : CollectionApiResult.success(
+                  result.data as PartnerPricingPreview))
+          : CollectionApiResult.failure(result.errorKind, result.message);
+
+  // ── Partner Bookings (C8) ───────────────────────────────────────────────
+  //
+  // `PartnerBookingController` + `PartnerStayController`. Owner-only:
+  // `PartnerBookingService.myApprovedProfileOrThrow` resolves through
+  // `partnerProfileRepo.findByUserId` (404 when there is no profile, 403 when it
+  // is not APPROVED), then `ownedBookingOrThrow` answers a **uniform 404** for
+  // both an unknown booking and one belonging to another partner. No
+  // `PartnerTeamRole` check exists on any booking endpoint.
+  //
+  // Reads:  GET  /partner/bookings          (server-paginated, filtered)
+  //         GET  /partner/bookings/{id}     (booking + payments + invoice + timeline)
+  //         GET  /partner/stays/{id}        (derived stay state + audit + history)
+  // Writes: PATCH /partner/bookings/{id}/{check-in|check-out|no-show|complete}
+  //         POST  /partner/bookings/check-in   (voucher payload or booking code)
+  //         POST  /partner/bookings/check-out  (voucher payload or booking code)
+  //
+  // There is deliberately **no cancel and no modify**: `BookingService.cancel`
+  // and `.modify` compare the caller against `booking.getUser()` and answer 403
+  // for anyone else, the property owner included. Those belong to the customer.
+
+  /// `GET /api/partner/bookings` — one page of the partner's bookings.
+  ///
+  /// The endpoint accepts no `hotelId`, so the result is partner-wide across
+  /// every owned property. Sorting is fixed server-side (`createdAt DESC`) and
+  /// is not a request parameter.
+  Future<CollectionApiResult<PartnerBookingPage>> getPartnerBookings(
+    PartnerBookingQuery query,
+  ) =>
+      _partnerGetObject(
+        _partnerUri('/partner/bookings', query.toQueryParameters()),
+        (body) => PartnerBookingPage.fromJson(body),
+      ).then(_requireBookingPage);
+
+  /// `GET /api/partner/bookings/{id}` — booking, payments, invoice, timeline.
+  Future<CollectionApiResult<PartnerBookingDetail>> getPartnerBookingDetail(
+          int bookingId) =>
+      _partnerGetObject(
+        _partnerUri('/partner/bookings/$bookingId'),
+        (body) => PartnerBookingDetail.fromJson(body),
+      ).then(_requireBookingDetail);
+
+  /// `GET /api/partner/stays/{bookingId}` — the consolidated read-only stay
+  /// projection: derived schedule and state, voucher classification, timeline,
+  /// modification history, check-in/out audit rows and operational warnings.
+  ///
+  /// Strictly read-only (`@Transactional(readOnly = true)`); it mutates nothing.
+  Future<CollectionApiResult<PartnerGuestStay>> getPartnerGuestStay(
+          int bookingId) =>
+      _partnerGetObject(
+        _partnerUri('/partner/stays/$bookingId'),
+        (body) => PartnerGuestStay.fromJson(body),
+      ).then(_requireGuestStay);
+
+  /// `PATCH /api/partner/bookings/{id}/{action}` — advance the booking
+  /// lifecycle through `BookingStatusEngineService`.
+  ///
+  /// Every transition is **one-way**: the engine's table defines no edge back to
+  /// the previous state, so the caller must confirm first. An illegal transition
+  /// is a **422**, never a 409, and leaves the booking untouched (the backend's
+  /// own `rollbackSafety_illegalTransition_noPartialStateChange` test asserts
+  /// this). Unlike the POST endpoints below, these are **not idempotent** —
+  /// repeating a check-in on an already-CHECKED_IN booking is itself a 422.
+  Future<CollectionApiResult<PartnerBooking>> runPartnerBookingAction({
+    required int bookingId,
+    required PartnerBookingAction action,
+  }) async {
+    try {
+      final res = await _client
+          .patch(
+            _partnerUri('/partner/bookings/$bookingId/${action.path}'),
+            headers: _jsonHeaders,
+          )
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        final booking = PartnerBooking.fromJson(body);
+        if (booking == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(booking);
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      // The transition may have committed before the connection dropped, and
+      // it cannot be undone — the caller must re-read rather than retry.
+      return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// `POST /api/partner/bookings/check-in` or `.../check-out` — the front-desk
+  /// mutations, addressed by a scanned voucher payload **or** a typed booking
+  /// code.
+  ///
+  /// Exactly one of the two must be supplied; both or neither is a **400**
+  /// enforced by the backend, and this client refuses to send such a request at
+  /// all. An ineligible status or a stay outside the configured window is a
+  /// **422**; an invalid signature, an unknown booking and another partner's
+  /// booking all collapse to a uniform **404**.
+  ///
+  /// Both endpoints are **idempotent**: repeating the call on a booking already
+  /// in the target state returns 200 with the original timestamp, writing no
+  /// second audit row and sending no second notification. A timeout is still
+  /// reported as uncertain — the client cannot know whether it landed — but
+  /// re-running it is safe because of that idempotency.
+  Future<CollectionApiResult<PartnerFrontDeskResult>>
+      runPartnerFrontDeskAction({
+    required bool checkIn,
+    String? voucherPayload,
+    String? bookingCode,
+  }) async {
+    final payload = voucherPayload?.trim();
+    final code = bookingCode?.trim();
+    final hasPayload = payload != null && payload.isNotEmpty;
+    final hasCode = code != null && code.isNotEmpty;
+    if (hasPayload == hasCode) {
+      // Mirrors the backend's own "exactly one of" rule rather than spending a
+      // round trip to be told the same thing.
+      return const CollectionApiResult.failure(ApiErrorKind.validation);
+    }
+
+    try {
+      final res = await _client
+          .post(
+            _partnerUri(
+                '/partner/bookings/${checkIn ? 'check-in' : 'check-out'}'),
+            headers: _jsonHeaders,
+            body: jsonEncode(
+              hasPayload ? {'voucherPayload': payload} : {'bookingCode': code},
+            ),
+          )
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        final result = PartnerFrontDeskResult.fromJson(body);
+        if (result == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(result);
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  CollectionApiResult<PartnerBookingPage> _requireBookingPage(
+          CollectionApiResult<PartnerBookingPage?> result) =>
+      result.success
+          ? (result.data == null
+              ? const CollectionApiResult.failure(ApiErrorKind.malformed)
+              : CollectionApiResult.success(result.data as PartnerBookingPage))
+          : CollectionApiResult.failure(result.errorKind, result.message);
+
+  CollectionApiResult<PartnerBookingDetail> _requireBookingDetail(
+          CollectionApiResult<PartnerBookingDetail?> result) =>
+      result.success
+          ? (result.data == null
+              ? const CollectionApiResult.failure(ApiErrorKind.malformed)
+              : CollectionApiResult.success(
+                  result.data as PartnerBookingDetail))
+          : CollectionApiResult.failure(result.errorKind, result.message);
+
+  CollectionApiResult<PartnerGuestStay> _requireGuestStay(
+          CollectionApiResult<PartnerGuestStay?> result) =>
+      result.success
+          ? (result.data == null
+              ? const CollectionApiResult.failure(ApiErrorKind.malformed)
+              : CollectionApiResult.success(result.data as PartnerGuestStay))
+          : CollectionApiResult.failure(result.errorKind, result.message);
+
+  // ── Partner Finance & Analytics (C11) ───────────────────────────────────
+  //
+  // `PartnerFinanceController` and `PartnerAnalyticsController` are **entirely
+  // read-only**: fifteen GETs, no mutation of any kind, and every one takes the
+  // same optional `hotelId` / `from` / `to` triple. C1 already consumes four of
+  // them (`analytics/overview`, `analytics/revenue`, `analytics/occupancy` and
+  // `finance/overview`); the eleven below had no client at all.
+  //
+  // Shared semantics, identical in `PartnerFinanceService` and
+  // `PartnerAnalyticsService` (`resolveRange` / `resolveHotelScope`):
+  //   * `to` defaults to today, `from` to `to - 29 days` → an inclusive 30-day
+  //     window. A **partial range is honoured**, not ignored — unlike the C4/C9
+  //     calendar, where sending one bound silently returns everything.
+  //   * `from > to` is a real **400**, not a silent empty result.
+  //   * Bookings are bucketed by **`checkInDate`**, inclusive on both ends.
+  //   * `hotelId` null → every owned property; an unowned id → uniform **404**.
+  //   * `LocalDate.now()` uses the *server's* zone (see the C10 finding).
+  //
+  // No endpoint paginates, and none accepts a sort. Each loads every matching
+  // booking into memory server-side — reported as a scalability concern.
+
+  /// `GET /api/partner/finance/revenue` — revenue by day, month, hotel and room
+  /// plus the server's own average and highest booking value.
+  Future<CollectionApiResult<PartnerFinanceRevenue>> getPartnerFinanceRevenue({
+    int? hotelId,
+    DateTime? from,
+    DateTime? to,
+  }) =>
+      _partnerGetObject(
+        _partnerUri('/partner/finance/revenue',
+            _partnerScopeQuery(hotelId: hotelId, from: from, to: to)),
+        PartnerFinanceRevenue.fromJson,
+      );
+
+  /// `GET /api/partner/finance/commissions` — gross, commission and net at the
+  /// platform rate. The rate is a hard-coded constant server-side; the client
+  /// neither applies nor re-derives it.
+  Future<CollectionApiResult<PartnerCommission>> getPartnerCommissions({
+    int? hotelId,
+    DateTime? from,
+    DateTime? to,
+  }) =>
+      _partnerGetObject(
+        _partnerUri('/partner/finance/commissions',
+            _partnerScopeQuery(hotelId: hotelId, from: from, to: to)),
+        PartnerCommission.fromJson,
+      );
+
+  /// `GET /api/partner/finance/settlements` — synthesized calendar-month
+  /// periods. There is no settlement ledger behind these.
+  Future<CollectionApiResult<PartnerSettlement>> getPartnerSettlements({
+    int? hotelId,
+    DateTime? from,
+    DateTime? to,
+  }) =>
+      _partnerGetObject(
+        _partnerUri('/partner/finance/settlements',
+            _partnerScopeQuery(hotelId: hotelId, from: from, to: to)),
+        PartnerSettlement.fromJson,
+      );
+
+  /// `GET /api/partner/finance/payouts` — the same synthesized periods split by
+  /// status, plus an assumed next-payout date. No payout record exists.
+  Future<CollectionApiResult<PartnerPayouts>> getPartnerPayouts({
+    int? hotelId,
+    DateTime? from,
+    DateTime? to,
+  }) =>
+      _partnerGetObject(
+        _partnerUri('/partner/finance/payouts',
+            _partnerScopeQuery(hotelId: hotelId, from: from, to: to)),
+        PartnerPayouts.fromJson,
+      );
+
+  /// `GET /api/partner/finance/invoices` — counts by status and a total.
+  /// Aggregates only: no invoice id, no invoice list, no document.
+  Future<CollectionApiResult<PartnerInvoiceFinance>> getPartnerInvoiceFinance({
+    int? hotelId,
+    DateTime? from,
+    DateTime? to,
+  }) =>
+      _partnerGetObject(
+        _partnerUri('/partner/finance/invoices',
+            _partnerScopeQuery(hotelId: hotelId, from: from, to: to)),
+        PartnerInvoiceFinance.fromJson,
+      );
+
+  /// `GET /api/partner/finance/refunds` — count, amount and the server's own
+  /// refund rate. A partner cannot initiate a refund; there is no such endpoint.
+  Future<CollectionApiResult<PartnerRefunds>> getPartnerRefunds({
+    int? hotelId,
+    DateTime? from,
+    DateTime? to,
+  }) =>
+      _partnerGetObject(
+        _partnerUri('/partner/finance/refunds',
+            _partnerScopeQuery(hotelId: hotelId, from: from, to: to)),
+        PartnerRefunds.fromJson,
+      );
+
+  /// `GET /api/partner/analytics/bookings` — status mix, arrivals, departures
+  /// and stay length.
+  Future<CollectionApiResult<PartnerBookingAnalytics>>
+      getPartnerBookingAnalytics({
+    int? hotelId,
+    DateTime? from,
+    DateTime? to,
+  }) =>
+          _partnerGetObject(
+            _partnerUri('/partner/analytics/bookings',
+                _partnerScopeQuery(hotelId: hotelId, from: from, to: to)),
+            PartnerBookingAnalytics.fromJson,
+          );
+
+  /// `GET /api/partner/analytics/rooms` — top rooms by revenue and by bookings,
+  /// plus an availability summary.
+  Future<CollectionApiResult<PartnerRoomAnalytics>> getPartnerRoomAnalytics({
+    int? hotelId,
+    DateTime? from,
+    DateTime? to,
+  }) =>
+      _partnerGetObject(
+        _partnerUri('/partner/analytics/rooms',
+            _partnerScopeQuery(hotelId: hotelId, from: from, to: to)),
+        PartnerRoomAnalytics.fromJson,
+      );
+
+  /// `GET /api/partner/analytics/promotions` — structural only. The backend
+  /// cannot attribute discounts yet, so `estimatedDiscountedBookings` is often
+  /// null and must not be shown as zero.
+  Future<CollectionApiResult<PartnerPromotionAnalytics>>
+      getPartnerPromotionAnalytics({
+    int? hotelId,
+    DateTime? from,
+    DateTime? to,
+  }) =>
+          _partnerGetObject(
+            _partnerUri('/partner/analytics/promotions',
+                _partnerScopeQuery(hotelId: hotelId, from: from, to: to)),
+            PartnerPromotionAnalytics.fromJson,
+          );
+
+  /// `GET /api/partner/analytics/reviews` — rating and moderation aggregates.
+  /// The response's `latestReviews` previews are deliberately not parsed; that
+  /// is the Reviews domain.
+  Future<CollectionApiResult<PartnerReviewAnalytics>>
+      getPartnerReviewAnalytics({
+    int? hotelId,
+    DateTime? from,
+    DateTime? to,
+  }) =>
+          _partnerGetObject(
+            _partnerUri('/partner/analytics/reviews',
+                _partnerScopeQuery(hotelId: hotelId, from: from, to: to)),
+            PartnerReviewAnalytics.fromJson,
+          );
+
+  /// `GET /api/partner/analytics/messages` — conversation counts and the mean
+  /// response time, which is null when nothing could be observed.
+  Future<CollectionApiResult<PartnerMessageAnalytics>>
+      getPartnerMessageAnalytics({
+    int? hotelId,
+    DateTime? from,
+    DateTime? to,
+  }) =>
+          _partnerGetObject(
+            _partnerUri('/partner/analytics/messages',
+                _partnerScopeQuery(hotelId: hotelId, from: from, to: to)),
+            PartnerMessageAnalytics.fromJson,
+          );
+
+  // ── Partner Reviews, Team & Payout account (C12) ────────────────────────
+  //
+  // ## Reviews
+  //
+  // `PartnerReviewController` has exactly **one** endpoint:
+  // `PUT /api/partner/reviews/{reviewId}/reply`. There is no partner review
+  // list, no review detail and no moderation — so the list below reuses the
+  // public `GET /api/places/{placeId}/reviews` that `getPlaceReviews` (UI-29)
+  // already implements, and no new read method is added.
+  //
+  // **A partner cannot read a review's text.** `ReviewService.getReview` runs
+  // `checkOwnerOrAdmin` against the review's *author*, so `GET /api/reviews/{id}`
+  // answers a partner with **403** (verified live). The only review fields a
+  // partner can see are those on `ReviewSummaryResponse`: rating, title, author
+  // name, status, date and their own reply. Reported, not worked around.
+  //
+  // ## Team and payout
+  //
+  // Both live on `PartnerSettingsController`, whose settings half C6 already
+  // consumes. Role rules come straight from `PartnerSettingsService`:
+  // team writes call `requireOwner` (**OWNER only**), payout writes require
+  // **OWNER or FINANCE**, and settings writes remain OWNER/MANAGER as C6 has it.
+  //
+  // The payout request carries a full account number, but the backend derives
+  // `bankAccountLast4` and **discards the rest immediately** — nothing sensitive
+  // is ever stored or returned.
+
+  /// `PUT /api/partner/reviews/{reviewId}/reply` — create or replace the single
+  /// partner reply.
+  ///
+  /// A review has exactly one reply: the first call creates it, later calls
+  /// replace it in place. There is **no delete endpoint**, so a published reply
+  /// can be edited but never withdrawn. Only an `APPROVED` review may be replied
+  /// to (**422** otherwise); an unknown review and one whose place the caller
+  /// does not own both give a uniform **404**. The guest is notified only on the
+  /// first reply.
+  Future<CollectionApiVoidResult> replyToPartnerReview({
+    required int reviewId,
+    required String content,
+  }) async {
+    final trimmed = content.trim();
+    if (trimmed.isEmpty) {
+      // Mirrors the backend's `@NotBlank` rather than spending a round trip.
+      return const CollectionApiVoidResult.failure(ApiErrorKind.validation);
+    }
+    try {
+      final res = await _client
+          .put(
+            _partnerUri('/partner/reviews/$reviewId/reply'),
+            headers: _jsonHeaders,
+            body: jsonEncode({'content': trimmed}),
+          )
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) return const CollectionApiVoidResult.success();
+      return CollectionApiVoidResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      // The reply may already be published, and it cannot be withdrawn.
+      return const CollectionApiVoidResult.failure(ApiErrorKind.uncertain);
+    } on http.ClientException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// `POST /api/partner/team` — invite a member by email with a role.
+  /// **OWNER only** (`requireOwner`).
+  Future<CollectionApiResult<PartnerTeamMember>> addPartnerTeamMember({
+    required String email,
+    required PartnerTeamRole role,
+  }) =>
+      _partnerTeamWrite(
+        () => _client.post(
+          _partnerUri('/partner/team'),
+          headers: _jsonHeaders,
+          body: jsonEncode({
+            'email': email.trim(),
+            'role': partnerTeamRoleWire(role),
+          }),
+        ),
+        role,
+      );
+
+  /// `PATCH /api/partner/team/{id}` — change a member's role, or activate and
+  /// deactivate them. **OWNER only.**
+  ///
+  /// Only the fields passed are sent, so a role change never silently toggles
+  /// `active` and vice versa.
+  Future<CollectionApiResult<PartnerTeamMember>> updatePartnerTeamMember({
+    required int memberId,
+    PartnerTeamRole? role,
+    bool? active,
+  }) =>
+      _partnerTeamWrite(
+        () => _client.patch(
+          _partnerUri('/partner/team/$memberId'),
+          headers: _jsonHeaders,
+          body: jsonEncode({
+            if (role != null) 'role': partnerTeamRoleWire(role),
+            if (active != null) 'active': active,
+          }),
+        ),
+        role,
+      );
+
+  /// `DELETE /api/partner/team/{id}` — remove a member. **OWNER only**, and
+  /// irreversible: there is no undo endpoint.
+  Future<CollectionApiVoidResult> removePartnerTeamMember(int memberId) async {
+    try {
+      final res = await _client
+          .delete(_partnerUri('/partner/team/$memberId'), headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 204) {
+        return const CollectionApiVoidResult.success();
+      }
+      return CollectionApiVoidResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      // The removal may have committed, and it cannot be undone.
+      return const CollectionApiVoidResult.failure(ApiErrorKind.uncertain);
+    } on http.ClientException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiVoidResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  Future<CollectionApiResult<PartnerTeamMember>> _partnerTeamWrite(
+    Future<http.Response> Function() send,
+    PartnerTeamRole? role,
+  ) async {
+    if (role != null && partnerTeamRoleWire(role) == null) {
+      // An unrecognised role has no wire value and must never be sent.
+      return const CollectionApiResult.failure(ApiErrorKind.validation);
+    }
+    try {
+      final res = await send().timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        final member = PartnerTeamMember.fromJson(body);
+        if (member == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(member);
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// `GET /api/partner/payout-account` — the safe projection.
+  ///
+  /// Only `bankAccountLast4` exists server-side; the full number was discarded
+  /// when it was first submitted, so there is nothing sensitive to receive.
+  Future<CollectionApiResult<PartnerPayoutAccount>> getPartnerPayoutAccount() =>
+      _partnerGetObject(
+        _partnerUri('/partner/payout-account'),
+        (body) => PartnerPayoutAccount.fromJson(body),
+      ).then(_requirePayoutAccount);
+
+  /// `PUT /api/partner/payout-account` — **OWNER or FINANCE**.
+  ///
+  /// The account number is sent once and never comes back; the response carries
+  /// only its last four digits. The client keeps no copy.
+  Future<CollectionApiResult<PartnerPayoutAccount>> updatePartnerPayoutAccount({
+    required String accountHolderName,
+    required String bankName,
+    required String bankAccountNumber,
+    required PartnerPayoutMethod payoutMethod,
+  }) async {
+    final wire = payoutMethod.wireValue;
+    final holder = accountHolderName.trim();
+    final bank = bankName.trim();
+    final number = bankAccountNumber.trim();
+    // Mirrors `@NotBlank` and `@Size(min = 4)` on `PartnerPayoutAccountRequest`.
+    if (wire == null || holder.isEmpty || bank.isEmpty || number.length < 4) {
+      return const CollectionApiResult.failure(ApiErrorKind.validation);
+    }
+    try {
+      final res = await _client
+          .put(
+            _partnerUri('/partner/payout-account'),
+            headers: _jsonHeaders,
+            body: jsonEncode({
+              'accountHolderName': holder,
+              'bankName': bank,
+              'bankAccountNumber': number,
+              'payoutMethod': wire,
+            }),
+          )
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        final account = PartnerPayoutAccount.fromJson(body);
+        if (account == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(account);
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  CollectionApiResult<PartnerPayoutAccount> _requirePayoutAccount(
+          CollectionApiResult<PartnerPayoutAccount?> result) =>
+      result.success
+          ? (result.data == null
+              ? const CollectionApiResult.failure(ApiErrorKind.malformed)
+              : CollectionApiResult.success(
+                  result.data as PartnerPayoutAccount))
+          : CollectionApiResult.failure(result.errorKind, result.message);
 
   Map<String, dynamic> _failureForStatus(http.Response res) {
     Map<String, dynamic>? body;

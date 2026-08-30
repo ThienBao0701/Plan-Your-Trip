@@ -4272,5 +4272,1434 @@
       "route": { "type": "String" }
     }
   },
-  "partnerModuleReadOnlyForRole": "Vai trò nhóm của bạn sẽ không thể thay đổi cài đặt trong mô-đun này."
+  "partnerModuleReadOnlyForRole": "Vai trò nhóm của bạn sẽ không thể thay đổi cài đặt trong mô-đun này.",
+  "partnerDashboardScopeHeading": "Phạm vi báo cáo",
+  "partnerDashboardScopeHint": "Áp dụng cho Hiệu suất, Công suất phòng và Doanh thu. Hoạt động hôm nay luôn tính trên tất cả cơ sở.",
+  "partnerDashboardScopeToday": "Hôm nay · tất cả cơ sở",
+  "partnerDashboardScopeAllProperties": "Tất cả cơ sở",
+  "partnerDashboardScopeLast30AllProperties": "30 ngày gần nhất · tất cả cơ sở",
+  "partnerDashboardScopeWindowAll": "{window} · tất cả cơ sở",
+  "partnerDashboardScopeWindowOne": "{window} · cơ sở đã chọn",
+  "partnerDashboardRangeLabel": "Khoảng thời gian",
+  "partnerDashboardRangeLast7": "7 ngày",
+  "partnerDashboardRangeLast30": "30 ngày",
+  "partnerDashboardRangeLast90": "90 ngày",
+  "partnerDashboardPropertyLabel": "Cơ sở",
+  "partnerDashboardPropertyAll": "Tất cả cơ sở",
+  "partnerDashboardPropertyCount": "{count, plural, =1{1 cơ sở} other{{count} cơ sở}}",
+  "partnerDashboardRoomCount": "{count, plural, =1{1 phòng đang hoạt động} other{{count} phòng đang hoạt động}}",
+  "partnerDashboardTeamRole": "Vai trò của bạn: {role}",
+  "partnerDashboardActiveProperty": "Đang xem {name}",
+  "partnerDashboardUpdatedAt": "Cập nhật {time}",
+  "partnerDashboardNoActivityHint": "Chưa có đặt phòng nào trong khoảng thời gian đã chọn nên các chỉ số hiệu suất bên dưới bằng 0.",
+  "partnerDashboardAttentionHeading": "Cần xử lý",
+  "partnerDashboardAttentionClear": "Hiện chưa có việc nào cần bạn xử lý.",
+  "partnerDashboardAttentionSemantic": "{label}, {count, plural, =1{1 mục cần xử lý} other{{count} mục cần xử lý}}",
+  "partnerDashboardQuickActionsHeading": "Thao tác nhanh",
+  "partnerDashboardPerformanceHeading": "Hiệu suất",
+  "partnerDashboardPerformanceEmpty": "Không có đặt phòng nào trong kỳ này nên chưa có số liệu để báo cáo.",
+  "partnerDashboardOccupancyHeading": "Công suất phòng",
+  "partnerDashboardOccupancyNoInventory": "Chưa thiết lập số lượng phòng nên không thể tính công suất.",
+  "partnerDashboardOccupancyChartLabel": "Công suất theo ngày",
+  "partnerDashboardRevenueHeading": "Doanh thu",
+  "partnerDashboardRevenueChartLabel": "Doanh thu theo ngày",
+  "partnerDashboardFinanceHeading": "Tổng quan tài chính",
+  "partnerDashboardActivityHeading": "Hoạt động gần đây",
+  "partnerDashboardActivityEmpty": "Chưa ghi nhận hoạt động nào.",
+  "partnerDashboardActivityBy": "bởi {actor}",
+  "partnerDashboardActivityUnknownActor": "Người dùng không xác định",
+  "partnerDashboardActivityMore": "{count, plural, =1{1 mục cũ hơn} other{{count} mục cũ hơn}}",
+  "partnerDashboardChartEmpty": "Không có dữ liệu trong kỳ này.",
+  "partnerDashboardErrorUnauthorized": "Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại để tải phần này.",
+  "partnerDashboardErrorForbidden": "Hồ sơ đối tác của bạn chưa được duyệt để xem dữ liệu này.",
+  "partnerDashboardErrorNotFound": "Dữ liệu này không khả dụng với hồ sơ đối tác của bạn.",
+  "partnerDashboardErrorValidation": "Khoảng thời gian không hợp lệ. Hãy chọn kỳ khác.",
+  "partnerDashboardErrorTimeout": "Phần này tải quá lâu.",
+  "partnerDashboardErrorNetwork": "Không kết nối được máy chủ cho phần này.",
+  "partnerDashboardErrorServer": "Máy chủ không tạo được dữ liệu này.",
+  "partnerDashboardErrorGeneric": "Không tải được phần này.",
+  "partnerValueUnavailable": "—",
+  "partnerKpiCurrentGuests": "Khách đang lưu trú",
+  "partnerKpiUpcoming": "Sắp tới",
+  "partnerKpiOccupancy": "Công suất phòng",
+  "partnerKpiRevenueToday": "Doanh thu hôm nay",
+  "partnerKpiRevenueMonth": "Doanh thu tháng này",
+  "partnerKpiAverageStay": "Số đêm lưu trú trung bình",
+  "partnerKpiTotalRevenue": "Tổng doanh thu",
+  "partnerKpiTotalBookings": "Tổng lượt đặt phòng",
+  "partnerKpiAdr": "Giá phòng trung bình",
+  "partnerKpiAdrCaption": "Trên mỗi đêm phòng đã bán",
+  "partnerKpiConfirmed": "Đã xác nhận",
+  "partnerKpiCancelled": "Đã hủy",
+  "partnerKpiReviewAverage": "Điểm đánh giá trung bình",
+  "partnerKpiReviewCount": "{count, plural, =0{Chưa có đánh giá} =1{Từ 1 đánh giá} other{Từ {count} đánh giá}}",
+  "partnerKpiResponseRate": "Tỷ lệ phản hồi tin nhắn",
+  "partnerOccupancyInventory": "Tổng số phòng",
+  "partnerOccupancySold": "Phòng đã bán",
+  "partnerOccupancyAvailable": "Phòng còn trống",
+  "partnerOccupancyStopSell": "Ngày ngừng bán",
+  "partnerRevenueMonthToDate": "Từ đầu tháng",
+  "partnerRevenueLast30": "30 ngày gần nhất",
+  "partnerRevenueByProperty": "Doanh thu theo cơ sở",
+  "partnerFinanceGross": "Doanh thu gộp",
+  "partnerFinanceNet": "Doanh thu thuần",
+  "partnerFinanceCommission": "Hoa hồng nền tảng",
+  "partnerFinanceTax": "Thuế ước tính",
+  "partnerFinanceRefunded": "Đã hoàn tiền",
+  "partnerFinancePendingSettlement": "Chờ quyết toán",
+  "partnerFinanceNextPayout": "Kỳ chi trả dự kiến tiếp theo",
+  "partnerFinanceCompletedBookings": "{count, plural, =1{1 đặt phòng hoàn tất} other{{count} đặt phòng hoàn tất}}",
+  "partnerFinancePaidBookings": "{count, plural, =1{1 đặt phòng đã thanh toán} other{{count} đặt phòng đã thanh toán}}",
+  "@partnerDashboardScopeWindowAll": {
+    "placeholders": {
+      "window": {"type": "String"}
+    }
+  },
+  "@partnerDashboardScopeWindowOne": {
+    "placeholders": {
+      "window": {"type": "String"}
+    }
+  },
+  "@partnerDashboardPropertyCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "@partnerDashboardRoomCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "@partnerDashboardTeamRole": {
+    "placeholders": {
+      "role": {"type": "String"}
+    }
+  },
+  "@partnerDashboardActiveProperty": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "@partnerDashboardUpdatedAt": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "@partnerDashboardAttentionSemantic": {
+    "placeholders": {
+      "label": {"type": "String"},
+      "count": {"type": "int"}
+    }
+  },
+  "@partnerDashboardActivityBy": {
+    "placeholders": {
+      "actor": {"type": "String"}
+    }
+  },
+  "@partnerDashboardActivityMore": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "@partnerKpiReviewCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "@partnerFinanceCompletedBookings": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "@partnerFinancePaidBookings": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partnerPropertiesCount": "{count, plural, =0{Chưa có cơ sở} =1{1 cơ sở} other{{count} cơ sở}}",
+  "@partnerPropertiesCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partnerPropertiesEmptyTitle": "Chưa có cơ sở nào",
+  "partnerPropertiesEmptyMessage": "Hồ sơ đối tác của bạn đã được duyệt nhưng chưa có cơ sở nào được gán. Cơ sở do đội ngũ Plan Your Trip gán.",
+  "partnerPropertiesSelectedSemantic": "Cơ sở đang chọn",
+  "partnerPropertyDetailHeading": "Chi tiết cơ sở",
+  "partnerPropertyCloseDetail": "Đóng chi tiết",
+  "partnerPropertyDetailNotFound": "Cơ sở này không còn khả dụng với tài khoản của bạn.",
+  "partnerPropertyActionsOwnerOnly": "Thao tác đăng bán chỉ dành cho chủ hồ sơ. Bạn vẫn xem được toàn bộ thông tin tại đây.",
+  "partnerPropertyStatusDraft": "Bản nháp",
+  "partnerPropertyStatusPendingReview": "Chờ duyệt",
+  "partnerPropertyStatusApproved": "Đã duyệt",
+  "partnerPropertyStatusPublished": "Đã đăng",
+  "partnerPropertyStatusHidden": "Đang ẩn",
+  "partnerPropertyStatusArchived": "Đã lưu trữ",
+  "partnerPropertyStatusRejected": "Bị từ chối",
+  "partnerPropertyStatusUnknown": "Trạng thái không xác định",
+  "partnerPropertyActive": "Đang mở bán",
+  "partnerPropertyInactive": "Đang tắt bán",
+  "partnerPropertyVerified": "Đã xác minh",
+  "partnerPropertyNotVerified": "Chưa xác minh",
+  "partnerPropertyFeatured": "Nổi bật",
+  "partnerPropertyNotFeatured": "Không nổi bật",
+  "partnerPropertyNotSet": "Chưa thiết lập",
+  "partnerPropertyRatingSummary": "{rating} từ {count, plural, =1{1 đánh giá} other{{count} đánh giá}}",
+  "@partnerPropertyRatingSummary": {
+    "placeholders": {
+      "rating": {"type": "String"},
+      "count": {"type": "int"}
+    }
+  },
+  "partnerPropertyVisibilityPublic": "Khách có thể tìm thấy và đặt cơ sở này ngay bây giờ.",
+  "partnerPropertyVisibilityNotPublic": "Cơ sở này hiện không hiển thị với khách.",
+  "partnerPropertyModerationNote": "Việc xác minh và gắn nổi bật do đội ngũ Plan Your Trip quản lý và không thể thay đổi tại đây.",
+  "partnerPropertyActivateAction": "Bật đăng bán",
+  "partnerPropertyDeactivateAction": "Tắt đăng bán",
+  "partnerPropertyActivatedMessage": "{name} đã được mở bán.",
+  "@partnerPropertyActivatedMessage": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "partnerPropertyDeactivatedMessage": "{name} đã ngừng mở bán.",
+  "@partnerPropertyDeactivatedMessage": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "partnerPropertyActionNotFound": "Cơ sở đó không còn khả dụng với tài khoản của bạn.",
+  "partnerPropertyActionFailed": "Không lưu được thay đổi. Chưa có gì bị thay đổi.",
+  "partnerPropertyActionUncertain": "Mất kết nối trước khi máy chủ xác nhận. Hãy làm mới để xem trạng thái hiện tại.",
+  "partnerPropertySectionIdentity": "Thông tin nhận dạng",
+  "partnerPropertySectionLocation": "Vị trí",
+  "partnerPropertySectionContact": "Liên hệ",
+  "partnerPropertySectionPolicies": "Chính sách",
+  "partnerPropertySectionVerification": "Xác minh",
+  "partnerPropertySectionPerformance": "Phản hồi của khách",
+  "partnerPropertySectionMetadata": "Hồ sơ dữ liệu",
+  "partnerPropertyFieldSlug": "Đường dẫn URL",
+  "partnerPropertyFieldShortDescription": "Mô tả ngắn",
+  "partnerPropertyFieldDescription": "Mô tả",
+  "partnerPropertyFieldAddress": "Địa chỉ",
+  "partnerPropertyFieldCoordinates": "Tọa độ",
+  "partnerPropertyFieldPhone": "Điện thoại",
+  "partnerPropertyFieldEmail": "Email",
+  "partnerPropertyFieldWebsite": "Website",
+  "partnerPropertyFieldFacebook": "Facebook",
+  "partnerPropertyFieldInstagram": "Instagram",
+  "partnerPropertyFieldCheckIn": "Nhận phòng từ",
+  "partnerPropertyFieldCheckOut": "Trả phòng trước",
+  "partnerPropertyFieldChildrenPolicy": "Chính sách trẻ em",
+  "partnerPropertyFieldPetPolicy": "Chính sách thú cưng",
+  "partnerPropertyFieldSmokingPolicy": "Chính sách hút thuốc",
+  "partnerPropertyFieldVerified": "Trạng thái xác minh",
+  "partnerPropertyFieldFeatured": "Vị trí nổi bật",
+  "partnerPropertyFieldRating": "Điểm trung bình",
+  "partnerPropertyFieldReviewCount": "Đánh giá",
+  "partnerPropertyFieldOwner": "Thuộc sở hữu của",
+  "partnerPropertyFieldCreated": "Ngày tạo",
+  "partnerPropertyFieldUpdated": "Cập nhật lần cuối",
+  "partnerRoomsCount": "{count, plural, =1{1 loại phòng} other{{count} loại phòng}}",
+  "@partnerRoomsCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partnerRoomsListedCount": "{count, plural, =1{1 đang mở bán} other{{count} đang mở bán}}",
+  "@partnerRoomsListedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partnerRoomsSoldOutCount": "{count, plural, =1{1 đã hết phòng} other{{count} đã hết phòng}}",
+  "@partnerRoomsSoldOutCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partnerRoomsForProperty": "Phòng tại {name}",
+  "@partnerRoomsForProperty": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "partnerRoomsNoPropertyContext": "Chưa chọn cơ sở",
+  "partnerRoomsPropertyScope": "Phạm vi cơ sở",
+  "partnerRoomsSelectPropertyTitle": "Hãy chọn một cơ sở",
+  "partnerRoomsSelectPropertyMessage": "Phòng thuộc về một cơ sở cụ thể, hãy chọn cơ sở để xem các loại phòng.",
+  "partnerRoomsNoPropertiesTitle": "Chưa có cơ sở nào",
+  "partnerRoomsNoPropertiesMessage": "Phòng nằm trong một cơ sở. Khi hồ sơ của bạn được gán cơ sở, các loại phòng sẽ hiển thị tại đây.",
+  "partnerRoomsPropertyUnavailableTitle": "Cơ sở không khả dụng",
+  "partnerRoomsPropertyUnavailableMessage": "Cơ sở này không còn khả dụng với tài khoản của bạn, hoặc chưa được cấu hình phòng.",
+  "partnerRoomsEmptyTitle": "Chưa có loại phòng nào",
+  "partnerRoomsEmptyMessage": "Cơ sở này chưa có loại phòng nào được cấu hình. Việc này do đội ngũ Plan Your Trip thiết lập.",
+  "partnerRoomActionsOwnerOnly": "Thao tác mở bán chỉ dành cho chủ hồ sơ. Bạn vẫn xem được mọi phòng tại đây.",
+  "partnerRoomDetailHeading": "Chi tiết phòng",
+  "partnerRoomCloseDetail": "Đóng chi tiết phòng",
+  "partnerRoomDetailNotFound": "Phòng này không còn khả dụng với tài khoản của bạn.",
+  "partnerRoomListed": "Đang mở bán",
+  "partnerRoomUnlisted": "Chưa mở bán",
+  "partnerRoomSoldOut": "Hết phòng",
+  "partnerRoomListAction": "Mở bán phòng này",
+  "partnerRoomUnlistAction": "Ngừng mở bán",
+  "partnerRoomListedMessage": "{name} đã được mở bán.",
+  "@partnerRoomListedMessage": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "partnerRoomUnlistedMessage": "{name} đã ngừng mở bán.",
+  "@partnerRoomUnlistedMessage": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "partnerRoomActionNotFound": "Phòng đó không còn khả dụng với tài khoản của bạn.",
+  "partnerRoomYes": "Có",
+  "partnerRoomNo": "Không",
+  "partnerRoomGuestsValue": "Tối đa {count} khách",
+  "@partnerRoomGuestsValue": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "partnerRoomInventoryValue": "Còn {available} trên {total}",
+  "@partnerRoomInventoryValue": {
+    "placeholders": {
+      "available": {"type": "String"},
+      "total": {"type": "String"}
+    }
+  },
+  "partnerRoomPriceFromValue": "Từ {price}",
+  "@partnerRoomPriceFromValue": {
+    "placeholders": {
+      "price": {"type": "String"}
+    }
+  },
+  "partnerRoomSizeValue": "{size} m²",
+  "@partnerRoomSizeValue": {
+    "placeholders": {
+      "size": {"type": "String"}
+    }
+  },
+  "partnerRoomSectionIdentity": "Thông tin nhận dạng",
+  "partnerRoomSectionBeds": "Giường",
+  "partnerRoomSectionCapacity": "Sức chứa",
+  "partnerRoomSectionInventory": "Số lượng phòng",
+  "partnerRoomSectionPricing": "Giá phòng",
+  "partnerRoomSectionConditions": "Điều kiện đặt phòng",
+  "partnerRoomSectionAmenities": "Tiện nghi",
+  "partnerRoomSectionMedia": "Hình ảnh",
+  "partnerRoomFieldCode": "Mã phòng",
+  "partnerRoomFieldType": "Loại phòng",
+  "partnerRoomFieldDescription": "Mô tả",
+  "partnerRoomFieldBedType": "Loại giường",
+  "partnerRoomFieldBedCount": "Số giường",
+  "partnerRoomFieldMaxGuests": "Số khách tối đa",
+  "partnerRoomFieldMaxAdults": "Số người lớn tối đa",
+  "partnerRoomFieldMaxChildren": "Số trẻ em tối đa",
+  "partnerRoomFieldSize": "Diện tích phòng",
+  "partnerRoomFieldFloor": "Tầng",
+  "partnerRoomFieldQuantity": "Tổng số phòng",
+  "partnerRoomFieldAvailable": "Hiện còn trống",
+  "partnerRoomFieldPriceFrom": "Giá từ",
+  "partnerRoomFieldOriginalPrice": "Giá gốc",
+  "partnerRoomFieldBreakfast": "Bao gồm bữa sáng",
+  "partnerRoomFieldFreeCancellation": "Hủy miễn phí",
+  "partnerRoomFieldInstantConfirmation": "Xác nhận tức thì",
+  "partnerRoomFieldSmoking": "Cho phép hút thuốc",
+  "partnerRoomFieldImages": "Ảnh thư viện",
+  "partnerRoomTypeStandard": "Tiêu chuẩn",
+  "partnerRoomTypeSuperior": "Cao cấp",
+  "partnerRoomTypeDeluxe": "Deluxe",
+  "partnerRoomTypePremier": "Premier",
+  "partnerRoomTypeExecutive": "Executive",
+  "partnerRoomTypeSuite": "Suite",
+  "partnerRoomTypeFamily": "Gia đình",
+  "partnerRoomTypeVilla": "Villa",
+  "partnerRoomTypeBungalow": "Bungalow",
+  "partnerRoomTypeUnknown": "Loại không xác định",
+  "partnerBedTypeSingle": "Giường đơn",
+  "partnerBedTypeDouble": "Giường đôi",
+  "partnerBedTypeTwin": "Hai giường đơn",
+  "partnerBedTypeQueen": "Giường Queen",
+  "partnerBedTypeKing": "Giường King",
+  "partnerBedTypeSofaBed": "Giường sofa",
+  "partnerBedTypeBunk": "Giường tầng",
+  "partnerBedTypeUnknown": "Giường không xác định",
+  "partnerInventoryForProperty": "Tồn phòng tại {name}",
+  "@partnerInventoryForProperty": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "partnerInventoryNoPropertyContext": "Chưa chọn cơ sở",
+  "partnerInventoryPropertyScope": "Phạm vi cơ sở",
+  "partnerInventoryRoomScope": "Loại phòng",
+  "partnerInventoryRangeLabel": "Khoảng xem",
+  "partnerInventoryRangeWeek": "7 ngày",
+  "partnerInventoryRangeFortnight": "14 ngày",
+  "partnerInventoryRangeMonth": "30 ngày",
+  "partnerInventoryWindow": "{from} – {to} · {count} ngày",
+  "@partnerInventoryWindow": {
+    "placeholders": {
+      "from": {"type": "String"},
+      "to": {"type": "String"},
+      "count": {"type": "int"}
+    }
+  },
+  "partnerInventoryBookableDays": "{bookable} trên {total} ngày có thể đặt",
+  "@partnerInventoryBookableDays": {
+    "placeholders": {
+      "bookable": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "partnerInventoryTotalAvailable": "{count} đêm phòng còn trống",
+  "@partnerInventoryTotalAvailable": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "partnerInventoryStopSellDays": "{count, plural, =1{1 ngày ngừng bán} other{{count} ngày ngừng bán}}",
+  "@partnerInventoryStopSellDays": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partnerInventoryNoPropertiesTitle": "Chưa có cơ sở nào",
+  "partnerInventoryNoPropertiesMessage": "Tồn phòng thuộc về loại phòng trong một cơ sở. Khi hồ sơ của bạn được gán cơ sở, lịch sẽ hiển thị tại đây.",
+  "partnerInventorySelectPropertyTitle": "Hãy chọn một cơ sở",
+  "partnerInventorySelectPropertyMessage": "Chọn một cơ sở để xem lịch tồn phòng của các loại phòng.",
+  "partnerInventoryNoRoomsTitle": "Chưa có loại phòng nào",
+  "partnerInventoryNoRoomsMessage": "Cơ sở này chưa có loại phòng nào nên chưa có tồn phòng để quản lý.",
+  "partnerInventorySelectRoomTitle": "Hãy chọn loại phòng",
+  "partnerInventorySelectRoomMessage": "Tồn phòng được quản lý theo từng loại phòng. Hãy chọn một loại để xem lịch.",
+  "partnerInventoryInvalidRangeTitle": "Khoảng ngày không hợp lệ",
+  "partnerInventoryInvalidRangeMessage": "Ngày bắt đầu không được sau ngày kết thúc.",
+  "partnerInventoryUnavailableTitle": "Không xem được tồn phòng",
+  "partnerInventoryUnavailableMessage": "Cơ sở hoặc loại phòng này không còn khả dụng với tài khoản của bạn.",
+  "partnerInventoryEmptyTitle": "Không có dữ liệu trong khoảng này",
+  "partnerInventoryEmptyMessage": "Chưa thiết lập tồn phòng cho các ngày này. Hãy thử khoảng thời gian khác.",
+  "partnerInventoryDate": "Ngày",
+  "partnerInventoryStateColumn": "Trạng thái",
+  "partnerInventoryTotal": "Tổng",
+  "partnerInventoryAvailable": "Còn trống",
+  "partnerInventorySold": "Đã bán",
+  "partnerInventoryBlocked": "Đang giữ",
+  "partnerInventoryMaintenance": "Bảo trì",
+  "partnerInventoryRestrictions": "Hạn chế",
+  "partnerInventoryStopSell": "Ngừng bán",
+  "partnerInventoryClosedArrival": "Không nhận khách",
+  "partnerInventoryClosedDeparture": "Không trả phòng",
+  "partnerInventoryStateBookable": "Có thể đặt",
+  "partnerInventoryStateSoldOut": "Hết phòng",
+  "partnerInventoryStateStopped": "Đã ngừng bán",
+  "partnerInventoryInconsistent": "Các số này không cộng lại bằng tổng.",
+  "partnerInventoryInconsistentSummary": "{count, plural, =1{1 ngày có các số không cộng lại bằng tổng} other{{count} ngày có các số không cộng lại bằng tổng}}. Chỉ máy chủ mới sửa được.",
+  "@partnerInventoryInconsistentSummary": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partnerInventoryEditOwnerOnly": "Thay đổi tình trạng phòng chỉ dành cho chủ hồ sơ. Bạn vẫn xem được lịch tại đây.",
+  "partnerInventorySaved": "Đã lưu.",
+  "partnerInventoryActionNotFound": "Ngày đó không còn khả dụng với tài khoản của bạn.",
+  "partnerRatesForProperty": "Giá tại {name}",
+  "@partnerRatesForProperty": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "partnerRatesForRoom": "Giá cho {room} tại {property}",
+  "@partnerRatesForRoom": {
+    "placeholders": {
+      "room": {"type": "String"},
+      "property": {"type": "String"}
+    }
+  },
+  "partnerRatesNoPropertyContext": "Chưa chọn cơ sở",
+  "partnerRatesPropertyScope": "Phạm vi cơ sở",
+  "partnerRatesRoomScope": "Loại phòng",
+  "partnerRatesCount": "{count, plural, =1{1 gói giá} other{{count} gói giá}}",
+  "@partnerRatesCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partnerRatesActiveCount": "{count, plural, =1{1 đang bật} other{{count} đang bật}}",
+  "@partnerRatesActiveCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partnerRatesExpiredCount": "{count, plural, =1{1 đã hết hạn} other{{count} đã hết hạn}}",
+  "@partnerRatesExpiredCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partnerRatesNoPropertiesTitle": "Chưa có cơ sở nào",
+  "partnerRatesNoPropertiesMessage": "Giá thuộc về loại phòng trong một cơ sở. Khi hồ sơ của bạn được gán cơ sở, các gói giá sẽ hiển thị tại đây.",
+  "partnerRatesSelectPropertyTitle": "Hãy chọn một cơ sở",
+  "partnerRatesSelectPropertyMessage": "Chọn một cơ sở để xem các gói giá của loại phòng.",
+  "partnerRatesNoRoomsTitle": "Chưa có loại phòng nào",
+  "partnerRatesNoRoomsMessage": "Cơ sở này chưa có loại phòng nên chưa có gì để định giá.",
+  "partnerRatesSelectRoomTitle": "Hãy chọn loại phòng",
+  "partnerRatesSelectRoomMessage": "Gói giá được quản lý theo từng loại phòng. Hãy chọn một loại để xem giá.",
+  "partnerRatesUnavailableTitle": "Không xem được giá",
+  "partnerRatesUnavailableMessage": "Cơ sở hoặc loại phòng này không còn khả dụng với tài khoản của bạn.",
+  "partnerRatesEmptyTitle": "Chưa có gói giá nào",
+  "partnerRatesEmptyMessage": "Loại phòng này chưa có gói giá. Việc này do đội ngũ Plan Your Trip thiết lập.",
+  "partnerRateDetailHeading": "Chi tiết gói giá",
+  "partnerRateCloseDetail": "Đóng chi tiết gói giá",
+  "partnerRateActionsOwnerOnly": "Thao tác với giá chỉ dành cho chủ hồ sơ. Bạn vẫn xem được mọi gói giá tại đây.",
+  "partnerRateCurrencyNote": "Số tiền hiển thị không kèm đơn vị tiền tệ vì API giá không cung cấp thông tin này.",
+  "partnerRateValidityNote": "Cả hai ngày đều được tính: một kỳ lưu trú hợp lệ khi mọi đêm nằm trong khoảng này.",
+  "partnerRateActive": "Đang bật",
+  "partnerRateInactive": "Đang tắt",
+  "partnerRateExpired": "Đã hết hạn",
+  "partnerRatePerNight": "{amount} mỗi đêm",
+  "@partnerRatePerNight": {
+    "placeholders": {
+      "amount": {"type": "String"}
+    }
+  },
+  "partnerRateValidity": "{from} – {to}",
+  "@partnerRateValidity": {
+    "placeholders": {
+      "from": {"type": "String"},
+      "to": {"type": "String"}
+    }
+  },
+  "partnerRatePriorityValue": "Ưu tiên {value}",
+  "@partnerRatePriorityValue": {
+    "placeholders": {
+      "value": {"type": "String"}
+    }
+  },
+  "partnerRateHasRestrictions": "Có điều kiện",
+  "partnerRateNightsValue": "{count} đêm",
+  "@partnerRateNightsValue": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "partnerRateDaysValue": "{count} ngày",
+  "@partnerRateDaysValue": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "partnerRateActivateAction": "Bật",
+  "partnerRateDeactivateAction": "Tắt",
+  "partnerRateActivatedMessage": "{name} đã được bật.",
+  "@partnerRateActivatedMessage": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "partnerRateDeactivatedMessage": "{name} đã được tắt.",
+  "@partnerRateDeactivatedMessage": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "partnerRateActionNotFound": "Gói giá đó không còn khả dụng với tài khoản của bạn.",
+  "partnerRateActionConflict": "Thay đổi này xung đột với một gói giá khác.",
+  "partnerRateTypeStandard": "Tiêu chuẩn",
+  "partnerRateTypePromotional": "Giá khuyến mãi",
+  "partnerRateTypeMember": "Thành viên",
+  "partnerRateTypeEarlyBird": "Đặt sớm",
+  "partnerRateTypeLastMinute": "Phút chót",
+  "partnerRateTypeUnknown": "Loại không xác định",
+  "partnerMealPlanRoomOnly": "Chỉ phòng",
+  "partnerMealPlanBreakfast": "Kèm bữa sáng",
+  "partnerMealPlanHalfBoard": "Bán phần",
+  "partnerMealPlanFullBoard": "Trọn phần",
+  "partnerMealPlanAllInclusive": "Trọn gói",
+  "partnerMealPlanUnknown": "Gói ăn không xác định",
+  "partnerCancellationFree": "Hủy miễn phí",
+  "partnerCancellationPartial": "Hoàn một phần",
+  "partnerCancellationNonRefundable": "Không hoàn tiền",
+  "partnerCancellationCustom": "Chính sách riêng",
+  "partnerCancellationUnknown": "Chính sách không xác định",
+  "partnerRateSourceBase": "Giá gốc",
+  "partnerRateSourceDerived": "Giá dẫn xuất",
+  "partnerRateSourceUnknown": "Nguồn không xác định",
+  "partnerRateAdjustmentFixed": "Số tiền cố định",
+  "partnerRateAdjustmentPercent": "Phần trăm",
+  "partnerRateAdjustmentUnknown": "Điều chỉnh không xác định",
+  "partnerRateSectionIdentity": "Thông tin nhận dạng",
+  "partnerRateSectionPricing": "Mức giá",
+  "partnerRateSectionValidity": "Hiệu lực",
+  "partnerRateSectionRestrictions": "Điều kiện lưu trú",
+  "partnerRateSectionCancellation": "Hủy phòng",
+  "partnerRateSectionInclusions": "Bao gồm",
+  "partnerRateSectionOccupancy": "Giá theo số khách",
+  "partnerRateFieldCode": "Mã gói",
+  "partnerRateFieldDescription": "Mô tả",
+  "partnerRateFieldPriority": "Độ ưu tiên",
+  "partnerRateFieldPricePerNight": "Giá mỗi đêm",
+  "partnerRateFieldExtraBedPrice": "Giá giường phụ",
+  "partnerRateFieldAdjustmentType": "Kiểu điều chỉnh",
+  "partnerRateFieldAdjustmentValue": "Mức điều chỉnh",
+  "partnerRateFieldParentPlan": "Dẫn xuất từ gói",
+  "partnerRateFieldValidFrom": "Hiệu lực từ",
+  "partnerRateFieldValidTo": "Hiệu lực đến",
+  "partnerRateFieldMinStay": "Lưu trú tối thiểu",
+  "partnerRateFieldMaxStay": "Lưu trú tối đa",
+  "partnerRateFieldMinAdvance": "Đặt trước tối thiểu",
+  "partnerRateFieldMaxAdvance": "Đặt trước tối đa",
+  "partnerRateFieldClosedToArrival": "Không nhận khách",
+  "partnerRateFieldClosedToDeparture": "Không trả phòng",
+  "partnerRateFieldPolicy": "Chính sách hủy",
+  "partnerRateFieldRefundable": "Được hoàn tiền",
+  "partnerRateFieldDeadlineHours": "Hạn hủy (giờ)",
+  "partnerRateFieldPenaltyPercent": "Phí phạt khi hủy",
+  "partnerRateFieldMealPlan": "Gói ăn",
+  "partnerRateFieldOccupancyPricing": "Bật giá theo số khách",
+  "partnerRateFieldChildPricing": "Bật giá trẻ em",
+  "partnerRateOccupancyEmpty": "Gói này chưa cấu hình giá theo số khách.",
+  "partnerRateOccupancyLabel": "{adults} người lớn, {children} trẻ em",
+  "@partnerRateOccupancyLabel": {
+    "placeholders": {
+      "adults": {"type": "String"},
+      "children": {"type": "String"}
+    }
+  },
+  "partnerPoliciesTitle": "Chính sách & cài đặt",
+  "partnerPoliciesForProperty": "Chính sách của {name}",
+  "@partnerPoliciesForProperty": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "partnerPoliciesNoPropertyContext": "Chưa chọn cơ sở",
+  "partnerPoliciesPropertyScope": "Phạm vi cơ sở",
+  "partnerPoliciesNoPropertiesTitle": "Chưa có cơ sở nào",
+  "partnerPoliciesNoPropertiesMessage": "Chính sách với khách thuộc về một cơ sở. Khi hồ sơ của bạn được gán cơ sở, chính sách sẽ hiển thị tại đây.",
+  "partnerPoliciesSelectPropertyTitle": "Hãy chọn một cơ sở",
+  "partnerPoliciesSelectPropertyMessage": "Chọn một cơ sở để xem và chỉnh sửa chính sách với khách.",
+  "partnerPoliciesUnavailableTitle": "Không xem được chính sách",
+  "partnerPoliciesUnavailableMessage": "Cơ sở này không còn khả dụng với tài khoản của bạn.",
+  "partnerPoliciesPropertySection": "Chính sách với khách",
+  "partnerPoliciesPropertyScopeNote": "Chỉ áp dụng cho cơ sở này. Khách sẽ thấy nội dung này trên trang cơ sở.",
+  "partnerPoliciesLiveWarning": "Thay đổi có hiệu lực ngay với mọi khách, kể cả khách đã đặt phòng — hệ thống không cố định chính sách tại thời điểm đặt.",
+  "partnerPoliciesOwnerOnly": "Chỉ chủ hồ sơ mới thay đổi được chính sách với khách. Bạn vẫn xem được tại đây.",
+  "partnerPoliciesCheckIn": "Nhận phòng từ",
+  "partnerPoliciesCheckOut": "Trả phòng trước",
+  "partnerPoliciesTimeHelper": "Giờ 24 tiếng, ví dụ 14:00",
+  "partnerPoliciesTimeRequired": "Bắt buộc",
+  "partnerPoliciesHouseRules": "Nội quy",
+  "partnerPoliciesHouseRulesNote": "Không bắt buộc. Để trống để xóa một nội quy.",
+  "partnerPoliciesRuleHint": "Để trống nếu không có nội quy",
+  "partnerPoliciesChildren": "Chính sách trẻ em",
+  "partnerPoliciesPets": "Chính sách thú cưng",
+  "partnerPoliciesSmoking": "Chính sách hút thuốc",
+  "partnerPoliciesSettingsSection": "Thông báo của tài khoản",
+  "partnerPoliciesSettingsScopeNote": "Áp dụng cho toàn bộ tài khoản đối tác, không riêng một cơ sở.",
+  "partnerPoliciesSettingsRoleNote": "Chỉ chủ hồ sơ hoặc quản lý mới thay đổi được cài đặt thông báo. Bạn vẫn xem được tại đây.",
+  "partnerPoliciesSettingsUnavailable": "Không truy cập được cài đặt tài khoản của bạn.",
+  "partnerPoliciesSettingsUpdated": "Cập nhật lần cuối {time}",
+  "@partnerPoliciesSettingsUpdated": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "partnerPoliciesLanguage": "Ngôn ngữ mặc định",
+  "partnerPoliciesTimezone": "Múi giờ",
+  "partnerPoliciesChannels": "Kênh nhận thông báo",
+  "partnerPoliciesChannelEmail": "Email",
+  "partnerPoliciesChannelSms": "SMS",
+  "partnerPoliciesChannelInApp": "Trong ứng dụng",
+  "partnerPoliciesTopics": "Nội dung muốn nhận thông báo",
+  "partnerPoliciesTopicBooking": "Đặt phòng",
+  "partnerPoliciesTopicPayment": "Thanh toán",
+  "partnerPoliciesTopicReview": "Đánh giá",
+  "partnerPoliciesTopicPromotion": "Ưu đãi",
+  "partnerPoliciesSave": "Lưu thay đổi",
+  "partnerPoliciesRevert": "Hủy bỏ",
+  "partnerPoliciesNoChanges": "Không có thay đổi chưa lưu.",
+  "partnerPoliciesSaved": "Đã lưu.",
+  "partnerPoliciesSaveForbidden": "Vai trò của bạn không cho phép thay đổi này.",
+  "partnerPoliciesSaveNotFound": "Bản ghi đó không còn khả dụng với tài khoản của bạn.",
+  "partnerPoliciesSaveValidation": "Bắt buộc nhập cả giờ nhận phòng và giờ trả phòng.",
+  "partnerAssetsSection": "Ảnh & phương tiện",
+  "partnerAssetsDeferredBadge": "Chưa khả dụng",
+  "partnerAssetsDeferredMessage": "Quản lý ảnh không nằm trong API dành cho đối tác. Việc tải lên, thay thế, sắp xếp và xóa ảnh chỉ dành cho quản trị viên, nên đội ngũ Plan Your Trip sẽ duy trì ảnh cho cơ sở của bạn.",
+  "partnerPromotionsTitle": "Khuyến mãi & voucher",
+  "partnerPromotionsTabPromotions": "Quy tắc khuyến mãi",
+  "partnerPromotionsTabVoucherCheck": "Kiểm tra voucher",
+  "partnerPromotionsScopeNote": "Tại đây liệt kê mọi khuyến mãi thuộc bất kỳ cơ sở hoặc phòng nào bạn sở hữu. API đối tác không giới hạn khuyến mãi theo từng cơ sở, nên danh sách này không lọc theo cơ sở bạn đang chọn.",
+  "partnerPromotionsCount": "{count} khuyến mãi",
+  "@partnerPromotionsCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partnerPromotionsActiveCount": "{count} đang bật",
+  "@partnerPromotionsActiveCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partnerPromotionsExpiredCount": "{count} đã qua ngày kết thúc",
+  "@partnerPromotionsExpiredCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partnerPromotionsCurrencyNote": "API khuyến mãi không trả về đơn vị tiền tệ, nên số tiền khuyến mãi hiển thị không kèm ký hiệu. Phần xem trước giá bên dưới có đơn vị tiền tệ riêng và sẽ hiển thị nó.",
+  "partnerPromotionsEmptyTitle": "Chưa có khuyến mãi nào",
+  "partnerPromotionsEmptyMessage": "Hiện chưa có khuyến mãi nào áp dụng cho cơ sở hoặc phòng của bạn. Các chiến dịch toàn hệ thống do Plan Your Trip vận hành không hiển thị ở đây vì bạn không quản lý chúng.",
+  "partnerPromotionsOwnerOnly": "Chỉ chủ tài khoản đối tác mới thay đổi được khuyến mãi. Bạn vẫn có thể xem tại đây.",
+  "partnerPromotionDetailHeading": "Chi tiết khuyến mãi",
+  "partnerPromotionCloseDetail": "Đóng chi tiết khuyến mãi",
+  "partnerPromotionSectionIdentity": "Thông tin nhận dạng",
+  "partnerPromotionFieldCode": "Mã khuyến mãi",
+  "partnerPromotionFieldDescription": "Mô tả",
+  "partnerPromotionFieldType": "Loại khuyến mãi",
+  "partnerPromotionSectionDiscount": "Mức giảm",
+  "partnerPromotionFieldDiscountType": "Kiểu giảm giá",
+  "partnerPromotionFieldDiscountValue": "Giá trị giảm",
+  "partnerPromotionFieldMaxDiscount": "Mức giảm tối đa",
+  "partnerPromotionSectionValidity": "Thời hạn áp dụng",
+  "partnerPromotionFieldStart": "Bắt đầu",
+  "partnerPromotionFieldEnd": "Kết thúc",
+  "partnerPromotionSectionConditions": "Điều kiện",
+  "partnerPromotionFieldMinimumStay": "Số đêm tối thiểu",
+  "partnerPromotionFieldMinimumSpend": "Chi tiêu tối thiểu",
+  "partnerPromotionSectionApplication": "Cách áp dụng",
+  "partnerPromotionFieldTarget": "Áp dụng cho",
+  "partnerPromotionFieldPriority": "Độ ưu tiên",
+  "partnerPromotionFieldStackable": "Cộng dồn với khuyến mãi khác",
+  "partnerPromotionStackableNote": "Bộ tính giá có thể áp dụng thêm khuyến mãi khác sau khuyến mãi này.",
+  "partnerPromotionNonStackableNote": "Bộ tính giá áp dụng khuyến mãi này rồi dừng lại, nên không cộng thêm khuyến mãi có độ ưu tiên thấp hơn.",
+  "partnerPromotionActive": "Đang bật",
+  "partnerPromotionInactive": "Đang tắt",
+  "partnerPromotionExpired": "Đã qua ngày kết thúc",
+  "partnerPromotionScheduled": "Bắt đầu sau",
+  "partnerPromotionExclusivePill": "Không cộng dồn",
+  "partnerPromotionValidity": "{from} – {to}",
+  "@partnerPromotionValidity": {
+    "placeholders": {
+      "from": {"type": "String"},
+      "to": {"type": "String"}
+    }
+  },
+  "partnerPromotionPriorityValue": "Ưu tiên {count}",
+  "@partnerPromotionPriorityValue": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "partnerPromotionHasConditions": "Có điều kiện kèm theo",
+  "partnerPromotionActivateAction": "Bật",
+  "partnerPromotionDeactivateAction": "Tắt",
+  "partnerPromotionTypeGeneral": "Chung",
+  "partnerPromotionTypeRoom": "Ưu đãi phòng",
+  "partnerPromotionTypeHotel": "Ưu đãi cơ sở",
+  "partnerPromotionTypeMember": "Thành viên",
+  "partnerPromotionTypeEarlyBird": "Đặt sớm",
+  "partnerPromotionTypeLastMinute": "Đặt sát ngày",
+  "partnerPromotionTypeWeekend": "Cuối tuần",
+  "partnerPromotionTypeHoliday": "Ngày lễ",
+  "partnerPromotionTypeUnknown": "Loại không xác định",
+  "partnerDiscountTypePercentage": "Theo phần trăm",
+  "partnerDiscountTypeFixed": "Số tiền cố định",
+  "partnerDiscountTypeUnknown": "Kiểu giảm giá không xác định",
+  "partnerPromotionTargetAll": "Mọi cơ sở trên Plan Your Trip",
+  "partnerPromotionTargetHotel": "Một cơ sở của bạn",
+  "partnerPromotionTargetRoom": "Một phòng của bạn",
+  "partnerPromotionTargetRoomNamed": "Phòng: {name}",
+  "@partnerPromotionTargetRoomNamed": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "partnerPromotionTargetUnknown": "Đối tượng không xác định",
+  "partnerPromotionPreviewHeading": "Xem trước giá",
+  "partnerPromotionPreviewNote": "Máy chủ tính toán phần này. Mọi số tiền và mọi khuyến mãi được áp dụng đều đến trực tiếp từ bộ tính giá — ứng dụng không tự tính bất kỳ con số nào.",
+  "partnerPromotionPreviewAction": "Chạy xem trước",
+  "partnerPromotionPreviewInvalidRange": "Ngày trả phòng phải sau ngày nhận phòng.",
+  "partnerPromotionPreviewStay": "{from} đến {to} · {nights} đêm",
+  "@partnerPromotionPreviewStay": {
+    "placeholders": {
+      "from": {"type": "String"},
+      "to": {"type": "String"},
+      "nights": {"type": "String"}
+    }
+  },
+  "partnerPromotionPreviewBase": "Giá gốc",
+  "partnerPromotionPreviewRatePlan": "Giá theo gói giá",
+  "partnerPromotionPreviewRatePlanNamed": "Gói giá: {name}",
+  "@partnerPromotionPreviewRatePlanNamed": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "partnerPromotionPreviewDiscount": "Số tiền khuyến mãi giảm",
+  "partnerPromotionPreviewTotal": "Tổng cho kỳ lưu trú này",
+  "partnerPromotionPreviewAppliedHeading": "Khuyến mãi mà bộ tính giá đã áp dụng",
+  "partnerPromotionPreviewNoneApplied": "Bộ tính giá không áp dụng khuyến mãi nào cho kỳ lưu trú này.",
+  "partnerPromotionPreviewUnnamed": "Khuyến mãi không tên",
+  "partnerPromotionPreviewAppliedAmount": "-{amount}",
+  "@partnerPromotionPreviewAppliedAmount": {
+    "placeholders": {
+      "amount": {"type": "String"}
+    }
+  },
+  "partnerPromotionActivatedMessage": "{name} đã được bật.",
+  "@partnerPromotionActivatedMessage": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "partnerPromotionDeactivatedMessage": "{name} đã được tắt.",
+  "@partnerPromotionDeactivatedMessage": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "partnerPromotionActionNotFound": "Khuyến mãi đó không còn khả dụng với tài khoản của bạn.",
+  "partnerPromotionActionConflict": "Mã khuyến mãi đó đã được dùng. Mã khuyến mãi là duy nhất trên toàn Plan Your Trip.",
+  "partnerPromotionActionValidation": "Máy chủ đã từ chối khuyến mãi này. Không có gì thay đổi.",
+  "partnerPromotionActionIncomplete": "Khuyến mãi này thiếu những trường mà thao tác cập nhật cần, nên không có yêu cầu nào được gửi đi. Hãy liên hệ bộ phận hỗ trợ để thay đổi.",
+  "partnerVoucherCheckHeading": "Kiểm tra voucher đặt phòng",
+  "partnerVoucherCheckNote": "Đây là vé xác nhận đặt phòng, không phải mã giảm giá. Việc kiểm tra chỉ xác nhận đặt phòng của khách — không nhận phòng cho ai và không thay đổi dữ liệu.",
+  "partnerVoucherCheckField": "Chuỗi voucher",
+  "partnerVoucherCheckAction": "Kiểm tra voucher",
+  "partnerVoucherCheckClear": "Xóa",
+  "partnerVoucherEligibleTitle": "Hợp lệ — có thể đón khách",
+  "partnerVoucherEligibleMessage": "Chữ ký hợp lệ và đặt phòng này đã sẵn sàng nhận phòng.",
+  "partnerVoucherNotEligibleTitle": "Hợp lệ — nhưng chưa thể nhận phòng",
+  "partnerVoucherNotEligibleMessage": "Chữ ký hợp lệ, nhưng đặt phòng này hiện chưa thể nhận phòng.",
+  "partnerVoucherNotRecognisedTitle": "Không nhận diện được",
+  "partnerVoucherNotRecognisedMessage": "Máy chủ không nhận diện voucher này cho tài khoản của bạn. Voucher có thể đã bị sửa, không tồn tại, hoặc thuộc về đối tác khác — máy chủ không cho biết trường hợp nào.",
+  "partnerVoucherEmptyTitle": "Chưa có gì để kiểm tra",
+  "partnerVoucherEmptyMessage": "Hãy dán hoặc quét chuỗi voucher trước.",
+  "partnerVoucherFailedTitle": "Không kiểm tra được voucher này",
+  "partnerVoucherFieldBooking": "Mã đặt phòng",
+  "partnerVoucherFieldBookingStatus": "Trạng thái đặt phòng",
+  "partnerVoucherFieldGuest": "Tên khách",
+  "partnerVoucherFieldProperty": "Cơ sở đã đặt",
+  "partnerVoucherFieldRoom": "Phòng đã đặt",
+  "partnerVoucherFieldStay": "Kỳ lưu trú",
+  "partnerVoucherFieldOccupancy": "Số khách",
+  "partnerVoucherStayValue": "{from} đến {to} · {nights} đêm",
+  "@partnerVoucherStayValue": {
+    "placeholders": {
+      "from": {"type": "String"},
+      "to": {"type": "String"},
+      "nights": {"type": "String"}
+    }
+  },
+  "partnerVoucherOccupancyValue": "{adults} người lớn · {children} trẻ em",
+  "@partnerVoucherOccupancyValue": {
+    "placeholders": {
+      "adults": {"type": "String"},
+      "children": {"type": "String"}
+    }
+  },
+  "partnerVoucherReadOnlyNote": "Chỉ kiểm tra. Việc nhận phòng thực hiện trên đặt phòng, không phải trên màn hình này.",
+  "partnerBookingsTitle": "Đặt chỗ & lễ tân",
+  "partnerBookingsTabReservations": "Danh sách đặt chỗ",
+  "partnerBookingsTabFrontDesk": "Lễ tân",
+  "partnerBookingsScopeNote": "Danh sách này gồm mọi đặt chỗ ở tất cả cơ sở bạn sở hữu. API đối tác không nhận tham số cơ sở, nên danh sách không lọc theo cơ sở bạn đang chọn — hãy lọc theo phòng để tập trung vào một cơ sở.",
+  "partnerBookingsEmptyTitle": "Chưa có đặt chỗ nào",
+  "partnerBookingsEmptyMessage": "Chưa có ai đặt chỗ tại các cơ sở của bạn. Đặt chỗ mới sẽ xuất hiện ở đây ngay khi khách đặt.",
+  "partnerBookingsNoMatchTitle": "Không có đặt chỗ nào khớp bộ lọc",
+  "partnerBookingsNoMatchMessage": "Không có kết quả nào khớp với bộ lọc bạn đã đặt. Hãy xóa bộ lọc để xem lại toàn bộ.",
+  "partnerBookingDetailHeading": "Chi tiết đặt chỗ",
+  "partnerBookingCloseDetail": "Đóng chi tiết đặt chỗ",
+  "partnerBookingNotFound": "Đặt chỗ đó không còn khả dụng với tài khoản của bạn.",
+  "partnerBookingColumnCode": "Mã đặt chỗ",
+  "partnerBookingColumnGuest": "Khách",
+  "partnerBookingColumnRoom": "Loại phòng",
+  "partnerBookingColumnCheckIn": "Nhận phòng",
+  "partnerBookingColumnCheckOut": "Trả phòng",
+  "partnerBookingColumnNights": "Số đêm",
+  "partnerBookingColumnStatus": "Trạng thái",
+  "partnerBookingColumnTotal": "Tổng tiền",
+  "partnerBookingStayRange": "{from} – {to}",
+  "@partnerBookingStayRange": {
+    "placeholders": {
+      "from": {"type": "String"},
+      "to": {"type": "String"}
+    }
+  },
+  "partnerBookingNightsValue": "{count} đêm",
+  "@partnerBookingNightsValue": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "partnerBookingOccupancyValue": "{adults} người lớn · {children} trẻ em",
+  "@partnerBookingOccupancyValue": {
+    "placeholders": {
+      "adults": {"type": "String"},
+      "children": {"type": "String"}
+    }
+  },
+  "partnerBookingNightProgressValue": "Đêm {current} trên {total}",
+  "@partnerBookingNightProgressValue": {
+    "placeholders": {
+      "current": {"type": "String"},
+      "total": {"type": "String"}
+    }
+  },
+  "partnerBookingStatusPending": "Chờ xử lý",
+  "partnerBookingStatusConfirmed": "Đã xác nhận",
+  "partnerBookingStatusCheckInReady": "Sẵn sàng nhận phòng",
+  "partnerBookingStatusCheckedIn": "Đã nhận phòng",
+  "partnerBookingStatusCheckedOut": "Đã trả phòng",
+  "partnerBookingStatusCompleted": "Đã hoàn tất",
+  "partnerBookingStatusCancelled": "Đã hủy",
+  "partnerBookingStatusRefunded": "Đã hoàn tiền",
+  "partnerBookingStatusArchived": "Đã lưu trữ",
+  "partnerBookingStatusNoShow": "Khách không đến",
+  "partnerBookingStatusUnknown": "Trạng thái không xác định",
+  "partnerStayStateUpcoming": "Kỳ lưu trú sắp tới",
+  "partnerStayStateReady": "Sẵn sàng nhận phòng",
+  "partnerStayStateInHouse": "Đang lưu trú",
+  "partnerStayStateCheckedOut": "Đã rời đi",
+  "partnerStayStateCompleted": "Kỳ lưu trú đã hoàn tất",
+  "partnerStayStateCancelled": "Kỳ lưu trú đã hủy",
+  "partnerStayStateNoShow": "Khách đã không đến",
+  "partnerStayStateExpired": "Đã quá thời hạn",
+  "partnerStayStateUnknown": "Trạng thái lưu trú không xác định",
+  "partnerStayWarningCancelled": "Kỳ lưu trú này đã bị hủy, đã hoàn tiền, hoặc được ghi nhận là khách không đến.",
+  "partnerStayWarningCompleted": "Kỳ lưu trú này đã kết thúc.",
+  "partnerStayWarningInHouse": "Khách đang lưu trú.",
+  "partnerStayWarningCheckOutOverdue": "Quá hạn trả phòng — đã qua ngày trả phòng nhưng khách vẫn đang ở trạng thái đã nhận phòng.",
+  "partnerStayWarningFuture": "Kỳ lưu trú chưa bắt đầu.",
+  "partnerStayWarningCheckInOverdue": "Quá hạn nhận phòng — đã qua ngày đến nhưng khách chưa nhận phòng.",
+  "partnerStayWarningUnknown": "Máy chủ báo một cảnh báo mà ứng dụng chưa nhận diện được.",
+  "partnerBookingFilterGuest": "Tên hoặc email khách",
+  "partnerBookingFilterCode": "Mã đặt chỗ",
+  "partnerBookingFilterStatus": "Trạng thái đặt chỗ",
+  "partnerBookingFilterAnyStatus": "Mọi trạng thái",
+  "partnerBookingFilterRoom": "Theo phòng",
+  "partnerBookingFilterAnyRoom": "Mọi phòng",
+  "partnerBookingFilterDates": "Ngày đến",
+  "partnerBookingFilterClear": "Xóa bộ lọc",
+  "partnerBookingFilterArrivals": "Đến hôm nay",
+  "partnerBookingFilterDepartures": "Rời hôm nay",
+  "partnerBookingFilterUpcoming": "Sắp tới",
+  "partnerBookingFilterInHouse": "Đang lưu trú",
+  "partnerBookingFilterCancelled": "Đã hủy",
+  "partnerBookingFilterCompleted": "Đã hoàn tất",
+  "partnerBookingFilterRangeBoth": "Đến từ {from} tới {to}",
+  "@partnerBookingFilterRangeBoth": {
+    "placeholders": {
+      "from": {"type": "String"},
+      "to": {"type": "String"}
+    }
+  },
+  "partnerBookingFilterRangeFrom": "Đến từ ngày {from} trở đi",
+  "@partnerBookingFilterRangeFrom": {
+    "placeholders": {
+      "from": {"type": "String"}
+    }
+  },
+  "partnerBookingFilterRangeTo": "Đến vào hoặc trước ngày {to}",
+  "@partnerBookingFilterRangeTo": {
+    "placeholders": {
+      "to": {"type": "String"}
+    }
+  },
+  "partnerBookingPageRange": "Hiển thị {from}-{to} trên {total}",
+  "@partnerBookingPageRange": {
+    "placeholders": {
+      "from": {"type": "String"},
+      "to": {"type": "String"},
+      "total": {"type": "String"}
+    }
+  },
+  "partnerBookingPagePosition": "Trang {page} trên {total}",
+  "@partnerBookingPagePosition": {
+    "placeholders": {
+      "page": {"type": "String"},
+      "total": {"type": "String"}
+    }
+  },
+  "partnerBookingPagePrevious": "Trang trước",
+  "partnerBookingPageNext": "Trang sau",
+  "partnerBookingSectionGuest": "Khách",
+  "partnerBookingSectionStay": "Kỳ lưu trú",
+  "partnerBookingSectionRoom": "Cơ sở & phòng",
+  "partnerBookingSectionPrice": "Giá đặt chỗ",
+  "partnerBookingSectionRatePlan": "Gói giá được ghi nhận khi đặt",
+  "partnerBookingSectionPayment": "Thanh toán & hóa đơn",
+  "partnerBookingSectionTimeline": "Dòng thời gian vòng đời",
+  "partnerBookingSectionModifications": "Lịch sử thay đổi",
+  "partnerBookingSectionAudit": "Bản ghi nhận & trả phòng",
+  "partnerBookingFieldGuestName": "Tên khách",
+  "partnerBookingFieldGuestEmail": "Email khách",
+  "partnerBookingFieldOccupancy": "Số khách",
+  "partnerBookingFieldSpecialRequest": "Yêu cầu đặc biệt",
+  "partnerBookingFieldCheckIn": "Ngày nhận phòng",
+  "partnerBookingFieldCheckOut": "Ngày trả phòng",
+  "partnerBookingFieldNights": "Số đêm đã đặt",
+  "partnerBookingFieldNightProgress": "Tiến độ lưu trú",
+  "partnerBookingFieldActualCheckIn": "Thời điểm nhận phòng thực tế",
+  "partnerBookingFieldActualCheckOut": "Thời điểm trả phòng thực tế",
+  "partnerBookingFieldProperty": "Cơ sở đã đặt",
+  "partnerBookingFieldRoom": "Phòng đã đặt",
+  "partnerBookingFieldRoomCode": "Mã phòng",
+  "partnerBookingFieldRoomCount": "Số phòng đã đặt",
+  "partnerBookingFieldBasePrice": "Giá gốc",
+  "partnerBookingFieldRatePlanPrice": "Giá theo gói giá",
+  "partnerBookingFieldDiscount": "Mức giảm đã áp dụng",
+  "partnerBookingFieldTotal": "Tổng đã tính",
+  "partnerBookingPriceNote": "Mọi số tiền ở đây do máy chủ tính và lưu lại vào thời điểm đặt chỗ. Ứng dụng không tính lại bất kỳ con số nào.",
+  "partnerBookingFieldRatePlanName": "Gói giá",
+  "partnerBookingFieldRatePlanCode": "Mã gói giá",
+  "partnerBookingFieldMealPlan": "Gói bữa ăn",
+  "partnerBookingFieldCancellationPolicy": "Chính sách hủy",
+  "partnerBookingFieldCancellationDeadline": "Hạn hủy miễn phí",
+  "partnerBookingFieldRefundable": "Được hoàn tiền",
+  "partnerBookingFieldNightlySnapshot": "Giá mỗi đêm đã ghi nhận",
+  "partnerBookingSnapshotNote": "Các giá trị này được ghi nhận vào lúc đặt chỗ. Việc chỉnh sửa gói giá hôm nay không làm thay đổi chúng.",
+  "partnerBookingNoPayments": "Chưa ghi nhận khoản thanh toán nào cho đặt chỗ này.",
+  "partnerBookingPaymentUnnamed": "Thanh toán",
+  "partnerBookingFieldInvoice": "Số hóa đơn",
+  "partnerBookingFieldInvoiceStatus": "Trạng thái hóa đơn",
+  "partnerBookingFieldInvoiceTotal": "Tổng hóa đơn",
+  "partnerBookingPaymentReadOnlyNote": "Thông tin thanh toán chỉ để xem. API đối tác không có thao tác thanh toán, hoàn tiền hay đối soát, và mã thẻ cùng mã giao dịch của cổng thanh toán không bao giờ được gửi tới màn hình này.",
+  "partnerBookingTimelineEmpty": "Máy chủ không ghi nhận sự kiện vòng đời nào cho đặt chỗ này.",
+  "partnerBookingEventCreated": "Đã tạo đặt chỗ",
+  "partnerBookingEventPaid": "Đã thanh toán xong",
+  "partnerBookingEventConfirmed": "Đã xác nhận đặt chỗ",
+  "partnerBookingEventCheckedIn": "Khách đã nhận phòng",
+  "partnerBookingEventCheckedOut": "Khách đã trả phòng",
+  "partnerBookingEventCompleted": "Đã hoàn tất đặt chỗ",
+  "partnerBookingEventCancelled": "Đã hủy đặt chỗ",
+  "partnerBookingEventArchived": "Đã lưu trữ đặt chỗ",
+  "partnerBookingEventModified": "Đã thay đổi đặt chỗ",
+  "partnerBookingEventReview": "Khách đã gửi đánh giá",
+  "partnerBookingModificationNote": "Khách tự thay đổi đặt chỗ của mình. Đây là bản ghi những gì đã thay đổi — API đối tác không cho phép thay đổi đặt chỗ từ đây.",
+  "partnerBookingModificationDates": "Ngày",
+  "partnerBookingModificationOccupancy": "Số khách",
+  "partnerBookingModificationRatePlan": "Gói giá",
+  "partnerBookingModificationPrice": "Giá tiền",
+  "partnerBookingNoAudit": "Chưa ghi nhận việc nhận phòng hay trả phòng cho đặt chỗ này.",
+  "partnerBookingAuditCheckIn": "Đã ghi nhận nhận phòng",
+  "partnerBookingAuditCheckOut": "Đã ghi nhận trả phòng",
+  "partnerBookingAuditByUser": "Nhân viên #{userId}",
+  "@partnerBookingAuditByUser": {
+    "placeholders": {
+      "userId": {"type": "String"}
+    }
+  },
+  "partnerBookingActionCheckIn": "Nhận phòng",
+  "partnerBookingActionCheckOut": "Trả phòng",
+  "partnerBookingActionNoShow": "Đánh dấu khách không đến",
+  "partnerBookingActionComplete": "Hoàn tất đặt chỗ",
+  "partnerBookingActionsIrreversibleNote": "Những thay đổi này không thể hoàn tác từ trang đối tác, và khách sẽ nhận được thông báo.",
+  "partnerBookingNoActionsAvailable": "Không có thao tác vận hành nào khả dụng với trạng thái hiện tại của đặt chỗ này.",
+  "partnerBookingNoActionsClosed": "Đặt chỗ này đã khép lại nên không còn thao tác vận hành nào.",
+  "partnerBookingActionConfirm": "{action} cho đặt chỗ {code}? Thao tác này không thể hoàn tác từ trang đối tác, và khách sẽ nhận được thông báo.",
+  "@partnerBookingActionConfirm": {
+    "placeholders": {
+      "action": {"type": "String"},
+      "code": {"type": "String"}
+    }
+  },
+  "partnerBookingActionConfirmCta": "Xác nhận",
+  "partnerBookingActionCancel": "Hủy bỏ",
+  "partnerBookingActionSucceeded": "Đã {action} cho đặt chỗ {code}.",
+  "@partnerBookingActionSucceeded": {
+    "placeholders": {
+      "action": {"type": "String"},
+      "code": {"type": "String"}
+    }
+  },
+  "partnerBookingActionRejected": "Máy chủ từ chối thay đổi đó với trạng thái hiện tại của đặt chỗ. Không có gì thay đổi.",
+  "partnerBookingActionValidation": "Máy chủ đã từ chối yêu cầu đó. Không có gì thay đổi.",
+  "partnerBookingActionUncertain": "Kết nối bị ngắt trước khi máy chủ xác nhận, và thay đổi này không thể hoàn tác. Hãy làm mới để xem trạng thái hiện tại trước khi thử lại.",
+  "partnerFrontDeskHeading": "Nhận hoặc trả phòng cho khách",
+  "partnerFrontDeskNote": "Quét mã QR voucher của khách hoặc nhập mã đặt chỗ. Thao tác này thay đổi đặt chỗ và gửi thông báo cho khách.",
+  "partnerFrontDeskField": "Chuỗi voucher hoặc mã đặt chỗ",
+  "partnerFrontDeskFieldHelp": "Voucher được quét sẽ ghi nhận là quét QR; mã đặt chỗ nhập tay sẽ ghi nhận là thủ công.",
+  "partnerFrontDeskCheckInAction": "Cho khách nhận phòng",
+  "partnerFrontDeskCheckOutAction": "Cho khách trả phòng",
+  "partnerFrontDeskClear": "Xóa",
+  "partnerFrontDeskConfirm": "Tiếp tục với {code}? Thao tác này thay đổi đặt chỗ, gửi thông báo cho khách và không thể hoàn tác từ trang đối tác.",
+  "@partnerFrontDeskConfirm": {
+    "placeholders": {
+      "code": {"type": "String"}
+    }
+  },
+  "partnerFrontDeskCheckedInTitle": "Khách đã nhận phòng",
+  "partnerFrontDeskCheckedOutTitle": "Khách đã trả phòng",
+  "partnerFrontDeskIdempotentNote": "Thực hiện lại thao tác này trên cùng một đặt chỗ là an toàn: máy chủ giữ nguyên thời điểm ban đầu và không ghi nhận trùng lặp.",
+  "partnerFrontDeskNotRecognisedTitle": "Không nhận diện được",
+  "partnerFrontDeskNotRecognisedMessage": "Máy chủ không nhận diện voucher hoặc mã đặt chỗ đó cho tài khoản của bạn. Nó có thể đã bị sửa, không tồn tại, hoặc thuộc về đối tác khác — máy chủ không cho biết trường hợp nào.",
+  "partnerFrontDeskRejectedTitle": "Chưa thể thực hiện",
+  "partnerFrontDeskRejectedMessage": "Trạng thái hoặc ngày của đặt chỗ này hiện chưa cho phép thao tác đó. Không có gì thay đổi.",
+  "partnerFrontDeskInvalidTitle": "Chưa có gì để gửi",
+  "partnerFrontDeskInvalidMessage": "Hãy quét hoặc nhập chuỗi voucher hay mã đặt chỗ trước.",
+  "partnerFrontDeskFailedTitle": "Không thể hoàn tất thao tác này",
+  "partnerFrontDeskUncertainTitle": "Chưa rõ kết quả",
+  "partnerFrontDeskUncertainMessage": "Kết nối bị ngắt trước khi máy chủ xác nhận. Hãy kiểm tra trạng thái đặt chỗ — nếu thao tác chưa thành công thì chạy lại là an toàn.",
+  "partnerCalendarTitle": "Lịch & tồn phòng",
+  "partnerCalendarTabOverview": "Lịch cơ sở",
+  "partnerCalendarTabInventory": "Tồn phòng theo phòng",
+  "partnerCalendarScopeNote": "Toàn bộ phòng của cơ sở đang chọn, theo từng đêm. Các số liệu lấy từ chính những bản ghi tồn phòng mà tab Tồn phòng chỉnh sửa — màn hình này chỉ đọc.",
+  "partnerCalendarWindowRange": "{from} – {to}",
+  "@partnerCalendarWindowRange": {
+    "placeholders": {
+      "from": {"type": "String"},
+      "to": {"type": "String"}
+    }
+  },
+  "partnerCalendarPreviousWeek": "Tuần trước",
+  "partnerCalendarNextWeek": "Tuần sau",
+  "partnerCalendarToday": "Hôm nay",
+  "partnerCalendarNoRoomsTitle": "Cơ sở này chưa có phòng nào",
+  "partnerCalendarNoRoomsMessage": "Chưa có gì để lên lịch cho tới khi cơ sở có ít nhất một phòng. Phòng được quản lý trong mục Phòng.",
+  "partnerCalendarWindowEmptyMessage": "Không có bản ghi tồn phòng nào cho bất kỳ phòng nào trong khoảng ngày này. Đêm không có bản ghi thì không thể bán, vì máy chủ đếm số bản ghi và từ chối kỳ lưu trú nếu thiếu bất kỳ đêm nào.",
+  "partnerCalendarRoomsFailed": "Không tải được lịch của {failed} trên {total} phòng. Những hàng đó hiển thị là không đọc được, không phải là trống.",
+  "@partnerCalendarRoomsFailed": {
+    "placeholders": {
+      "failed": {"type": "String"},
+      "total": {"type": "String"}
+    }
+  },
+  "partnerCalendarRoomFailed": "Không tải được {room}.",
+  "@partnerCalendarRoomFailed": {
+    "placeholders": {
+      "room": {"type": "String"}
+    }
+  },
+  "partnerCalendarStateOpen": "Đang mở bán",
+  "partnerCalendarStateSoldOut": "Đã hết phòng",
+  "partnerCalendarStateStopSell": "Ngừng bán",
+  "partnerCalendarStateNoRecord": "Không có bản ghi",
+  "partnerCalendarLegendHeading": "Mỗi đêm hiển thị điều gì",
+  "partnerCalendarLegendClosedArrival": "Chặn nhận phòng",
+  "partnerCalendarLegendClosedDeparture": "Chặn trả phòng",
+  "partnerCalendarLegendOccupied": "Số phòng đã bán",
+  "partnerCalendarLegendNote": "Con số trên mỗi đêm là số phòng còn trống. Chặn nhận phòng khiến kỳ lưu trú không được bắt đầu vào đêm đó; chặn trả phòng khiến kỳ lưu trú không được kết thúc ở đêm đó. Cả hai đều không ngăn đêm đó được bán trong một kỳ lưu trú dài hơn.",
+  "partnerCalendarSoldValue": "đã bán {count}",
+  "@partnerCalendarSoldValue": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "partnerCalendarMetricSellable": "đêm đang mở bán",
+  "partnerCalendarMetricOccupied": "đêm có phòng đã bán",
+  "partnerCalendarMetricRestricted": "đêm có hạn chế",
+  "partnerCalendarMetricMissing": "đêm không có bản ghi",
+  "partnerCalendarNightHeading": "{room} · {date}",
+  "@partnerCalendarNightHeading": {
+    "placeholders": {
+      "room": {"type": "String"},
+      "date": {"type": "String"}
+    }
+  },
+  "partnerCalendarCloseNight": "Đóng chi tiết đêm",
+  "partnerCalendarFieldAvailable": "Còn trống",
+  "partnerCalendarFieldSold": "Đã bán",
+  "partnerCalendarFieldBlocked": "Đang khóa",
+  "partnerCalendarFieldMaintenance": "Đang bảo trì",
+  "partnerCalendarFieldTotal": "Tổng số phòng",
+  "partnerCalendarInconsistentMessage": "Số phòng còn trống, đã bán, đang khóa và đang bảo trì không cộng lại bằng tổng của đêm này. Các con số của máy chủ được hiển thị nguyên vẹn.",
+  "partnerCalendarNoRecordExplanation": "Không có bản ghi tồn phòng cho đêm này. Điều đó không đồng nghĩa với còn trống: máy chủ đếm số bản ghi, nên mọi kỳ lưu trú bao gồm đêm này đều bị từ chối. Hãy tạo bản ghi trong tab Tồn phòng để đêm này có thể bán được.",
+  "partnerCalendarQuestionsHeading": "Đêm này cho phép những gì",
+  "partnerCalendarQuestionStock": "Vẫn còn phòng trống",
+  "partnerCalendarQuestionSellable": "Đêm này có thể bán",
+  "partnerCalendarQuestionArrival": "Kỳ lưu trú có thể bắt đầu vào đêm này",
+  "partnerCalendarQuestionDeparture": "Kỳ lưu trú có thể kết thúc ở đêm này",
+  "partnerCalendarQuestionsNote": "Đây là bốn phép kiểm tra riêng biệt của máy chủ, không phải một. Một đêm vẫn có thể bán được trong kỳ lưu trú dài hơn dù đang chặn nhận phòng hoặc chặn trả phòng.",
+  "partnerCalendarReasonNoStock": "Không còn phòng nào cho đêm này.",
+  "partnerCalendarReasonStopSell": "Đêm này đang bật ngừng bán.",
+  "partnerCalendarReasonNotSellable": "Đêm này hoàn toàn không thể bán.",
+  "partnerCalendarReasonClosedArrival": "Đêm này đang chặn nhận phòng.",
+  "partnerCalendarReasonClosedDeparture": "Đêm này đang chặn trả phòng.",
+  "partnerCalendarReadOnlyNote": "Lịch này chỉ để xem. Ngừng bán, chặn nhận phòng và chặn trả phòng được thay đổi trong tab Tồn phòng, để mọi thao tác ghi chỉ do một nơi quản lý.",
+  "partnerCalendarManageRestrictions": "Mở tồn phòng theo phòng",
+  "partnerMetricWindow": "{from} – {to}",
+  "@partnerMetricWindow": {
+    "placeholders": {
+      "from": {"type": "String"},
+      "to": {"type": "String"}
+    }
+  },
+  "partnerMetricAllProperties": "Tất cả cơ sở",
+  "partnerMetricChangeRange": "Đổi khoảng ngày",
+  "partnerMetricDefaultRange": "30 ngày gần nhất",
+  "partnerMetricInvalidRange": "Ngày bắt đầu không được sau ngày kết thúc. Máy chủ từ chối khoảng ngày đó.",
+  "partnerMetricScopeNotFound": "Cơ sở đó không khả dụng với tài khoản của bạn.",
+  "partnerMetricNotLoaded": "Phần này chưa được tải.",
+  "partnerMetricUnavailable": "Không có dữ liệu",
+  "partnerMetricSectionsFailed": "Không tải được {count} phần. Các phần đó hiển thị là không có dữ liệu, không phải bằng 0.",
+  "@partnerMetricSectionsFailed": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "partnerMetricPeakDay": "Ngày cao nhất {date}, {value}",
+  "@partnerMetricPeakDay": {
+    "placeholders": {
+      "date": {"type": "String"},
+      "value": {"type": "String"}
+    }
+  },
+  "partnerFinanceTitle": "Tài chính & đối soát",
+  "partnerFinanceTabOverview": "Doanh thu & hoa hồng",
+  "partnerFinanceTabRevenue": "Doanh thu",
+  "partnerFinanceTabSettlement": "Đối soát & chi trả",
+  "partnerFinanceScopeAll": "Số liệu bao gồm mọi cơ sở bạn sở hữu. Hãy chọn một cơ sở trong không gian làm việc để thu hẹp phạm vi. Số tiền hiển thị dạng số có phân nhóm: API tài chính không gửi kèm đơn vị tiền tệ.",
+  "partnerFinanceScopeProperty": "Số liệu chỉ bao gồm cơ sở đang chọn. Số tiền hiển thị dạng số có phân nhóm: API tài chính không gửi kèm đơn vị tiền tệ.",
+  "partnerFinanceEstimateNotice": "Đây là các con số ước tính, không phải bảng kê tài chính chính thức. Hoa hồng nền tảng được máy chủ áp dụng theo một tỷ lệ cố định, số thuế chỉ mang tính tham khảo, và các kỳ đối soát được tính từ doanh thu đặt phòng chứ không đọc từ sổ đối soát.",
+  "partnerFinanceNoData": "Máy chủ không trả về số liệu nào cho khoảng thời gian này.",
+  "partnerFinanceOverviewHeading": "Doanh thu và hoa hồng",
+  "partnerFinanceOverviewSubtitle": "Đặt phòng được tính theo ngày nhận phòng nằm trong khoảng đã chọn.",
+  "partnerFinanceCommissionCaption": "Do máy chủ tính theo tỷ lệ cố định",
+  "partnerFinanceTaxCaption": "Chỉ mang tính tham khảo — không phải số thuế thực tế",
+  "partnerFinanceCompletedLabel": "Đặt phòng đã hoàn tất",
+  "partnerFinancePaidLabel": "Đặt phòng đã thanh toán",
+  "partnerFinancePendingCaption": "Toàn bộ doanh thu ròng của khoảng thời gian: hệ thống chưa theo dõi phần đã thực sự đối soát",
+  "partnerFinanceNextPayoutCaption": "Theo chu kỳ hằng tháng giả định, không phải ngày đã lên lịch",
+  "partnerFinanceCommissionHeading": "Chi tiết hoa hồng",
+  "partnerFinanceRateNotice": "Máy chủ đã áp dụng tỷ lệ nền tảng cố định {rate}. Đây là hằng số trong dịch vụ, không phải tỷ lệ đã thương lượng, và ứng dụng không bao giờ tự áp dụng nó.",
+  "@partnerFinanceRateNotice": {
+    "placeholders": {
+      "rate": {"type": "String"}
+    }
+  },
+  "partnerFinanceRevenueHeading": "Chi tiết doanh thu",
+  "partnerFinanceRevenueSubtitle": "Mọi con số đều do máy chủ tính và làm tròn. Màn hình này không tính lại bất kỳ giá trị nào.",
+  "partnerFinanceRevenueEmpty": "Không ghi nhận doanh thu nào trong khoảng thời gian này.",
+  "partnerFinanceAverageBooking": "Giá trị đặt phòng trung bình",
+  "partnerFinanceHighestBooking": "Đặt phòng cao nhất",
+  "partnerFinanceByDay": "Theo ngày",
+  "partnerFinanceByMonth": "Theo tháng",
+  "partnerFinanceByProperty": "Theo cơ sở",
+  "partnerFinanceByRoom": "Theo phòng",
+  "partnerFinanceSettlementHeading": "Đối soát",
+  "partnerFinanceSettlementSubtitle": "Các kỳ là tháng dương lịch được tính từ doanh thu đặt phòng. Không có sổ đối soát nào đứng sau chúng.",
+  "partnerFinanceSettlementEmpty": "Không có kỳ đối soát nào trong khoảng thời gian này.",
+  "partnerFinanceCurrentSettlement": "Kỳ hiện tại",
+  "partnerFinanceLastSettlement": "Kỳ trước",
+  "partnerFinancePending": "Đang chờ",
+  "partnerFinancePaid": "Đã đối soát",
+  "partnerFinanceSettlementMismatch": "Máy chủ báo có khoản đã đối soát trong khi không kỳ nào bên dưới được đánh dấu đã đối soát. Cả hai giá trị đều hiển thị đúng như máy chủ gửi; hãy thận trọng với tổng đã đối soát.",
+  "partnerFinanceSettlementPeriods": "Các kỳ",
+  "partnerFinancePeriod": "Kỳ",
+  "partnerFinanceStatus": "Trạng thái",
+  "partnerFinanceStatusPaid": "Đã đối soát",
+  "partnerFinanceStatusPending": "Đang chờ",
+  "partnerFinanceStatusUnknown": "Không xác định",
+  "partnerFinancePayoutHeading": "Chi trả",
+  "partnerFinancePayoutSubtitle": "Vẫn là các kỳ được tính đó, chia theo trạng thái.",
+  "partnerFinancePayoutEmpty": "Không có kỳ chi trả nào trong khoảng thời gian này.",
+  "partnerFinanceEstimatedPayoutDate": "Ngày chi trả dự kiến",
+  "partnerFinanceUpcomingPayouts": "Sắp tới",
+  "partnerFinanceCompletedPayouts": "Đã hoàn tất",
+  "partnerFinancePayoutNoRecords": "API đối tác không có bản ghi chi trả nào — không có mã tham chiếu, thông tin ngân hàng hay thông tin cổng thanh toán để hiển thị, và ứng dụng cũng không yêu cầu chúng.",
+  "partnerFinanceInvoiceHeading": "Hóa đơn",
+  "partnerFinanceInvoiceEmpty": "Không có hóa đơn nào được phát hành trong khoảng thời gian này.",
+  "partnerFinanceInvoiceIssued": "Đã phát hành",
+  "partnerFinanceInvoicePaid": "Đã thanh toán",
+  "partnerFinanceInvoiceCancelled": "Đã hủy",
+  "partnerFinanceInvoiceRefunded": "Đã hoàn tiền",
+  "partnerFinanceInvoiceTotal": "Tổng đã xuất hóa đơn",
+  "partnerFinanceInvoiceNoDocuments": "API đối tác chỉ trả về số lượng hóa đơn. Không có danh sách hóa đơn, không có số hóa đơn để mở và không có bản tải xuống, nên ứng dụng không hiển thị chức năng đó.",
+  "partnerFinanceRefundHeading": "Hoàn tiền",
+  "partnerFinanceRefundEmpty": "Không ghi nhận khoản hoàn tiền nào trong khoảng thời gian này.",
+  "partnerFinanceRefundCount": "Số lần hoàn tiền",
+  "partnerFinanceRefundAmount": "Số tiền đã hoàn",
+  "partnerFinanceRefundRate": "Tỷ lệ hoàn tiền",
+  "partnerFinanceRefundReadOnly": "Phần hoàn tiền ở đây chỉ để xem. API đối tác không có thao tác hoàn tiền, nên việc hoàn tiền được thực hiện ở nơi khác.",
+  "partnerAnalyticsTitle": "Phân tích hiệu suất",
+  "partnerAnalyticsDashboardPointer": "Doanh thu, công suất phòng và các tổng số chính nằm ở Bảng điều khiển, nơi đã báo cáo chúng. Trang này bổ sung những gì Bảng điều khiển chưa có.",
+  "partnerAnalyticsScopeAll": "Số liệu bao gồm mọi cơ sở bạn sở hữu. Hãy chọn một cơ sở trong không gian làm việc để thu hẹp phạm vi.",
+  "partnerAnalyticsScopeProperty": "Số liệu chỉ bao gồm cơ sở đang chọn.",
+  "partnerAnalyticsBookingsHeading": "Hoạt động đặt phòng",
+  "partnerAnalyticsBookingsEmpty": "Không có đặt phòng nào trong khoảng thời gian này.",
+  "partnerAnalyticsArrivals": "Lượt đến",
+  "partnerAnalyticsDepartures": "Lượt đi",
+  "partnerAnalyticsCancellations": "Lượt hủy",
+  "partnerAnalyticsNoShows": "Khách không đến",
+  "partnerAnalyticsAverageStay": "Thời gian lưu trú trung bình",
+  "partnerAnalyticsAverageStayCaption": "Số đêm, do máy chủ tính",
+  "partnerAnalyticsByStatus": "Theo trạng thái",
+  "partnerAnalyticsRoomsHeading": "Hiệu suất phòng",
+  "partnerAnalyticsRoomsEmpty": "Không có hoạt động phòng nào trong khoảng thời gian này.",
+  "partnerAnalyticsOccupancyEstimate": "Công suất ước tính",
+  "partnerAnalyticsOccupancyCaption": "Máy chủ gọi đây là con số ước tính",
+  "partnerAnalyticsTopRoomsRevenue": "Phòng dẫn đầu theo doanh thu",
+  "partnerAnalyticsTopRoomsBookings": "Phòng dẫn đầu theo lượt đặt",
+  "partnerAnalyticsAvailability": "Tổng hợp tình trạng phòng trống",
+  "partnerAnalyticsPromotionsHeading": "Hoạt động khuyến mãi",
+  "partnerAnalyticsPromotionsSubtitle": "Chỉ mang tính cấu trúc: máy chủ chưa thể quy khoản giảm giá về từng đặt phòng.",
+  "partnerAnalyticsPromotionsEmpty": "Không có hoạt động khuyến mãi nào trong khoảng thời gian này.",
+  "partnerAnalyticsActivePromotions": "Khuyến mãi đang bật",
+  "partnerAnalyticsDiscountedBookings": "Đặt phòng có giảm giá",
+  "partnerAnalyticsNoAttribution": "Máy chủ chưa quy được khoản giảm giá",
+  "partnerAnalyticsPromotionsByType": "Theo loại",
+  "partnerAnalyticsPromotionsByStatus": "Theo trạng thái khuyến mãi",
+  "partnerAnalyticsReviewsHeading": "Tổng hợp đánh giá",
+  "partnerAnalyticsReviewsSubtitle": "Tổng hợp điểm và trạng thái kiểm duyệt. Từng đánh giá và phần trả lời được quản lý trong mục Đánh giá.",
+  "partnerAnalyticsReviewsEmpty": "Không có đánh giá nào trong khoảng thời gian này.",
+  "partnerAnalyticsAverageRating": "Điểm trung bình",
+  "partnerAnalyticsApprovedOnly": "Chỉ tính các đánh giá đã duyệt",
+  "partnerAnalyticsNoReviews": "Chưa có đánh giá nào để tính trung bình",
+  "partnerAnalyticsReviewCount": "Tổng số đánh giá",
+  "partnerAnalyticsReviewsApproved": "Đã duyệt",
+  "partnerAnalyticsReviewsPending": "Chờ duyệt",
+  "partnerAnalyticsReviewsRejected": "Đã từ chối",
+  "partnerAnalyticsMessagesHeading": "Hoạt động tin nhắn",
+  "partnerAnalyticsMessagesEmpty": "Không có cuộc trò chuyện nào trong khoảng thời gian này.",
+  "partnerAnalyticsOpenConversations": "Cuộc trò chuyện đang mở",
+  "partnerAnalyticsClosedConversations": "Cuộc trò chuyện đã đóng",
+  "partnerAnalyticsArchivedConversations": "Cuộc trò chuyện đã lưu trữ",
+  "partnerAnalyticsUnreadMessages": "Chưa đọc dành cho bạn",
+  "partnerAnalyticsResponseTime": "Thời gian phản hồi trung bình",
+  "partnerAnalyticsNoResponses": "Chưa đo được thời gian phản hồi",
+  "partnerAnalyticsMinutesValue": "{value} phút",
+  "@partnerAnalyticsMinutesValue": {
+    "placeholders": {
+      "value": {"type": "String"}
+    }
+  },
+  "partnerReviewsTitle": "Đánh giá của khách",
+  "partnerReviewsAnalyticsPointer": "Điểm số và tổng hợp kiểm duyệt nằm ở trang Phân tích. Trang này dùng để trả lời.",
+  "partnerReviewsScopeNote": "Các đánh giá đã đăng của cơ sở đang chọn. Chỉ đánh giá đã đăng mới được trả lời, và đây đúng là tập hợp mà máy chủ cho phép trả lời.",
+  "partnerReviewsNoBodyNotice": "API đối tác không trả về nội dung khách đã viết — chỉ có điểm số, tiêu đề và ngày. Phần trả lời được viết dựa trên những thông tin đó.",
+  "partnerReviewsNoPropertyTitle": "Hãy chọn một cơ sở",
+  "partnerReviewsNoPropertyMessage": "Đánh giá được liệt kê theo từng cơ sở. Hãy chọn một cơ sở trong không gian làm việc để xem đánh giá.",
+  "partnerReviewsEmptyTitle": "Chưa có đánh giá nào được đăng",
+  "partnerReviewsEmptyMessage": "Chưa có nội dung nào được đăng cho cơ sở này. Đánh giá sẽ xuất hiện khi khách viết và được duyệt.",
+  "partnerReviewsNoMatchTitle": "Không có mục nào khớp bộ lọc",
+  "partnerReviewsNoMatchMessage": "Cơ sở này có đánh giá, nhưng không có mục nào thuộc nhóm đã chọn.",
+  "partnerReviewsFilterAll": "Hiện tất cả",
+  "partnerReviewsFilterAllCount": "Tất cả ({count})",
+  "@partnerReviewsFilterAllCount": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "partnerReviewsFilterNeedsReplyCount": "Cần trả lời ({count})",
+  "@partnerReviewsFilterNeedsReplyCount": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "partnerReviewsFilterRepliedCount": "Đã trả lời ({count})",
+  "@partnerReviewsFilterRepliedCount": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "partnerReviewsNeedsReply": "Cần trả lời",
+  "partnerReviewsReplied": "Đã trả lời",
+  "partnerReviewsNoTitle": "Đánh giá không có tiêu đề",
+  "partnerReviewsRatingValue": "Chấm {rating} trên 5",
+  "@partnerReviewsRatingValue": {
+    "placeholders": {
+      "rating": {"type": "String"}
+    }
+  },
+  "partnerReviewsReplyHeading": "Phản hồi của bạn",
+  "partnerReviewsCloseReply": "Đóng phần trả lời",
+  "partnerReviewsCurrentReply": "Đang được đăng",
+  "partnerReviewsRepliedAt": "trả lời {date}",
+  "@partnerReviewsRepliedAt": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "partnerReviewsEditedAt": "sửa {date}",
+  "@partnerReviewsEditedAt": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "partnerReviewsReplyField": "Trả lời khách này",
+  "partnerReviewsReplyHelp": "Mỗi đánh giá chỉ có một phản hồi. Đăng lại sẽ thay thế phản hồi cũ chứ không thêm phản hồi thứ hai.",
+  "partnerReviewsPublicNotice": "Phản hồi của bạn được đăng công khai bên cạnh đánh giá, và sau đó không thể xóa — chỉ có thể sửa lại nội dung. Khách sẽ được thông báo trong lần bạn trả lời đầu tiên.",
+  "partnerReviewsPublishReply": "Đăng phản hồi",
+  "partnerReviewsUpdateReply": "Thay phản hồi",
+  "partnerReviewsPublishConfirm": "Đăng công khai phản hồi này? Sau đó không thể xóa, chỉ có thể viết lại.",
+  "partnerReviewsReplyPublished": "Phản hồi của bạn đã được đăng.",
+  "partnerReviewsReplyEmpty": "Hãy viết nội dung phản hồi trước khi đăng.",
+  "partnerReviewsReplyUncertain": "Kết nối bị ngắt trước khi máy chủ xác nhận, và phản hồi thì không thể xóa. Hãy làm mới để xem phản hồi đã được đăng hay chưa.",
+  "partnerReviewsNotFound": "Đánh giá đó không còn khả dụng với tài khoản của bạn.",
+  "partnerReviewsNotApprovedNotice": "Chỉ đánh giá đã đăng mới được trả lời. Máy chủ từ chối phản hồi với mọi trạng thái khác.",
+  "partnerSettingsTitle": "Tài khoản & cài đặt",
+  "partnerSettingsTabWorkspace": "Chính sách & không gian làm việc",
+  "partnerSettingsTabTeam": "Nhân sự",
+  "partnerSettingsTabPayout": "Tài khoản nhận tiền",
+  "partnerSettingsTabProfile": "Hồ sơ doanh nghiệp",
+  "partnerTeamHeading": "Thành viên nhóm",
+  "partnerTeamSubtitle": "Tất cả những người có thể làm việc trong không gian đối tác này, kèm vai trò mà máy chủ cấp cho họ.",
+  "partnerTeamEmpty": "Chưa ghi nhận thành viên nào.",
+  "partnerTeamOwnerOnly": "Chỉ chủ tài khoản đối tác mới thêm, sửa hoặc xóa được thành viên. Bạn vẫn có thể xem danh sách tại đây.",
+  "partnerTeamRoleField": "Vai trò",
+  "partnerTeamActive": "Đang hoạt động",
+  "partnerTeamInactive": "Ngừng hoạt động",
+  "partnerTeamActivate": "Kích hoạt",
+  "partnerTeamDeactivate": "Tạm ngừng",
+  "partnerTeamRemove": "Xóa khỏi nhóm",
+  "partnerTeamRemoveConfirm": "Xóa {member} khỏi nhóm? Thao tác này không thể hoàn tác tại đây — sẽ phải thêm lại từ đầu.",
+  "@partnerTeamRemoveConfirm": {
+    "placeholders": {
+      "member": {"type": "String"}
+    }
+  },
+  "partnerTeamInviteHeading": "Thêm thành viên",
+  "partnerTeamInviteNote": "Máy chủ tìm tài khoản Plan Your Trip hiện có theo email. Hệ thống không gửi lời mời, nên người đó phải có sẵn tài khoản.",
+  "partnerTeamInviteEmail": "Email tài khoản của họ",
+  "partnerTeamInviteAction": "Thêm thành viên",
+  "partnerPayoutHeading": "Tài khoản nhận tiền",
+  "partnerPayoutSubtitle": "Nơi các khoản đối soát sẽ được chuyển tới. Chỉ lưu dưới dạng thông tin tham chiếu.",
+  "partnerPayoutNone": "Chưa thêm tài khoản nhận tiền nào.",
+  "partnerPayoutLoadFailed": "Không tải được tài khoản nhận tiền. Điều này khác với việc chưa có tài khoản.",
+  "partnerPayoutHolder": "Chủ tài khoản",
+  "partnerPayoutBank": "Ngân hàng",
+  "partnerPayoutAccountNumber": "Số tài khoản",
+  "partnerPayoutMasked": "Kết thúc bằng {last4}",
+  "@partnerPayoutMasked": {
+    "placeholders": {
+      "last4": {"type": "String"}
+    }
+  },
+  "partnerPayoutMethod": "Hình thức nhận tiền",
+  "partnerPayoutMethodBank": "Chuyển khoản ngân hàng",
+  "partnerPayoutMethodManual": "Thủ công",
+  "partnerPayoutMethodUnknown": "Hình thức không xác định",
+  "partnerPayoutStatus": "Trạng thái xác minh",
+  "partnerPayoutUpdated": "Cập nhật lần cuối",
+  "partnerPayoutNoExecutionNotice": "Không có khoản chi trả nào được thực hiện từ đây, và số tài khoản đầy đủ không bao giờ được lưu: máy chủ chỉ giữ lại bốn chữ số cuối và loại bỏ phần còn lại ngay khi bạn gửi.",
+  "partnerPayoutRoleNotice": "Chỉ chủ tài khoản đối tác hoặc thành viên phụ trách tài chính mới thay đổi được các thông tin này. Bạn vẫn có thể xem tại đây.",
+  "partnerPayoutAdd": "Thêm tài khoản nhận tiền",
+  "partnerPayoutReplace": "Thay thông tin",
+  "partnerPayoutCancelEdit": "Hủy bỏ",
+  "partnerPayoutFormHeading": "Thông tin nhận tiền mới",
+  "partnerPayoutNumberHelp": "Tối thiểu 4 ký tự. Chỉ bốn chữ số cuối được lưu lại.",
+  "partnerPayoutSave": "Lưu thông tin nhận tiền",
+  "partnerPayoutReplaceConfirm": "Thay thông tin nhận tiền? Số tài khoản trước đó không thể khôi phục vì nó chưa bao giờ được lưu.",
+  "partnerProfileHeading": "Hồ sơ doanh nghiệp",
+  "partnerProfileBusinessName": "Tên doanh nghiệp",
+  "partnerProfileRepresentative": "Người đại diện",
+  "partnerProfileVerification": "Tình trạng xác minh",
+  "partnerProfileYourRole": "Vai trò của bạn",
+  "partnerProfileReadOnlyNotice": "Hồ sơ doanh nghiệp đã được duyệt không thể chỉnh sửa qua API đối tác — máy chủ chỉ nhận thay đổi khi hồ sơ còn là bản nháp hoặc đã bị từ chối. Hãy liên hệ bộ phận hỗ trợ để thay đổi.",
+  "partnerProfileStatusDraft": "Bản nháp",
+  "partnerProfileStatusSubmitted": "Đang chờ duyệt",
+  "partnerProfileStatusApproved": "Đã duyệt",
+  "partnerProfileStatusRejected": "Đã từ chối",
+  "partnerProfileStatusSuspended": "Đã tạm ngưng",
+  "partnerProfileStatusUnknown": "Trạng thái không xác định",
+  "partnerAccountSaved": "Đã lưu.",
+  "partnerAccountNotFound": "Bản ghi đó không còn khả dụng với tài khoản của bạn.",
+  "partnerAccountConflict": "Máy chủ từ chối vì xung đột với một bản ghi đã có.",
+  "partnerAccountValidation": "Hãy kiểm tra lại thông tin rồi thử lại.",
+  "partnerAccountUncertain": "Kết nối bị ngắt trước khi máy chủ xác nhận. Hãy làm mới để xem trạng thái hiện tại trước khi thử lại."
 }

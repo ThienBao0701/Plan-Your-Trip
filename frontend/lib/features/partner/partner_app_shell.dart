@@ -12,6 +12,16 @@ import '../../shared/widgets/glass_widgets.dart';
 import 'partner_dashboard_screen.dart';
 import 'partner_module_screen.dart';
 import 'partner_navigation.dart';
+import 'properties/partner_properties_screen.dart';
+import 'analytics/partner_analytics_screen.dart';
+import 'bookings/partner_bookings_screen.dart';
+import 'finance/partner_finance_screen.dart';
+import 'calendar/partner_calendar_screen.dart';
+import 'reviews/partner_reviews_screen.dart';
+import 'settings/partner_settings_screen.dart';
+import 'promotions/partner_promotions_screen.dart';
+import 'rates/partner_rates_screen.dart';
+import 'rooms/partner_rooms_screen.dart';
 import 'widgets/partner_state_views.dart';
 
 /// The Partner Extranet shell: an operations workspace, not the traveller app.
@@ -427,10 +437,24 @@ class _PartnerWorkArea extends StatelessWidget {
                     detail: partner.errorMessage,
                     onPrimaryAction: partner.isRetryable ? onReload : null,
                   )
-                else if (destination.implemented)
-                  const PartnerDashboardScreen()
                 else
-                  PartnerModuleScreen(destination: destination),
+                  // Dispatch by the backend's own menu key. Anything not yet
+                  // built falls through to the honest "planned" view rather
+                  // than a fabricated screen.
+                  switch (destination.key) {
+                    'dashboard' => const PartnerDashboardScreen(),
+                    'hotels' => const PartnerPropertiesScreen(),
+                    'rooms' => const PartnerRoomsScreen(),
+                    'calendar' => const PartnerCalendarScreen(),
+                    'pricing' => const PartnerRatesScreen(),
+                    'promotions' => const PartnerPromotionsScreen(),
+                    'bookings' => const PartnerBookingsScreen(),
+                    'finance' => const PartnerFinanceScreen(),
+                    'analytics' => const PartnerAnalyticsScreen(),
+                    'reviews' => const PartnerReviewsScreen(),
+                    'settings' => const PartnerSettingsScreen(),
+                    _ => PartnerModuleScreen(destination: destination),
+                  },
                 if (!isDesktop) ...[
                   const SizedBox(height: AppSpacing.md),
                   Center(

@@ -4272,5 +4272,1434 @@
       "route": { "type": "String" }
     }
   },
-  "partnerModuleReadOnlyForRole": "Your team role will not be able to change settings in this module."
+  "partnerModuleReadOnlyForRole": "Your team role will not be able to change settings in this module.",
+  "partnerDashboardScopeHeading": "Reporting scope",
+  "partnerDashboardScopeHint": "Applies to Performance, Occupancy and Revenue. Today's operations always cover every property.",
+  "partnerDashboardScopeToday": "Today · all properties",
+  "partnerDashboardScopeAllProperties": "All properties",
+  "partnerDashboardScopeLast30AllProperties": "Last 30 days · all properties",
+  "partnerDashboardScopeWindowAll": "{window} · all properties",
+  "@partnerDashboardScopeWindowAll": {
+    "placeholders": {
+      "window": {"type": "String"}
+    }
+  },
+  "partnerDashboardScopeWindowOne": "{window} · selected property",
+  "@partnerDashboardScopeWindowOne": {
+    "placeholders": {
+      "window": {"type": "String"}
+    }
+  },
+  "partnerDashboardRangeLabel": "Date range",
+  "partnerDashboardRangeLast7": "7 days",
+  "partnerDashboardRangeLast30": "30 days",
+  "partnerDashboardRangeLast90": "90 days",
+  "partnerDashboardPropertyLabel": "Property",
+  "partnerDashboardPropertyAll": "All properties",
+  "partnerDashboardPropertyCount": "{count, plural, =1{1 property} other{{count} properties}}",
+  "@partnerDashboardPropertyCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partnerDashboardRoomCount": "{count, plural, =1{1 active room} other{{count} active rooms}}",
+  "@partnerDashboardRoomCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partnerDashboardTeamRole": "Your role: {role}",
+  "@partnerDashboardTeamRole": {
+    "placeholders": {
+      "role": {"type": "String"}
+    }
+  },
+  "partnerDashboardActiveProperty": "Scoped to {name}",
+  "@partnerDashboardActiveProperty": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "partnerDashboardUpdatedAt": "Updated {time}",
+  "@partnerDashboardUpdatedAt": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "partnerDashboardNoActivityHint": "No bookings fall in the selected window yet, so the performance figures below are zero.",
+  "partnerDashboardAttentionHeading": "Needs attention",
+  "partnerDashboardAttentionClear": "Nothing is waiting on you right now.",
+  "partnerDashboardAttentionSemantic": "{label}, {count, plural, =1{1 item needs attention} other{{count} items need attention}}",
+  "@partnerDashboardAttentionSemantic": {
+    "placeholders": {
+      "label": {"type": "String"},
+      "count": {"type": "int"}
+    }
+  },
+  "partnerDashboardQuickActionsHeading": "Quick actions",
+  "partnerDashboardPerformanceHeading": "Performance",
+  "partnerDashboardPerformanceEmpty": "No bookings in this period, so there is nothing to report yet.",
+  "partnerDashboardOccupancyHeading": "Occupancy",
+  "partnerDashboardOccupancyNoInventory": "No room inventory is configured yet, so occupancy cannot be measured.",
+  "partnerDashboardOccupancyChartLabel": "Occupancy per day",
+  "partnerDashboardRevenueHeading": "Revenue",
+  "partnerDashboardRevenueChartLabel": "Revenue per day",
+  "partnerDashboardFinanceHeading": "Finance summary",
+  "partnerDashboardActivityHeading": "Recent activity",
+  "partnerDashboardActivityEmpty": "No activity has been recorded yet.",
+  "partnerDashboardActivityBy": "by {actor}",
+  "@partnerDashboardActivityBy": {
+    "placeholders": {
+      "actor": {"type": "String"}
+    }
+  },
+  "partnerDashboardActivityUnknownActor": "Unknown user",
+  "partnerDashboardActivityMore": "{count, plural, =1{1 older entry} other{{count} older entries}}",
+  "@partnerDashboardActivityMore": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partnerDashboardChartEmpty": "No data points in this period.",
+  "partnerDashboardErrorUnauthorized": "Your session expired. Sign in again to load this.",
+  "partnerDashboardErrorForbidden": "Your partner profile is not approved for this data.",
+  "partnerDashboardErrorNotFound": "This data is not available for your partner profile.",
+  "partnerDashboardErrorValidation": "That date range is not valid. Choose a different period.",
+  "partnerDashboardErrorTimeout": "This panel took too long to load.",
+  "partnerDashboardErrorNetwork": "Could not reach the server for this panel.",
+  "partnerDashboardErrorServer": "The server could not produce this data.",
+  "partnerDashboardErrorGeneric": "This panel could not be loaded.",
+  "partnerValueUnavailable": "—",
+  "partnerKpiCurrentGuests": "In house now",
+  "partnerKpiUpcoming": "Upcoming",
+  "partnerKpiOccupancy": "Occupancy",
+  "partnerKpiRevenueToday": "Revenue today",
+  "partnerKpiRevenueMonth": "Revenue this month",
+  "partnerKpiAverageStay": "Average stay (nights)",
+  "partnerKpiTotalRevenue": "Total revenue",
+  "partnerKpiTotalBookings": "Total bookings",
+  "partnerKpiAdr": "Average daily rate",
+  "partnerKpiAdrCaption": "Per sold room night",
+  "partnerKpiConfirmed": "Confirmed",
+  "partnerKpiCancelled": "Cancelled",
+  "partnerKpiReviewAverage": "Average rating",
+  "partnerKpiReviewCount": "{count, plural, =0{No reviews} =1{From 1 review} other{From {count} reviews}}",
+  "@partnerKpiReviewCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partnerKpiResponseRate": "Message response rate",
+  "partnerOccupancyInventory": "Room inventory",
+  "partnerOccupancySold": "Sold rooms",
+  "partnerOccupancyAvailable": "Available rooms",
+  "partnerOccupancyStopSell": "Stop-sell days",
+  "partnerRevenueMonthToDate": "Month to date",
+  "partnerRevenueLast30": "Last 30 days",
+  "partnerRevenueByProperty": "Revenue by property",
+  "partnerFinanceGross": "Gross revenue",
+  "partnerFinanceNet": "Net revenue",
+  "partnerFinanceCommission": "Platform commission",
+  "partnerFinanceTax": "Estimated tax",
+  "partnerFinanceRefunded": "Refunded",
+  "partnerFinancePendingSettlement": "Pending settlement",
+  "partnerFinanceNextPayout": "Next estimated payout",
+  "partnerFinanceCompletedBookings": "{count, plural, =1{1 completed booking} other{{count} completed bookings}}",
+  "@partnerFinanceCompletedBookings": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partnerFinancePaidBookings": "{count, plural, =1{1 paid booking} other{{count} paid bookings}}",
+  "@partnerFinancePaidBookings": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partnerPropertiesCount": "{count, plural, =0{No properties} =1{1 property} other{{count} properties}}",
+  "@partnerPropertiesCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partnerPropertiesEmptyTitle": "No properties yet",
+  "partnerPropertiesEmptyMessage": "Your partner profile is approved, but no property has been assigned to it yet. Properties are assigned by the Plan Your Trip team.",
+  "partnerPropertiesSelectedSemantic": "Selected property",
+  "partnerPropertyDetailHeading": "Property details",
+  "partnerPropertyCloseDetail": "Close details",
+  "partnerPropertyDetailNotFound": "This property is no longer available to your account.",
+  "partnerPropertyActionsOwnerOnly": "Listing actions are available to the profile owner. You can review every detail here.",
+  "partnerPropertyStatusDraft": "Draft",
+  "partnerPropertyStatusPendingReview": "Pending review",
+  "partnerPropertyStatusApproved": "Approved",
+  "partnerPropertyStatusPublished": "Published",
+  "partnerPropertyStatusHidden": "Hidden",
+  "partnerPropertyStatusArchived": "Archived",
+  "partnerPropertyStatusRejected": "Rejected",
+  "partnerPropertyStatusUnknown": "Unknown status",
+  "partnerPropertyActive": "Listing on",
+  "partnerPropertyInactive": "Listing off",
+  "partnerPropertyVerified": "Verified",
+  "partnerPropertyNotVerified": "Not verified",
+  "partnerPropertyFeatured": "Featured",
+  "partnerPropertyNotFeatured": "Not featured",
+  "partnerPropertyNotSet": "Not set",
+  "partnerPropertyRatingSummary": "{rating} from {count, plural, =1{1 review} other{{count} reviews}}",
+  "@partnerPropertyRatingSummary": {
+    "placeholders": {
+      "rating": {"type": "String"},
+      "count": {"type": "int"}
+    }
+  },
+  "partnerPropertyVisibilityPublic": "Guests can find and book this property now.",
+  "partnerPropertyVisibilityNotPublic": "This property is not visible to guests right now.",
+  "partnerPropertyModerationNote": "Verification and featuring are managed by the Plan Your Trip team and cannot be changed here.",
+  "partnerPropertyActivateAction": "Turn listing on",
+  "partnerPropertyDeactivateAction": "Turn listing off",
+  "partnerPropertyActivatedMessage": "{name} is now listed.",
+  "@partnerPropertyActivatedMessage": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "partnerPropertyDeactivatedMessage": "{name} is no longer listed.",
+  "@partnerPropertyDeactivatedMessage": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "partnerPropertyActionNotFound": "That property is no longer available to your account.",
+  "partnerPropertyActionFailed": "The change could not be saved. Nothing was altered.",
+  "partnerPropertyActionUncertain": "The connection dropped before the server confirmed. Refresh to see the current state.",
+  "partnerPropertySectionIdentity": "Identity",
+  "partnerPropertySectionLocation": "Location",
+  "partnerPropertySectionContact": "Contact",
+  "partnerPropertySectionPolicies": "Policies",
+  "partnerPropertySectionVerification": "Verification",
+  "partnerPropertySectionPerformance": "Guest feedback",
+  "partnerPropertySectionMetadata": "Record",
+  "partnerPropertyFieldSlug": "URL slug",
+  "partnerPropertyFieldShortDescription": "Short description",
+  "partnerPropertyFieldDescription": "Description",
+  "partnerPropertyFieldAddress": "Address",
+  "partnerPropertyFieldCoordinates": "Coordinates",
+  "partnerPropertyFieldPhone": "Phone",
+  "partnerPropertyFieldEmail": "Email",
+  "partnerPropertyFieldWebsite": "Website",
+  "partnerPropertyFieldFacebook": "Facebook",
+  "partnerPropertyFieldInstagram": "Instagram",
+  "partnerPropertyFieldCheckIn": "Check-in from",
+  "partnerPropertyFieldCheckOut": "Check-out by",
+  "partnerPropertyFieldChildrenPolicy": "Children policy",
+  "partnerPropertyFieldPetPolicy": "Pet policy",
+  "partnerPropertyFieldSmokingPolicy": "Smoking policy",
+  "partnerPropertyFieldVerified": "Verification status",
+  "partnerPropertyFieldFeatured": "Featured placement",
+  "partnerPropertyFieldRating": "Average rating",
+  "partnerPropertyFieldReviewCount": "Reviews",
+  "partnerPropertyFieldOwner": "Owned by",
+  "partnerPropertyFieldCreated": "Created",
+  "partnerPropertyFieldUpdated": "Last updated",
+  "partnerRoomsCount": "{count, plural, =1{1 room type} other{{count} room types}}",
+  "@partnerRoomsCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partnerRoomsListedCount": "{count, plural, =1{1 listed} other{{count} listed}}",
+  "@partnerRoomsListedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partnerRoomsSoldOutCount": "{count, plural, =1{1 sold out} other{{count} sold out}}",
+  "@partnerRoomsSoldOutCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partnerRoomsForProperty": "Rooms at {name}",
+  "@partnerRoomsForProperty": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "partnerRoomsNoPropertyContext": "No property selected",
+  "partnerRoomsPropertyScope": "Property scope",
+  "partnerRoomsSelectPropertyTitle": "Choose a property",
+  "partnerRoomsSelectPropertyMessage": "Rooms belong to a specific property, so pick one to see its room types.",
+  "partnerRoomsNoPropertiesTitle": "No properties yet",
+  "partnerRoomsNoPropertiesMessage": "Rooms live inside a property. Once a property is assigned to your profile, its room types appear here.",
+  "partnerRoomsPropertyUnavailableTitle": "Property unavailable",
+  "partnerRoomsPropertyUnavailableMessage": "This property is no longer available to your account, or it has no room configuration yet.",
+  "partnerRoomsEmptyTitle": "No room types yet",
+  "partnerRoomsEmptyMessage": "This property has no room types configured. They are set up by the Plan Your Trip team.",
+  "partnerRoomActionsOwnerOnly": "Listing actions are available to the profile owner. You can review every room here.",
+  "partnerRoomDetailHeading": "Room details",
+  "partnerRoomCloseDetail": "Close room details",
+  "partnerRoomDetailNotFound": "This room is no longer available to your account.",
+  "partnerRoomListed": "Listed",
+  "partnerRoomUnlisted": "Not listed",
+  "partnerRoomSoldOut": "Sold out",
+  "partnerRoomListAction": "List this room",
+  "partnerRoomUnlistAction": "Stop listing",
+  "partnerRoomListedMessage": "{name} is now listed.",
+  "@partnerRoomListedMessage": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "partnerRoomUnlistedMessage": "{name} is no longer listed.",
+  "@partnerRoomUnlistedMessage": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "partnerRoomActionNotFound": "That room is no longer available to your account.",
+  "partnerRoomYes": "Yes",
+  "partnerRoomNo": "No",
+  "partnerRoomGuestsValue": "Up to {count} guests",
+  "@partnerRoomGuestsValue": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "partnerRoomInventoryValue": "{available} of {total} available",
+  "@partnerRoomInventoryValue": {
+    "placeholders": {
+      "available": {"type": "String"},
+      "total": {"type": "String"}
+    }
+  },
+  "partnerRoomPriceFromValue": "From {price}",
+  "@partnerRoomPriceFromValue": {
+    "placeholders": {
+      "price": {"type": "String"}
+    }
+  },
+  "partnerRoomSizeValue": "{size} m²",
+  "@partnerRoomSizeValue": {
+    "placeholders": {
+      "size": {"type": "String"}
+    }
+  },
+  "partnerRoomSectionIdentity": "Identity",
+  "partnerRoomSectionBeds": "Beds",
+  "partnerRoomSectionCapacity": "Capacity",
+  "partnerRoomSectionInventory": "Inventory",
+  "partnerRoomSectionPricing": "Price",
+  "partnerRoomSectionConditions": "Booking conditions",
+  "partnerRoomSectionAmenities": "Amenities",
+  "partnerRoomSectionMedia": "Media",
+  "partnerRoomFieldCode": "Room code",
+  "partnerRoomFieldType": "Room type",
+  "partnerRoomFieldDescription": "Description",
+  "partnerRoomFieldBedType": "Bed type",
+  "partnerRoomFieldBedCount": "Number of beds",
+  "partnerRoomFieldMaxGuests": "Maximum guests",
+  "partnerRoomFieldMaxAdults": "Maximum adults",
+  "partnerRoomFieldMaxChildren": "Maximum children",
+  "partnerRoomFieldSize": "Room size",
+  "partnerRoomFieldFloor": "Floor",
+  "partnerRoomFieldQuantity": "Total rooms",
+  "partnerRoomFieldAvailable": "Currently available",
+  "partnerRoomFieldPriceFrom": "Price from",
+  "partnerRoomFieldOriginalPrice": "Original price",
+  "partnerRoomFieldBreakfast": "Breakfast included",
+  "partnerRoomFieldFreeCancellation": "Free cancellation",
+  "partnerRoomFieldInstantConfirmation": "Instant confirmation",
+  "partnerRoomFieldSmoking": "Smoking allowed",
+  "partnerRoomFieldImages": "Gallery images",
+  "partnerRoomTypeStandard": "Standard",
+  "partnerRoomTypeSuperior": "Superior",
+  "partnerRoomTypeDeluxe": "Deluxe",
+  "partnerRoomTypePremier": "Premier",
+  "partnerRoomTypeExecutive": "Executive",
+  "partnerRoomTypeSuite": "Suite",
+  "partnerRoomTypeFamily": "Family",
+  "partnerRoomTypeVilla": "Villa",
+  "partnerRoomTypeBungalow": "Bungalow",
+  "partnerRoomTypeUnknown": "Unrecognised type",
+  "partnerBedTypeSingle": "Single",
+  "partnerBedTypeDouble": "Double",
+  "partnerBedTypeTwin": "Twin",
+  "partnerBedTypeQueen": "Queen",
+  "partnerBedTypeKing": "King",
+  "partnerBedTypeSofaBed": "Sofa bed",
+  "partnerBedTypeBunk": "Bunk bed",
+  "partnerBedTypeUnknown": "Unrecognised bed",
+  "partnerInventoryForProperty": "Inventory at {name}",
+  "@partnerInventoryForProperty": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "partnerInventoryNoPropertyContext": "No property selected",
+  "partnerInventoryPropertyScope": "Property scope",
+  "partnerInventoryRoomScope": "Room type",
+  "partnerInventoryRangeLabel": "Window",
+  "partnerInventoryRangeWeek": "7 days",
+  "partnerInventoryRangeFortnight": "14 days",
+  "partnerInventoryRangeMonth": "30 days",
+  "partnerInventoryWindow": "{from} – {to} · {count} days",
+  "@partnerInventoryWindow": {
+    "placeholders": {
+      "from": {"type": "String"},
+      "to": {"type": "String"},
+      "count": {"type": "int"}
+    }
+  },
+  "partnerInventoryBookableDays": "{bookable} of {total} days bookable",
+  "@partnerInventoryBookableDays": {
+    "placeholders": {
+      "bookable": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "partnerInventoryTotalAvailable": "{count} room-nights available",
+  "@partnerInventoryTotalAvailable": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "partnerInventoryStopSellDays": "{count, plural, =1{1 day stopped} other{{count} days stopped}}",
+  "@partnerInventoryStopSellDays": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partnerInventoryNoPropertiesTitle": "No properties yet",
+  "partnerInventoryNoPropertiesMessage": "Inventory belongs to a room in a property. Once a property is assigned to your profile, its calendar appears here.",
+  "partnerInventorySelectPropertyTitle": "Choose a property",
+  "partnerInventorySelectPropertyMessage": "Pick a property to see the inventory calendar for its room types.",
+  "partnerInventoryNoRoomsTitle": "No room types yet",
+  "partnerInventoryNoRoomsMessage": "This property has no room types, so there is no inventory to manage.",
+  "partnerInventorySelectRoomTitle": "Choose a room type",
+  "partnerInventorySelectRoomMessage": "Inventory is kept per room type. Pick one to see its calendar.",
+  "partnerInventoryInvalidRangeTitle": "Invalid date range",
+  "partnerInventoryInvalidRangeMessage": "The start date must not be after the end date.",
+  "partnerInventoryUnavailableTitle": "Inventory unavailable",
+  "partnerInventoryUnavailableMessage": "This property or room type is no longer available to your account.",
+  "partnerInventoryEmptyTitle": "No inventory in this window",
+  "partnerInventoryEmptyMessage": "No inventory rows have been set up for these dates. Try a different window.",
+  "partnerInventoryDate": "Date",
+  "partnerInventoryStateColumn": "Status",
+  "partnerInventoryTotal": "Total",
+  "partnerInventoryAvailable": "Available",
+  "partnerInventorySold": "Sold",
+  "partnerInventoryBlocked": "Blocked",
+  "partnerInventoryMaintenance": "Maintenance",
+  "partnerInventoryRestrictions": "Restrictions",
+  "partnerInventoryStopSell": "Stop sell",
+  "partnerInventoryClosedArrival": "No arrivals",
+  "partnerInventoryClosedDeparture": "No departures",
+  "partnerInventoryStateBookable": "Bookable",
+  "partnerInventoryStateSoldOut": "Sold out",
+  "partnerInventoryStateStopped": "Stopped",
+  "partnerInventoryInconsistent": "These numbers do not add up to the total.",
+  "partnerInventoryInconsistentSummary": "{count, plural, =1{1 day has counts that do not add up to its total} other{{count} days have counts that do not add up to their total}}. Only the backend can correct this.",
+  "@partnerInventoryInconsistentSummary": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partnerInventoryEditOwnerOnly": "Changing availability is available to the profile owner. You can review the calendar here.",
+  "partnerInventorySaved": "Saved.",
+  "partnerInventoryActionNotFound": "That date is no longer available to your account.",
+  "partnerRatesForProperty": "Rates at {name}",
+  "@partnerRatesForProperty": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "partnerRatesForRoom": "Rates for {room} at {property}",
+  "@partnerRatesForRoom": {
+    "placeholders": {
+      "room": {"type": "String"},
+      "property": {"type": "String"}
+    }
+  },
+  "partnerRatesNoPropertyContext": "No property selected",
+  "partnerRatesPropertyScope": "Property scope",
+  "partnerRatesRoomScope": "Room type",
+  "partnerRatesCount": "{count, plural, =1{1 rate plan} other{{count} rate plans}}",
+  "@partnerRatesCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partnerRatesActiveCount": "{count, plural, =1{1 active} other{{count} active}}",
+  "@partnerRatesActiveCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partnerRatesExpiredCount": "{count, plural, =1{1 expired} other{{count} expired}}",
+  "@partnerRatesExpiredCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partnerRatesNoPropertiesTitle": "No properties yet",
+  "partnerRatesNoPropertiesMessage": "Rates belong to a room in a property. Once a property is assigned to your profile, its rate plans appear here.",
+  "partnerRatesSelectPropertyTitle": "Choose a property",
+  "partnerRatesSelectPropertyMessage": "Pick a property to see the rate plans for its room types.",
+  "partnerRatesNoRoomsTitle": "No room types yet",
+  "partnerRatesNoRoomsMessage": "This property has no room types, so there is nothing to price.",
+  "partnerRatesSelectRoomTitle": "Choose a room type",
+  "partnerRatesSelectRoomMessage": "Rate plans are kept per room type. Pick one to see its rates.",
+  "partnerRatesUnavailableTitle": "Rates unavailable",
+  "partnerRatesUnavailableMessage": "This property or room type is no longer available to your account.",
+  "partnerRatesEmptyTitle": "No rate plans yet",
+  "partnerRatesEmptyMessage": "This room type has no rate plans. They are set up by the Plan Your Trip team.",
+  "partnerRateDetailHeading": "Rate plan details",
+  "partnerRateCloseDetail": "Close rate plan details",
+  "partnerRateActionsOwnerOnly": "Rate actions are available to the profile owner. You can review every plan here.",
+  "partnerRateCurrencyNote": "Amounts are shown without a currency because the rate API does not supply one.",
+  "partnerRateValidityNote": "Both dates are inclusive: a stay qualifies when every night falls inside this window.",
+  "partnerRateActive": "Active",
+  "partnerRateInactive": "Inactive",
+  "partnerRateExpired": "Expired",
+  "partnerRatePerNight": "{amount} per night",
+  "@partnerRatePerNight": {
+    "placeholders": {
+      "amount": {"type": "String"}
+    }
+  },
+  "partnerRateValidity": "{from} – {to}",
+  "@partnerRateValidity": {
+    "placeholders": {
+      "from": {"type": "String"},
+      "to": {"type": "String"}
+    }
+  },
+  "partnerRatePriorityValue": "Priority {value}",
+  "@partnerRatePriorityValue": {
+    "placeholders": {
+      "value": {"type": "String"}
+    }
+  },
+  "partnerRateHasRestrictions": "Has restrictions",
+  "partnerRateNightsValue": "{count} nights",
+  "@partnerRateNightsValue": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "partnerRateDaysValue": "{count} days",
+  "@partnerRateDaysValue": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "partnerRateActivateAction": "Activate",
+  "partnerRateDeactivateAction": "Deactivate",
+  "partnerRateActivatedMessage": "{name} is now active.",
+  "@partnerRateActivatedMessage": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "partnerRateDeactivatedMessage": "{name} is now inactive.",
+  "@partnerRateDeactivatedMessage": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "partnerRateActionNotFound": "That rate plan is no longer available to your account.",
+  "partnerRateActionConflict": "That change conflicts with another rate plan.",
+  "partnerRateTypeStandard": "Standard",
+  "partnerRateTypePromotional": "Promotional",
+  "partnerRateTypeMember": "Member",
+  "partnerRateTypeEarlyBird": "Early bird",
+  "partnerRateTypeLastMinute": "Last minute",
+  "partnerRateTypeUnknown": "Unrecognised type",
+  "partnerMealPlanRoomOnly": "Room only",
+  "partnerMealPlanBreakfast": "Breakfast",
+  "partnerMealPlanHalfBoard": "Half board",
+  "partnerMealPlanFullBoard": "Full board",
+  "partnerMealPlanAllInclusive": "All inclusive",
+  "partnerMealPlanUnknown": "Unrecognised meal plan",
+  "partnerCancellationFree": "Free cancellation",
+  "partnerCancellationPartial": "Partially refundable",
+  "partnerCancellationNonRefundable": "Non-refundable",
+  "partnerCancellationCustom": "Custom policy",
+  "partnerCancellationUnknown": "Unrecognised policy",
+  "partnerRateSourceBase": "Base rate",
+  "partnerRateSourceDerived": "Derived rate",
+  "partnerRateSourceUnknown": "Unrecognised source",
+  "partnerRateAdjustmentFixed": "Fixed amount",
+  "partnerRateAdjustmentPercent": "Percentage",
+  "partnerRateAdjustmentUnknown": "Unrecognised adjustment",
+  "partnerRateSectionIdentity": "Identity",
+  "partnerRateSectionPricing": "Price",
+  "partnerRateSectionValidity": "Validity",
+  "partnerRateSectionRestrictions": "Stay restrictions",
+  "partnerRateSectionCancellation": "Cancellation",
+  "partnerRateSectionInclusions": "Inclusions",
+  "partnerRateSectionOccupancy": "Occupancy prices",
+  "partnerRateFieldCode": "Plan code",
+  "partnerRateFieldDescription": "Description",
+  "partnerRateFieldPriority": "Priority",
+  "partnerRateFieldPricePerNight": "Price per night",
+  "partnerRateFieldExtraBedPrice": "Extra bed price",
+  "partnerRateFieldAdjustmentType": "Adjustment type",
+  "partnerRateFieldAdjustmentValue": "Adjustment",
+  "partnerRateFieldParentPlan": "Derived from plan",
+  "partnerRateFieldValidFrom": "Valid from",
+  "partnerRateFieldValidTo": "Valid to",
+  "partnerRateFieldMinStay": "Minimum stay",
+  "partnerRateFieldMaxStay": "Maximum stay",
+  "partnerRateFieldMinAdvance": "Minimum advance booking",
+  "partnerRateFieldMaxAdvance": "Maximum advance booking",
+  "partnerRateFieldClosedToArrival": "Closed to arrival",
+  "partnerRateFieldClosedToDeparture": "Closed to departure",
+  "partnerRateFieldPolicy": "Cancellation policy",
+  "partnerRateFieldRefundable": "Refundable",
+  "partnerRateFieldDeadlineHours": "Cancellation deadline (hours)",
+  "partnerRateFieldPenaltyPercent": "Cancellation penalty",
+  "partnerRateFieldMealPlan": "Meal plan",
+  "partnerRateFieldOccupancyPricing": "Occupancy pricing enabled",
+  "partnerRateFieldChildPricing": "Child pricing enabled",
+  "partnerRateOccupancyEmpty": "No occupancy prices are configured for this plan.",
+  "partnerRateOccupancyLabel": "{adults} adults, {children} children",
+  "@partnerRateOccupancyLabel": {
+    "placeholders": {
+      "adults": {"type": "String"},
+      "children": {"type": "String"}
+    }
+  },
+  "partnerPoliciesTitle": "Policies & settings",
+  "partnerPoliciesForProperty": "Policies for {name}",
+  "@partnerPoliciesForProperty": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "partnerPoliciesNoPropertyContext": "No property selected",
+  "partnerPoliciesPropertyScope": "Property scope",
+  "partnerPoliciesNoPropertiesTitle": "No properties yet",
+  "partnerPoliciesNoPropertiesMessage": "Guest policies belong to a property. Once a property is assigned to your profile, its policies appear here.",
+  "partnerPoliciesSelectPropertyTitle": "Choose a property",
+  "partnerPoliciesSelectPropertyMessage": "Pick a property to review and edit its guest policies.",
+  "partnerPoliciesUnavailableTitle": "Policies unavailable",
+  "partnerPoliciesUnavailableMessage": "This property is no longer available to your account.",
+  "partnerPoliciesPropertySection": "Guest policies",
+  "partnerPoliciesPropertyScopeNote": "Applies to this property only. Guests see these on the listing.",
+  "partnerPoliciesLiveWarning": "These take effect immediately for every guest, including guests who already hold a booking — the platform does not freeze policies at booking time.",
+  "partnerPoliciesOwnerOnly": "Guest policies can be changed by the profile owner. You can review them here.",
+  "partnerPoliciesCheckIn": "Check-in from",
+  "partnerPoliciesCheckOut": "Check-out by",
+  "partnerPoliciesTimeHelper": "24-hour time, for example 14:00",
+  "partnerPoliciesTimeRequired": "Required",
+  "partnerPoliciesHouseRules": "House rules",
+  "partnerPoliciesHouseRulesNote": "Optional. Leave a rule empty to remove it.",
+  "partnerPoliciesRuleHint": "Leave empty for no rule",
+  "partnerPoliciesChildren": "Children policy",
+  "partnerPoliciesPets": "Pet policy",
+  "partnerPoliciesSmoking": "Smoking policy",
+  "partnerPoliciesSettingsSection": "Workspace notifications",
+  "partnerPoliciesSettingsScopeNote": "Applies to your whole partner account, not to one property.",
+  "partnerPoliciesSettingsRoleNote": "Notification settings can be changed by an owner or manager. You can review them here.",
+  "partnerPoliciesSettingsUnavailable": "Your workspace settings are not available.",
+  "partnerPoliciesSettingsUpdated": "Last updated {time}",
+  "@partnerPoliciesSettingsUpdated": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "partnerPoliciesLanguage": "Default language",
+  "partnerPoliciesTimezone": "Timezone",
+  "partnerPoliciesChannels": "Delivery channels",
+  "partnerPoliciesChannelEmail": "Email",
+  "partnerPoliciesChannelSms": "SMS",
+  "partnerPoliciesChannelInApp": "In-app",
+  "partnerPoliciesTopics": "What to notify me about",
+  "partnerPoliciesTopicBooking": "Bookings",
+  "partnerPoliciesTopicPayment": "Payments",
+  "partnerPoliciesTopicReview": "Reviews",
+  "partnerPoliciesTopicPromotion": "Promotions",
+  "partnerPoliciesSave": "Save changes",
+  "partnerPoliciesRevert": "Discard",
+  "partnerPoliciesNoChanges": "No unsaved changes.",
+  "partnerPoliciesSaved": "Saved.",
+  "partnerPoliciesSaveForbidden": "Your role does not allow this change.",
+  "partnerPoliciesSaveNotFound": "That record is no longer available to your account.",
+  "partnerPoliciesSaveValidation": "Check-in and check-out times are both required.",
+  "partnerAssetsSection": "Photos & media",
+  "partnerAssetsDeferredBadge": "Not available",
+  "partnerAssetsDeferredMessage": "Photo management is not part of the partner API. Uploading, replacing, reordering and deleting media are admin-only operations, so the Plan Your Trip team maintains your listing images for now.",
+  "partnerPromotionsTitle": "Promotions & vouchers",
+  "partnerPromotionsTabPromotions": "Promotion rules",
+  "partnerPromotionsTabVoucherCheck": "Voucher check",
+  "partnerPromotionsScopeNote": "Every promotion on any property or room you own is listed here. The partner API does not narrow promotions to one property, so this list is not filtered by your selected property.",
+  "partnerPromotionsCount": "{count} promotions",
+  "@partnerPromotionsCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partnerPromotionsActiveCount": "{count} active",
+  "@partnerPromotionsActiveCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partnerPromotionsExpiredCount": "{count} past their end date",
+  "@partnerPromotionsExpiredCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partnerPromotionsCurrencyNote": "The promotion API sends no currency, so promotion amounts appear without a symbol. The pricing preview below carries its own currency and shows it.",
+  "partnerPromotionsEmptyTitle": "No promotions yet",
+  "partnerPromotionsEmptyMessage": "Nothing currently targets your properties or rooms. Site-wide campaigns run by Plan Your Trip are not shown here because they are not yours to manage.",
+  "partnerPromotionsOwnerOnly": "Only the partner account owner can change promotions. You can read them here.",
+  "partnerPromotionDetailHeading": "Promotion details",
+  "partnerPromotionCloseDetail": "Close promotion details",
+  "partnerPromotionSectionIdentity": "Identity",
+  "partnerPromotionFieldCode": "Promotion code",
+  "partnerPromotionFieldDescription": "Description",
+  "partnerPromotionFieldType": "Promotion type",
+  "partnerPromotionSectionDiscount": "Discount",
+  "partnerPromotionFieldDiscountType": "Discount type",
+  "partnerPromotionFieldDiscountValue": "Discount value",
+  "partnerPromotionFieldMaxDiscount": "Maximum discount",
+  "partnerPromotionSectionValidity": "Validity",
+  "partnerPromotionFieldStart": "Starts",
+  "partnerPromotionFieldEnd": "Ends",
+  "partnerPromotionSectionConditions": "Conditions",
+  "partnerPromotionFieldMinimumStay": "Minimum stay",
+  "partnerPromotionFieldMinimumSpend": "Minimum spend",
+  "partnerPromotionSectionApplication": "How it applies",
+  "partnerPromotionFieldTarget": "Applies to",
+  "partnerPromotionFieldPriority": "Priority",
+  "partnerPromotionFieldStackable": "Combines with others",
+  "partnerPromotionStackableNote": "The pricing engine may add further promotions after this one.",
+  "partnerPromotionNonStackableNote": "The pricing engine applies this promotion and then stops, so no lower-priority promotion is added after it.",
+  "partnerPromotionActive": "Active",
+  "partnerPromotionInactive": "Inactive",
+  "partnerPromotionExpired": "Past end date",
+  "partnerPromotionScheduled": "Starts later",
+  "partnerPromotionExclusivePill": "Does not combine",
+  "partnerPromotionValidity": "{from} – {to}",
+  "@partnerPromotionValidity": {
+    "placeholders": {
+      "from": {"type": "String"},
+      "to": {"type": "String"}
+    }
+  },
+  "partnerPromotionPriorityValue": "Priority {count}",
+  "@partnerPromotionPriorityValue": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "partnerPromotionHasConditions": "Has conditions",
+  "partnerPromotionActivateAction": "Activate",
+  "partnerPromotionDeactivateAction": "Deactivate",
+  "partnerPromotionTypeGeneral": "General",
+  "partnerPromotionTypeRoom": "Room offer",
+  "partnerPromotionTypeHotel": "Property offer",
+  "partnerPromotionTypeMember": "Member",
+  "partnerPromotionTypeEarlyBird": "Early bird",
+  "partnerPromotionTypeLastMinute": "Last minute",
+  "partnerPromotionTypeWeekend": "Weekend",
+  "partnerPromotionTypeHoliday": "Holiday",
+  "partnerPromotionTypeUnknown": "Unrecognised type",
+  "partnerDiscountTypePercentage": "Percentage",
+  "partnerDiscountTypeFixed": "Fixed amount",
+  "partnerDiscountTypeUnknown": "Unrecognised discount",
+  "partnerPromotionTargetAll": "Every property on Plan Your Trip",
+  "partnerPromotionTargetHotel": "One of your properties",
+  "partnerPromotionTargetRoom": "One of your rooms",
+  "partnerPromotionTargetRoomNamed": "Room: {name}",
+  "@partnerPromotionTargetRoomNamed": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "partnerPromotionTargetUnknown": "Unrecognised target",
+  "partnerPromotionPreviewHeading": "Pricing preview",
+  "partnerPromotionPreviewNote": "The backend calculates this. Every amount and every applied promotion comes straight from the pricing engine — nothing is worked out in the app.",
+  "partnerPromotionPreviewAction": "Run preview",
+  "partnerPromotionPreviewInvalidRange": "Check-out must be after check-in.",
+  "partnerPromotionPreviewStay": "{from} to {to} · {nights} nights",
+  "@partnerPromotionPreviewStay": {
+    "placeholders": {
+      "from": {"type": "String"},
+      "to": {"type": "String"},
+      "nights": {"type": "String"}
+    }
+  },
+  "partnerPromotionPreviewBase": "Base price",
+  "partnerPromotionPreviewRatePlan": "Rate plan price",
+  "partnerPromotionPreviewRatePlanNamed": "Rate plan: {name}",
+  "@partnerPromotionPreviewRatePlanNamed": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "partnerPromotionPreviewDiscount": "Promotion discount",
+  "partnerPromotionPreviewTotal": "Total for this stay",
+  "partnerPromotionPreviewAppliedHeading": "Promotions the engine applied",
+  "partnerPromotionPreviewNoneApplied": "The engine applied no promotion to this stay.",
+  "partnerPromotionPreviewUnnamed": "Unnamed promotion",
+  "partnerPromotionPreviewAppliedAmount": "-{amount}",
+  "@partnerPromotionPreviewAppliedAmount": {
+    "placeholders": {
+      "amount": {"type": "String"}
+    }
+  },
+  "partnerPromotionActivatedMessage": "{name} is now active.",
+  "@partnerPromotionActivatedMessage": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "partnerPromotionDeactivatedMessage": "{name} is now inactive.",
+  "@partnerPromotionDeactivatedMessage": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "partnerPromotionActionNotFound": "That promotion is no longer available to your account.",
+  "partnerPromotionActionConflict": "That promotion code is already in use. Promotion codes are unique across Plan Your Trip.",
+  "partnerPromotionActionValidation": "The server rejected the promotion. Nothing was changed.",
+  "partnerPromotionActionIncomplete": "This promotion is missing fields the update needs, so nothing was sent. Ask support to change it.",
+  "partnerVoucherCheckHeading": "Check a booking voucher",
+  "partnerVoucherCheckNote": "This is a booking pass, not a discount code. Checking it confirms a guest's booking — it does not check anyone in and changes nothing.",
+  "partnerVoucherCheckField": "Voucher payload",
+  "partnerVoucherCheckAction": "Check voucher",
+  "partnerVoucherCheckClear": "Clear",
+  "partnerVoucherEligibleTitle": "Valid — the guest can be admitted",
+  "partnerVoucherEligibleMessage": "The signature is valid and this booking is ready for check-in.",
+  "partnerVoucherNotEligibleTitle": "Valid — but not ready for check-in",
+  "partnerVoucherNotEligibleMessage": "The signature is valid, but this booking cannot be checked in right now.",
+  "partnerVoucherNotRecognisedTitle": "Not recognised",
+  "partnerVoucherNotRecognisedMessage": "The server does not recognise this voucher for your account. It may have been altered, may not exist, or may belong to another partner — the server does not say which.",
+  "partnerVoucherEmptyTitle": "Nothing to check",
+  "partnerVoucherEmptyMessage": "Paste or scan a voucher payload first.",
+  "partnerVoucherFailedTitle": "Could not check this voucher",
+  "partnerVoucherFieldBooking": "Booking code",
+  "partnerVoucherFieldBookingStatus": "Booking status",
+  "partnerVoucherFieldGuest": "Guest name",
+  "partnerVoucherFieldProperty": "Booked property",
+  "partnerVoucherFieldRoom": "Booked room",
+  "partnerVoucherFieldStay": "Stay",
+  "partnerVoucherFieldOccupancy": "Occupancy",
+  "partnerVoucherStayValue": "{from} to {to} · {nights} nights",
+  "@partnerVoucherStayValue": {
+    "placeholders": {
+      "from": {"type": "String"},
+      "to": {"type": "String"},
+      "nights": {"type": "String"}
+    }
+  },
+  "partnerVoucherOccupancyValue": "{adults} adults · {children} children",
+  "@partnerVoucherOccupancyValue": {
+    "placeholders": {
+      "adults": {"type": "String"},
+      "children": {"type": "String"}
+    }
+  },
+  "partnerVoucherReadOnlyNote": "Checking only. Check-in itself happens on the booking, not on this screen.",
+  "partnerBookingsTitle": "Bookings & front desk",
+  "partnerBookingsTabReservations": "Reservations",
+  "partnerBookingsTabFrontDesk": "Front desk",
+  "partnerBookingsScopeNote": "This list covers every booking across all properties you own. The partner API accepts no property parameter, so it is not narrowed by your selected property — filter by room to focus on one property.",
+  "partnerBookingsEmptyTitle": "No bookings yet",
+  "partnerBookingsEmptyMessage": "Nothing has been booked at your properties yet. New reservations appear here as soon as guests make them.",
+  "partnerBookingsNoMatchTitle": "No bookings match these filters",
+  "partnerBookingsNoMatchMessage": "Nothing matched the filters you set. Clear them to see every booking again.",
+  "partnerBookingDetailHeading": "Booking details",
+  "partnerBookingCloseDetail": "Close booking details",
+  "partnerBookingNotFound": "That booking is no longer available to your account.",
+  "partnerBookingColumnCode": "Booking code",
+  "partnerBookingColumnGuest": "Guest",
+  "partnerBookingColumnRoom": "Room",
+  "partnerBookingColumnCheckIn": "Check-in",
+  "partnerBookingColumnCheckOut": "Check-out",
+  "partnerBookingColumnNights": "Nights",
+  "partnerBookingColumnStatus": "Status",
+  "partnerBookingColumnTotal": "Total",
+  "partnerBookingStayRange": "{from} – {to}",
+  "@partnerBookingStayRange": {
+    "placeholders": {
+      "from": {"type": "String"},
+      "to": {"type": "String"}
+    }
+  },
+  "partnerBookingNightsValue": "{count} nights",
+  "@partnerBookingNightsValue": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "partnerBookingOccupancyValue": "{adults} adults · {children} children",
+  "@partnerBookingOccupancyValue": {
+    "placeholders": {
+      "adults": {"type": "String"},
+      "children": {"type": "String"}
+    }
+  },
+  "partnerBookingNightProgressValue": "Night {current} of {total}",
+  "@partnerBookingNightProgressValue": {
+    "placeholders": {
+      "current": {"type": "String"},
+      "total": {"type": "String"}
+    }
+  },
+  "partnerBookingStatusPending": "Pending",
+  "partnerBookingStatusConfirmed": "Confirmed",
+  "partnerBookingStatusCheckInReady": "Ready to check in",
+  "partnerBookingStatusCheckedIn": "Checked in",
+  "partnerBookingStatusCheckedOut": "Checked out",
+  "partnerBookingStatusCompleted": "Completed",
+  "partnerBookingStatusCancelled": "Cancelled",
+  "partnerBookingStatusRefunded": "Refunded",
+  "partnerBookingStatusArchived": "Archived",
+  "partnerBookingStatusNoShow": "No-show",
+  "partnerBookingStatusUnknown": "Unrecognised status",
+  "partnerStayStateUpcoming": "Upcoming stay",
+  "partnerStayStateReady": "Ready for check-in",
+  "partnerStayStateInHouse": "In house",
+  "partnerStayStateCheckedOut": "Departed",
+  "partnerStayStateCompleted": "Stay completed",
+  "partnerStayStateCancelled": "Stay cancelled",
+  "partnerStayStateNoShow": "Guest did not arrive",
+  "partnerStayStateExpired": "Window passed",
+  "partnerStayStateUnknown": "Unrecognised stay state",
+  "partnerStayWarningCancelled": "This stay was cancelled, refunded, or recorded as a no-show.",
+  "partnerStayWarningCompleted": "This stay is finished.",
+  "partnerStayWarningInHouse": "The guest is currently staying.",
+  "partnerStayWarningCheckOutOverdue": "Check-out is overdue — the departure date has passed and the guest is still checked in.",
+  "partnerStayWarningFuture": "The stay has not started yet.",
+  "partnerStayWarningCheckInOverdue": "Check-in is overdue — the arrival date has passed and the guest is not checked in.",
+  "partnerStayWarningUnknown": "The server reported a warning this app does not recognise.",
+  "partnerBookingFilterGuest": "Guest name or email",
+  "partnerBookingFilterCode": "Booking code",
+  "partnerBookingFilterStatus": "Booking status",
+  "partnerBookingFilterAnyStatus": "Any status",
+  "partnerBookingFilterRoom": "Room",
+  "partnerBookingFilterAnyRoom": "Any room",
+  "partnerBookingFilterDates": "Arrival dates",
+  "partnerBookingFilterClear": "Clear filters",
+  "partnerBookingFilterArrivals": "Arriving today",
+  "partnerBookingFilterDepartures": "Departing today",
+  "partnerBookingFilterUpcoming": "Upcoming",
+  "partnerBookingFilterInHouse": "In house",
+  "partnerBookingFilterCancelled": "Cancelled",
+  "partnerBookingFilterCompleted": "Completed",
+  "partnerBookingFilterRangeBoth": "Arriving {from} to {to}",
+  "@partnerBookingFilterRangeBoth": {
+    "placeholders": {
+      "from": {"type": "String"},
+      "to": {"type": "String"}
+    }
+  },
+  "partnerBookingFilterRangeFrom": "Arriving on or after {from}",
+  "@partnerBookingFilterRangeFrom": {
+    "placeholders": {
+      "from": {"type": "String"}
+    }
+  },
+  "partnerBookingFilterRangeTo": "Arriving on or before {to}",
+  "@partnerBookingFilterRangeTo": {
+    "placeholders": {
+      "to": {"type": "String"}
+    }
+  },
+  "partnerBookingPageRange": "Showing {from}-{to} of {total}",
+  "@partnerBookingPageRange": {
+    "placeholders": {
+      "from": {"type": "String"},
+      "to": {"type": "String"},
+      "total": {"type": "String"}
+    }
+  },
+  "partnerBookingPagePosition": "Page {page} of {total}",
+  "@partnerBookingPagePosition": {
+    "placeholders": {
+      "page": {"type": "String"},
+      "total": {"type": "String"}
+    }
+  },
+  "partnerBookingPagePrevious": "Previous page",
+  "partnerBookingPageNext": "Next page",
+  "partnerBookingSectionGuest": "Guest",
+  "partnerBookingSectionStay": "Stay",
+  "partnerBookingSectionRoom": "Property & room",
+  "partnerBookingSectionPrice": "Price",
+  "partnerBookingSectionRatePlan": "Rate plan captured at booking",
+  "partnerBookingSectionPayment": "Payment & invoice",
+  "partnerBookingSectionTimeline": "Lifecycle timeline",
+  "partnerBookingSectionModifications": "Change history",
+  "partnerBookingSectionAudit": "Check-in & check-out record",
+  "partnerBookingFieldGuestName": "Guest name",
+  "partnerBookingFieldGuestEmail": "Guest email",
+  "partnerBookingFieldOccupancy": "Occupancy",
+  "partnerBookingFieldSpecialRequest": "Special request",
+  "partnerBookingFieldCheckIn": "Check-in date",
+  "partnerBookingFieldCheckOut": "Check-out date",
+  "partnerBookingFieldNights": "Nights booked",
+  "partnerBookingFieldNightProgress": "Stay progress",
+  "partnerBookingFieldActualCheckIn": "Actually checked in",
+  "partnerBookingFieldActualCheckOut": "Actually checked out",
+  "partnerBookingFieldProperty": "Booked property",
+  "partnerBookingFieldRoom": "Booked room",
+  "partnerBookingFieldRoomCode": "Room code",
+  "partnerBookingFieldRoomCount": "Rooms booked",
+  "partnerBookingFieldBasePrice": "Base price",
+  "partnerBookingFieldRatePlanPrice": "Rate plan price",
+  "partnerBookingFieldDiscount": "Discount applied",
+  "partnerBookingFieldTotal": "Total charged",
+  "partnerBookingPriceNote": "Every amount here was calculated and stored by the backend when the booking was made. Nothing is recalculated in this app.",
+  "partnerBookingFieldRatePlanName": "Rate plan",
+  "partnerBookingFieldRatePlanCode": "Rate plan code",
+  "partnerBookingFieldMealPlan": "Meal plan",
+  "partnerBookingFieldCancellationPolicy": "Cancellation policy",
+  "partnerBookingFieldCancellationDeadline": "Free-cancellation deadline",
+  "partnerBookingFieldRefundable": "Refundable",
+  "partnerBookingFieldNightlySnapshot": "Nightly rate captured",
+  "partnerBookingSnapshotNote": "These values were captured when the booking was made. Editing a rate plan today does not change them.",
+  "partnerBookingNoPayments": "No payment has been recorded against this booking.",
+  "partnerBookingPaymentUnnamed": "Payment",
+  "partnerBookingFieldInvoice": "Invoice number",
+  "partnerBookingFieldInvoiceStatus": "Invoice status",
+  "partnerBookingFieldInvoiceTotal": "Invoice total",
+  "partnerBookingPaymentReadOnlyNote": "Payment details are read-only. The partner API offers no payment, refund, or settlement action, and card and gateway identifiers are never sent to this screen.",
+  "partnerBookingTimelineEmpty": "The server recorded no lifecycle events for this booking.",
+  "partnerBookingEventCreated": "Booking created",
+  "partnerBookingEventPaid": "Payment completed",
+  "partnerBookingEventConfirmed": "Booking confirmed",
+  "partnerBookingEventCheckedIn": "Guest checked in",
+  "partnerBookingEventCheckedOut": "Guest checked out",
+  "partnerBookingEventCompleted": "Reservation completed",
+  "partnerBookingEventCancelled": "Booking cancelled",
+  "partnerBookingEventArchived": "Reservation archived",
+  "partnerBookingEventModified": "Booking changed",
+  "partnerBookingEventReview": "Guest submitted a review",
+  "partnerBookingModificationNote": "Guests change their own bookings. This is the record of what changed — the partner API offers no way to change a booking from here.",
+  "partnerBookingModificationDates": "Dates",
+  "partnerBookingModificationOccupancy": "Occupancy",
+  "partnerBookingModificationRatePlan": "Rate plan",
+  "partnerBookingModificationPrice": "Price",
+  "partnerBookingNoAudit": "No check-in or check-out has been recorded for this booking.",
+  "partnerBookingAuditCheckIn": "Check-in recorded",
+  "partnerBookingAuditCheckOut": "Check-out recorded",
+  "partnerBookingAuditByUser": "Staff #{userId}",
+  "@partnerBookingAuditByUser": {
+    "placeholders": {
+      "userId": {"type": "String"}
+    }
+  },
+  "partnerBookingActionCheckIn": "Check in",
+  "partnerBookingActionCheckOut": "Check out",
+  "partnerBookingActionNoShow": "Mark as no-show",
+  "partnerBookingActionComplete": "Complete reservation",
+  "partnerBookingActionsIrreversibleNote": "These changes cannot be undone from the extranet, and the guest is notified.",
+  "partnerBookingNoActionsAvailable": "No operational action is available for this booking's current status.",
+  "partnerBookingNoActionsClosed": "This booking is closed, so no operational action remains.",
+  "partnerBookingActionConfirm": "{action} for booking {code}? This cannot be undone from the extranet, and the guest is notified.",
+  "@partnerBookingActionConfirm": {
+    "placeholders": {
+      "action": {"type": "String"},
+      "code": {"type": "String"}
+    }
+  },
+  "partnerBookingActionConfirmCta": "Confirm",
+  "partnerBookingActionCancel": "Cancel",
+  "partnerBookingActionSucceeded": "{action} completed for booking {code}.",
+  "@partnerBookingActionSucceeded": {
+    "placeholders": {
+      "action": {"type": "String"},
+      "code": {"type": "String"}
+    }
+  },
+  "partnerBookingActionRejected": "The server refused that change for this booking's current status. Nothing was altered.",
+  "partnerBookingActionValidation": "The server rejected that request. Nothing was altered.",
+  "partnerBookingActionUncertain": "The connection dropped before the server confirmed, and this change cannot be undone. Refresh to see the current status before trying again.",
+  "partnerFrontDeskHeading": "Check a guest in or out",
+  "partnerFrontDeskNote": "Scan the guest's voucher QR or type their booking code. This changes the booking and notifies the guest.",
+  "partnerFrontDeskField": "Voucher payload or booking code",
+  "partnerFrontDeskFieldHelp": "A scanned voucher is recorded as a QR scan; a typed booking code is recorded as manual.",
+  "partnerFrontDeskCheckInAction": "Check guest in",
+  "partnerFrontDeskCheckOutAction": "Check guest out",
+  "partnerFrontDeskClear": "Clear",
+  "partnerFrontDeskConfirm": "Proceed for {code}? This changes the booking, notifies the guest, and cannot be undone from the extranet.",
+  "@partnerFrontDeskConfirm": {
+    "placeholders": {
+      "code": {"type": "String"}
+    }
+  },
+  "partnerFrontDeskCheckedInTitle": "Guest checked in",
+  "partnerFrontDeskCheckedOutTitle": "Guest checked out",
+  "partnerFrontDeskIdempotentNote": "Repeating this on the same booking is safe: the server keeps the original time and records nothing twice.",
+  "partnerFrontDeskNotRecognisedTitle": "Not recognised",
+  "partnerFrontDeskNotRecognisedMessage": "The server does not recognise that voucher or booking code for your account. It may have been altered, may not exist, or may belong to another partner — the server does not say which.",
+  "partnerFrontDeskRejectedTitle": "Cannot do that yet",
+  "partnerFrontDeskRejectedMessage": "This booking's status or dates do not allow that right now. Nothing was changed.",
+  "partnerFrontDeskInvalidTitle": "Nothing to submit",
+  "partnerFrontDeskInvalidMessage": "Scan or type a voucher payload or booking code first.",
+  "partnerFrontDeskFailedTitle": "Could not complete this",
+  "partnerFrontDeskUncertainTitle": "Outcome unknown",
+  "partnerFrontDeskUncertainMessage": "The connection dropped before the server confirmed. Check the booking's status — running this again is safe if it did not go through.",
+  "partnerCalendarTitle": "Calendar & inventory",
+  "partnerCalendarTabOverview": "Property calendar",
+  "partnerCalendarTabInventory": "Room inventory",
+  "partnerCalendarScopeNote": "Every room in the selected property, night by night. The figures come from the same inventory records the Room inventory tab edits — this view only reads them.",
+  "partnerCalendarWindowRange": "{from} – {to}",
+  "@partnerCalendarWindowRange": {
+    "placeholders": {
+      "from": {"type": "String"},
+      "to": {"type": "String"}
+    }
+  },
+  "partnerCalendarPreviousWeek": "Previous week",
+  "partnerCalendarNextWeek": "Next week",
+  "partnerCalendarToday": "Today",
+  "partnerCalendarNoRoomsTitle": "This property has no rooms",
+  "partnerCalendarNoRoomsMessage": "There is nothing to schedule until the property has at least one room. Rooms are managed in the Rooms module.",
+  "partnerCalendarWindowEmptyMessage": "No inventory records exist for any room in these dates. Nights without a record cannot be sold, because the availability check counts records and rejects a stay when any night is missing.",
+  "partnerCalendarRoomsFailed": "{failed} of {total} room calendars could not be loaded. Those rows are shown as unavailable to read, not as empty.",
+  "@partnerCalendarRoomsFailed": {
+    "placeholders": {
+      "failed": {"type": "String"},
+      "total": {"type": "String"}
+    }
+  },
+  "partnerCalendarRoomFailed": "{room} could not be loaded.",
+  "@partnerCalendarRoomFailed": {
+    "placeholders": {
+      "room": {"type": "String"}
+    }
+  },
+  "partnerCalendarStateOpen": "Open for sale",
+  "partnerCalendarStateSoldOut": "Nothing left",
+  "partnerCalendarStateStopSell": "Stop sell",
+  "partnerCalendarStateNoRecord": "No record",
+  "partnerCalendarLegendHeading": "What each night shows",
+  "partnerCalendarLegendClosedArrival": "Closed to arrival",
+  "partnerCalendarLegendClosedDeparture": "Closed to departure",
+  "partnerCalendarLegendOccupied": "Rooms sold",
+  "partnerCalendarLegendNote": "The number on each night is rooms still available. Closed to arrival blocks a stay from starting that night; closed to departure blocks it from ending on that night. Neither stops the night being sold within a longer stay.",
+  "partnerCalendarSoldValue": "{count} sold",
+  "@partnerCalendarSoldValue": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "partnerCalendarMetricSellable": "nights open for sale",
+  "partnerCalendarMetricOccupied": "nights with rooms sold",
+  "partnerCalendarMetricRestricted": "nights with a restriction",
+  "partnerCalendarMetricMissing": "nights with no record",
+  "partnerCalendarNightHeading": "{room} · {date}",
+  "@partnerCalendarNightHeading": {
+    "placeholders": {
+      "room": {"type": "String"},
+      "date": {"type": "String"}
+    }
+  },
+  "partnerCalendarCloseNight": "Close night details",
+  "partnerCalendarFieldAvailable": "Available",
+  "partnerCalendarFieldSold": "Sold",
+  "partnerCalendarFieldBlocked": "Blocked",
+  "partnerCalendarFieldMaintenance": "Maintenance",
+  "partnerCalendarFieldTotal": "Total rooms",
+  "partnerCalendarInconsistentMessage": "Available, sold, blocked and maintenance do not add up to the total for this night. The server's own numbers are shown unchanged.",
+  "partnerCalendarNoRecordExplanation": "There is no inventory record for this night. That is not the same as being free: the availability check counts records, so any stay covering this night is rejected. Create the record in the Room inventory tab to make the night sellable.",
+  "partnerCalendarQuestionsHeading": "What this night allows",
+  "partnerCalendarQuestionStock": "Rooms are left",
+  "partnerCalendarQuestionSellable": "The night can be sold",
+  "partnerCalendarQuestionArrival": "A stay can start this night",
+  "partnerCalendarQuestionDeparture": "A stay can end with this night",
+  "partnerCalendarQuestionsNote": "These are four separate checks the server makes, not one. A night can be sellable inside a longer stay while still refusing an arrival or a departure.",
+  "partnerCalendarReasonNoStock": "No rooms are left for this night.",
+  "partnerCalendarReasonStopSell": "Stop sell is on for this night.",
+  "partnerCalendarReasonNotSellable": "The night cannot be sold at all.",
+  "partnerCalendarReasonClosedArrival": "Closed to arrival on this night.",
+  "partnerCalendarReasonClosedDeparture": "Closed to departure on this night.",
+  "partnerCalendarReadOnlyNote": "This calendar only reads. Stop sell, closed to arrival and closed to departure are changed in the Room inventory tab, so one place owns every write.",
+  "partnerCalendarManageRestrictions": "Open room inventory",
+  "partnerMetricWindow": "{from} – {to}",
+  "@partnerMetricWindow": {
+    "placeholders": {
+      "from": {"type": "String"},
+      "to": {"type": "String"}
+    }
+  },
+  "partnerMetricAllProperties": "All properties",
+  "partnerMetricChangeRange": "Change dates",
+  "partnerMetricDefaultRange": "Last 30 days",
+  "partnerMetricInvalidRange": "The start date must not be after the end date. The server rejects that range.",
+  "partnerMetricScopeNotFound": "That property is not available to your account.",
+  "partnerMetricNotLoaded": "This section has not been loaded.",
+  "partnerMetricUnavailable": "Not available",
+  "partnerMetricSectionsFailed": "{count} section(s) could not be loaded. They are shown as unavailable, not as zero.",
+  "@partnerMetricSectionsFailed": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "partnerMetricPeakDay": "Highest day {date}, {value}",
+  "@partnerMetricPeakDay": {
+    "placeholders": {
+      "date": {"type": "String"},
+      "value": {"type": "String"}
+    }
+  },
+  "partnerFinanceTitle": "Finance & settlement",
+  "partnerFinanceTabOverview": "Revenue & commission",
+  "partnerFinanceTabRevenue": "Revenue",
+  "partnerFinanceTabSettlement": "Settlement & payouts",
+  "partnerFinanceScopeAll": "Figures cover every property you own. Select a property in the workspace to narrow them. Amounts are grouped numbers: the finance API sends no currency with them.",
+  "partnerFinanceScopeProperty": "Figures cover the selected property only. Amounts are grouped numbers: the finance API sends no currency with them.",
+  "partnerFinanceEstimateNotice": "These are derived estimates, not a statement of account. The platform commission is a fixed rate applied by the server, the tax figure is indicative only, and settlement periods are calculated from booking revenue rather than read from a settlement ledger.",
+  "partnerFinanceNoData": "The server returned no figures for this window.",
+  "partnerFinanceOverviewHeading": "Revenue and commission",
+  "partnerFinanceOverviewSubtitle": "Bookings are counted by check-in date within the selected window.",
+  "partnerFinanceCommissionCaption": "Calculated by the server at a fixed rate",
+  "partnerFinanceTaxCaption": "Indicative only — not a tax calculation",
+  "partnerFinanceCompletedLabel": "Completed bookings",
+  "partnerFinancePaidLabel": "Bookings with a paid payment",
+  "partnerFinancePendingCaption": "The whole window's net revenue: nothing tracks what has actually been settled",
+  "partnerFinanceNextPayoutCaption": "An assumed monthly cadence, not a scheduled date",
+  "partnerFinanceCommissionHeading": "Commission breakdown",
+  "partnerFinanceRateNotice": "The server applied a fixed platform rate of {rate}. It is a constant in the service, not a negotiated rate, and this app never applies it itself.",
+  "@partnerFinanceRateNotice": {
+    "placeholders": {
+      "rate": {"type": "String"}
+    }
+  },
+  "partnerFinanceRevenueHeading": "Revenue breakdown",
+  "partnerFinanceRevenueSubtitle": "Every figure is calculated and rounded by the server. Nothing on this screen is recalculated.",
+  "partnerFinanceRevenueEmpty": "No revenue was recorded in this window.",
+  "partnerFinanceAverageBooking": "Average booking value",
+  "partnerFinanceHighestBooking": "Highest booking",
+  "partnerFinanceByDay": "By day",
+  "partnerFinanceByMonth": "By month",
+  "partnerFinanceByProperty": "By property",
+  "partnerFinanceByRoom": "By room",
+  "partnerFinanceSettlementHeading": "Settlement",
+  "partnerFinanceSettlementSubtitle": "Periods are calendar months calculated from booking revenue. No settlement ledger exists behind them.",
+  "partnerFinanceSettlementEmpty": "No settlement period falls in this window.",
+  "partnerFinanceCurrentSettlement": "Current period",
+  "partnerFinanceLastSettlement": "Previous period",
+  "partnerFinancePending": "Pending",
+  "partnerFinancePaid": "Settled",
+  "partnerFinanceSettlementMismatch": "The server reports a settled amount although no period below is marked settled. Both values are shown exactly as the server sent them; treat the settled total with caution.",
+  "partnerFinanceSettlementPeriods": "Periods",
+  "partnerFinancePeriod": "Period",
+  "partnerFinanceStatus": "Status",
+  "partnerFinanceStatusPaid": "Settled",
+  "partnerFinanceStatusPending": "Pending",
+  "partnerFinanceStatusUnknown": "Unrecognised",
+  "partnerFinancePayoutHeading": "Payouts",
+  "partnerFinancePayoutSubtitle": "The same calculated periods, split by status.",
+  "partnerFinancePayoutEmpty": "No payout period falls in this window.",
+  "partnerFinanceEstimatedPayoutDate": "Estimated payout date",
+  "partnerFinanceUpcomingPayouts": "Upcoming",
+  "partnerFinanceCompletedPayouts": "Completed",
+  "partnerFinancePayoutNoRecords": "No payout records exist in the partner API — there is no reference, bank detail or payment provider information to show, and none is requested.",
+  "partnerFinanceInvoiceHeading": "Invoices",
+  "partnerFinanceInvoiceEmpty": "No invoice was issued in this window.",
+  "partnerFinanceInvoiceIssued": "Issued",
+  "partnerFinanceInvoicePaid": "Paid",
+  "partnerFinanceInvoiceCancelled": "Cancelled",
+  "partnerFinanceInvoiceRefunded": "Refunded",
+  "partnerFinanceInvoiceTotal": "Total invoiced",
+  "partnerFinanceInvoiceNoDocuments": "The partner API returns invoice counts only. There is no invoice list, no invoice number to open and no download, so none is offered here.",
+  "partnerFinanceRefundHeading": "Refunds",
+  "partnerFinanceRefundEmpty": "No refund was recorded in this window.",
+  "partnerFinanceRefundCount": "Refunds",
+  "partnerFinanceRefundAmount": "Refunded amount",
+  "partnerFinanceRefundRate": "Refund rate",
+  "partnerFinanceRefundReadOnly": "Refunds are read-only here. The partner API has no refund action, so refunds are started elsewhere.",
+  "partnerAnalyticsTitle": "Performance analytics",
+  "partnerAnalyticsDashboardPointer": "Revenue, occupancy and the headline totals live on the Dashboard, which already reports them. This page covers what the Dashboard does not.",
+  "partnerAnalyticsScopeAll": "Figures cover every property you own. Select a property in the workspace to narrow them.",
+  "partnerAnalyticsScopeProperty": "Figures cover the selected property only.",
+  "partnerAnalyticsBookingsHeading": "Booking activity",
+  "partnerAnalyticsBookingsEmpty": "No booking falls in this window.",
+  "partnerAnalyticsArrivals": "Arrivals",
+  "partnerAnalyticsDepartures": "Departures",
+  "partnerAnalyticsCancellations": "Cancellations",
+  "partnerAnalyticsNoShows": "No-shows",
+  "partnerAnalyticsAverageStay": "Average stay",
+  "partnerAnalyticsAverageStayCaption": "Nights, calculated by the server",
+  "partnerAnalyticsByStatus": "By status",
+  "partnerAnalyticsRoomsHeading": "Room performance",
+  "partnerAnalyticsRoomsEmpty": "No room activity falls in this window.",
+  "partnerAnalyticsOccupancyEstimate": "Occupancy estimate",
+  "partnerAnalyticsOccupancyCaption": "The server calls this an estimate",
+  "partnerAnalyticsTopRoomsRevenue": "Top rooms by revenue",
+  "partnerAnalyticsTopRoomsBookings": "Top rooms by bookings",
+  "partnerAnalyticsAvailability": "Availability summary",
+  "partnerAnalyticsPromotionsHeading": "Promotion activity",
+  "partnerAnalyticsPromotionsSubtitle": "Structural only: the server cannot yet attribute a discount to a booking.",
+  "partnerAnalyticsPromotionsEmpty": "No promotion activity falls in this window.",
+  "partnerAnalyticsActivePromotions": "Active promotions",
+  "partnerAnalyticsDiscountedBookings": "Discounted bookings",
+  "partnerAnalyticsNoAttribution": "The server cannot attribute discounts yet",
+  "partnerAnalyticsPromotionsByType": "By type",
+  "partnerAnalyticsPromotionsByStatus": "By status",
+  "partnerAnalyticsReviewsHeading": "Review summary",
+  "partnerAnalyticsReviewsSubtitle": "Rating and moderation totals. Individual reviews and replies are managed in the Reviews module.",
+  "partnerAnalyticsReviewsEmpty": "No review falls in this window.",
+  "partnerAnalyticsAverageRating": "Average rating",
+  "partnerAnalyticsApprovedOnly": "Approved reviews only",
+  "partnerAnalyticsNoReviews": "No reviews to average",
+  "partnerAnalyticsReviewCount": "Total reviews",
+  "partnerAnalyticsReviewsApproved": "Approved",
+  "partnerAnalyticsReviewsPending": "Pending",
+  "partnerAnalyticsReviewsRejected": "Rejected",
+  "partnerAnalyticsMessagesHeading": "Message activity",
+  "partnerAnalyticsMessagesEmpty": "No conversation falls in this window.",
+  "partnerAnalyticsOpenConversations": "Open conversations",
+  "partnerAnalyticsClosedConversations": "Closed conversations",
+  "partnerAnalyticsArchivedConversations": "Archived conversations",
+  "partnerAnalyticsUnreadMessages": "Unread for you",
+  "partnerAnalyticsResponseTime": "Average response time",
+  "partnerAnalyticsNoResponses": "No response time could be measured",
+  "partnerAnalyticsMinutesValue": "{value} min",
+  "@partnerAnalyticsMinutesValue": {
+    "placeholders": {
+      "value": {"type": "String"}
+    }
+  },
+  "partnerReviewsTitle": "Guest reviews",
+  "partnerReviewsAnalyticsPointer": "Ratings and moderation totals are on the Analytics page. This page is for replying.",
+  "partnerReviewsScopeNote": "The published reviews for the selected property. Only published reviews can be replied to, and this is exactly the set the server allows a reply on.",
+  "partnerReviewsNoBodyNotice": "The partner API does not return the text a guest wrote — only the rating, the title and the date. Replies are written against those.",
+  "partnerReviewsNoPropertyTitle": "Select a property",
+  "partnerReviewsNoPropertyMessage": "Reviews are listed per property. Choose one in the workspace to see its reviews.",
+  "partnerReviewsEmptyTitle": "No published reviews yet",
+  "partnerReviewsEmptyMessage": "Nothing has been published for this property. Reviews appear here once a guest writes one and it is approved.",
+  "partnerReviewsNoMatchTitle": "Nothing matches this filter",
+  "partnerReviewsNoMatchMessage": "This property has reviews, but none in the selected group.",
+  "partnerReviewsFilterAll": "Show all",
+  "partnerReviewsFilterAllCount": "All ({count})",
+  "@partnerReviewsFilterAllCount": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "partnerReviewsFilterNeedsReplyCount": "Needs a reply ({count})",
+  "@partnerReviewsFilterNeedsReplyCount": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "partnerReviewsFilterRepliedCount": "Replied ({count})",
+  "@partnerReviewsFilterRepliedCount": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "partnerReviewsNeedsReply": "Needs a reply",
+  "partnerReviewsReplied": "Replied",
+  "partnerReviewsNoTitle": "Untitled review",
+  "partnerReviewsRatingValue": "Rated {rating} out of 5",
+  "@partnerReviewsRatingValue": {
+    "placeholders": {
+      "rating": {"type": "String"}
+    }
+  },
+  "partnerReviewsReplyHeading": "Your reply",
+  "partnerReviewsCloseReply": "Close reply",
+  "partnerReviewsCurrentReply": "Currently published",
+  "partnerReviewsRepliedAt": "replied {date}",
+  "@partnerReviewsRepliedAt": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "partnerReviewsEditedAt": "edited {date}",
+  "@partnerReviewsEditedAt": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "partnerReviewsReplyField": "Reply to this guest",
+  "partnerReviewsReplyHelp": "A review has one reply. Publishing again replaces it rather than adding a second.",
+  "partnerReviewsPublicNotice": "Your reply is published publicly alongside the review, and there is no way to delete it afterwards — only to replace its wording. The guest is notified the first time you reply.",
+  "partnerReviewsPublishReply": "Publish reply",
+  "partnerReviewsUpdateReply": "Replace reply",
+  "partnerReviewsPublishConfirm": "Publish this reply publicly? It cannot be deleted afterwards, only rewritten.",
+  "partnerReviewsReplyPublished": "Your reply is published.",
+  "partnerReviewsReplyEmpty": "Write a reply before publishing.",
+  "partnerReviewsReplyUncertain": "The connection dropped before the server confirmed, and a reply cannot be deleted. Refresh to see whether it was published.",
+  "partnerReviewsNotFound": "That review is no longer available to your account.",
+  "partnerReviewsNotApprovedNotice": "Only a published review can be replied to. The server refuses a reply on any other status.",
+  "partnerSettingsTitle": "Account & settings",
+  "partnerSettingsTabWorkspace": "Policies & workspace",
+  "partnerSettingsTabTeam": "Team",
+  "partnerSettingsTabPayout": "Payout account",
+  "partnerSettingsTabProfile": "Business profile",
+  "partnerTeamHeading": "Team members",
+  "partnerTeamSubtitle": "Everyone who can act in this partner workspace, and the role the server grants them.",
+  "partnerTeamEmpty": "No team members are recorded.",
+  "partnerTeamOwnerOnly": "Only the partner owner can add, change or remove team members. You can see the team here.",
+  "partnerTeamRoleField": "Role",
+  "partnerTeamActive": "Active",
+  "partnerTeamInactive": "Inactive",
+  "partnerTeamActivate": "Activate",
+  "partnerTeamDeactivate": "Deactivate",
+  "partnerTeamRemove": "Remove",
+  "partnerTeamRemoveConfirm": "Remove {member} from the team? This cannot be undone from here — they would have to be added again.",
+  "@partnerTeamRemoveConfirm": {
+    "placeholders": {
+      "member": {"type": "String"}
+    }
+  },
+  "partnerTeamInviteHeading": "Add a team member",
+  "partnerTeamInviteNote": "The server matches an existing Plan Your Trip account by email. It does not send an invitation, so the person must already have an account.",
+  "partnerTeamInviteEmail": "Their account email",
+  "partnerTeamInviteAction": "Add member",
+  "partnerPayoutHeading": "Payout account",
+  "partnerPayoutSubtitle": "Where settlements would be sent. Held as reference details only.",
+  "partnerPayoutNone": "No payout account has been added yet.",
+  "partnerPayoutLoadFailed": "The payout account could not be loaded. This is not the same as having none.",
+  "partnerPayoutHolder": "Account holder",
+  "partnerPayoutBank": "Bank",
+  "partnerPayoutAccountNumber": "Account number",
+  "partnerPayoutMasked": "Ends in {last4}",
+  "@partnerPayoutMasked": {
+    "placeholders": {
+      "last4": {"type": "String"}
+    }
+  },
+  "partnerPayoutMethod": "Payout method",
+  "partnerPayoutMethodBank": "Bank transfer",
+  "partnerPayoutMethodManual": "Manual",
+  "partnerPayoutMethodUnknown": "Unrecognised method",
+  "partnerPayoutStatus": "Verification status",
+  "partnerPayoutUpdated": "Last updated",
+  "partnerPayoutNoExecutionNotice": "No payout is ever sent from here, and the full account number is never stored: the server keeps only its last four digits and discards the rest as soon as it is submitted.",
+  "partnerPayoutRoleNotice": "Only the partner owner or a finance team member can change these details. You can see them here.",
+  "partnerPayoutAdd": "Add payout account",
+  "partnerPayoutReplace": "Replace details",
+  "partnerPayoutCancelEdit": "Cancel",
+  "partnerPayoutFormHeading": "New payout details",
+  "partnerPayoutNumberHelp": "At least 4 characters. Only the last four digits are kept.",
+  "partnerPayoutSave": "Save payout details",
+  "partnerPayoutReplaceConfirm": "Replace the payout details? The previous account number cannot be recovered, because it was never stored.",
+  "partnerProfileHeading": "Business profile",
+  "partnerProfileBusinessName": "Business name",
+  "partnerProfileRepresentative": "Representative",
+  "partnerProfileVerification": "Verification",
+  "partnerProfileYourRole": "Your role",
+  "partnerProfileReadOnlyNotice": "An approved business profile cannot be edited through the partner API — the server accepts changes only while a profile is a draft or has been rejected. Contact support to change these details.",
+  "partnerProfileStatusDraft": "Draft",
+  "partnerProfileStatusSubmitted": "Awaiting review",
+  "partnerProfileStatusApproved": "Approved",
+  "partnerProfileStatusRejected": "Rejected",
+  "partnerProfileStatusSuspended": "Suspended",
+  "partnerProfileStatusUnknown": "Unrecognised status",
+  "partnerAccountSaved": "Saved.",
+  "partnerAccountNotFound": "That record is no longer available to your account.",
+  "partnerAccountConflict": "The server refused that because it conflicts with an existing record.",
+  "partnerAccountValidation": "Check the details and try again.",
+  "partnerAccountUncertain": "The connection dropped before the server confirmed. Refresh to see the current state before trying again."
 }

@@ -8676,4 +8676,3302 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get partnerModuleReadOnlyForRole =>
       'Your team role will not be able to change settings in this module.';
+
+  @override
+  String get partnerDashboardScopeHeading => 'Reporting scope';
+
+  @override
+  String get partnerDashboardScopeHint =>
+      'Applies to Performance, Occupancy and Revenue. Today\'s operations always cover every property.';
+
+  @override
+  String get partnerDashboardScopeToday => 'Today · all properties';
+
+  @override
+  String get partnerDashboardScopeAllProperties => 'All properties';
+
+  @override
+  String get partnerDashboardScopeLast30AllProperties =>
+      'Last 30 days · all properties';
+
+  @override
+  String partnerDashboardScopeWindowAll(String window) {
+    return '$window · all properties';
+  }
+
+  @override
+  String partnerDashboardScopeWindowOne(String window) {
+    return '$window · selected property';
+  }
+
+  @override
+  String get partnerDashboardRangeLabel => 'Date range';
+
+  @override
+  String get partnerDashboardRangeLast7 => '7 days';
+
+  @override
+  String get partnerDashboardRangeLast30 => '30 days';
+
+  @override
+  String get partnerDashboardRangeLast90 => '90 days';
+
+  @override
+  String get partnerDashboardPropertyLabel => 'Property';
+
+  @override
+  String get partnerDashboardPropertyAll => 'All properties';
+
+  @override
+  String partnerDashboardPropertyCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count properties',
+      one: '1 property',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String partnerDashboardRoomCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count active rooms',
+      one: '1 active room',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String partnerDashboardTeamRole(String role) {
+    return 'Your role: $role';
+  }
+
+  @override
+  String partnerDashboardActiveProperty(String name) {
+    return 'Scoped to $name';
+  }
+
+  @override
+  String partnerDashboardUpdatedAt(String time) {
+    return 'Updated $time';
+  }
+
+  @override
+  String get partnerDashboardNoActivityHint =>
+      'No bookings fall in the selected window yet, so the performance figures below are zero.';
+
+  @override
+  String get partnerDashboardAttentionHeading => 'Needs attention';
+
+  @override
+  String get partnerDashboardAttentionClear =>
+      'Nothing is waiting on you right now.';
+
+  @override
+  String partnerDashboardAttentionSemantic(String label, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items need attention',
+      one: '1 item needs attention',
+    );
+    return '$label, $_temp0';
+  }
+
+  @override
+  String get partnerDashboardQuickActionsHeading => 'Quick actions';
+
+  @override
+  String get partnerDashboardPerformanceHeading => 'Performance';
+
+  @override
+  String get partnerDashboardPerformanceEmpty =>
+      'No bookings in this period, so there is nothing to report yet.';
+
+  @override
+  String get partnerDashboardOccupancyHeading => 'Occupancy';
+
+  @override
+  String get partnerDashboardOccupancyNoInventory =>
+      'No room inventory is configured yet, so occupancy cannot be measured.';
+
+  @override
+  String get partnerDashboardOccupancyChartLabel => 'Occupancy per day';
+
+  @override
+  String get partnerDashboardRevenueHeading => 'Revenue';
+
+  @override
+  String get partnerDashboardRevenueChartLabel => 'Revenue per day';
+
+  @override
+  String get partnerDashboardFinanceHeading => 'Finance summary';
+
+  @override
+  String get partnerDashboardActivityHeading => 'Recent activity';
+
+  @override
+  String get partnerDashboardActivityEmpty =>
+      'No activity has been recorded yet.';
+
+  @override
+  String partnerDashboardActivityBy(String actor) {
+    return 'by $actor';
+  }
+
+  @override
+  String get partnerDashboardActivityUnknownActor => 'Unknown user';
+
+  @override
+  String partnerDashboardActivityMore(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count older entries',
+      one: '1 older entry',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get partnerDashboardChartEmpty => 'No data points in this period.';
+
+  @override
+  String get partnerDashboardErrorUnauthorized =>
+      'Your session expired. Sign in again to load this.';
+
+  @override
+  String get partnerDashboardErrorForbidden =>
+      'Your partner profile is not approved for this data.';
+
+  @override
+  String get partnerDashboardErrorNotFound =>
+      'This data is not available for your partner profile.';
+
+  @override
+  String get partnerDashboardErrorValidation =>
+      'That date range is not valid. Choose a different period.';
+
+  @override
+  String get partnerDashboardErrorTimeout =>
+      'This panel took too long to load.';
+
+  @override
+  String get partnerDashboardErrorNetwork =>
+      'Could not reach the server for this panel.';
+
+  @override
+  String get partnerDashboardErrorServer =>
+      'The server could not produce this data.';
+
+  @override
+  String get partnerDashboardErrorGeneric => 'This panel could not be loaded.';
+
+  @override
+  String get partnerValueUnavailable => '—';
+
+  @override
+  String get partnerKpiCurrentGuests => 'In house now';
+
+  @override
+  String get partnerKpiUpcoming => 'Upcoming';
+
+  @override
+  String get partnerKpiOccupancy => 'Occupancy';
+
+  @override
+  String get partnerKpiRevenueToday => 'Revenue today';
+
+  @override
+  String get partnerKpiRevenueMonth => 'Revenue this month';
+
+  @override
+  String get partnerKpiAverageStay => 'Average stay (nights)';
+
+  @override
+  String get partnerKpiTotalRevenue => 'Total revenue';
+
+  @override
+  String get partnerKpiTotalBookings => 'Total bookings';
+
+  @override
+  String get partnerKpiAdr => 'Average daily rate';
+
+  @override
+  String get partnerKpiAdrCaption => 'Per sold room night';
+
+  @override
+  String get partnerKpiConfirmed => 'Confirmed';
+
+  @override
+  String get partnerKpiCancelled => 'Cancelled';
+
+  @override
+  String get partnerKpiReviewAverage => 'Average rating';
+
+  @override
+  String partnerKpiReviewCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'From $count reviews',
+      one: 'From 1 review',
+      zero: 'No reviews',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get partnerKpiResponseRate => 'Message response rate';
+
+  @override
+  String get partnerOccupancyInventory => 'Room inventory';
+
+  @override
+  String get partnerOccupancySold => 'Sold rooms';
+
+  @override
+  String get partnerOccupancyAvailable => 'Available rooms';
+
+  @override
+  String get partnerOccupancyStopSell => 'Stop-sell days';
+
+  @override
+  String get partnerRevenueMonthToDate => 'Month to date';
+
+  @override
+  String get partnerRevenueLast30 => 'Last 30 days';
+
+  @override
+  String get partnerRevenueByProperty => 'Revenue by property';
+
+  @override
+  String get partnerFinanceGross => 'Gross revenue';
+
+  @override
+  String get partnerFinanceNet => 'Net revenue';
+
+  @override
+  String get partnerFinanceCommission => 'Platform commission';
+
+  @override
+  String get partnerFinanceTax => 'Estimated tax';
+
+  @override
+  String get partnerFinanceRefunded => 'Refunded';
+
+  @override
+  String get partnerFinancePendingSettlement => 'Pending settlement';
+
+  @override
+  String get partnerFinanceNextPayout => 'Next estimated payout';
+
+  @override
+  String partnerFinanceCompletedBookings(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count completed bookings',
+      one: '1 completed booking',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String partnerFinancePaidBookings(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count paid bookings',
+      one: '1 paid booking',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String partnerPropertiesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count properties',
+      one: '1 property',
+      zero: 'No properties',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get partnerPropertiesEmptyTitle => 'No properties yet';
+
+  @override
+  String get partnerPropertiesEmptyMessage =>
+      'Your partner profile is approved, but no property has been assigned to it yet. Properties are assigned by the Plan Your Trip team.';
+
+  @override
+  String get partnerPropertiesSelectedSemantic => 'Selected property';
+
+  @override
+  String get partnerPropertyDetailHeading => 'Property details';
+
+  @override
+  String get partnerPropertyCloseDetail => 'Close details';
+
+  @override
+  String get partnerPropertyDetailNotFound =>
+      'This property is no longer available to your account.';
+
+  @override
+  String get partnerPropertyActionsOwnerOnly =>
+      'Listing actions are available to the profile owner. You can review every detail here.';
+
+  @override
+  String get partnerPropertyStatusDraft => 'Draft';
+
+  @override
+  String get partnerPropertyStatusPendingReview => 'Pending review';
+
+  @override
+  String get partnerPropertyStatusApproved => 'Approved';
+
+  @override
+  String get partnerPropertyStatusPublished => 'Published';
+
+  @override
+  String get partnerPropertyStatusHidden => 'Hidden';
+
+  @override
+  String get partnerPropertyStatusArchived => 'Archived';
+
+  @override
+  String get partnerPropertyStatusRejected => 'Rejected';
+
+  @override
+  String get partnerPropertyStatusUnknown => 'Unknown status';
+
+  @override
+  String get partnerPropertyActive => 'Listing on';
+
+  @override
+  String get partnerPropertyInactive => 'Listing off';
+
+  @override
+  String get partnerPropertyVerified => 'Verified';
+
+  @override
+  String get partnerPropertyNotVerified => 'Not verified';
+
+  @override
+  String get partnerPropertyFeatured => 'Featured';
+
+  @override
+  String get partnerPropertyNotFeatured => 'Not featured';
+
+  @override
+  String get partnerPropertyNotSet => 'Not set';
+
+  @override
+  String partnerPropertyRatingSummary(String rating, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count reviews',
+      one: '1 review',
+    );
+    return '$rating from $_temp0';
+  }
+
+  @override
+  String get partnerPropertyVisibilityPublic =>
+      'Guests can find and book this property now.';
+
+  @override
+  String get partnerPropertyVisibilityNotPublic =>
+      'This property is not visible to guests right now.';
+
+  @override
+  String get partnerPropertyModerationNote =>
+      'Verification and featuring are managed by the Plan Your Trip team and cannot be changed here.';
+
+  @override
+  String get partnerPropertyActivateAction => 'Turn listing on';
+
+  @override
+  String get partnerPropertyDeactivateAction => 'Turn listing off';
+
+  @override
+  String partnerPropertyActivatedMessage(String name) {
+    return '$name is now listed.';
+  }
+
+  @override
+  String partnerPropertyDeactivatedMessage(String name) {
+    return '$name is no longer listed.';
+  }
+
+  @override
+  String get partnerPropertyActionNotFound =>
+      'That property is no longer available to your account.';
+
+  @override
+  String get partnerPropertyActionFailed =>
+      'The change could not be saved. Nothing was altered.';
+
+  @override
+  String get partnerPropertyActionUncertain =>
+      'The connection dropped before the server confirmed. Refresh to see the current state.';
+
+  @override
+  String get partnerPropertySectionIdentity => 'Identity';
+
+  @override
+  String get partnerPropertySectionLocation => 'Location';
+
+  @override
+  String get partnerPropertySectionContact => 'Contact';
+
+  @override
+  String get partnerPropertySectionPolicies => 'Policies';
+
+  @override
+  String get partnerPropertySectionVerification => 'Verification';
+
+  @override
+  String get partnerPropertySectionPerformance => 'Guest feedback';
+
+  @override
+  String get partnerPropertySectionMetadata => 'Record';
+
+  @override
+  String get partnerPropertyFieldSlug => 'URL slug';
+
+  @override
+  String get partnerPropertyFieldShortDescription => 'Short description';
+
+  @override
+  String get partnerPropertyFieldDescription => 'Description';
+
+  @override
+  String get partnerPropertyFieldAddress => 'Address';
+
+  @override
+  String get partnerPropertyFieldCoordinates => 'Coordinates';
+
+  @override
+  String get partnerPropertyFieldPhone => 'Phone';
+
+  @override
+  String get partnerPropertyFieldEmail => 'Email';
+
+  @override
+  String get partnerPropertyFieldWebsite => 'Website';
+
+  @override
+  String get partnerPropertyFieldFacebook => 'Facebook';
+
+  @override
+  String get partnerPropertyFieldInstagram => 'Instagram';
+
+  @override
+  String get partnerPropertyFieldCheckIn => 'Check-in from';
+
+  @override
+  String get partnerPropertyFieldCheckOut => 'Check-out by';
+
+  @override
+  String get partnerPropertyFieldChildrenPolicy => 'Children policy';
+
+  @override
+  String get partnerPropertyFieldPetPolicy => 'Pet policy';
+
+  @override
+  String get partnerPropertyFieldSmokingPolicy => 'Smoking policy';
+
+  @override
+  String get partnerPropertyFieldVerified => 'Verification status';
+
+  @override
+  String get partnerPropertyFieldFeatured => 'Featured placement';
+
+  @override
+  String get partnerPropertyFieldRating => 'Average rating';
+
+  @override
+  String get partnerPropertyFieldReviewCount => 'Reviews';
+
+  @override
+  String get partnerPropertyFieldOwner => 'Owned by';
+
+  @override
+  String get partnerPropertyFieldCreated => 'Created';
+
+  @override
+  String get partnerPropertyFieldUpdated => 'Last updated';
+
+  @override
+  String partnerRoomsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count room types',
+      one: '1 room type',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String partnerRoomsListedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count listed',
+      one: '1 listed',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String partnerRoomsSoldOutCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sold out',
+      one: '1 sold out',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String partnerRoomsForProperty(String name) {
+    return 'Rooms at $name';
+  }
+
+  @override
+  String get partnerRoomsNoPropertyContext => 'No property selected';
+
+  @override
+  String get partnerRoomsPropertyScope => 'Property scope';
+
+  @override
+  String get partnerRoomsSelectPropertyTitle => 'Choose a property';
+
+  @override
+  String get partnerRoomsSelectPropertyMessage =>
+      'Rooms belong to a specific property, so pick one to see its room types.';
+
+  @override
+  String get partnerRoomsNoPropertiesTitle => 'No properties yet';
+
+  @override
+  String get partnerRoomsNoPropertiesMessage =>
+      'Rooms live inside a property. Once a property is assigned to your profile, its room types appear here.';
+
+  @override
+  String get partnerRoomsPropertyUnavailableTitle => 'Property unavailable';
+
+  @override
+  String get partnerRoomsPropertyUnavailableMessage =>
+      'This property is no longer available to your account, or it has no room configuration yet.';
+
+  @override
+  String get partnerRoomsEmptyTitle => 'No room types yet';
+
+  @override
+  String get partnerRoomsEmptyMessage =>
+      'This property has no room types configured. They are set up by the Plan Your Trip team.';
+
+  @override
+  String get partnerRoomActionsOwnerOnly =>
+      'Listing actions are available to the profile owner. You can review every room here.';
+
+  @override
+  String get partnerRoomDetailHeading => 'Room details';
+
+  @override
+  String get partnerRoomCloseDetail => 'Close room details';
+
+  @override
+  String get partnerRoomDetailNotFound =>
+      'This room is no longer available to your account.';
+
+  @override
+  String get partnerRoomListed => 'Listed';
+
+  @override
+  String get partnerRoomUnlisted => 'Not listed';
+
+  @override
+  String get partnerRoomSoldOut => 'Sold out';
+
+  @override
+  String get partnerRoomListAction => 'List this room';
+
+  @override
+  String get partnerRoomUnlistAction => 'Stop listing';
+
+  @override
+  String partnerRoomListedMessage(String name) {
+    return '$name is now listed.';
+  }
+
+  @override
+  String partnerRoomUnlistedMessage(String name) {
+    return '$name is no longer listed.';
+  }
+
+  @override
+  String get partnerRoomActionNotFound =>
+      'That room is no longer available to your account.';
+
+  @override
+  String get partnerRoomYes => 'Yes';
+
+  @override
+  String get partnerRoomNo => 'No';
+
+  @override
+  String partnerRoomGuestsValue(String count) {
+    return 'Up to $count guests';
+  }
+
+  @override
+  String partnerRoomInventoryValue(String available, String total) {
+    return '$available of $total available';
+  }
+
+  @override
+  String partnerRoomPriceFromValue(String price) {
+    return 'From $price';
+  }
+
+  @override
+  String partnerRoomSizeValue(String size) {
+    return '$size m²';
+  }
+
+  @override
+  String get partnerRoomSectionIdentity => 'Identity';
+
+  @override
+  String get partnerRoomSectionBeds => 'Beds';
+
+  @override
+  String get partnerRoomSectionCapacity => 'Capacity';
+
+  @override
+  String get partnerRoomSectionInventory => 'Inventory';
+
+  @override
+  String get partnerRoomSectionPricing => 'Price';
+
+  @override
+  String get partnerRoomSectionConditions => 'Booking conditions';
+
+  @override
+  String get partnerRoomSectionAmenities => 'Amenities';
+
+  @override
+  String get partnerRoomSectionMedia => 'Media';
+
+  @override
+  String get partnerRoomFieldCode => 'Room code';
+
+  @override
+  String get partnerRoomFieldType => 'Room type';
+
+  @override
+  String get partnerRoomFieldDescription => 'Description';
+
+  @override
+  String get partnerRoomFieldBedType => 'Bed type';
+
+  @override
+  String get partnerRoomFieldBedCount => 'Number of beds';
+
+  @override
+  String get partnerRoomFieldMaxGuests => 'Maximum guests';
+
+  @override
+  String get partnerRoomFieldMaxAdults => 'Maximum adults';
+
+  @override
+  String get partnerRoomFieldMaxChildren => 'Maximum children';
+
+  @override
+  String get partnerRoomFieldSize => 'Room size';
+
+  @override
+  String get partnerRoomFieldFloor => 'Floor';
+
+  @override
+  String get partnerRoomFieldQuantity => 'Total rooms';
+
+  @override
+  String get partnerRoomFieldAvailable => 'Currently available';
+
+  @override
+  String get partnerRoomFieldPriceFrom => 'Price from';
+
+  @override
+  String get partnerRoomFieldOriginalPrice => 'Original price';
+
+  @override
+  String get partnerRoomFieldBreakfast => 'Breakfast included';
+
+  @override
+  String get partnerRoomFieldFreeCancellation => 'Free cancellation';
+
+  @override
+  String get partnerRoomFieldInstantConfirmation => 'Instant confirmation';
+
+  @override
+  String get partnerRoomFieldSmoking => 'Smoking allowed';
+
+  @override
+  String get partnerRoomFieldImages => 'Gallery images';
+
+  @override
+  String get partnerRoomTypeStandard => 'Standard';
+
+  @override
+  String get partnerRoomTypeSuperior => 'Superior';
+
+  @override
+  String get partnerRoomTypeDeluxe => 'Deluxe';
+
+  @override
+  String get partnerRoomTypePremier => 'Premier';
+
+  @override
+  String get partnerRoomTypeExecutive => 'Executive';
+
+  @override
+  String get partnerRoomTypeSuite => 'Suite';
+
+  @override
+  String get partnerRoomTypeFamily => 'Family';
+
+  @override
+  String get partnerRoomTypeVilla => 'Villa';
+
+  @override
+  String get partnerRoomTypeBungalow => 'Bungalow';
+
+  @override
+  String get partnerRoomTypeUnknown => 'Unrecognised type';
+
+  @override
+  String get partnerBedTypeSingle => 'Single';
+
+  @override
+  String get partnerBedTypeDouble => 'Double';
+
+  @override
+  String get partnerBedTypeTwin => 'Twin';
+
+  @override
+  String get partnerBedTypeQueen => 'Queen';
+
+  @override
+  String get partnerBedTypeKing => 'King';
+
+  @override
+  String get partnerBedTypeSofaBed => 'Sofa bed';
+
+  @override
+  String get partnerBedTypeBunk => 'Bunk bed';
+
+  @override
+  String get partnerBedTypeUnknown => 'Unrecognised bed';
+
+  @override
+  String partnerInventoryForProperty(String name) {
+    return 'Inventory at $name';
+  }
+
+  @override
+  String get partnerInventoryNoPropertyContext => 'No property selected';
+
+  @override
+  String get partnerInventoryPropertyScope => 'Property scope';
+
+  @override
+  String get partnerInventoryRoomScope => 'Room type';
+
+  @override
+  String get partnerInventoryRangeLabel => 'Window';
+
+  @override
+  String get partnerInventoryRangeWeek => '7 days';
+
+  @override
+  String get partnerInventoryRangeFortnight => '14 days';
+
+  @override
+  String get partnerInventoryRangeMonth => '30 days';
+
+  @override
+  String partnerInventoryWindow(String from, String to, int count) {
+    return '$from – $to · $count days';
+  }
+
+  @override
+  String partnerInventoryBookableDays(int bookable, int total) {
+    return '$bookable of $total days bookable';
+  }
+
+  @override
+  String partnerInventoryTotalAvailable(String count) {
+    return '$count room-nights available';
+  }
+
+  @override
+  String partnerInventoryStopSellDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days stopped',
+      one: '1 day stopped',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get partnerInventoryNoPropertiesTitle => 'No properties yet';
+
+  @override
+  String get partnerInventoryNoPropertiesMessage =>
+      'Inventory belongs to a room in a property. Once a property is assigned to your profile, its calendar appears here.';
+
+  @override
+  String get partnerInventorySelectPropertyTitle => 'Choose a property';
+
+  @override
+  String get partnerInventorySelectPropertyMessage =>
+      'Pick a property to see the inventory calendar for its room types.';
+
+  @override
+  String get partnerInventoryNoRoomsTitle => 'No room types yet';
+
+  @override
+  String get partnerInventoryNoRoomsMessage =>
+      'This property has no room types, so there is no inventory to manage.';
+
+  @override
+  String get partnerInventorySelectRoomTitle => 'Choose a room type';
+
+  @override
+  String get partnerInventorySelectRoomMessage =>
+      'Inventory is kept per room type. Pick one to see its calendar.';
+
+  @override
+  String get partnerInventoryInvalidRangeTitle => 'Invalid date range';
+
+  @override
+  String get partnerInventoryInvalidRangeMessage =>
+      'The start date must not be after the end date.';
+
+  @override
+  String get partnerInventoryUnavailableTitle => 'Inventory unavailable';
+
+  @override
+  String get partnerInventoryUnavailableMessage =>
+      'This property or room type is no longer available to your account.';
+
+  @override
+  String get partnerInventoryEmptyTitle => 'No inventory in this window';
+
+  @override
+  String get partnerInventoryEmptyMessage =>
+      'No inventory rows have been set up for these dates. Try a different window.';
+
+  @override
+  String get partnerInventoryDate => 'Date';
+
+  @override
+  String get partnerInventoryStateColumn => 'Status';
+
+  @override
+  String get partnerInventoryTotal => 'Total';
+
+  @override
+  String get partnerInventoryAvailable => 'Available';
+
+  @override
+  String get partnerInventorySold => 'Sold';
+
+  @override
+  String get partnerInventoryBlocked => 'Blocked';
+
+  @override
+  String get partnerInventoryMaintenance => 'Maintenance';
+
+  @override
+  String get partnerInventoryRestrictions => 'Restrictions';
+
+  @override
+  String get partnerInventoryStopSell => 'Stop sell';
+
+  @override
+  String get partnerInventoryClosedArrival => 'No arrivals';
+
+  @override
+  String get partnerInventoryClosedDeparture => 'No departures';
+
+  @override
+  String get partnerInventoryStateBookable => 'Bookable';
+
+  @override
+  String get partnerInventoryStateSoldOut => 'Sold out';
+
+  @override
+  String get partnerInventoryStateStopped => 'Stopped';
+
+  @override
+  String get partnerInventoryInconsistent =>
+      'These numbers do not add up to the total.';
+
+  @override
+  String partnerInventoryInconsistentSummary(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days have counts that do not add up to their total',
+      one: '1 day has counts that do not add up to its total',
+    );
+    return '$_temp0. Only the backend can correct this.';
+  }
+
+  @override
+  String get partnerInventoryEditOwnerOnly =>
+      'Changing availability is available to the profile owner. You can review the calendar here.';
+
+  @override
+  String get partnerInventorySaved => 'Saved.';
+
+  @override
+  String get partnerInventoryActionNotFound =>
+      'That date is no longer available to your account.';
+
+  @override
+  String partnerRatesForProperty(String name) {
+    return 'Rates at $name';
+  }
+
+  @override
+  String partnerRatesForRoom(String room, String property) {
+    return 'Rates for $room at $property';
+  }
+
+  @override
+  String get partnerRatesNoPropertyContext => 'No property selected';
+
+  @override
+  String get partnerRatesPropertyScope => 'Property scope';
+
+  @override
+  String get partnerRatesRoomScope => 'Room type';
+
+  @override
+  String partnerRatesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count rate plans',
+      one: '1 rate plan',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String partnerRatesActiveCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count active',
+      one: '1 active',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String partnerRatesExpiredCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count expired',
+      one: '1 expired',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get partnerRatesNoPropertiesTitle => 'No properties yet';
+
+  @override
+  String get partnerRatesNoPropertiesMessage =>
+      'Rates belong to a room in a property. Once a property is assigned to your profile, its rate plans appear here.';
+
+  @override
+  String get partnerRatesSelectPropertyTitle => 'Choose a property';
+
+  @override
+  String get partnerRatesSelectPropertyMessage =>
+      'Pick a property to see the rate plans for its room types.';
+
+  @override
+  String get partnerRatesNoRoomsTitle => 'No room types yet';
+
+  @override
+  String get partnerRatesNoRoomsMessage =>
+      'This property has no room types, so there is nothing to price.';
+
+  @override
+  String get partnerRatesSelectRoomTitle => 'Choose a room type';
+
+  @override
+  String get partnerRatesSelectRoomMessage =>
+      'Rate plans are kept per room type. Pick one to see its rates.';
+
+  @override
+  String get partnerRatesUnavailableTitle => 'Rates unavailable';
+
+  @override
+  String get partnerRatesUnavailableMessage =>
+      'This property or room type is no longer available to your account.';
+
+  @override
+  String get partnerRatesEmptyTitle => 'No rate plans yet';
+
+  @override
+  String get partnerRatesEmptyMessage =>
+      'This room type has no rate plans. They are set up by the Plan Your Trip team.';
+
+  @override
+  String get partnerRateDetailHeading => 'Rate plan details';
+
+  @override
+  String get partnerRateCloseDetail => 'Close rate plan details';
+
+  @override
+  String get partnerRateActionsOwnerOnly =>
+      'Rate actions are available to the profile owner. You can review every plan here.';
+
+  @override
+  String get partnerRateCurrencyNote =>
+      'Amounts are shown without a currency because the rate API does not supply one.';
+
+  @override
+  String get partnerRateValidityNote =>
+      'Both dates are inclusive: a stay qualifies when every night falls inside this window.';
+
+  @override
+  String get partnerRateActive => 'Active';
+
+  @override
+  String get partnerRateInactive => 'Inactive';
+
+  @override
+  String get partnerRateExpired => 'Expired';
+
+  @override
+  String partnerRatePerNight(String amount) {
+    return '$amount per night';
+  }
+
+  @override
+  String partnerRateValidity(String from, String to) {
+    return '$from – $to';
+  }
+
+  @override
+  String partnerRatePriorityValue(String value) {
+    return 'Priority $value';
+  }
+
+  @override
+  String get partnerRateHasRestrictions => 'Has restrictions';
+
+  @override
+  String partnerRateNightsValue(String count) {
+    return '$count nights';
+  }
+
+  @override
+  String partnerRateDaysValue(String count) {
+    return '$count days';
+  }
+
+  @override
+  String get partnerRateActivateAction => 'Activate';
+
+  @override
+  String get partnerRateDeactivateAction => 'Deactivate';
+
+  @override
+  String partnerRateActivatedMessage(String name) {
+    return '$name is now active.';
+  }
+
+  @override
+  String partnerRateDeactivatedMessage(String name) {
+    return '$name is now inactive.';
+  }
+
+  @override
+  String get partnerRateActionNotFound =>
+      'That rate plan is no longer available to your account.';
+
+  @override
+  String get partnerRateActionConflict =>
+      'That change conflicts with another rate plan.';
+
+  @override
+  String get partnerRateTypeStandard => 'Standard';
+
+  @override
+  String get partnerRateTypePromotional => 'Promotional';
+
+  @override
+  String get partnerRateTypeMember => 'Member';
+
+  @override
+  String get partnerRateTypeEarlyBird => 'Early bird';
+
+  @override
+  String get partnerRateTypeLastMinute => 'Last minute';
+
+  @override
+  String get partnerRateTypeUnknown => 'Unrecognised type';
+
+  @override
+  String get partnerMealPlanRoomOnly => 'Room only';
+
+  @override
+  String get partnerMealPlanBreakfast => 'Breakfast';
+
+  @override
+  String get partnerMealPlanHalfBoard => 'Half board';
+
+  @override
+  String get partnerMealPlanFullBoard => 'Full board';
+
+  @override
+  String get partnerMealPlanAllInclusive => 'All inclusive';
+
+  @override
+  String get partnerMealPlanUnknown => 'Unrecognised meal plan';
+
+  @override
+  String get partnerCancellationFree => 'Free cancellation';
+
+  @override
+  String get partnerCancellationPartial => 'Partially refundable';
+
+  @override
+  String get partnerCancellationNonRefundable => 'Non-refundable';
+
+  @override
+  String get partnerCancellationCustom => 'Custom policy';
+
+  @override
+  String get partnerCancellationUnknown => 'Unrecognised policy';
+
+  @override
+  String get partnerRateSourceBase => 'Base rate';
+
+  @override
+  String get partnerRateSourceDerived => 'Derived rate';
+
+  @override
+  String get partnerRateSourceUnknown => 'Unrecognised source';
+
+  @override
+  String get partnerRateAdjustmentFixed => 'Fixed amount';
+
+  @override
+  String get partnerRateAdjustmentPercent => 'Percentage';
+
+  @override
+  String get partnerRateAdjustmentUnknown => 'Unrecognised adjustment';
+
+  @override
+  String get partnerRateSectionIdentity => 'Identity';
+
+  @override
+  String get partnerRateSectionPricing => 'Price';
+
+  @override
+  String get partnerRateSectionValidity => 'Validity';
+
+  @override
+  String get partnerRateSectionRestrictions => 'Stay restrictions';
+
+  @override
+  String get partnerRateSectionCancellation => 'Cancellation';
+
+  @override
+  String get partnerRateSectionInclusions => 'Inclusions';
+
+  @override
+  String get partnerRateSectionOccupancy => 'Occupancy prices';
+
+  @override
+  String get partnerRateFieldCode => 'Plan code';
+
+  @override
+  String get partnerRateFieldDescription => 'Description';
+
+  @override
+  String get partnerRateFieldPriority => 'Priority';
+
+  @override
+  String get partnerRateFieldPricePerNight => 'Price per night';
+
+  @override
+  String get partnerRateFieldExtraBedPrice => 'Extra bed price';
+
+  @override
+  String get partnerRateFieldAdjustmentType => 'Adjustment type';
+
+  @override
+  String get partnerRateFieldAdjustmentValue => 'Adjustment';
+
+  @override
+  String get partnerRateFieldParentPlan => 'Derived from plan';
+
+  @override
+  String get partnerRateFieldValidFrom => 'Valid from';
+
+  @override
+  String get partnerRateFieldValidTo => 'Valid to';
+
+  @override
+  String get partnerRateFieldMinStay => 'Minimum stay';
+
+  @override
+  String get partnerRateFieldMaxStay => 'Maximum stay';
+
+  @override
+  String get partnerRateFieldMinAdvance => 'Minimum advance booking';
+
+  @override
+  String get partnerRateFieldMaxAdvance => 'Maximum advance booking';
+
+  @override
+  String get partnerRateFieldClosedToArrival => 'Closed to arrival';
+
+  @override
+  String get partnerRateFieldClosedToDeparture => 'Closed to departure';
+
+  @override
+  String get partnerRateFieldPolicy => 'Cancellation policy';
+
+  @override
+  String get partnerRateFieldRefundable => 'Refundable';
+
+  @override
+  String get partnerRateFieldDeadlineHours => 'Cancellation deadline (hours)';
+
+  @override
+  String get partnerRateFieldPenaltyPercent => 'Cancellation penalty';
+
+  @override
+  String get partnerRateFieldMealPlan => 'Meal plan';
+
+  @override
+  String get partnerRateFieldOccupancyPricing => 'Occupancy pricing enabled';
+
+  @override
+  String get partnerRateFieldChildPricing => 'Child pricing enabled';
+
+  @override
+  String get partnerRateOccupancyEmpty =>
+      'No occupancy prices are configured for this plan.';
+
+  @override
+  String partnerRateOccupancyLabel(String adults, String children) {
+    return '$adults adults, $children children';
+  }
+
+  @override
+  String get partnerPoliciesTitle => 'Policies & settings';
+
+  @override
+  String partnerPoliciesForProperty(String name) {
+    return 'Policies for $name';
+  }
+
+  @override
+  String get partnerPoliciesNoPropertyContext => 'No property selected';
+
+  @override
+  String get partnerPoliciesPropertyScope => 'Property scope';
+
+  @override
+  String get partnerPoliciesNoPropertiesTitle => 'No properties yet';
+
+  @override
+  String get partnerPoliciesNoPropertiesMessage =>
+      'Guest policies belong to a property. Once a property is assigned to your profile, its policies appear here.';
+
+  @override
+  String get partnerPoliciesSelectPropertyTitle => 'Choose a property';
+
+  @override
+  String get partnerPoliciesSelectPropertyMessage =>
+      'Pick a property to review and edit its guest policies.';
+
+  @override
+  String get partnerPoliciesUnavailableTitle => 'Policies unavailable';
+
+  @override
+  String get partnerPoliciesUnavailableMessage =>
+      'This property is no longer available to your account.';
+
+  @override
+  String get partnerPoliciesPropertySection => 'Guest policies';
+
+  @override
+  String get partnerPoliciesPropertyScopeNote =>
+      'Applies to this property only. Guests see these on the listing.';
+
+  @override
+  String get partnerPoliciesLiveWarning =>
+      'These take effect immediately for every guest, including guests who already hold a booking — the platform does not freeze policies at booking time.';
+
+  @override
+  String get partnerPoliciesOwnerOnly =>
+      'Guest policies can be changed by the profile owner. You can review them here.';
+
+  @override
+  String get partnerPoliciesCheckIn => 'Check-in from';
+
+  @override
+  String get partnerPoliciesCheckOut => 'Check-out by';
+
+  @override
+  String get partnerPoliciesTimeHelper => '24-hour time, for example 14:00';
+
+  @override
+  String get partnerPoliciesTimeRequired => 'Required';
+
+  @override
+  String get partnerPoliciesHouseRules => 'House rules';
+
+  @override
+  String get partnerPoliciesHouseRulesNote =>
+      'Optional. Leave a rule empty to remove it.';
+
+  @override
+  String get partnerPoliciesRuleHint => 'Leave empty for no rule';
+
+  @override
+  String get partnerPoliciesChildren => 'Children policy';
+
+  @override
+  String get partnerPoliciesPets => 'Pet policy';
+
+  @override
+  String get partnerPoliciesSmoking => 'Smoking policy';
+
+  @override
+  String get partnerPoliciesSettingsSection => 'Workspace notifications';
+
+  @override
+  String get partnerPoliciesSettingsScopeNote =>
+      'Applies to your whole partner account, not to one property.';
+
+  @override
+  String get partnerPoliciesSettingsRoleNote =>
+      'Notification settings can be changed by an owner or manager. You can review them here.';
+
+  @override
+  String get partnerPoliciesSettingsUnavailable =>
+      'Your workspace settings are not available.';
+
+  @override
+  String partnerPoliciesSettingsUpdated(String time) {
+    return 'Last updated $time';
+  }
+
+  @override
+  String get partnerPoliciesLanguage => 'Default language';
+
+  @override
+  String get partnerPoliciesTimezone => 'Timezone';
+
+  @override
+  String get partnerPoliciesChannels => 'Delivery channels';
+
+  @override
+  String get partnerPoliciesChannelEmail => 'Email';
+
+  @override
+  String get partnerPoliciesChannelSms => 'SMS';
+
+  @override
+  String get partnerPoliciesChannelInApp => 'In-app';
+
+  @override
+  String get partnerPoliciesTopics => 'What to notify me about';
+
+  @override
+  String get partnerPoliciesTopicBooking => 'Bookings';
+
+  @override
+  String get partnerPoliciesTopicPayment => 'Payments';
+
+  @override
+  String get partnerPoliciesTopicReview => 'Reviews';
+
+  @override
+  String get partnerPoliciesTopicPromotion => 'Promotions';
+
+  @override
+  String get partnerPoliciesSave => 'Save changes';
+
+  @override
+  String get partnerPoliciesRevert => 'Discard';
+
+  @override
+  String get partnerPoliciesNoChanges => 'No unsaved changes.';
+
+  @override
+  String get partnerPoliciesSaved => 'Saved.';
+
+  @override
+  String get partnerPoliciesSaveForbidden =>
+      'Your role does not allow this change.';
+
+  @override
+  String get partnerPoliciesSaveNotFound =>
+      'That record is no longer available to your account.';
+
+  @override
+  String get partnerPoliciesSaveValidation =>
+      'Check-in and check-out times are both required.';
+
+  @override
+  String get partnerAssetsSection => 'Photos & media';
+
+  @override
+  String get partnerAssetsDeferredBadge => 'Not available';
+
+  @override
+  String get partnerAssetsDeferredMessage =>
+      'Photo management is not part of the partner API. Uploading, replacing, reordering and deleting media are admin-only operations, so the Plan Your Trip team maintains your listing images for now.';
+
+  @override
+  String get partnerPromotionsTitle => 'Promotions & vouchers';
+
+  @override
+  String get partnerPromotionsTabPromotions => 'Promotion rules';
+
+  @override
+  String get partnerPromotionsTabVoucherCheck => 'Voucher check';
+
+  @override
+  String get partnerPromotionsScopeNote =>
+      'Every promotion on any property or room you own is listed here. The partner API does not narrow promotions to one property, so this list is not filtered by your selected property.';
+
+  @override
+  String partnerPromotionsCount(int count) {
+    return '$count promotions';
+  }
+
+  @override
+  String partnerPromotionsActiveCount(int count) {
+    return '$count active';
+  }
+
+  @override
+  String partnerPromotionsExpiredCount(int count) {
+    return '$count past their end date';
+  }
+
+  @override
+  String get partnerPromotionsCurrencyNote =>
+      'The promotion API sends no currency, so promotion amounts appear without a symbol. The pricing preview below carries its own currency and shows it.';
+
+  @override
+  String get partnerPromotionsEmptyTitle => 'No promotions yet';
+
+  @override
+  String get partnerPromotionsEmptyMessage =>
+      'Nothing currently targets your properties or rooms. Site-wide campaigns run by Plan Your Trip are not shown here because they are not yours to manage.';
+
+  @override
+  String get partnerPromotionsOwnerOnly =>
+      'Only the partner account owner can change promotions. You can read them here.';
+
+  @override
+  String get partnerPromotionDetailHeading => 'Promotion details';
+
+  @override
+  String get partnerPromotionCloseDetail => 'Close promotion details';
+
+  @override
+  String get partnerPromotionSectionIdentity => 'Identity';
+
+  @override
+  String get partnerPromotionFieldCode => 'Promotion code';
+
+  @override
+  String get partnerPromotionFieldDescription => 'Description';
+
+  @override
+  String get partnerPromotionFieldType => 'Promotion type';
+
+  @override
+  String get partnerPromotionSectionDiscount => 'Discount';
+
+  @override
+  String get partnerPromotionFieldDiscountType => 'Discount type';
+
+  @override
+  String get partnerPromotionFieldDiscountValue => 'Discount value';
+
+  @override
+  String get partnerPromotionFieldMaxDiscount => 'Maximum discount';
+
+  @override
+  String get partnerPromotionSectionValidity => 'Validity';
+
+  @override
+  String get partnerPromotionFieldStart => 'Starts';
+
+  @override
+  String get partnerPromotionFieldEnd => 'Ends';
+
+  @override
+  String get partnerPromotionSectionConditions => 'Conditions';
+
+  @override
+  String get partnerPromotionFieldMinimumStay => 'Minimum stay';
+
+  @override
+  String get partnerPromotionFieldMinimumSpend => 'Minimum spend';
+
+  @override
+  String get partnerPromotionSectionApplication => 'How it applies';
+
+  @override
+  String get partnerPromotionFieldTarget => 'Applies to';
+
+  @override
+  String get partnerPromotionFieldPriority => 'Priority';
+
+  @override
+  String get partnerPromotionFieldStackable => 'Combines with others';
+
+  @override
+  String get partnerPromotionStackableNote =>
+      'The pricing engine may add further promotions after this one.';
+
+  @override
+  String get partnerPromotionNonStackableNote =>
+      'The pricing engine applies this promotion and then stops, so no lower-priority promotion is added after it.';
+
+  @override
+  String get partnerPromotionActive => 'Active';
+
+  @override
+  String get partnerPromotionInactive => 'Inactive';
+
+  @override
+  String get partnerPromotionExpired => 'Past end date';
+
+  @override
+  String get partnerPromotionScheduled => 'Starts later';
+
+  @override
+  String get partnerPromotionExclusivePill => 'Does not combine';
+
+  @override
+  String partnerPromotionValidity(String from, String to) {
+    return '$from – $to';
+  }
+
+  @override
+  String partnerPromotionPriorityValue(String count) {
+    return 'Priority $count';
+  }
+
+  @override
+  String get partnerPromotionHasConditions => 'Has conditions';
+
+  @override
+  String get partnerPromotionActivateAction => 'Activate';
+
+  @override
+  String get partnerPromotionDeactivateAction => 'Deactivate';
+
+  @override
+  String get partnerPromotionTypeGeneral => 'General';
+
+  @override
+  String get partnerPromotionTypeRoom => 'Room offer';
+
+  @override
+  String get partnerPromotionTypeHotel => 'Property offer';
+
+  @override
+  String get partnerPromotionTypeMember => 'Member';
+
+  @override
+  String get partnerPromotionTypeEarlyBird => 'Early bird';
+
+  @override
+  String get partnerPromotionTypeLastMinute => 'Last minute';
+
+  @override
+  String get partnerPromotionTypeWeekend => 'Weekend';
+
+  @override
+  String get partnerPromotionTypeHoliday => 'Holiday';
+
+  @override
+  String get partnerPromotionTypeUnknown => 'Unrecognised type';
+
+  @override
+  String get partnerDiscountTypePercentage => 'Percentage';
+
+  @override
+  String get partnerDiscountTypeFixed => 'Fixed amount';
+
+  @override
+  String get partnerDiscountTypeUnknown => 'Unrecognised discount';
+
+  @override
+  String get partnerPromotionTargetAll => 'Every property on Plan Your Trip';
+
+  @override
+  String get partnerPromotionTargetHotel => 'One of your properties';
+
+  @override
+  String get partnerPromotionTargetRoom => 'One of your rooms';
+
+  @override
+  String partnerPromotionTargetRoomNamed(String name) {
+    return 'Room: $name';
+  }
+
+  @override
+  String get partnerPromotionTargetUnknown => 'Unrecognised target';
+
+  @override
+  String get partnerPromotionPreviewHeading => 'Pricing preview';
+
+  @override
+  String get partnerPromotionPreviewNote =>
+      'The backend calculates this. Every amount and every applied promotion comes straight from the pricing engine — nothing is worked out in the app.';
+
+  @override
+  String get partnerPromotionPreviewAction => 'Run preview';
+
+  @override
+  String get partnerPromotionPreviewInvalidRange =>
+      'Check-out must be after check-in.';
+
+  @override
+  String partnerPromotionPreviewStay(String from, String to, String nights) {
+    return '$from to $to · $nights nights';
+  }
+
+  @override
+  String get partnerPromotionPreviewBase => 'Base price';
+
+  @override
+  String get partnerPromotionPreviewRatePlan => 'Rate plan price';
+
+  @override
+  String partnerPromotionPreviewRatePlanNamed(String name) {
+    return 'Rate plan: $name';
+  }
+
+  @override
+  String get partnerPromotionPreviewDiscount => 'Promotion discount';
+
+  @override
+  String get partnerPromotionPreviewTotal => 'Total for this stay';
+
+  @override
+  String get partnerPromotionPreviewAppliedHeading =>
+      'Promotions the engine applied';
+
+  @override
+  String get partnerPromotionPreviewNoneApplied =>
+      'The engine applied no promotion to this stay.';
+
+  @override
+  String get partnerPromotionPreviewUnnamed => 'Unnamed promotion';
+
+  @override
+  String partnerPromotionPreviewAppliedAmount(String amount) {
+    return '-$amount';
+  }
+
+  @override
+  String partnerPromotionActivatedMessage(String name) {
+    return '$name is now active.';
+  }
+
+  @override
+  String partnerPromotionDeactivatedMessage(String name) {
+    return '$name is now inactive.';
+  }
+
+  @override
+  String get partnerPromotionActionNotFound =>
+      'That promotion is no longer available to your account.';
+
+  @override
+  String get partnerPromotionActionConflict =>
+      'That promotion code is already in use. Promotion codes are unique across Plan Your Trip.';
+
+  @override
+  String get partnerPromotionActionValidation =>
+      'The server rejected the promotion. Nothing was changed.';
+
+  @override
+  String get partnerPromotionActionIncomplete =>
+      'This promotion is missing fields the update needs, so nothing was sent. Ask support to change it.';
+
+  @override
+  String get partnerVoucherCheckHeading => 'Check a booking voucher';
+
+  @override
+  String get partnerVoucherCheckNote =>
+      'This is a booking pass, not a discount code. Checking it confirms a guest\'s booking — it does not check anyone in and changes nothing.';
+
+  @override
+  String get partnerVoucherCheckField => 'Voucher payload';
+
+  @override
+  String get partnerVoucherCheckAction => 'Check voucher';
+
+  @override
+  String get partnerVoucherCheckClear => 'Clear';
+
+  @override
+  String get partnerVoucherEligibleTitle => 'Valid — the guest can be admitted';
+
+  @override
+  String get partnerVoucherEligibleMessage =>
+      'The signature is valid and this booking is ready for check-in.';
+
+  @override
+  String get partnerVoucherNotEligibleTitle =>
+      'Valid — but not ready for check-in';
+
+  @override
+  String get partnerVoucherNotEligibleMessage =>
+      'The signature is valid, but this booking cannot be checked in right now.';
+
+  @override
+  String get partnerVoucherNotRecognisedTitle => 'Not recognised';
+
+  @override
+  String get partnerVoucherNotRecognisedMessage =>
+      'The server does not recognise this voucher for your account. It may have been altered, may not exist, or may belong to another partner — the server does not say which.';
+
+  @override
+  String get partnerVoucherEmptyTitle => 'Nothing to check';
+
+  @override
+  String get partnerVoucherEmptyMessage =>
+      'Paste or scan a voucher payload first.';
+
+  @override
+  String get partnerVoucherFailedTitle => 'Could not check this voucher';
+
+  @override
+  String get partnerVoucherFieldBooking => 'Booking code';
+
+  @override
+  String get partnerVoucherFieldBookingStatus => 'Booking status';
+
+  @override
+  String get partnerVoucherFieldGuest => 'Guest name';
+
+  @override
+  String get partnerVoucherFieldProperty => 'Booked property';
+
+  @override
+  String get partnerVoucherFieldRoom => 'Booked room';
+
+  @override
+  String get partnerVoucherFieldStay => 'Stay';
+
+  @override
+  String get partnerVoucherFieldOccupancy => 'Occupancy';
+
+  @override
+  String partnerVoucherStayValue(String from, String to, String nights) {
+    return '$from to $to · $nights nights';
+  }
+
+  @override
+  String partnerVoucherOccupancyValue(String adults, String children) {
+    return '$adults adults · $children children';
+  }
+
+  @override
+  String get partnerVoucherReadOnlyNote =>
+      'Checking only. Check-in itself happens on the booking, not on this screen.';
+
+  @override
+  String get partnerBookingsTitle => 'Bookings & front desk';
+
+  @override
+  String get partnerBookingsTabReservations => 'Reservations';
+
+  @override
+  String get partnerBookingsTabFrontDesk => 'Front desk';
+
+  @override
+  String get partnerBookingsScopeNote =>
+      'This list covers every booking across all properties you own. The partner API accepts no property parameter, so it is not narrowed by your selected property — filter by room to focus on one property.';
+
+  @override
+  String get partnerBookingsEmptyTitle => 'No bookings yet';
+
+  @override
+  String get partnerBookingsEmptyMessage =>
+      'Nothing has been booked at your properties yet. New reservations appear here as soon as guests make them.';
+
+  @override
+  String get partnerBookingsNoMatchTitle => 'No bookings match these filters';
+
+  @override
+  String get partnerBookingsNoMatchMessage =>
+      'Nothing matched the filters you set. Clear them to see every booking again.';
+
+  @override
+  String get partnerBookingDetailHeading => 'Booking details';
+
+  @override
+  String get partnerBookingCloseDetail => 'Close booking details';
+
+  @override
+  String get partnerBookingNotFound =>
+      'That booking is no longer available to your account.';
+
+  @override
+  String get partnerBookingColumnCode => 'Booking code';
+
+  @override
+  String get partnerBookingColumnGuest => 'Guest';
+
+  @override
+  String get partnerBookingColumnRoom => 'Room';
+
+  @override
+  String get partnerBookingColumnCheckIn => 'Check-in';
+
+  @override
+  String get partnerBookingColumnCheckOut => 'Check-out';
+
+  @override
+  String get partnerBookingColumnNights => 'Nights';
+
+  @override
+  String get partnerBookingColumnStatus => 'Status';
+
+  @override
+  String get partnerBookingColumnTotal => 'Total';
+
+  @override
+  String partnerBookingStayRange(String from, String to) {
+    return '$from – $to';
+  }
+
+  @override
+  String partnerBookingNightsValue(String count) {
+    return '$count nights';
+  }
+
+  @override
+  String partnerBookingOccupancyValue(String adults, String children) {
+    return '$adults adults · $children children';
+  }
+
+  @override
+  String partnerBookingNightProgressValue(String current, String total) {
+    return 'Night $current of $total';
+  }
+
+  @override
+  String get partnerBookingStatusPending => 'Pending';
+
+  @override
+  String get partnerBookingStatusConfirmed => 'Confirmed';
+
+  @override
+  String get partnerBookingStatusCheckInReady => 'Ready to check in';
+
+  @override
+  String get partnerBookingStatusCheckedIn => 'Checked in';
+
+  @override
+  String get partnerBookingStatusCheckedOut => 'Checked out';
+
+  @override
+  String get partnerBookingStatusCompleted => 'Completed';
+
+  @override
+  String get partnerBookingStatusCancelled => 'Cancelled';
+
+  @override
+  String get partnerBookingStatusRefunded => 'Refunded';
+
+  @override
+  String get partnerBookingStatusArchived => 'Archived';
+
+  @override
+  String get partnerBookingStatusNoShow => 'No-show';
+
+  @override
+  String get partnerBookingStatusUnknown => 'Unrecognised status';
+
+  @override
+  String get partnerStayStateUpcoming => 'Upcoming stay';
+
+  @override
+  String get partnerStayStateReady => 'Ready for check-in';
+
+  @override
+  String get partnerStayStateInHouse => 'In house';
+
+  @override
+  String get partnerStayStateCheckedOut => 'Departed';
+
+  @override
+  String get partnerStayStateCompleted => 'Stay completed';
+
+  @override
+  String get partnerStayStateCancelled => 'Stay cancelled';
+
+  @override
+  String get partnerStayStateNoShow => 'Guest did not arrive';
+
+  @override
+  String get partnerStayStateExpired => 'Window passed';
+
+  @override
+  String get partnerStayStateUnknown => 'Unrecognised stay state';
+
+  @override
+  String get partnerStayWarningCancelled =>
+      'This stay was cancelled, refunded, or recorded as a no-show.';
+
+  @override
+  String get partnerStayWarningCompleted => 'This stay is finished.';
+
+  @override
+  String get partnerStayWarningInHouse => 'The guest is currently staying.';
+
+  @override
+  String get partnerStayWarningCheckOutOverdue =>
+      'Check-out is overdue — the departure date has passed and the guest is still checked in.';
+
+  @override
+  String get partnerStayWarningFuture => 'The stay has not started yet.';
+
+  @override
+  String get partnerStayWarningCheckInOverdue =>
+      'Check-in is overdue — the arrival date has passed and the guest is not checked in.';
+
+  @override
+  String get partnerStayWarningUnknown =>
+      'The server reported a warning this app does not recognise.';
+
+  @override
+  String get partnerBookingFilterGuest => 'Guest name or email';
+
+  @override
+  String get partnerBookingFilterCode => 'Booking code';
+
+  @override
+  String get partnerBookingFilterStatus => 'Booking status';
+
+  @override
+  String get partnerBookingFilterAnyStatus => 'Any status';
+
+  @override
+  String get partnerBookingFilterRoom => 'Room';
+
+  @override
+  String get partnerBookingFilterAnyRoom => 'Any room';
+
+  @override
+  String get partnerBookingFilterDates => 'Arrival dates';
+
+  @override
+  String get partnerBookingFilterClear => 'Clear filters';
+
+  @override
+  String get partnerBookingFilterArrivals => 'Arriving today';
+
+  @override
+  String get partnerBookingFilterDepartures => 'Departing today';
+
+  @override
+  String get partnerBookingFilterUpcoming => 'Upcoming';
+
+  @override
+  String get partnerBookingFilterInHouse => 'In house';
+
+  @override
+  String get partnerBookingFilterCancelled => 'Cancelled';
+
+  @override
+  String get partnerBookingFilterCompleted => 'Completed';
+
+  @override
+  String partnerBookingFilterRangeBoth(String from, String to) {
+    return 'Arriving $from to $to';
+  }
+
+  @override
+  String partnerBookingFilterRangeFrom(String from) {
+    return 'Arriving on or after $from';
+  }
+
+  @override
+  String partnerBookingFilterRangeTo(String to) {
+    return 'Arriving on or before $to';
+  }
+
+  @override
+  String partnerBookingPageRange(String from, String to, String total) {
+    return 'Showing $from-$to of $total';
+  }
+
+  @override
+  String partnerBookingPagePosition(String page, String total) {
+    return 'Page $page of $total';
+  }
+
+  @override
+  String get partnerBookingPagePrevious => 'Previous page';
+
+  @override
+  String get partnerBookingPageNext => 'Next page';
+
+  @override
+  String get partnerBookingSectionGuest => 'Guest';
+
+  @override
+  String get partnerBookingSectionStay => 'Stay';
+
+  @override
+  String get partnerBookingSectionRoom => 'Property & room';
+
+  @override
+  String get partnerBookingSectionPrice => 'Price';
+
+  @override
+  String get partnerBookingSectionRatePlan => 'Rate plan captured at booking';
+
+  @override
+  String get partnerBookingSectionPayment => 'Payment & invoice';
+
+  @override
+  String get partnerBookingSectionTimeline => 'Lifecycle timeline';
+
+  @override
+  String get partnerBookingSectionModifications => 'Change history';
+
+  @override
+  String get partnerBookingSectionAudit => 'Check-in & check-out record';
+
+  @override
+  String get partnerBookingFieldGuestName => 'Guest name';
+
+  @override
+  String get partnerBookingFieldGuestEmail => 'Guest email';
+
+  @override
+  String get partnerBookingFieldOccupancy => 'Occupancy';
+
+  @override
+  String get partnerBookingFieldSpecialRequest => 'Special request';
+
+  @override
+  String get partnerBookingFieldCheckIn => 'Check-in date';
+
+  @override
+  String get partnerBookingFieldCheckOut => 'Check-out date';
+
+  @override
+  String get partnerBookingFieldNights => 'Nights booked';
+
+  @override
+  String get partnerBookingFieldNightProgress => 'Stay progress';
+
+  @override
+  String get partnerBookingFieldActualCheckIn => 'Actually checked in';
+
+  @override
+  String get partnerBookingFieldActualCheckOut => 'Actually checked out';
+
+  @override
+  String get partnerBookingFieldProperty => 'Booked property';
+
+  @override
+  String get partnerBookingFieldRoom => 'Booked room';
+
+  @override
+  String get partnerBookingFieldRoomCode => 'Room code';
+
+  @override
+  String get partnerBookingFieldRoomCount => 'Rooms booked';
+
+  @override
+  String get partnerBookingFieldBasePrice => 'Base price';
+
+  @override
+  String get partnerBookingFieldRatePlanPrice => 'Rate plan price';
+
+  @override
+  String get partnerBookingFieldDiscount => 'Discount applied';
+
+  @override
+  String get partnerBookingFieldTotal => 'Total charged';
+
+  @override
+  String get partnerBookingPriceNote =>
+      'Every amount here was calculated and stored by the backend when the booking was made. Nothing is recalculated in this app.';
+
+  @override
+  String get partnerBookingFieldRatePlanName => 'Rate plan';
+
+  @override
+  String get partnerBookingFieldRatePlanCode => 'Rate plan code';
+
+  @override
+  String get partnerBookingFieldMealPlan => 'Meal plan';
+
+  @override
+  String get partnerBookingFieldCancellationPolicy => 'Cancellation policy';
+
+  @override
+  String get partnerBookingFieldCancellationDeadline =>
+      'Free-cancellation deadline';
+
+  @override
+  String get partnerBookingFieldRefundable => 'Refundable';
+
+  @override
+  String get partnerBookingFieldNightlySnapshot => 'Nightly rate captured';
+
+  @override
+  String get partnerBookingSnapshotNote =>
+      'These values were captured when the booking was made. Editing a rate plan today does not change them.';
+
+  @override
+  String get partnerBookingNoPayments =>
+      'No payment has been recorded against this booking.';
+
+  @override
+  String get partnerBookingPaymentUnnamed => 'Payment';
+
+  @override
+  String get partnerBookingFieldInvoice => 'Invoice number';
+
+  @override
+  String get partnerBookingFieldInvoiceStatus => 'Invoice status';
+
+  @override
+  String get partnerBookingFieldInvoiceTotal => 'Invoice total';
+
+  @override
+  String get partnerBookingPaymentReadOnlyNote =>
+      'Payment details are read-only. The partner API offers no payment, refund, or settlement action, and card and gateway identifiers are never sent to this screen.';
+
+  @override
+  String get partnerBookingTimelineEmpty =>
+      'The server recorded no lifecycle events for this booking.';
+
+  @override
+  String get partnerBookingEventCreated => 'Booking created';
+
+  @override
+  String get partnerBookingEventPaid => 'Payment completed';
+
+  @override
+  String get partnerBookingEventConfirmed => 'Booking confirmed';
+
+  @override
+  String get partnerBookingEventCheckedIn => 'Guest checked in';
+
+  @override
+  String get partnerBookingEventCheckedOut => 'Guest checked out';
+
+  @override
+  String get partnerBookingEventCompleted => 'Reservation completed';
+
+  @override
+  String get partnerBookingEventCancelled => 'Booking cancelled';
+
+  @override
+  String get partnerBookingEventArchived => 'Reservation archived';
+
+  @override
+  String get partnerBookingEventModified => 'Booking changed';
+
+  @override
+  String get partnerBookingEventReview => 'Guest submitted a review';
+
+  @override
+  String get partnerBookingModificationNote =>
+      'Guests change their own bookings. This is the record of what changed — the partner API offers no way to change a booking from here.';
+
+  @override
+  String get partnerBookingModificationDates => 'Dates';
+
+  @override
+  String get partnerBookingModificationOccupancy => 'Occupancy';
+
+  @override
+  String get partnerBookingModificationRatePlan => 'Rate plan';
+
+  @override
+  String get partnerBookingModificationPrice => 'Price';
+
+  @override
+  String get partnerBookingNoAudit =>
+      'No check-in or check-out has been recorded for this booking.';
+
+  @override
+  String get partnerBookingAuditCheckIn => 'Check-in recorded';
+
+  @override
+  String get partnerBookingAuditCheckOut => 'Check-out recorded';
+
+  @override
+  String partnerBookingAuditByUser(String userId) {
+    return 'Staff #$userId';
+  }
+
+  @override
+  String get partnerBookingActionCheckIn => 'Check in';
+
+  @override
+  String get partnerBookingActionCheckOut => 'Check out';
+
+  @override
+  String get partnerBookingActionNoShow => 'Mark as no-show';
+
+  @override
+  String get partnerBookingActionComplete => 'Complete reservation';
+
+  @override
+  String get partnerBookingActionsIrreversibleNote =>
+      'These changes cannot be undone from the extranet, and the guest is notified.';
+
+  @override
+  String get partnerBookingNoActionsAvailable =>
+      'No operational action is available for this booking\'s current status.';
+
+  @override
+  String get partnerBookingNoActionsClosed =>
+      'This booking is closed, so no operational action remains.';
+
+  @override
+  String partnerBookingActionConfirm(String action, String code) {
+    return '$action for booking $code? This cannot be undone from the extranet, and the guest is notified.';
+  }
+
+  @override
+  String get partnerBookingActionConfirmCta => 'Confirm';
+
+  @override
+  String get partnerBookingActionCancel => 'Cancel';
+
+  @override
+  String partnerBookingActionSucceeded(String action, String code) {
+    return '$action completed for booking $code.';
+  }
+
+  @override
+  String get partnerBookingActionRejected =>
+      'The server refused that change for this booking\'s current status. Nothing was altered.';
+
+  @override
+  String get partnerBookingActionValidation =>
+      'The server rejected that request. Nothing was altered.';
+
+  @override
+  String get partnerBookingActionUncertain =>
+      'The connection dropped before the server confirmed, and this change cannot be undone. Refresh to see the current status before trying again.';
+
+  @override
+  String get partnerFrontDeskHeading => 'Check a guest in or out';
+
+  @override
+  String get partnerFrontDeskNote =>
+      'Scan the guest\'s voucher QR or type their booking code. This changes the booking and notifies the guest.';
+
+  @override
+  String get partnerFrontDeskField => 'Voucher payload or booking code';
+
+  @override
+  String get partnerFrontDeskFieldHelp =>
+      'A scanned voucher is recorded as a QR scan; a typed booking code is recorded as manual.';
+
+  @override
+  String get partnerFrontDeskCheckInAction => 'Check guest in';
+
+  @override
+  String get partnerFrontDeskCheckOutAction => 'Check guest out';
+
+  @override
+  String get partnerFrontDeskClear => 'Clear';
+
+  @override
+  String partnerFrontDeskConfirm(String code) {
+    return 'Proceed for $code? This changes the booking, notifies the guest, and cannot be undone from the extranet.';
+  }
+
+  @override
+  String get partnerFrontDeskCheckedInTitle => 'Guest checked in';
+
+  @override
+  String get partnerFrontDeskCheckedOutTitle => 'Guest checked out';
+
+  @override
+  String get partnerFrontDeskIdempotentNote =>
+      'Repeating this on the same booking is safe: the server keeps the original time and records nothing twice.';
+
+  @override
+  String get partnerFrontDeskNotRecognisedTitle => 'Not recognised';
+
+  @override
+  String get partnerFrontDeskNotRecognisedMessage =>
+      'The server does not recognise that voucher or booking code for your account. It may have been altered, may not exist, or may belong to another partner — the server does not say which.';
+
+  @override
+  String get partnerFrontDeskRejectedTitle => 'Cannot do that yet';
+
+  @override
+  String get partnerFrontDeskRejectedMessage =>
+      'This booking\'s status or dates do not allow that right now. Nothing was changed.';
+
+  @override
+  String get partnerFrontDeskInvalidTitle => 'Nothing to submit';
+
+  @override
+  String get partnerFrontDeskInvalidMessage =>
+      'Scan or type a voucher payload or booking code first.';
+
+  @override
+  String get partnerFrontDeskFailedTitle => 'Could not complete this';
+
+  @override
+  String get partnerFrontDeskUncertainTitle => 'Outcome unknown';
+
+  @override
+  String get partnerFrontDeskUncertainMessage =>
+      'The connection dropped before the server confirmed. Check the booking\'s status — running this again is safe if it did not go through.';
+
+  @override
+  String get partnerCalendarTitle => 'Calendar & inventory';
+
+  @override
+  String get partnerCalendarTabOverview => 'Property calendar';
+
+  @override
+  String get partnerCalendarTabInventory => 'Room inventory';
+
+  @override
+  String get partnerCalendarScopeNote =>
+      'Every room in the selected property, night by night. The figures come from the same inventory records the Room inventory tab edits — this view only reads them.';
+
+  @override
+  String partnerCalendarWindowRange(String from, String to) {
+    return '$from – $to';
+  }
+
+  @override
+  String get partnerCalendarPreviousWeek => 'Previous week';
+
+  @override
+  String get partnerCalendarNextWeek => 'Next week';
+
+  @override
+  String get partnerCalendarToday => 'Today';
+
+  @override
+  String get partnerCalendarNoRoomsTitle => 'This property has no rooms';
+
+  @override
+  String get partnerCalendarNoRoomsMessage =>
+      'There is nothing to schedule until the property has at least one room. Rooms are managed in the Rooms module.';
+
+  @override
+  String get partnerCalendarWindowEmptyMessage =>
+      'No inventory records exist for any room in these dates. Nights without a record cannot be sold, because the availability check counts records and rejects a stay when any night is missing.';
+
+  @override
+  String partnerCalendarRoomsFailed(String failed, String total) {
+    return '$failed of $total room calendars could not be loaded. Those rows are shown as unavailable to read, not as empty.';
+  }
+
+  @override
+  String partnerCalendarRoomFailed(String room) {
+    return '$room could not be loaded.';
+  }
+
+  @override
+  String get partnerCalendarStateOpen => 'Open for sale';
+
+  @override
+  String get partnerCalendarStateSoldOut => 'Nothing left';
+
+  @override
+  String get partnerCalendarStateStopSell => 'Stop sell';
+
+  @override
+  String get partnerCalendarStateNoRecord => 'No record';
+
+  @override
+  String get partnerCalendarLegendHeading => 'What each night shows';
+
+  @override
+  String get partnerCalendarLegendClosedArrival => 'Closed to arrival';
+
+  @override
+  String get partnerCalendarLegendClosedDeparture => 'Closed to departure';
+
+  @override
+  String get partnerCalendarLegendOccupied => 'Rooms sold';
+
+  @override
+  String get partnerCalendarLegendNote =>
+      'The number on each night is rooms still available. Closed to arrival blocks a stay from starting that night; closed to departure blocks it from ending on that night. Neither stops the night being sold within a longer stay.';
+
+  @override
+  String partnerCalendarSoldValue(String count) {
+    return '$count sold';
+  }
+
+  @override
+  String get partnerCalendarMetricSellable => 'nights open for sale';
+
+  @override
+  String get partnerCalendarMetricOccupied => 'nights with rooms sold';
+
+  @override
+  String get partnerCalendarMetricRestricted => 'nights with a restriction';
+
+  @override
+  String get partnerCalendarMetricMissing => 'nights with no record';
+
+  @override
+  String partnerCalendarNightHeading(String room, String date) {
+    return '$room · $date';
+  }
+
+  @override
+  String get partnerCalendarCloseNight => 'Close night details';
+
+  @override
+  String get partnerCalendarFieldAvailable => 'Available';
+
+  @override
+  String get partnerCalendarFieldSold => 'Sold';
+
+  @override
+  String get partnerCalendarFieldBlocked => 'Blocked';
+
+  @override
+  String get partnerCalendarFieldMaintenance => 'Maintenance';
+
+  @override
+  String get partnerCalendarFieldTotal => 'Total rooms';
+
+  @override
+  String get partnerCalendarInconsistentMessage =>
+      'Available, sold, blocked and maintenance do not add up to the total for this night. The server\'s own numbers are shown unchanged.';
+
+  @override
+  String get partnerCalendarNoRecordExplanation =>
+      'There is no inventory record for this night. That is not the same as being free: the availability check counts records, so any stay covering this night is rejected. Create the record in the Room inventory tab to make the night sellable.';
+
+  @override
+  String get partnerCalendarQuestionsHeading => 'What this night allows';
+
+  @override
+  String get partnerCalendarQuestionStock => 'Rooms are left';
+
+  @override
+  String get partnerCalendarQuestionSellable => 'The night can be sold';
+
+  @override
+  String get partnerCalendarQuestionArrival => 'A stay can start this night';
+
+  @override
+  String get partnerCalendarQuestionDeparture =>
+      'A stay can end with this night';
+
+  @override
+  String get partnerCalendarQuestionsNote =>
+      'These are four separate checks the server makes, not one. A night can be sellable inside a longer stay while still refusing an arrival or a departure.';
+
+  @override
+  String get partnerCalendarReasonNoStock =>
+      'No rooms are left for this night.';
+
+  @override
+  String get partnerCalendarReasonStopSell => 'Stop sell is on for this night.';
+
+  @override
+  String get partnerCalendarReasonNotSellable =>
+      'The night cannot be sold at all.';
+
+  @override
+  String get partnerCalendarReasonClosedArrival =>
+      'Closed to arrival on this night.';
+
+  @override
+  String get partnerCalendarReasonClosedDeparture =>
+      'Closed to departure on this night.';
+
+  @override
+  String get partnerCalendarReadOnlyNote =>
+      'This calendar only reads. Stop sell, closed to arrival and closed to departure are changed in the Room inventory tab, so one place owns every write.';
+
+  @override
+  String get partnerCalendarManageRestrictions => 'Open room inventory';
+
+  @override
+  String partnerMetricWindow(String from, String to) {
+    return '$from – $to';
+  }
+
+  @override
+  String get partnerMetricAllProperties => 'All properties';
+
+  @override
+  String get partnerMetricChangeRange => 'Change dates';
+
+  @override
+  String get partnerMetricDefaultRange => 'Last 30 days';
+
+  @override
+  String get partnerMetricInvalidRange =>
+      'The start date must not be after the end date. The server rejects that range.';
+
+  @override
+  String get partnerMetricScopeNotFound =>
+      'That property is not available to your account.';
+
+  @override
+  String get partnerMetricNotLoaded => 'This section has not been loaded.';
+
+  @override
+  String get partnerMetricUnavailable => 'Not available';
+
+  @override
+  String partnerMetricSectionsFailed(String count) {
+    return '$count section(s) could not be loaded. They are shown as unavailable, not as zero.';
+  }
+
+  @override
+  String partnerMetricPeakDay(String date, String value) {
+    return 'Highest day $date, $value';
+  }
+
+  @override
+  String get partnerFinanceTitle => 'Finance & settlement';
+
+  @override
+  String get partnerFinanceTabOverview => 'Revenue & commission';
+
+  @override
+  String get partnerFinanceTabRevenue => 'Revenue';
+
+  @override
+  String get partnerFinanceTabSettlement => 'Settlement & payouts';
+
+  @override
+  String get partnerFinanceScopeAll =>
+      'Figures cover every property you own. Select a property in the workspace to narrow them. Amounts are grouped numbers: the finance API sends no currency with them.';
+
+  @override
+  String get partnerFinanceScopeProperty =>
+      'Figures cover the selected property only. Amounts are grouped numbers: the finance API sends no currency with them.';
+
+  @override
+  String get partnerFinanceEstimateNotice =>
+      'These are derived estimates, not a statement of account. The platform commission is a fixed rate applied by the server, the tax figure is indicative only, and settlement periods are calculated from booking revenue rather than read from a settlement ledger.';
+
+  @override
+  String get partnerFinanceNoData =>
+      'The server returned no figures for this window.';
+
+  @override
+  String get partnerFinanceOverviewHeading => 'Revenue and commission';
+
+  @override
+  String get partnerFinanceOverviewSubtitle =>
+      'Bookings are counted by check-in date within the selected window.';
+
+  @override
+  String get partnerFinanceCommissionCaption =>
+      'Calculated by the server at a fixed rate';
+
+  @override
+  String get partnerFinanceTaxCaption =>
+      'Indicative only — not a tax calculation';
+
+  @override
+  String get partnerFinanceCompletedLabel => 'Completed bookings';
+
+  @override
+  String get partnerFinancePaidLabel => 'Bookings with a paid payment';
+
+  @override
+  String get partnerFinancePendingCaption =>
+      'The whole window\'s net revenue: nothing tracks what has actually been settled';
+
+  @override
+  String get partnerFinanceNextPayoutCaption =>
+      'An assumed monthly cadence, not a scheduled date';
+
+  @override
+  String get partnerFinanceCommissionHeading => 'Commission breakdown';
+
+  @override
+  String partnerFinanceRateNotice(String rate) {
+    return 'The server applied a fixed platform rate of $rate. It is a constant in the service, not a negotiated rate, and this app never applies it itself.';
+  }
+
+  @override
+  String get partnerFinanceRevenueHeading => 'Revenue breakdown';
+
+  @override
+  String get partnerFinanceRevenueSubtitle =>
+      'Every figure is calculated and rounded by the server. Nothing on this screen is recalculated.';
+
+  @override
+  String get partnerFinanceRevenueEmpty =>
+      'No revenue was recorded in this window.';
+
+  @override
+  String get partnerFinanceAverageBooking => 'Average booking value';
+
+  @override
+  String get partnerFinanceHighestBooking => 'Highest booking';
+
+  @override
+  String get partnerFinanceByDay => 'By day';
+
+  @override
+  String get partnerFinanceByMonth => 'By month';
+
+  @override
+  String get partnerFinanceByProperty => 'By property';
+
+  @override
+  String get partnerFinanceByRoom => 'By room';
+
+  @override
+  String get partnerFinanceSettlementHeading => 'Settlement';
+
+  @override
+  String get partnerFinanceSettlementSubtitle =>
+      'Periods are calendar months calculated from booking revenue. No settlement ledger exists behind them.';
+
+  @override
+  String get partnerFinanceSettlementEmpty =>
+      'No settlement period falls in this window.';
+
+  @override
+  String get partnerFinanceCurrentSettlement => 'Current period';
+
+  @override
+  String get partnerFinanceLastSettlement => 'Previous period';
+
+  @override
+  String get partnerFinancePending => 'Pending';
+
+  @override
+  String get partnerFinancePaid => 'Settled';
+
+  @override
+  String get partnerFinanceSettlementMismatch =>
+      'The server reports a settled amount although no period below is marked settled. Both values are shown exactly as the server sent them; treat the settled total with caution.';
+
+  @override
+  String get partnerFinanceSettlementPeriods => 'Periods';
+
+  @override
+  String get partnerFinancePeriod => 'Period';
+
+  @override
+  String get partnerFinanceStatus => 'Status';
+
+  @override
+  String get partnerFinanceStatusPaid => 'Settled';
+
+  @override
+  String get partnerFinanceStatusPending => 'Pending';
+
+  @override
+  String get partnerFinanceStatusUnknown => 'Unrecognised';
+
+  @override
+  String get partnerFinancePayoutHeading => 'Payouts';
+
+  @override
+  String get partnerFinancePayoutSubtitle =>
+      'The same calculated periods, split by status.';
+
+  @override
+  String get partnerFinancePayoutEmpty =>
+      'No payout period falls in this window.';
+
+  @override
+  String get partnerFinanceEstimatedPayoutDate => 'Estimated payout date';
+
+  @override
+  String get partnerFinanceUpcomingPayouts => 'Upcoming';
+
+  @override
+  String get partnerFinanceCompletedPayouts => 'Completed';
+
+  @override
+  String get partnerFinancePayoutNoRecords =>
+      'No payout records exist in the partner API — there is no reference, bank detail or payment provider information to show, and none is requested.';
+
+  @override
+  String get partnerFinanceInvoiceHeading => 'Invoices';
+
+  @override
+  String get partnerFinanceInvoiceEmpty =>
+      'No invoice was issued in this window.';
+
+  @override
+  String get partnerFinanceInvoiceIssued => 'Issued';
+
+  @override
+  String get partnerFinanceInvoicePaid => 'Paid';
+
+  @override
+  String get partnerFinanceInvoiceCancelled => 'Cancelled';
+
+  @override
+  String get partnerFinanceInvoiceRefunded => 'Refunded';
+
+  @override
+  String get partnerFinanceInvoiceTotal => 'Total invoiced';
+
+  @override
+  String get partnerFinanceInvoiceNoDocuments =>
+      'The partner API returns invoice counts only. There is no invoice list, no invoice number to open and no download, so none is offered here.';
+
+  @override
+  String get partnerFinanceRefundHeading => 'Refunds';
+
+  @override
+  String get partnerFinanceRefundEmpty =>
+      'No refund was recorded in this window.';
+
+  @override
+  String get partnerFinanceRefundCount => 'Refunds';
+
+  @override
+  String get partnerFinanceRefundAmount => 'Refunded amount';
+
+  @override
+  String get partnerFinanceRefundRate => 'Refund rate';
+
+  @override
+  String get partnerFinanceRefundReadOnly =>
+      'Refunds are read-only here. The partner API has no refund action, so refunds are started elsewhere.';
+
+  @override
+  String get partnerAnalyticsTitle => 'Performance analytics';
+
+  @override
+  String get partnerAnalyticsDashboardPointer =>
+      'Revenue, occupancy and the headline totals live on the Dashboard, which already reports them. This page covers what the Dashboard does not.';
+
+  @override
+  String get partnerAnalyticsScopeAll =>
+      'Figures cover every property you own. Select a property in the workspace to narrow them.';
+
+  @override
+  String get partnerAnalyticsScopeProperty =>
+      'Figures cover the selected property only.';
+
+  @override
+  String get partnerAnalyticsBookingsHeading => 'Booking activity';
+
+  @override
+  String get partnerAnalyticsBookingsEmpty =>
+      'No booking falls in this window.';
+
+  @override
+  String get partnerAnalyticsArrivals => 'Arrivals';
+
+  @override
+  String get partnerAnalyticsDepartures => 'Departures';
+
+  @override
+  String get partnerAnalyticsCancellations => 'Cancellations';
+
+  @override
+  String get partnerAnalyticsNoShows => 'No-shows';
+
+  @override
+  String get partnerAnalyticsAverageStay => 'Average stay';
+
+  @override
+  String get partnerAnalyticsAverageStayCaption =>
+      'Nights, calculated by the server';
+
+  @override
+  String get partnerAnalyticsByStatus => 'By status';
+
+  @override
+  String get partnerAnalyticsRoomsHeading => 'Room performance';
+
+  @override
+  String get partnerAnalyticsRoomsEmpty =>
+      'No room activity falls in this window.';
+
+  @override
+  String get partnerAnalyticsOccupancyEstimate => 'Occupancy estimate';
+
+  @override
+  String get partnerAnalyticsOccupancyCaption =>
+      'The server calls this an estimate';
+
+  @override
+  String get partnerAnalyticsTopRoomsRevenue => 'Top rooms by revenue';
+
+  @override
+  String get partnerAnalyticsTopRoomsBookings => 'Top rooms by bookings';
+
+  @override
+  String get partnerAnalyticsAvailability => 'Availability summary';
+
+  @override
+  String get partnerAnalyticsPromotionsHeading => 'Promotion activity';
+
+  @override
+  String get partnerAnalyticsPromotionsSubtitle =>
+      'Structural only: the server cannot yet attribute a discount to a booking.';
+
+  @override
+  String get partnerAnalyticsPromotionsEmpty =>
+      'No promotion activity falls in this window.';
+
+  @override
+  String get partnerAnalyticsActivePromotions => 'Active promotions';
+
+  @override
+  String get partnerAnalyticsDiscountedBookings => 'Discounted bookings';
+
+  @override
+  String get partnerAnalyticsNoAttribution =>
+      'The server cannot attribute discounts yet';
+
+  @override
+  String get partnerAnalyticsPromotionsByType => 'By type';
+
+  @override
+  String get partnerAnalyticsPromotionsByStatus => 'By status';
+
+  @override
+  String get partnerAnalyticsReviewsHeading => 'Review summary';
+
+  @override
+  String get partnerAnalyticsReviewsSubtitle =>
+      'Rating and moderation totals. Individual reviews and replies are managed in the Reviews module.';
+
+  @override
+  String get partnerAnalyticsReviewsEmpty => 'No review falls in this window.';
+
+  @override
+  String get partnerAnalyticsAverageRating => 'Average rating';
+
+  @override
+  String get partnerAnalyticsApprovedOnly => 'Approved reviews only';
+
+  @override
+  String get partnerAnalyticsNoReviews => 'No reviews to average';
+
+  @override
+  String get partnerAnalyticsReviewCount => 'Total reviews';
+
+  @override
+  String get partnerAnalyticsReviewsApproved => 'Approved';
+
+  @override
+  String get partnerAnalyticsReviewsPending => 'Pending';
+
+  @override
+  String get partnerAnalyticsReviewsRejected => 'Rejected';
+
+  @override
+  String get partnerAnalyticsMessagesHeading => 'Message activity';
+
+  @override
+  String get partnerAnalyticsMessagesEmpty =>
+      'No conversation falls in this window.';
+
+  @override
+  String get partnerAnalyticsOpenConversations => 'Open conversations';
+
+  @override
+  String get partnerAnalyticsClosedConversations => 'Closed conversations';
+
+  @override
+  String get partnerAnalyticsArchivedConversations => 'Archived conversations';
+
+  @override
+  String get partnerAnalyticsUnreadMessages => 'Unread for you';
+
+  @override
+  String get partnerAnalyticsResponseTime => 'Average response time';
+
+  @override
+  String get partnerAnalyticsNoResponses =>
+      'No response time could be measured';
+
+  @override
+  String partnerAnalyticsMinutesValue(String value) {
+    return '$value min';
+  }
+
+  @override
+  String get partnerReviewsTitle => 'Guest reviews';
+
+  @override
+  String get partnerReviewsAnalyticsPointer =>
+      'Ratings and moderation totals are on the Analytics page. This page is for replying.';
+
+  @override
+  String get partnerReviewsScopeNote =>
+      'The published reviews for the selected property. Only published reviews can be replied to, and this is exactly the set the server allows a reply on.';
+
+  @override
+  String get partnerReviewsNoBodyNotice =>
+      'The partner API does not return the text a guest wrote — only the rating, the title and the date. Replies are written against those.';
+
+  @override
+  String get partnerReviewsNoPropertyTitle => 'Select a property';
+
+  @override
+  String get partnerReviewsNoPropertyMessage =>
+      'Reviews are listed per property. Choose one in the workspace to see its reviews.';
+
+  @override
+  String get partnerReviewsEmptyTitle => 'No published reviews yet';
+
+  @override
+  String get partnerReviewsEmptyMessage =>
+      'Nothing has been published for this property. Reviews appear here once a guest writes one and it is approved.';
+
+  @override
+  String get partnerReviewsNoMatchTitle => 'Nothing matches this filter';
+
+  @override
+  String get partnerReviewsNoMatchMessage =>
+      'This property has reviews, but none in the selected group.';
+
+  @override
+  String get partnerReviewsFilterAll => 'Show all';
+
+  @override
+  String partnerReviewsFilterAllCount(String count) {
+    return 'All ($count)';
+  }
+
+  @override
+  String partnerReviewsFilterNeedsReplyCount(String count) {
+    return 'Needs a reply ($count)';
+  }
+
+  @override
+  String partnerReviewsFilterRepliedCount(String count) {
+    return 'Replied ($count)';
+  }
+
+  @override
+  String get partnerReviewsNeedsReply => 'Needs a reply';
+
+  @override
+  String get partnerReviewsReplied => 'Replied';
+
+  @override
+  String get partnerReviewsNoTitle => 'Untitled review';
+
+  @override
+  String partnerReviewsRatingValue(String rating) {
+    return 'Rated $rating out of 5';
+  }
+
+  @override
+  String get partnerReviewsReplyHeading => 'Your reply';
+
+  @override
+  String get partnerReviewsCloseReply => 'Close reply';
+
+  @override
+  String get partnerReviewsCurrentReply => 'Currently published';
+
+  @override
+  String partnerReviewsRepliedAt(String date) {
+    return 'replied $date';
+  }
+
+  @override
+  String partnerReviewsEditedAt(String date) {
+    return 'edited $date';
+  }
+
+  @override
+  String get partnerReviewsReplyField => 'Reply to this guest';
+
+  @override
+  String get partnerReviewsReplyHelp =>
+      'A review has one reply. Publishing again replaces it rather than adding a second.';
+
+  @override
+  String get partnerReviewsPublicNotice =>
+      'Your reply is published publicly alongside the review, and there is no way to delete it afterwards — only to replace its wording. The guest is notified the first time you reply.';
+
+  @override
+  String get partnerReviewsPublishReply => 'Publish reply';
+
+  @override
+  String get partnerReviewsUpdateReply => 'Replace reply';
+
+  @override
+  String get partnerReviewsPublishConfirm =>
+      'Publish this reply publicly? It cannot be deleted afterwards, only rewritten.';
+
+  @override
+  String get partnerReviewsReplyPublished => 'Your reply is published.';
+
+  @override
+  String get partnerReviewsReplyEmpty => 'Write a reply before publishing.';
+
+  @override
+  String get partnerReviewsReplyUncertain =>
+      'The connection dropped before the server confirmed, and a reply cannot be deleted. Refresh to see whether it was published.';
+
+  @override
+  String get partnerReviewsNotFound =>
+      'That review is no longer available to your account.';
+
+  @override
+  String get partnerReviewsNotApprovedNotice =>
+      'Only a published review can be replied to. The server refuses a reply on any other status.';
+
+  @override
+  String get partnerSettingsTitle => 'Account & settings';
+
+  @override
+  String get partnerSettingsTabWorkspace => 'Policies & workspace';
+
+  @override
+  String get partnerSettingsTabTeam => 'Team';
+
+  @override
+  String get partnerSettingsTabPayout => 'Payout account';
+
+  @override
+  String get partnerSettingsTabProfile => 'Business profile';
+
+  @override
+  String get partnerTeamHeading => 'Team members';
+
+  @override
+  String get partnerTeamSubtitle =>
+      'Everyone who can act in this partner workspace, and the role the server grants them.';
+
+  @override
+  String get partnerTeamEmpty => 'No team members are recorded.';
+
+  @override
+  String get partnerTeamOwnerOnly =>
+      'Only the partner owner can add, change or remove team members. You can see the team here.';
+
+  @override
+  String get partnerTeamRoleField => 'Role';
+
+  @override
+  String get partnerTeamActive => 'Active';
+
+  @override
+  String get partnerTeamInactive => 'Inactive';
+
+  @override
+  String get partnerTeamActivate => 'Activate';
+
+  @override
+  String get partnerTeamDeactivate => 'Deactivate';
+
+  @override
+  String get partnerTeamRemove => 'Remove';
+
+  @override
+  String partnerTeamRemoveConfirm(String member) {
+    return 'Remove $member from the team? This cannot be undone from here — they would have to be added again.';
+  }
+
+  @override
+  String get partnerTeamInviteHeading => 'Add a team member';
+
+  @override
+  String get partnerTeamInviteNote =>
+      'The server matches an existing Plan Your Trip account by email. It does not send an invitation, so the person must already have an account.';
+
+  @override
+  String get partnerTeamInviteEmail => 'Their account email';
+
+  @override
+  String get partnerTeamInviteAction => 'Add member';
+
+  @override
+  String get partnerPayoutHeading => 'Payout account';
+
+  @override
+  String get partnerPayoutSubtitle =>
+      'Where settlements would be sent. Held as reference details only.';
+
+  @override
+  String get partnerPayoutNone => 'No payout account has been added yet.';
+
+  @override
+  String get partnerPayoutLoadFailed =>
+      'The payout account could not be loaded. This is not the same as having none.';
+
+  @override
+  String get partnerPayoutHolder => 'Account holder';
+
+  @override
+  String get partnerPayoutBank => 'Bank';
+
+  @override
+  String get partnerPayoutAccountNumber => 'Account number';
+
+  @override
+  String partnerPayoutMasked(String last4) {
+    return 'Ends in $last4';
+  }
+
+  @override
+  String get partnerPayoutMethod => 'Payout method';
+
+  @override
+  String get partnerPayoutMethodBank => 'Bank transfer';
+
+  @override
+  String get partnerPayoutMethodManual => 'Manual';
+
+  @override
+  String get partnerPayoutMethodUnknown => 'Unrecognised method';
+
+  @override
+  String get partnerPayoutStatus => 'Verification status';
+
+  @override
+  String get partnerPayoutUpdated => 'Last updated';
+
+  @override
+  String get partnerPayoutNoExecutionNotice =>
+      'No payout is ever sent from here, and the full account number is never stored: the server keeps only its last four digits and discards the rest as soon as it is submitted.';
+
+  @override
+  String get partnerPayoutRoleNotice =>
+      'Only the partner owner or a finance team member can change these details. You can see them here.';
+
+  @override
+  String get partnerPayoutAdd => 'Add payout account';
+
+  @override
+  String get partnerPayoutReplace => 'Replace details';
+
+  @override
+  String get partnerPayoutCancelEdit => 'Cancel';
+
+  @override
+  String get partnerPayoutFormHeading => 'New payout details';
+
+  @override
+  String get partnerPayoutNumberHelp =>
+      'At least 4 characters. Only the last four digits are kept.';
+
+  @override
+  String get partnerPayoutSave => 'Save payout details';
+
+  @override
+  String get partnerPayoutReplaceConfirm =>
+      'Replace the payout details? The previous account number cannot be recovered, because it was never stored.';
+
+  @override
+  String get partnerProfileHeading => 'Business profile';
+
+  @override
+  String get partnerProfileBusinessName => 'Business name';
+
+  @override
+  String get partnerProfileRepresentative => 'Representative';
+
+  @override
+  String get partnerProfileVerification => 'Verification';
+
+  @override
+  String get partnerProfileYourRole => 'Your role';
+
+  @override
+  String get partnerProfileReadOnlyNotice =>
+      'An approved business profile cannot be edited through the partner API — the server accepts changes only while a profile is a draft or has been rejected. Contact support to change these details.';
+
+  @override
+  String get partnerProfileStatusDraft => 'Draft';
+
+  @override
+  String get partnerProfileStatusSubmitted => 'Awaiting review';
+
+  @override
+  String get partnerProfileStatusApproved => 'Approved';
+
+  @override
+  String get partnerProfileStatusRejected => 'Rejected';
+
+  @override
+  String get partnerProfileStatusSuspended => 'Suspended';
+
+  @override
+  String get partnerProfileStatusUnknown => 'Unrecognised status';
+
+  @override
+  String get partnerAccountSaved => 'Saved.';
+
+  @override
+  String get partnerAccountNotFound =>
+      'That record is no longer available to your account.';
+
+  @override
+  String get partnerAccountConflict =>
+      'The server refused that because it conflicts with an existing record.';
+
+  @override
+  String get partnerAccountValidation => 'Check the details and try again.';
+
+  @override
+  String get partnerAccountUncertain =>
+      'The connection dropped before the server confirmed. Refresh to see the current state before trying again.';
 }

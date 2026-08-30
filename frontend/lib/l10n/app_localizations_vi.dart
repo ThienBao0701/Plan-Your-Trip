@@ -8510,4 +8510,3303 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get partnerModuleReadOnlyForRole =>
       'Vai trò nhóm của bạn sẽ không thể thay đổi cài đặt trong mô-đun này.';
+
+  @override
+  String get partnerDashboardScopeHeading => 'Phạm vi báo cáo';
+
+  @override
+  String get partnerDashboardScopeHint =>
+      'Áp dụng cho Hiệu suất, Công suất phòng và Doanh thu. Hoạt động hôm nay luôn tính trên tất cả cơ sở.';
+
+  @override
+  String get partnerDashboardScopeToday => 'Hôm nay · tất cả cơ sở';
+
+  @override
+  String get partnerDashboardScopeAllProperties => 'Tất cả cơ sở';
+
+  @override
+  String get partnerDashboardScopeLast30AllProperties =>
+      '30 ngày gần nhất · tất cả cơ sở';
+
+  @override
+  String partnerDashboardScopeWindowAll(String window) {
+    return '$window · tất cả cơ sở';
+  }
+
+  @override
+  String partnerDashboardScopeWindowOne(String window) {
+    return '$window · cơ sở đã chọn';
+  }
+
+  @override
+  String get partnerDashboardRangeLabel => 'Khoảng thời gian';
+
+  @override
+  String get partnerDashboardRangeLast7 => '7 ngày';
+
+  @override
+  String get partnerDashboardRangeLast30 => '30 ngày';
+
+  @override
+  String get partnerDashboardRangeLast90 => '90 ngày';
+
+  @override
+  String get partnerDashboardPropertyLabel => 'Cơ sở';
+
+  @override
+  String get partnerDashboardPropertyAll => 'Tất cả cơ sở';
+
+  @override
+  String partnerDashboardPropertyCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cơ sở',
+      one: '1 cơ sở',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String partnerDashboardRoomCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count phòng đang hoạt động',
+      one: '1 phòng đang hoạt động',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String partnerDashboardTeamRole(String role) {
+    return 'Vai trò của bạn: $role';
+  }
+
+  @override
+  String partnerDashboardActiveProperty(String name) {
+    return 'Đang xem $name';
+  }
+
+  @override
+  String partnerDashboardUpdatedAt(String time) {
+    return 'Cập nhật $time';
+  }
+
+  @override
+  String get partnerDashboardNoActivityHint =>
+      'Chưa có đặt phòng nào trong khoảng thời gian đã chọn nên các chỉ số hiệu suất bên dưới bằng 0.';
+
+  @override
+  String get partnerDashboardAttentionHeading => 'Cần xử lý';
+
+  @override
+  String get partnerDashboardAttentionClear =>
+      'Hiện chưa có việc nào cần bạn xử lý.';
+
+  @override
+  String partnerDashboardAttentionSemantic(String label, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mục cần xử lý',
+      one: '1 mục cần xử lý',
+    );
+    return '$label, $_temp0';
+  }
+
+  @override
+  String get partnerDashboardQuickActionsHeading => 'Thao tác nhanh';
+
+  @override
+  String get partnerDashboardPerformanceHeading => 'Hiệu suất';
+
+  @override
+  String get partnerDashboardPerformanceEmpty =>
+      'Không có đặt phòng nào trong kỳ này nên chưa có số liệu để báo cáo.';
+
+  @override
+  String get partnerDashboardOccupancyHeading => 'Công suất phòng';
+
+  @override
+  String get partnerDashboardOccupancyNoInventory =>
+      'Chưa thiết lập số lượng phòng nên không thể tính công suất.';
+
+  @override
+  String get partnerDashboardOccupancyChartLabel => 'Công suất theo ngày';
+
+  @override
+  String get partnerDashboardRevenueHeading => 'Doanh thu';
+
+  @override
+  String get partnerDashboardRevenueChartLabel => 'Doanh thu theo ngày';
+
+  @override
+  String get partnerDashboardFinanceHeading => 'Tổng quan tài chính';
+
+  @override
+  String get partnerDashboardActivityHeading => 'Hoạt động gần đây';
+
+  @override
+  String get partnerDashboardActivityEmpty => 'Chưa ghi nhận hoạt động nào.';
+
+  @override
+  String partnerDashboardActivityBy(String actor) {
+    return 'bởi $actor';
+  }
+
+  @override
+  String get partnerDashboardActivityUnknownActor =>
+      'Người dùng không xác định';
+
+  @override
+  String partnerDashboardActivityMore(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mục cũ hơn',
+      one: '1 mục cũ hơn',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get partnerDashboardChartEmpty => 'Không có dữ liệu trong kỳ này.';
+
+  @override
+  String get partnerDashboardErrorUnauthorized =>
+      'Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại để tải phần này.';
+
+  @override
+  String get partnerDashboardErrorForbidden =>
+      'Hồ sơ đối tác của bạn chưa được duyệt để xem dữ liệu này.';
+
+  @override
+  String get partnerDashboardErrorNotFound =>
+      'Dữ liệu này không khả dụng với hồ sơ đối tác của bạn.';
+
+  @override
+  String get partnerDashboardErrorValidation =>
+      'Khoảng thời gian không hợp lệ. Hãy chọn kỳ khác.';
+
+  @override
+  String get partnerDashboardErrorTimeout => 'Phần này tải quá lâu.';
+
+  @override
+  String get partnerDashboardErrorNetwork =>
+      'Không kết nối được máy chủ cho phần này.';
+
+  @override
+  String get partnerDashboardErrorServer =>
+      'Máy chủ không tạo được dữ liệu này.';
+
+  @override
+  String get partnerDashboardErrorGeneric => 'Không tải được phần này.';
+
+  @override
+  String get partnerValueUnavailable => '—';
+
+  @override
+  String get partnerKpiCurrentGuests => 'Khách đang lưu trú';
+
+  @override
+  String get partnerKpiUpcoming => 'Sắp tới';
+
+  @override
+  String get partnerKpiOccupancy => 'Công suất phòng';
+
+  @override
+  String get partnerKpiRevenueToday => 'Doanh thu hôm nay';
+
+  @override
+  String get partnerKpiRevenueMonth => 'Doanh thu tháng này';
+
+  @override
+  String get partnerKpiAverageStay => 'Số đêm lưu trú trung bình';
+
+  @override
+  String get partnerKpiTotalRevenue => 'Tổng doanh thu';
+
+  @override
+  String get partnerKpiTotalBookings => 'Tổng lượt đặt phòng';
+
+  @override
+  String get partnerKpiAdr => 'Giá phòng trung bình';
+
+  @override
+  String get partnerKpiAdrCaption => 'Trên mỗi đêm phòng đã bán';
+
+  @override
+  String get partnerKpiConfirmed => 'Đã xác nhận';
+
+  @override
+  String get partnerKpiCancelled => 'Đã hủy';
+
+  @override
+  String get partnerKpiReviewAverage => 'Điểm đánh giá trung bình';
+
+  @override
+  String partnerKpiReviewCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Từ $count đánh giá',
+      one: 'Từ 1 đánh giá',
+      zero: 'Chưa có đánh giá',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get partnerKpiResponseRate => 'Tỷ lệ phản hồi tin nhắn';
+
+  @override
+  String get partnerOccupancyInventory => 'Tổng số phòng';
+
+  @override
+  String get partnerOccupancySold => 'Phòng đã bán';
+
+  @override
+  String get partnerOccupancyAvailable => 'Phòng còn trống';
+
+  @override
+  String get partnerOccupancyStopSell => 'Ngày ngừng bán';
+
+  @override
+  String get partnerRevenueMonthToDate => 'Từ đầu tháng';
+
+  @override
+  String get partnerRevenueLast30 => '30 ngày gần nhất';
+
+  @override
+  String get partnerRevenueByProperty => 'Doanh thu theo cơ sở';
+
+  @override
+  String get partnerFinanceGross => 'Doanh thu gộp';
+
+  @override
+  String get partnerFinanceNet => 'Doanh thu thuần';
+
+  @override
+  String get partnerFinanceCommission => 'Hoa hồng nền tảng';
+
+  @override
+  String get partnerFinanceTax => 'Thuế ước tính';
+
+  @override
+  String get partnerFinanceRefunded => 'Đã hoàn tiền';
+
+  @override
+  String get partnerFinancePendingSettlement => 'Chờ quyết toán';
+
+  @override
+  String get partnerFinanceNextPayout => 'Kỳ chi trả dự kiến tiếp theo';
+
+  @override
+  String partnerFinanceCompletedBookings(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count đặt phòng hoàn tất',
+      one: '1 đặt phòng hoàn tất',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String partnerFinancePaidBookings(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count đặt phòng đã thanh toán',
+      one: '1 đặt phòng đã thanh toán',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String partnerPropertiesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cơ sở',
+      one: '1 cơ sở',
+      zero: 'Chưa có cơ sở',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get partnerPropertiesEmptyTitle => 'Chưa có cơ sở nào';
+
+  @override
+  String get partnerPropertiesEmptyMessage =>
+      'Hồ sơ đối tác của bạn đã được duyệt nhưng chưa có cơ sở nào được gán. Cơ sở do đội ngũ Plan Your Trip gán.';
+
+  @override
+  String get partnerPropertiesSelectedSemantic => 'Cơ sở đang chọn';
+
+  @override
+  String get partnerPropertyDetailHeading => 'Chi tiết cơ sở';
+
+  @override
+  String get partnerPropertyCloseDetail => 'Đóng chi tiết';
+
+  @override
+  String get partnerPropertyDetailNotFound =>
+      'Cơ sở này không còn khả dụng với tài khoản của bạn.';
+
+  @override
+  String get partnerPropertyActionsOwnerOnly =>
+      'Thao tác đăng bán chỉ dành cho chủ hồ sơ. Bạn vẫn xem được toàn bộ thông tin tại đây.';
+
+  @override
+  String get partnerPropertyStatusDraft => 'Bản nháp';
+
+  @override
+  String get partnerPropertyStatusPendingReview => 'Chờ duyệt';
+
+  @override
+  String get partnerPropertyStatusApproved => 'Đã duyệt';
+
+  @override
+  String get partnerPropertyStatusPublished => 'Đã đăng';
+
+  @override
+  String get partnerPropertyStatusHidden => 'Đang ẩn';
+
+  @override
+  String get partnerPropertyStatusArchived => 'Đã lưu trữ';
+
+  @override
+  String get partnerPropertyStatusRejected => 'Bị từ chối';
+
+  @override
+  String get partnerPropertyStatusUnknown => 'Trạng thái không xác định';
+
+  @override
+  String get partnerPropertyActive => 'Đang mở bán';
+
+  @override
+  String get partnerPropertyInactive => 'Đang tắt bán';
+
+  @override
+  String get partnerPropertyVerified => 'Đã xác minh';
+
+  @override
+  String get partnerPropertyNotVerified => 'Chưa xác minh';
+
+  @override
+  String get partnerPropertyFeatured => 'Nổi bật';
+
+  @override
+  String get partnerPropertyNotFeatured => 'Không nổi bật';
+
+  @override
+  String get partnerPropertyNotSet => 'Chưa thiết lập';
+
+  @override
+  String partnerPropertyRatingSummary(String rating, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count đánh giá',
+      one: '1 đánh giá',
+    );
+    return '$rating từ $_temp0';
+  }
+
+  @override
+  String get partnerPropertyVisibilityPublic =>
+      'Khách có thể tìm thấy và đặt cơ sở này ngay bây giờ.';
+
+  @override
+  String get partnerPropertyVisibilityNotPublic =>
+      'Cơ sở này hiện không hiển thị với khách.';
+
+  @override
+  String get partnerPropertyModerationNote =>
+      'Việc xác minh và gắn nổi bật do đội ngũ Plan Your Trip quản lý và không thể thay đổi tại đây.';
+
+  @override
+  String get partnerPropertyActivateAction => 'Bật đăng bán';
+
+  @override
+  String get partnerPropertyDeactivateAction => 'Tắt đăng bán';
+
+  @override
+  String partnerPropertyActivatedMessage(String name) {
+    return '$name đã được mở bán.';
+  }
+
+  @override
+  String partnerPropertyDeactivatedMessage(String name) {
+    return '$name đã ngừng mở bán.';
+  }
+
+  @override
+  String get partnerPropertyActionNotFound =>
+      'Cơ sở đó không còn khả dụng với tài khoản của bạn.';
+
+  @override
+  String get partnerPropertyActionFailed =>
+      'Không lưu được thay đổi. Chưa có gì bị thay đổi.';
+
+  @override
+  String get partnerPropertyActionUncertain =>
+      'Mất kết nối trước khi máy chủ xác nhận. Hãy làm mới để xem trạng thái hiện tại.';
+
+  @override
+  String get partnerPropertySectionIdentity => 'Thông tin nhận dạng';
+
+  @override
+  String get partnerPropertySectionLocation => 'Vị trí';
+
+  @override
+  String get partnerPropertySectionContact => 'Liên hệ';
+
+  @override
+  String get partnerPropertySectionPolicies => 'Chính sách';
+
+  @override
+  String get partnerPropertySectionVerification => 'Xác minh';
+
+  @override
+  String get partnerPropertySectionPerformance => 'Phản hồi của khách';
+
+  @override
+  String get partnerPropertySectionMetadata => 'Hồ sơ dữ liệu';
+
+  @override
+  String get partnerPropertyFieldSlug => 'Đường dẫn URL';
+
+  @override
+  String get partnerPropertyFieldShortDescription => 'Mô tả ngắn';
+
+  @override
+  String get partnerPropertyFieldDescription => 'Mô tả';
+
+  @override
+  String get partnerPropertyFieldAddress => 'Địa chỉ';
+
+  @override
+  String get partnerPropertyFieldCoordinates => 'Tọa độ';
+
+  @override
+  String get partnerPropertyFieldPhone => 'Điện thoại';
+
+  @override
+  String get partnerPropertyFieldEmail => 'Email';
+
+  @override
+  String get partnerPropertyFieldWebsite => 'Website';
+
+  @override
+  String get partnerPropertyFieldFacebook => 'Facebook';
+
+  @override
+  String get partnerPropertyFieldInstagram => 'Instagram';
+
+  @override
+  String get partnerPropertyFieldCheckIn => 'Nhận phòng từ';
+
+  @override
+  String get partnerPropertyFieldCheckOut => 'Trả phòng trước';
+
+  @override
+  String get partnerPropertyFieldChildrenPolicy => 'Chính sách trẻ em';
+
+  @override
+  String get partnerPropertyFieldPetPolicy => 'Chính sách thú cưng';
+
+  @override
+  String get partnerPropertyFieldSmokingPolicy => 'Chính sách hút thuốc';
+
+  @override
+  String get partnerPropertyFieldVerified => 'Trạng thái xác minh';
+
+  @override
+  String get partnerPropertyFieldFeatured => 'Vị trí nổi bật';
+
+  @override
+  String get partnerPropertyFieldRating => 'Điểm trung bình';
+
+  @override
+  String get partnerPropertyFieldReviewCount => 'Đánh giá';
+
+  @override
+  String get partnerPropertyFieldOwner => 'Thuộc sở hữu của';
+
+  @override
+  String get partnerPropertyFieldCreated => 'Ngày tạo';
+
+  @override
+  String get partnerPropertyFieldUpdated => 'Cập nhật lần cuối';
+
+  @override
+  String partnerRoomsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count loại phòng',
+      one: '1 loại phòng',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String partnerRoomsListedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count đang mở bán',
+      one: '1 đang mở bán',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String partnerRoomsSoldOutCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count đã hết phòng',
+      one: '1 đã hết phòng',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String partnerRoomsForProperty(String name) {
+    return 'Phòng tại $name';
+  }
+
+  @override
+  String get partnerRoomsNoPropertyContext => 'Chưa chọn cơ sở';
+
+  @override
+  String get partnerRoomsPropertyScope => 'Phạm vi cơ sở';
+
+  @override
+  String get partnerRoomsSelectPropertyTitle => 'Hãy chọn một cơ sở';
+
+  @override
+  String get partnerRoomsSelectPropertyMessage =>
+      'Phòng thuộc về một cơ sở cụ thể, hãy chọn cơ sở để xem các loại phòng.';
+
+  @override
+  String get partnerRoomsNoPropertiesTitle => 'Chưa có cơ sở nào';
+
+  @override
+  String get partnerRoomsNoPropertiesMessage =>
+      'Phòng nằm trong một cơ sở. Khi hồ sơ của bạn được gán cơ sở, các loại phòng sẽ hiển thị tại đây.';
+
+  @override
+  String get partnerRoomsPropertyUnavailableTitle => 'Cơ sở không khả dụng';
+
+  @override
+  String get partnerRoomsPropertyUnavailableMessage =>
+      'Cơ sở này không còn khả dụng với tài khoản của bạn, hoặc chưa được cấu hình phòng.';
+
+  @override
+  String get partnerRoomsEmptyTitle => 'Chưa có loại phòng nào';
+
+  @override
+  String get partnerRoomsEmptyMessage =>
+      'Cơ sở này chưa có loại phòng nào được cấu hình. Việc này do đội ngũ Plan Your Trip thiết lập.';
+
+  @override
+  String get partnerRoomActionsOwnerOnly =>
+      'Thao tác mở bán chỉ dành cho chủ hồ sơ. Bạn vẫn xem được mọi phòng tại đây.';
+
+  @override
+  String get partnerRoomDetailHeading => 'Chi tiết phòng';
+
+  @override
+  String get partnerRoomCloseDetail => 'Đóng chi tiết phòng';
+
+  @override
+  String get partnerRoomDetailNotFound =>
+      'Phòng này không còn khả dụng với tài khoản của bạn.';
+
+  @override
+  String get partnerRoomListed => 'Đang mở bán';
+
+  @override
+  String get partnerRoomUnlisted => 'Chưa mở bán';
+
+  @override
+  String get partnerRoomSoldOut => 'Hết phòng';
+
+  @override
+  String get partnerRoomListAction => 'Mở bán phòng này';
+
+  @override
+  String get partnerRoomUnlistAction => 'Ngừng mở bán';
+
+  @override
+  String partnerRoomListedMessage(String name) {
+    return '$name đã được mở bán.';
+  }
+
+  @override
+  String partnerRoomUnlistedMessage(String name) {
+    return '$name đã ngừng mở bán.';
+  }
+
+  @override
+  String get partnerRoomActionNotFound =>
+      'Phòng đó không còn khả dụng với tài khoản của bạn.';
+
+  @override
+  String get partnerRoomYes => 'Có';
+
+  @override
+  String get partnerRoomNo => 'Không';
+
+  @override
+  String partnerRoomGuestsValue(String count) {
+    return 'Tối đa $count khách';
+  }
+
+  @override
+  String partnerRoomInventoryValue(String available, String total) {
+    return 'Còn $available trên $total';
+  }
+
+  @override
+  String partnerRoomPriceFromValue(String price) {
+    return 'Từ $price';
+  }
+
+  @override
+  String partnerRoomSizeValue(String size) {
+    return '$size m²';
+  }
+
+  @override
+  String get partnerRoomSectionIdentity => 'Thông tin nhận dạng';
+
+  @override
+  String get partnerRoomSectionBeds => 'Giường';
+
+  @override
+  String get partnerRoomSectionCapacity => 'Sức chứa';
+
+  @override
+  String get partnerRoomSectionInventory => 'Số lượng phòng';
+
+  @override
+  String get partnerRoomSectionPricing => 'Giá phòng';
+
+  @override
+  String get partnerRoomSectionConditions => 'Điều kiện đặt phòng';
+
+  @override
+  String get partnerRoomSectionAmenities => 'Tiện nghi';
+
+  @override
+  String get partnerRoomSectionMedia => 'Hình ảnh';
+
+  @override
+  String get partnerRoomFieldCode => 'Mã phòng';
+
+  @override
+  String get partnerRoomFieldType => 'Loại phòng';
+
+  @override
+  String get partnerRoomFieldDescription => 'Mô tả';
+
+  @override
+  String get partnerRoomFieldBedType => 'Loại giường';
+
+  @override
+  String get partnerRoomFieldBedCount => 'Số giường';
+
+  @override
+  String get partnerRoomFieldMaxGuests => 'Số khách tối đa';
+
+  @override
+  String get partnerRoomFieldMaxAdults => 'Số người lớn tối đa';
+
+  @override
+  String get partnerRoomFieldMaxChildren => 'Số trẻ em tối đa';
+
+  @override
+  String get partnerRoomFieldSize => 'Diện tích phòng';
+
+  @override
+  String get partnerRoomFieldFloor => 'Tầng';
+
+  @override
+  String get partnerRoomFieldQuantity => 'Tổng số phòng';
+
+  @override
+  String get partnerRoomFieldAvailable => 'Hiện còn trống';
+
+  @override
+  String get partnerRoomFieldPriceFrom => 'Giá từ';
+
+  @override
+  String get partnerRoomFieldOriginalPrice => 'Giá gốc';
+
+  @override
+  String get partnerRoomFieldBreakfast => 'Bao gồm bữa sáng';
+
+  @override
+  String get partnerRoomFieldFreeCancellation => 'Hủy miễn phí';
+
+  @override
+  String get partnerRoomFieldInstantConfirmation => 'Xác nhận tức thì';
+
+  @override
+  String get partnerRoomFieldSmoking => 'Cho phép hút thuốc';
+
+  @override
+  String get partnerRoomFieldImages => 'Ảnh thư viện';
+
+  @override
+  String get partnerRoomTypeStandard => 'Tiêu chuẩn';
+
+  @override
+  String get partnerRoomTypeSuperior => 'Cao cấp';
+
+  @override
+  String get partnerRoomTypeDeluxe => 'Deluxe';
+
+  @override
+  String get partnerRoomTypePremier => 'Premier';
+
+  @override
+  String get partnerRoomTypeExecutive => 'Executive';
+
+  @override
+  String get partnerRoomTypeSuite => 'Suite';
+
+  @override
+  String get partnerRoomTypeFamily => 'Gia đình';
+
+  @override
+  String get partnerRoomTypeVilla => 'Villa';
+
+  @override
+  String get partnerRoomTypeBungalow => 'Bungalow';
+
+  @override
+  String get partnerRoomTypeUnknown => 'Loại không xác định';
+
+  @override
+  String get partnerBedTypeSingle => 'Giường đơn';
+
+  @override
+  String get partnerBedTypeDouble => 'Giường đôi';
+
+  @override
+  String get partnerBedTypeTwin => 'Hai giường đơn';
+
+  @override
+  String get partnerBedTypeQueen => 'Giường Queen';
+
+  @override
+  String get partnerBedTypeKing => 'Giường King';
+
+  @override
+  String get partnerBedTypeSofaBed => 'Giường sofa';
+
+  @override
+  String get partnerBedTypeBunk => 'Giường tầng';
+
+  @override
+  String get partnerBedTypeUnknown => 'Giường không xác định';
+
+  @override
+  String partnerInventoryForProperty(String name) {
+    return 'Tồn phòng tại $name';
+  }
+
+  @override
+  String get partnerInventoryNoPropertyContext => 'Chưa chọn cơ sở';
+
+  @override
+  String get partnerInventoryPropertyScope => 'Phạm vi cơ sở';
+
+  @override
+  String get partnerInventoryRoomScope => 'Loại phòng';
+
+  @override
+  String get partnerInventoryRangeLabel => 'Khoảng xem';
+
+  @override
+  String get partnerInventoryRangeWeek => '7 ngày';
+
+  @override
+  String get partnerInventoryRangeFortnight => '14 ngày';
+
+  @override
+  String get partnerInventoryRangeMonth => '30 ngày';
+
+  @override
+  String partnerInventoryWindow(String from, String to, int count) {
+    return '$from – $to · $count ngày';
+  }
+
+  @override
+  String partnerInventoryBookableDays(int bookable, int total) {
+    return '$bookable trên $total ngày có thể đặt';
+  }
+
+  @override
+  String partnerInventoryTotalAvailable(String count) {
+    return '$count đêm phòng còn trống';
+  }
+
+  @override
+  String partnerInventoryStopSellDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ngày ngừng bán',
+      one: '1 ngày ngừng bán',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get partnerInventoryNoPropertiesTitle => 'Chưa có cơ sở nào';
+
+  @override
+  String get partnerInventoryNoPropertiesMessage =>
+      'Tồn phòng thuộc về loại phòng trong một cơ sở. Khi hồ sơ của bạn được gán cơ sở, lịch sẽ hiển thị tại đây.';
+
+  @override
+  String get partnerInventorySelectPropertyTitle => 'Hãy chọn một cơ sở';
+
+  @override
+  String get partnerInventorySelectPropertyMessage =>
+      'Chọn một cơ sở để xem lịch tồn phòng của các loại phòng.';
+
+  @override
+  String get partnerInventoryNoRoomsTitle => 'Chưa có loại phòng nào';
+
+  @override
+  String get partnerInventoryNoRoomsMessage =>
+      'Cơ sở này chưa có loại phòng nào nên chưa có tồn phòng để quản lý.';
+
+  @override
+  String get partnerInventorySelectRoomTitle => 'Hãy chọn loại phòng';
+
+  @override
+  String get partnerInventorySelectRoomMessage =>
+      'Tồn phòng được quản lý theo từng loại phòng. Hãy chọn một loại để xem lịch.';
+
+  @override
+  String get partnerInventoryInvalidRangeTitle => 'Khoảng ngày không hợp lệ';
+
+  @override
+  String get partnerInventoryInvalidRangeMessage =>
+      'Ngày bắt đầu không được sau ngày kết thúc.';
+
+  @override
+  String get partnerInventoryUnavailableTitle => 'Không xem được tồn phòng';
+
+  @override
+  String get partnerInventoryUnavailableMessage =>
+      'Cơ sở hoặc loại phòng này không còn khả dụng với tài khoản của bạn.';
+
+  @override
+  String get partnerInventoryEmptyTitle => 'Không có dữ liệu trong khoảng này';
+
+  @override
+  String get partnerInventoryEmptyMessage =>
+      'Chưa thiết lập tồn phòng cho các ngày này. Hãy thử khoảng thời gian khác.';
+
+  @override
+  String get partnerInventoryDate => 'Ngày';
+
+  @override
+  String get partnerInventoryStateColumn => 'Trạng thái';
+
+  @override
+  String get partnerInventoryTotal => 'Tổng';
+
+  @override
+  String get partnerInventoryAvailable => 'Còn trống';
+
+  @override
+  String get partnerInventorySold => 'Đã bán';
+
+  @override
+  String get partnerInventoryBlocked => 'Đang giữ';
+
+  @override
+  String get partnerInventoryMaintenance => 'Bảo trì';
+
+  @override
+  String get partnerInventoryRestrictions => 'Hạn chế';
+
+  @override
+  String get partnerInventoryStopSell => 'Ngừng bán';
+
+  @override
+  String get partnerInventoryClosedArrival => 'Không nhận khách';
+
+  @override
+  String get partnerInventoryClosedDeparture => 'Không trả phòng';
+
+  @override
+  String get partnerInventoryStateBookable => 'Có thể đặt';
+
+  @override
+  String get partnerInventoryStateSoldOut => 'Hết phòng';
+
+  @override
+  String get partnerInventoryStateStopped => 'Đã ngừng bán';
+
+  @override
+  String get partnerInventoryInconsistent =>
+      'Các số này không cộng lại bằng tổng.';
+
+  @override
+  String partnerInventoryInconsistentSummary(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ngày có các số không cộng lại bằng tổng',
+      one: '1 ngày có các số không cộng lại bằng tổng',
+    );
+    return '$_temp0. Chỉ máy chủ mới sửa được.';
+  }
+
+  @override
+  String get partnerInventoryEditOwnerOnly =>
+      'Thay đổi tình trạng phòng chỉ dành cho chủ hồ sơ. Bạn vẫn xem được lịch tại đây.';
+
+  @override
+  String get partnerInventorySaved => 'Đã lưu.';
+
+  @override
+  String get partnerInventoryActionNotFound =>
+      'Ngày đó không còn khả dụng với tài khoản của bạn.';
+
+  @override
+  String partnerRatesForProperty(String name) {
+    return 'Giá tại $name';
+  }
+
+  @override
+  String partnerRatesForRoom(String room, String property) {
+    return 'Giá cho $room tại $property';
+  }
+
+  @override
+  String get partnerRatesNoPropertyContext => 'Chưa chọn cơ sở';
+
+  @override
+  String get partnerRatesPropertyScope => 'Phạm vi cơ sở';
+
+  @override
+  String get partnerRatesRoomScope => 'Loại phòng';
+
+  @override
+  String partnerRatesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count gói giá',
+      one: '1 gói giá',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String partnerRatesActiveCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count đang bật',
+      one: '1 đang bật',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String partnerRatesExpiredCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count đã hết hạn',
+      one: '1 đã hết hạn',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get partnerRatesNoPropertiesTitle => 'Chưa có cơ sở nào';
+
+  @override
+  String get partnerRatesNoPropertiesMessage =>
+      'Giá thuộc về loại phòng trong một cơ sở. Khi hồ sơ của bạn được gán cơ sở, các gói giá sẽ hiển thị tại đây.';
+
+  @override
+  String get partnerRatesSelectPropertyTitle => 'Hãy chọn một cơ sở';
+
+  @override
+  String get partnerRatesSelectPropertyMessage =>
+      'Chọn một cơ sở để xem các gói giá của loại phòng.';
+
+  @override
+  String get partnerRatesNoRoomsTitle => 'Chưa có loại phòng nào';
+
+  @override
+  String get partnerRatesNoRoomsMessage =>
+      'Cơ sở này chưa có loại phòng nên chưa có gì để định giá.';
+
+  @override
+  String get partnerRatesSelectRoomTitle => 'Hãy chọn loại phòng';
+
+  @override
+  String get partnerRatesSelectRoomMessage =>
+      'Gói giá được quản lý theo từng loại phòng. Hãy chọn một loại để xem giá.';
+
+  @override
+  String get partnerRatesUnavailableTitle => 'Không xem được giá';
+
+  @override
+  String get partnerRatesUnavailableMessage =>
+      'Cơ sở hoặc loại phòng này không còn khả dụng với tài khoản của bạn.';
+
+  @override
+  String get partnerRatesEmptyTitle => 'Chưa có gói giá nào';
+
+  @override
+  String get partnerRatesEmptyMessage =>
+      'Loại phòng này chưa có gói giá. Việc này do đội ngũ Plan Your Trip thiết lập.';
+
+  @override
+  String get partnerRateDetailHeading => 'Chi tiết gói giá';
+
+  @override
+  String get partnerRateCloseDetail => 'Đóng chi tiết gói giá';
+
+  @override
+  String get partnerRateActionsOwnerOnly =>
+      'Thao tác với giá chỉ dành cho chủ hồ sơ. Bạn vẫn xem được mọi gói giá tại đây.';
+
+  @override
+  String get partnerRateCurrencyNote =>
+      'Số tiền hiển thị không kèm đơn vị tiền tệ vì API giá không cung cấp thông tin này.';
+
+  @override
+  String get partnerRateValidityNote =>
+      'Cả hai ngày đều được tính: một kỳ lưu trú hợp lệ khi mọi đêm nằm trong khoảng này.';
+
+  @override
+  String get partnerRateActive => 'Đang bật';
+
+  @override
+  String get partnerRateInactive => 'Đang tắt';
+
+  @override
+  String get partnerRateExpired => 'Đã hết hạn';
+
+  @override
+  String partnerRatePerNight(String amount) {
+    return '$amount mỗi đêm';
+  }
+
+  @override
+  String partnerRateValidity(String from, String to) {
+    return '$from – $to';
+  }
+
+  @override
+  String partnerRatePriorityValue(String value) {
+    return 'Ưu tiên $value';
+  }
+
+  @override
+  String get partnerRateHasRestrictions => 'Có điều kiện';
+
+  @override
+  String partnerRateNightsValue(String count) {
+    return '$count đêm';
+  }
+
+  @override
+  String partnerRateDaysValue(String count) {
+    return '$count ngày';
+  }
+
+  @override
+  String get partnerRateActivateAction => 'Bật';
+
+  @override
+  String get partnerRateDeactivateAction => 'Tắt';
+
+  @override
+  String partnerRateActivatedMessage(String name) {
+    return '$name đã được bật.';
+  }
+
+  @override
+  String partnerRateDeactivatedMessage(String name) {
+    return '$name đã được tắt.';
+  }
+
+  @override
+  String get partnerRateActionNotFound =>
+      'Gói giá đó không còn khả dụng với tài khoản của bạn.';
+
+  @override
+  String get partnerRateActionConflict =>
+      'Thay đổi này xung đột với một gói giá khác.';
+
+  @override
+  String get partnerRateTypeStandard => 'Tiêu chuẩn';
+
+  @override
+  String get partnerRateTypePromotional => 'Giá khuyến mãi';
+
+  @override
+  String get partnerRateTypeMember => 'Thành viên';
+
+  @override
+  String get partnerRateTypeEarlyBird => 'Đặt sớm';
+
+  @override
+  String get partnerRateTypeLastMinute => 'Phút chót';
+
+  @override
+  String get partnerRateTypeUnknown => 'Loại không xác định';
+
+  @override
+  String get partnerMealPlanRoomOnly => 'Chỉ phòng';
+
+  @override
+  String get partnerMealPlanBreakfast => 'Kèm bữa sáng';
+
+  @override
+  String get partnerMealPlanHalfBoard => 'Bán phần';
+
+  @override
+  String get partnerMealPlanFullBoard => 'Trọn phần';
+
+  @override
+  String get partnerMealPlanAllInclusive => 'Trọn gói';
+
+  @override
+  String get partnerMealPlanUnknown => 'Gói ăn không xác định';
+
+  @override
+  String get partnerCancellationFree => 'Hủy miễn phí';
+
+  @override
+  String get partnerCancellationPartial => 'Hoàn một phần';
+
+  @override
+  String get partnerCancellationNonRefundable => 'Không hoàn tiền';
+
+  @override
+  String get partnerCancellationCustom => 'Chính sách riêng';
+
+  @override
+  String get partnerCancellationUnknown => 'Chính sách không xác định';
+
+  @override
+  String get partnerRateSourceBase => 'Giá gốc';
+
+  @override
+  String get partnerRateSourceDerived => 'Giá dẫn xuất';
+
+  @override
+  String get partnerRateSourceUnknown => 'Nguồn không xác định';
+
+  @override
+  String get partnerRateAdjustmentFixed => 'Số tiền cố định';
+
+  @override
+  String get partnerRateAdjustmentPercent => 'Phần trăm';
+
+  @override
+  String get partnerRateAdjustmentUnknown => 'Điều chỉnh không xác định';
+
+  @override
+  String get partnerRateSectionIdentity => 'Thông tin nhận dạng';
+
+  @override
+  String get partnerRateSectionPricing => 'Mức giá';
+
+  @override
+  String get partnerRateSectionValidity => 'Hiệu lực';
+
+  @override
+  String get partnerRateSectionRestrictions => 'Điều kiện lưu trú';
+
+  @override
+  String get partnerRateSectionCancellation => 'Hủy phòng';
+
+  @override
+  String get partnerRateSectionInclusions => 'Bao gồm';
+
+  @override
+  String get partnerRateSectionOccupancy => 'Giá theo số khách';
+
+  @override
+  String get partnerRateFieldCode => 'Mã gói';
+
+  @override
+  String get partnerRateFieldDescription => 'Mô tả';
+
+  @override
+  String get partnerRateFieldPriority => 'Độ ưu tiên';
+
+  @override
+  String get partnerRateFieldPricePerNight => 'Giá mỗi đêm';
+
+  @override
+  String get partnerRateFieldExtraBedPrice => 'Giá giường phụ';
+
+  @override
+  String get partnerRateFieldAdjustmentType => 'Kiểu điều chỉnh';
+
+  @override
+  String get partnerRateFieldAdjustmentValue => 'Mức điều chỉnh';
+
+  @override
+  String get partnerRateFieldParentPlan => 'Dẫn xuất từ gói';
+
+  @override
+  String get partnerRateFieldValidFrom => 'Hiệu lực từ';
+
+  @override
+  String get partnerRateFieldValidTo => 'Hiệu lực đến';
+
+  @override
+  String get partnerRateFieldMinStay => 'Lưu trú tối thiểu';
+
+  @override
+  String get partnerRateFieldMaxStay => 'Lưu trú tối đa';
+
+  @override
+  String get partnerRateFieldMinAdvance => 'Đặt trước tối thiểu';
+
+  @override
+  String get partnerRateFieldMaxAdvance => 'Đặt trước tối đa';
+
+  @override
+  String get partnerRateFieldClosedToArrival => 'Không nhận khách';
+
+  @override
+  String get partnerRateFieldClosedToDeparture => 'Không trả phòng';
+
+  @override
+  String get partnerRateFieldPolicy => 'Chính sách hủy';
+
+  @override
+  String get partnerRateFieldRefundable => 'Được hoàn tiền';
+
+  @override
+  String get partnerRateFieldDeadlineHours => 'Hạn hủy (giờ)';
+
+  @override
+  String get partnerRateFieldPenaltyPercent => 'Phí phạt khi hủy';
+
+  @override
+  String get partnerRateFieldMealPlan => 'Gói ăn';
+
+  @override
+  String get partnerRateFieldOccupancyPricing => 'Bật giá theo số khách';
+
+  @override
+  String get partnerRateFieldChildPricing => 'Bật giá trẻ em';
+
+  @override
+  String get partnerRateOccupancyEmpty =>
+      'Gói này chưa cấu hình giá theo số khách.';
+
+  @override
+  String partnerRateOccupancyLabel(String adults, String children) {
+    return '$adults người lớn, $children trẻ em';
+  }
+
+  @override
+  String get partnerPoliciesTitle => 'Chính sách & cài đặt';
+
+  @override
+  String partnerPoliciesForProperty(String name) {
+    return 'Chính sách của $name';
+  }
+
+  @override
+  String get partnerPoliciesNoPropertyContext => 'Chưa chọn cơ sở';
+
+  @override
+  String get partnerPoliciesPropertyScope => 'Phạm vi cơ sở';
+
+  @override
+  String get partnerPoliciesNoPropertiesTitle => 'Chưa có cơ sở nào';
+
+  @override
+  String get partnerPoliciesNoPropertiesMessage =>
+      'Chính sách với khách thuộc về một cơ sở. Khi hồ sơ của bạn được gán cơ sở, chính sách sẽ hiển thị tại đây.';
+
+  @override
+  String get partnerPoliciesSelectPropertyTitle => 'Hãy chọn một cơ sở';
+
+  @override
+  String get partnerPoliciesSelectPropertyMessage =>
+      'Chọn một cơ sở để xem và chỉnh sửa chính sách với khách.';
+
+  @override
+  String get partnerPoliciesUnavailableTitle => 'Không xem được chính sách';
+
+  @override
+  String get partnerPoliciesUnavailableMessage =>
+      'Cơ sở này không còn khả dụng với tài khoản của bạn.';
+
+  @override
+  String get partnerPoliciesPropertySection => 'Chính sách với khách';
+
+  @override
+  String get partnerPoliciesPropertyScopeNote =>
+      'Chỉ áp dụng cho cơ sở này. Khách sẽ thấy nội dung này trên trang cơ sở.';
+
+  @override
+  String get partnerPoliciesLiveWarning =>
+      'Thay đổi có hiệu lực ngay với mọi khách, kể cả khách đã đặt phòng — hệ thống không cố định chính sách tại thời điểm đặt.';
+
+  @override
+  String get partnerPoliciesOwnerOnly =>
+      'Chỉ chủ hồ sơ mới thay đổi được chính sách với khách. Bạn vẫn xem được tại đây.';
+
+  @override
+  String get partnerPoliciesCheckIn => 'Nhận phòng từ';
+
+  @override
+  String get partnerPoliciesCheckOut => 'Trả phòng trước';
+
+  @override
+  String get partnerPoliciesTimeHelper => 'Giờ 24 tiếng, ví dụ 14:00';
+
+  @override
+  String get partnerPoliciesTimeRequired => 'Bắt buộc';
+
+  @override
+  String get partnerPoliciesHouseRules => 'Nội quy';
+
+  @override
+  String get partnerPoliciesHouseRulesNote =>
+      'Không bắt buộc. Để trống để xóa một nội quy.';
+
+  @override
+  String get partnerPoliciesRuleHint => 'Để trống nếu không có nội quy';
+
+  @override
+  String get partnerPoliciesChildren => 'Chính sách trẻ em';
+
+  @override
+  String get partnerPoliciesPets => 'Chính sách thú cưng';
+
+  @override
+  String get partnerPoliciesSmoking => 'Chính sách hút thuốc';
+
+  @override
+  String get partnerPoliciesSettingsSection => 'Thông báo của tài khoản';
+
+  @override
+  String get partnerPoliciesSettingsScopeNote =>
+      'Áp dụng cho toàn bộ tài khoản đối tác, không riêng một cơ sở.';
+
+  @override
+  String get partnerPoliciesSettingsRoleNote =>
+      'Chỉ chủ hồ sơ hoặc quản lý mới thay đổi được cài đặt thông báo. Bạn vẫn xem được tại đây.';
+
+  @override
+  String get partnerPoliciesSettingsUnavailable =>
+      'Không truy cập được cài đặt tài khoản của bạn.';
+
+  @override
+  String partnerPoliciesSettingsUpdated(String time) {
+    return 'Cập nhật lần cuối $time';
+  }
+
+  @override
+  String get partnerPoliciesLanguage => 'Ngôn ngữ mặc định';
+
+  @override
+  String get partnerPoliciesTimezone => 'Múi giờ';
+
+  @override
+  String get partnerPoliciesChannels => 'Kênh nhận thông báo';
+
+  @override
+  String get partnerPoliciesChannelEmail => 'Email';
+
+  @override
+  String get partnerPoliciesChannelSms => 'SMS';
+
+  @override
+  String get partnerPoliciesChannelInApp => 'Trong ứng dụng';
+
+  @override
+  String get partnerPoliciesTopics => 'Nội dung muốn nhận thông báo';
+
+  @override
+  String get partnerPoliciesTopicBooking => 'Đặt phòng';
+
+  @override
+  String get partnerPoliciesTopicPayment => 'Thanh toán';
+
+  @override
+  String get partnerPoliciesTopicReview => 'Đánh giá';
+
+  @override
+  String get partnerPoliciesTopicPromotion => 'Ưu đãi';
+
+  @override
+  String get partnerPoliciesSave => 'Lưu thay đổi';
+
+  @override
+  String get partnerPoliciesRevert => 'Hủy bỏ';
+
+  @override
+  String get partnerPoliciesNoChanges => 'Không có thay đổi chưa lưu.';
+
+  @override
+  String get partnerPoliciesSaved => 'Đã lưu.';
+
+  @override
+  String get partnerPoliciesSaveForbidden =>
+      'Vai trò của bạn không cho phép thay đổi này.';
+
+  @override
+  String get partnerPoliciesSaveNotFound =>
+      'Bản ghi đó không còn khả dụng với tài khoản của bạn.';
+
+  @override
+  String get partnerPoliciesSaveValidation =>
+      'Bắt buộc nhập cả giờ nhận phòng và giờ trả phòng.';
+
+  @override
+  String get partnerAssetsSection => 'Ảnh & phương tiện';
+
+  @override
+  String get partnerAssetsDeferredBadge => 'Chưa khả dụng';
+
+  @override
+  String get partnerAssetsDeferredMessage =>
+      'Quản lý ảnh không nằm trong API dành cho đối tác. Việc tải lên, thay thế, sắp xếp và xóa ảnh chỉ dành cho quản trị viên, nên đội ngũ Plan Your Trip sẽ duy trì ảnh cho cơ sở của bạn.';
+
+  @override
+  String get partnerPromotionsTitle => 'Khuyến mãi & voucher';
+
+  @override
+  String get partnerPromotionsTabPromotions => 'Quy tắc khuyến mãi';
+
+  @override
+  String get partnerPromotionsTabVoucherCheck => 'Kiểm tra voucher';
+
+  @override
+  String get partnerPromotionsScopeNote =>
+      'Tại đây liệt kê mọi khuyến mãi thuộc bất kỳ cơ sở hoặc phòng nào bạn sở hữu. API đối tác không giới hạn khuyến mãi theo từng cơ sở, nên danh sách này không lọc theo cơ sở bạn đang chọn.';
+
+  @override
+  String partnerPromotionsCount(int count) {
+    return '$count khuyến mãi';
+  }
+
+  @override
+  String partnerPromotionsActiveCount(int count) {
+    return '$count đang bật';
+  }
+
+  @override
+  String partnerPromotionsExpiredCount(int count) {
+    return '$count đã qua ngày kết thúc';
+  }
+
+  @override
+  String get partnerPromotionsCurrencyNote =>
+      'API khuyến mãi không trả về đơn vị tiền tệ, nên số tiền khuyến mãi hiển thị không kèm ký hiệu. Phần xem trước giá bên dưới có đơn vị tiền tệ riêng và sẽ hiển thị nó.';
+
+  @override
+  String get partnerPromotionsEmptyTitle => 'Chưa có khuyến mãi nào';
+
+  @override
+  String get partnerPromotionsEmptyMessage =>
+      'Hiện chưa có khuyến mãi nào áp dụng cho cơ sở hoặc phòng của bạn. Các chiến dịch toàn hệ thống do Plan Your Trip vận hành không hiển thị ở đây vì bạn không quản lý chúng.';
+
+  @override
+  String get partnerPromotionsOwnerOnly =>
+      'Chỉ chủ tài khoản đối tác mới thay đổi được khuyến mãi. Bạn vẫn có thể xem tại đây.';
+
+  @override
+  String get partnerPromotionDetailHeading => 'Chi tiết khuyến mãi';
+
+  @override
+  String get partnerPromotionCloseDetail => 'Đóng chi tiết khuyến mãi';
+
+  @override
+  String get partnerPromotionSectionIdentity => 'Thông tin nhận dạng';
+
+  @override
+  String get partnerPromotionFieldCode => 'Mã khuyến mãi';
+
+  @override
+  String get partnerPromotionFieldDescription => 'Mô tả';
+
+  @override
+  String get partnerPromotionFieldType => 'Loại khuyến mãi';
+
+  @override
+  String get partnerPromotionSectionDiscount => 'Mức giảm';
+
+  @override
+  String get partnerPromotionFieldDiscountType => 'Kiểu giảm giá';
+
+  @override
+  String get partnerPromotionFieldDiscountValue => 'Giá trị giảm';
+
+  @override
+  String get partnerPromotionFieldMaxDiscount => 'Mức giảm tối đa';
+
+  @override
+  String get partnerPromotionSectionValidity => 'Thời hạn áp dụng';
+
+  @override
+  String get partnerPromotionFieldStart => 'Bắt đầu';
+
+  @override
+  String get partnerPromotionFieldEnd => 'Kết thúc';
+
+  @override
+  String get partnerPromotionSectionConditions => 'Điều kiện';
+
+  @override
+  String get partnerPromotionFieldMinimumStay => 'Số đêm tối thiểu';
+
+  @override
+  String get partnerPromotionFieldMinimumSpend => 'Chi tiêu tối thiểu';
+
+  @override
+  String get partnerPromotionSectionApplication => 'Cách áp dụng';
+
+  @override
+  String get partnerPromotionFieldTarget => 'Áp dụng cho';
+
+  @override
+  String get partnerPromotionFieldPriority => 'Độ ưu tiên';
+
+  @override
+  String get partnerPromotionFieldStackable => 'Cộng dồn với khuyến mãi khác';
+
+  @override
+  String get partnerPromotionStackableNote =>
+      'Bộ tính giá có thể áp dụng thêm khuyến mãi khác sau khuyến mãi này.';
+
+  @override
+  String get partnerPromotionNonStackableNote =>
+      'Bộ tính giá áp dụng khuyến mãi này rồi dừng lại, nên không cộng thêm khuyến mãi có độ ưu tiên thấp hơn.';
+
+  @override
+  String get partnerPromotionActive => 'Đang bật';
+
+  @override
+  String get partnerPromotionInactive => 'Đang tắt';
+
+  @override
+  String get partnerPromotionExpired => 'Đã qua ngày kết thúc';
+
+  @override
+  String get partnerPromotionScheduled => 'Bắt đầu sau';
+
+  @override
+  String get partnerPromotionExclusivePill => 'Không cộng dồn';
+
+  @override
+  String partnerPromotionValidity(String from, String to) {
+    return '$from – $to';
+  }
+
+  @override
+  String partnerPromotionPriorityValue(String count) {
+    return 'Ưu tiên $count';
+  }
+
+  @override
+  String get partnerPromotionHasConditions => 'Có điều kiện kèm theo';
+
+  @override
+  String get partnerPromotionActivateAction => 'Bật';
+
+  @override
+  String get partnerPromotionDeactivateAction => 'Tắt';
+
+  @override
+  String get partnerPromotionTypeGeneral => 'Chung';
+
+  @override
+  String get partnerPromotionTypeRoom => 'Ưu đãi phòng';
+
+  @override
+  String get partnerPromotionTypeHotel => 'Ưu đãi cơ sở';
+
+  @override
+  String get partnerPromotionTypeMember => 'Thành viên';
+
+  @override
+  String get partnerPromotionTypeEarlyBird => 'Đặt sớm';
+
+  @override
+  String get partnerPromotionTypeLastMinute => 'Đặt sát ngày';
+
+  @override
+  String get partnerPromotionTypeWeekend => 'Cuối tuần';
+
+  @override
+  String get partnerPromotionTypeHoliday => 'Ngày lễ';
+
+  @override
+  String get partnerPromotionTypeUnknown => 'Loại không xác định';
+
+  @override
+  String get partnerDiscountTypePercentage => 'Theo phần trăm';
+
+  @override
+  String get partnerDiscountTypeFixed => 'Số tiền cố định';
+
+  @override
+  String get partnerDiscountTypeUnknown => 'Kiểu giảm giá không xác định';
+
+  @override
+  String get partnerPromotionTargetAll => 'Mọi cơ sở trên Plan Your Trip';
+
+  @override
+  String get partnerPromotionTargetHotel => 'Một cơ sở của bạn';
+
+  @override
+  String get partnerPromotionTargetRoom => 'Một phòng của bạn';
+
+  @override
+  String partnerPromotionTargetRoomNamed(String name) {
+    return 'Phòng: $name';
+  }
+
+  @override
+  String get partnerPromotionTargetUnknown => 'Đối tượng không xác định';
+
+  @override
+  String get partnerPromotionPreviewHeading => 'Xem trước giá';
+
+  @override
+  String get partnerPromotionPreviewNote =>
+      'Máy chủ tính toán phần này. Mọi số tiền và mọi khuyến mãi được áp dụng đều đến trực tiếp từ bộ tính giá — ứng dụng không tự tính bất kỳ con số nào.';
+
+  @override
+  String get partnerPromotionPreviewAction => 'Chạy xem trước';
+
+  @override
+  String get partnerPromotionPreviewInvalidRange =>
+      'Ngày trả phòng phải sau ngày nhận phòng.';
+
+  @override
+  String partnerPromotionPreviewStay(String from, String to, String nights) {
+    return '$from đến $to · $nights đêm';
+  }
+
+  @override
+  String get partnerPromotionPreviewBase => 'Giá gốc';
+
+  @override
+  String get partnerPromotionPreviewRatePlan => 'Giá theo gói giá';
+
+  @override
+  String partnerPromotionPreviewRatePlanNamed(String name) {
+    return 'Gói giá: $name';
+  }
+
+  @override
+  String get partnerPromotionPreviewDiscount => 'Số tiền khuyến mãi giảm';
+
+  @override
+  String get partnerPromotionPreviewTotal => 'Tổng cho kỳ lưu trú này';
+
+  @override
+  String get partnerPromotionPreviewAppliedHeading =>
+      'Khuyến mãi mà bộ tính giá đã áp dụng';
+
+  @override
+  String get partnerPromotionPreviewNoneApplied =>
+      'Bộ tính giá không áp dụng khuyến mãi nào cho kỳ lưu trú này.';
+
+  @override
+  String get partnerPromotionPreviewUnnamed => 'Khuyến mãi không tên';
+
+  @override
+  String partnerPromotionPreviewAppliedAmount(String amount) {
+    return '-$amount';
+  }
+
+  @override
+  String partnerPromotionActivatedMessage(String name) {
+    return '$name đã được bật.';
+  }
+
+  @override
+  String partnerPromotionDeactivatedMessage(String name) {
+    return '$name đã được tắt.';
+  }
+
+  @override
+  String get partnerPromotionActionNotFound =>
+      'Khuyến mãi đó không còn khả dụng với tài khoản của bạn.';
+
+  @override
+  String get partnerPromotionActionConflict =>
+      'Mã khuyến mãi đó đã được dùng. Mã khuyến mãi là duy nhất trên toàn Plan Your Trip.';
+
+  @override
+  String get partnerPromotionActionValidation =>
+      'Máy chủ đã từ chối khuyến mãi này. Không có gì thay đổi.';
+
+  @override
+  String get partnerPromotionActionIncomplete =>
+      'Khuyến mãi này thiếu những trường mà thao tác cập nhật cần, nên không có yêu cầu nào được gửi đi. Hãy liên hệ bộ phận hỗ trợ để thay đổi.';
+
+  @override
+  String get partnerVoucherCheckHeading => 'Kiểm tra voucher đặt phòng';
+
+  @override
+  String get partnerVoucherCheckNote =>
+      'Đây là vé xác nhận đặt phòng, không phải mã giảm giá. Việc kiểm tra chỉ xác nhận đặt phòng của khách — không nhận phòng cho ai và không thay đổi dữ liệu.';
+
+  @override
+  String get partnerVoucherCheckField => 'Chuỗi voucher';
+
+  @override
+  String get partnerVoucherCheckAction => 'Kiểm tra voucher';
+
+  @override
+  String get partnerVoucherCheckClear => 'Xóa';
+
+  @override
+  String get partnerVoucherEligibleTitle => 'Hợp lệ — có thể đón khách';
+
+  @override
+  String get partnerVoucherEligibleMessage =>
+      'Chữ ký hợp lệ và đặt phòng này đã sẵn sàng nhận phòng.';
+
+  @override
+  String get partnerVoucherNotEligibleTitle =>
+      'Hợp lệ — nhưng chưa thể nhận phòng';
+
+  @override
+  String get partnerVoucherNotEligibleMessage =>
+      'Chữ ký hợp lệ, nhưng đặt phòng này hiện chưa thể nhận phòng.';
+
+  @override
+  String get partnerVoucherNotRecognisedTitle => 'Không nhận diện được';
+
+  @override
+  String get partnerVoucherNotRecognisedMessage =>
+      'Máy chủ không nhận diện voucher này cho tài khoản của bạn. Voucher có thể đã bị sửa, không tồn tại, hoặc thuộc về đối tác khác — máy chủ không cho biết trường hợp nào.';
+
+  @override
+  String get partnerVoucherEmptyTitle => 'Chưa có gì để kiểm tra';
+
+  @override
+  String get partnerVoucherEmptyMessage =>
+      'Hãy dán hoặc quét chuỗi voucher trước.';
+
+  @override
+  String get partnerVoucherFailedTitle => 'Không kiểm tra được voucher này';
+
+  @override
+  String get partnerVoucherFieldBooking => 'Mã đặt phòng';
+
+  @override
+  String get partnerVoucherFieldBookingStatus => 'Trạng thái đặt phòng';
+
+  @override
+  String get partnerVoucherFieldGuest => 'Tên khách';
+
+  @override
+  String get partnerVoucherFieldProperty => 'Cơ sở đã đặt';
+
+  @override
+  String get partnerVoucherFieldRoom => 'Phòng đã đặt';
+
+  @override
+  String get partnerVoucherFieldStay => 'Kỳ lưu trú';
+
+  @override
+  String get partnerVoucherFieldOccupancy => 'Số khách';
+
+  @override
+  String partnerVoucherStayValue(String from, String to, String nights) {
+    return '$from đến $to · $nights đêm';
+  }
+
+  @override
+  String partnerVoucherOccupancyValue(String adults, String children) {
+    return '$adults người lớn · $children trẻ em';
+  }
+
+  @override
+  String get partnerVoucherReadOnlyNote =>
+      'Chỉ kiểm tra. Việc nhận phòng thực hiện trên đặt phòng, không phải trên màn hình này.';
+
+  @override
+  String get partnerBookingsTitle => 'Đặt chỗ & lễ tân';
+
+  @override
+  String get partnerBookingsTabReservations => 'Danh sách đặt chỗ';
+
+  @override
+  String get partnerBookingsTabFrontDesk => 'Lễ tân';
+
+  @override
+  String get partnerBookingsScopeNote =>
+      'Danh sách này gồm mọi đặt chỗ ở tất cả cơ sở bạn sở hữu. API đối tác không nhận tham số cơ sở, nên danh sách không lọc theo cơ sở bạn đang chọn — hãy lọc theo phòng để tập trung vào một cơ sở.';
+
+  @override
+  String get partnerBookingsEmptyTitle => 'Chưa có đặt chỗ nào';
+
+  @override
+  String get partnerBookingsEmptyMessage =>
+      'Chưa có ai đặt chỗ tại các cơ sở của bạn. Đặt chỗ mới sẽ xuất hiện ở đây ngay khi khách đặt.';
+
+  @override
+  String get partnerBookingsNoMatchTitle => 'Không có đặt chỗ nào khớp bộ lọc';
+
+  @override
+  String get partnerBookingsNoMatchMessage =>
+      'Không có kết quả nào khớp với bộ lọc bạn đã đặt. Hãy xóa bộ lọc để xem lại toàn bộ.';
+
+  @override
+  String get partnerBookingDetailHeading => 'Chi tiết đặt chỗ';
+
+  @override
+  String get partnerBookingCloseDetail => 'Đóng chi tiết đặt chỗ';
+
+  @override
+  String get partnerBookingNotFound =>
+      'Đặt chỗ đó không còn khả dụng với tài khoản của bạn.';
+
+  @override
+  String get partnerBookingColumnCode => 'Mã đặt chỗ';
+
+  @override
+  String get partnerBookingColumnGuest => 'Khách';
+
+  @override
+  String get partnerBookingColumnRoom => 'Loại phòng';
+
+  @override
+  String get partnerBookingColumnCheckIn => 'Nhận phòng';
+
+  @override
+  String get partnerBookingColumnCheckOut => 'Trả phòng';
+
+  @override
+  String get partnerBookingColumnNights => 'Số đêm';
+
+  @override
+  String get partnerBookingColumnStatus => 'Trạng thái';
+
+  @override
+  String get partnerBookingColumnTotal => 'Tổng tiền';
+
+  @override
+  String partnerBookingStayRange(String from, String to) {
+    return '$from – $to';
+  }
+
+  @override
+  String partnerBookingNightsValue(String count) {
+    return '$count đêm';
+  }
+
+  @override
+  String partnerBookingOccupancyValue(String adults, String children) {
+    return '$adults người lớn · $children trẻ em';
+  }
+
+  @override
+  String partnerBookingNightProgressValue(String current, String total) {
+    return 'Đêm $current trên $total';
+  }
+
+  @override
+  String get partnerBookingStatusPending => 'Chờ xử lý';
+
+  @override
+  String get partnerBookingStatusConfirmed => 'Đã xác nhận';
+
+  @override
+  String get partnerBookingStatusCheckInReady => 'Sẵn sàng nhận phòng';
+
+  @override
+  String get partnerBookingStatusCheckedIn => 'Đã nhận phòng';
+
+  @override
+  String get partnerBookingStatusCheckedOut => 'Đã trả phòng';
+
+  @override
+  String get partnerBookingStatusCompleted => 'Đã hoàn tất';
+
+  @override
+  String get partnerBookingStatusCancelled => 'Đã hủy';
+
+  @override
+  String get partnerBookingStatusRefunded => 'Đã hoàn tiền';
+
+  @override
+  String get partnerBookingStatusArchived => 'Đã lưu trữ';
+
+  @override
+  String get partnerBookingStatusNoShow => 'Khách không đến';
+
+  @override
+  String get partnerBookingStatusUnknown => 'Trạng thái không xác định';
+
+  @override
+  String get partnerStayStateUpcoming => 'Kỳ lưu trú sắp tới';
+
+  @override
+  String get partnerStayStateReady => 'Sẵn sàng nhận phòng';
+
+  @override
+  String get partnerStayStateInHouse => 'Đang lưu trú';
+
+  @override
+  String get partnerStayStateCheckedOut => 'Đã rời đi';
+
+  @override
+  String get partnerStayStateCompleted => 'Kỳ lưu trú đã hoàn tất';
+
+  @override
+  String get partnerStayStateCancelled => 'Kỳ lưu trú đã hủy';
+
+  @override
+  String get partnerStayStateNoShow => 'Khách đã không đến';
+
+  @override
+  String get partnerStayStateExpired => 'Đã quá thời hạn';
+
+  @override
+  String get partnerStayStateUnknown => 'Trạng thái lưu trú không xác định';
+
+  @override
+  String get partnerStayWarningCancelled =>
+      'Kỳ lưu trú này đã bị hủy, đã hoàn tiền, hoặc được ghi nhận là khách không đến.';
+
+  @override
+  String get partnerStayWarningCompleted => 'Kỳ lưu trú này đã kết thúc.';
+
+  @override
+  String get partnerStayWarningInHouse => 'Khách đang lưu trú.';
+
+  @override
+  String get partnerStayWarningCheckOutOverdue =>
+      'Quá hạn trả phòng — đã qua ngày trả phòng nhưng khách vẫn đang ở trạng thái đã nhận phòng.';
+
+  @override
+  String get partnerStayWarningFuture => 'Kỳ lưu trú chưa bắt đầu.';
+
+  @override
+  String get partnerStayWarningCheckInOverdue =>
+      'Quá hạn nhận phòng — đã qua ngày đến nhưng khách chưa nhận phòng.';
+
+  @override
+  String get partnerStayWarningUnknown =>
+      'Máy chủ báo một cảnh báo mà ứng dụng chưa nhận diện được.';
+
+  @override
+  String get partnerBookingFilterGuest => 'Tên hoặc email khách';
+
+  @override
+  String get partnerBookingFilterCode => 'Mã đặt chỗ';
+
+  @override
+  String get partnerBookingFilterStatus => 'Trạng thái đặt chỗ';
+
+  @override
+  String get partnerBookingFilterAnyStatus => 'Mọi trạng thái';
+
+  @override
+  String get partnerBookingFilterRoom => 'Theo phòng';
+
+  @override
+  String get partnerBookingFilterAnyRoom => 'Mọi phòng';
+
+  @override
+  String get partnerBookingFilterDates => 'Ngày đến';
+
+  @override
+  String get partnerBookingFilterClear => 'Xóa bộ lọc';
+
+  @override
+  String get partnerBookingFilterArrivals => 'Đến hôm nay';
+
+  @override
+  String get partnerBookingFilterDepartures => 'Rời hôm nay';
+
+  @override
+  String get partnerBookingFilterUpcoming => 'Sắp tới';
+
+  @override
+  String get partnerBookingFilterInHouse => 'Đang lưu trú';
+
+  @override
+  String get partnerBookingFilterCancelled => 'Đã hủy';
+
+  @override
+  String get partnerBookingFilterCompleted => 'Đã hoàn tất';
+
+  @override
+  String partnerBookingFilterRangeBoth(String from, String to) {
+    return 'Đến từ $from tới $to';
+  }
+
+  @override
+  String partnerBookingFilterRangeFrom(String from) {
+    return 'Đến từ ngày $from trở đi';
+  }
+
+  @override
+  String partnerBookingFilterRangeTo(String to) {
+    return 'Đến vào hoặc trước ngày $to';
+  }
+
+  @override
+  String partnerBookingPageRange(String from, String to, String total) {
+    return 'Hiển thị $from-$to trên $total';
+  }
+
+  @override
+  String partnerBookingPagePosition(String page, String total) {
+    return 'Trang $page trên $total';
+  }
+
+  @override
+  String get partnerBookingPagePrevious => 'Trang trước';
+
+  @override
+  String get partnerBookingPageNext => 'Trang sau';
+
+  @override
+  String get partnerBookingSectionGuest => 'Khách';
+
+  @override
+  String get partnerBookingSectionStay => 'Kỳ lưu trú';
+
+  @override
+  String get partnerBookingSectionRoom => 'Cơ sở & phòng';
+
+  @override
+  String get partnerBookingSectionPrice => 'Giá đặt chỗ';
+
+  @override
+  String get partnerBookingSectionRatePlan => 'Gói giá được ghi nhận khi đặt';
+
+  @override
+  String get partnerBookingSectionPayment => 'Thanh toán & hóa đơn';
+
+  @override
+  String get partnerBookingSectionTimeline => 'Dòng thời gian vòng đời';
+
+  @override
+  String get partnerBookingSectionModifications => 'Lịch sử thay đổi';
+
+  @override
+  String get partnerBookingSectionAudit => 'Bản ghi nhận & trả phòng';
+
+  @override
+  String get partnerBookingFieldGuestName => 'Tên khách';
+
+  @override
+  String get partnerBookingFieldGuestEmail => 'Email khách';
+
+  @override
+  String get partnerBookingFieldOccupancy => 'Số khách';
+
+  @override
+  String get partnerBookingFieldSpecialRequest => 'Yêu cầu đặc biệt';
+
+  @override
+  String get partnerBookingFieldCheckIn => 'Ngày nhận phòng';
+
+  @override
+  String get partnerBookingFieldCheckOut => 'Ngày trả phòng';
+
+  @override
+  String get partnerBookingFieldNights => 'Số đêm đã đặt';
+
+  @override
+  String get partnerBookingFieldNightProgress => 'Tiến độ lưu trú';
+
+  @override
+  String get partnerBookingFieldActualCheckIn => 'Thời điểm nhận phòng thực tế';
+
+  @override
+  String get partnerBookingFieldActualCheckOut => 'Thời điểm trả phòng thực tế';
+
+  @override
+  String get partnerBookingFieldProperty => 'Cơ sở đã đặt';
+
+  @override
+  String get partnerBookingFieldRoom => 'Phòng đã đặt';
+
+  @override
+  String get partnerBookingFieldRoomCode => 'Mã phòng';
+
+  @override
+  String get partnerBookingFieldRoomCount => 'Số phòng đã đặt';
+
+  @override
+  String get partnerBookingFieldBasePrice => 'Giá gốc';
+
+  @override
+  String get partnerBookingFieldRatePlanPrice => 'Giá theo gói giá';
+
+  @override
+  String get partnerBookingFieldDiscount => 'Mức giảm đã áp dụng';
+
+  @override
+  String get partnerBookingFieldTotal => 'Tổng đã tính';
+
+  @override
+  String get partnerBookingPriceNote =>
+      'Mọi số tiền ở đây do máy chủ tính và lưu lại vào thời điểm đặt chỗ. Ứng dụng không tính lại bất kỳ con số nào.';
+
+  @override
+  String get partnerBookingFieldRatePlanName => 'Gói giá';
+
+  @override
+  String get partnerBookingFieldRatePlanCode => 'Mã gói giá';
+
+  @override
+  String get partnerBookingFieldMealPlan => 'Gói bữa ăn';
+
+  @override
+  String get partnerBookingFieldCancellationPolicy => 'Chính sách hủy';
+
+  @override
+  String get partnerBookingFieldCancellationDeadline => 'Hạn hủy miễn phí';
+
+  @override
+  String get partnerBookingFieldRefundable => 'Được hoàn tiền';
+
+  @override
+  String get partnerBookingFieldNightlySnapshot => 'Giá mỗi đêm đã ghi nhận';
+
+  @override
+  String get partnerBookingSnapshotNote =>
+      'Các giá trị này được ghi nhận vào lúc đặt chỗ. Việc chỉnh sửa gói giá hôm nay không làm thay đổi chúng.';
+
+  @override
+  String get partnerBookingNoPayments =>
+      'Chưa ghi nhận khoản thanh toán nào cho đặt chỗ này.';
+
+  @override
+  String get partnerBookingPaymentUnnamed => 'Thanh toán';
+
+  @override
+  String get partnerBookingFieldInvoice => 'Số hóa đơn';
+
+  @override
+  String get partnerBookingFieldInvoiceStatus => 'Trạng thái hóa đơn';
+
+  @override
+  String get partnerBookingFieldInvoiceTotal => 'Tổng hóa đơn';
+
+  @override
+  String get partnerBookingPaymentReadOnlyNote =>
+      'Thông tin thanh toán chỉ để xem. API đối tác không có thao tác thanh toán, hoàn tiền hay đối soát, và mã thẻ cùng mã giao dịch của cổng thanh toán không bao giờ được gửi tới màn hình này.';
+
+  @override
+  String get partnerBookingTimelineEmpty =>
+      'Máy chủ không ghi nhận sự kiện vòng đời nào cho đặt chỗ này.';
+
+  @override
+  String get partnerBookingEventCreated => 'Đã tạo đặt chỗ';
+
+  @override
+  String get partnerBookingEventPaid => 'Đã thanh toán xong';
+
+  @override
+  String get partnerBookingEventConfirmed => 'Đã xác nhận đặt chỗ';
+
+  @override
+  String get partnerBookingEventCheckedIn => 'Khách đã nhận phòng';
+
+  @override
+  String get partnerBookingEventCheckedOut => 'Khách đã trả phòng';
+
+  @override
+  String get partnerBookingEventCompleted => 'Đã hoàn tất đặt chỗ';
+
+  @override
+  String get partnerBookingEventCancelled => 'Đã hủy đặt chỗ';
+
+  @override
+  String get partnerBookingEventArchived => 'Đã lưu trữ đặt chỗ';
+
+  @override
+  String get partnerBookingEventModified => 'Đã thay đổi đặt chỗ';
+
+  @override
+  String get partnerBookingEventReview => 'Khách đã gửi đánh giá';
+
+  @override
+  String get partnerBookingModificationNote =>
+      'Khách tự thay đổi đặt chỗ của mình. Đây là bản ghi những gì đã thay đổi — API đối tác không cho phép thay đổi đặt chỗ từ đây.';
+
+  @override
+  String get partnerBookingModificationDates => 'Ngày';
+
+  @override
+  String get partnerBookingModificationOccupancy => 'Số khách';
+
+  @override
+  String get partnerBookingModificationRatePlan => 'Gói giá';
+
+  @override
+  String get partnerBookingModificationPrice => 'Giá tiền';
+
+  @override
+  String get partnerBookingNoAudit =>
+      'Chưa ghi nhận việc nhận phòng hay trả phòng cho đặt chỗ này.';
+
+  @override
+  String get partnerBookingAuditCheckIn => 'Đã ghi nhận nhận phòng';
+
+  @override
+  String get partnerBookingAuditCheckOut => 'Đã ghi nhận trả phòng';
+
+  @override
+  String partnerBookingAuditByUser(String userId) {
+    return 'Nhân viên #$userId';
+  }
+
+  @override
+  String get partnerBookingActionCheckIn => 'Nhận phòng';
+
+  @override
+  String get partnerBookingActionCheckOut => 'Trả phòng';
+
+  @override
+  String get partnerBookingActionNoShow => 'Đánh dấu khách không đến';
+
+  @override
+  String get partnerBookingActionComplete => 'Hoàn tất đặt chỗ';
+
+  @override
+  String get partnerBookingActionsIrreversibleNote =>
+      'Những thay đổi này không thể hoàn tác từ trang đối tác, và khách sẽ nhận được thông báo.';
+
+  @override
+  String get partnerBookingNoActionsAvailable =>
+      'Không có thao tác vận hành nào khả dụng với trạng thái hiện tại của đặt chỗ này.';
+
+  @override
+  String get partnerBookingNoActionsClosed =>
+      'Đặt chỗ này đã khép lại nên không còn thao tác vận hành nào.';
+
+  @override
+  String partnerBookingActionConfirm(String action, String code) {
+    return '$action cho đặt chỗ $code? Thao tác này không thể hoàn tác từ trang đối tác, và khách sẽ nhận được thông báo.';
+  }
+
+  @override
+  String get partnerBookingActionConfirmCta => 'Xác nhận';
+
+  @override
+  String get partnerBookingActionCancel => 'Hủy bỏ';
+
+  @override
+  String partnerBookingActionSucceeded(String action, String code) {
+    return 'Đã $action cho đặt chỗ $code.';
+  }
+
+  @override
+  String get partnerBookingActionRejected =>
+      'Máy chủ từ chối thay đổi đó với trạng thái hiện tại của đặt chỗ. Không có gì thay đổi.';
+
+  @override
+  String get partnerBookingActionValidation =>
+      'Máy chủ đã từ chối yêu cầu đó. Không có gì thay đổi.';
+
+  @override
+  String get partnerBookingActionUncertain =>
+      'Kết nối bị ngắt trước khi máy chủ xác nhận, và thay đổi này không thể hoàn tác. Hãy làm mới để xem trạng thái hiện tại trước khi thử lại.';
+
+  @override
+  String get partnerFrontDeskHeading => 'Nhận hoặc trả phòng cho khách';
+
+  @override
+  String get partnerFrontDeskNote =>
+      'Quét mã QR voucher của khách hoặc nhập mã đặt chỗ. Thao tác này thay đổi đặt chỗ và gửi thông báo cho khách.';
+
+  @override
+  String get partnerFrontDeskField => 'Chuỗi voucher hoặc mã đặt chỗ';
+
+  @override
+  String get partnerFrontDeskFieldHelp =>
+      'Voucher được quét sẽ ghi nhận là quét QR; mã đặt chỗ nhập tay sẽ ghi nhận là thủ công.';
+
+  @override
+  String get partnerFrontDeskCheckInAction => 'Cho khách nhận phòng';
+
+  @override
+  String get partnerFrontDeskCheckOutAction => 'Cho khách trả phòng';
+
+  @override
+  String get partnerFrontDeskClear => 'Xóa';
+
+  @override
+  String partnerFrontDeskConfirm(String code) {
+    return 'Tiếp tục với $code? Thao tác này thay đổi đặt chỗ, gửi thông báo cho khách và không thể hoàn tác từ trang đối tác.';
+  }
+
+  @override
+  String get partnerFrontDeskCheckedInTitle => 'Khách đã nhận phòng';
+
+  @override
+  String get partnerFrontDeskCheckedOutTitle => 'Khách đã trả phòng';
+
+  @override
+  String get partnerFrontDeskIdempotentNote =>
+      'Thực hiện lại thao tác này trên cùng một đặt chỗ là an toàn: máy chủ giữ nguyên thời điểm ban đầu và không ghi nhận trùng lặp.';
+
+  @override
+  String get partnerFrontDeskNotRecognisedTitle => 'Không nhận diện được';
+
+  @override
+  String get partnerFrontDeskNotRecognisedMessage =>
+      'Máy chủ không nhận diện voucher hoặc mã đặt chỗ đó cho tài khoản của bạn. Nó có thể đã bị sửa, không tồn tại, hoặc thuộc về đối tác khác — máy chủ không cho biết trường hợp nào.';
+
+  @override
+  String get partnerFrontDeskRejectedTitle => 'Chưa thể thực hiện';
+
+  @override
+  String get partnerFrontDeskRejectedMessage =>
+      'Trạng thái hoặc ngày của đặt chỗ này hiện chưa cho phép thao tác đó. Không có gì thay đổi.';
+
+  @override
+  String get partnerFrontDeskInvalidTitle => 'Chưa có gì để gửi';
+
+  @override
+  String get partnerFrontDeskInvalidMessage =>
+      'Hãy quét hoặc nhập chuỗi voucher hay mã đặt chỗ trước.';
+
+  @override
+  String get partnerFrontDeskFailedTitle => 'Không thể hoàn tất thao tác này';
+
+  @override
+  String get partnerFrontDeskUncertainTitle => 'Chưa rõ kết quả';
+
+  @override
+  String get partnerFrontDeskUncertainMessage =>
+      'Kết nối bị ngắt trước khi máy chủ xác nhận. Hãy kiểm tra trạng thái đặt chỗ — nếu thao tác chưa thành công thì chạy lại là an toàn.';
+
+  @override
+  String get partnerCalendarTitle => 'Lịch & tồn phòng';
+
+  @override
+  String get partnerCalendarTabOverview => 'Lịch cơ sở';
+
+  @override
+  String get partnerCalendarTabInventory => 'Tồn phòng theo phòng';
+
+  @override
+  String get partnerCalendarScopeNote =>
+      'Toàn bộ phòng của cơ sở đang chọn, theo từng đêm. Các số liệu lấy từ chính những bản ghi tồn phòng mà tab Tồn phòng chỉnh sửa — màn hình này chỉ đọc.';
+
+  @override
+  String partnerCalendarWindowRange(String from, String to) {
+    return '$from – $to';
+  }
+
+  @override
+  String get partnerCalendarPreviousWeek => 'Tuần trước';
+
+  @override
+  String get partnerCalendarNextWeek => 'Tuần sau';
+
+  @override
+  String get partnerCalendarToday => 'Hôm nay';
+
+  @override
+  String get partnerCalendarNoRoomsTitle => 'Cơ sở này chưa có phòng nào';
+
+  @override
+  String get partnerCalendarNoRoomsMessage =>
+      'Chưa có gì để lên lịch cho tới khi cơ sở có ít nhất một phòng. Phòng được quản lý trong mục Phòng.';
+
+  @override
+  String get partnerCalendarWindowEmptyMessage =>
+      'Không có bản ghi tồn phòng nào cho bất kỳ phòng nào trong khoảng ngày này. Đêm không có bản ghi thì không thể bán, vì máy chủ đếm số bản ghi và từ chối kỳ lưu trú nếu thiếu bất kỳ đêm nào.';
+
+  @override
+  String partnerCalendarRoomsFailed(String failed, String total) {
+    return 'Không tải được lịch của $failed trên $total phòng. Những hàng đó hiển thị là không đọc được, không phải là trống.';
+  }
+
+  @override
+  String partnerCalendarRoomFailed(String room) {
+    return 'Không tải được $room.';
+  }
+
+  @override
+  String get partnerCalendarStateOpen => 'Đang mở bán';
+
+  @override
+  String get partnerCalendarStateSoldOut => 'Đã hết phòng';
+
+  @override
+  String get partnerCalendarStateStopSell => 'Ngừng bán';
+
+  @override
+  String get partnerCalendarStateNoRecord => 'Không có bản ghi';
+
+  @override
+  String get partnerCalendarLegendHeading => 'Mỗi đêm hiển thị điều gì';
+
+  @override
+  String get partnerCalendarLegendClosedArrival => 'Chặn nhận phòng';
+
+  @override
+  String get partnerCalendarLegendClosedDeparture => 'Chặn trả phòng';
+
+  @override
+  String get partnerCalendarLegendOccupied => 'Số phòng đã bán';
+
+  @override
+  String get partnerCalendarLegendNote =>
+      'Con số trên mỗi đêm là số phòng còn trống. Chặn nhận phòng khiến kỳ lưu trú không được bắt đầu vào đêm đó; chặn trả phòng khiến kỳ lưu trú không được kết thúc ở đêm đó. Cả hai đều không ngăn đêm đó được bán trong một kỳ lưu trú dài hơn.';
+
+  @override
+  String partnerCalendarSoldValue(String count) {
+    return 'đã bán $count';
+  }
+
+  @override
+  String get partnerCalendarMetricSellable => 'đêm đang mở bán';
+
+  @override
+  String get partnerCalendarMetricOccupied => 'đêm có phòng đã bán';
+
+  @override
+  String get partnerCalendarMetricRestricted => 'đêm có hạn chế';
+
+  @override
+  String get partnerCalendarMetricMissing => 'đêm không có bản ghi';
+
+  @override
+  String partnerCalendarNightHeading(String room, String date) {
+    return '$room · $date';
+  }
+
+  @override
+  String get partnerCalendarCloseNight => 'Đóng chi tiết đêm';
+
+  @override
+  String get partnerCalendarFieldAvailable => 'Còn trống';
+
+  @override
+  String get partnerCalendarFieldSold => 'Đã bán';
+
+  @override
+  String get partnerCalendarFieldBlocked => 'Đang khóa';
+
+  @override
+  String get partnerCalendarFieldMaintenance => 'Đang bảo trì';
+
+  @override
+  String get partnerCalendarFieldTotal => 'Tổng số phòng';
+
+  @override
+  String get partnerCalendarInconsistentMessage =>
+      'Số phòng còn trống, đã bán, đang khóa và đang bảo trì không cộng lại bằng tổng của đêm này. Các con số của máy chủ được hiển thị nguyên vẹn.';
+
+  @override
+  String get partnerCalendarNoRecordExplanation =>
+      'Không có bản ghi tồn phòng cho đêm này. Điều đó không đồng nghĩa với còn trống: máy chủ đếm số bản ghi, nên mọi kỳ lưu trú bao gồm đêm này đều bị từ chối. Hãy tạo bản ghi trong tab Tồn phòng để đêm này có thể bán được.';
+
+  @override
+  String get partnerCalendarQuestionsHeading => 'Đêm này cho phép những gì';
+
+  @override
+  String get partnerCalendarQuestionStock => 'Vẫn còn phòng trống';
+
+  @override
+  String get partnerCalendarQuestionSellable => 'Đêm này có thể bán';
+
+  @override
+  String get partnerCalendarQuestionArrival =>
+      'Kỳ lưu trú có thể bắt đầu vào đêm này';
+
+  @override
+  String get partnerCalendarQuestionDeparture =>
+      'Kỳ lưu trú có thể kết thúc ở đêm này';
+
+  @override
+  String get partnerCalendarQuestionsNote =>
+      'Đây là bốn phép kiểm tra riêng biệt của máy chủ, không phải một. Một đêm vẫn có thể bán được trong kỳ lưu trú dài hơn dù đang chặn nhận phòng hoặc chặn trả phòng.';
+
+  @override
+  String get partnerCalendarReasonNoStock => 'Không còn phòng nào cho đêm này.';
+
+  @override
+  String get partnerCalendarReasonStopSell => 'Đêm này đang bật ngừng bán.';
+
+  @override
+  String get partnerCalendarReasonNotSellable =>
+      'Đêm này hoàn toàn không thể bán.';
+
+  @override
+  String get partnerCalendarReasonClosedArrival =>
+      'Đêm này đang chặn nhận phòng.';
+
+  @override
+  String get partnerCalendarReasonClosedDeparture =>
+      'Đêm này đang chặn trả phòng.';
+
+  @override
+  String get partnerCalendarReadOnlyNote =>
+      'Lịch này chỉ để xem. Ngừng bán, chặn nhận phòng và chặn trả phòng được thay đổi trong tab Tồn phòng, để mọi thao tác ghi chỉ do một nơi quản lý.';
+
+  @override
+  String get partnerCalendarManageRestrictions => 'Mở tồn phòng theo phòng';
+
+  @override
+  String partnerMetricWindow(String from, String to) {
+    return '$from – $to';
+  }
+
+  @override
+  String get partnerMetricAllProperties => 'Tất cả cơ sở';
+
+  @override
+  String get partnerMetricChangeRange => 'Đổi khoảng ngày';
+
+  @override
+  String get partnerMetricDefaultRange => '30 ngày gần nhất';
+
+  @override
+  String get partnerMetricInvalidRange =>
+      'Ngày bắt đầu không được sau ngày kết thúc. Máy chủ từ chối khoảng ngày đó.';
+
+  @override
+  String get partnerMetricScopeNotFound =>
+      'Cơ sở đó không khả dụng với tài khoản của bạn.';
+
+  @override
+  String get partnerMetricNotLoaded => 'Phần này chưa được tải.';
+
+  @override
+  String get partnerMetricUnavailable => 'Không có dữ liệu';
+
+  @override
+  String partnerMetricSectionsFailed(String count) {
+    return 'Không tải được $count phần. Các phần đó hiển thị là không có dữ liệu, không phải bằng 0.';
+  }
+
+  @override
+  String partnerMetricPeakDay(String date, String value) {
+    return 'Ngày cao nhất $date, $value';
+  }
+
+  @override
+  String get partnerFinanceTitle => 'Tài chính & đối soát';
+
+  @override
+  String get partnerFinanceTabOverview => 'Doanh thu & hoa hồng';
+
+  @override
+  String get partnerFinanceTabRevenue => 'Doanh thu';
+
+  @override
+  String get partnerFinanceTabSettlement => 'Đối soát & chi trả';
+
+  @override
+  String get partnerFinanceScopeAll =>
+      'Số liệu bao gồm mọi cơ sở bạn sở hữu. Hãy chọn một cơ sở trong không gian làm việc để thu hẹp phạm vi. Số tiền hiển thị dạng số có phân nhóm: API tài chính không gửi kèm đơn vị tiền tệ.';
+
+  @override
+  String get partnerFinanceScopeProperty =>
+      'Số liệu chỉ bao gồm cơ sở đang chọn. Số tiền hiển thị dạng số có phân nhóm: API tài chính không gửi kèm đơn vị tiền tệ.';
+
+  @override
+  String get partnerFinanceEstimateNotice =>
+      'Đây là các con số ước tính, không phải bảng kê tài chính chính thức. Hoa hồng nền tảng được máy chủ áp dụng theo một tỷ lệ cố định, số thuế chỉ mang tính tham khảo, và các kỳ đối soát được tính từ doanh thu đặt phòng chứ không đọc từ sổ đối soát.';
+
+  @override
+  String get partnerFinanceNoData =>
+      'Máy chủ không trả về số liệu nào cho khoảng thời gian này.';
+
+  @override
+  String get partnerFinanceOverviewHeading => 'Doanh thu và hoa hồng';
+
+  @override
+  String get partnerFinanceOverviewSubtitle =>
+      'Đặt phòng được tính theo ngày nhận phòng nằm trong khoảng đã chọn.';
+
+  @override
+  String get partnerFinanceCommissionCaption =>
+      'Do máy chủ tính theo tỷ lệ cố định';
+
+  @override
+  String get partnerFinanceTaxCaption =>
+      'Chỉ mang tính tham khảo — không phải số thuế thực tế';
+
+  @override
+  String get partnerFinanceCompletedLabel => 'Đặt phòng đã hoàn tất';
+
+  @override
+  String get partnerFinancePaidLabel => 'Đặt phòng đã thanh toán';
+
+  @override
+  String get partnerFinancePendingCaption =>
+      'Toàn bộ doanh thu ròng của khoảng thời gian: hệ thống chưa theo dõi phần đã thực sự đối soát';
+
+  @override
+  String get partnerFinanceNextPayoutCaption =>
+      'Theo chu kỳ hằng tháng giả định, không phải ngày đã lên lịch';
+
+  @override
+  String get partnerFinanceCommissionHeading => 'Chi tiết hoa hồng';
+
+  @override
+  String partnerFinanceRateNotice(String rate) {
+    return 'Máy chủ đã áp dụng tỷ lệ nền tảng cố định $rate. Đây là hằng số trong dịch vụ, không phải tỷ lệ đã thương lượng, và ứng dụng không bao giờ tự áp dụng nó.';
+  }
+
+  @override
+  String get partnerFinanceRevenueHeading => 'Chi tiết doanh thu';
+
+  @override
+  String get partnerFinanceRevenueSubtitle =>
+      'Mọi con số đều do máy chủ tính và làm tròn. Màn hình này không tính lại bất kỳ giá trị nào.';
+
+  @override
+  String get partnerFinanceRevenueEmpty =>
+      'Không ghi nhận doanh thu nào trong khoảng thời gian này.';
+
+  @override
+  String get partnerFinanceAverageBooking => 'Giá trị đặt phòng trung bình';
+
+  @override
+  String get partnerFinanceHighestBooking => 'Đặt phòng cao nhất';
+
+  @override
+  String get partnerFinanceByDay => 'Theo ngày';
+
+  @override
+  String get partnerFinanceByMonth => 'Theo tháng';
+
+  @override
+  String get partnerFinanceByProperty => 'Theo cơ sở';
+
+  @override
+  String get partnerFinanceByRoom => 'Theo phòng';
+
+  @override
+  String get partnerFinanceSettlementHeading => 'Đối soát';
+
+  @override
+  String get partnerFinanceSettlementSubtitle =>
+      'Các kỳ là tháng dương lịch được tính từ doanh thu đặt phòng. Không có sổ đối soát nào đứng sau chúng.';
+
+  @override
+  String get partnerFinanceSettlementEmpty =>
+      'Không có kỳ đối soát nào trong khoảng thời gian này.';
+
+  @override
+  String get partnerFinanceCurrentSettlement => 'Kỳ hiện tại';
+
+  @override
+  String get partnerFinanceLastSettlement => 'Kỳ trước';
+
+  @override
+  String get partnerFinancePending => 'Đang chờ';
+
+  @override
+  String get partnerFinancePaid => 'Đã đối soát';
+
+  @override
+  String get partnerFinanceSettlementMismatch =>
+      'Máy chủ báo có khoản đã đối soát trong khi không kỳ nào bên dưới được đánh dấu đã đối soát. Cả hai giá trị đều hiển thị đúng như máy chủ gửi; hãy thận trọng với tổng đã đối soát.';
+
+  @override
+  String get partnerFinanceSettlementPeriods => 'Các kỳ';
+
+  @override
+  String get partnerFinancePeriod => 'Kỳ';
+
+  @override
+  String get partnerFinanceStatus => 'Trạng thái';
+
+  @override
+  String get partnerFinanceStatusPaid => 'Đã đối soát';
+
+  @override
+  String get partnerFinanceStatusPending => 'Đang chờ';
+
+  @override
+  String get partnerFinanceStatusUnknown => 'Không xác định';
+
+  @override
+  String get partnerFinancePayoutHeading => 'Chi trả';
+
+  @override
+  String get partnerFinancePayoutSubtitle =>
+      'Vẫn là các kỳ được tính đó, chia theo trạng thái.';
+
+  @override
+  String get partnerFinancePayoutEmpty =>
+      'Không có kỳ chi trả nào trong khoảng thời gian này.';
+
+  @override
+  String get partnerFinanceEstimatedPayoutDate => 'Ngày chi trả dự kiến';
+
+  @override
+  String get partnerFinanceUpcomingPayouts => 'Sắp tới';
+
+  @override
+  String get partnerFinanceCompletedPayouts => 'Đã hoàn tất';
+
+  @override
+  String get partnerFinancePayoutNoRecords =>
+      'API đối tác không có bản ghi chi trả nào — không có mã tham chiếu, thông tin ngân hàng hay thông tin cổng thanh toán để hiển thị, và ứng dụng cũng không yêu cầu chúng.';
+
+  @override
+  String get partnerFinanceInvoiceHeading => 'Hóa đơn';
+
+  @override
+  String get partnerFinanceInvoiceEmpty =>
+      'Không có hóa đơn nào được phát hành trong khoảng thời gian này.';
+
+  @override
+  String get partnerFinanceInvoiceIssued => 'Đã phát hành';
+
+  @override
+  String get partnerFinanceInvoicePaid => 'Đã thanh toán';
+
+  @override
+  String get partnerFinanceInvoiceCancelled => 'Đã hủy';
+
+  @override
+  String get partnerFinanceInvoiceRefunded => 'Đã hoàn tiền';
+
+  @override
+  String get partnerFinanceInvoiceTotal => 'Tổng đã xuất hóa đơn';
+
+  @override
+  String get partnerFinanceInvoiceNoDocuments =>
+      'API đối tác chỉ trả về số lượng hóa đơn. Không có danh sách hóa đơn, không có số hóa đơn để mở và không có bản tải xuống, nên ứng dụng không hiển thị chức năng đó.';
+
+  @override
+  String get partnerFinanceRefundHeading => 'Hoàn tiền';
+
+  @override
+  String get partnerFinanceRefundEmpty =>
+      'Không ghi nhận khoản hoàn tiền nào trong khoảng thời gian này.';
+
+  @override
+  String get partnerFinanceRefundCount => 'Số lần hoàn tiền';
+
+  @override
+  String get partnerFinanceRefundAmount => 'Số tiền đã hoàn';
+
+  @override
+  String get partnerFinanceRefundRate => 'Tỷ lệ hoàn tiền';
+
+  @override
+  String get partnerFinanceRefundReadOnly =>
+      'Phần hoàn tiền ở đây chỉ để xem. API đối tác không có thao tác hoàn tiền, nên việc hoàn tiền được thực hiện ở nơi khác.';
+
+  @override
+  String get partnerAnalyticsTitle => 'Phân tích hiệu suất';
+
+  @override
+  String get partnerAnalyticsDashboardPointer =>
+      'Doanh thu, công suất phòng và các tổng số chính nằm ở Bảng điều khiển, nơi đã báo cáo chúng. Trang này bổ sung những gì Bảng điều khiển chưa có.';
+
+  @override
+  String get partnerAnalyticsScopeAll =>
+      'Số liệu bao gồm mọi cơ sở bạn sở hữu. Hãy chọn một cơ sở trong không gian làm việc để thu hẹp phạm vi.';
+
+  @override
+  String get partnerAnalyticsScopeProperty =>
+      'Số liệu chỉ bao gồm cơ sở đang chọn.';
+
+  @override
+  String get partnerAnalyticsBookingsHeading => 'Hoạt động đặt phòng';
+
+  @override
+  String get partnerAnalyticsBookingsEmpty =>
+      'Không có đặt phòng nào trong khoảng thời gian này.';
+
+  @override
+  String get partnerAnalyticsArrivals => 'Lượt đến';
+
+  @override
+  String get partnerAnalyticsDepartures => 'Lượt đi';
+
+  @override
+  String get partnerAnalyticsCancellations => 'Lượt hủy';
+
+  @override
+  String get partnerAnalyticsNoShows => 'Khách không đến';
+
+  @override
+  String get partnerAnalyticsAverageStay => 'Thời gian lưu trú trung bình';
+
+  @override
+  String get partnerAnalyticsAverageStayCaption => 'Số đêm, do máy chủ tính';
+
+  @override
+  String get partnerAnalyticsByStatus => 'Theo trạng thái';
+
+  @override
+  String get partnerAnalyticsRoomsHeading => 'Hiệu suất phòng';
+
+  @override
+  String get partnerAnalyticsRoomsEmpty =>
+      'Không có hoạt động phòng nào trong khoảng thời gian này.';
+
+  @override
+  String get partnerAnalyticsOccupancyEstimate => 'Công suất ước tính';
+
+  @override
+  String get partnerAnalyticsOccupancyCaption =>
+      'Máy chủ gọi đây là con số ước tính';
+
+  @override
+  String get partnerAnalyticsTopRoomsRevenue => 'Phòng dẫn đầu theo doanh thu';
+
+  @override
+  String get partnerAnalyticsTopRoomsBookings => 'Phòng dẫn đầu theo lượt đặt';
+
+  @override
+  String get partnerAnalyticsAvailability => 'Tổng hợp tình trạng phòng trống';
+
+  @override
+  String get partnerAnalyticsPromotionsHeading => 'Hoạt động khuyến mãi';
+
+  @override
+  String get partnerAnalyticsPromotionsSubtitle =>
+      'Chỉ mang tính cấu trúc: máy chủ chưa thể quy khoản giảm giá về từng đặt phòng.';
+
+  @override
+  String get partnerAnalyticsPromotionsEmpty =>
+      'Không có hoạt động khuyến mãi nào trong khoảng thời gian này.';
+
+  @override
+  String get partnerAnalyticsActivePromotions => 'Khuyến mãi đang bật';
+
+  @override
+  String get partnerAnalyticsDiscountedBookings => 'Đặt phòng có giảm giá';
+
+  @override
+  String get partnerAnalyticsNoAttribution =>
+      'Máy chủ chưa quy được khoản giảm giá';
+
+  @override
+  String get partnerAnalyticsPromotionsByType => 'Theo loại';
+
+  @override
+  String get partnerAnalyticsPromotionsByStatus => 'Theo trạng thái khuyến mãi';
+
+  @override
+  String get partnerAnalyticsReviewsHeading => 'Tổng hợp đánh giá';
+
+  @override
+  String get partnerAnalyticsReviewsSubtitle =>
+      'Tổng hợp điểm và trạng thái kiểm duyệt. Từng đánh giá và phần trả lời được quản lý trong mục Đánh giá.';
+
+  @override
+  String get partnerAnalyticsReviewsEmpty =>
+      'Không có đánh giá nào trong khoảng thời gian này.';
+
+  @override
+  String get partnerAnalyticsAverageRating => 'Điểm trung bình';
+
+  @override
+  String get partnerAnalyticsApprovedOnly => 'Chỉ tính các đánh giá đã duyệt';
+
+  @override
+  String get partnerAnalyticsNoReviews =>
+      'Chưa có đánh giá nào để tính trung bình';
+
+  @override
+  String get partnerAnalyticsReviewCount => 'Tổng số đánh giá';
+
+  @override
+  String get partnerAnalyticsReviewsApproved => 'Đã duyệt';
+
+  @override
+  String get partnerAnalyticsReviewsPending => 'Chờ duyệt';
+
+  @override
+  String get partnerAnalyticsReviewsRejected => 'Đã từ chối';
+
+  @override
+  String get partnerAnalyticsMessagesHeading => 'Hoạt động tin nhắn';
+
+  @override
+  String get partnerAnalyticsMessagesEmpty =>
+      'Không có cuộc trò chuyện nào trong khoảng thời gian này.';
+
+  @override
+  String get partnerAnalyticsOpenConversations => 'Cuộc trò chuyện đang mở';
+
+  @override
+  String get partnerAnalyticsClosedConversations => 'Cuộc trò chuyện đã đóng';
+
+  @override
+  String get partnerAnalyticsArchivedConversations =>
+      'Cuộc trò chuyện đã lưu trữ';
+
+  @override
+  String get partnerAnalyticsUnreadMessages => 'Chưa đọc dành cho bạn';
+
+  @override
+  String get partnerAnalyticsResponseTime => 'Thời gian phản hồi trung bình';
+
+  @override
+  String get partnerAnalyticsNoResponses => 'Chưa đo được thời gian phản hồi';
+
+  @override
+  String partnerAnalyticsMinutesValue(String value) {
+    return '$value phút';
+  }
+
+  @override
+  String get partnerReviewsTitle => 'Đánh giá của khách';
+
+  @override
+  String get partnerReviewsAnalyticsPointer =>
+      'Điểm số và tổng hợp kiểm duyệt nằm ở trang Phân tích. Trang này dùng để trả lời.';
+
+  @override
+  String get partnerReviewsScopeNote =>
+      'Các đánh giá đã đăng của cơ sở đang chọn. Chỉ đánh giá đã đăng mới được trả lời, và đây đúng là tập hợp mà máy chủ cho phép trả lời.';
+
+  @override
+  String get partnerReviewsNoBodyNotice =>
+      'API đối tác không trả về nội dung khách đã viết — chỉ có điểm số, tiêu đề và ngày. Phần trả lời được viết dựa trên những thông tin đó.';
+
+  @override
+  String get partnerReviewsNoPropertyTitle => 'Hãy chọn một cơ sở';
+
+  @override
+  String get partnerReviewsNoPropertyMessage =>
+      'Đánh giá được liệt kê theo từng cơ sở. Hãy chọn một cơ sở trong không gian làm việc để xem đánh giá.';
+
+  @override
+  String get partnerReviewsEmptyTitle => 'Chưa có đánh giá nào được đăng';
+
+  @override
+  String get partnerReviewsEmptyMessage =>
+      'Chưa có nội dung nào được đăng cho cơ sở này. Đánh giá sẽ xuất hiện khi khách viết và được duyệt.';
+
+  @override
+  String get partnerReviewsNoMatchTitle => 'Không có mục nào khớp bộ lọc';
+
+  @override
+  String get partnerReviewsNoMatchMessage =>
+      'Cơ sở này có đánh giá, nhưng không có mục nào thuộc nhóm đã chọn.';
+
+  @override
+  String get partnerReviewsFilterAll => 'Hiện tất cả';
+
+  @override
+  String partnerReviewsFilterAllCount(String count) {
+    return 'Tất cả ($count)';
+  }
+
+  @override
+  String partnerReviewsFilterNeedsReplyCount(String count) {
+    return 'Cần trả lời ($count)';
+  }
+
+  @override
+  String partnerReviewsFilterRepliedCount(String count) {
+    return 'Đã trả lời ($count)';
+  }
+
+  @override
+  String get partnerReviewsNeedsReply => 'Cần trả lời';
+
+  @override
+  String get partnerReviewsReplied => 'Đã trả lời';
+
+  @override
+  String get partnerReviewsNoTitle => 'Đánh giá không có tiêu đề';
+
+  @override
+  String partnerReviewsRatingValue(String rating) {
+    return 'Chấm $rating trên 5';
+  }
+
+  @override
+  String get partnerReviewsReplyHeading => 'Phản hồi của bạn';
+
+  @override
+  String get partnerReviewsCloseReply => 'Đóng phần trả lời';
+
+  @override
+  String get partnerReviewsCurrentReply => 'Đang được đăng';
+
+  @override
+  String partnerReviewsRepliedAt(String date) {
+    return 'trả lời $date';
+  }
+
+  @override
+  String partnerReviewsEditedAt(String date) {
+    return 'sửa $date';
+  }
+
+  @override
+  String get partnerReviewsReplyField => 'Trả lời khách này';
+
+  @override
+  String get partnerReviewsReplyHelp =>
+      'Mỗi đánh giá chỉ có một phản hồi. Đăng lại sẽ thay thế phản hồi cũ chứ không thêm phản hồi thứ hai.';
+
+  @override
+  String get partnerReviewsPublicNotice =>
+      'Phản hồi của bạn được đăng công khai bên cạnh đánh giá, và sau đó không thể xóa — chỉ có thể sửa lại nội dung. Khách sẽ được thông báo trong lần bạn trả lời đầu tiên.';
+
+  @override
+  String get partnerReviewsPublishReply => 'Đăng phản hồi';
+
+  @override
+  String get partnerReviewsUpdateReply => 'Thay phản hồi';
+
+  @override
+  String get partnerReviewsPublishConfirm =>
+      'Đăng công khai phản hồi này? Sau đó không thể xóa, chỉ có thể viết lại.';
+
+  @override
+  String get partnerReviewsReplyPublished => 'Phản hồi của bạn đã được đăng.';
+
+  @override
+  String get partnerReviewsReplyEmpty =>
+      'Hãy viết nội dung phản hồi trước khi đăng.';
+
+  @override
+  String get partnerReviewsReplyUncertain =>
+      'Kết nối bị ngắt trước khi máy chủ xác nhận, và phản hồi thì không thể xóa. Hãy làm mới để xem phản hồi đã được đăng hay chưa.';
+
+  @override
+  String get partnerReviewsNotFound =>
+      'Đánh giá đó không còn khả dụng với tài khoản của bạn.';
+
+  @override
+  String get partnerReviewsNotApprovedNotice =>
+      'Chỉ đánh giá đã đăng mới được trả lời. Máy chủ từ chối phản hồi với mọi trạng thái khác.';
+
+  @override
+  String get partnerSettingsTitle => 'Tài khoản & cài đặt';
+
+  @override
+  String get partnerSettingsTabWorkspace => 'Chính sách & không gian làm việc';
+
+  @override
+  String get partnerSettingsTabTeam => 'Nhân sự';
+
+  @override
+  String get partnerSettingsTabPayout => 'Tài khoản nhận tiền';
+
+  @override
+  String get partnerSettingsTabProfile => 'Hồ sơ doanh nghiệp';
+
+  @override
+  String get partnerTeamHeading => 'Thành viên nhóm';
+
+  @override
+  String get partnerTeamSubtitle =>
+      'Tất cả những người có thể làm việc trong không gian đối tác này, kèm vai trò mà máy chủ cấp cho họ.';
+
+  @override
+  String get partnerTeamEmpty => 'Chưa ghi nhận thành viên nào.';
+
+  @override
+  String get partnerTeamOwnerOnly =>
+      'Chỉ chủ tài khoản đối tác mới thêm, sửa hoặc xóa được thành viên. Bạn vẫn có thể xem danh sách tại đây.';
+
+  @override
+  String get partnerTeamRoleField => 'Vai trò';
+
+  @override
+  String get partnerTeamActive => 'Đang hoạt động';
+
+  @override
+  String get partnerTeamInactive => 'Ngừng hoạt động';
+
+  @override
+  String get partnerTeamActivate => 'Kích hoạt';
+
+  @override
+  String get partnerTeamDeactivate => 'Tạm ngừng';
+
+  @override
+  String get partnerTeamRemove => 'Xóa khỏi nhóm';
+
+  @override
+  String partnerTeamRemoveConfirm(String member) {
+    return 'Xóa $member khỏi nhóm? Thao tác này không thể hoàn tác tại đây — sẽ phải thêm lại từ đầu.';
+  }
+
+  @override
+  String get partnerTeamInviteHeading => 'Thêm thành viên';
+
+  @override
+  String get partnerTeamInviteNote =>
+      'Máy chủ tìm tài khoản Plan Your Trip hiện có theo email. Hệ thống không gửi lời mời, nên người đó phải có sẵn tài khoản.';
+
+  @override
+  String get partnerTeamInviteEmail => 'Email tài khoản của họ';
+
+  @override
+  String get partnerTeamInviteAction => 'Thêm thành viên';
+
+  @override
+  String get partnerPayoutHeading => 'Tài khoản nhận tiền';
+
+  @override
+  String get partnerPayoutSubtitle =>
+      'Nơi các khoản đối soát sẽ được chuyển tới. Chỉ lưu dưới dạng thông tin tham chiếu.';
+
+  @override
+  String get partnerPayoutNone => 'Chưa thêm tài khoản nhận tiền nào.';
+
+  @override
+  String get partnerPayoutLoadFailed =>
+      'Không tải được tài khoản nhận tiền. Điều này khác với việc chưa có tài khoản.';
+
+  @override
+  String get partnerPayoutHolder => 'Chủ tài khoản';
+
+  @override
+  String get partnerPayoutBank => 'Ngân hàng';
+
+  @override
+  String get partnerPayoutAccountNumber => 'Số tài khoản';
+
+  @override
+  String partnerPayoutMasked(String last4) {
+    return 'Kết thúc bằng $last4';
+  }
+
+  @override
+  String get partnerPayoutMethod => 'Hình thức nhận tiền';
+
+  @override
+  String get partnerPayoutMethodBank => 'Chuyển khoản ngân hàng';
+
+  @override
+  String get partnerPayoutMethodManual => 'Thủ công';
+
+  @override
+  String get partnerPayoutMethodUnknown => 'Hình thức không xác định';
+
+  @override
+  String get partnerPayoutStatus => 'Trạng thái xác minh';
+
+  @override
+  String get partnerPayoutUpdated => 'Cập nhật lần cuối';
+
+  @override
+  String get partnerPayoutNoExecutionNotice =>
+      'Không có khoản chi trả nào được thực hiện từ đây, và số tài khoản đầy đủ không bao giờ được lưu: máy chủ chỉ giữ lại bốn chữ số cuối và loại bỏ phần còn lại ngay khi bạn gửi.';
+
+  @override
+  String get partnerPayoutRoleNotice =>
+      'Chỉ chủ tài khoản đối tác hoặc thành viên phụ trách tài chính mới thay đổi được các thông tin này. Bạn vẫn có thể xem tại đây.';
+
+  @override
+  String get partnerPayoutAdd => 'Thêm tài khoản nhận tiền';
+
+  @override
+  String get partnerPayoutReplace => 'Thay thông tin';
+
+  @override
+  String get partnerPayoutCancelEdit => 'Hủy bỏ';
+
+  @override
+  String get partnerPayoutFormHeading => 'Thông tin nhận tiền mới';
+
+  @override
+  String get partnerPayoutNumberHelp =>
+      'Tối thiểu 4 ký tự. Chỉ bốn chữ số cuối được lưu lại.';
+
+  @override
+  String get partnerPayoutSave => 'Lưu thông tin nhận tiền';
+
+  @override
+  String get partnerPayoutReplaceConfirm =>
+      'Thay thông tin nhận tiền? Số tài khoản trước đó không thể khôi phục vì nó chưa bao giờ được lưu.';
+
+  @override
+  String get partnerProfileHeading => 'Hồ sơ doanh nghiệp';
+
+  @override
+  String get partnerProfileBusinessName => 'Tên doanh nghiệp';
+
+  @override
+  String get partnerProfileRepresentative => 'Người đại diện';
+
+  @override
+  String get partnerProfileVerification => 'Tình trạng xác minh';
+
+  @override
+  String get partnerProfileYourRole => 'Vai trò của bạn';
+
+  @override
+  String get partnerProfileReadOnlyNotice =>
+      'Hồ sơ doanh nghiệp đã được duyệt không thể chỉnh sửa qua API đối tác — máy chủ chỉ nhận thay đổi khi hồ sơ còn là bản nháp hoặc đã bị từ chối. Hãy liên hệ bộ phận hỗ trợ để thay đổi.';
+
+  @override
+  String get partnerProfileStatusDraft => 'Bản nháp';
+
+  @override
+  String get partnerProfileStatusSubmitted => 'Đang chờ duyệt';
+
+  @override
+  String get partnerProfileStatusApproved => 'Đã duyệt';
+
+  @override
+  String get partnerProfileStatusRejected => 'Đã từ chối';
+
+  @override
+  String get partnerProfileStatusSuspended => 'Đã tạm ngưng';
+
+  @override
+  String get partnerProfileStatusUnknown => 'Trạng thái không xác định';
+
+  @override
+  String get partnerAccountSaved => 'Đã lưu.';
+
+  @override
+  String get partnerAccountNotFound =>
+      'Bản ghi đó không còn khả dụng với tài khoản của bạn.';
+
+  @override
+  String get partnerAccountConflict =>
+      'Máy chủ từ chối vì xung đột với một bản ghi đã có.';
+
+  @override
+  String get partnerAccountValidation =>
+      'Hãy kiểm tra lại thông tin rồi thử lại.';
+
+  @override
+  String get partnerAccountUncertain =>
+      'Kết nối bị ngắt trước khi máy chủ xác nhận. Hãy làm mới để xem trạng thái hiện tại trước khi thử lại.';
 }

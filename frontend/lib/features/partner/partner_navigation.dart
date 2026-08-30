@@ -119,6 +119,7 @@ class PartnerNavigation {
       icon: Icons.apartment_outlined,
       selectedIcon: Icons.apartment_rounded,
       group: PartnerNavGroup.property,
+      implemented: true,
     ),
     PartnerDestination(
       key: 'rooms',
@@ -126,6 +127,7 @@ class PartnerNavigation {
       icon: Icons.meeting_room_outlined,
       selectedIcon: Icons.meeting_room_rounded,
       group: PartnerNavGroup.property,
+      implemented: true,
     ),
     PartnerDestination(
       key: 'calendar',
@@ -133,6 +135,7 @@ class PartnerNavigation {
       icon: Icons.calendar_month_outlined,
       selectedIcon: Icons.calendar_month_rounded,
       group: PartnerNavGroup.property,
+      implemented: true,
     ),
     PartnerDestination(
       key: 'pricing',
@@ -140,6 +143,7 @@ class PartnerNavigation {
       icon: Icons.sell_outlined,
       selectedIcon: Icons.sell_rounded,
       group: PartnerNavGroup.property,
+      implemented: true,
     ),
     PartnerDestination(
       key: 'bookings',
@@ -147,6 +151,7 @@ class PartnerNavigation {
       icon: Icons.receipt_long_outlined,
       selectedIcon: Icons.receipt_long_rounded,
       group: PartnerNavGroup.operations,
+      implemented: true,
     ),
     PartnerDestination(
       key: 'messages',
@@ -163,6 +168,7 @@ class PartnerNavigation {
       selectedIcon: Icons.local_offer_rounded,
       group: PartnerNavGroup.growth,
       badge: PartnerNavBadge.activePromotions,
+      implemented: true,
     ),
     PartnerDestination(
       key: 'reviews',
@@ -171,6 +177,7 @@ class PartnerNavigation {
       selectedIcon: Icons.star_rounded,
       group: PartnerNavGroup.growth,
       badge: PartnerNavBadge.pendingReviews,
+      implemented: true,
     ),
     PartnerDestination(
       key: 'finance',
@@ -178,6 +185,7 @@ class PartnerNavigation {
       icon: Icons.account_balance_outlined,
       selectedIcon: Icons.account_balance_rounded,
       group: PartnerNavGroup.business,
+      implemented: true,
     ),
     PartnerDestination(
       key: 'analytics',
@@ -185,6 +193,7 @@ class PartnerNavigation {
       icon: Icons.insights_outlined,
       selectedIcon: Icons.insights_rounded,
       group: PartnerNavGroup.business,
+      implemented: true,
     ),
     PartnerDestination(
       key: 'notifications',
@@ -200,6 +209,7 @@ class PartnerNavigation {
       icon: Icons.settings_outlined,
       selectedIcon: Icons.settings_rounded,
       group: PartnerNavGroup.account,
+      implemented: true,
     ),
   ];
 

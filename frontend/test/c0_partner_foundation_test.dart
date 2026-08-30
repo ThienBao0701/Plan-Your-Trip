@@ -176,6 +176,76 @@ void main() {
         if (path.endsWith('/partner/team')) {
           return jsonResponse(teamJson('OWNER'), 200);
         }
+
+        // C1 — the dashboard screen now also consumes these. They are served
+        // here so the C0 shell assertions still exercise a fully-loaded
+        // dashboard; the C0 expectations themselves are unchanged.
+        if (path.endsWith('/partner/dashboard')) {
+          return jsonResponse({
+            // todaysArrivals/todaysDepartures are the same values
+            // `extranet/home` reports: PartnerExtranetService.getHome reads
+            // them straight off bookingService.getDashboard.
+            'todaysArrivals': 5,
+            'todaysDepartures': 3,
+            'currentGuests': 12,
+            'upcoming': 27,
+            'cancelled': 2,
+            'completed': 40,
+            'occupancyRate': 72.5,
+            'revenueToday': 3200,
+            'revenueMonth': 88000,
+            'averageStayNights': 2.4,
+          }, 200);
+        }
+        if (path.endsWith('/partner/analytics/overview')) {
+          return jsonResponse({
+            'totalRevenue': 125000,
+            'totalBookings': 64,
+            'confirmedBookings': 48,
+            'cancelledBookings': 6,
+            'completedBookings': 18,
+            'occupancyRate': 68.25,
+            'averageDailyRate': 1450.75,
+            'averageStayNights': 2.4,
+            'reviewAverage': 4.6,
+            'reviewCount': 30,
+            'unreadMessages': 4,
+            'responseRate': 91.5,
+          }, 200);
+        }
+        if (path.endsWith('/partner/analytics/occupancy')) {
+          return jsonResponse({
+            'occupancyByDay': [
+              {'date': '2026-08-26', 'value': 72.5},
+            ],
+            'totalRoomInventory': 34,
+            'soldRooms': 22,
+            'availableRooms': 12,
+            'stopSellDaysCount': 1,
+          }, 200);
+        }
+        if (path.endsWith('/partner/analytics/revenue')) {
+          return jsonResponse({
+            'revenueByDay': [
+              {'date': '2026-08-26', 'value': 4200},
+            ],
+            'revenueByRoom': <Object>[],
+            'revenueByHotel': <Object>[],
+            'revenueMonthToDate': 88000,
+            'revenueLast30Days': 125000,
+          }, 200);
+        }
+        if (path.endsWith('/partner/extranet/activity-logs')) {
+          return jsonResponse(<Object>[], 200);
+        }
+        if (path.endsWith('/partner/extranet/menu')) {
+          // Deliberately no badged entries here. C0's assertions are about the
+          // shell's own sidebar, and a badged entry would render the same
+          // destination name a second time in C1's "needs attention" rail,
+          // making those `findsOneWidget` checks ambiguous for reasons that
+          // have nothing to do with the shell. C1's own suite covers badges.
+          return jsonResponse({'sections': <Object>[]}, 200);
+        }
         return jsonResponse(errorBody(404, 'Not found', path), 404);
       });
 
@@ -662,12 +732,38 @@ void main() {
       expect(grouped.toSet().length, grouped.length);
     });
 
-    test('only the dashboard is implemented in C0', () {
+    test('only modules that are actually built are marked implemented', () {
+      // The point of this assertion is that no destination claims to be built
+      // before it is — an unbuilt module must fall through to the honest
+      // "planned" view rather than render a fabricated screen. The list grows
+      // as phases land: C0 shipped the shell + dashboard, C2 shipped hotels
+      // (Properties), C3 shipped rooms, C4 shipped calendar (Inventory),
+      // C5 shipped pricing (Rates), C6 shipped settings (Policies), C7 shipped
+      // promotions (Promotions & voucher check), C8 shipped bookings
+      // (Reservations & front desk), C9 added the property-calendar view to
+      // the calendar destination C4 already held (leaving the ledger unchanged),
+      // C10 concluded no new destination was warranted, C11 shipped finance and
+      // analytics, and C12 shipped reviews. This
+      // list is a deliberate ledger — it
+      // must be updated consciously each phase, so a destination flipped to
+      // implemented without a real screen behind it fails here first.
       final implemented = PartnerNavigation.destinations
           .where((d) => d.implemented)
           .map((d) => d.key)
           .toList();
-      expect(implemented, ['dashboard']);
+      expect(implemented, [
+        'dashboard', 'hotels', 'rooms', 'calendar', 'pricing', 'bookings',
+        'promotions', 'reviews', 'finance', 'analytics', 'settings',
+      ]);
+
+      // Everything else must still be unimplemented.
+      final planned = PartnerNavigation.destinations
+          .where((d) => !d.implemented)
+          .map((d) => d.key)
+          .toSet();
+      expect(planned, {
+        'messages', 'notifications',
+      });
     });
 
     test('settings write access mirrors the backend team-role rule', () {
@@ -735,13 +831,16 @@ void main() {
       );
 
       final l10n = AppLocalizationsEn();
-      await tester.tap(find.text(l10n.partnerNavFinance));
+      // Messages is still unbuilt. This example has moved twice as phases
+      // landed — Finance in C11, Reviews in C12 — while the assertion itself is
+      // unchanged.
+      await tester.tap(find.text(l10n.partnerNavMessages));
       await tester.pumpAndSettle();
 
       expect(find.byType(PartnerModuleScreen), findsOneWidget);
       expect(find.byType(PartnerDashboardScreen), findsNothing);
       expect(find.text(l10n.partnerModulePlannedBadge), findsOneWidget);
-      expect(find.text('Route: /partner/finance'), findsOneWidget);
+      expect(find.text('Route: /partner/messages'), findsOneWidget);
     });
 
     testWidgets('collapses to a drawer on a phone without breaking layout',

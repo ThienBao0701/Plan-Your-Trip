@@ -14787,6 +14787,5646 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your team role will not be able to change settings in this module.'**
   String get partnerModuleReadOnlyForRole;
+
+  /// No description provided for @partnerDashboardScopeHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Reporting scope'**
+  String get partnerDashboardScopeHeading;
+
+  /// No description provided for @partnerDashboardScopeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Applies to Performance, Occupancy and Revenue. Today\'s operations always cover every property.'**
+  String get partnerDashboardScopeHint;
+
+  /// No description provided for @partnerDashboardScopeToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today · all properties'**
+  String get partnerDashboardScopeToday;
+
+  /// No description provided for @partnerDashboardScopeAllProperties.
+  ///
+  /// In en, this message translates to:
+  /// **'All properties'**
+  String get partnerDashboardScopeAllProperties;
+
+  /// No description provided for @partnerDashboardScopeLast30AllProperties.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 30 days · all properties'**
+  String get partnerDashboardScopeLast30AllProperties;
+
+  /// No description provided for @partnerDashboardScopeWindowAll.
+  ///
+  /// In en, this message translates to:
+  /// **'{window} · all properties'**
+  String partnerDashboardScopeWindowAll(String window);
+
+  /// No description provided for @partnerDashboardScopeWindowOne.
+  ///
+  /// In en, this message translates to:
+  /// **'{window} · selected property'**
+  String partnerDashboardScopeWindowOne(String window);
+
+  /// No description provided for @partnerDashboardRangeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Date range'**
+  String get partnerDashboardRangeLabel;
+
+  /// No description provided for @partnerDashboardRangeLast7.
+  ///
+  /// In en, this message translates to:
+  /// **'7 days'**
+  String get partnerDashboardRangeLast7;
+
+  /// No description provided for @partnerDashboardRangeLast30.
+  ///
+  /// In en, this message translates to:
+  /// **'30 days'**
+  String get partnerDashboardRangeLast30;
+
+  /// No description provided for @partnerDashboardRangeLast90.
+  ///
+  /// In en, this message translates to:
+  /// **'90 days'**
+  String get partnerDashboardRangeLast90;
+
+  /// No description provided for @partnerDashboardPropertyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Property'**
+  String get partnerDashboardPropertyLabel;
+
+  /// No description provided for @partnerDashboardPropertyAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All properties'**
+  String get partnerDashboardPropertyAll;
+
+  /// No description provided for @partnerDashboardPropertyCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 property} other{{count} properties}}'**
+  String partnerDashboardPropertyCount(int count);
+
+  /// No description provided for @partnerDashboardRoomCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 active room} other{{count} active rooms}}'**
+  String partnerDashboardRoomCount(int count);
+
+  /// No description provided for @partnerDashboardTeamRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Your role: {role}'**
+  String partnerDashboardTeamRole(String role);
+
+  /// No description provided for @partnerDashboardActiveProperty.
+  ///
+  /// In en, this message translates to:
+  /// **'Scoped to {name}'**
+  String partnerDashboardActiveProperty(String name);
+
+  /// No description provided for @partnerDashboardUpdatedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated {time}'**
+  String partnerDashboardUpdatedAt(String time);
+
+  /// No description provided for @partnerDashboardNoActivityHint.
+  ///
+  /// In en, this message translates to:
+  /// **'No bookings fall in the selected window yet, so the performance figures below are zero.'**
+  String get partnerDashboardNoActivityHint;
+
+  /// No description provided for @partnerDashboardAttentionHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs attention'**
+  String get partnerDashboardAttentionHeading;
+
+  /// No description provided for @partnerDashboardAttentionClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing is waiting on you right now.'**
+  String get partnerDashboardAttentionClear;
+
+  /// No description provided for @partnerDashboardAttentionSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{label}, {count, plural, =1{1 item needs attention} other{{count} items need attention}}'**
+  String partnerDashboardAttentionSemantic(String label, int count);
+
+  /// No description provided for @partnerDashboardQuickActionsHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick actions'**
+  String get partnerDashboardQuickActionsHeading;
+
+  /// No description provided for @partnerDashboardPerformanceHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Performance'**
+  String get partnerDashboardPerformanceHeading;
+
+  /// No description provided for @partnerDashboardPerformanceEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No bookings in this period, so there is nothing to report yet.'**
+  String get partnerDashboardPerformanceEmpty;
+
+  /// No description provided for @partnerDashboardOccupancyHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Occupancy'**
+  String get partnerDashboardOccupancyHeading;
+
+  /// No description provided for @partnerDashboardOccupancyNoInventory.
+  ///
+  /// In en, this message translates to:
+  /// **'No room inventory is configured yet, so occupancy cannot be measured.'**
+  String get partnerDashboardOccupancyNoInventory;
+
+  /// No description provided for @partnerDashboardOccupancyChartLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Occupancy per day'**
+  String get partnerDashboardOccupancyChartLabel;
+
+  /// No description provided for @partnerDashboardRevenueHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Revenue'**
+  String get partnerDashboardRevenueHeading;
+
+  /// No description provided for @partnerDashboardRevenueChartLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Revenue per day'**
+  String get partnerDashboardRevenueChartLabel;
+
+  /// No description provided for @partnerDashboardFinanceHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Finance summary'**
+  String get partnerDashboardFinanceHeading;
+
+  /// No description provided for @partnerDashboardActivityHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent activity'**
+  String get partnerDashboardActivityHeading;
+
+  /// No description provided for @partnerDashboardActivityEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No activity has been recorded yet.'**
+  String get partnerDashboardActivityEmpty;
+
+  /// No description provided for @partnerDashboardActivityBy.
+  ///
+  /// In en, this message translates to:
+  /// **'by {actor}'**
+  String partnerDashboardActivityBy(String actor);
+
+  /// No description provided for @partnerDashboardActivityUnknownActor.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown user'**
+  String get partnerDashboardActivityUnknownActor;
+
+  /// No description provided for @partnerDashboardActivityMore.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 older entry} other{{count} older entries}}'**
+  String partnerDashboardActivityMore(int count);
+
+  /// No description provided for @partnerDashboardChartEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No data points in this period.'**
+  String get partnerDashboardChartEmpty;
+
+  /// No description provided for @partnerDashboardErrorUnauthorized.
+  ///
+  /// In en, this message translates to:
+  /// **'Your session expired. Sign in again to load this.'**
+  String get partnerDashboardErrorUnauthorized;
+
+  /// No description provided for @partnerDashboardErrorForbidden.
+  ///
+  /// In en, this message translates to:
+  /// **'Your partner profile is not approved for this data.'**
+  String get partnerDashboardErrorForbidden;
+
+  /// No description provided for @partnerDashboardErrorNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This data is not available for your partner profile.'**
+  String get partnerDashboardErrorNotFound;
+
+  /// No description provided for @partnerDashboardErrorValidation.
+  ///
+  /// In en, this message translates to:
+  /// **'That date range is not valid. Choose a different period.'**
+  String get partnerDashboardErrorValidation;
+
+  /// No description provided for @partnerDashboardErrorTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'This panel took too long to load.'**
+  String get partnerDashboardErrorTimeout;
+
+  /// No description provided for @partnerDashboardErrorNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not reach the server for this panel.'**
+  String get partnerDashboardErrorNetwork;
+
+  /// No description provided for @partnerDashboardErrorServer.
+  ///
+  /// In en, this message translates to:
+  /// **'The server could not produce this data.'**
+  String get partnerDashboardErrorServer;
+
+  /// No description provided for @partnerDashboardErrorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'This panel could not be loaded.'**
+  String get partnerDashboardErrorGeneric;
+
+  /// No description provided for @partnerValueUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'—'**
+  String get partnerValueUnavailable;
+
+  /// No description provided for @partnerKpiCurrentGuests.
+  ///
+  /// In en, this message translates to:
+  /// **'In house now'**
+  String get partnerKpiCurrentGuests;
+
+  /// No description provided for @partnerKpiUpcoming.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get partnerKpiUpcoming;
+
+  /// No description provided for @partnerKpiOccupancy.
+  ///
+  /// In en, this message translates to:
+  /// **'Occupancy'**
+  String get partnerKpiOccupancy;
+
+  /// No description provided for @partnerKpiRevenueToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Revenue today'**
+  String get partnerKpiRevenueToday;
+
+  /// No description provided for @partnerKpiRevenueMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Revenue this month'**
+  String get partnerKpiRevenueMonth;
+
+  /// No description provided for @partnerKpiAverageStay.
+  ///
+  /// In en, this message translates to:
+  /// **'Average stay (nights)'**
+  String get partnerKpiAverageStay;
+
+  /// No description provided for @partnerKpiTotalRevenue.
+  ///
+  /// In en, this message translates to:
+  /// **'Total revenue'**
+  String get partnerKpiTotalRevenue;
+
+  /// No description provided for @partnerKpiTotalBookings.
+  ///
+  /// In en, this message translates to:
+  /// **'Total bookings'**
+  String get partnerKpiTotalBookings;
+
+  /// No description provided for @partnerKpiAdr.
+  ///
+  /// In en, this message translates to:
+  /// **'Average daily rate'**
+  String get partnerKpiAdr;
+
+  /// No description provided for @partnerKpiAdrCaption.
+  ///
+  /// In en, this message translates to:
+  /// **'Per sold room night'**
+  String get partnerKpiAdrCaption;
+
+  /// No description provided for @partnerKpiConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed'**
+  String get partnerKpiConfirmed;
+
+  /// No description provided for @partnerKpiCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get partnerKpiCancelled;
+
+  /// No description provided for @partnerKpiReviewAverage.
+  ///
+  /// In en, this message translates to:
+  /// **'Average rating'**
+  String get partnerKpiReviewAverage;
+
+  /// No description provided for @partnerKpiReviewCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No reviews} =1{From 1 review} other{From {count} reviews}}'**
+  String partnerKpiReviewCount(int count);
+
+  /// No description provided for @partnerKpiResponseRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Message response rate'**
+  String get partnerKpiResponseRate;
+
+  /// No description provided for @partnerOccupancyInventory.
+  ///
+  /// In en, this message translates to:
+  /// **'Room inventory'**
+  String get partnerOccupancyInventory;
+
+  /// No description provided for @partnerOccupancySold.
+  ///
+  /// In en, this message translates to:
+  /// **'Sold rooms'**
+  String get partnerOccupancySold;
+
+  /// No description provided for @partnerOccupancyAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Available rooms'**
+  String get partnerOccupancyAvailable;
+
+  /// No description provided for @partnerOccupancyStopSell.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop-sell days'**
+  String get partnerOccupancyStopSell;
+
+  /// No description provided for @partnerRevenueMonthToDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Month to date'**
+  String get partnerRevenueMonthToDate;
+
+  /// No description provided for @partnerRevenueLast30.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 30 days'**
+  String get partnerRevenueLast30;
+
+  /// No description provided for @partnerRevenueByProperty.
+  ///
+  /// In en, this message translates to:
+  /// **'Revenue by property'**
+  String get partnerRevenueByProperty;
+
+  /// No description provided for @partnerFinanceGross.
+  ///
+  /// In en, this message translates to:
+  /// **'Gross revenue'**
+  String get partnerFinanceGross;
+
+  /// No description provided for @partnerFinanceNet.
+  ///
+  /// In en, this message translates to:
+  /// **'Net revenue'**
+  String get partnerFinanceNet;
+
+  /// No description provided for @partnerFinanceCommission.
+  ///
+  /// In en, this message translates to:
+  /// **'Platform commission'**
+  String get partnerFinanceCommission;
+
+  /// No description provided for @partnerFinanceTax.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated tax'**
+  String get partnerFinanceTax;
+
+  /// No description provided for @partnerFinanceRefunded.
+  ///
+  /// In en, this message translates to:
+  /// **'Refunded'**
+  String get partnerFinanceRefunded;
+
+  /// No description provided for @partnerFinancePendingSettlement.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending settlement'**
+  String get partnerFinancePendingSettlement;
+
+  /// No description provided for @partnerFinanceNextPayout.
+  ///
+  /// In en, this message translates to:
+  /// **'Next estimated payout'**
+  String get partnerFinanceNextPayout;
+
+  /// No description provided for @partnerFinanceCompletedBookings.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 completed booking} other{{count} completed bookings}}'**
+  String partnerFinanceCompletedBookings(int count);
+
+  /// No description provided for @partnerFinancePaidBookings.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 paid booking} other{{count} paid bookings}}'**
+  String partnerFinancePaidBookings(int count);
+
+  /// No description provided for @partnerPropertiesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No properties} =1{1 property} other{{count} properties}}'**
+  String partnerPropertiesCount(int count);
+
+  /// No description provided for @partnerPropertiesEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No properties yet'**
+  String get partnerPropertiesEmptyTitle;
+
+  /// No description provided for @partnerPropertiesEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your partner profile is approved, but no property has been assigned to it yet. Properties are assigned by the Plan Your Trip team.'**
+  String get partnerPropertiesEmptyMessage;
+
+  /// No description provided for @partnerPropertiesSelectedSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected property'**
+  String get partnerPropertiesSelectedSemantic;
+
+  /// No description provided for @partnerPropertyDetailHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Property details'**
+  String get partnerPropertyDetailHeading;
+
+  /// No description provided for @partnerPropertyCloseDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Close details'**
+  String get partnerPropertyCloseDetail;
+
+  /// No description provided for @partnerPropertyDetailNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This property is no longer available to your account.'**
+  String get partnerPropertyDetailNotFound;
+
+  /// No description provided for @partnerPropertyActionsOwnerOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Listing actions are available to the profile owner. You can review every detail here.'**
+  String get partnerPropertyActionsOwnerOnly;
+
+  /// No description provided for @partnerPropertyStatusDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft'**
+  String get partnerPropertyStatusDraft;
+
+  /// No description provided for @partnerPropertyStatusPendingReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending review'**
+  String get partnerPropertyStatusPendingReview;
+
+  /// No description provided for @partnerPropertyStatusApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved'**
+  String get partnerPropertyStatusApproved;
+
+  /// No description provided for @partnerPropertyStatusPublished.
+  ///
+  /// In en, this message translates to:
+  /// **'Published'**
+  String get partnerPropertyStatusPublished;
+
+  /// No description provided for @partnerPropertyStatusHidden.
+  ///
+  /// In en, this message translates to:
+  /// **'Hidden'**
+  String get partnerPropertyStatusHidden;
+
+  /// No description provided for @partnerPropertyStatusArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived'**
+  String get partnerPropertyStatusArchived;
+
+  /// No description provided for @partnerPropertyStatusRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get partnerPropertyStatusRejected;
+
+  /// No description provided for @partnerPropertyStatusUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown status'**
+  String get partnerPropertyStatusUnknown;
+
+  /// No description provided for @partnerPropertyActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Listing on'**
+  String get partnerPropertyActive;
+
+  /// No description provided for @partnerPropertyInactive.
+  ///
+  /// In en, this message translates to:
+  /// **'Listing off'**
+  String get partnerPropertyInactive;
+
+  /// No description provided for @partnerPropertyVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified'**
+  String get partnerPropertyVerified;
+
+  /// No description provided for @partnerPropertyNotVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Not verified'**
+  String get partnerPropertyNotVerified;
+
+  /// No description provided for @partnerPropertyFeatured.
+  ///
+  /// In en, this message translates to:
+  /// **'Featured'**
+  String get partnerPropertyFeatured;
+
+  /// No description provided for @partnerPropertyNotFeatured.
+  ///
+  /// In en, this message translates to:
+  /// **'Not featured'**
+  String get partnerPropertyNotFeatured;
+
+  /// No description provided for @partnerPropertyNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set'**
+  String get partnerPropertyNotSet;
+
+  /// No description provided for @partnerPropertyRatingSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{rating} from {count, plural, =1{1 review} other{{count} reviews}}'**
+  String partnerPropertyRatingSummary(String rating, int count);
+
+  /// No description provided for @partnerPropertyVisibilityPublic.
+  ///
+  /// In en, this message translates to:
+  /// **'Guests can find and book this property now.'**
+  String get partnerPropertyVisibilityPublic;
+
+  /// No description provided for @partnerPropertyVisibilityNotPublic.
+  ///
+  /// In en, this message translates to:
+  /// **'This property is not visible to guests right now.'**
+  String get partnerPropertyVisibilityNotPublic;
+
+  /// No description provided for @partnerPropertyModerationNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification and featuring are managed by the Plan Your Trip team and cannot be changed here.'**
+  String get partnerPropertyModerationNote;
+
+  /// No description provided for @partnerPropertyActivateAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn listing on'**
+  String get partnerPropertyActivateAction;
+
+  /// No description provided for @partnerPropertyDeactivateAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn listing off'**
+  String get partnerPropertyDeactivateAction;
+
+  /// No description provided for @partnerPropertyActivatedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is now listed.'**
+  String partnerPropertyActivatedMessage(String name);
+
+  /// No description provided for @partnerPropertyDeactivatedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is no longer listed.'**
+  String partnerPropertyDeactivatedMessage(String name);
+
+  /// No description provided for @partnerPropertyActionNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'That property is no longer available to your account.'**
+  String get partnerPropertyActionNotFound;
+
+  /// No description provided for @partnerPropertyActionFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The change could not be saved. Nothing was altered.'**
+  String get partnerPropertyActionFailed;
+
+  /// No description provided for @partnerPropertyActionUncertain.
+  ///
+  /// In en, this message translates to:
+  /// **'The connection dropped before the server confirmed. Refresh to see the current state.'**
+  String get partnerPropertyActionUncertain;
+
+  /// No description provided for @partnerPropertySectionIdentity.
+  ///
+  /// In en, this message translates to:
+  /// **'Identity'**
+  String get partnerPropertySectionIdentity;
+
+  /// No description provided for @partnerPropertySectionLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get partnerPropertySectionLocation;
+
+  /// No description provided for @partnerPropertySectionContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact'**
+  String get partnerPropertySectionContact;
+
+  /// No description provided for @partnerPropertySectionPolicies.
+  ///
+  /// In en, this message translates to:
+  /// **'Policies'**
+  String get partnerPropertySectionPolicies;
+
+  /// No description provided for @partnerPropertySectionVerification.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification'**
+  String get partnerPropertySectionVerification;
+
+  /// No description provided for @partnerPropertySectionPerformance.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest feedback'**
+  String get partnerPropertySectionPerformance;
+
+  /// No description provided for @partnerPropertySectionMetadata.
+  ///
+  /// In en, this message translates to:
+  /// **'Record'**
+  String get partnerPropertySectionMetadata;
+
+  /// No description provided for @partnerPropertyFieldSlug.
+  ///
+  /// In en, this message translates to:
+  /// **'URL slug'**
+  String get partnerPropertyFieldSlug;
+
+  /// No description provided for @partnerPropertyFieldShortDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Short description'**
+  String get partnerPropertyFieldShortDescription;
+
+  /// No description provided for @partnerPropertyFieldDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get partnerPropertyFieldDescription;
+
+  /// No description provided for @partnerPropertyFieldAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get partnerPropertyFieldAddress;
+
+  /// No description provided for @partnerPropertyFieldCoordinates.
+  ///
+  /// In en, this message translates to:
+  /// **'Coordinates'**
+  String get partnerPropertyFieldCoordinates;
+
+  /// No description provided for @partnerPropertyFieldPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get partnerPropertyFieldPhone;
+
+  /// No description provided for @partnerPropertyFieldEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get partnerPropertyFieldEmail;
+
+  /// No description provided for @partnerPropertyFieldWebsite.
+  ///
+  /// In en, this message translates to:
+  /// **'Website'**
+  String get partnerPropertyFieldWebsite;
+
+  /// No description provided for @partnerPropertyFieldFacebook.
+  ///
+  /// In en, this message translates to:
+  /// **'Facebook'**
+  String get partnerPropertyFieldFacebook;
+
+  /// No description provided for @partnerPropertyFieldInstagram.
+  ///
+  /// In en, this message translates to:
+  /// **'Instagram'**
+  String get partnerPropertyFieldInstagram;
+
+  /// No description provided for @partnerPropertyFieldCheckIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in from'**
+  String get partnerPropertyFieldCheckIn;
+
+  /// No description provided for @partnerPropertyFieldCheckOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-out by'**
+  String get partnerPropertyFieldCheckOut;
+
+  /// No description provided for @partnerPropertyFieldChildrenPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Children policy'**
+  String get partnerPropertyFieldChildrenPolicy;
+
+  /// No description provided for @partnerPropertyFieldPetPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Pet policy'**
+  String get partnerPropertyFieldPetPolicy;
+
+  /// No description provided for @partnerPropertyFieldSmokingPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Smoking policy'**
+  String get partnerPropertyFieldSmokingPolicy;
+
+  /// No description provided for @partnerPropertyFieldVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification status'**
+  String get partnerPropertyFieldVerified;
+
+  /// No description provided for @partnerPropertyFieldFeatured.
+  ///
+  /// In en, this message translates to:
+  /// **'Featured placement'**
+  String get partnerPropertyFieldFeatured;
+
+  /// No description provided for @partnerPropertyFieldRating.
+  ///
+  /// In en, this message translates to:
+  /// **'Average rating'**
+  String get partnerPropertyFieldRating;
+
+  /// No description provided for @partnerPropertyFieldReviewCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviews'**
+  String get partnerPropertyFieldReviewCount;
+
+  /// No description provided for @partnerPropertyFieldOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Owned by'**
+  String get partnerPropertyFieldOwner;
+
+  /// No description provided for @partnerPropertyFieldCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Created'**
+  String get partnerPropertyFieldCreated;
+
+  /// No description provided for @partnerPropertyFieldUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Last updated'**
+  String get partnerPropertyFieldUpdated;
+
+  /// No description provided for @partnerRoomsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 room type} other{{count} room types}}'**
+  String partnerRoomsCount(int count);
+
+  /// No description provided for @partnerRoomsListedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 listed} other{{count} listed}}'**
+  String partnerRoomsListedCount(int count);
+
+  /// No description provided for @partnerRoomsSoldOutCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 sold out} other{{count} sold out}}'**
+  String partnerRoomsSoldOutCount(int count);
+
+  /// No description provided for @partnerRoomsForProperty.
+  ///
+  /// In en, this message translates to:
+  /// **'Rooms at {name}'**
+  String partnerRoomsForProperty(String name);
+
+  /// No description provided for @partnerRoomsNoPropertyContext.
+  ///
+  /// In en, this message translates to:
+  /// **'No property selected'**
+  String get partnerRoomsNoPropertyContext;
+
+  /// No description provided for @partnerRoomsPropertyScope.
+  ///
+  /// In en, this message translates to:
+  /// **'Property scope'**
+  String get partnerRoomsPropertyScope;
+
+  /// No description provided for @partnerRoomsSelectPropertyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a property'**
+  String get partnerRoomsSelectPropertyTitle;
+
+  /// No description provided for @partnerRoomsSelectPropertyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Rooms belong to a specific property, so pick one to see its room types.'**
+  String get partnerRoomsSelectPropertyMessage;
+
+  /// No description provided for @partnerRoomsNoPropertiesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No properties yet'**
+  String get partnerRoomsNoPropertiesTitle;
+
+  /// No description provided for @partnerRoomsNoPropertiesMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Rooms live inside a property. Once a property is assigned to your profile, its room types appear here.'**
+  String get partnerRoomsNoPropertiesMessage;
+
+  /// No description provided for @partnerRoomsPropertyUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Property unavailable'**
+  String get partnerRoomsPropertyUnavailableTitle;
+
+  /// No description provided for @partnerRoomsPropertyUnavailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This property is no longer available to your account, or it has no room configuration yet.'**
+  String get partnerRoomsPropertyUnavailableMessage;
+
+  /// No description provided for @partnerRoomsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No room types yet'**
+  String get partnerRoomsEmptyTitle;
+
+  /// No description provided for @partnerRoomsEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This property has no room types configured. They are set up by the Plan Your Trip team.'**
+  String get partnerRoomsEmptyMessage;
+
+  /// No description provided for @partnerRoomActionsOwnerOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Listing actions are available to the profile owner. You can review every room here.'**
+  String get partnerRoomActionsOwnerOnly;
+
+  /// No description provided for @partnerRoomDetailHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Room details'**
+  String get partnerRoomDetailHeading;
+
+  /// No description provided for @partnerRoomCloseDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Close room details'**
+  String get partnerRoomCloseDetail;
+
+  /// No description provided for @partnerRoomDetailNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This room is no longer available to your account.'**
+  String get partnerRoomDetailNotFound;
+
+  /// No description provided for @partnerRoomListed.
+  ///
+  /// In en, this message translates to:
+  /// **'Listed'**
+  String get partnerRoomListed;
+
+  /// No description provided for @partnerRoomUnlisted.
+  ///
+  /// In en, this message translates to:
+  /// **'Not listed'**
+  String get partnerRoomUnlisted;
+
+  /// No description provided for @partnerRoomSoldOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Sold out'**
+  String get partnerRoomSoldOut;
+
+  /// No description provided for @partnerRoomListAction.
+  ///
+  /// In en, this message translates to:
+  /// **'List this room'**
+  String get partnerRoomListAction;
+
+  /// No description provided for @partnerRoomUnlistAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop listing'**
+  String get partnerRoomUnlistAction;
+
+  /// No description provided for @partnerRoomListedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is now listed.'**
+  String partnerRoomListedMessage(String name);
+
+  /// No description provided for @partnerRoomUnlistedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is no longer listed.'**
+  String partnerRoomUnlistedMessage(String name);
+
+  /// No description provided for @partnerRoomActionNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'That room is no longer available to your account.'**
+  String get partnerRoomActionNotFound;
+
+  /// No description provided for @partnerRoomYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get partnerRoomYes;
+
+  /// No description provided for @partnerRoomNo.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get partnerRoomNo;
+
+  /// No description provided for @partnerRoomGuestsValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Up to {count} guests'**
+  String partnerRoomGuestsValue(String count);
+
+  /// No description provided for @partnerRoomInventoryValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{available} of {total} available'**
+  String partnerRoomInventoryValue(String available, String total);
+
+  /// No description provided for @partnerRoomPriceFromValue.
+  ///
+  /// In en, this message translates to:
+  /// **'From {price}'**
+  String partnerRoomPriceFromValue(String price);
+
+  /// No description provided for @partnerRoomSizeValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{size} m²'**
+  String partnerRoomSizeValue(String size);
+
+  /// No description provided for @partnerRoomSectionIdentity.
+  ///
+  /// In en, this message translates to:
+  /// **'Identity'**
+  String get partnerRoomSectionIdentity;
+
+  /// No description provided for @partnerRoomSectionBeds.
+  ///
+  /// In en, this message translates to:
+  /// **'Beds'**
+  String get partnerRoomSectionBeds;
+
+  /// No description provided for @partnerRoomSectionCapacity.
+  ///
+  /// In en, this message translates to:
+  /// **'Capacity'**
+  String get partnerRoomSectionCapacity;
+
+  /// No description provided for @partnerRoomSectionInventory.
+  ///
+  /// In en, this message translates to:
+  /// **'Inventory'**
+  String get partnerRoomSectionInventory;
+
+  /// No description provided for @partnerRoomSectionPricing.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get partnerRoomSectionPricing;
+
+  /// No description provided for @partnerRoomSectionConditions.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking conditions'**
+  String get partnerRoomSectionConditions;
+
+  /// No description provided for @partnerRoomSectionAmenities.
+  ///
+  /// In en, this message translates to:
+  /// **'Amenities'**
+  String get partnerRoomSectionAmenities;
+
+  /// No description provided for @partnerRoomSectionMedia.
+  ///
+  /// In en, this message translates to:
+  /// **'Media'**
+  String get partnerRoomSectionMedia;
+
+  /// No description provided for @partnerRoomFieldCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Room code'**
+  String get partnerRoomFieldCode;
+
+  /// No description provided for @partnerRoomFieldType.
+  ///
+  /// In en, this message translates to:
+  /// **'Room type'**
+  String get partnerRoomFieldType;
+
+  /// No description provided for @partnerRoomFieldDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get partnerRoomFieldDescription;
+
+  /// No description provided for @partnerRoomFieldBedType.
+  ///
+  /// In en, this message translates to:
+  /// **'Bed type'**
+  String get partnerRoomFieldBedType;
+
+  /// No description provided for @partnerRoomFieldBedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Number of beds'**
+  String get partnerRoomFieldBedCount;
+
+  /// No description provided for @partnerRoomFieldMaxGuests.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum guests'**
+  String get partnerRoomFieldMaxGuests;
+
+  /// No description provided for @partnerRoomFieldMaxAdults.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum adults'**
+  String get partnerRoomFieldMaxAdults;
+
+  /// No description provided for @partnerRoomFieldMaxChildren.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum children'**
+  String get partnerRoomFieldMaxChildren;
+
+  /// No description provided for @partnerRoomFieldSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Room size'**
+  String get partnerRoomFieldSize;
+
+  /// No description provided for @partnerRoomFieldFloor.
+  ///
+  /// In en, this message translates to:
+  /// **'Floor'**
+  String get partnerRoomFieldFloor;
+
+  /// No description provided for @partnerRoomFieldQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Total rooms'**
+  String get partnerRoomFieldQuantity;
+
+  /// No description provided for @partnerRoomFieldAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Currently available'**
+  String get partnerRoomFieldAvailable;
+
+  /// No description provided for @partnerRoomFieldPriceFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Price from'**
+  String get partnerRoomFieldPriceFrom;
+
+  /// No description provided for @partnerRoomFieldOriginalPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Original price'**
+  String get partnerRoomFieldOriginalPrice;
+
+  /// No description provided for @partnerRoomFieldBreakfast.
+  ///
+  /// In en, this message translates to:
+  /// **'Breakfast included'**
+  String get partnerRoomFieldBreakfast;
+
+  /// No description provided for @partnerRoomFieldFreeCancellation.
+  ///
+  /// In en, this message translates to:
+  /// **'Free cancellation'**
+  String get partnerRoomFieldFreeCancellation;
+
+  /// No description provided for @partnerRoomFieldInstantConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Instant confirmation'**
+  String get partnerRoomFieldInstantConfirmation;
+
+  /// No description provided for @partnerRoomFieldSmoking.
+  ///
+  /// In en, this message translates to:
+  /// **'Smoking allowed'**
+  String get partnerRoomFieldSmoking;
+
+  /// No description provided for @partnerRoomFieldImages.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery images'**
+  String get partnerRoomFieldImages;
+
+  /// No description provided for @partnerRoomTypeStandard.
+  ///
+  /// In en, this message translates to:
+  /// **'Standard'**
+  String get partnerRoomTypeStandard;
+
+  /// No description provided for @partnerRoomTypeSuperior.
+  ///
+  /// In en, this message translates to:
+  /// **'Superior'**
+  String get partnerRoomTypeSuperior;
+
+  /// No description provided for @partnerRoomTypeDeluxe.
+  ///
+  /// In en, this message translates to:
+  /// **'Deluxe'**
+  String get partnerRoomTypeDeluxe;
+
+  /// No description provided for @partnerRoomTypePremier.
+  ///
+  /// In en, this message translates to:
+  /// **'Premier'**
+  String get partnerRoomTypePremier;
+
+  /// No description provided for @partnerRoomTypeExecutive.
+  ///
+  /// In en, this message translates to:
+  /// **'Executive'**
+  String get partnerRoomTypeExecutive;
+
+  /// No description provided for @partnerRoomTypeSuite.
+  ///
+  /// In en, this message translates to:
+  /// **'Suite'**
+  String get partnerRoomTypeSuite;
+
+  /// No description provided for @partnerRoomTypeFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Family'**
+  String get partnerRoomTypeFamily;
+
+  /// No description provided for @partnerRoomTypeVilla.
+  ///
+  /// In en, this message translates to:
+  /// **'Villa'**
+  String get partnerRoomTypeVilla;
+
+  /// No description provided for @partnerRoomTypeBungalow.
+  ///
+  /// In en, this message translates to:
+  /// **'Bungalow'**
+  String get partnerRoomTypeBungalow;
+
+  /// No description provided for @partnerRoomTypeUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unrecognised type'**
+  String get partnerRoomTypeUnknown;
+
+  /// No description provided for @partnerBedTypeSingle.
+  ///
+  /// In en, this message translates to:
+  /// **'Single'**
+  String get partnerBedTypeSingle;
+
+  /// No description provided for @partnerBedTypeDouble.
+  ///
+  /// In en, this message translates to:
+  /// **'Double'**
+  String get partnerBedTypeDouble;
+
+  /// No description provided for @partnerBedTypeTwin.
+  ///
+  /// In en, this message translates to:
+  /// **'Twin'**
+  String get partnerBedTypeTwin;
+
+  /// No description provided for @partnerBedTypeQueen.
+  ///
+  /// In en, this message translates to:
+  /// **'Queen'**
+  String get partnerBedTypeQueen;
+
+  /// No description provided for @partnerBedTypeKing.
+  ///
+  /// In en, this message translates to:
+  /// **'King'**
+  String get partnerBedTypeKing;
+
+  /// No description provided for @partnerBedTypeSofaBed.
+  ///
+  /// In en, this message translates to:
+  /// **'Sofa bed'**
+  String get partnerBedTypeSofaBed;
+
+  /// No description provided for @partnerBedTypeBunk.
+  ///
+  /// In en, this message translates to:
+  /// **'Bunk bed'**
+  String get partnerBedTypeBunk;
+
+  /// No description provided for @partnerBedTypeUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unrecognised bed'**
+  String get partnerBedTypeUnknown;
+
+  /// No description provided for @partnerInventoryForProperty.
+  ///
+  /// In en, this message translates to:
+  /// **'Inventory at {name}'**
+  String partnerInventoryForProperty(String name);
+
+  /// No description provided for @partnerInventoryNoPropertyContext.
+  ///
+  /// In en, this message translates to:
+  /// **'No property selected'**
+  String get partnerInventoryNoPropertyContext;
+
+  /// No description provided for @partnerInventoryPropertyScope.
+  ///
+  /// In en, this message translates to:
+  /// **'Property scope'**
+  String get partnerInventoryPropertyScope;
+
+  /// No description provided for @partnerInventoryRoomScope.
+  ///
+  /// In en, this message translates to:
+  /// **'Room type'**
+  String get partnerInventoryRoomScope;
+
+  /// No description provided for @partnerInventoryRangeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Window'**
+  String get partnerInventoryRangeLabel;
+
+  /// No description provided for @partnerInventoryRangeWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'7 days'**
+  String get partnerInventoryRangeWeek;
+
+  /// No description provided for @partnerInventoryRangeFortnight.
+  ///
+  /// In en, this message translates to:
+  /// **'14 days'**
+  String get partnerInventoryRangeFortnight;
+
+  /// No description provided for @partnerInventoryRangeMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'30 days'**
+  String get partnerInventoryRangeMonth;
+
+  /// No description provided for @partnerInventoryWindow.
+  ///
+  /// In en, this message translates to:
+  /// **'{from} – {to} · {count} days'**
+  String partnerInventoryWindow(String from, String to, int count);
+
+  /// No description provided for @partnerInventoryBookableDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{bookable} of {total} days bookable'**
+  String partnerInventoryBookableDays(int bookable, int total);
+
+  /// No description provided for @partnerInventoryTotalAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} room-nights available'**
+  String partnerInventoryTotalAvailable(String count);
+
+  /// No description provided for @partnerInventoryStopSellDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 day stopped} other{{count} days stopped}}'**
+  String partnerInventoryStopSellDays(int count);
+
+  /// No description provided for @partnerInventoryNoPropertiesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No properties yet'**
+  String get partnerInventoryNoPropertiesTitle;
+
+  /// No description provided for @partnerInventoryNoPropertiesMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Inventory belongs to a room in a property. Once a property is assigned to your profile, its calendar appears here.'**
+  String get partnerInventoryNoPropertiesMessage;
+
+  /// No description provided for @partnerInventorySelectPropertyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a property'**
+  String get partnerInventorySelectPropertyTitle;
+
+  /// No description provided for @partnerInventorySelectPropertyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a property to see the inventory calendar for its room types.'**
+  String get partnerInventorySelectPropertyMessage;
+
+  /// No description provided for @partnerInventoryNoRoomsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No room types yet'**
+  String get partnerInventoryNoRoomsTitle;
+
+  /// No description provided for @partnerInventoryNoRoomsMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This property has no room types, so there is no inventory to manage.'**
+  String get partnerInventoryNoRoomsMessage;
+
+  /// No description provided for @partnerInventorySelectRoomTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a room type'**
+  String get partnerInventorySelectRoomTitle;
+
+  /// No description provided for @partnerInventorySelectRoomMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Inventory is kept per room type. Pick one to see its calendar.'**
+  String get partnerInventorySelectRoomMessage;
+
+  /// No description provided for @partnerInventoryInvalidRangeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid date range'**
+  String get partnerInventoryInvalidRangeTitle;
+
+  /// No description provided for @partnerInventoryInvalidRangeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The start date must not be after the end date.'**
+  String get partnerInventoryInvalidRangeMessage;
+
+  /// No description provided for @partnerInventoryUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Inventory unavailable'**
+  String get partnerInventoryUnavailableTitle;
+
+  /// No description provided for @partnerInventoryUnavailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This property or room type is no longer available to your account.'**
+  String get partnerInventoryUnavailableMessage;
+
+  /// No description provided for @partnerInventoryEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No inventory in this window'**
+  String get partnerInventoryEmptyTitle;
+
+  /// No description provided for @partnerInventoryEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No inventory rows have been set up for these dates. Try a different window.'**
+  String get partnerInventoryEmptyMessage;
+
+  /// No description provided for @partnerInventoryDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get partnerInventoryDate;
+
+  /// No description provided for @partnerInventoryStateColumn.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get partnerInventoryStateColumn;
+
+  /// No description provided for @partnerInventoryTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get partnerInventoryTotal;
+
+  /// No description provided for @partnerInventoryAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Available'**
+  String get partnerInventoryAvailable;
+
+  /// No description provided for @partnerInventorySold.
+  ///
+  /// In en, this message translates to:
+  /// **'Sold'**
+  String get partnerInventorySold;
+
+  /// No description provided for @partnerInventoryBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Blocked'**
+  String get partnerInventoryBlocked;
+
+  /// No description provided for @partnerInventoryMaintenance.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintenance'**
+  String get partnerInventoryMaintenance;
+
+  /// No description provided for @partnerInventoryRestrictions.
+  ///
+  /// In en, this message translates to:
+  /// **'Restrictions'**
+  String get partnerInventoryRestrictions;
+
+  /// No description provided for @partnerInventoryStopSell.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop sell'**
+  String get partnerInventoryStopSell;
+
+  /// No description provided for @partnerInventoryClosedArrival.
+  ///
+  /// In en, this message translates to:
+  /// **'No arrivals'**
+  String get partnerInventoryClosedArrival;
+
+  /// No description provided for @partnerInventoryClosedDeparture.
+  ///
+  /// In en, this message translates to:
+  /// **'No departures'**
+  String get partnerInventoryClosedDeparture;
+
+  /// No description provided for @partnerInventoryStateBookable.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookable'**
+  String get partnerInventoryStateBookable;
+
+  /// No description provided for @partnerInventoryStateSoldOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Sold out'**
+  String get partnerInventoryStateSoldOut;
+
+  /// No description provided for @partnerInventoryStateStopped.
+  ///
+  /// In en, this message translates to:
+  /// **'Stopped'**
+  String get partnerInventoryStateStopped;
+
+  /// No description provided for @partnerInventoryInconsistent.
+  ///
+  /// In en, this message translates to:
+  /// **'These numbers do not add up to the total.'**
+  String get partnerInventoryInconsistent;
+
+  /// No description provided for @partnerInventoryInconsistentSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 day has counts that do not add up to its total} other{{count} days have counts that do not add up to their total}}. Only the backend can correct this.'**
+  String partnerInventoryInconsistentSummary(int count);
+
+  /// No description provided for @partnerInventoryEditOwnerOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Changing availability is available to the profile owner. You can review the calendar here.'**
+  String get partnerInventoryEditOwnerOnly;
+
+  /// No description provided for @partnerInventorySaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved.'**
+  String get partnerInventorySaved;
+
+  /// No description provided for @partnerInventoryActionNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'That date is no longer available to your account.'**
+  String get partnerInventoryActionNotFound;
+
+  /// No description provided for @partnerRatesForProperty.
+  ///
+  /// In en, this message translates to:
+  /// **'Rates at {name}'**
+  String partnerRatesForProperty(String name);
+
+  /// No description provided for @partnerRatesForRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Rates for {room} at {property}'**
+  String partnerRatesForRoom(String room, String property);
+
+  /// No description provided for @partnerRatesNoPropertyContext.
+  ///
+  /// In en, this message translates to:
+  /// **'No property selected'**
+  String get partnerRatesNoPropertyContext;
+
+  /// No description provided for @partnerRatesPropertyScope.
+  ///
+  /// In en, this message translates to:
+  /// **'Property scope'**
+  String get partnerRatesPropertyScope;
+
+  /// No description provided for @partnerRatesRoomScope.
+  ///
+  /// In en, this message translates to:
+  /// **'Room type'**
+  String get partnerRatesRoomScope;
+
+  /// No description provided for @partnerRatesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 rate plan} other{{count} rate plans}}'**
+  String partnerRatesCount(int count);
+
+  /// No description provided for @partnerRatesActiveCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 active} other{{count} active}}'**
+  String partnerRatesActiveCount(int count);
+
+  /// No description provided for @partnerRatesExpiredCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 expired} other{{count} expired}}'**
+  String partnerRatesExpiredCount(int count);
+
+  /// No description provided for @partnerRatesNoPropertiesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No properties yet'**
+  String get partnerRatesNoPropertiesTitle;
+
+  /// No description provided for @partnerRatesNoPropertiesMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Rates belong to a room in a property. Once a property is assigned to your profile, its rate plans appear here.'**
+  String get partnerRatesNoPropertiesMessage;
+
+  /// No description provided for @partnerRatesSelectPropertyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a property'**
+  String get partnerRatesSelectPropertyTitle;
+
+  /// No description provided for @partnerRatesSelectPropertyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a property to see the rate plans for its room types.'**
+  String get partnerRatesSelectPropertyMessage;
+
+  /// No description provided for @partnerRatesNoRoomsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No room types yet'**
+  String get partnerRatesNoRoomsTitle;
+
+  /// No description provided for @partnerRatesNoRoomsMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This property has no room types, so there is nothing to price.'**
+  String get partnerRatesNoRoomsMessage;
+
+  /// No description provided for @partnerRatesSelectRoomTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a room type'**
+  String get partnerRatesSelectRoomTitle;
+
+  /// No description provided for @partnerRatesSelectRoomMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate plans are kept per room type. Pick one to see its rates.'**
+  String get partnerRatesSelectRoomMessage;
+
+  /// No description provided for @partnerRatesUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rates unavailable'**
+  String get partnerRatesUnavailableTitle;
+
+  /// No description provided for @partnerRatesUnavailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This property or room type is no longer available to your account.'**
+  String get partnerRatesUnavailableMessage;
+
+  /// No description provided for @partnerRatesEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No rate plans yet'**
+  String get partnerRatesEmptyTitle;
+
+  /// No description provided for @partnerRatesEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This room type has no rate plans. They are set up by the Plan Your Trip team.'**
+  String get partnerRatesEmptyMessage;
+
+  /// No description provided for @partnerRateDetailHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate plan details'**
+  String get partnerRateDetailHeading;
+
+  /// No description provided for @partnerRateCloseDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Close rate plan details'**
+  String get partnerRateCloseDetail;
+
+  /// No description provided for @partnerRateActionsOwnerOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate actions are available to the profile owner. You can review every plan here.'**
+  String get partnerRateActionsOwnerOnly;
+
+  /// No description provided for @partnerRateCurrencyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Amounts are shown without a currency because the rate API does not supply one.'**
+  String get partnerRateCurrencyNote;
+
+  /// No description provided for @partnerRateValidityNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Both dates are inclusive: a stay qualifies when every night falls inside this window.'**
+  String get partnerRateValidityNote;
+
+  /// No description provided for @partnerRateActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get partnerRateActive;
+
+  /// No description provided for @partnerRateInactive.
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive'**
+  String get partnerRateInactive;
+
+  /// No description provided for @partnerRateExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get partnerRateExpired;
+
+  /// No description provided for @partnerRatePerNight.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} per night'**
+  String partnerRatePerNight(String amount);
+
+  /// No description provided for @partnerRateValidity.
+  ///
+  /// In en, this message translates to:
+  /// **'{from} – {to}'**
+  String partnerRateValidity(String from, String to);
+
+  /// No description provided for @partnerRatePriorityValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Priority {value}'**
+  String partnerRatePriorityValue(String value);
+
+  /// No description provided for @partnerRateHasRestrictions.
+  ///
+  /// In en, this message translates to:
+  /// **'Has restrictions'**
+  String get partnerRateHasRestrictions;
+
+  /// No description provided for @partnerRateNightsValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} nights'**
+  String partnerRateNightsValue(String count);
+
+  /// No description provided for @partnerRateDaysValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} days'**
+  String partnerRateDaysValue(String count);
+
+  /// No description provided for @partnerRateActivateAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Activate'**
+  String get partnerRateActivateAction;
+
+  /// No description provided for @partnerRateDeactivateAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Deactivate'**
+  String get partnerRateDeactivateAction;
+
+  /// No description provided for @partnerRateActivatedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is now active.'**
+  String partnerRateActivatedMessage(String name);
+
+  /// No description provided for @partnerRateDeactivatedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is now inactive.'**
+  String partnerRateDeactivatedMessage(String name);
+
+  /// No description provided for @partnerRateActionNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'That rate plan is no longer available to your account.'**
+  String get partnerRateActionNotFound;
+
+  /// No description provided for @partnerRateActionConflict.
+  ///
+  /// In en, this message translates to:
+  /// **'That change conflicts with another rate plan.'**
+  String get partnerRateActionConflict;
+
+  /// No description provided for @partnerRateTypeStandard.
+  ///
+  /// In en, this message translates to:
+  /// **'Standard'**
+  String get partnerRateTypeStandard;
+
+  /// No description provided for @partnerRateTypePromotional.
+  ///
+  /// In en, this message translates to:
+  /// **'Promotional'**
+  String get partnerRateTypePromotional;
+
+  /// No description provided for @partnerRateTypeMember.
+  ///
+  /// In en, this message translates to:
+  /// **'Member'**
+  String get partnerRateTypeMember;
+
+  /// No description provided for @partnerRateTypeEarlyBird.
+  ///
+  /// In en, this message translates to:
+  /// **'Early bird'**
+  String get partnerRateTypeEarlyBird;
+
+  /// No description provided for @partnerRateTypeLastMinute.
+  ///
+  /// In en, this message translates to:
+  /// **'Last minute'**
+  String get partnerRateTypeLastMinute;
+
+  /// No description provided for @partnerRateTypeUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unrecognised type'**
+  String get partnerRateTypeUnknown;
+
+  /// No description provided for @partnerMealPlanRoomOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Room only'**
+  String get partnerMealPlanRoomOnly;
+
+  /// No description provided for @partnerMealPlanBreakfast.
+  ///
+  /// In en, this message translates to:
+  /// **'Breakfast'**
+  String get partnerMealPlanBreakfast;
+
+  /// No description provided for @partnerMealPlanHalfBoard.
+  ///
+  /// In en, this message translates to:
+  /// **'Half board'**
+  String get partnerMealPlanHalfBoard;
+
+  /// No description provided for @partnerMealPlanFullBoard.
+  ///
+  /// In en, this message translates to:
+  /// **'Full board'**
+  String get partnerMealPlanFullBoard;
+
+  /// No description provided for @partnerMealPlanAllInclusive.
+  ///
+  /// In en, this message translates to:
+  /// **'All inclusive'**
+  String get partnerMealPlanAllInclusive;
+
+  /// No description provided for @partnerMealPlanUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unrecognised meal plan'**
+  String get partnerMealPlanUnknown;
+
+  /// No description provided for @partnerCancellationFree.
+  ///
+  /// In en, this message translates to:
+  /// **'Free cancellation'**
+  String get partnerCancellationFree;
+
+  /// No description provided for @partnerCancellationPartial.
+  ///
+  /// In en, this message translates to:
+  /// **'Partially refundable'**
+  String get partnerCancellationPartial;
+
+  /// No description provided for @partnerCancellationNonRefundable.
+  ///
+  /// In en, this message translates to:
+  /// **'Non-refundable'**
+  String get partnerCancellationNonRefundable;
+
+  /// No description provided for @partnerCancellationCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom policy'**
+  String get partnerCancellationCustom;
+
+  /// No description provided for @partnerCancellationUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unrecognised policy'**
+  String get partnerCancellationUnknown;
+
+  /// No description provided for @partnerRateSourceBase.
+  ///
+  /// In en, this message translates to:
+  /// **'Base rate'**
+  String get partnerRateSourceBase;
+
+  /// No description provided for @partnerRateSourceDerived.
+  ///
+  /// In en, this message translates to:
+  /// **'Derived rate'**
+  String get partnerRateSourceDerived;
+
+  /// No description provided for @partnerRateSourceUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unrecognised source'**
+  String get partnerRateSourceUnknown;
+
+  /// No description provided for @partnerRateAdjustmentFixed.
+  ///
+  /// In en, this message translates to:
+  /// **'Fixed amount'**
+  String get partnerRateAdjustmentFixed;
+
+  /// No description provided for @partnerRateAdjustmentPercent.
+  ///
+  /// In en, this message translates to:
+  /// **'Percentage'**
+  String get partnerRateAdjustmentPercent;
+
+  /// No description provided for @partnerRateAdjustmentUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unrecognised adjustment'**
+  String get partnerRateAdjustmentUnknown;
+
+  /// No description provided for @partnerRateSectionIdentity.
+  ///
+  /// In en, this message translates to:
+  /// **'Identity'**
+  String get partnerRateSectionIdentity;
+
+  /// No description provided for @partnerRateSectionPricing.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get partnerRateSectionPricing;
+
+  /// No description provided for @partnerRateSectionValidity.
+  ///
+  /// In en, this message translates to:
+  /// **'Validity'**
+  String get partnerRateSectionValidity;
+
+  /// No description provided for @partnerRateSectionRestrictions.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay restrictions'**
+  String get partnerRateSectionRestrictions;
+
+  /// No description provided for @partnerRateSectionCancellation.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancellation'**
+  String get partnerRateSectionCancellation;
+
+  /// No description provided for @partnerRateSectionInclusions.
+  ///
+  /// In en, this message translates to:
+  /// **'Inclusions'**
+  String get partnerRateSectionInclusions;
+
+  /// No description provided for @partnerRateSectionOccupancy.
+  ///
+  /// In en, this message translates to:
+  /// **'Occupancy prices'**
+  String get partnerRateSectionOccupancy;
+
+  /// No description provided for @partnerRateFieldCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan code'**
+  String get partnerRateFieldCode;
+
+  /// No description provided for @partnerRateFieldDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get partnerRateFieldDescription;
+
+  /// No description provided for @partnerRateFieldPriority.
+  ///
+  /// In en, this message translates to:
+  /// **'Priority'**
+  String get partnerRateFieldPriority;
+
+  /// No description provided for @partnerRateFieldPricePerNight.
+  ///
+  /// In en, this message translates to:
+  /// **'Price per night'**
+  String get partnerRateFieldPricePerNight;
+
+  /// No description provided for @partnerRateFieldExtraBedPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Extra bed price'**
+  String get partnerRateFieldExtraBedPrice;
+
+  /// No description provided for @partnerRateFieldAdjustmentType.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjustment type'**
+  String get partnerRateFieldAdjustmentType;
+
+  /// No description provided for @partnerRateFieldAdjustmentValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjustment'**
+  String get partnerRateFieldAdjustmentValue;
+
+  /// No description provided for @partnerRateFieldParentPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Derived from plan'**
+  String get partnerRateFieldParentPlan;
+
+  /// No description provided for @partnerRateFieldValidFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Valid from'**
+  String get partnerRateFieldValidFrom;
+
+  /// No description provided for @partnerRateFieldValidTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Valid to'**
+  String get partnerRateFieldValidTo;
+
+  /// No description provided for @partnerRateFieldMinStay.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum stay'**
+  String get partnerRateFieldMinStay;
+
+  /// No description provided for @partnerRateFieldMaxStay.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum stay'**
+  String get partnerRateFieldMaxStay;
+
+  /// No description provided for @partnerRateFieldMinAdvance.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum advance booking'**
+  String get partnerRateFieldMinAdvance;
+
+  /// No description provided for @partnerRateFieldMaxAdvance.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum advance booking'**
+  String get partnerRateFieldMaxAdvance;
+
+  /// No description provided for @partnerRateFieldClosedToArrival.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed to arrival'**
+  String get partnerRateFieldClosedToArrival;
+
+  /// No description provided for @partnerRateFieldClosedToDeparture.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed to departure'**
+  String get partnerRateFieldClosedToDeparture;
+
+  /// No description provided for @partnerRateFieldPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancellation policy'**
+  String get partnerRateFieldPolicy;
+
+  /// No description provided for @partnerRateFieldRefundable.
+  ///
+  /// In en, this message translates to:
+  /// **'Refundable'**
+  String get partnerRateFieldRefundable;
+
+  /// No description provided for @partnerRateFieldDeadlineHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancellation deadline (hours)'**
+  String get partnerRateFieldDeadlineHours;
+
+  /// No description provided for @partnerRateFieldPenaltyPercent.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancellation penalty'**
+  String get partnerRateFieldPenaltyPercent;
+
+  /// No description provided for @partnerRateFieldMealPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Meal plan'**
+  String get partnerRateFieldMealPlan;
+
+  /// No description provided for @partnerRateFieldOccupancyPricing.
+  ///
+  /// In en, this message translates to:
+  /// **'Occupancy pricing enabled'**
+  String get partnerRateFieldOccupancyPricing;
+
+  /// No description provided for @partnerRateFieldChildPricing.
+  ///
+  /// In en, this message translates to:
+  /// **'Child pricing enabled'**
+  String get partnerRateFieldChildPricing;
+
+  /// No description provided for @partnerRateOccupancyEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No occupancy prices are configured for this plan.'**
+  String get partnerRateOccupancyEmpty;
+
+  /// No description provided for @partnerRateOccupancyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{adults} adults, {children} children'**
+  String partnerRateOccupancyLabel(String adults, String children);
+
+  /// No description provided for @partnerPoliciesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Policies & settings'**
+  String get partnerPoliciesTitle;
+
+  /// No description provided for @partnerPoliciesForProperty.
+  ///
+  /// In en, this message translates to:
+  /// **'Policies for {name}'**
+  String partnerPoliciesForProperty(String name);
+
+  /// No description provided for @partnerPoliciesNoPropertyContext.
+  ///
+  /// In en, this message translates to:
+  /// **'No property selected'**
+  String get partnerPoliciesNoPropertyContext;
+
+  /// No description provided for @partnerPoliciesPropertyScope.
+  ///
+  /// In en, this message translates to:
+  /// **'Property scope'**
+  String get partnerPoliciesPropertyScope;
+
+  /// No description provided for @partnerPoliciesNoPropertiesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No properties yet'**
+  String get partnerPoliciesNoPropertiesTitle;
+
+  /// No description provided for @partnerPoliciesNoPropertiesMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest policies belong to a property. Once a property is assigned to your profile, its policies appear here.'**
+  String get partnerPoliciesNoPropertiesMessage;
+
+  /// No description provided for @partnerPoliciesSelectPropertyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a property'**
+  String get partnerPoliciesSelectPropertyTitle;
+
+  /// No description provided for @partnerPoliciesSelectPropertyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a property to review and edit its guest policies.'**
+  String get partnerPoliciesSelectPropertyMessage;
+
+  /// No description provided for @partnerPoliciesUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Policies unavailable'**
+  String get partnerPoliciesUnavailableTitle;
+
+  /// No description provided for @partnerPoliciesUnavailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This property is no longer available to your account.'**
+  String get partnerPoliciesUnavailableMessage;
+
+  /// No description provided for @partnerPoliciesPropertySection.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest policies'**
+  String get partnerPoliciesPropertySection;
+
+  /// No description provided for @partnerPoliciesPropertyScopeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Applies to this property only. Guests see these on the listing.'**
+  String get partnerPoliciesPropertyScopeNote;
+
+  /// No description provided for @partnerPoliciesLiveWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'These take effect immediately for every guest, including guests who already hold a booking — the platform does not freeze policies at booking time.'**
+  String get partnerPoliciesLiveWarning;
+
+  /// No description provided for @partnerPoliciesOwnerOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest policies can be changed by the profile owner. You can review them here.'**
+  String get partnerPoliciesOwnerOnly;
+
+  /// No description provided for @partnerPoliciesCheckIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in from'**
+  String get partnerPoliciesCheckIn;
+
+  /// No description provided for @partnerPoliciesCheckOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-out by'**
+  String get partnerPoliciesCheckOut;
+
+  /// No description provided for @partnerPoliciesTimeHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'24-hour time, for example 14:00'**
+  String get partnerPoliciesTimeHelper;
+
+  /// No description provided for @partnerPoliciesTimeRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Required'**
+  String get partnerPoliciesTimeRequired;
+
+  /// No description provided for @partnerPoliciesHouseRules.
+  ///
+  /// In en, this message translates to:
+  /// **'House rules'**
+  String get partnerPoliciesHouseRules;
+
+  /// No description provided for @partnerPoliciesHouseRulesNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional. Leave a rule empty to remove it.'**
+  String get partnerPoliciesHouseRulesNote;
+
+  /// No description provided for @partnerPoliciesRuleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave empty for no rule'**
+  String get partnerPoliciesRuleHint;
+
+  /// No description provided for @partnerPoliciesChildren.
+  ///
+  /// In en, this message translates to:
+  /// **'Children policy'**
+  String get partnerPoliciesChildren;
+
+  /// No description provided for @partnerPoliciesPets.
+  ///
+  /// In en, this message translates to:
+  /// **'Pet policy'**
+  String get partnerPoliciesPets;
+
+  /// No description provided for @partnerPoliciesSmoking.
+  ///
+  /// In en, this message translates to:
+  /// **'Smoking policy'**
+  String get partnerPoliciesSmoking;
+
+  /// No description provided for @partnerPoliciesSettingsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Workspace notifications'**
+  String get partnerPoliciesSettingsSection;
+
+  /// No description provided for @partnerPoliciesSettingsScopeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Applies to your whole partner account, not to one property.'**
+  String get partnerPoliciesSettingsScopeNote;
+
+  /// No description provided for @partnerPoliciesSettingsRoleNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification settings can be changed by an owner or manager. You can review them here.'**
+  String get partnerPoliciesSettingsRoleNote;
+
+  /// No description provided for @partnerPoliciesSettingsUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Your workspace settings are not available.'**
+  String get partnerPoliciesSettingsUnavailable;
+
+  /// No description provided for @partnerPoliciesSettingsUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Last updated {time}'**
+  String partnerPoliciesSettingsUpdated(String time);
+
+  /// No description provided for @partnerPoliciesLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Default language'**
+  String get partnerPoliciesLanguage;
+
+  /// No description provided for @partnerPoliciesTimezone.
+  ///
+  /// In en, this message translates to:
+  /// **'Timezone'**
+  String get partnerPoliciesTimezone;
+
+  /// No description provided for @partnerPoliciesChannels.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivery channels'**
+  String get partnerPoliciesChannels;
+
+  /// No description provided for @partnerPoliciesChannelEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get partnerPoliciesChannelEmail;
+
+  /// No description provided for @partnerPoliciesChannelSms.
+  ///
+  /// In en, this message translates to:
+  /// **'SMS'**
+  String get partnerPoliciesChannelSms;
+
+  /// No description provided for @partnerPoliciesChannelInApp.
+  ///
+  /// In en, this message translates to:
+  /// **'In-app'**
+  String get partnerPoliciesChannelInApp;
+
+  /// No description provided for @partnerPoliciesTopics.
+  ///
+  /// In en, this message translates to:
+  /// **'What to notify me about'**
+  String get partnerPoliciesTopics;
+
+  /// No description provided for @partnerPoliciesTopicBooking.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookings'**
+  String get partnerPoliciesTopicBooking;
+
+  /// No description provided for @partnerPoliciesTopicPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Payments'**
+  String get partnerPoliciesTopicPayment;
+
+  /// No description provided for @partnerPoliciesTopicReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviews'**
+  String get partnerPoliciesTopicReview;
+
+  /// No description provided for @partnerPoliciesTopicPromotion.
+  ///
+  /// In en, this message translates to:
+  /// **'Promotions'**
+  String get partnerPoliciesTopicPromotion;
+
+  /// No description provided for @partnerPoliciesSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get partnerPoliciesSave;
+
+  /// No description provided for @partnerPoliciesRevert.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get partnerPoliciesRevert;
+
+  /// No description provided for @partnerPoliciesNoChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'No unsaved changes.'**
+  String get partnerPoliciesNoChanges;
+
+  /// No description provided for @partnerPoliciesSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved.'**
+  String get partnerPoliciesSaved;
+
+  /// No description provided for @partnerPoliciesSaveForbidden.
+  ///
+  /// In en, this message translates to:
+  /// **'Your role does not allow this change.'**
+  String get partnerPoliciesSaveForbidden;
+
+  /// No description provided for @partnerPoliciesSaveNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'That record is no longer available to your account.'**
+  String get partnerPoliciesSaveNotFound;
+
+  /// No description provided for @partnerPoliciesSaveValidation.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in and check-out times are both required.'**
+  String get partnerPoliciesSaveValidation;
+
+  /// No description provided for @partnerAssetsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos & media'**
+  String get partnerAssetsSection;
+
+  /// No description provided for @partnerAssetsDeferredBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Not available'**
+  String get partnerAssetsDeferredBadge;
+
+  /// No description provided for @partnerAssetsDeferredMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo management is not part of the partner API. Uploading, replacing, reordering and deleting media are admin-only operations, so the Plan Your Trip team maintains your listing images for now.'**
+  String get partnerAssetsDeferredMessage;
+
+  /// No description provided for @partnerPromotionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Promotions & vouchers'**
+  String get partnerPromotionsTitle;
+
+  /// No description provided for @partnerPromotionsTabPromotions.
+  ///
+  /// In en, this message translates to:
+  /// **'Promotion rules'**
+  String get partnerPromotionsTabPromotions;
+
+  /// No description provided for @partnerPromotionsTabVoucherCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Voucher check'**
+  String get partnerPromotionsTabVoucherCheck;
+
+  /// No description provided for @partnerPromotionsScopeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Every promotion on any property or room you own is listed here. The partner API does not narrow promotions to one property, so this list is not filtered by your selected property.'**
+  String get partnerPromotionsScopeNote;
+
+  /// No description provided for @partnerPromotionsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} promotions'**
+  String partnerPromotionsCount(int count);
+
+  /// No description provided for @partnerPromotionsActiveCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} active'**
+  String partnerPromotionsActiveCount(int count);
+
+  /// No description provided for @partnerPromotionsExpiredCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} past their end date'**
+  String partnerPromotionsExpiredCount(int count);
+
+  /// No description provided for @partnerPromotionsCurrencyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The promotion API sends no currency, so promotion amounts appear without a symbol. The pricing preview below carries its own currency and shows it.'**
+  String get partnerPromotionsCurrencyNote;
+
+  /// No description provided for @partnerPromotionsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No promotions yet'**
+  String get partnerPromotionsEmptyTitle;
+
+  /// No description provided for @partnerPromotionsEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing currently targets your properties or rooms. Site-wide campaigns run by Plan Your Trip are not shown here because they are not yours to manage.'**
+  String get partnerPromotionsEmptyMessage;
+
+  /// No description provided for @partnerPromotionsOwnerOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the partner account owner can change promotions. You can read them here.'**
+  String get partnerPromotionsOwnerOnly;
+
+  /// No description provided for @partnerPromotionDetailHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Promotion details'**
+  String get partnerPromotionDetailHeading;
+
+  /// No description provided for @partnerPromotionCloseDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Close promotion details'**
+  String get partnerPromotionCloseDetail;
+
+  /// No description provided for @partnerPromotionSectionIdentity.
+  ///
+  /// In en, this message translates to:
+  /// **'Identity'**
+  String get partnerPromotionSectionIdentity;
+
+  /// No description provided for @partnerPromotionFieldCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Promotion code'**
+  String get partnerPromotionFieldCode;
+
+  /// No description provided for @partnerPromotionFieldDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get partnerPromotionFieldDescription;
+
+  /// No description provided for @partnerPromotionFieldType.
+  ///
+  /// In en, this message translates to:
+  /// **'Promotion type'**
+  String get partnerPromotionFieldType;
+
+  /// No description provided for @partnerPromotionSectionDiscount.
+  ///
+  /// In en, this message translates to:
+  /// **'Discount'**
+  String get partnerPromotionSectionDiscount;
+
+  /// No description provided for @partnerPromotionFieldDiscountType.
+  ///
+  /// In en, this message translates to:
+  /// **'Discount type'**
+  String get partnerPromotionFieldDiscountType;
+
+  /// No description provided for @partnerPromotionFieldDiscountValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Discount value'**
+  String get partnerPromotionFieldDiscountValue;
+
+  /// No description provided for @partnerPromotionFieldMaxDiscount.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum discount'**
+  String get partnerPromotionFieldMaxDiscount;
+
+  /// No description provided for @partnerPromotionSectionValidity.
+  ///
+  /// In en, this message translates to:
+  /// **'Validity'**
+  String get partnerPromotionSectionValidity;
+
+  /// No description provided for @partnerPromotionFieldStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Starts'**
+  String get partnerPromotionFieldStart;
+
+  /// No description provided for @partnerPromotionFieldEnd.
+  ///
+  /// In en, this message translates to:
+  /// **'Ends'**
+  String get partnerPromotionFieldEnd;
+
+  /// No description provided for @partnerPromotionSectionConditions.
+  ///
+  /// In en, this message translates to:
+  /// **'Conditions'**
+  String get partnerPromotionSectionConditions;
+
+  /// No description provided for @partnerPromotionFieldMinimumStay.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum stay'**
+  String get partnerPromotionFieldMinimumStay;
+
+  /// No description provided for @partnerPromotionFieldMinimumSpend.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum spend'**
+  String get partnerPromotionFieldMinimumSpend;
+
+  /// No description provided for @partnerPromotionSectionApplication.
+  ///
+  /// In en, this message translates to:
+  /// **'How it applies'**
+  String get partnerPromotionSectionApplication;
+
+  /// No description provided for @partnerPromotionFieldTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Applies to'**
+  String get partnerPromotionFieldTarget;
+
+  /// No description provided for @partnerPromotionFieldPriority.
+  ///
+  /// In en, this message translates to:
+  /// **'Priority'**
+  String get partnerPromotionFieldPriority;
+
+  /// No description provided for @partnerPromotionFieldStackable.
+  ///
+  /// In en, this message translates to:
+  /// **'Combines with others'**
+  String get partnerPromotionFieldStackable;
+
+  /// No description provided for @partnerPromotionStackableNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The pricing engine may add further promotions after this one.'**
+  String get partnerPromotionStackableNote;
+
+  /// No description provided for @partnerPromotionNonStackableNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The pricing engine applies this promotion and then stops, so no lower-priority promotion is added after it.'**
+  String get partnerPromotionNonStackableNote;
+
+  /// No description provided for @partnerPromotionActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get partnerPromotionActive;
+
+  /// No description provided for @partnerPromotionInactive.
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive'**
+  String get partnerPromotionInactive;
+
+  /// No description provided for @partnerPromotionExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Past end date'**
+  String get partnerPromotionExpired;
+
+  /// No description provided for @partnerPromotionScheduled.
+  ///
+  /// In en, this message translates to:
+  /// **'Starts later'**
+  String get partnerPromotionScheduled;
+
+  /// No description provided for @partnerPromotionExclusivePill.
+  ///
+  /// In en, this message translates to:
+  /// **'Does not combine'**
+  String get partnerPromotionExclusivePill;
+
+  /// No description provided for @partnerPromotionValidity.
+  ///
+  /// In en, this message translates to:
+  /// **'{from} – {to}'**
+  String partnerPromotionValidity(String from, String to);
+
+  /// No description provided for @partnerPromotionPriorityValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Priority {count}'**
+  String partnerPromotionPriorityValue(String count);
+
+  /// No description provided for @partnerPromotionHasConditions.
+  ///
+  /// In en, this message translates to:
+  /// **'Has conditions'**
+  String get partnerPromotionHasConditions;
+
+  /// No description provided for @partnerPromotionActivateAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Activate'**
+  String get partnerPromotionActivateAction;
+
+  /// No description provided for @partnerPromotionDeactivateAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Deactivate'**
+  String get partnerPromotionDeactivateAction;
+
+  /// No description provided for @partnerPromotionTypeGeneral.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get partnerPromotionTypeGeneral;
+
+  /// No description provided for @partnerPromotionTypeRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Room offer'**
+  String get partnerPromotionTypeRoom;
+
+  /// No description provided for @partnerPromotionTypeHotel.
+  ///
+  /// In en, this message translates to:
+  /// **'Property offer'**
+  String get partnerPromotionTypeHotel;
+
+  /// No description provided for @partnerPromotionTypeMember.
+  ///
+  /// In en, this message translates to:
+  /// **'Member'**
+  String get partnerPromotionTypeMember;
+
+  /// No description provided for @partnerPromotionTypeEarlyBird.
+  ///
+  /// In en, this message translates to:
+  /// **'Early bird'**
+  String get partnerPromotionTypeEarlyBird;
+
+  /// No description provided for @partnerPromotionTypeLastMinute.
+  ///
+  /// In en, this message translates to:
+  /// **'Last minute'**
+  String get partnerPromotionTypeLastMinute;
+
+  /// No description provided for @partnerPromotionTypeWeekend.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekend'**
+  String get partnerPromotionTypeWeekend;
+
+  /// No description provided for @partnerPromotionTypeHoliday.
+  ///
+  /// In en, this message translates to:
+  /// **'Holiday'**
+  String get partnerPromotionTypeHoliday;
+
+  /// No description provided for @partnerPromotionTypeUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unrecognised type'**
+  String get partnerPromotionTypeUnknown;
+
+  /// No description provided for @partnerDiscountTypePercentage.
+  ///
+  /// In en, this message translates to:
+  /// **'Percentage'**
+  String get partnerDiscountTypePercentage;
+
+  /// No description provided for @partnerDiscountTypeFixed.
+  ///
+  /// In en, this message translates to:
+  /// **'Fixed amount'**
+  String get partnerDiscountTypeFixed;
+
+  /// No description provided for @partnerDiscountTypeUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unrecognised discount'**
+  String get partnerDiscountTypeUnknown;
+
+  /// No description provided for @partnerPromotionTargetAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Every property on Plan Your Trip'**
+  String get partnerPromotionTargetAll;
+
+  /// No description provided for @partnerPromotionTargetHotel.
+  ///
+  /// In en, this message translates to:
+  /// **'One of your properties'**
+  String get partnerPromotionTargetHotel;
+
+  /// No description provided for @partnerPromotionTargetRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'One of your rooms'**
+  String get partnerPromotionTargetRoom;
+
+  /// No description provided for @partnerPromotionTargetRoomNamed.
+  ///
+  /// In en, this message translates to:
+  /// **'Room: {name}'**
+  String partnerPromotionTargetRoomNamed(String name);
+
+  /// No description provided for @partnerPromotionTargetUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unrecognised target'**
+  String get partnerPromotionTargetUnknown;
+
+  /// No description provided for @partnerPromotionPreviewHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Pricing preview'**
+  String get partnerPromotionPreviewHeading;
+
+  /// No description provided for @partnerPromotionPreviewNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The backend calculates this. Every amount and every applied promotion comes straight from the pricing engine — nothing is worked out in the app.'**
+  String get partnerPromotionPreviewNote;
+
+  /// No description provided for @partnerPromotionPreviewAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Run preview'**
+  String get partnerPromotionPreviewAction;
+
+  /// No description provided for @partnerPromotionPreviewInvalidRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-out must be after check-in.'**
+  String get partnerPromotionPreviewInvalidRange;
+
+  /// No description provided for @partnerPromotionPreviewStay.
+  ///
+  /// In en, this message translates to:
+  /// **'{from} to {to} · {nights} nights'**
+  String partnerPromotionPreviewStay(String from, String to, String nights);
+
+  /// No description provided for @partnerPromotionPreviewBase.
+  ///
+  /// In en, this message translates to:
+  /// **'Base price'**
+  String get partnerPromotionPreviewBase;
+
+  /// No description provided for @partnerPromotionPreviewRatePlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate plan price'**
+  String get partnerPromotionPreviewRatePlan;
+
+  /// No description provided for @partnerPromotionPreviewRatePlanNamed.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate plan: {name}'**
+  String partnerPromotionPreviewRatePlanNamed(String name);
+
+  /// No description provided for @partnerPromotionPreviewDiscount.
+  ///
+  /// In en, this message translates to:
+  /// **'Promotion discount'**
+  String get partnerPromotionPreviewDiscount;
+
+  /// No description provided for @partnerPromotionPreviewTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total for this stay'**
+  String get partnerPromotionPreviewTotal;
+
+  /// No description provided for @partnerPromotionPreviewAppliedHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Promotions the engine applied'**
+  String get partnerPromotionPreviewAppliedHeading;
+
+  /// No description provided for @partnerPromotionPreviewNoneApplied.
+  ///
+  /// In en, this message translates to:
+  /// **'The engine applied no promotion to this stay.'**
+  String get partnerPromotionPreviewNoneApplied;
+
+  /// No description provided for @partnerPromotionPreviewUnnamed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unnamed promotion'**
+  String get partnerPromotionPreviewUnnamed;
+
+  /// No description provided for @partnerPromotionPreviewAppliedAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'-{amount}'**
+  String partnerPromotionPreviewAppliedAmount(String amount);
+
+  /// No description provided for @partnerPromotionActivatedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is now active.'**
+  String partnerPromotionActivatedMessage(String name);
+
+  /// No description provided for @partnerPromotionDeactivatedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is now inactive.'**
+  String partnerPromotionDeactivatedMessage(String name);
+
+  /// No description provided for @partnerPromotionActionNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'That promotion is no longer available to your account.'**
+  String get partnerPromotionActionNotFound;
+
+  /// No description provided for @partnerPromotionActionConflict.
+  ///
+  /// In en, this message translates to:
+  /// **'That promotion code is already in use. Promotion codes are unique across Plan Your Trip.'**
+  String get partnerPromotionActionConflict;
+
+  /// No description provided for @partnerPromotionActionValidation.
+  ///
+  /// In en, this message translates to:
+  /// **'The server rejected the promotion. Nothing was changed.'**
+  String get partnerPromotionActionValidation;
+
+  /// No description provided for @partnerPromotionActionIncomplete.
+  ///
+  /// In en, this message translates to:
+  /// **'This promotion is missing fields the update needs, so nothing was sent. Ask support to change it.'**
+  String get partnerPromotionActionIncomplete;
+
+  /// No description provided for @partnerVoucherCheckHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Check a booking voucher'**
+  String get partnerVoucherCheckHeading;
+
+  /// No description provided for @partnerVoucherCheckNote.
+  ///
+  /// In en, this message translates to:
+  /// **'This is a booking pass, not a discount code. Checking it confirms a guest\'s booking — it does not check anyone in and changes nothing.'**
+  String get partnerVoucherCheckNote;
+
+  /// No description provided for @partnerVoucherCheckField.
+  ///
+  /// In en, this message translates to:
+  /// **'Voucher payload'**
+  String get partnerVoucherCheckField;
+
+  /// No description provided for @partnerVoucherCheckAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Check voucher'**
+  String get partnerVoucherCheckAction;
+
+  /// No description provided for @partnerVoucherCheckClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get partnerVoucherCheckClear;
+
+  /// No description provided for @partnerVoucherEligibleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Valid — the guest can be admitted'**
+  String get partnerVoucherEligibleTitle;
+
+  /// No description provided for @partnerVoucherEligibleMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The signature is valid and this booking is ready for check-in.'**
+  String get partnerVoucherEligibleMessage;
+
+  /// No description provided for @partnerVoucherNotEligibleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Valid — but not ready for check-in'**
+  String get partnerVoucherNotEligibleTitle;
+
+  /// No description provided for @partnerVoucherNotEligibleMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The signature is valid, but this booking cannot be checked in right now.'**
+  String get partnerVoucherNotEligibleMessage;
+
+  /// No description provided for @partnerVoucherNotRecognisedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Not recognised'**
+  String get partnerVoucherNotRecognisedTitle;
+
+  /// No description provided for @partnerVoucherNotRecognisedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The server does not recognise this voucher for your account. It may have been altered, may not exist, or may belong to another partner — the server does not say which.'**
+  String get partnerVoucherNotRecognisedMessage;
+
+  /// No description provided for @partnerVoucherEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to check'**
+  String get partnerVoucherEmptyTitle;
+
+  /// No description provided for @partnerVoucherEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste or scan a voucher payload first.'**
+  String get partnerVoucherEmptyMessage;
+
+  /// No description provided for @partnerVoucherFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not check this voucher'**
+  String get partnerVoucherFailedTitle;
+
+  /// No description provided for @partnerVoucherFieldBooking.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking code'**
+  String get partnerVoucherFieldBooking;
+
+  /// No description provided for @partnerVoucherFieldBookingStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking status'**
+  String get partnerVoucherFieldBookingStatus;
+
+  /// No description provided for @partnerVoucherFieldGuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest name'**
+  String get partnerVoucherFieldGuest;
+
+  /// No description provided for @partnerVoucherFieldProperty.
+  ///
+  /// In en, this message translates to:
+  /// **'Booked property'**
+  String get partnerVoucherFieldProperty;
+
+  /// No description provided for @partnerVoucherFieldRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Booked room'**
+  String get partnerVoucherFieldRoom;
+
+  /// No description provided for @partnerVoucherFieldStay.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay'**
+  String get partnerVoucherFieldStay;
+
+  /// No description provided for @partnerVoucherFieldOccupancy.
+  ///
+  /// In en, this message translates to:
+  /// **'Occupancy'**
+  String get partnerVoucherFieldOccupancy;
+
+  /// No description provided for @partnerVoucherStayValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{from} to {to} · {nights} nights'**
+  String partnerVoucherStayValue(String from, String to, String nights);
+
+  /// No description provided for @partnerVoucherOccupancyValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{adults} adults · {children} children'**
+  String partnerVoucherOccupancyValue(String adults, String children);
+
+  /// No description provided for @partnerVoucherReadOnlyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking only. Check-in itself happens on the booking, not on this screen.'**
+  String get partnerVoucherReadOnlyNote;
+
+  /// No description provided for @partnerBookingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookings & front desk'**
+  String get partnerBookingsTitle;
+
+  /// No description provided for @partnerBookingsTabReservations.
+  ///
+  /// In en, this message translates to:
+  /// **'Reservations'**
+  String get partnerBookingsTabReservations;
+
+  /// No description provided for @partnerBookingsTabFrontDesk.
+  ///
+  /// In en, this message translates to:
+  /// **'Front desk'**
+  String get partnerBookingsTabFrontDesk;
+
+  /// No description provided for @partnerBookingsScopeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'This list covers every booking across all properties you own. The partner API accepts no property parameter, so it is not narrowed by your selected property — filter by room to focus on one property.'**
+  String get partnerBookingsScopeNote;
+
+  /// No description provided for @partnerBookingsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No bookings yet'**
+  String get partnerBookingsEmptyTitle;
+
+  /// No description provided for @partnerBookingsEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing has been booked at your properties yet. New reservations appear here as soon as guests make them.'**
+  String get partnerBookingsEmptyMessage;
+
+  /// No description provided for @partnerBookingsNoMatchTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No bookings match these filters'**
+  String get partnerBookingsNoMatchTitle;
+
+  /// No description provided for @partnerBookingsNoMatchMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing matched the filters you set. Clear them to see every booking again.'**
+  String get partnerBookingsNoMatchMessage;
+
+  /// No description provided for @partnerBookingDetailHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking details'**
+  String get partnerBookingDetailHeading;
+
+  /// No description provided for @partnerBookingCloseDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Close booking details'**
+  String get partnerBookingCloseDetail;
+
+  /// No description provided for @partnerBookingNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'That booking is no longer available to your account.'**
+  String get partnerBookingNotFound;
+
+  /// No description provided for @partnerBookingColumnCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking code'**
+  String get partnerBookingColumnCode;
+
+  /// No description provided for @partnerBookingColumnGuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest'**
+  String get partnerBookingColumnGuest;
+
+  /// No description provided for @partnerBookingColumnRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Room'**
+  String get partnerBookingColumnRoom;
+
+  /// No description provided for @partnerBookingColumnCheckIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in'**
+  String get partnerBookingColumnCheckIn;
+
+  /// No description provided for @partnerBookingColumnCheckOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-out'**
+  String get partnerBookingColumnCheckOut;
+
+  /// No description provided for @partnerBookingColumnNights.
+  ///
+  /// In en, this message translates to:
+  /// **'Nights'**
+  String get partnerBookingColumnNights;
+
+  /// No description provided for @partnerBookingColumnStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get partnerBookingColumnStatus;
+
+  /// No description provided for @partnerBookingColumnTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get partnerBookingColumnTotal;
+
+  /// No description provided for @partnerBookingStayRange.
+  ///
+  /// In en, this message translates to:
+  /// **'{from} – {to}'**
+  String partnerBookingStayRange(String from, String to);
+
+  /// No description provided for @partnerBookingNightsValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} nights'**
+  String partnerBookingNightsValue(String count);
+
+  /// No description provided for @partnerBookingOccupancyValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{adults} adults · {children} children'**
+  String partnerBookingOccupancyValue(String adults, String children);
+
+  /// No description provided for @partnerBookingNightProgressValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Night {current} of {total}'**
+  String partnerBookingNightProgressValue(String current, String total);
+
+  /// No description provided for @partnerBookingStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get partnerBookingStatusPending;
+
+  /// No description provided for @partnerBookingStatusConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed'**
+  String get partnerBookingStatusConfirmed;
+
+  /// No description provided for @partnerBookingStatusCheckInReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready to check in'**
+  String get partnerBookingStatusCheckInReady;
+
+  /// No description provided for @partnerBookingStatusCheckedIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Checked in'**
+  String get partnerBookingStatusCheckedIn;
+
+  /// No description provided for @partnerBookingStatusCheckedOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Checked out'**
+  String get partnerBookingStatusCheckedOut;
+
+  /// No description provided for @partnerBookingStatusCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get partnerBookingStatusCompleted;
+
+  /// No description provided for @partnerBookingStatusCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get partnerBookingStatusCancelled;
+
+  /// No description provided for @partnerBookingStatusRefunded.
+  ///
+  /// In en, this message translates to:
+  /// **'Refunded'**
+  String get partnerBookingStatusRefunded;
+
+  /// No description provided for @partnerBookingStatusArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived'**
+  String get partnerBookingStatusArchived;
+
+  /// No description provided for @partnerBookingStatusNoShow.
+  ///
+  /// In en, this message translates to:
+  /// **'No-show'**
+  String get partnerBookingStatusNoShow;
+
+  /// No description provided for @partnerBookingStatusUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unrecognised status'**
+  String get partnerBookingStatusUnknown;
+
+  /// No description provided for @partnerStayStateUpcoming.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming stay'**
+  String get partnerStayStateUpcoming;
+
+  /// No description provided for @partnerStayStateReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready for check-in'**
+  String get partnerStayStateReady;
+
+  /// No description provided for @partnerStayStateInHouse.
+  ///
+  /// In en, this message translates to:
+  /// **'In house'**
+  String get partnerStayStateInHouse;
+
+  /// No description provided for @partnerStayStateCheckedOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Departed'**
+  String get partnerStayStateCheckedOut;
+
+  /// No description provided for @partnerStayStateCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay completed'**
+  String get partnerStayStateCompleted;
+
+  /// No description provided for @partnerStayStateCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay cancelled'**
+  String get partnerStayStateCancelled;
+
+  /// No description provided for @partnerStayStateNoShow.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest did not arrive'**
+  String get partnerStayStateNoShow;
+
+  /// No description provided for @partnerStayStateExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Window passed'**
+  String get partnerStayStateExpired;
+
+  /// No description provided for @partnerStayStateUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unrecognised stay state'**
+  String get partnerStayStateUnknown;
+
+  /// No description provided for @partnerStayWarningCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'This stay was cancelled, refunded, or recorded as a no-show.'**
+  String get partnerStayWarningCancelled;
+
+  /// No description provided for @partnerStayWarningCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'This stay is finished.'**
+  String get partnerStayWarningCompleted;
+
+  /// No description provided for @partnerStayWarningInHouse.
+  ///
+  /// In en, this message translates to:
+  /// **'The guest is currently staying.'**
+  String get partnerStayWarningInHouse;
+
+  /// No description provided for @partnerStayWarningCheckOutOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-out is overdue — the departure date has passed and the guest is still checked in.'**
+  String get partnerStayWarningCheckOutOverdue;
+
+  /// No description provided for @partnerStayWarningFuture.
+  ///
+  /// In en, this message translates to:
+  /// **'The stay has not started yet.'**
+  String get partnerStayWarningFuture;
+
+  /// No description provided for @partnerStayWarningCheckInOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in is overdue — the arrival date has passed and the guest is not checked in.'**
+  String get partnerStayWarningCheckInOverdue;
+
+  /// No description provided for @partnerStayWarningUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'The server reported a warning this app does not recognise.'**
+  String get partnerStayWarningUnknown;
+
+  /// No description provided for @partnerBookingFilterGuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest name or email'**
+  String get partnerBookingFilterGuest;
+
+  /// No description provided for @partnerBookingFilterCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking code'**
+  String get partnerBookingFilterCode;
+
+  /// No description provided for @partnerBookingFilterStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking status'**
+  String get partnerBookingFilterStatus;
+
+  /// No description provided for @partnerBookingFilterAnyStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Any status'**
+  String get partnerBookingFilterAnyStatus;
+
+  /// No description provided for @partnerBookingFilterRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Room'**
+  String get partnerBookingFilterRoom;
+
+  /// No description provided for @partnerBookingFilterAnyRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Any room'**
+  String get partnerBookingFilterAnyRoom;
+
+  /// No description provided for @partnerBookingFilterDates.
+  ///
+  /// In en, this message translates to:
+  /// **'Arrival dates'**
+  String get partnerBookingFilterDates;
+
+  /// No description provided for @partnerBookingFilterClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear filters'**
+  String get partnerBookingFilterClear;
+
+  /// No description provided for @partnerBookingFilterArrivals.
+  ///
+  /// In en, this message translates to:
+  /// **'Arriving today'**
+  String get partnerBookingFilterArrivals;
+
+  /// No description provided for @partnerBookingFilterDepartures.
+  ///
+  /// In en, this message translates to:
+  /// **'Departing today'**
+  String get partnerBookingFilterDepartures;
+
+  /// No description provided for @partnerBookingFilterUpcoming.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get partnerBookingFilterUpcoming;
+
+  /// No description provided for @partnerBookingFilterInHouse.
+  ///
+  /// In en, this message translates to:
+  /// **'In house'**
+  String get partnerBookingFilterInHouse;
+
+  /// No description provided for @partnerBookingFilterCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get partnerBookingFilterCancelled;
+
+  /// No description provided for @partnerBookingFilterCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get partnerBookingFilterCompleted;
+
+  /// No description provided for @partnerBookingFilterRangeBoth.
+  ///
+  /// In en, this message translates to:
+  /// **'Arriving {from} to {to}'**
+  String partnerBookingFilterRangeBoth(String from, String to);
+
+  /// No description provided for @partnerBookingFilterRangeFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Arriving on or after {from}'**
+  String partnerBookingFilterRangeFrom(String from);
+
+  /// No description provided for @partnerBookingFilterRangeTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Arriving on or before {to}'**
+  String partnerBookingFilterRangeTo(String to);
+
+  /// No description provided for @partnerBookingPageRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing {from}-{to} of {total}'**
+  String partnerBookingPageRange(String from, String to, String total);
+
+  /// No description provided for @partnerBookingPagePosition.
+  ///
+  /// In en, this message translates to:
+  /// **'Page {page} of {total}'**
+  String partnerBookingPagePosition(String page, String total);
+
+  /// No description provided for @partnerBookingPagePrevious.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous page'**
+  String get partnerBookingPagePrevious;
+
+  /// No description provided for @partnerBookingPageNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next page'**
+  String get partnerBookingPageNext;
+
+  /// No description provided for @partnerBookingSectionGuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest'**
+  String get partnerBookingSectionGuest;
+
+  /// No description provided for @partnerBookingSectionStay.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay'**
+  String get partnerBookingSectionStay;
+
+  /// No description provided for @partnerBookingSectionRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Property & room'**
+  String get partnerBookingSectionRoom;
+
+  /// No description provided for @partnerBookingSectionPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get partnerBookingSectionPrice;
+
+  /// No description provided for @partnerBookingSectionRatePlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate plan captured at booking'**
+  String get partnerBookingSectionRatePlan;
+
+  /// No description provided for @partnerBookingSectionPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment & invoice'**
+  String get partnerBookingSectionPayment;
+
+  /// No description provided for @partnerBookingSectionTimeline.
+  ///
+  /// In en, this message translates to:
+  /// **'Lifecycle timeline'**
+  String get partnerBookingSectionTimeline;
+
+  /// No description provided for @partnerBookingSectionModifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Change history'**
+  String get partnerBookingSectionModifications;
+
+  /// No description provided for @partnerBookingSectionAudit.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in & check-out record'**
+  String get partnerBookingSectionAudit;
+
+  /// No description provided for @partnerBookingFieldGuestName.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest name'**
+  String get partnerBookingFieldGuestName;
+
+  /// No description provided for @partnerBookingFieldGuestEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest email'**
+  String get partnerBookingFieldGuestEmail;
+
+  /// No description provided for @partnerBookingFieldOccupancy.
+  ///
+  /// In en, this message translates to:
+  /// **'Occupancy'**
+  String get partnerBookingFieldOccupancy;
+
+  /// No description provided for @partnerBookingFieldSpecialRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Special request'**
+  String get partnerBookingFieldSpecialRequest;
+
+  /// No description provided for @partnerBookingFieldCheckIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in date'**
+  String get partnerBookingFieldCheckIn;
+
+  /// No description provided for @partnerBookingFieldCheckOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-out date'**
+  String get partnerBookingFieldCheckOut;
+
+  /// No description provided for @partnerBookingFieldNights.
+  ///
+  /// In en, this message translates to:
+  /// **'Nights booked'**
+  String get partnerBookingFieldNights;
+
+  /// No description provided for @partnerBookingFieldNightProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay progress'**
+  String get partnerBookingFieldNightProgress;
+
+  /// No description provided for @partnerBookingFieldActualCheckIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Actually checked in'**
+  String get partnerBookingFieldActualCheckIn;
+
+  /// No description provided for @partnerBookingFieldActualCheckOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Actually checked out'**
+  String get partnerBookingFieldActualCheckOut;
+
+  /// No description provided for @partnerBookingFieldProperty.
+  ///
+  /// In en, this message translates to:
+  /// **'Booked property'**
+  String get partnerBookingFieldProperty;
+
+  /// No description provided for @partnerBookingFieldRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Booked room'**
+  String get partnerBookingFieldRoom;
+
+  /// No description provided for @partnerBookingFieldRoomCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Room code'**
+  String get partnerBookingFieldRoomCode;
+
+  /// No description provided for @partnerBookingFieldRoomCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Rooms booked'**
+  String get partnerBookingFieldRoomCount;
+
+  /// No description provided for @partnerBookingFieldBasePrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Base price'**
+  String get partnerBookingFieldBasePrice;
+
+  /// No description provided for @partnerBookingFieldRatePlanPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate plan price'**
+  String get partnerBookingFieldRatePlanPrice;
+
+  /// No description provided for @partnerBookingFieldDiscount.
+  ///
+  /// In en, this message translates to:
+  /// **'Discount applied'**
+  String get partnerBookingFieldDiscount;
+
+  /// No description provided for @partnerBookingFieldTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total charged'**
+  String get partnerBookingFieldTotal;
+
+  /// No description provided for @partnerBookingPriceNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Every amount here was calculated and stored by the backend when the booking was made. Nothing is recalculated in this app.'**
+  String get partnerBookingPriceNote;
+
+  /// No description provided for @partnerBookingFieldRatePlanName.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate plan'**
+  String get partnerBookingFieldRatePlanName;
+
+  /// No description provided for @partnerBookingFieldRatePlanCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate plan code'**
+  String get partnerBookingFieldRatePlanCode;
+
+  /// No description provided for @partnerBookingFieldMealPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Meal plan'**
+  String get partnerBookingFieldMealPlan;
+
+  /// No description provided for @partnerBookingFieldCancellationPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancellation policy'**
+  String get partnerBookingFieldCancellationPolicy;
+
+  /// No description provided for @partnerBookingFieldCancellationDeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Free-cancellation deadline'**
+  String get partnerBookingFieldCancellationDeadline;
+
+  /// No description provided for @partnerBookingFieldRefundable.
+  ///
+  /// In en, this message translates to:
+  /// **'Refundable'**
+  String get partnerBookingFieldRefundable;
+
+  /// No description provided for @partnerBookingFieldNightlySnapshot.
+  ///
+  /// In en, this message translates to:
+  /// **'Nightly rate captured'**
+  String get partnerBookingFieldNightlySnapshot;
+
+  /// No description provided for @partnerBookingSnapshotNote.
+  ///
+  /// In en, this message translates to:
+  /// **'These values were captured when the booking was made. Editing a rate plan today does not change them.'**
+  String get partnerBookingSnapshotNote;
+
+  /// No description provided for @partnerBookingNoPayments.
+  ///
+  /// In en, this message translates to:
+  /// **'No payment has been recorded against this booking.'**
+  String get partnerBookingNoPayments;
+
+  /// No description provided for @partnerBookingPaymentUnnamed.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment'**
+  String get partnerBookingPaymentUnnamed;
+
+  /// No description provided for @partnerBookingFieldInvoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice number'**
+  String get partnerBookingFieldInvoice;
+
+  /// No description provided for @partnerBookingFieldInvoiceStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice status'**
+  String get partnerBookingFieldInvoiceStatus;
+
+  /// No description provided for @partnerBookingFieldInvoiceTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice total'**
+  String get partnerBookingFieldInvoiceTotal;
+
+  /// No description provided for @partnerBookingPaymentReadOnlyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment details are read-only. The partner API offers no payment, refund, or settlement action, and card and gateway identifiers are never sent to this screen.'**
+  String get partnerBookingPaymentReadOnlyNote;
+
+  /// No description provided for @partnerBookingTimelineEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'The server recorded no lifecycle events for this booking.'**
+  String get partnerBookingTimelineEmpty;
+
+  /// No description provided for @partnerBookingEventCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking created'**
+  String get partnerBookingEventCreated;
+
+  /// No description provided for @partnerBookingEventPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment completed'**
+  String get partnerBookingEventPaid;
+
+  /// No description provided for @partnerBookingEventConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking confirmed'**
+  String get partnerBookingEventConfirmed;
+
+  /// No description provided for @partnerBookingEventCheckedIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest checked in'**
+  String get partnerBookingEventCheckedIn;
+
+  /// No description provided for @partnerBookingEventCheckedOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest checked out'**
+  String get partnerBookingEventCheckedOut;
+
+  /// No description provided for @partnerBookingEventCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Reservation completed'**
+  String get partnerBookingEventCompleted;
+
+  /// No description provided for @partnerBookingEventCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking cancelled'**
+  String get partnerBookingEventCancelled;
+
+  /// No description provided for @partnerBookingEventArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Reservation archived'**
+  String get partnerBookingEventArchived;
+
+  /// No description provided for @partnerBookingEventModified.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking changed'**
+  String get partnerBookingEventModified;
+
+  /// No description provided for @partnerBookingEventReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest submitted a review'**
+  String get partnerBookingEventReview;
+
+  /// No description provided for @partnerBookingModificationNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Guests change their own bookings. This is the record of what changed — the partner API offers no way to change a booking from here.'**
+  String get partnerBookingModificationNote;
+
+  /// No description provided for @partnerBookingModificationDates.
+  ///
+  /// In en, this message translates to:
+  /// **'Dates'**
+  String get partnerBookingModificationDates;
+
+  /// No description provided for @partnerBookingModificationOccupancy.
+  ///
+  /// In en, this message translates to:
+  /// **'Occupancy'**
+  String get partnerBookingModificationOccupancy;
+
+  /// No description provided for @partnerBookingModificationRatePlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate plan'**
+  String get partnerBookingModificationRatePlan;
+
+  /// No description provided for @partnerBookingModificationPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get partnerBookingModificationPrice;
+
+  /// No description provided for @partnerBookingNoAudit.
+  ///
+  /// In en, this message translates to:
+  /// **'No check-in or check-out has been recorded for this booking.'**
+  String get partnerBookingNoAudit;
+
+  /// No description provided for @partnerBookingAuditCheckIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in recorded'**
+  String get partnerBookingAuditCheckIn;
+
+  /// No description provided for @partnerBookingAuditCheckOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-out recorded'**
+  String get partnerBookingAuditCheckOut;
+
+  /// No description provided for @partnerBookingAuditByUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Staff #{userId}'**
+  String partnerBookingAuditByUser(String userId);
+
+  /// No description provided for @partnerBookingActionCheckIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Check in'**
+  String get partnerBookingActionCheckIn;
+
+  /// No description provided for @partnerBookingActionCheckOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Check out'**
+  String get partnerBookingActionCheckOut;
+
+  /// No description provided for @partnerBookingActionNoShow.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as no-show'**
+  String get partnerBookingActionNoShow;
+
+  /// No description provided for @partnerBookingActionComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete reservation'**
+  String get partnerBookingActionComplete;
+
+  /// No description provided for @partnerBookingActionsIrreversibleNote.
+  ///
+  /// In en, this message translates to:
+  /// **'These changes cannot be undone from the extranet, and the guest is notified.'**
+  String get partnerBookingActionsIrreversibleNote;
+
+  /// No description provided for @partnerBookingNoActionsAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No operational action is available for this booking\'s current status.'**
+  String get partnerBookingNoActionsAvailable;
+
+  /// No description provided for @partnerBookingNoActionsClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'This booking is closed, so no operational action remains.'**
+  String get partnerBookingNoActionsClosed;
+
+  /// No description provided for @partnerBookingActionConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'{action} for booking {code}? This cannot be undone from the extranet, and the guest is notified.'**
+  String partnerBookingActionConfirm(String action, String code);
+
+  /// No description provided for @partnerBookingActionConfirmCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get partnerBookingActionConfirmCta;
+
+  /// No description provided for @partnerBookingActionCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get partnerBookingActionCancel;
+
+  /// No description provided for @partnerBookingActionSucceeded.
+  ///
+  /// In en, this message translates to:
+  /// **'{action} completed for booking {code}.'**
+  String partnerBookingActionSucceeded(String action, String code);
+
+  /// No description provided for @partnerBookingActionRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'The server refused that change for this booking\'s current status. Nothing was altered.'**
+  String get partnerBookingActionRejected;
+
+  /// No description provided for @partnerBookingActionValidation.
+  ///
+  /// In en, this message translates to:
+  /// **'The server rejected that request. Nothing was altered.'**
+  String get partnerBookingActionValidation;
+
+  /// No description provided for @partnerBookingActionUncertain.
+  ///
+  /// In en, this message translates to:
+  /// **'The connection dropped before the server confirmed, and this change cannot be undone. Refresh to see the current status before trying again.'**
+  String get partnerBookingActionUncertain;
+
+  /// No description provided for @partnerFrontDeskHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Check a guest in or out'**
+  String get partnerFrontDeskHeading;
+
+  /// No description provided for @partnerFrontDeskNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan the guest\'s voucher QR or type their booking code. This changes the booking and notifies the guest.'**
+  String get partnerFrontDeskNote;
+
+  /// No description provided for @partnerFrontDeskField.
+  ///
+  /// In en, this message translates to:
+  /// **'Voucher payload or booking code'**
+  String get partnerFrontDeskField;
+
+  /// No description provided for @partnerFrontDeskFieldHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'A scanned voucher is recorded as a QR scan; a typed booking code is recorded as manual.'**
+  String get partnerFrontDeskFieldHelp;
+
+  /// No description provided for @partnerFrontDeskCheckInAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Check guest in'**
+  String get partnerFrontDeskCheckInAction;
+
+  /// No description provided for @partnerFrontDeskCheckOutAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Check guest out'**
+  String get partnerFrontDeskCheckOutAction;
+
+  /// No description provided for @partnerFrontDeskClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get partnerFrontDeskClear;
+
+  /// No description provided for @partnerFrontDeskConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Proceed for {code}? This changes the booking, notifies the guest, and cannot be undone from the extranet.'**
+  String partnerFrontDeskConfirm(String code);
+
+  /// No description provided for @partnerFrontDeskCheckedInTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest checked in'**
+  String get partnerFrontDeskCheckedInTitle;
+
+  /// No description provided for @partnerFrontDeskCheckedOutTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest checked out'**
+  String get partnerFrontDeskCheckedOutTitle;
+
+  /// No description provided for @partnerFrontDeskIdempotentNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeating this on the same booking is safe: the server keeps the original time and records nothing twice.'**
+  String get partnerFrontDeskIdempotentNote;
+
+  /// No description provided for @partnerFrontDeskNotRecognisedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Not recognised'**
+  String get partnerFrontDeskNotRecognisedTitle;
+
+  /// No description provided for @partnerFrontDeskNotRecognisedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The server does not recognise that voucher or booking code for your account. It may have been altered, may not exist, or may belong to another partner — the server does not say which.'**
+  String get partnerFrontDeskNotRecognisedMessage;
+
+  /// No description provided for @partnerFrontDeskRejectedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot do that yet'**
+  String get partnerFrontDeskRejectedTitle;
+
+  /// No description provided for @partnerFrontDeskRejectedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This booking\'s status or dates do not allow that right now. Nothing was changed.'**
+  String get partnerFrontDeskRejectedMessage;
+
+  /// No description provided for @partnerFrontDeskInvalidTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to submit'**
+  String get partnerFrontDeskInvalidTitle;
+
+  /// No description provided for @partnerFrontDeskInvalidMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan or type a voucher payload or booking code first.'**
+  String get partnerFrontDeskInvalidMessage;
+
+  /// No description provided for @partnerFrontDeskFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not complete this'**
+  String get partnerFrontDeskFailedTitle;
+
+  /// No description provided for @partnerFrontDeskUncertainTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Outcome unknown'**
+  String get partnerFrontDeskUncertainTitle;
+
+  /// No description provided for @partnerFrontDeskUncertainMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The connection dropped before the server confirmed. Check the booking\'s status — running this again is safe if it did not go through.'**
+  String get partnerFrontDeskUncertainMessage;
+
+  /// No description provided for @partnerCalendarTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar & inventory'**
+  String get partnerCalendarTitle;
+
+  /// No description provided for @partnerCalendarTabOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'Property calendar'**
+  String get partnerCalendarTabOverview;
+
+  /// No description provided for @partnerCalendarTabInventory.
+  ///
+  /// In en, this message translates to:
+  /// **'Room inventory'**
+  String get partnerCalendarTabInventory;
+
+  /// No description provided for @partnerCalendarScopeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Every room in the selected property, night by night. The figures come from the same inventory records the Room inventory tab edits — this view only reads them.'**
+  String get partnerCalendarScopeNote;
+
+  /// No description provided for @partnerCalendarWindowRange.
+  ///
+  /// In en, this message translates to:
+  /// **'{from} – {to}'**
+  String partnerCalendarWindowRange(String from, String to);
+
+  /// No description provided for @partnerCalendarPreviousWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous week'**
+  String get partnerCalendarPreviousWeek;
+
+  /// No description provided for @partnerCalendarNextWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Next week'**
+  String get partnerCalendarNextWeek;
+
+  /// No description provided for @partnerCalendarToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get partnerCalendarToday;
+
+  /// No description provided for @partnerCalendarNoRoomsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This property has no rooms'**
+  String get partnerCalendarNoRoomsTitle;
+
+  /// No description provided for @partnerCalendarNoRoomsMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'There is nothing to schedule until the property has at least one room. Rooms are managed in the Rooms module.'**
+  String get partnerCalendarNoRoomsMessage;
+
+  /// No description provided for @partnerCalendarWindowEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No inventory records exist for any room in these dates. Nights without a record cannot be sold, because the availability check counts records and rejects a stay when any night is missing.'**
+  String get partnerCalendarWindowEmptyMessage;
+
+  /// No description provided for @partnerCalendarRoomsFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'{failed} of {total} room calendars could not be loaded. Those rows are shown as unavailable to read, not as empty.'**
+  String partnerCalendarRoomsFailed(String failed, String total);
+
+  /// No description provided for @partnerCalendarRoomFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'{room} could not be loaded.'**
+  String partnerCalendarRoomFailed(String room);
+
+  /// No description provided for @partnerCalendarStateOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open for sale'**
+  String get partnerCalendarStateOpen;
+
+  /// No description provided for @partnerCalendarStateSoldOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing left'**
+  String get partnerCalendarStateSoldOut;
+
+  /// No description provided for @partnerCalendarStateStopSell.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop sell'**
+  String get partnerCalendarStateStopSell;
+
+  /// No description provided for @partnerCalendarStateNoRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'No record'**
+  String get partnerCalendarStateNoRecord;
+
+  /// No description provided for @partnerCalendarLegendHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'What each night shows'**
+  String get partnerCalendarLegendHeading;
+
+  /// No description provided for @partnerCalendarLegendClosedArrival.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed to arrival'**
+  String get partnerCalendarLegendClosedArrival;
+
+  /// No description provided for @partnerCalendarLegendClosedDeparture.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed to departure'**
+  String get partnerCalendarLegendClosedDeparture;
+
+  /// No description provided for @partnerCalendarLegendOccupied.
+  ///
+  /// In en, this message translates to:
+  /// **'Rooms sold'**
+  String get partnerCalendarLegendOccupied;
+
+  /// No description provided for @partnerCalendarLegendNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The number on each night is rooms still available. Closed to arrival blocks a stay from starting that night; closed to departure blocks it from ending on that night. Neither stops the night being sold within a longer stay.'**
+  String get partnerCalendarLegendNote;
+
+  /// No description provided for @partnerCalendarSoldValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} sold'**
+  String partnerCalendarSoldValue(String count);
+
+  /// No description provided for @partnerCalendarMetricSellable.
+  ///
+  /// In en, this message translates to:
+  /// **'nights open for sale'**
+  String get partnerCalendarMetricSellable;
+
+  /// No description provided for @partnerCalendarMetricOccupied.
+  ///
+  /// In en, this message translates to:
+  /// **'nights with rooms sold'**
+  String get partnerCalendarMetricOccupied;
+
+  /// No description provided for @partnerCalendarMetricRestricted.
+  ///
+  /// In en, this message translates to:
+  /// **'nights with a restriction'**
+  String get partnerCalendarMetricRestricted;
+
+  /// No description provided for @partnerCalendarMetricMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'nights with no record'**
+  String get partnerCalendarMetricMissing;
+
+  /// No description provided for @partnerCalendarNightHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'{room} · {date}'**
+  String partnerCalendarNightHeading(String room, String date);
+
+  /// No description provided for @partnerCalendarCloseNight.
+  ///
+  /// In en, this message translates to:
+  /// **'Close night details'**
+  String get partnerCalendarCloseNight;
+
+  /// No description provided for @partnerCalendarFieldAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Available'**
+  String get partnerCalendarFieldAvailable;
+
+  /// No description provided for @partnerCalendarFieldSold.
+  ///
+  /// In en, this message translates to:
+  /// **'Sold'**
+  String get partnerCalendarFieldSold;
+
+  /// No description provided for @partnerCalendarFieldBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Blocked'**
+  String get partnerCalendarFieldBlocked;
+
+  /// No description provided for @partnerCalendarFieldMaintenance.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintenance'**
+  String get partnerCalendarFieldMaintenance;
+
+  /// No description provided for @partnerCalendarFieldTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total rooms'**
+  String get partnerCalendarFieldTotal;
+
+  /// No description provided for @partnerCalendarInconsistentMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Available, sold, blocked and maintenance do not add up to the total for this night. The server\'s own numbers are shown unchanged.'**
+  String get partnerCalendarInconsistentMessage;
+
+  /// No description provided for @partnerCalendarNoRecordExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'There is no inventory record for this night. That is not the same as being free: the availability check counts records, so any stay covering this night is rejected. Create the record in the Room inventory tab to make the night sellable.'**
+  String get partnerCalendarNoRecordExplanation;
+
+  /// No description provided for @partnerCalendarQuestionsHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'What this night allows'**
+  String get partnerCalendarQuestionsHeading;
+
+  /// No description provided for @partnerCalendarQuestionStock.
+  ///
+  /// In en, this message translates to:
+  /// **'Rooms are left'**
+  String get partnerCalendarQuestionStock;
+
+  /// No description provided for @partnerCalendarQuestionSellable.
+  ///
+  /// In en, this message translates to:
+  /// **'The night can be sold'**
+  String get partnerCalendarQuestionSellable;
+
+  /// No description provided for @partnerCalendarQuestionArrival.
+  ///
+  /// In en, this message translates to:
+  /// **'A stay can start this night'**
+  String get partnerCalendarQuestionArrival;
+
+  /// No description provided for @partnerCalendarQuestionDeparture.
+  ///
+  /// In en, this message translates to:
+  /// **'A stay can end with this night'**
+  String get partnerCalendarQuestionDeparture;
+
+  /// No description provided for @partnerCalendarQuestionsNote.
+  ///
+  /// In en, this message translates to:
+  /// **'These are four separate checks the server makes, not one. A night can be sellable inside a longer stay while still refusing an arrival or a departure.'**
+  String get partnerCalendarQuestionsNote;
+
+  /// No description provided for @partnerCalendarReasonNoStock.
+  ///
+  /// In en, this message translates to:
+  /// **'No rooms are left for this night.'**
+  String get partnerCalendarReasonNoStock;
+
+  /// No description provided for @partnerCalendarReasonStopSell.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop sell is on for this night.'**
+  String get partnerCalendarReasonStopSell;
+
+  /// No description provided for @partnerCalendarReasonNotSellable.
+  ///
+  /// In en, this message translates to:
+  /// **'The night cannot be sold at all.'**
+  String get partnerCalendarReasonNotSellable;
+
+  /// No description provided for @partnerCalendarReasonClosedArrival.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed to arrival on this night.'**
+  String get partnerCalendarReasonClosedArrival;
+
+  /// No description provided for @partnerCalendarReasonClosedDeparture.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed to departure on this night.'**
+  String get partnerCalendarReasonClosedDeparture;
+
+  /// No description provided for @partnerCalendarReadOnlyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'This calendar only reads. Stop sell, closed to arrival and closed to departure are changed in the Room inventory tab, so one place owns every write.'**
+  String get partnerCalendarReadOnlyNote;
+
+  /// No description provided for @partnerCalendarManageRestrictions.
+  ///
+  /// In en, this message translates to:
+  /// **'Open room inventory'**
+  String get partnerCalendarManageRestrictions;
+
+  /// No description provided for @partnerMetricWindow.
+  ///
+  /// In en, this message translates to:
+  /// **'{from} – {to}'**
+  String partnerMetricWindow(String from, String to);
+
+  /// No description provided for @partnerMetricAllProperties.
+  ///
+  /// In en, this message translates to:
+  /// **'All properties'**
+  String get partnerMetricAllProperties;
+
+  /// No description provided for @partnerMetricChangeRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Change dates'**
+  String get partnerMetricChangeRange;
+
+  /// No description provided for @partnerMetricDefaultRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 30 days'**
+  String get partnerMetricDefaultRange;
+
+  /// No description provided for @partnerMetricInvalidRange.
+  ///
+  /// In en, this message translates to:
+  /// **'The start date must not be after the end date. The server rejects that range.'**
+  String get partnerMetricInvalidRange;
+
+  /// No description provided for @partnerMetricScopeNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'That property is not available to your account.'**
+  String get partnerMetricScopeNotFound;
+
+  /// No description provided for @partnerMetricNotLoaded.
+  ///
+  /// In en, this message translates to:
+  /// **'This section has not been loaded.'**
+  String get partnerMetricNotLoaded;
+
+  /// No description provided for @partnerMetricUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Not available'**
+  String get partnerMetricUnavailable;
+
+  /// No description provided for @partnerMetricSectionsFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} section(s) could not be loaded. They are shown as unavailable, not as zero.'**
+  String partnerMetricSectionsFailed(String count);
+
+  /// No description provided for @partnerMetricPeakDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Highest day {date}, {value}'**
+  String partnerMetricPeakDay(String date, String value);
+
+  /// No description provided for @partnerFinanceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Finance & settlement'**
+  String get partnerFinanceTitle;
+
+  /// No description provided for @partnerFinanceTabOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'Revenue & commission'**
+  String get partnerFinanceTabOverview;
+
+  /// No description provided for @partnerFinanceTabRevenue.
+  ///
+  /// In en, this message translates to:
+  /// **'Revenue'**
+  String get partnerFinanceTabRevenue;
+
+  /// No description provided for @partnerFinanceTabSettlement.
+  ///
+  /// In en, this message translates to:
+  /// **'Settlement & payouts'**
+  String get partnerFinanceTabSettlement;
+
+  /// No description provided for @partnerFinanceScopeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Figures cover every property you own. Select a property in the workspace to narrow them. Amounts are grouped numbers: the finance API sends no currency with them.'**
+  String get partnerFinanceScopeAll;
+
+  /// No description provided for @partnerFinanceScopeProperty.
+  ///
+  /// In en, this message translates to:
+  /// **'Figures cover the selected property only. Amounts are grouped numbers: the finance API sends no currency with them.'**
+  String get partnerFinanceScopeProperty;
+
+  /// No description provided for @partnerFinanceEstimateNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'These are derived estimates, not a statement of account. The platform commission is a fixed rate applied by the server, the tax figure is indicative only, and settlement periods are calculated from booking revenue rather than read from a settlement ledger.'**
+  String get partnerFinanceEstimateNotice;
+
+  /// No description provided for @partnerFinanceNoData.
+  ///
+  /// In en, this message translates to:
+  /// **'The server returned no figures for this window.'**
+  String get partnerFinanceNoData;
+
+  /// No description provided for @partnerFinanceOverviewHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Revenue and commission'**
+  String get partnerFinanceOverviewHeading;
+
+  /// No description provided for @partnerFinanceOverviewSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookings are counted by check-in date within the selected window.'**
+  String get partnerFinanceOverviewSubtitle;
+
+  /// No description provided for @partnerFinanceCommissionCaption.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculated by the server at a fixed rate'**
+  String get partnerFinanceCommissionCaption;
+
+  /// No description provided for @partnerFinanceTaxCaption.
+  ///
+  /// In en, this message translates to:
+  /// **'Indicative only — not a tax calculation'**
+  String get partnerFinanceTaxCaption;
+
+  /// No description provided for @partnerFinanceCompletedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed bookings'**
+  String get partnerFinanceCompletedLabel;
+
+  /// No description provided for @partnerFinancePaidLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookings with a paid payment'**
+  String get partnerFinancePaidLabel;
+
+  /// No description provided for @partnerFinancePendingCaption.
+  ///
+  /// In en, this message translates to:
+  /// **'The whole window\'s net revenue: nothing tracks what has actually been settled'**
+  String get partnerFinancePendingCaption;
+
+  /// No description provided for @partnerFinanceNextPayoutCaption.
+  ///
+  /// In en, this message translates to:
+  /// **'An assumed monthly cadence, not a scheduled date'**
+  String get partnerFinanceNextPayoutCaption;
+
+  /// No description provided for @partnerFinanceCommissionHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Commission breakdown'**
+  String get partnerFinanceCommissionHeading;
+
+  /// No description provided for @partnerFinanceRateNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'The server applied a fixed platform rate of {rate}. It is a constant in the service, not a negotiated rate, and this app never applies it itself.'**
+  String partnerFinanceRateNotice(String rate);
+
+  /// No description provided for @partnerFinanceRevenueHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Revenue breakdown'**
+  String get partnerFinanceRevenueHeading;
+
+  /// No description provided for @partnerFinanceRevenueSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Every figure is calculated and rounded by the server. Nothing on this screen is recalculated.'**
+  String get partnerFinanceRevenueSubtitle;
+
+  /// No description provided for @partnerFinanceRevenueEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No revenue was recorded in this window.'**
+  String get partnerFinanceRevenueEmpty;
+
+  /// No description provided for @partnerFinanceAverageBooking.
+  ///
+  /// In en, this message translates to:
+  /// **'Average booking value'**
+  String get partnerFinanceAverageBooking;
+
+  /// No description provided for @partnerFinanceHighestBooking.
+  ///
+  /// In en, this message translates to:
+  /// **'Highest booking'**
+  String get partnerFinanceHighestBooking;
+
+  /// No description provided for @partnerFinanceByDay.
+  ///
+  /// In en, this message translates to:
+  /// **'By day'**
+  String get partnerFinanceByDay;
+
+  /// No description provided for @partnerFinanceByMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'By month'**
+  String get partnerFinanceByMonth;
+
+  /// No description provided for @partnerFinanceByProperty.
+  ///
+  /// In en, this message translates to:
+  /// **'By property'**
+  String get partnerFinanceByProperty;
+
+  /// No description provided for @partnerFinanceByRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'By room'**
+  String get partnerFinanceByRoom;
+
+  /// No description provided for @partnerFinanceSettlementHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Settlement'**
+  String get partnerFinanceSettlementHeading;
+
+  /// No description provided for @partnerFinanceSettlementSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Periods are calendar months calculated from booking revenue. No settlement ledger exists behind them.'**
+  String get partnerFinanceSettlementSubtitle;
+
+  /// No description provided for @partnerFinanceSettlementEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No settlement period falls in this window.'**
+  String get partnerFinanceSettlementEmpty;
+
+  /// No description provided for @partnerFinanceCurrentSettlement.
+  ///
+  /// In en, this message translates to:
+  /// **'Current period'**
+  String get partnerFinanceCurrentSettlement;
+
+  /// No description provided for @partnerFinanceLastSettlement.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous period'**
+  String get partnerFinanceLastSettlement;
+
+  /// No description provided for @partnerFinancePending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get partnerFinancePending;
+
+  /// No description provided for @partnerFinancePaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Settled'**
+  String get partnerFinancePaid;
+
+  /// No description provided for @partnerFinanceSettlementMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'The server reports a settled amount although no period below is marked settled. Both values are shown exactly as the server sent them; treat the settled total with caution.'**
+  String get partnerFinanceSettlementMismatch;
+
+  /// No description provided for @partnerFinanceSettlementPeriods.
+  ///
+  /// In en, this message translates to:
+  /// **'Periods'**
+  String get partnerFinanceSettlementPeriods;
+
+  /// No description provided for @partnerFinancePeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Period'**
+  String get partnerFinancePeriod;
+
+  /// No description provided for @partnerFinanceStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get partnerFinanceStatus;
+
+  /// No description provided for @partnerFinanceStatusPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Settled'**
+  String get partnerFinanceStatusPaid;
+
+  /// No description provided for @partnerFinanceStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get partnerFinanceStatusPending;
+
+  /// No description provided for @partnerFinanceStatusUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unrecognised'**
+  String get partnerFinanceStatusUnknown;
+
+  /// No description provided for @partnerFinancePayoutHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Payouts'**
+  String get partnerFinancePayoutHeading;
+
+  /// No description provided for @partnerFinancePayoutSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The same calculated periods, split by status.'**
+  String get partnerFinancePayoutSubtitle;
+
+  /// No description provided for @partnerFinancePayoutEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No payout period falls in this window.'**
+  String get partnerFinancePayoutEmpty;
+
+  /// No description provided for @partnerFinanceEstimatedPayoutDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated payout date'**
+  String get partnerFinanceEstimatedPayoutDate;
+
+  /// No description provided for @partnerFinanceUpcomingPayouts.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get partnerFinanceUpcomingPayouts;
+
+  /// No description provided for @partnerFinanceCompletedPayouts.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get partnerFinanceCompletedPayouts;
+
+  /// No description provided for @partnerFinancePayoutNoRecords.
+  ///
+  /// In en, this message translates to:
+  /// **'No payout records exist in the partner API — there is no reference, bank detail or payment provider information to show, and none is requested.'**
+  String get partnerFinancePayoutNoRecords;
+
+  /// No description provided for @partnerFinanceInvoiceHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoices'**
+  String get partnerFinanceInvoiceHeading;
+
+  /// No description provided for @partnerFinanceInvoiceEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No invoice was issued in this window.'**
+  String get partnerFinanceInvoiceEmpty;
+
+  /// No description provided for @partnerFinanceInvoiceIssued.
+  ///
+  /// In en, this message translates to:
+  /// **'Issued'**
+  String get partnerFinanceInvoiceIssued;
+
+  /// No description provided for @partnerFinanceInvoicePaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid'**
+  String get partnerFinanceInvoicePaid;
+
+  /// No description provided for @partnerFinanceInvoiceCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get partnerFinanceInvoiceCancelled;
+
+  /// No description provided for @partnerFinanceInvoiceRefunded.
+  ///
+  /// In en, this message translates to:
+  /// **'Refunded'**
+  String get partnerFinanceInvoiceRefunded;
+
+  /// No description provided for @partnerFinanceInvoiceTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total invoiced'**
+  String get partnerFinanceInvoiceTotal;
+
+  /// No description provided for @partnerFinanceInvoiceNoDocuments.
+  ///
+  /// In en, this message translates to:
+  /// **'The partner API returns invoice counts only. There is no invoice list, no invoice number to open and no download, so none is offered here.'**
+  String get partnerFinanceInvoiceNoDocuments;
+
+  /// No description provided for @partnerFinanceRefundHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Refunds'**
+  String get partnerFinanceRefundHeading;
+
+  /// No description provided for @partnerFinanceRefundEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No refund was recorded in this window.'**
+  String get partnerFinanceRefundEmpty;
+
+  /// No description provided for @partnerFinanceRefundCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Refunds'**
+  String get partnerFinanceRefundCount;
+
+  /// No description provided for @partnerFinanceRefundAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Refunded amount'**
+  String get partnerFinanceRefundAmount;
+
+  /// No description provided for @partnerFinanceRefundRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Refund rate'**
+  String get partnerFinanceRefundRate;
+
+  /// No description provided for @partnerFinanceRefundReadOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Refunds are read-only here. The partner API has no refund action, so refunds are started elsewhere.'**
+  String get partnerFinanceRefundReadOnly;
+
+  /// No description provided for @partnerAnalyticsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Performance analytics'**
+  String get partnerAnalyticsTitle;
+
+  /// No description provided for @partnerAnalyticsDashboardPointer.
+  ///
+  /// In en, this message translates to:
+  /// **'Revenue, occupancy and the headline totals live on the Dashboard, which already reports them. This page covers what the Dashboard does not.'**
+  String get partnerAnalyticsDashboardPointer;
+
+  /// No description provided for @partnerAnalyticsScopeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Figures cover every property you own. Select a property in the workspace to narrow them.'**
+  String get partnerAnalyticsScopeAll;
+
+  /// No description provided for @partnerAnalyticsScopeProperty.
+  ///
+  /// In en, this message translates to:
+  /// **'Figures cover the selected property only.'**
+  String get partnerAnalyticsScopeProperty;
+
+  /// No description provided for @partnerAnalyticsBookingsHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking activity'**
+  String get partnerAnalyticsBookingsHeading;
+
+  /// No description provided for @partnerAnalyticsBookingsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No booking falls in this window.'**
+  String get partnerAnalyticsBookingsEmpty;
+
+  /// No description provided for @partnerAnalyticsArrivals.
+  ///
+  /// In en, this message translates to:
+  /// **'Arrivals'**
+  String get partnerAnalyticsArrivals;
+
+  /// No description provided for @partnerAnalyticsDepartures.
+  ///
+  /// In en, this message translates to:
+  /// **'Departures'**
+  String get partnerAnalyticsDepartures;
+
+  /// No description provided for @partnerAnalyticsCancellations.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancellations'**
+  String get partnerAnalyticsCancellations;
+
+  /// No description provided for @partnerAnalyticsNoShows.
+  ///
+  /// In en, this message translates to:
+  /// **'No-shows'**
+  String get partnerAnalyticsNoShows;
+
+  /// No description provided for @partnerAnalyticsAverageStay.
+  ///
+  /// In en, this message translates to:
+  /// **'Average stay'**
+  String get partnerAnalyticsAverageStay;
+
+  /// No description provided for @partnerAnalyticsAverageStayCaption.
+  ///
+  /// In en, this message translates to:
+  /// **'Nights, calculated by the server'**
+  String get partnerAnalyticsAverageStayCaption;
+
+  /// No description provided for @partnerAnalyticsByStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'By status'**
+  String get partnerAnalyticsByStatus;
+
+  /// No description provided for @partnerAnalyticsRoomsHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Room performance'**
+  String get partnerAnalyticsRoomsHeading;
+
+  /// No description provided for @partnerAnalyticsRoomsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No room activity falls in this window.'**
+  String get partnerAnalyticsRoomsEmpty;
+
+  /// No description provided for @partnerAnalyticsOccupancyEstimate.
+  ///
+  /// In en, this message translates to:
+  /// **'Occupancy estimate'**
+  String get partnerAnalyticsOccupancyEstimate;
+
+  /// No description provided for @partnerAnalyticsOccupancyCaption.
+  ///
+  /// In en, this message translates to:
+  /// **'The server calls this an estimate'**
+  String get partnerAnalyticsOccupancyCaption;
+
+  /// No description provided for @partnerAnalyticsTopRoomsRevenue.
+  ///
+  /// In en, this message translates to:
+  /// **'Top rooms by revenue'**
+  String get partnerAnalyticsTopRoomsRevenue;
+
+  /// No description provided for @partnerAnalyticsTopRoomsBookings.
+  ///
+  /// In en, this message translates to:
+  /// **'Top rooms by bookings'**
+  String get partnerAnalyticsTopRoomsBookings;
+
+  /// No description provided for @partnerAnalyticsAvailability.
+  ///
+  /// In en, this message translates to:
+  /// **'Availability summary'**
+  String get partnerAnalyticsAvailability;
+
+  /// No description provided for @partnerAnalyticsPromotionsHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Promotion activity'**
+  String get partnerAnalyticsPromotionsHeading;
+
+  /// No description provided for @partnerAnalyticsPromotionsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Structural only: the server cannot yet attribute a discount to a booking.'**
+  String get partnerAnalyticsPromotionsSubtitle;
+
+  /// No description provided for @partnerAnalyticsPromotionsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No promotion activity falls in this window.'**
+  String get partnerAnalyticsPromotionsEmpty;
+
+  /// No description provided for @partnerAnalyticsActivePromotions.
+  ///
+  /// In en, this message translates to:
+  /// **'Active promotions'**
+  String get partnerAnalyticsActivePromotions;
+
+  /// No description provided for @partnerAnalyticsDiscountedBookings.
+  ///
+  /// In en, this message translates to:
+  /// **'Discounted bookings'**
+  String get partnerAnalyticsDiscountedBookings;
+
+  /// No description provided for @partnerAnalyticsNoAttribution.
+  ///
+  /// In en, this message translates to:
+  /// **'The server cannot attribute discounts yet'**
+  String get partnerAnalyticsNoAttribution;
+
+  /// No description provided for @partnerAnalyticsPromotionsByType.
+  ///
+  /// In en, this message translates to:
+  /// **'By type'**
+  String get partnerAnalyticsPromotionsByType;
+
+  /// No description provided for @partnerAnalyticsPromotionsByStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'By status'**
+  String get partnerAnalyticsPromotionsByStatus;
+
+  /// No description provided for @partnerAnalyticsReviewsHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Review summary'**
+  String get partnerAnalyticsReviewsHeading;
+
+  /// No description provided for @partnerAnalyticsReviewsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating and moderation totals. Individual reviews and replies are managed in the Reviews module.'**
+  String get partnerAnalyticsReviewsSubtitle;
+
+  /// No description provided for @partnerAnalyticsReviewsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No review falls in this window.'**
+  String get partnerAnalyticsReviewsEmpty;
+
+  /// No description provided for @partnerAnalyticsAverageRating.
+  ///
+  /// In en, this message translates to:
+  /// **'Average rating'**
+  String get partnerAnalyticsAverageRating;
+
+  /// No description provided for @partnerAnalyticsApprovedOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved reviews only'**
+  String get partnerAnalyticsApprovedOnly;
+
+  /// No description provided for @partnerAnalyticsNoReviews.
+  ///
+  /// In en, this message translates to:
+  /// **'No reviews to average'**
+  String get partnerAnalyticsNoReviews;
+
+  /// No description provided for @partnerAnalyticsReviewCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Total reviews'**
+  String get partnerAnalyticsReviewCount;
+
+  /// No description provided for @partnerAnalyticsReviewsApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved'**
+  String get partnerAnalyticsReviewsApproved;
+
+  /// No description provided for @partnerAnalyticsReviewsPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get partnerAnalyticsReviewsPending;
+
+  /// No description provided for @partnerAnalyticsReviewsRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get partnerAnalyticsReviewsRejected;
+
+  /// No description provided for @partnerAnalyticsMessagesHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Message activity'**
+  String get partnerAnalyticsMessagesHeading;
+
+  /// No description provided for @partnerAnalyticsMessagesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No conversation falls in this window.'**
+  String get partnerAnalyticsMessagesEmpty;
+
+  /// No description provided for @partnerAnalyticsOpenConversations.
+  ///
+  /// In en, this message translates to:
+  /// **'Open conversations'**
+  String get partnerAnalyticsOpenConversations;
+
+  /// No description provided for @partnerAnalyticsClosedConversations.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed conversations'**
+  String get partnerAnalyticsClosedConversations;
+
+  /// No description provided for @partnerAnalyticsArchivedConversations.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived conversations'**
+  String get partnerAnalyticsArchivedConversations;
+
+  /// No description provided for @partnerAnalyticsUnreadMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'Unread for you'**
+  String get partnerAnalyticsUnreadMessages;
+
+  /// No description provided for @partnerAnalyticsResponseTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Average response time'**
+  String get partnerAnalyticsResponseTime;
+
+  /// No description provided for @partnerAnalyticsNoResponses.
+  ///
+  /// In en, this message translates to:
+  /// **'No response time could be measured'**
+  String get partnerAnalyticsNoResponses;
+
+  /// No description provided for @partnerAnalyticsMinutesValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{value} min'**
+  String partnerAnalyticsMinutesValue(String value);
+
+  /// No description provided for @partnerReviewsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest reviews'**
+  String get partnerReviewsTitle;
+
+  /// No description provided for @partnerReviewsAnalyticsPointer.
+  ///
+  /// In en, this message translates to:
+  /// **'Ratings and moderation totals are on the Analytics page. This page is for replying.'**
+  String get partnerReviewsAnalyticsPointer;
+
+  /// No description provided for @partnerReviewsScopeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The published reviews for the selected property. Only published reviews can be replied to, and this is exactly the set the server allows a reply on.'**
+  String get partnerReviewsScopeNote;
+
+  /// No description provided for @partnerReviewsNoBodyNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'The partner API does not return the text a guest wrote — only the rating, the title and the date. Replies are written against those.'**
+  String get partnerReviewsNoBodyNotice;
+
+  /// No description provided for @partnerReviewsNoPropertyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a property'**
+  String get partnerReviewsNoPropertyTitle;
+
+  /// No description provided for @partnerReviewsNoPropertyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviews are listed per property. Choose one in the workspace to see its reviews.'**
+  String get partnerReviewsNoPropertyMessage;
+
+  /// No description provided for @partnerReviewsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No published reviews yet'**
+  String get partnerReviewsEmptyTitle;
+
+  /// No description provided for @partnerReviewsEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing has been published for this property. Reviews appear here once a guest writes one and it is approved.'**
+  String get partnerReviewsEmptyMessage;
+
+  /// No description provided for @partnerReviewsNoMatchTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing matches this filter'**
+  String get partnerReviewsNoMatchTitle;
+
+  /// No description provided for @partnerReviewsNoMatchMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This property has reviews, but none in the selected group.'**
+  String get partnerReviewsNoMatchMessage;
+
+  /// No description provided for @partnerReviewsFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Show all'**
+  String get partnerReviewsFilterAll;
+
+  /// No description provided for @partnerReviewsFilterAllCount.
+  ///
+  /// In en, this message translates to:
+  /// **'All ({count})'**
+  String partnerReviewsFilterAllCount(String count);
+
+  /// No description provided for @partnerReviewsFilterNeedsReplyCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs a reply ({count})'**
+  String partnerReviewsFilterNeedsReplyCount(String count);
+
+  /// No description provided for @partnerReviewsFilterRepliedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Replied ({count})'**
+  String partnerReviewsFilterRepliedCount(String count);
+
+  /// No description provided for @partnerReviewsNeedsReply.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs a reply'**
+  String get partnerReviewsNeedsReply;
+
+  /// No description provided for @partnerReviewsReplied.
+  ///
+  /// In en, this message translates to:
+  /// **'Replied'**
+  String get partnerReviewsReplied;
+
+  /// No description provided for @partnerReviewsNoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Untitled review'**
+  String get partnerReviewsNoTitle;
+
+  /// No description provided for @partnerReviewsRatingValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Rated {rating} out of 5'**
+  String partnerReviewsRatingValue(String rating);
+
+  /// No description provided for @partnerReviewsReplyHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Your reply'**
+  String get partnerReviewsReplyHeading;
+
+  /// No description provided for @partnerReviewsCloseReply.
+  ///
+  /// In en, this message translates to:
+  /// **'Close reply'**
+  String get partnerReviewsCloseReply;
+
+  /// No description provided for @partnerReviewsCurrentReply.
+  ///
+  /// In en, this message translates to:
+  /// **'Currently published'**
+  String get partnerReviewsCurrentReply;
+
+  /// No description provided for @partnerReviewsRepliedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'replied {date}'**
+  String partnerReviewsRepliedAt(String date);
+
+  /// No description provided for @partnerReviewsEditedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'edited {date}'**
+  String partnerReviewsEditedAt(String date);
+
+  /// No description provided for @partnerReviewsReplyField.
+  ///
+  /// In en, this message translates to:
+  /// **'Reply to this guest'**
+  String get partnerReviewsReplyField;
+
+  /// No description provided for @partnerReviewsReplyHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'A review has one reply. Publishing again replaces it rather than adding a second.'**
+  String get partnerReviewsReplyHelp;
+
+  /// No description provided for @partnerReviewsPublicNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Your reply is published publicly alongside the review, and there is no way to delete it afterwards — only to replace its wording. The guest is notified the first time you reply.'**
+  String get partnerReviewsPublicNotice;
+
+  /// No description provided for @partnerReviewsPublishReply.
+  ///
+  /// In en, this message translates to:
+  /// **'Publish reply'**
+  String get partnerReviewsPublishReply;
+
+  /// No description provided for @partnerReviewsUpdateReply.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace reply'**
+  String get partnerReviewsUpdateReply;
+
+  /// No description provided for @partnerReviewsPublishConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Publish this reply publicly? It cannot be deleted afterwards, only rewritten.'**
+  String get partnerReviewsPublishConfirm;
+
+  /// No description provided for @partnerReviewsReplyPublished.
+  ///
+  /// In en, this message translates to:
+  /// **'Your reply is published.'**
+  String get partnerReviewsReplyPublished;
+
+  /// No description provided for @partnerReviewsReplyEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a reply before publishing.'**
+  String get partnerReviewsReplyEmpty;
+
+  /// No description provided for @partnerReviewsReplyUncertain.
+  ///
+  /// In en, this message translates to:
+  /// **'The connection dropped before the server confirmed, and a reply cannot be deleted. Refresh to see whether it was published.'**
+  String get partnerReviewsReplyUncertain;
+
+  /// No description provided for @partnerReviewsNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'That review is no longer available to your account.'**
+  String get partnerReviewsNotFound;
+
+  /// No description provided for @partnerReviewsNotApprovedNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Only a published review can be replied to. The server refuses a reply on any other status.'**
+  String get partnerReviewsNotApprovedNotice;
+
+  /// No description provided for @partnerSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Account & settings'**
+  String get partnerSettingsTitle;
+
+  /// No description provided for @partnerSettingsTabWorkspace.
+  ///
+  /// In en, this message translates to:
+  /// **'Policies & workspace'**
+  String get partnerSettingsTabWorkspace;
+
+  /// No description provided for @partnerSettingsTabTeam.
+  ///
+  /// In en, this message translates to:
+  /// **'Team'**
+  String get partnerSettingsTabTeam;
+
+  /// No description provided for @partnerSettingsTabPayout.
+  ///
+  /// In en, this message translates to:
+  /// **'Payout account'**
+  String get partnerSettingsTabPayout;
+
+  /// No description provided for @partnerSettingsTabProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Business profile'**
+  String get partnerSettingsTabProfile;
+
+  /// No description provided for @partnerTeamHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Team members'**
+  String get partnerTeamHeading;
+
+  /// No description provided for @partnerTeamSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Everyone who can act in this partner workspace, and the role the server grants them.'**
+  String get partnerTeamSubtitle;
+
+  /// No description provided for @partnerTeamEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No team members are recorded.'**
+  String get partnerTeamEmpty;
+
+  /// No description provided for @partnerTeamOwnerOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the partner owner can add, change or remove team members. You can see the team here.'**
+  String get partnerTeamOwnerOnly;
+
+  /// No description provided for @partnerTeamRoleField.
+  ///
+  /// In en, this message translates to:
+  /// **'Role'**
+  String get partnerTeamRoleField;
+
+  /// No description provided for @partnerTeamActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get partnerTeamActive;
+
+  /// No description provided for @partnerTeamInactive.
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive'**
+  String get partnerTeamInactive;
+
+  /// No description provided for @partnerTeamActivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Activate'**
+  String get partnerTeamActivate;
+
+  /// No description provided for @partnerTeamDeactivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Deactivate'**
+  String get partnerTeamDeactivate;
+
+  /// No description provided for @partnerTeamRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get partnerTeamRemove;
+
+  /// No description provided for @partnerTeamRemoveConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {member} from the team? This cannot be undone from here — they would have to be added again.'**
+  String partnerTeamRemoveConfirm(String member);
+
+  /// No description provided for @partnerTeamInviteHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a team member'**
+  String get partnerTeamInviteHeading;
+
+  /// No description provided for @partnerTeamInviteNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The server matches an existing Plan Your Trip account by email. It does not send an invitation, so the person must already have an account.'**
+  String get partnerTeamInviteNote;
+
+  /// No description provided for @partnerTeamInviteEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Their account email'**
+  String get partnerTeamInviteEmail;
+
+  /// No description provided for @partnerTeamInviteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add member'**
+  String get partnerTeamInviteAction;
+
+  /// No description provided for @partnerPayoutHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Payout account'**
+  String get partnerPayoutHeading;
+
+  /// No description provided for @partnerPayoutSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Where settlements would be sent. Held as reference details only.'**
+  String get partnerPayoutSubtitle;
+
+  /// No description provided for @partnerPayoutNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No payout account has been added yet.'**
+  String get partnerPayoutNone;
+
+  /// No description provided for @partnerPayoutLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The payout account could not be loaded. This is not the same as having none.'**
+  String get partnerPayoutLoadFailed;
+
+  /// No description provided for @partnerPayoutHolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Account holder'**
+  String get partnerPayoutHolder;
+
+  /// No description provided for @partnerPayoutBank.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank'**
+  String get partnerPayoutBank;
+
+  /// No description provided for @partnerPayoutAccountNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Account number'**
+  String get partnerPayoutAccountNumber;
+
+  /// No description provided for @partnerPayoutMasked.
+  ///
+  /// In en, this message translates to:
+  /// **'Ends in {last4}'**
+  String partnerPayoutMasked(String last4);
+
+  /// No description provided for @partnerPayoutMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Payout method'**
+  String get partnerPayoutMethod;
+
+  /// No description provided for @partnerPayoutMethodBank.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank transfer'**
+  String get partnerPayoutMethodBank;
+
+  /// No description provided for @partnerPayoutMethodManual.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual'**
+  String get partnerPayoutMethodManual;
+
+  /// No description provided for @partnerPayoutMethodUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unrecognised method'**
+  String get partnerPayoutMethodUnknown;
+
+  /// No description provided for @partnerPayoutStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification status'**
+  String get partnerPayoutStatus;
+
+  /// No description provided for @partnerPayoutUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Last updated'**
+  String get partnerPayoutUpdated;
+
+  /// No description provided for @partnerPayoutNoExecutionNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'No payout is ever sent from here, and the full account number is never stored: the server keeps only its last four digits and discards the rest as soon as it is submitted.'**
+  String get partnerPayoutNoExecutionNotice;
+
+  /// No description provided for @partnerPayoutRoleNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the partner owner or a finance team member can change these details. You can see them here.'**
+  String get partnerPayoutRoleNotice;
+
+  /// No description provided for @partnerPayoutAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add payout account'**
+  String get partnerPayoutAdd;
+
+  /// No description provided for @partnerPayoutReplace.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace details'**
+  String get partnerPayoutReplace;
+
+  /// No description provided for @partnerPayoutCancelEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get partnerPayoutCancelEdit;
+
+  /// No description provided for @partnerPayoutFormHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'New payout details'**
+  String get partnerPayoutFormHeading;
+
+  /// No description provided for @partnerPayoutNumberHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'At least 4 characters. Only the last four digits are kept.'**
+  String get partnerPayoutNumberHelp;
+
+  /// No description provided for @partnerPayoutSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save payout details'**
+  String get partnerPayoutSave;
+
+  /// No description provided for @partnerPayoutReplaceConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace the payout details? The previous account number cannot be recovered, because it was never stored.'**
+  String get partnerPayoutReplaceConfirm;
+
+  /// No description provided for @partnerProfileHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Business profile'**
+  String get partnerProfileHeading;
+
+  /// No description provided for @partnerProfileBusinessName.
+  ///
+  /// In en, this message translates to:
+  /// **'Business name'**
+  String get partnerProfileBusinessName;
+
+  /// No description provided for @partnerProfileRepresentative.
+  ///
+  /// In en, this message translates to:
+  /// **'Representative'**
+  String get partnerProfileRepresentative;
+
+  /// No description provided for @partnerProfileVerification.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification'**
+  String get partnerProfileVerification;
+
+  /// No description provided for @partnerProfileYourRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Your role'**
+  String get partnerProfileYourRole;
+
+  /// No description provided for @partnerProfileReadOnlyNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'An approved business profile cannot be edited through the partner API — the server accepts changes only while a profile is a draft or has been rejected. Contact support to change these details.'**
+  String get partnerProfileReadOnlyNotice;
+
+  /// No description provided for @partnerProfileStatusDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft'**
+  String get partnerProfileStatusDraft;
+
+  /// No description provided for @partnerProfileStatusSubmitted.
+  ///
+  /// In en, this message translates to:
+  /// **'Awaiting review'**
+  String get partnerProfileStatusSubmitted;
+
+  /// No description provided for @partnerProfileStatusApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved'**
+  String get partnerProfileStatusApproved;
+
+  /// No description provided for @partnerProfileStatusRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get partnerProfileStatusRejected;
+
+  /// No description provided for @partnerProfileStatusSuspended.
+  ///
+  /// In en, this message translates to:
+  /// **'Suspended'**
+  String get partnerProfileStatusSuspended;
+
+  /// No description provided for @partnerProfileStatusUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unrecognised status'**
+  String get partnerProfileStatusUnknown;
+
+  /// No description provided for @partnerAccountSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved.'**
+  String get partnerAccountSaved;
+
+  /// No description provided for @partnerAccountNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'That record is no longer available to your account.'**
+  String get partnerAccountNotFound;
+
+  /// No description provided for @partnerAccountConflict.
+  ///
+  /// In en, this message translates to:
+  /// **'The server refused that because it conflicts with an existing record.'**
+  String get partnerAccountConflict;
+
+  /// No description provided for @partnerAccountValidation.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the details and try again.'**
+  String get partnerAccountValidation;
+
+  /// No description provided for @partnerAccountUncertain.
+  ///
+  /// In en, this message translates to:
+  /// **'The connection dropped before the server confirmed. Refresh to see the current state before trying again.'**
+  String get partnerAccountUncertain;
 }
 
 class _AppLocalizationsDelegate
