@@ -50,14 +50,15 @@ public class PartnerCalendarService {
     public RoomInventoryResponse updateDay(Long userId, Long roomId, LocalDate date, RoomInventoryRequest req) {
         PartnerProfile profile = myApprovedProfileOrThrow(userId);
         ownedRoomOrThrow(roomId, profile.getId());
-        return roomInventoryService.update(roomId, date, req);
+        // PARTNER authority: soldInventory is booking-derived and not editable here (H-FIX 1B).
+        return roomInventoryService.update(roomId, date, req, RoomInventoryService.Authority.PARTNER);
     }
 
     @Transactional
     public List<RoomInventoryResponse> bulkUpdate(Long userId, Long roomId, BulkInventoryRequest req) {
         PartnerProfile profile = myApprovedProfileOrThrow(userId);
         ownedRoomOrThrow(roomId, profile.getId());
-        return roomInventoryService.bulkUpsert(roomId, req);
+        return roomInventoryService.bulkUpsert(roomId, req, RoomInventoryService.Authority.PARTNER);
     }
 
     @Transactional

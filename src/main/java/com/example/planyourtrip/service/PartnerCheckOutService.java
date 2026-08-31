@@ -64,17 +64,22 @@ public class PartnerCheckOutService {
      */
     private final long lateWindowDays;
 
+    /** H-FIX 3 — supplies "today" in the property's configured timezone, never the server's. */
+    private final PartnerBusinessZoneService businessZone;
+
     public PartnerCheckOutService(PartnerVoucherVerificationService verificationService,
                                   BookingStatusEngineService statusEngine,
                                   BookingRepository bookingRepo,
                                   BookingCheckOutAuditRepository auditRepo,
                                   PartnerProfileRepository partnerProfiles,
+                                  PartnerBusinessZoneService businessZone,
                                   @Value("${booking.checkout.late-window-days:1}") long lateWindowDays) {
         this.verificationService = verificationService;
         this.statusEngine = statusEngine;
         this.bookingRepo = bookingRepo;
         this.auditRepo = auditRepo;
         this.partnerProfiles = partnerProfiles;
+        this.businessZone = businessZone;
         this.lateWindowDays = lateWindowDays;
     }
 
@@ -144,7 +149,10 @@ public class PartnerCheckOutService {
             throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,
                 "Cannot check out before check-in");
         }
-        LocalDate today = LocalDate.now();
+        // H-FIX 3 — the closing date is a calendar day at the hotel, so it must be compared against
+        // the property's local date, not the server's. The check-in-instant guard above stays on
+        // Instant: it compares two absolute points in time, which is zone-independent.
+        LocalDate today = businessZone.todayFor(booking);
         LocalDate windowCloses = booking.getCheckOutDate().plusDays(lateWindowDays);
         if (today.isAfter(windowCloses)) {
             throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,

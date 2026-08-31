@@ -14,9 +14,49 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Room-inventory reads and numeric writes.
+ *
+ * <h2>H-FIX 1 — concurrency strategy: pessimistic, matching the booking path</h2>
+ *
+ * {@code BookingService} reserves inventory by taking {@link RoomInventoryRepository#lockForUpdate}
+ * (a {@code SELECT ... FOR UPDATE} over the exact night rows, ordered by date) and then issuing the
+ * bulk {@code decrementInventory} / {@code restoreInventory} JPQL updates. Before this fix the write
+ * paths below read the same rows with a plain finder and overwrote every counter, taking no lock —
+ * so a partner or admin saving a calendar could silently erase a booking's decrement (lost update,
+ * i.e. oversell). A lock only protects data when <em>every</em> writer takes it.
+ *
+ * <p><strong>Why not {@code @Version} instead.</strong> Optimistic locking would not have worked
+ * here: the booking path mutates inventory through {@code @Modifying} bulk JPQL, which bypasses the
+ * persistence context and therefore never increments a version column. A stale writer's version
+ * would still match and the clobber would still commit. Adding {@code @Version} would have looked
+ * like a fix while changing nothing. These writes now take the <em>same</em> pessimistic lock as the
+ * booking path, in the same deterministic {@code inventoryDate} order, so the two serialize on the
+ * database rows themselves and cannot deadlock against each other.
+ *
+ * <h2>H-FIX 1B — {@code soldInventory} is booking-derived</h2>
+ *
+ * {@code soldInventory} is only ever moved by {@code decrementInventory} / {@code restoreInventory},
+ * which trade units against {@code availableInventory}. It is authoritative booking state, not an
+ * operator-editable field, so {@link Authority#PARTNER} writes may not change it — see
+ * {@link #resolveSold}.
+ *
+ * <h2>H-FIX 1C — the invariant</h2>
+ *
+ * The counters may not over-allocate the room; see {@link #validateCounts}.
+ */
 @Service
 @Transactional(readOnly = true)
 public class RoomInventoryService {
+
+    /**
+     * Who is performing a numeric write, which decides whether {@code soldInventory} may change.
+     *
+     * <p>{@link #ADMIN} keeps the pre-existing behaviour of the admin inventory endpoints, which are
+     * a data-administration surface and must retain the ability to correct a sold count.
+     * {@link #PARTNER} is the extranet calendar, where sold is read-only.
+     */
+    public enum Authority { ADMIN, PARTNER }
 
     private final RoomInventoryRepository inventoryRepo;
     private final HotelRoomRepository roomRepo;
@@ -43,7 +83,8 @@ public class RoomInventoryService {
     @Transactional
     public RoomInventoryResponse create(Long roomId, RoomInventoryRequest req) {
         roomOrThrow(roomId);
-        validateCounts(req);
+        // A row that does not exist yet has no sold units; ADMIN may seed a non-zero count.
+        validateCounts(req, req.soldInventory());
         if (inventoryRepo.existsByHotelRoomIdAndInventoryDate(roomId, req.inventoryDate())) {
             throw new ApiException(HttpStatus.CONFLICT,
                 "Inventory already exists for room " + roomId + " on " + req.inventoryDate());
@@ -51,27 +92,61 @@ public class RoomInventoryService {
         HotelRoom room = roomOrThrow(roomId);
         RoomInventory inv = new RoomInventory();
         inv.setHotelRoom(room);
-        fill(inv, req);
+        fill(inv, req, req.soldInventory());
         return toResponse(inventoryRepo.save(inv));
     }
 
+    /** Admin numeric write — {@code soldInventory} remains writable. */
     @Transactional
     public RoomInventoryResponse update(Long roomId, LocalDate date, RoomInventoryRequest req) {
+        return update(roomId, date, req, Authority.ADMIN);
+    }
+
+    @Transactional
+    public RoomInventoryResponse update(Long roomId, LocalDate date, RoomInventoryRequest req,
+                                         Authority authority) {
         roomOrThrow(roomId);
-        validateCounts(req);
+        // Lock BEFORE the read so the read-modify-write below is atomic against a concurrent
+        // booking decrement over the same night. Half-open [date, date+1) matches the booking
+        // path's own window, so both contend on exactly the same row.
+        inventoryRepo.lockForUpdate(roomId, date, date.plusDays(1));
         RoomInventory inv = inventoryRepo.findByHotelRoomIdAndInventoryDate(roomId, date)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND,
                 "Inventory not found for room " + roomId + " on " + date));
-        fill(inv, req);
+        int sold = resolveSold(req, inv.getSoldInventory(), authority);
+        validateCounts(req, sold);
+        fill(inv, req, sold);
         return toResponse(inventoryRepo.save(inv));
     }
 
+    /** Admin bulk upsert — {@code soldInventory} remains writable. */
     @Transactional
     public List<RoomInventoryResponse> bulkUpsert(Long roomId, BulkInventoryRequest req) {
+        return bulkUpsert(roomId, req, Authority.ADMIN);
+    }
+
+    @Transactional
+    public List<RoomInventoryResponse> bulkUpsert(Long roomId, BulkInventoryRequest req,
+                                                   Authority authority) {
         HotelRoom room = roomOrThrow(roomId);
+
+        // Lock the whole requested span up front, in one deterministic date-ordered statement, so a
+        // multi-date save cannot interleave with a booking mid-way and cannot deadlock against it.
+        // Rows that do not exist yet cannot be locked; those are protected instead by the
+        // uk_room_inventory_date unique constraint, which turns a concurrent double-insert into a
+        // constraint violation rather than a duplicate row.
+        req.items().stream().map(RoomInventoryRequest::inventoryDate)
+            .filter(java.util.Objects::nonNull)
+            .min(LocalDate::compareTo)
+            .ifPresent(min -> {
+                LocalDate max = req.items().stream().map(RoomInventoryRequest::inventoryDate)
+                    .filter(java.util.Objects::nonNull)
+                    .max(LocalDate::compareTo).orElse(min);
+                inventoryRepo.lockForUpdate(roomId, min, max.plusDays(1));
+            });
+
         List<RoomInventoryResponse> results = new ArrayList<>();
         for (RoomInventoryRequest item : req.items()) {
-            validateCounts(item);
             RoomInventory inv = inventoryRepo
                 .findByHotelRoomIdAndInventoryDate(roomId, item.inventoryDate())
                 .orElseGet(() -> {
@@ -79,31 +154,88 @@ public class RoomInventoryService {
                     fresh.setHotelRoom(room);
                     return fresh;
                 });
-            fill(inv, item);
+            // A row being created here has no sold units yet, so 0 is its authoritative value.
+            int persistedSold = inv.getId() == null ? 0 : inv.getSoldInventory();
+            int sold = resolveSold(item, persistedSold, authority);
+            validateCounts(item, sold);
+            fill(inv, item, sold);
             results.add(toResponse(inventoryRepo.save(inv)));
         }
         return results;
     }
 
-    private void fill(RoomInventory inv, RoomInventoryRequest req) {
+    /**
+     * Decides the {@code soldInventory} a write will persist.
+     *
+     * <p>{@link Authority#ADMIN} may set it. {@link Authority#PARTNER} may not: the value is derived
+     * from bookings, so the persisted count always wins. A partner request that echoes the correct
+     * current value succeeds unchanged — which is what a read-modify-write of a fresh calendar does.
+     * A request carrying a <em>different</em> value is rejected with 409 rather than silently
+     * ignored, because the only ways to produce one are a stale read (exactly the lost-update the
+     * lock above prevents) or an attempt to edit booking state; both deserve to be told, not
+     * quietly discarded.
+     */
+    private int resolveSold(RoomInventoryRequest req, int persistedSold, Authority authority) {
+        if (authority == Authority.ADMIN) return req.soldInventory();
+        if (req.soldInventory() != persistedSold) {
+            throw new ApiException(HttpStatus.CONFLICT,
+                "soldInventory is derived from bookings and cannot be modified here; "
+                    + "the current value for " + req.inventoryDate() + " is " + persistedSold
+                    + ". Re-read the calendar and resubmit.");
+        }
+        return persistedSold;
+    }
+
+    private void fill(RoomInventory inv, RoomInventoryRequest req, int sold) {
         inv.setInventoryDate(req.inventoryDate());
         inv.setTotalInventory(req.totalInventory());
         inv.setAvailableInventory(req.availableInventory());
         inv.setBlockedInventory(req.blockedInventory());
-        inv.setSoldInventory(req.soldInventory());
+        inv.setSoldInventory(sold);
         inv.setMaintenanceInventory(req.maintenanceInventory());
         inv.setStopSell(req.stopSell());
         inv.setClosedArrival(req.closedArrival());
         inv.setClosedDeparture(req.closedDeparture());
     }
 
-    private void validateCounts(RoomInventoryRequest req) {
+    /**
+     * Enforces the counter invariant: the four counters may not <em>over-allocate</em> the room.
+     *
+     * <p>{@code available + sold + blocked + maintenance <= total}.
+     *
+     * <p>The bound is {@code <=} rather than {@code ==}, and that distinction was settled by reading
+     * the domain rather than by assumption. Equality holds for every seeded row
+     * ({@code 18 + 0 + 1 + 1 == 20}) and is conserved by the booking path, because
+     * {@code decrementInventory} / {@code restoreInventory} only trade units between
+     * {@code available} and {@code sold}. But equality is <em>not</em> a rule the system actually
+     * imposes: provisioning legitimately writes a night as {@code total=3, available=1} with the
+     * other counters at zero, meaning "three units exist, one is currently sellable" and leaving the
+     * remainder simply unaccounted. Demanding equality would reject that valid operation.
+     *
+     * <p>What must never be allowed is the opposite direction. Before this fix each counter was only
+     * bounded individually, so {@code total=20} with all four counters at {@code 20} — sum 80 —
+     * was accepted, describing a room whose parts claim four times its own capacity. That is the
+     * over-allocation this check now rejects; under-allocation is wasteful but never oversells.
+     *
+     * <p>{@code sold} is passed in rather than read from {@code req} because for a partner write it
+     * is the persisted value, not the submitted one, that will be stored.
+     */
+    private void validateCounts(RoomInventoryRequest req, int sold) {
         int total = req.totalInventory();
         List<String> errors = new ArrayList<>();
         if (req.availableInventory()   > total) errors.add("availableInventory exceeds totalInventory");
         if (req.blockedInventory()     > total) errors.add("blockedInventory exceeds totalInventory");
-        if (req.soldInventory()        > total) errors.add("soldInventory exceeds totalInventory");
+        if (sold                       > total) errors.add("soldInventory exceeds totalInventory");
         if (req.maintenanceInventory() > total) errors.add("maintenanceInventory exceeds totalInventory");
+        if (errors.isEmpty()) {
+            int sum = req.availableInventory() + sold
+                + req.blockedInventory() + req.maintenanceInventory();
+            if (sum > total) {
+                errors.add("availableInventory + soldInventory + blockedInventory + "
+                    + "maintenanceInventory must not exceed totalInventory (got " + sum
+                    + " vs totalInventory " + total + ")");
+            }
+        }
         if (!errors.isEmpty()) {
             throw new ApiException(HttpStatus.BAD_REQUEST, String.join("; ", errors));
         }

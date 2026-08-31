@@ -59,6 +59,9 @@ public class PartnerCheckInService {
     private final BookingCheckInAuditRepository auditRepo;
     private final PartnerProfileRepository partnerProfiles;
 
+    /** H-FIX 3 — supplies "today" in the property's configured timezone, never the server's. */
+    private final PartnerBusinessZoneService businessZone;
+
     /**
      * How many days BEFORE the check-in date a guest may already be admitted (early-check-in window).
      * Default 1 — a guest arriving the day before check-in can be checked in. Configurable via
@@ -71,12 +74,14 @@ public class PartnerCheckInService {
                                  BookingRepository bookingRepo,
                                  BookingCheckInAuditRepository auditRepo,
                                  PartnerProfileRepository partnerProfiles,
+                                 PartnerBusinessZoneService businessZone,
                                  @Value("${booking.checkin.early-window-days:1}") long earlyWindowDays) {
         this.verificationService = verificationService;
         this.statusEngine = statusEngine;
         this.bookingRepo = bookingRepo;
         this.auditRepo = auditRepo;
         this.partnerProfiles = partnerProfiles;
+        this.businessZone = businessZone;
         this.earlyWindowDays = earlyWindowDays;
     }
 
@@ -130,9 +135,14 @@ public class PartnerCheckInService {
      * Allow check-in when today is within {@code [checkInDate - earlyWindowDays, checkOutDate)} — i.e.
      * from the early-window opening up to (but not on/after) the check-out date. Before the window
      * opens → far-future 422; on/after check-out → expired 422.
+     *
+     * <p>H-FIX 3 — "today" is the date in the <em>property's</em> configured timezone, not the
+     * server's. {@code checkInDate}/{@code checkOutDate} are {@code LocalDate}s that mean local
+     * calendar days at the hotel, so comparing them against a server-local date is only correct while
+     * the two zones coincide.
      */
     private void validateCheckInWindow(Booking booking) {
-        LocalDate today = LocalDate.now();
+        LocalDate today = businessZone.todayFor(booking);
         LocalDate windowOpens = booking.getCheckInDate().minusDays(earlyWindowDays);
         if (today.isBefore(windowOpens)) {
             throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,

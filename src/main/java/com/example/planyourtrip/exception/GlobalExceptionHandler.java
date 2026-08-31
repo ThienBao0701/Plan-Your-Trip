@@ -7,11 +7,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.*;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.time.Instant;
+import java.util.Set;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -74,6 +79,76 @@ public class GlobalExceptionHandler {
     ResponseEntity<ErrorBody> notFound(NoHandlerFoundException ex, HttpServletRequest req) {
         return ResponseEntity.status(404).body(new ErrorBody(
             Instant.now().toString(), 404, "Not Found", "Resource not found", req.getRequestURI()));
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // H-FIX 2 — Spring request-binding failures.
+    //
+    // These four are thrown by Spring MVC while binding the request, BEFORE any
+    // controller or service code runs. Without explicit handlers they fell through
+    // to the catch-all below and surfaced as 500 "Unexpected server error", which
+    // made a caller's malformed request indistinguishable from a genuine server
+    // fault in logs and alerting. They are pure client errors, so they map to
+    // 400/405 and reuse the same uniform ErrorBody as every other response.
+    //
+    // Deliberately NOT logged at error level: they are caller mistakes, not faults.
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /** A required query parameter was absent, e.g. {@code GET /api/partner/rooms} with no {@code hotelId}. */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    ResponseEntity<ErrorBody> missingParameter(MissingServletRequestParameterException ex,
+                                                HttpServletRequest req) {
+        return ResponseEntity.badRequest().body(new ErrorBody(
+            Instant.now().toString(), 400, "Bad Request",
+            ex.getParameterName() + ": required parameter is missing", req.getRequestURI()));
+    }
+
+    /**
+     * A path variable or query parameter could not be converted to the declared type —
+     * a non-numeric id, or a malformed {@code LocalDate} such as {@code from=NOTADATE}.
+     * The offending value is echoed back because it is the caller's own input.
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    ResponseEntity<ErrorBody> typeMismatch(MethodArgumentTypeMismatchException ex,
+                                            HttpServletRequest req) {
+        Class<?> required = ex.getRequiredType();
+        String expected = required != null ? required.getSimpleName() : "the expected type";
+        return ResponseEntity.badRequest().body(new ErrorBody(
+            Instant.now().toString(), 400, "Bad Request",
+            ex.getName() + ": '" + ex.getValue() + "' is not a valid " + expected,
+            req.getRequestURI()));
+    }
+
+    /**
+     * The request body could not be parsed — malformed JSON, or a value Jackson cannot
+     * bind such as an unknown enum constant (e.g. a team role of {@code SUPER_PARTNER}).
+     * The parser's own message is not echoed: it can carry type and package internals.
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    ResponseEntity<ErrorBody> unreadableBody(HttpMessageNotReadableException ex,
+                                              HttpServletRequest req) {
+        return ResponseEntity.badRequest().body(new ErrorBody(
+            Instant.now().toString(), 400, "Bad Request",
+            "Malformed request body: the JSON could not be parsed, or a field holds an unsupported value",
+            req.getRequestURI()));
+    }
+
+    /**
+     * The route exists but not for this verb (e.g. {@code GET} on the PUT-only
+     * {@code /api/partner/reviews/{id}/reply}). RFC 9110 requires {@code Allow} on a 405,
+     * so the supported methods are advertised when Spring knows them.
+     */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    ResponseEntity<ErrorBody> methodNotAllowed(HttpRequestMethodNotSupportedException ex,
+                                                HttpServletRequest req) {
+        ResponseEntity.BodyBuilder builder = ResponseEntity.status(405);
+        Set<HttpMethod> supported = ex.getSupportedHttpMethods();
+        if (supported != null && !supported.isEmpty()) {
+            builder.allow(supported.toArray(new HttpMethod[0]));
+        }
+        return builder.body(new ErrorBody(
+            Instant.now().toString(), 405, "Method Not Allowed",
+            ex.getMethod() + " is not supported for this endpoint", req.getRequestURI()));
     }
 
     @ExceptionHandler(Exception.class)
