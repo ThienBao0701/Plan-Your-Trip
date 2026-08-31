@@ -61,6 +61,22 @@ enum AppRole {
   /// Only `PARTNER`. An `ADMIN` may reach partner routes (above), but partner
   /// controllers resolve `partnerProfileRepo.findByUserId(uid)`, so an admin
   /// normally has no partner profile and would land on an empty workspace —
-  /// admins keep the traveller app as their default surface.
+  /// admins keep the Admin CMS as their default surface (below).
   bool get landsOnPartnerExtranet => this == AppRole.partner;
+
+  /// Whether the backend's URL rule for `/api/admin/**` (`hasRole("ADMIN")`)
+  /// would admit this role. Mirrors `SecurityConfig` exactly — note it is
+  /// **stricter** than [canEnterPartnerExtranet]: `PARTNER` is refused here,
+  /// and D0 verified live that a partner token receives 403 on every admin
+  /// route. `unknown` fails closed like everywhere else.
+  bool get canEnterAdminConsole => this == AppRole.admin;
+
+  /// Whether the Admin CMS is this role's *default* landing surface.
+  ///
+  /// Identical to [canEnterAdminConsole] today because `ADMIN` has exactly one
+  /// natural home. It is kept as a separate name so the "may enter" and "lands
+  /// on" questions stay distinct, the way they already do for partners — the
+  /// two diverge for `PARTNER`, and conflating them is what would make a future
+  /// role change subtly wrong.
+  bool get landsOnAdminConsole => this == AppRole.admin;
 }

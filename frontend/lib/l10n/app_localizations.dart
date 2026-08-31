@@ -20427,6 +20427,702 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The connection dropped before the server confirmed. Refresh to see the current state before trying again.'**
   String get partnerAccountUncertain;
+
+  /// No description provided for @adminConsoleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Admin console'**
+  String get adminConsoleTitle;
+
+  /// No description provided for @adminSignedInAs.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed in as {email}'**
+  String adminSignedInAs(String email);
+
+  /// No description provided for @adminNavDashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Dashboard'**
+  String get adminNavDashboard;
+
+  /// No description provided for @adminNavBookings.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookings'**
+  String get adminNavBookings;
+
+  /// No description provided for @adminNavPayments.
+  ///
+  /// In en, this message translates to:
+  /// **'Payments'**
+  String get adminNavPayments;
+
+  /// No description provided for @adminNavInvoices.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoices'**
+  String get adminNavInvoices;
+
+  /// No description provided for @adminNavReviews.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviews'**
+  String get adminNavReviews;
+
+  /// No description provided for @adminNavActivityLog.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity log'**
+  String get adminNavActivityLog;
+
+  /// No description provided for @adminSectionOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'Overview'**
+  String get adminSectionOverview;
+
+  /// No description provided for @adminSectionOperations.
+  ///
+  /// In en, this message translates to:
+  /// **'Operations'**
+  String get adminSectionOperations;
+
+  /// No description provided for @adminSectionFinance.
+  ///
+  /// In en, this message translates to:
+  /// **'Finance'**
+  String get adminSectionFinance;
+
+  /// No description provided for @adminSectionCommunity.
+  ///
+  /// In en, this message translates to:
+  /// **'Community'**
+  String get adminSectionCommunity;
+
+  /// No description provided for @adminSectionAudit.
+  ///
+  /// In en, this message translates to:
+  /// **'Audit'**
+  String get adminSectionAudit;
+
+  /// No description provided for @adminAccessDeniedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Administrator access required'**
+  String get adminAccessDeniedTitle;
+
+  /// No description provided for @adminAccessDeniedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This area is limited to administrator accounts.'**
+  String get adminAccessDeniedBody;
+
+  /// No description provided for @adminAccessDeniedAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Go back'**
+  String get adminAccessDeniedAction;
+
+  /// No description provided for @adminMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Menu'**
+  String get adminMenu;
+
+  /// No description provided for @adminLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading…'**
+  String get adminLoading;
+
+  /// No description provided for @adminEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to show'**
+  String get adminEmptyTitle;
+
+  /// No description provided for @adminEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No records match this view yet.'**
+  String get adminEmptyMessage;
+
+  /// No description provided for @adminErrorUnauthorized.
+  ///
+  /// In en, this message translates to:
+  /// **'Your session has expired. Please sign in again.'**
+  String get adminErrorUnauthorized;
+
+  /// No description provided for @adminErrorForbidden.
+  ///
+  /// In en, this message translates to:
+  /// **'This account does not have administrator access.'**
+  String get adminErrorForbidden;
+
+  /// No description provided for @adminErrorNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'That record could not be found.'**
+  String get adminErrorNotFound;
+
+  /// No description provided for @adminErrorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load this view.'**
+  String get adminErrorGeneric;
+
+  /// No description provided for @adminRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get adminRetry;
+
+  /// No description provided for @adminRefresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get adminRefresh;
+
+  /// No description provided for @adminValueUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'—'**
+  String get adminValueUnknown;
+
+  /// No description provided for @adminPaginationEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No results'**
+  String get adminPaginationEmpty;
+
+  /// No description provided for @adminPaginationRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing {first}–{last} of {total}'**
+  String adminPaginationRange(int first, int last, int total);
+
+  /// No description provided for @adminPaginationPageOf.
+  ///
+  /// In en, this message translates to:
+  /// **'Page {page} of {total}'**
+  String adminPaginationPageOf(int page, int total);
+
+  /// No description provided for @adminPaginationPrevious.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous page'**
+  String get adminPaginationPrevious;
+
+  /// No description provided for @adminPaginationNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next page'**
+  String get adminPaginationNext;
+
+  /// No description provided for @adminSortAscending.
+  ///
+  /// In en, this message translates to:
+  /// **'Sorted ascending'**
+  String get adminSortAscending;
+
+  /// No description provided for @adminSortDescending.
+  ///
+  /// In en, this message translates to:
+  /// **'Sorted descending'**
+  String get adminSortDescending;
+
+  /// No description provided for @adminFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get adminFilterAll;
+
+  /// No description provided for @adminFilterStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get adminFilterStatus;
+
+  /// No description provided for @adminSortCreatedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Created'**
+  String get adminSortCreatedAt;
+
+  /// No description provided for @adminSortCheckIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in'**
+  String get adminSortCheckIn;
+
+  /// No description provided for @adminSortCheckOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-out'**
+  String get adminSortCheckOut;
+
+  /// No description provided for @adminSortFinalPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get adminSortFinalPrice;
+
+  /// No description provided for @adminSortStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get adminSortStatus;
+
+  /// No description provided for @adminSortBookingCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking code'**
+  String get adminSortBookingCode;
+
+  /// No description provided for @adminSortAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get adminSortAmount;
+
+  /// No description provided for @adminSortPaidAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid'**
+  String get adminSortPaidAt;
+
+  /// No description provided for @adminSortRefundedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Refunded'**
+  String get adminSortRefundedAt;
+
+  /// No description provided for @adminSortRating.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating'**
+  String get adminSortRating;
+
+  /// No description provided for @adminSortApprovedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved'**
+  String get adminSortApprovedAt;
+
+  /// No description provided for @adminSortIssuedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Issued'**
+  String get adminSortIssuedAt;
+
+  /// No description provided for @adminSortTotalAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get adminSortTotalAmount;
+
+  /// No description provided for @adminDashboardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Platform overview'**
+  String get adminDashboardTitle;
+
+  /// No description provided for @adminDashboardTotalBookings.
+  ///
+  /// In en, this message translates to:
+  /// **'Total bookings'**
+  String get adminDashboardTotalBookings;
+
+  /// No description provided for @adminDashboardGrossRevenue.
+  ///
+  /// In en, this message translates to:
+  /// **'Gross revenue'**
+  String get adminDashboardGrossRevenue;
+
+  /// No description provided for @adminDashboardActiveHotels.
+  ///
+  /// In en, this message translates to:
+  /// **'Active hotels'**
+  String get adminDashboardActiveHotels;
+
+  /// No description provided for @adminDashboardActiveRooms.
+  ///
+  /// In en, this message translates to:
+  /// **'Active rooms'**
+  String get adminDashboardActiveRooms;
+
+  /// No description provided for @adminDashboardTotalUsers.
+  ///
+  /// In en, this message translates to:
+  /// **'Users'**
+  String get adminDashboardTotalUsers;
+
+  /// No description provided for @adminDashboardTotalPartners.
+  ///
+  /// In en, this message translates to:
+  /// **'Partners'**
+  String get adminDashboardTotalPartners;
+
+  /// No description provided for @adminDashboardBookingsInRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookings in range'**
+  String get adminDashboardBookingsInRange;
+
+  /// No description provided for @adminDashboardRevenueInRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Revenue in range'**
+  String get adminDashboardRevenueInRange;
+
+  /// No description provided for @adminDashboardBookingsByStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookings by status'**
+  String get adminDashboardBookingsByStatus;
+
+  /// No description provided for @adminDashboardNoBookings.
+  ///
+  /// In en, this message translates to:
+  /// **'The platform has no bookings yet.'**
+  String get adminDashboardNoBookings;
+
+  /// No description provided for @adminDashboardRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Range {from} to {to}'**
+  String adminDashboardRange(String from, String to);
+
+  /// No description provided for @adminDashboardRangeDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Backend default range'**
+  String get adminDashboardRangeDefault;
+
+  /// No description provided for @adminDashboardLoadedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Loaded at {time}'**
+  String adminDashboardLoadedAt(String time);
+
+  /// No description provided for @adminDashboardNoCurrency.
+  ///
+  /// In en, this message translates to:
+  /// **'Revenue is reported without a currency by this endpoint.'**
+  String get adminDashboardNoCurrency;
+
+  /// No description provided for @adminBookingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookings'**
+  String get adminBookingsTitle;
+
+  /// No description provided for @adminBookingCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Code'**
+  String get adminBookingCode;
+
+  /// No description provided for @adminBookingHotel.
+  ///
+  /// In en, this message translates to:
+  /// **'Hotel'**
+  String get adminBookingHotel;
+
+  /// No description provided for @adminBookingRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Room'**
+  String get adminBookingRoom;
+
+  /// No description provided for @adminBookingStay.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay'**
+  String get adminBookingStay;
+
+  /// No description provided for @adminBookingNights.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} nights'**
+  String adminBookingNights(int count);
+
+  /// No description provided for @adminBookingTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get adminBookingTotal;
+
+  /// No description provided for @adminBookingCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Created'**
+  String get adminBookingCreated;
+
+  /// No description provided for @adminBookingsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No bookings match these filters.'**
+  String get adminBookingsEmpty;
+
+  /// No description provided for @adminPaymentsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payments'**
+  String get adminPaymentsTitle;
+
+  /// No description provided for @adminPaymentCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment'**
+  String get adminPaymentCode;
+
+  /// No description provided for @adminPaymentBooking.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking'**
+  String get adminPaymentBooking;
+
+  /// No description provided for @adminPaymentAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get adminPaymentAmount;
+
+  /// No description provided for @adminPaymentMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Method'**
+  String get adminPaymentMethod;
+
+  /// No description provided for @adminPaymentProvider.
+  ///
+  /// In en, this message translates to:
+  /// **'Provider'**
+  String get adminPaymentProvider;
+
+  /// No description provided for @adminPaymentPaidAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid'**
+  String get adminPaymentPaidAt;
+
+  /// No description provided for @adminPaymentRefundedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Refunded'**
+  String get adminPaymentRefundedAt;
+
+  /// No description provided for @adminPaymentFailureReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Failure reason'**
+  String get adminPaymentFailureReason;
+
+  /// No description provided for @adminPaymentsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No payments match these filters.'**
+  String get adminPaymentsEmpty;
+
+  /// No description provided for @adminReviewsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviews'**
+  String get adminReviewsTitle;
+
+  /// No description provided for @adminReviewPlace.
+  ///
+  /// In en, this message translates to:
+  /// **'Place'**
+  String get adminReviewPlace;
+
+  /// No description provided for @adminReviewAuthor.
+  ///
+  /// In en, this message translates to:
+  /// **'Author'**
+  String get adminReviewAuthor;
+
+  /// No description provided for @adminReviewRating.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating'**
+  String get adminReviewRating;
+
+  /// No description provided for @adminReviewContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Review'**
+  String get adminReviewContent;
+
+  /// No description provided for @adminReviewReported.
+  ///
+  /// In en, this message translates to:
+  /// **'Reported {count} times'**
+  String adminReviewReported(int count);
+
+  /// No description provided for @adminReviewPartnerReply.
+  ///
+  /// In en, this message translates to:
+  /// **'Partner reply'**
+  String get adminReviewPartnerReply;
+
+  /// No description provided for @adminReviewNoReply.
+  ///
+  /// In en, this message translates to:
+  /// **'No partner reply'**
+  String get adminReviewNoReply;
+
+  /// No description provided for @adminReviewsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No reviews match these filters.'**
+  String get adminReviewsEmpty;
+
+  /// No description provided for @adminReviewReadOnlyNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'This view is read-only. Moderation is not available in this release.'**
+  String get adminReviewReadOnlyNotice;
+
+  /// No description provided for @adminInvoicesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoices'**
+  String get adminInvoicesTitle;
+
+  /// No description provided for @adminInvoiceNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice'**
+  String get adminInvoiceNumber;
+
+  /// No description provided for @adminInvoiceBooking.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking'**
+  String get adminInvoiceBooking;
+
+  /// No description provided for @adminInvoiceHotel.
+  ///
+  /// In en, this message translates to:
+  /// **'Hotel'**
+  String get adminInvoiceHotel;
+
+  /// No description provided for @adminInvoiceSubtotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Subtotal'**
+  String get adminInvoiceSubtotal;
+
+  /// No description provided for @adminInvoiceDiscount.
+  ///
+  /// In en, this message translates to:
+  /// **'Discount'**
+  String get adminInvoiceDiscount;
+
+  /// No description provided for @adminInvoiceTax.
+  ///
+  /// In en, this message translates to:
+  /// **'Tax'**
+  String get adminInvoiceTax;
+
+  /// No description provided for @adminInvoiceTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get adminInvoiceTotal;
+
+  /// No description provided for @adminInvoiceIssuedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Issued'**
+  String get adminInvoiceIssuedAt;
+
+  /// No description provided for @adminInvoicePaidAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid'**
+  String get adminInvoicePaidAt;
+
+  /// No description provided for @adminInvoicesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No invoices match these filters.'**
+  String get adminInvoicesEmpty;
+
+  /// No description provided for @adminActivityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity log'**
+  String get adminActivityTitle;
+
+  /// No description provided for @adminActivityActor.
+  ///
+  /// In en, this message translates to:
+  /// **'Actor'**
+  String get adminActivityActor;
+
+  /// No description provided for @adminActivityAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Action'**
+  String get adminActivityAction;
+
+  /// No description provided for @adminActivityTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Target'**
+  String get adminActivityTarget;
+
+  /// No description provided for @adminActivityWhen.
+  ///
+  /// In en, this message translates to:
+  /// **'When'**
+  String get adminActivityWhen;
+
+  /// No description provided for @adminActivityDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get adminActivityDescription;
+
+  /// No description provided for @adminActivityBefore.
+  ///
+  /// In en, this message translates to:
+  /// **'Before'**
+  String get adminActivityBefore;
+
+  /// No description provided for @adminActivityAfter.
+  ///
+  /// In en, this message translates to:
+  /// **'After'**
+  String get adminActivityAfter;
+
+  /// No description provided for @adminActivitySystemActor.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get adminActivitySystemActor;
+
+  /// No description provided for @adminActivityEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No administrative actions recorded yet.'**
+  String get adminActivityEmpty;
+
+  /// No description provided for @adminActivityFixedOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Newest first, fixed by the server.'**
+  String get adminActivityFixedOrder;
+
+  /// No description provided for @adminActivityFilterAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Action'**
+  String get adminActivityFilterAction;
 }
 
 class _AppLocalizationsDelegate

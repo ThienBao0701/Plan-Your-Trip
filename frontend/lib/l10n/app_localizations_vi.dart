@@ -11809,4 +11809,371 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get partnerAccountUncertain =>
       'Kết nối bị ngắt trước khi máy chủ xác nhận. Hãy làm mới để xem trạng thái hiện tại trước khi thử lại.';
+
+  @override
+  String get adminConsoleTitle => 'Bảng quản trị';
+
+  @override
+  String adminSignedInAs(String email) {
+    return 'Đăng nhập với $email';
+  }
+
+  @override
+  String get adminNavDashboard => 'Tổng quan';
+
+  @override
+  String get adminNavBookings => 'Đặt phòng';
+
+  @override
+  String get adminNavPayments => 'Thanh toán';
+
+  @override
+  String get adminNavInvoices => 'Hóa đơn';
+
+  @override
+  String get adminNavReviews => 'Đánh giá';
+
+  @override
+  String get adminNavActivityLog => 'Nhật ký hoạt động';
+
+  @override
+  String get adminSectionOverview => 'Tổng quan';
+
+  @override
+  String get adminSectionOperations => 'Vận hành';
+
+  @override
+  String get adminSectionFinance => 'Tài chính';
+
+  @override
+  String get adminSectionCommunity => 'Cộng đồng';
+
+  @override
+  String get adminSectionAudit => 'Kiểm toán';
+
+  @override
+  String get adminAccessDeniedTitle => 'Cần quyền quản trị viên';
+
+  @override
+  String get adminAccessDeniedBody =>
+      'Khu vực này chỉ dành cho tài khoản quản trị viên.';
+
+  @override
+  String get adminAccessDeniedAction => 'Quay lại';
+
+  @override
+  String get adminMenu => 'Menu';
+
+  @override
+  String get adminLoading => 'Đang tải…';
+
+  @override
+  String get adminEmptyTitle => 'Không có dữ liệu';
+
+  @override
+  String get adminEmptyMessage => 'Chưa có bản ghi nào phù hợp.';
+
+  @override
+  String get adminErrorUnauthorized =>
+      'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.';
+
+  @override
+  String get adminErrorForbidden =>
+      'Tài khoản này không có quyền quản trị viên.';
+
+  @override
+  String get adminErrorNotFound => 'Không tìm thấy bản ghi.';
+
+  @override
+  String get adminErrorGeneric => 'Không thể tải dữ liệu.';
+
+  @override
+  String get adminRetry => 'Thử lại';
+
+  @override
+  String get adminRefresh => 'Làm mới';
+
+  @override
+  String get adminValueUnknown => '—';
+
+  @override
+  String get adminPaginationEmpty => 'Không có kết quả';
+
+  @override
+  String adminPaginationRange(int first, int last, int total) {
+    return 'Hiển thị $first–$last trên $total';
+  }
+
+  @override
+  String adminPaginationPageOf(int page, int total) {
+    return 'Trang $page / $total';
+  }
+
+  @override
+  String get adminPaginationPrevious => 'Trang trước';
+
+  @override
+  String get adminPaginationNext => 'Trang sau';
+
+  @override
+  String get adminSortAscending => 'Sắp xếp tăng dần';
+
+  @override
+  String get adminSortDescending => 'Sắp xếp giảm dần';
+
+  @override
+  String get adminFilterAll => 'Tất cả';
+
+  @override
+  String get adminFilterStatus => 'Trạng thái';
+
+  @override
+  String get adminSortCreatedAt => 'Ngày tạo';
+
+  @override
+  String get adminSortCheckIn => 'Ngày nhận phòng';
+
+  @override
+  String get adminSortCheckOut => 'Ngày trả phòng';
+
+  @override
+  String get adminSortFinalPrice => 'Tổng tiền';
+
+  @override
+  String get adminSortStatus => 'Trạng thái';
+
+  @override
+  String get adminSortBookingCode => 'Mã đặt phòng';
+
+  @override
+  String get adminSortAmount => 'Số tiền';
+
+  @override
+  String get adminSortPaidAt => 'Ngày thanh toán';
+
+  @override
+  String get adminSortRefundedAt => 'Ngày hoàn tiền';
+
+  @override
+  String get adminSortRating => 'Điểm đánh giá';
+
+  @override
+  String get adminSortApprovedAt => 'Ngày duyệt';
+
+  @override
+  String get adminSortIssuedAt => 'Ngày phát hành';
+
+  @override
+  String get adminSortTotalAmount => 'Tổng tiền';
+
+  @override
+  String get adminDashboardTitle => 'Tổng quan nền tảng';
+
+  @override
+  String get adminDashboardTotalBookings => 'Tổng lượt đặt';
+
+  @override
+  String get adminDashboardGrossRevenue => 'Doanh thu gộp';
+
+  @override
+  String get adminDashboardActiveHotels => 'Khách sạn đang hoạt động';
+
+  @override
+  String get adminDashboardActiveRooms => 'Phòng đang hoạt động';
+
+  @override
+  String get adminDashboardTotalUsers => 'Người dùng';
+
+  @override
+  String get adminDashboardTotalPartners => 'Đối tác';
+
+  @override
+  String get adminDashboardBookingsInRange => 'Lượt đặt trong kỳ';
+
+  @override
+  String get adminDashboardRevenueInRange => 'Doanh thu trong kỳ';
+
+  @override
+  String get adminDashboardBookingsByStatus => 'Lượt đặt theo trạng thái';
+
+  @override
+  String get adminDashboardNoBookings => 'Nền tảng chưa có lượt đặt nào.';
+
+  @override
+  String adminDashboardRange(String from, String to) {
+    return 'Từ $from đến $to';
+  }
+
+  @override
+  String get adminDashboardRangeDefault => 'Khoảng thời gian mặc định';
+
+  @override
+  String adminDashboardLoadedAt(String time) {
+    return 'Tải lúc $time';
+  }
+
+  @override
+  String get adminDashboardNoCurrency =>
+      'Điểm cuối này trả về doanh thu không kèm đơn vị tiền tệ.';
+
+  @override
+  String get adminBookingsTitle => 'Đặt phòng';
+
+  @override
+  String get adminBookingCode => 'Mã';
+
+  @override
+  String get adminBookingHotel => 'Khách sạn';
+
+  @override
+  String get adminBookingRoom => 'Phòng';
+
+  @override
+  String get adminBookingStay => 'Thời gian lưu trú';
+
+  @override
+  String adminBookingNights(int count) {
+    return '$count đêm';
+  }
+
+  @override
+  String get adminBookingTotal => 'Tổng tiền';
+
+  @override
+  String get adminBookingCreated => 'Ngày tạo';
+
+  @override
+  String get adminBookingsEmpty => 'Không có lượt đặt nào phù hợp.';
+
+  @override
+  String get adminPaymentsTitle => 'Thanh toán';
+
+  @override
+  String get adminPaymentCode => 'Thanh toán';
+
+  @override
+  String get adminPaymentBooking => 'Đặt phòng';
+
+  @override
+  String get adminPaymentAmount => 'Số tiền';
+
+  @override
+  String get adminPaymentMethod => 'Phương thức';
+
+  @override
+  String get adminPaymentProvider => 'Nhà cung cấp';
+
+  @override
+  String get adminPaymentPaidAt => 'Đã thanh toán';
+
+  @override
+  String get adminPaymentRefundedAt => 'Đã hoàn tiền';
+
+  @override
+  String get adminPaymentFailureReason => 'Lý do thất bại';
+
+  @override
+  String get adminPaymentsEmpty => 'Không có thanh toán nào phù hợp.';
+
+  @override
+  String get adminReviewsTitle => 'Đánh giá';
+
+  @override
+  String get adminReviewPlace => 'Địa điểm';
+
+  @override
+  String get adminReviewAuthor => 'Người viết';
+
+  @override
+  String get adminReviewRating => 'Điểm';
+
+  @override
+  String get adminReviewContent => 'Nội dung';
+
+  @override
+  String adminReviewReported(int count) {
+    return 'Bị báo cáo $count lần';
+  }
+
+  @override
+  String get adminReviewPartnerReply => 'Phản hồi của đối tác';
+
+  @override
+  String get adminReviewNoReply => 'Chưa có phản hồi';
+
+  @override
+  String get adminReviewsEmpty => 'Không có đánh giá nào phù hợp.';
+
+  @override
+  String get adminReviewReadOnlyNotice =>
+      'Màn hình này chỉ để xem. Chức năng kiểm duyệt chưa có trong bản này.';
+
+  @override
+  String get adminInvoicesTitle => 'Hóa đơn';
+
+  @override
+  String get adminInvoiceNumber => 'Hóa đơn';
+
+  @override
+  String get adminInvoiceBooking => 'Đặt phòng';
+
+  @override
+  String get adminInvoiceHotel => 'Khách sạn';
+
+  @override
+  String get adminInvoiceSubtotal => 'Tạm tính';
+
+  @override
+  String get adminInvoiceDiscount => 'Giảm giá';
+
+  @override
+  String get adminInvoiceTax => 'Thuế';
+
+  @override
+  String get adminInvoiceTotal => 'Tổng cộng';
+
+  @override
+  String get adminInvoiceIssuedAt => 'Ngày phát hành';
+
+  @override
+  String get adminInvoicePaidAt => 'Ngày thanh toán';
+
+  @override
+  String get adminInvoicesEmpty => 'Không có hóa đơn nào phù hợp.';
+
+  @override
+  String get adminActivityTitle => 'Nhật ký hoạt động';
+
+  @override
+  String get adminActivityActor => 'Người thực hiện';
+
+  @override
+  String get adminActivityAction => 'Hành động';
+
+  @override
+  String get adminActivityTarget => 'Đối tượng';
+
+  @override
+  String get adminActivityWhen => 'Thời điểm';
+
+  @override
+  String get adminActivityDescription => 'Chi tiết';
+
+  @override
+  String get adminActivityBefore => 'Trước';
+
+  @override
+  String get adminActivityAfter => 'Sau';
+
+  @override
+  String get adminActivitySystemActor => 'Hệ thống';
+
+  @override
+  String get adminActivityEmpty => 'Chưa ghi nhận hành động quản trị nào.';
+
+  @override
+  String get adminActivityFixedOrder => 'Mới nhất trước, do máy chủ quy định.';
+
+  @override
+  String get adminActivityFilterAction => 'Hành động';
 }

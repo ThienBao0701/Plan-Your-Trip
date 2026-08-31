@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'core/app_state.dart';
+import 'core/admin/admin_state.dart';
 import 'core/partner/partner_state.dart';
 import 'design/app_theme.dart';
 import 'features/auth/onboarding_screen.dart';
@@ -14,12 +15,19 @@ Future<void> main() async {
   // paradigm, not a second state-management system. It mirrors the session so
   // partner data is dropped whenever the account or mode changes.
   final partner = PartnerState(api: state.api)..bindSession(state);
+  // AdminState is a third sibling under the same InheritedNotifier paradigm --
+  // not a third state-management system. Like PartnerState it mirrors the
+  // session, so admin context is dropped whenever the account or mode changes.
+  final admin = AdminState(api: state.api)..bindSession(state);
   runApp(
     AppScope(
       notifier: state,
       child: PartnerScope(
         notifier: partner,
-        child: const PlanYourTripApp(),
+        child: AdminScope(
+          notifier: admin,
+          child: const PlanYourTripApp(),
+        ),
       ),
     ),
   );

@@ -11974,4 +11974,371 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get partnerAccountUncertain =>
       'The connection dropped before the server confirmed. Refresh to see the current state before trying again.';
+
+  @override
+  String get adminConsoleTitle => 'Admin console';
+
+  @override
+  String adminSignedInAs(String email) {
+    return 'Signed in as $email';
+  }
+
+  @override
+  String get adminNavDashboard => 'Dashboard';
+
+  @override
+  String get adminNavBookings => 'Bookings';
+
+  @override
+  String get adminNavPayments => 'Payments';
+
+  @override
+  String get adminNavInvoices => 'Invoices';
+
+  @override
+  String get adminNavReviews => 'Reviews';
+
+  @override
+  String get adminNavActivityLog => 'Activity log';
+
+  @override
+  String get adminSectionOverview => 'Overview';
+
+  @override
+  String get adminSectionOperations => 'Operations';
+
+  @override
+  String get adminSectionFinance => 'Finance';
+
+  @override
+  String get adminSectionCommunity => 'Community';
+
+  @override
+  String get adminSectionAudit => 'Audit';
+
+  @override
+  String get adminAccessDeniedTitle => 'Administrator access required';
+
+  @override
+  String get adminAccessDeniedBody =>
+      'This area is limited to administrator accounts.';
+
+  @override
+  String get adminAccessDeniedAction => 'Go back';
+
+  @override
+  String get adminMenu => 'Menu';
+
+  @override
+  String get adminLoading => 'Loading…';
+
+  @override
+  String get adminEmptyTitle => 'Nothing to show';
+
+  @override
+  String get adminEmptyMessage => 'No records match this view yet.';
+
+  @override
+  String get adminErrorUnauthorized =>
+      'Your session has expired. Please sign in again.';
+
+  @override
+  String get adminErrorForbidden =>
+      'This account does not have administrator access.';
+
+  @override
+  String get adminErrorNotFound => 'That record could not be found.';
+
+  @override
+  String get adminErrorGeneric => 'Could not load this view.';
+
+  @override
+  String get adminRetry => 'Try again';
+
+  @override
+  String get adminRefresh => 'Refresh';
+
+  @override
+  String get adminValueUnknown => '—';
+
+  @override
+  String get adminPaginationEmpty => 'No results';
+
+  @override
+  String adminPaginationRange(int first, int last, int total) {
+    return 'Showing $first–$last of $total';
+  }
+
+  @override
+  String adminPaginationPageOf(int page, int total) {
+    return 'Page $page of $total';
+  }
+
+  @override
+  String get adminPaginationPrevious => 'Previous page';
+
+  @override
+  String get adminPaginationNext => 'Next page';
+
+  @override
+  String get adminSortAscending => 'Sorted ascending';
+
+  @override
+  String get adminSortDescending => 'Sorted descending';
+
+  @override
+  String get adminFilterAll => 'All';
+
+  @override
+  String get adminFilterStatus => 'Status';
+
+  @override
+  String get adminSortCreatedAt => 'Created';
+
+  @override
+  String get adminSortCheckIn => 'Check-in';
+
+  @override
+  String get adminSortCheckOut => 'Check-out';
+
+  @override
+  String get adminSortFinalPrice => 'Total';
+
+  @override
+  String get adminSortStatus => 'Status';
+
+  @override
+  String get adminSortBookingCode => 'Booking code';
+
+  @override
+  String get adminSortAmount => 'Amount';
+
+  @override
+  String get adminSortPaidAt => 'Paid';
+
+  @override
+  String get adminSortRefundedAt => 'Refunded';
+
+  @override
+  String get adminSortRating => 'Rating';
+
+  @override
+  String get adminSortApprovedAt => 'Approved';
+
+  @override
+  String get adminSortIssuedAt => 'Issued';
+
+  @override
+  String get adminSortTotalAmount => 'Total';
+
+  @override
+  String get adminDashboardTitle => 'Platform overview';
+
+  @override
+  String get adminDashboardTotalBookings => 'Total bookings';
+
+  @override
+  String get adminDashboardGrossRevenue => 'Gross revenue';
+
+  @override
+  String get adminDashboardActiveHotels => 'Active hotels';
+
+  @override
+  String get adminDashboardActiveRooms => 'Active rooms';
+
+  @override
+  String get adminDashboardTotalUsers => 'Users';
+
+  @override
+  String get adminDashboardTotalPartners => 'Partners';
+
+  @override
+  String get adminDashboardBookingsInRange => 'Bookings in range';
+
+  @override
+  String get adminDashboardRevenueInRange => 'Revenue in range';
+
+  @override
+  String get adminDashboardBookingsByStatus => 'Bookings by status';
+
+  @override
+  String get adminDashboardNoBookings => 'The platform has no bookings yet.';
+
+  @override
+  String adminDashboardRange(String from, String to) {
+    return 'Range $from to $to';
+  }
+
+  @override
+  String get adminDashboardRangeDefault => 'Backend default range';
+
+  @override
+  String adminDashboardLoadedAt(String time) {
+    return 'Loaded at $time';
+  }
+
+  @override
+  String get adminDashboardNoCurrency =>
+      'Revenue is reported without a currency by this endpoint.';
+
+  @override
+  String get adminBookingsTitle => 'Bookings';
+
+  @override
+  String get adminBookingCode => 'Code';
+
+  @override
+  String get adminBookingHotel => 'Hotel';
+
+  @override
+  String get adminBookingRoom => 'Room';
+
+  @override
+  String get adminBookingStay => 'Stay';
+
+  @override
+  String adminBookingNights(int count) {
+    return '$count nights';
+  }
+
+  @override
+  String get adminBookingTotal => 'Total';
+
+  @override
+  String get adminBookingCreated => 'Created';
+
+  @override
+  String get adminBookingsEmpty => 'No bookings match these filters.';
+
+  @override
+  String get adminPaymentsTitle => 'Payments';
+
+  @override
+  String get adminPaymentCode => 'Payment';
+
+  @override
+  String get adminPaymentBooking => 'Booking';
+
+  @override
+  String get adminPaymentAmount => 'Amount';
+
+  @override
+  String get adminPaymentMethod => 'Method';
+
+  @override
+  String get adminPaymentProvider => 'Provider';
+
+  @override
+  String get adminPaymentPaidAt => 'Paid';
+
+  @override
+  String get adminPaymentRefundedAt => 'Refunded';
+
+  @override
+  String get adminPaymentFailureReason => 'Failure reason';
+
+  @override
+  String get adminPaymentsEmpty => 'No payments match these filters.';
+
+  @override
+  String get adminReviewsTitle => 'Reviews';
+
+  @override
+  String get adminReviewPlace => 'Place';
+
+  @override
+  String get adminReviewAuthor => 'Author';
+
+  @override
+  String get adminReviewRating => 'Rating';
+
+  @override
+  String get adminReviewContent => 'Review';
+
+  @override
+  String adminReviewReported(int count) {
+    return 'Reported $count times';
+  }
+
+  @override
+  String get adminReviewPartnerReply => 'Partner reply';
+
+  @override
+  String get adminReviewNoReply => 'No partner reply';
+
+  @override
+  String get adminReviewsEmpty => 'No reviews match these filters.';
+
+  @override
+  String get adminReviewReadOnlyNotice =>
+      'This view is read-only. Moderation is not available in this release.';
+
+  @override
+  String get adminInvoicesTitle => 'Invoices';
+
+  @override
+  String get adminInvoiceNumber => 'Invoice';
+
+  @override
+  String get adminInvoiceBooking => 'Booking';
+
+  @override
+  String get adminInvoiceHotel => 'Hotel';
+
+  @override
+  String get adminInvoiceSubtotal => 'Subtotal';
+
+  @override
+  String get adminInvoiceDiscount => 'Discount';
+
+  @override
+  String get adminInvoiceTax => 'Tax';
+
+  @override
+  String get adminInvoiceTotal => 'Total';
+
+  @override
+  String get adminInvoiceIssuedAt => 'Issued';
+
+  @override
+  String get adminInvoicePaidAt => 'Paid';
+
+  @override
+  String get adminInvoicesEmpty => 'No invoices match these filters.';
+
+  @override
+  String get adminActivityTitle => 'Activity log';
+
+  @override
+  String get adminActivityActor => 'Actor';
+
+  @override
+  String get adminActivityAction => 'Action';
+
+  @override
+  String get adminActivityTarget => 'Target';
+
+  @override
+  String get adminActivityWhen => 'When';
+
+  @override
+  String get adminActivityDescription => 'Details';
+
+  @override
+  String get adminActivityBefore => 'Before';
+
+  @override
+  String get adminActivityAfter => 'After';
+
+  @override
+  String get adminActivitySystemActor => 'System';
+
+  @override
+  String get adminActivityEmpty => 'No administrative actions recorded yet.';
+
+  @override
+  String get adminActivityFixedOrder => 'Newest first, fixed by the server.';
+
+  @override
+  String get adminActivityFilterAction => 'Action';
 }

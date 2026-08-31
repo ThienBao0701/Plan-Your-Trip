@@ -3168,26 +3168,36 @@
   "availabilityRealRoomCount": "{count, plural, =1{1 room available} other{{count} rooms available}}",
   "@availabilityRealRoomCount": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "availabilityRealPerNight": "{price} / night",
   "@availabilityRealPerNight": {
     "placeholders": {
-      "price": { "type": "String" }
+      "price": {
+        "type": "String"
+      }
     }
   },
   "availabilityRealOriginalPrice": "{price}",
   "@availabilityRealOriginalPrice": {
     "placeholders": {
-      "price": { "type": "String" }
+      "price": {
+        "type": "String"
+      }
     }
   },
   "availabilityRealTotalForNights": "{price} total · {nights, plural, =1{1 night} other{{nights} nights}}",
   "@availabilityRealTotalForNights": {
     "placeholders": {
-      "price": { "type": "String" },
-      "nights": { "type": "int" }
+      "price": {
+        "type": "String"
+      },
+      "nights": {
+        "type": "int"
+      }
     }
   },
   "availabilityRealFreeCancellation": "Free cancellation",
@@ -3198,8 +3208,12 @@
   "placeGallerySemantic": "Photo gallery for {name}, {count, plural, =1{1 image} other{{count} images}}",
   "@placeGallerySemantic": {
     "placeholders": {
-      "name": { "type": "String" },
-      "count": { "type": "int" }
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
     }
   },
   "placeGalleryClose": "Close photo",
@@ -3211,8 +3225,12 @@
   "placeCoordinatesValue": "{lat}, {long}",
   "@placeCoordinatesValue": {
     "placeholders": {
-      "lat": { "type": "String" },
-      "long": { "type": "String" }
+      "lat": {
+        "type": "String"
+      },
+      "long": {
+        "type": "String"
+      }
     }
   },
   "placeAmenitiesTitle": "Amenities",
@@ -3298,54 +3316,72 @@
   "hotelServiceUnavailable": "{service} (unavailable)",
   "@hotelServiceUnavailable": {
     "placeholders": {
-      "service": { "type": "String" }
+      "service": {
+        "type": "String"
+      }
     }
   },
   "roomSelectAction": "Select this room",
   "roomSelectSemantic": "Select {name}",
   "@roomSelectSemantic": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "roomSelectedBadge": "Selected",
   "roomDetailImageSemantic": "Photos of {name}",
   "@roomDetailImageSemantic": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "roomCodeLabel": "Room code {code}",
   "@roomCodeLabel": {
     "placeholders": {
-      "code": { "type": "String" }
+      "code": {
+        "type": "String"
+      }
     }
   },
   "roomBedConfig": "{count, plural, =1{1 {bed}} other{{count} {bed}}}",
   "@roomBedConfig": {
     "placeholders": {
-      "count": { "type": "int" },
-      "bed": { "type": "String" }
+      "count": {
+        "type": "int"
+      },
+      "bed": {
+        "type": "String"
+      }
     }
   },
   "roomOccupancyTitle": "Occupancy",
   "roomOccupancyAdults": "{count, plural, =1{1 adult} other{{count} adults}}",
   "@roomOccupancyAdults": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "roomOccupancyChildren": "{count, plural, =1{1 child} other{{count} children}}",
   "@roomOccupancyChildren": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "roomPriceTitle": "Price",
   "hotelRoomCardSelectedSemantic": "{name}, selected",
   "@hotelRoomCardSelectedSemantic": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "roomRatePlansTitle": "Rate plans",
@@ -3357,13 +3393,17 @@
   "roomRatePlanSemantic": "Rate plan {name}",
   "@roomRatePlanSemantic": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "roomRatePlanSelectedSemantic": "Rate plan {name}, selected",
   "@roomRatePlanSelectedSemantic": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "roomRatePlanIneligible": "Not available for the selected stay.",
@@ -3372,20 +3412,28 @@
   "ratePlanFinalNightly": "{price} / night",
   "@ratePlanFinalNightly": {
     "placeholders": {
-      "price": { "type": "String" }
+      "price": {
+        "type": "String"
+      }
     }
   },
   "ratePlanBaseNightly": "Base {price} / night",
   "@ratePlanBaseNightly": {
     "placeholders": {
-      "price": { "type": "String" }
+      "price": {
+        "type": "String"
+      }
     }
   },
   "ratePlanStaySubtotal": "{price} for {nights, plural, =1{1 night} other{{nights} nights}}",
   "@ratePlanStaySubtotal": {
     "placeholders": {
-      "price": { "type": "String" },
-      "nights": { "type": "int" }
+      "price": {
+        "type": "String"
+      },
+      "nights": {
+        "type": "int"
+      }
     }
   },
   "bookingCreateAction": "Create booking",
@@ -3408,7 +3456,9 @@
   "bookingStatusGenericHeadline": "Booking status: {status}",
   "@bookingStatusGenericHeadline": {
     "placeholders": {
-      "status": { "type": "String" }
+      "status": {
+        "type": "String"
+      }
     }
   },
   "bookingSubmitValidationMessage": "Some booking details couldn't be accepted. Please review your dates and guests and try again.",
@@ -3473,11 +3523,19 @@
   "reviewsMineEmptyMessage": "Reviews you write for completed stays will appear here.",
   "reviewStarsSemantic": "{rating} out of 5",
   "@reviewStarsSemantic": {
-    "placeholders": { "rating": { "type": "int" } }
+    "placeholders": {
+      "rating": {
+        "type": "int"
+      }
+    }
   },
   "writeReviewRateStarSemantic": "Rate {rating} out of 5",
   "@writeReviewRateStarSemantic": {
-    "placeholders": { "rating": { "type": "int" } }
+    "placeholders": {
+      "rating": {
+        "type": "int"
+      }
+    }
   },
   "reviewPartnerReplyTitle": "Response from the property",
   "reviewUnknownPlace": "Place",
@@ -3519,15 +3577,30 @@
   "recentlyViewedUnknownPlace": "Place",
   "recentlyViewedCardSemantic": "Open {name}",
   "@recentlyViewedCardSemantic": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "recentlyViewedRatingSemantic": "Rated {rating} from {count} reviews",
   "@recentlyViewedRatingSemantic": {
-    "placeholders": { "rating": { "type": "String" }, "count": { "type": "int" } }
+    "placeholders": {
+      "rating": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "recentlyViewedRemoveSemantic": "Remove {name} from recently viewed",
   "@recentlyViewedRemoveSemantic": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "recentlyViewedClearSemantic": "Clear recently viewed",
   "recentlyViewedClearConfirmTitle": "Clear recently viewed?",
@@ -3536,7 +3609,11 @@
   "recentlyViewedRemoveConfirmTitle": "Remove from recently viewed?",
   "recentlyViewedRemoveConfirmMessage": "Remove {name} from your recently viewed list?",
   "@recentlyViewedRemoveConfirmMessage": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "recentlyViewedRemoveConfirmAction": "Remove",
   "recentlyViewedClearedMessage": "Recently viewed cleared.",
@@ -3572,7 +3649,9 @@
   "profileEditPassportWarning": "Currently saved: {masked}. Re-enter it to keep it — leaving this blank removes the saved passport when you save.",
   "@profileEditPassportWarning": {
     "placeholders": {
-      "masked": { "type": "String" }
+      "masked": {
+        "type": "String"
+      }
     }
   },
   "profileEditPassportHint": "Optional. Stored masked once saved.",
@@ -3581,13 +3660,17 @@
   "profileCompletionSemantic": "Profile {percent}% complete",
   "@profileCompletionSemantic": {
     "placeholders": {
-      "percent": { "type": "int" }
+      "percent": {
+        "type": "int"
+      }
     }
   },
   "profileRoleSemantic": "Account role: {role}",
   "@profileRoleSemantic": {
     "placeholders": {
-      "role": { "type": "String" }
+      "role": {
+        "type": "String"
+      }
     }
   },
   "profileEditEmptyPreferences": "Add your travel preferences to personalise your trips.",
@@ -3609,7 +3692,9 @@
   "giftCardsRealBalanceSemantic": "Current balance {balance}",
   "@giftCardsRealBalanceSemantic": {
     "placeholders": {
-      "balance": { "type": "String" }
+      "balance": {
+        "type": "String"
+      }
     }
   },
   "loyaltyRealLoadingMessage": "Loading your loyalty points…",
@@ -3633,13 +3718,17 @@
   "membershipRealPointsToNext": "{points} more points to the next tier",
   "@membershipRealPointsToNext": {
     "placeholders": {
-      "points": { "type": "int" }
+      "points": {
+        "type": "int"
+      }
     }
   },
   "membershipRealBookingsToNext": "{bookings} more completed bookings to the next tier",
   "@membershipRealBookingsToNext": {
     "placeholders": {
-      "bookings": { "type": "int" }
+      "bookings": {
+        "type": "int"
+      }
     }
   },
   "referralRealLoadingMessage": "Loading your referral…",
@@ -3666,19 +3755,25 @@
   "couponDetailMinimumSpend": "Minimum spend {amount}",
   "@couponDetailMinimumSpend": {
     "placeholders": {
-      "amount": { "type": "String" }
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "couponDetailValidUntil": "Valid until {date}",
   "@couponDetailValidUntil": {
     "placeholders": {
-      "date": { "type": "String" }
+      "date": {
+        "type": "String"
+      }
     }
   },
   "couponDetailUsagePerUser": "Up to {count} use(s) per customer",
   "@couponDetailUsagePerUser": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "recommendationsTitle": "Recommended for you",
@@ -3698,19 +3793,25 @@
   "recommendationsDismissSemantic": "Dismiss {name}",
   "@recommendationsDismissSemantic": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "recommendationCardSemantic": "Recommendation: {name}",
   "@recommendationCardSemantic": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "recommendationScoreSemantic": "Match score {score} out of 100",
   "@recommendationScoreSemantic": {
     "placeholders": {
-      "score": { "type": "int" }
+      "score": {
+        "type": "int"
+      }
     }
   },
   "recommendationTypePlace": "Place",
@@ -3726,13 +3827,17 @@
   "recommendationDetailGenerated": "Suggested {date}",
   "@recommendationDetailGenerated": {
     "placeholders": {
-      "date": { "type": "String" }
+      "date": {
+        "type": "String"
+      }
     }
   },
   "recommendationDetailExpires": "Available until {date}",
   "@recommendationDetailExpires": {
     "placeholders": {
-      "date": { "type": "String" }
+      "date": {
+        "type": "String"
+      }
     }
   },
   "expensesTitle": "Expenses",
@@ -3767,31 +3872,41 @@
   "expensesDeleteConfirmMessage": "Delete \"{title}\"? This can't be undone.",
   "@expensesDeleteConfirmMessage": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "expensesDeleteSemantic": "Delete {title}",
   "@expensesDeleteSemantic": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "expenseCardSemantic": "Expense: {title}",
   "@expenseCardSemantic": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "expensesSummaryBudget": "Budget {amount}",
   "@expensesSummaryBudget": {
     "placeholders": {
-      "amount": { "type": "String" }
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "expensesSummaryRemaining": "{amount} left",
   "@expensesSummaryRemaining": {
     "placeholders": {
-      "amount": { "type": "String" }
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "conversationsTitle": "Messages",
@@ -3830,27 +3945,39 @@
   "conversationBookingLabel": "Booking {code}",
   "@conversationBookingLabel": {
     "placeholders": {
-      "code": { "type": "String" }
+      "code": {
+        "type": "String"
+      }
     }
   },
   "conversationUnreadBadge": "{count} unread",
   "@conversationUnreadBadge": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "conversationTileSemantic": "Conversation {title}, {count} unread",
   "@conversationTileSemantic": {
     "placeholders": {
-      "title": { "type": "String" },
-      "count": { "type": "int" }
+      "title": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
     }
   },
   "conversationMessageSemantic": "{sender} said: {body}",
   "@conversationMessageSemantic": {
     "placeholders": {
-      "sender": { "type": "String" },
-      "body": { "type": "String" }
+      "sender": {
+        "type": "String"
+      },
+      "body": {
+        "type": "String"
+      }
     }
   },
   "aiContextTitle": "AI trip context",
@@ -3876,38 +4003,52 @@
   "aiContextGeneratedAt": "Snapshot taken {date}",
   "@aiContextGeneratedAt": {
     "placeholders": {
-      "date": { "type": "String" }
+      "date": {
+        "type": "String"
+      }
     }
   },
   "aiContextTripDays": "{count} days",
   "@aiContextTripDays": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "aiContextStatSemantic": "{label}: {value}",
   "@aiContextStatSemantic": {
     "placeholders": {
-      "label": { "type": "String" },
-      "value": { "type": "int" }
+      "label": {
+        "type": "String"
+      },
+      "value": {
+        "type": "int"
+      }
     }
   },
   "aiContextSpent": "Spent {amount}",
   "@aiContextSpent": {
     "placeholders": {
-      "amount": { "type": "String" }
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "aiContextBudget": "Budget {amount}",
   "@aiContextBudget": {
     "placeholders": {
-      "amount": { "type": "String" }
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "aiContextRemaining": "{amount} left",
   "@aiContextRemaining": {
     "placeholders": {
-      "amount": { "type": "String" }
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "documentsRealLoadingMessage": "Loading documents…",
@@ -3960,19 +4101,25 @@
   "packingRealDeleteConfirmMessage": "Delete {label} from this checklist?",
   "@packingRealDeleteConfirmMessage": {
     "placeholders": {
-      "label": { "type": "String" }
+      "label": {
+        "type": "String"
+      }
     }
   },
   "packingRealCheckSemantic": "Mark {label} as packed",
   "@packingRealCheckSemantic": {
     "placeholders": {
-      "label": { "type": "String" }
+      "label": {
+        "type": "String"
+      }
     }
   },
   "packingRealUncheckSemantic": "Mark {label} as not packed",
   "@packingRealUncheckSemantic": {
     "placeholders": {
-      "label": { "type": "String" }
+      "label": {
+        "type": "String"
+      }
     }
   },
   "remindersRealTitle": "Trip reminders",
@@ -3996,19 +4143,25 @@
   "remindersRealDeleteConfirmMessage": "Delete {title} from this trip?",
   "@remindersRealDeleteConfirmMessage": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "remindersRealCompleteSemantic": "Mark {title} as complete",
   "@remindersRealCompleteSemantic": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "remindersRealCancelSemantic": "Cancel {title}",
   "@remindersRealCancelSemantic": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "budgetRealTitle": "Trip budget",
@@ -4057,7 +4210,9 @@
   "collaborationRealRemoveConfirmMessage": "Remove {name} from this trip? They lose access immediately.",
   "@collaborationRealRemoveConfirmMessage": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "sharedTripsRealLoadingMessage": "Loading shared trips…",
@@ -4134,7 +4289,9 @@
   "walletRealReferenceHint": "Current: {masked}. Leave blank to keep it removed; re-enter to replace.",
   "@walletRealReferenceHint": {
     "placeholders": {
-      "masked": { "type": "String" }
+      "masked": {
+        "type": "String"
+      }
     }
   },
   "walletRealValidFromField": "Valid from",
@@ -4149,19 +4306,25 @@
   "walletRealDeleteConfirmMessage": "Delete {title} from your wallet? The linked document, booking, or invoice is not affected.",
   "@walletRealDeleteConfirmMessage": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "walletRealFavoriteSemantic": "Add {title} to favorites",
   "@walletRealFavoriteSemantic": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "walletRealUnfavoriteSemantic": "Remove {title} from favorites",
   "@walletRealUnfavoriteSemantic": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "partnerExtranetTitle": "Partner Extranet",
@@ -4189,14 +4352,20 @@
   "partnerNavBadgeSemantic": "{label}, {count} pending",
   "@partnerNavBadgeSemantic": {
     "placeholders": {
-      "label": { "type": "String" },
-      "count": { "type": "int" }
+      "label": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerTeamRoleLabel": "Your team role: {role}",
   "@partnerTeamRoleLabel": {
     "placeholders": {
-      "role": { "type": "String" }
+      "role": {
+        "type": "String"
+      }
     }
   },
   "partnerTeamRoleOwner": "Owner",
@@ -4244,7 +4413,9 @@
   "partnerDashboardRepresentative": "Represented by {name}",
   "@partnerDashboardRepresentative": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerMetricArrivals": "Arrivals today",
@@ -4261,7 +4432,9 @@
   "partnerPropertyInactiveSemantic": "{name}, inactive",
   "@partnerPropertyInactiveSemantic": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerModulePlannedBadge": "Planned",
@@ -4269,7 +4442,9 @@
   "partnerModuleEndpointHint": "Route: {route}",
   "@partnerModuleEndpointHint": {
     "placeholders": {
-      "route": { "type": "String" }
+      "route": {
+        "type": "String"
+      }
     }
   },
   "partnerModuleReadOnlyForRole": "Your team role will not be able to change settings in this module.",
@@ -4281,13 +4456,17 @@
   "partnerDashboardScopeWindowAll": "{window} · all properties",
   "@partnerDashboardScopeWindowAll": {
     "placeholders": {
-      "window": {"type": "String"}
+      "window": {
+        "type": "String"
+      }
     }
   },
   "partnerDashboardScopeWindowOne": "{window} · selected property",
   "@partnerDashboardScopeWindowOne": {
     "placeholders": {
-      "window": {"type": "String"}
+      "window": {
+        "type": "String"
+      }
     }
   },
   "partnerDashboardRangeLabel": "Date range",
@@ -4299,31 +4478,41 @@
   "partnerDashboardPropertyCount": "{count, plural, =1{1 property} other{{count} properties}}",
   "@partnerDashboardPropertyCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerDashboardRoomCount": "{count, plural, =1{1 active room} other{{count} active rooms}}",
   "@partnerDashboardRoomCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerDashboardTeamRole": "Your role: {role}",
   "@partnerDashboardTeamRole": {
     "placeholders": {
-      "role": {"type": "String"}
+      "role": {
+        "type": "String"
+      }
     }
   },
   "partnerDashboardActiveProperty": "Scoped to {name}",
   "@partnerDashboardActiveProperty": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerDashboardUpdatedAt": "Updated {time}",
   "@partnerDashboardUpdatedAt": {
     "placeholders": {
-      "time": {"type": "String"}
+      "time": {
+        "type": "String"
+      }
     }
   },
   "partnerDashboardNoActivityHint": "No bookings fall in the selected window yet, so the performance figures below are zero.",
@@ -4332,8 +4521,12 @@
   "partnerDashboardAttentionSemantic": "{label}, {count, plural, =1{1 item needs attention} other{{count} items need attention}}",
   "@partnerDashboardAttentionSemantic": {
     "placeholders": {
-      "label": {"type": "String"},
-      "count": {"type": "int"}
+      "label": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerDashboardQuickActionsHeading": "Quick actions",
@@ -4350,14 +4543,18 @@
   "partnerDashboardActivityBy": "by {actor}",
   "@partnerDashboardActivityBy": {
     "placeholders": {
-      "actor": {"type": "String"}
+      "actor": {
+        "type": "String"
+      }
     }
   },
   "partnerDashboardActivityUnknownActor": "Unknown user",
   "partnerDashboardActivityMore": "{count, plural, =1{1 older entry} other{{count} older entries}}",
   "@partnerDashboardActivityMore": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerDashboardChartEmpty": "No data points in this period.",
@@ -4386,7 +4583,9 @@
   "partnerKpiReviewCount": "{count, plural, =0{No reviews} =1{From 1 review} other{From {count} reviews}}",
   "@partnerKpiReviewCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerKpiResponseRate": "Message response rate",
@@ -4407,19 +4606,25 @@
   "partnerFinanceCompletedBookings": "{count, plural, =1{1 completed booking} other{{count} completed bookings}}",
   "@partnerFinanceCompletedBookings": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerFinancePaidBookings": "{count, plural, =1{1 paid booking} other{{count} paid bookings}}",
   "@partnerFinancePaidBookings": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerPropertiesCount": "{count, plural, =0{No properties} =1{1 property} other{{count} properties}}",
   "@partnerPropertiesCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerPropertiesEmptyTitle": "No properties yet",
@@ -4447,8 +4652,12 @@
   "partnerPropertyRatingSummary": "{rating} from {count, plural, =1{1 review} other{{count} reviews}}",
   "@partnerPropertyRatingSummary": {
     "placeholders": {
-      "rating": {"type": "String"},
-      "count": {"type": "int"}
+      "rating": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerPropertyVisibilityPublic": "Guests can find and book this property now.",
@@ -4459,13 +4668,17 @@
   "partnerPropertyActivatedMessage": "{name} is now listed.",
   "@partnerPropertyActivatedMessage": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerPropertyDeactivatedMessage": "{name} is no longer listed.",
   "@partnerPropertyDeactivatedMessage": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerPropertyActionNotFound": "That property is no longer available to your account.",
@@ -4503,25 +4716,33 @@
   "partnerRoomsCount": "{count, plural, =1{1 room type} other{{count} room types}}",
   "@partnerRoomsCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerRoomsListedCount": "{count, plural, =1{1 listed} other{{count} listed}}",
   "@partnerRoomsListedCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerRoomsSoldOutCount": "{count, plural, =1{1 sold out} other{{count} sold out}}",
   "@partnerRoomsSoldOutCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerRoomsForProperty": "Rooms at {name}",
   "@partnerRoomsForProperty": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerRoomsNoPropertyContext": "No property selected",
@@ -4546,13 +4767,17 @@
   "partnerRoomListedMessage": "{name} is now listed.",
   "@partnerRoomListedMessage": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerRoomUnlistedMessage": "{name} is no longer listed.",
   "@partnerRoomUnlistedMessage": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerRoomActionNotFound": "That room is no longer available to your account.",
@@ -4561,26 +4786,36 @@
   "partnerRoomGuestsValue": "Up to {count} guests",
   "@partnerRoomGuestsValue": {
     "placeholders": {
-      "count": {"type": "String"}
+      "count": {
+        "type": "String"
+      }
     }
   },
   "partnerRoomInventoryValue": "{available} of {total} available",
   "@partnerRoomInventoryValue": {
     "placeholders": {
-      "available": {"type": "String"},
-      "total": {"type": "String"}
+      "available": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
     }
   },
   "partnerRoomPriceFromValue": "From {price}",
   "@partnerRoomPriceFromValue": {
     "placeholders": {
-      "price": {"type": "String"}
+      "price": {
+        "type": "String"
+      }
     }
   },
   "partnerRoomSizeValue": "{size} m²",
   "@partnerRoomSizeValue": {
     "placeholders": {
-      "size": {"type": "String"}
+      "size": {
+        "type": "String"
+      }
     }
   },
   "partnerRoomSectionIdentity": "Identity",
@@ -4631,7 +4866,9 @@
   "partnerInventoryForProperty": "Inventory at {name}",
   "@partnerInventoryForProperty": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerInventoryNoPropertyContext": "No property selected",
@@ -4644,28 +4881,42 @@
   "partnerInventoryWindow": "{from} – {to} · {count} days",
   "@partnerInventoryWindow": {
     "placeholders": {
-      "from": {"type": "String"},
-      "to": {"type": "String"},
-      "count": {"type": "int"}
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerInventoryBookableDays": "{bookable} of {total} days bookable",
   "@partnerInventoryBookableDays": {
     "placeholders": {
-      "bookable": {"type": "int"},
-      "total": {"type": "int"}
+      "bookable": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
     }
   },
   "partnerInventoryTotalAvailable": "{count} room-nights available",
   "@partnerInventoryTotalAvailable": {
     "placeholders": {
-      "count": {"type": "String"}
+      "count": {
+        "type": "String"
+      }
     }
   },
   "partnerInventoryStopSellDays": "{count, plural, =1{1 day stopped} other{{count} days stopped}}",
   "@partnerInventoryStopSellDays": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerInventoryNoPropertiesTitle": "No properties yet",
@@ -4700,7 +4951,9 @@
   "partnerInventoryInconsistentSummary": "{count, plural, =1{1 day has counts that do not add up to its total} other{{count} days have counts that do not add up to their total}}. Only the backend can correct this.",
   "@partnerInventoryInconsistentSummary": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerInventoryEditOwnerOnly": "Changing availability is available to the profile owner. You can review the calendar here.",
@@ -4709,14 +4962,20 @@
   "partnerRatesForProperty": "Rates at {name}",
   "@partnerRatesForProperty": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerRatesForRoom": "Rates for {room} at {property}",
   "@partnerRatesForRoom": {
     "placeholders": {
-      "room": {"type": "String"},
-      "property": {"type": "String"}
+      "room": {
+        "type": "String"
+      },
+      "property": {
+        "type": "String"
+      }
     }
   },
   "partnerRatesNoPropertyContext": "No property selected",
@@ -4725,19 +4984,25 @@
   "partnerRatesCount": "{count, plural, =1{1 rate plan} other{{count} rate plans}}",
   "@partnerRatesCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerRatesActiveCount": "{count, plural, =1{1 active} other{{count} active}}",
   "@partnerRatesActiveCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerRatesExpiredCount": "{count, plural, =1{1 expired} other{{count} expired}}",
   "@partnerRatesExpiredCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerRatesNoPropertiesTitle": "No properties yet",
@@ -4763,33 +5028,45 @@
   "partnerRatePerNight": "{amount} per night",
   "@partnerRatePerNight": {
     "placeholders": {
-      "amount": {"type": "String"}
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "partnerRateValidity": "{from} – {to}",
   "@partnerRateValidity": {
     "placeholders": {
-      "from": {"type": "String"},
-      "to": {"type": "String"}
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
     }
   },
   "partnerRatePriorityValue": "Priority {value}",
   "@partnerRatePriorityValue": {
     "placeholders": {
-      "value": {"type": "String"}
+      "value": {
+        "type": "String"
+      }
     }
   },
   "partnerRateHasRestrictions": "Has restrictions",
   "partnerRateNightsValue": "{count} nights",
   "@partnerRateNightsValue": {
     "placeholders": {
-      "count": {"type": "String"}
+      "count": {
+        "type": "String"
+      }
     }
   },
   "partnerRateDaysValue": "{count} days",
   "@partnerRateDaysValue": {
     "placeholders": {
-      "count": {"type": "String"}
+      "count": {
+        "type": "String"
+      }
     }
   },
   "partnerRateActivateAction": "Activate",
@@ -4797,13 +5074,17 @@
   "partnerRateActivatedMessage": "{name} is now active.",
   "@partnerRateActivatedMessage": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerRateDeactivatedMessage": "{name} is now inactive.",
   "@partnerRateDeactivatedMessage": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerRateActionNotFound": "That rate plan is no longer available to your account.",
@@ -4865,15 +5146,21 @@
   "partnerRateOccupancyLabel": "{adults} adults, {children} children",
   "@partnerRateOccupancyLabel": {
     "placeholders": {
-      "adults": {"type": "String"},
-      "children": {"type": "String"}
+      "adults": {
+        "type": "String"
+      },
+      "children": {
+        "type": "String"
+      }
     }
   },
   "partnerPoliciesTitle": "Policies & settings",
   "partnerPoliciesForProperty": "Policies for {name}",
   "@partnerPoliciesForProperty": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerPoliciesNoPropertyContext": "No property selected",
@@ -4905,7 +5192,9 @@
   "partnerPoliciesSettingsUpdated": "Last updated {time}",
   "@partnerPoliciesSettingsUpdated": {
     "placeholders": {
-      "time": {"type": "String"}
+      "time": {
+        "type": "String"
+      }
     }
   },
   "partnerPoliciesLanguage": "Default language",
@@ -4936,19 +5225,25 @@
   "partnerPromotionsCount": "{count} promotions",
   "@partnerPromotionsCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerPromotionsActiveCount": "{count} active",
   "@partnerPromotionsActiveCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerPromotionsExpiredCount": "{count} past their end date",
   "@partnerPromotionsExpiredCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerPromotionsCurrencyNote": "The promotion API sends no currency, so promotion amounts appear without a symbol. The pricing preview below carries its own currency and shows it.",
@@ -4985,14 +5280,20 @@
   "partnerPromotionValidity": "{from} – {to}",
   "@partnerPromotionValidity": {
     "placeholders": {
-      "from": {"type": "String"},
-      "to": {"type": "String"}
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
     }
   },
   "partnerPromotionPriorityValue": "Priority {count}",
   "@partnerPromotionPriorityValue": {
     "placeholders": {
-      "count": {"type": "String"}
+      "count": {
+        "type": "String"
+      }
     }
   },
   "partnerPromotionHasConditions": "Has conditions",
@@ -5016,7 +5317,9 @@
   "partnerPromotionTargetRoomNamed": "Room: {name}",
   "@partnerPromotionTargetRoomNamed": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerPromotionTargetUnknown": "Unrecognised target",
@@ -5027,9 +5330,15 @@
   "partnerPromotionPreviewStay": "{from} to {to} · {nights} nights",
   "@partnerPromotionPreviewStay": {
     "placeholders": {
-      "from": {"type": "String"},
-      "to": {"type": "String"},
-      "nights": {"type": "String"}
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "nights": {
+        "type": "String"
+      }
     }
   },
   "partnerPromotionPreviewBase": "Base price",
@@ -5037,7 +5346,9 @@
   "partnerPromotionPreviewRatePlanNamed": "Rate plan: {name}",
   "@partnerPromotionPreviewRatePlanNamed": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerPromotionPreviewDiscount": "Promotion discount",
@@ -5048,19 +5359,25 @@
   "partnerPromotionPreviewAppliedAmount": "-{amount}",
   "@partnerPromotionPreviewAppliedAmount": {
     "placeholders": {
-      "amount": {"type": "String"}
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "partnerPromotionActivatedMessage": "{name} is now active.",
   "@partnerPromotionActivatedMessage": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerPromotionDeactivatedMessage": "{name} is now inactive.",
   "@partnerPromotionDeactivatedMessage": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerPromotionActionNotFound": "That promotion is no longer available to your account.",
@@ -5091,16 +5408,26 @@
   "partnerVoucherStayValue": "{from} to {to} · {nights} nights",
   "@partnerVoucherStayValue": {
     "placeholders": {
-      "from": {"type": "String"},
-      "to": {"type": "String"},
-      "nights": {"type": "String"}
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "nights": {
+        "type": "String"
+      }
     }
   },
   "partnerVoucherOccupancyValue": "{adults} adults · {children} children",
   "@partnerVoucherOccupancyValue": {
     "placeholders": {
-      "adults": {"type": "String"},
-      "children": {"type": "String"}
+      "adults": {
+        "type": "String"
+      },
+      "children": {
+        "type": "String"
+      }
     }
   },
   "partnerVoucherReadOnlyNote": "Checking only. Check-in itself happens on the booking, not on this screen.",
@@ -5126,28 +5453,42 @@
   "partnerBookingStayRange": "{from} – {to}",
   "@partnerBookingStayRange": {
     "placeholders": {
-      "from": {"type": "String"},
-      "to": {"type": "String"}
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
     }
   },
   "partnerBookingNightsValue": "{count} nights",
   "@partnerBookingNightsValue": {
     "placeholders": {
-      "count": {"type": "String"}
+      "count": {
+        "type": "String"
+      }
     }
   },
   "partnerBookingOccupancyValue": "{adults} adults · {children} children",
   "@partnerBookingOccupancyValue": {
     "placeholders": {
-      "adults": {"type": "String"},
-      "children": {"type": "String"}
+      "adults": {
+        "type": "String"
+      },
+      "children": {
+        "type": "String"
+      }
     }
   },
   "partnerBookingNightProgressValue": "Night {current} of {total}",
   "@partnerBookingNightProgressValue": {
     "placeholders": {
-      "current": {"type": "String"},
-      "total": {"type": "String"}
+      "current": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
     }
   },
   "partnerBookingStatusPending": "Pending",
@@ -5194,35 +5535,53 @@
   "partnerBookingFilterRangeBoth": "Arriving {from} to {to}",
   "@partnerBookingFilterRangeBoth": {
     "placeholders": {
-      "from": {"type": "String"},
-      "to": {"type": "String"}
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
     }
   },
   "partnerBookingFilterRangeFrom": "Arriving on or after {from}",
   "@partnerBookingFilterRangeFrom": {
     "placeholders": {
-      "from": {"type": "String"}
+      "from": {
+        "type": "String"
+      }
     }
   },
   "partnerBookingFilterRangeTo": "Arriving on or before {to}",
   "@partnerBookingFilterRangeTo": {
     "placeholders": {
-      "to": {"type": "String"}
+      "to": {
+        "type": "String"
+      }
     }
   },
   "partnerBookingPageRange": "Showing {from}-{to} of {total}",
   "@partnerBookingPageRange": {
     "placeholders": {
-      "from": {"type": "String"},
-      "to": {"type": "String"},
-      "total": {"type": "String"}
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
     }
   },
   "partnerBookingPagePosition": "Page {page} of {total}",
   "@partnerBookingPagePosition": {
     "placeholders": {
-      "page": {"type": "String"},
-      "total": {"type": "String"}
+      "page": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
     }
   },
   "partnerBookingPagePrevious": "Previous page",
@@ -5291,7 +5650,9 @@
   "partnerBookingAuditByUser": "Staff #{userId}",
   "@partnerBookingAuditByUser": {
     "placeholders": {
-      "userId": {"type": "String"}
+      "userId": {
+        "type": "String"
+      }
     }
   },
   "partnerBookingActionCheckIn": "Check in",
@@ -5304,8 +5665,12 @@
   "partnerBookingActionConfirm": "{action} for booking {code}? This cannot be undone from the extranet, and the guest is notified.",
   "@partnerBookingActionConfirm": {
     "placeholders": {
-      "action": {"type": "String"},
-      "code": {"type": "String"}
+      "action": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      }
     }
   },
   "partnerBookingActionConfirmCta": "Confirm",
@@ -5313,8 +5678,12 @@
   "partnerBookingActionSucceeded": "{action} completed for booking {code}.",
   "@partnerBookingActionSucceeded": {
     "placeholders": {
-      "action": {"type": "String"},
-      "code": {"type": "String"}
+      "action": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      }
     }
   },
   "partnerBookingActionRejected": "The server refused that change for this booking's current status. Nothing was altered.",
@@ -5330,7 +5699,9 @@
   "partnerFrontDeskConfirm": "Proceed for {code}? This changes the booking, notifies the guest, and cannot be undone from the extranet.",
   "@partnerFrontDeskConfirm": {
     "placeholders": {
-      "code": {"type": "String"}
+      "code": {
+        "type": "String"
+      }
     }
   },
   "partnerFrontDeskCheckedInTitle": "Guest checked in",
@@ -5352,8 +5723,12 @@
   "partnerCalendarWindowRange": "{from} – {to}",
   "@partnerCalendarWindowRange": {
     "placeholders": {
-      "from": {"type": "String"},
-      "to": {"type": "String"}
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
     }
   },
   "partnerCalendarPreviousWeek": "Previous week",
@@ -5365,14 +5740,20 @@
   "partnerCalendarRoomsFailed": "{failed} of {total} room calendars could not be loaded. Those rows are shown as unavailable to read, not as empty.",
   "@partnerCalendarRoomsFailed": {
     "placeholders": {
-      "failed": {"type": "String"},
-      "total": {"type": "String"}
+      "failed": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
     }
   },
   "partnerCalendarRoomFailed": "{room} could not be loaded.",
   "@partnerCalendarRoomFailed": {
     "placeholders": {
-      "room": {"type": "String"}
+      "room": {
+        "type": "String"
+      }
     }
   },
   "partnerCalendarStateOpen": "Open for sale",
@@ -5387,7 +5768,9 @@
   "partnerCalendarSoldValue": "{count} sold",
   "@partnerCalendarSoldValue": {
     "placeholders": {
-      "count": {"type": "String"}
+      "count": {
+        "type": "String"
+      }
     }
   },
   "partnerCalendarMetricSellable": "nights open for sale",
@@ -5397,8 +5780,12 @@
   "partnerCalendarNightHeading": "{room} · {date}",
   "@partnerCalendarNightHeading": {
     "placeholders": {
-      "room": {"type": "String"},
-      "date": {"type": "String"}
+      "room": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
     }
   },
   "partnerCalendarCloseNight": "Close night details",
@@ -5425,8 +5812,12 @@
   "partnerMetricWindow": "{from} – {to}",
   "@partnerMetricWindow": {
     "placeholders": {
-      "from": {"type": "String"},
-      "to": {"type": "String"}
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
     }
   },
   "partnerMetricAllProperties": "All properties",
@@ -5439,14 +5830,20 @@
   "partnerMetricSectionsFailed": "{count} section(s) could not be loaded. They are shown as unavailable, not as zero.",
   "@partnerMetricSectionsFailed": {
     "placeholders": {
-      "count": {"type": "String"}
+      "count": {
+        "type": "String"
+      }
     }
   },
   "partnerMetricPeakDay": "Highest day {date}, {value}",
   "@partnerMetricPeakDay": {
     "placeholders": {
-      "date": {"type": "String"},
-      "value": {"type": "String"}
+      "date": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      }
     }
   },
   "partnerFinanceTitle": "Finance & settlement",
@@ -5469,7 +5866,9 @@
   "partnerFinanceRateNotice": "The server applied a fixed platform rate of {rate}. It is a constant in the service, not a negotiated rate, and this app never applies it itself.",
   "@partnerFinanceRateNotice": {
     "placeholders": {
-      "rate": {"type": "String"}
+      "rate": {
+        "type": "String"
+      }
     }
   },
   "partnerFinanceRevenueHeading": "Revenue breakdown",
@@ -5565,7 +5964,9 @@
   "partnerAnalyticsMinutesValue": "{value} min",
   "@partnerAnalyticsMinutesValue": {
     "placeholders": {
-      "value": {"type": "String"}
+      "value": {
+        "type": "String"
+      }
     }
   },
   "partnerReviewsTitle": "Guest reviews",
@@ -5582,19 +5983,25 @@
   "partnerReviewsFilterAllCount": "All ({count})",
   "@partnerReviewsFilterAllCount": {
     "placeholders": {
-      "count": {"type": "String"}
+      "count": {
+        "type": "String"
+      }
     }
   },
   "partnerReviewsFilterNeedsReplyCount": "Needs a reply ({count})",
   "@partnerReviewsFilterNeedsReplyCount": {
     "placeholders": {
-      "count": {"type": "String"}
+      "count": {
+        "type": "String"
+      }
     }
   },
   "partnerReviewsFilterRepliedCount": "Replied ({count})",
   "@partnerReviewsFilterRepliedCount": {
     "placeholders": {
-      "count": {"type": "String"}
+      "count": {
+        "type": "String"
+      }
     }
   },
   "partnerReviewsNeedsReply": "Needs a reply",
@@ -5603,7 +6010,9 @@
   "partnerReviewsRatingValue": "Rated {rating} out of 5",
   "@partnerReviewsRatingValue": {
     "placeholders": {
-      "rating": {"type": "String"}
+      "rating": {
+        "type": "String"
+      }
     }
   },
   "partnerReviewsReplyHeading": "Your reply",
@@ -5612,13 +6021,17 @@
   "partnerReviewsRepliedAt": "replied {date}",
   "@partnerReviewsRepliedAt": {
     "placeholders": {
-      "date": {"type": "String"}
+      "date": {
+        "type": "String"
+      }
     }
   },
   "partnerReviewsEditedAt": "edited {date}",
   "@partnerReviewsEditedAt": {
     "placeholders": {
-      "date": {"type": "String"}
+      "date": {
+        "type": "String"
+      }
     }
   },
   "partnerReviewsReplyField": "Reply to this guest",
@@ -5650,7 +6063,9 @@
   "partnerTeamRemoveConfirm": "Remove {member} from the team? This cannot be undone from here — they would have to be added again.",
   "@partnerTeamRemoveConfirm": {
     "placeholders": {
-      "member": {"type": "String"}
+      "member": {
+        "type": "String"
+      }
     }
   },
   "partnerTeamInviteHeading": "Add a team member",
@@ -5667,7 +6082,9 @@
   "partnerPayoutMasked": "Ends in {last4}",
   "@partnerPayoutMasked": {
     "placeholders": {
-      "last4": {"type": "String"}
+      "last4": {
+        "type": "String"
+      }
     }
   },
   "partnerPayoutMethod": "Payout method",
@@ -5701,5 +6118,182 @@
   "partnerAccountNotFound": "That record is no longer available to your account.",
   "partnerAccountConflict": "The server refused that because it conflicts with an existing record.",
   "partnerAccountValidation": "Check the details and try again.",
-  "partnerAccountUncertain": "The connection dropped before the server confirmed. Refresh to see the current state before trying again."
+  "partnerAccountUncertain": "The connection dropped before the server confirmed. Refresh to see the current state before trying again.",
+  "adminConsoleTitle": "Admin console",
+  "adminSignedInAs": "Signed in as {email}",
+  "@adminSignedInAs": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "adminNavDashboard": "Dashboard",
+  "adminNavBookings": "Bookings",
+  "adminNavPayments": "Payments",
+  "adminNavInvoices": "Invoices",
+  "adminNavReviews": "Reviews",
+  "adminNavActivityLog": "Activity log",
+  "adminSectionOverview": "Overview",
+  "adminSectionOperations": "Operations",
+  "adminSectionFinance": "Finance",
+  "adminSectionCommunity": "Community",
+  "adminSectionAudit": "Audit",
+  "adminAccessDeniedTitle": "Administrator access required",
+  "adminAccessDeniedBody": "This area is limited to administrator accounts.",
+  "adminAccessDeniedAction": "Go back",
+  "adminMenu": "Menu",
+  "adminLoading": "Loading…",
+  "adminEmptyTitle": "Nothing to show",
+  "adminEmptyMessage": "No records match this view yet.",
+  "adminErrorUnauthorized": "Your session has expired. Please sign in again.",
+  "adminErrorForbidden": "This account does not have administrator access.",
+  "adminErrorNotFound": "That record could not be found.",
+  "adminErrorGeneric": "Could not load this view.",
+  "adminRetry": "Try again",
+  "adminRefresh": "Refresh",
+  "adminValueUnknown": "—",
+  "adminPaginationEmpty": "No results",
+  "adminPaginationRange": "Showing {first}–{last} of {total}",
+  "@adminPaginationRange": {
+    "placeholders": {
+      "first": {
+        "type": "int"
+      },
+      "last": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "adminPaginationPageOf": "Page {page} of {total}",
+  "@adminPaginationPageOf": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "adminPaginationPrevious": "Previous page",
+  "adminPaginationNext": "Next page",
+  "adminSortAscending": "Sorted ascending",
+  "adminSortDescending": "Sorted descending",
+  "adminFilterAll": "All",
+  "adminFilterStatus": "Status",
+  "adminSortCreatedAt": "Created",
+  "adminSortCheckIn": "Check-in",
+  "adminSortCheckOut": "Check-out",
+  "adminSortFinalPrice": "Total",
+  "adminSortStatus": "Status",
+  "adminSortBookingCode": "Booking code",
+  "adminSortAmount": "Amount",
+  "adminSortPaidAt": "Paid",
+  "adminSortRefundedAt": "Refunded",
+  "adminSortRating": "Rating",
+  "adminSortApprovedAt": "Approved",
+  "adminSortIssuedAt": "Issued",
+  "adminSortTotalAmount": "Total",
+  "adminDashboardTitle": "Platform overview",
+  "adminDashboardTotalBookings": "Total bookings",
+  "adminDashboardGrossRevenue": "Gross revenue",
+  "adminDashboardActiveHotels": "Active hotels",
+  "adminDashboardActiveRooms": "Active rooms",
+  "adminDashboardTotalUsers": "Users",
+  "adminDashboardTotalPartners": "Partners",
+  "adminDashboardBookingsInRange": "Bookings in range",
+  "adminDashboardRevenueInRange": "Revenue in range",
+  "adminDashboardBookingsByStatus": "Bookings by status",
+  "adminDashboardNoBookings": "The platform has no bookings yet.",
+  "adminDashboardRange": "Range {from} to {to}",
+  "@adminDashboardRange": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "adminDashboardRangeDefault": "Backend default range",
+  "adminDashboardLoadedAt": "Loaded at {time}",
+  "@adminDashboardLoadedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "adminDashboardNoCurrency": "Revenue is reported without a currency by this endpoint.",
+  "adminBookingsTitle": "Bookings",
+  "adminBookingCode": "Code",
+  "adminBookingHotel": "Hotel",
+  "adminBookingRoom": "Room",
+  "adminBookingStay": "Stay",
+  "adminBookingNights": "{count} nights",
+  "@adminBookingNights": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminBookingTotal": "Total",
+  "adminBookingCreated": "Created",
+  "adminBookingsEmpty": "No bookings match these filters.",
+  "adminPaymentsTitle": "Payments",
+  "adminPaymentCode": "Payment",
+  "adminPaymentBooking": "Booking",
+  "adminPaymentAmount": "Amount",
+  "adminPaymentMethod": "Method",
+  "adminPaymentProvider": "Provider",
+  "adminPaymentPaidAt": "Paid",
+  "adminPaymentRefundedAt": "Refunded",
+  "adminPaymentFailureReason": "Failure reason",
+  "adminPaymentsEmpty": "No payments match these filters.",
+  "adminReviewsTitle": "Reviews",
+  "adminReviewPlace": "Place",
+  "adminReviewAuthor": "Author",
+  "adminReviewRating": "Rating",
+  "adminReviewContent": "Review",
+  "adminReviewReported": "Reported {count} times",
+  "@adminReviewReported": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminReviewPartnerReply": "Partner reply",
+  "adminReviewNoReply": "No partner reply",
+  "adminReviewsEmpty": "No reviews match these filters.",
+  "adminReviewReadOnlyNotice": "This view is read-only. Moderation is not available in this release.",
+  "adminInvoicesTitle": "Invoices",
+  "adminInvoiceNumber": "Invoice",
+  "adminInvoiceBooking": "Booking",
+  "adminInvoiceHotel": "Hotel",
+  "adminInvoiceSubtotal": "Subtotal",
+  "adminInvoiceDiscount": "Discount",
+  "adminInvoiceTax": "Tax",
+  "adminInvoiceTotal": "Total",
+  "adminInvoiceIssuedAt": "Issued",
+  "adminInvoicePaidAt": "Paid",
+  "adminInvoicesEmpty": "No invoices match these filters.",
+  "adminActivityTitle": "Activity log",
+  "adminActivityActor": "Actor",
+  "adminActivityAction": "Action",
+  "adminActivityTarget": "Target",
+  "adminActivityWhen": "When",
+  "adminActivityDescription": "Details",
+  "adminActivityBefore": "Before",
+  "adminActivityAfter": "After",
+  "adminActivitySystemActor": "System",
+  "adminActivityEmpty": "No administrative actions recorded yet.",
+  "adminActivityFixedOrder": "Newest first, fixed by the server.",
+  "adminActivityFilterAction": "Action"
 }

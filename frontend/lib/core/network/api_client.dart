@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import '../config/app_config.dart';
+import '../admin/admin_models.dart';
 import '../mock/app_models.dart';
 import '../mock/mock_data.dart';
 import '../partner/partner_account_models.dart';
@@ -5795,4 +5796,217 @@ class ApiClient {
         'code': code,
         'message': message,
       };
+
+  // ---------------------------------------------------------------------------
+  // ADMIN CMS (D1b)
+  //
+  // `SecurityConfig` gates `/api/admin/**` on `hasRole("ADMIN")` -- a single
+  // rule, stricter than the partner namespace, and USER/PARTNER receive 403.
+  // These methods add no client-side authorization of their own: the guard in
+  // `AdminRoutes` is UX only and every call below is authorized server-side.
+  //
+  // Every collection here returns the backend's `PageResponse` envelope added
+  // in D1a. `sort` is passed through as `field,dir` and the backend validates it
+  // against a per-endpoint allowlist, answering 400 for anything else -- so the
+  // client never needs, and never offers, a free-text sort input.
+  // ---------------------------------------------------------------------------
+
+  Uri _adminUri(String path, [Map<String, String>? query]) {
+    final uri = Uri.parse('$baseUrl$path');
+    if (query == null || query.isEmpty) return uri;
+    return uri.replace(queryParameters: {...uri.queryParameters, ...query});
+  }
+
+  /// Page/size/sort in the shape D1a's `AdminPaging` expects. Omitted entries
+  /// let the backend apply its own defaults (page 0, size 20, newest first)
+  /// rather than the client duplicating those constants.
+  Map<String, String> _adminPageQuery({int? page, int? size, String? sort}) => {
+        if (page != null) 'page': '$page',
+        if (size != null) 'size': '$size',
+        if (sort != null && sort.isNotEmpty) 'sort': sort,
+      };
+
+  /// Shared request/decode path for an admin `PageResponse<T>`.
+  Future<CollectionApiResult<AdminPage<T>>> _adminGetPage<T>(
+    Uri uri,
+    T? Function(Map<String, dynamic>) parseItem,
+  ) async {
+    try {
+      final res = await _client
+          .get(uri, headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        final page = AdminPage.fromJson<T>(body, parseItem);
+        if (page == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(page);
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// `GET /api/admin/analytics/overview` -- platform-wide counts and revenue.
+  /// Both bounds are optional; the backend applies its own default window.
+  Future<CollectionApiResult<AdminDashboardOverview>> getAdminOverview({
+    DateTime? from,
+    DateTime? to,
+  }) async {
+    final query = <String, String>{
+      if (from != null) 'from': _isoDate(from),
+      if (to != null) 'to': _isoDate(to),
+    };
+    try {
+      final res = await _client
+          .get(_adminUri('/admin/analytics/overview', query),
+              headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(
+            AdminDashboardOverview.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// `GET /api/admin/bookings` -- paginated. Filters are exactly the five the
+  /// controller declares; sort must be one of
+  /// `createdAt|checkInDate|checkOutDate|finalPrice|status|bookingCode`.
+  Future<CollectionApiResult<AdminPage<AdminBookingRow>>> getAdminBookings({
+    String? status,
+    String? hotel,
+    DateTime? date,
+    String? guest,
+    String? bookingCode,
+    int? page,
+    int? size,
+    String? sort,
+  }) =>
+      _adminGetPage<AdminBookingRow>(
+        _adminUri('/admin/bookings', {
+          if (status != null && status.isNotEmpty) 'status': status,
+          if (hotel != null && hotel.isNotEmpty) 'hotel': hotel,
+          if (date != null) 'date': _isoDate(date),
+          if (guest != null && guest.isNotEmpty) 'guest': guest,
+          if (bookingCode != null && bookingCode.isNotEmpty)
+            'bookingCode': bookingCode,
+          ..._adminPageQuery(page: page, size: size, sort: sort),
+        }),
+        AdminBookingRow.fromJson,
+      );
+
+  /// `GET /api/admin/payments` -- paginated. Filters: `status`, `bookingId`.
+  /// Sort: `createdAt|amount|status|paidAt|refundedAt`.
+  Future<CollectionApiResult<AdminPage<AdminPaymentRow>>> getAdminPayments({
+    String? status,
+    int? bookingId,
+    int? page,
+    int? size,
+    String? sort,
+  }) =>
+      _adminGetPage<AdminPaymentRow>(
+        _adminUri('/admin/payments', {
+          if (status != null && status.isNotEmpty) 'status': status,
+          if (bookingId != null) 'bookingId': '$bookingId',
+          ..._adminPageQuery(page: page, size: size, sort: sort),
+        }),
+        AdminPaymentRow.fromJson,
+      );
+
+  /// `GET /api/admin/reviews` -- paginated. Filters: `status`, `placeId`.
+  /// Sort: `createdAt|ratingOverall|status|approvedAt`.
+  Future<CollectionApiResult<AdminPage<AdminReviewRow>>> getAdminReviews({
+    String? status,
+    int? placeId,
+    int? page,
+    int? size,
+    String? sort,
+  }) =>
+      _adminGetPage<AdminReviewRow>(
+        _adminUri('/admin/reviews', {
+          if (status != null && status.isNotEmpty) 'status': status,
+          if (placeId != null) 'placeId': '$placeId',
+          ..._adminPageQuery(page: page, size: size, sort: sort),
+        }),
+        AdminReviewRow.fromJson,
+      );
+
+  /// `GET /api/admin/invoices` -- paginated. Filter: `status`.
+  /// Sort: `createdAt|status|issuedAt|totalAmount`.
+  Future<CollectionApiResult<AdminPage<AdminInvoiceRow>>> getAdminInvoices({
+    String? status,
+    int? page,
+    int? size,
+    String? sort,
+  }) =>
+      _adminGetPage<AdminInvoiceRow>(
+        _adminUri('/admin/invoices', {
+          if (status != null && status.isNotEmpty) 'status': status,
+          ..._adminPageQuery(page: page, size: size, sort: sort),
+        }),
+        AdminInvoiceRow.fromJson,
+      );
+
+  /// `GET /api/admin/activity-logs` -- the append-only administrative audit
+  /// trail added in D1a.
+  ///
+  /// Ordering is fixed newest-first **server-side** and is not client
+  /// controllable, so no `sort` parameter is sent: the trail deliberately has no
+  /// sort-injection surface. `from`/`to` are ISO-8601 instants and the backend
+  /// answers 400 for an inverted range.
+  Future<CollectionApiResult<AdminPage<AdminActivityLogRow>>>
+      getAdminActivityLogs({
+    int? actorUserId,
+    String? action,
+    String? targetType,
+    int? targetId,
+    DateTime? from,
+    DateTime? to,
+    int? page,
+    int? size,
+  }) =>
+          _adminGetPage<AdminActivityLogRow>(
+            _adminUri('/admin/activity-logs', {
+              if (actorUserId != null) 'actorUserId': '$actorUserId',
+              if (action != null && action.isNotEmpty) 'action': action,
+              if (targetType != null && targetType.isNotEmpty)
+                'targetType': targetType,
+              if (targetId != null) 'targetId': '$targetId',
+              if (from != null) 'from': from.toUtc().toIso8601String(),
+              if (to != null) 'to': to.toUtc().toIso8601String(),
+              ..._adminPageQuery(page: page, size: size),
+            }),
+            AdminActivityLogRow.fromJson,
+          );
+
 }

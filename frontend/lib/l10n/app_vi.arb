@@ -3168,26 +3168,36 @@
   "availabilityRealRoomCount": "{count, plural, =1{Còn 1 phòng} other{Còn {count} phòng}}",
   "@availabilityRealRoomCount": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "availabilityRealPerNight": "{price} / đêm",
   "@availabilityRealPerNight": {
     "placeholders": {
-      "price": { "type": "String" }
+      "price": {
+        "type": "String"
+      }
     }
   },
   "availabilityRealOriginalPrice": "{price}",
   "@availabilityRealOriginalPrice": {
     "placeholders": {
-      "price": { "type": "String" }
+      "price": {
+        "type": "String"
+      }
     }
   },
   "availabilityRealTotalForNights": "{price} tổng · {nights, plural, =1{1 đêm} other{{nights} đêm}}",
   "@availabilityRealTotalForNights": {
     "placeholders": {
-      "price": { "type": "String" },
-      "nights": { "type": "int" }
+      "price": {
+        "type": "String"
+      },
+      "nights": {
+        "type": "int"
+      }
     }
   },
   "availabilityRealFreeCancellation": "Miễn phí hủy",
@@ -3198,8 +3208,12 @@
   "placeGallerySemantic": "Thư viện ảnh của {name}, {count, plural, other{{count} ảnh}}",
   "@placeGallerySemantic": {
     "placeholders": {
-      "name": { "type": "String" },
-      "count": { "type": "int" }
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
     }
   },
   "placeGalleryClose": "Đóng ảnh",
@@ -3211,8 +3225,12 @@
   "placeCoordinatesValue": "{lat}, {long}",
   "@placeCoordinatesValue": {
     "placeholders": {
-      "lat": { "type": "String" },
-      "long": { "type": "String" }
+      "lat": {
+        "type": "String"
+      },
+      "long": {
+        "type": "String"
+      }
     }
   },
   "placeAmenitiesTitle": "Tiện ích",
@@ -3298,54 +3316,72 @@
   "hotelServiceUnavailable": "{service} (không khả dụng)",
   "@hotelServiceUnavailable": {
     "placeholders": {
-      "service": { "type": "String" }
+      "service": {
+        "type": "String"
+      }
     }
   },
   "roomSelectAction": "Chọn phòng này",
   "roomSelectSemantic": "Chọn {name}",
   "@roomSelectSemantic": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "roomSelectedBadge": "Đã chọn",
   "roomDetailImageSemantic": "Ảnh của {name}",
   "@roomDetailImageSemantic": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "roomCodeLabel": "Mã phòng {code}",
   "@roomCodeLabel": {
     "placeholders": {
-      "code": { "type": "String" }
+      "code": {
+        "type": "String"
+      }
     }
   },
   "roomBedConfig": "{count, plural, other{{count} {bed}}}",
   "@roomBedConfig": {
     "placeholders": {
-      "count": { "type": "int" },
-      "bed": { "type": "String" }
+      "count": {
+        "type": "int"
+      },
+      "bed": {
+        "type": "String"
+      }
     }
   },
   "roomOccupancyTitle": "Sức chứa",
   "roomOccupancyAdults": "{count, plural, other{{count} người lớn}}",
   "@roomOccupancyAdults": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "roomOccupancyChildren": "{count, plural, other{{count} trẻ em}}",
   "@roomOccupancyChildren": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "roomPriceTitle": "Giá",
   "hotelRoomCardSelectedSemantic": "{name}, đã chọn",
   "@hotelRoomCardSelectedSemantic": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "roomRatePlansTitle": "Gói giá",
@@ -3357,13 +3393,17 @@
   "roomRatePlanSemantic": "Gói giá {name}",
   "@roomRatePlanSemantic": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "roomRatePlanSelectedSemantic": "Gói giá {name}, đã chọn",
   "@roomRatePlanSelectedSemantic": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "roomRatePlanIneligible": "Không khả dụng cho kỳ lưu trú đã chọn.",
@@ -3372,20 +3412,28 @@
   "ratePlanFinalNightly": "{price} / đêm",
   "@ratePlanFinalNightly": {
     "placeholders": {
-      "price": { "type": "String" }
+      "price": {
+        "type": "String"
+      }
     }
   },
   "ratePlanBaseNightly": "Giá gốc {price} / đêm",
   "@ratePlanBaseNightly": {
     "placeholders": {
-      "price": { "type": "String" }
+      "price": {
+        "type": "String"
+      }
     }
   },
   "ratePlanStaySubtotal": "{price} cho {nights, plural, other{{nights} đêm}}",
   "@ratePlanStaySubtotal": {
     "placeholders": {
-      "price": { "type": "String" },
-      "nights": { "type": "int" }
+      "price": {
+        "type": "String"
+      },
+      "nights": {
+        "type": "int"
+      }
     }
   },
   "bookingCreateAction": "Tạo đặt phòng",
@@ -3408,7 +3456,9 @@
   "bookingStatusGenericHeadline": "Trạng thái đặt phòng: {status}",
   "@bookingStatusGenericHeadline": {
     "placeholders": {
-      "status": { "type": "String" }
+      "status": {
+        "type": "String"
+      }
     }
   },
   "bookingSubmitValidationMessage": "Một số thông tin đặt phòng không hợp lệ. Vui lòng kiểm tra lại ngày và số khách rồi thử lại.",
@@ -3473,11 +3523,19 @@
   "reviewsMineEmptyMessage": "Đánh giá bạn viết cho các kỳ nghỉ đã hoàn tất sẽ xuất hiện ở đây.",
   "reviewStarsSemantic": "{rating} trên 5",
   "@reviewStarsSemantic": {
-    "placeholders": { "rating": { "type": "int" } }
+    "placeholders": {
+      "rating": {
+        "type": "int"
+      }
+    }
   },
   "writeReviewRateStarSemantic": "Chấm {rating} trên 5",
   "@writeReviewRateStarSemantic": {
-    "placeholders": { "rating": { "type": "int" } }
+    "placeholders": {
+      "rating": {
+        "type": "int"
+      }
+    }
   },
   "reviewPartnerReplyTitle": "Phản hồi từ cơ sở lưu trú",
   "reviewUnknownPlace": "Địa điểm",
@@ -3519,15 +3577,30 @@
   "recentlyViewedUnknownPlace": "Địa điểm",
   "recentlyViewedCardSemantic": "Mở {name}",
   "@recentlyViewedCardSemantic": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "recentlyViewedRatingSemantic": "Đánh giá {rating} từ {count} nhận xét",
   "@recentlyViewedRatingSemantic": {
-    "placeholders": { "rating": { "type": "String" }, "count": { "type": "int" } }
+    "placeholders": {
+      "rating": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "recentlyViewedRemoveSemantic": "Xóa {name} khỏi mục đã xem gần đây",
   "@recentlyViewedRemoveSemantic": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "recentlyViewedClearSemantic": "Xóa mục đã xem gần đây",
   "recentlyViewedClearConfirmTitle": "Xóa mục đã xem gần đây?",
@@ -3536,7 +3609,11 @@
   "recentlyViewedRemoveConfirmTitle": "Xóa khỏi mục đã xem gần đây?",
   "recentlyViewedRemoveConfirmMessage": "Xóa {name} khỏi danh sách đã xem gần đây của bạn?",
   "@recentlyViewedRemoveConfirmMessage": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "recentlyViewedRemoveConfirmAction": "Xóa",
   "recentlyViewedClearedMessage": "Đã xóa mục đã xem gần đây.",
@@ -3572,7 +3649,9 @@
   "profileEditPassportWarning": "Đang lưu: {masked}. Nhập lại để giữ nguyên — để trống sẽ xóa hộ chiếu đã lưu khi bạn lưu.",
   "@profileEditPassportWarning": {
     "placeholders": {
-      "masked": { "type": "String" }
+      "masked": {
+        "type": "String"
+      }
     }
   },
   "profileEditPassportHint": "Không bắt buộc. Được che khi đã lưu.",
@@ -3581,13 +3660,17 @@
   "profileCompletionSemantic": "Hồ sơ hoàn thành {percent}%",
   "@profileCompletionSemantic": {
     "placeholders": {
-      "percent": { "type": "int" }
+      "percent": {
+        "type": "int"
+      }
     }
   },
   "profileRoleSemantic": "Vai trò tài khoản: {role}",
   "@profileRoleSemantic": {
     "placeholders": {
-      "role": { "type": "String" }
+      "role": {
+        "type": "String"
+      }
     }
   },
   "profileEditEmptyPreferences": "Thêm tùy chọn du lịch để cá nhân hóa chuyến đi của bạn.",
@@ -3609,7 +3692,9 @@
   "giftCardsRealBalanceSemantic": "Số dư hiện tại {balance}",
   "@giftCardsRealBalanceSemantic": {
     "placeholders": {
-      "balance": { "type": "String" }
+      "balance": {
+        "type": "String"
+      }
     }
   },
   "loyaltyRealLoadingMessage": "Đang tải điểm thưởng của bạn…",
@@ -3633,13 +3718,17 @@
   "membershipRealPointsToNext": "Cần thêm {points} điểm để lên hạng tiếp theo",
   "@membershipRealPointsToNext": {
     "placeholders": {
-      "points": { "type": "int" }
+      "points": {
+        "type": "int"
+      }
     }
   },
   "membershipRealBookingsToNext": "Cần thêm {bookings} lượt đặt hoàn tất để lên hạng tiếp theo",
   "@membershipRealBookingsToNext": {
     "placeholders": {
-      "bookings": { "type": "int" }
+      "bookings": {
+        "type": "int"
+      }
     }
   },
   "referralRealLoadingMessage": "Đang tải thông tin giới thiệu…",
@@ -3666,19 +3755,25 @@
   "couponDetailMinimumSpend": "Chi tiêu tối thiểu {amount}",
   "@couponDetailMinimumSpend": {
     "placeholders": {
-      "amount": { "type": "String" }
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "couponDetailValidUntil": "Có hiệu lực đến {date}",
   "@couponDetailValidUntil": {
     "placeholders": {
-      "date": { "type": "String" }
+      "date": {
+        "type": "String"
+      }
     }
   },
   "couponDetailUsagePerUser": "Tối đa {count} lượt dùng mỗi khách hàng",
   "@couponDetailUsagePerUser": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "recommendationsTitle": "Gợi ý cho bạn",
@@ -3698,19 +3793,25 @@
   "recommendationsDismissSemantic": "Bỏ qua {name}",
   "@recommendationsDismissSemantic": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "recommendationCardSemantic": "Gợi ý: {name}",
   "@recommendationCardSemantic": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "recommendationScoreSemantic": "Điểm phù hợp {score} trên 100",
   "@recommendationScoreSemantic": {
     "placeholders": {
-      "score": { "type": "int" }
+      "score": {
+        "type": "int"
+      }
     }
   },
   "recommendationTypePlace": "Địa điểm",
@@ -3726,13 +3827,17 @@
   "recommendationDetailGenerated": "Gợi ý ngày {date}",
   "@recommendationDetailGenerated": {
     "placeholders": {
-      "date": { "type": "String" }
+      "date": {
+        "type": "String"
+      }
     }
   },
   "recommendationDetailExpires": "Khả dụng đến {date}",
   "@recommendationDetailExpires": {
     "placeholders": {
-      "date": { "type": "String" }
+      "date": {
+        "type": "String"
+      }
     }
   },
   "expensesTitle": "Chi phí",
@@ -3767,31 +3872,41 @@
   "expensesDeleteConfirmMessage": "Xóa \"{title}\"? Không thể hoàn tác.",
   "@expensesDeleteConfirmMessage": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "expensesDeleteSemantic": "Xóa {title}",
   "@expensesDeleteSemantic": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "expenseCardSemantic": "Chi phí: {title}",
   "@expenseCardSemantic": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "expensesSummaryBudget": "Ngân sách {amount}",
   "@expensesSummaryBudget": {
     "placeholders": {
-      "amount": { "type": "String" }
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "expensesSummaryRemaining": "Còn lại {amount}",
   "@expensesSummaryRemaining": {
     "placeholders": {
-      "amount": { "type": "String" }
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "conversationsTitle": "Tin nhắn",
@@ -3830,27 +3945,39 @@
   "conversationBookingLabel": "Đặt phòng {code}",
   "@conversationBookingLabel": {
     "placeholders": {
-      "code": { "type": "String" }
+      "code": {
+        "type": "String"
+      }
     }
   },
   "conversationUnreadBadge": "{count} chưa đọc",
   "@conversationUnreadBadge": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "conversationTileSemantic": "Cuộc trò chuyện {title}, {count} chưa đọc",
   "@conversationTileSemantic": {
     "placeholders": {
-      "title": { "type": "String" },
-      "count": { "type": "int" }
+      "title": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
     }
   },
   "conversationMessageSemantic": "{sender} đã nói: {body}",
   "@conversationMessageSemantic": {
     "placeholders": {
-      "sender": { "type": "String" },
-      "body": { "type": "String" }
+      "sender": {
+        "type": "String"
+      },
+      "body": {
+        "type": "String"
+      }
     }
   },
   "aiContextTitle": "Bối cảnh chuyến đi AI",
@@ -3876,38 +4003,52 @@
   "aiContextGeneratedAt": "Ảnh chụp lúc {date}",
   "@aiContextGeneratedAt": {
     "placeholders": {
-      "date": { "type": "String" }
+      "date": {
+        "type": "String"
+      }
     }
   },
   "aiContextTripDays": "{count} ngày",
   "@aiContextTripDays": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "aiContextStatSemantic": "{label}: {value}",
   "@aiContextStatSemantic": {
     "placeholders": {
-      "label": { "type": "String" },
-      "value": { "type": "int" }
+      "label": {
+        "type": "String"
+      },
+      "value": {
+        "type": "int"
+      }
     }
   },
   "aiContextSpent": "Đã chi {amount}",
   "@aiContextSpent": {
     "placeholders": {
-      "amount": { "type": "String" }
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "aiContextBudget": "Ngân sách {amount}",
   "@aiContextBudget": {
     "placeholders": {
-      "amount": { "type": "String" }
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "aiContextRemaining": "Còn lại {amount}",
   "@aiContextRemaining": {
     "placeholders": {
-      "amount": { "type": "String" }
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "documentsRealLoadingMessage": "Đang tải tài liệu…",
@@ -3960,19 +4101,25 @@
   "packingRealDeleteConfirmMessage": "Xóa {label} khỏi danh sách này?",
   "@packingRealDeleteConfirmMessage": {
     "placeholders": {
-      "label": { "type": "String" }
+      "label": {
+        "type": "String"
+      }
     }
   },
   "packingRealCheckSemantic": "Đánh dấu {label} đã đóng gói",
   "@packingRealCheckSemantic": {
     "placeholders": {
-      "label": { "type": "String" }
+      "label": {
+        "type": "String"
+      }
     }
   },
   "packingRealUncheckSemantic": "Đánh dấu {label} chưa đóng gói",
   "@packingRealUncheckSemantic": {
     "placeholders": {
-      "label": { "type": "String" }
+      "label": {
+        "type": "String"
+      }
     }
   },
   "remindersRealTitle": "Nhắc nhở chuyến đi",
@@ -3996,19 +4143,25 @@
   "remindersRealDeleteConfirmMessage": "Xóa {title} khỏi chuyến đi này?",
   "@remindersRealDeleteConfirmMessage": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "remindersRealCompleteSemantic": "Đánh dấu {title} hoàn thành",
   "@remindersRealCompleteSemantic": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "remindersRealCancelSemantic": "Hủy {title}",
   "@remindersRealCancelSemantic": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "budgetRealTitle": "Ngân sách chuyến đi",
@@ -4057,7 +4210,9 @@
   "collaborationRealRemoveConfirmMessage": "Xóa {name} khỏi chuyến đi này? Họ sẽ mất quyền truy cập ngay lập tức.",
   "@collaborationRealRemoveConfirmMessage": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "sharedTripsRealLoadingMessage": "Đang tải chuyến đi được chia sẻ…",
@@ -4134,7 +4289,9 @@
   "walletRealReferenceHint": "Hiện tại: {masked}. Để trống để giữ nguyên trạng thái đã xóa; nhập lại để thay thế.",
   "@walletRealReferenceHint": {
     "placeholders": {
-      "masked": { "type": "String" }
+      "masked": {
+        "type": "String"
+      }
     }
   },
   "walletRealValidFromField": "Có hiệu lực từ",
@@ -4149,19 +4306,25 @@
   "walletRealDeleteConfirmMessage": "Xóa {title} khỏi ví của bạn? Tài liệu, đặt chỗ hoặc hóa đơn được liên kết sẽ không bị ảnh hưởng.",
   "@walletRealDeleteConfirmMessage": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "walletRealFavoriteSemantic": "Thêm {title} vào mục yêu thích",
   "@walletRealFavoriteSemantic": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "walletRealUnfavoriteSemantic": "Xóa {title} khỏi mục yêu thích",
   "@walletRealUnfavoriteSemantic": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "partnerExtranetTitle": "Cổng đối tác",
@@ -4189,14 +4352,20 @@
   "partnerNavBadgeSemantic": "{label}, {count} mục đang chờ",
   "@partnerNavBadgeSemantic": {
     "placeholders": {
-      "label": { "type": "String" },
-      "count": { "type": "int" }
+      "label": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerTeamRoleLabel": "Vai trò của bạn: {role}",
   "@partnerTeamRoleLabel": {
     "placeholders": {
-      "role": { "type": "String" }
+      "role": {
+        "type": "String"
+      }
     }
   },
   "partnerTeamRoleOwner": "Chủ sở hữu",
@@ -4244,7 +4413,9 @@
   "partnerDashboardRepresentative": "Người đại diện: {name}",
   "@partnerDashboardRepresentative": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerMetricArrivals": "Nhận phòng hôm nay",
@@ -4261,7 +4432,9 @@
   "partnerPropertyInactiveSemantic": "{name}, ngừng hoạt động",
   "@partnerPropertyInactiveSemantic": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerModulePlannedBadge": "Dự kiến",
@@ -4269,7 +4442,9 @@
   "partnerModuleEndpointHint": "Tuyến: {route}",
   "@partnerModuleEndpointHint": {
     "placeholders": {
-      "route": { "type": "String" }
+      "route": {
+        "type": "String"
+      }
     }
   },
   "partnerModuleReadOnlyForRole": "Vai trò nhóm của bạn sẽ không thể thay đổi cài đặt trong mô-đun này.",
@@ -4352,74 +4527,104 @@
   "partnerFinancePaidBookings": "{count, plural, =1{1 đặt phòng đã thanh toán} other{{count} đặt phòng đã thanh toán}}",
   "@partnerDashboardScopeWindowAll": {
     "placeholders": {
-      "window": {"type": "String"}
+      "window": {
+        "type": "String"
+      }
     }
   },
   "@partnerDashboardScopeWindowOne": {
     "placeholders": {
-      "window": {"type": "String"}
+      "window": {
+        "type": "String"
+      }
     }
   },
   "@partnerDashboardPropertyCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@partnerDashboardRoomCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@partnerDashboardTeamRole": {
     "placeholders": {
-      "role": {"type": "String"}
+      "role": {
+        "type": "String"
+      }
     }
   },
   "@partnerDashboardActiveProperty": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@partnerDashboardUpdatedAt": {
     "placeholders": {
-      "time": {"type": "String"}
+      "time": {
+        "type": "String"
+      }
     }
   },
   "@partnerDashboardAttentionSemantic": {
     "placeholders": {
-      "label": {"type": "String"},
-      "count": {"type": "int"}
+      "label": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@partnerDashboardActivityBy": {
     "placeholders": {
-      "actor": {"type": "String"}
+      "actor": {
+        "type": "String"
+      }
     }
   },
   "@partnerDashboardActivityMore": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@partnerKpiReviewCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@partnerFinanceCompletedBookings": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@partnerFinancePaidBookings": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerPropertiesCount": "{count, plural, =0{Chưa có cơ sở} =1{1 cơ sở} other{{count} cơ sở}}",
   "@partnerPropertiesCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerPropertiesEmptyTitle": "Chưa có cơ sở nào",
@@ -4447,8 +4652,12 @@
   "partnerPropertyRatingSummary": "{rating} từ {count, plural, =1{1 đánh giá} other{{count} đánh giá}}",
   "@partnerPropertyRatingSummary": {
     "placeholders": {
-      "rating": {"type": "String"},
-      "count": {"type": "int"}
+      "rating": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerPropertyVisibilityPublic": "Khách có thể tìm thấy và đặt cơ sở này ngay bây giờ.",
@@ -4459,13 +4668,17 @@
   "partnerPropertyActivatedMessage": "{name} đã được mở bán.",
   "@partnerPropertyActivatedMessage": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerPropertyDeactivatedMessage": "{name} đã ngừng mở bán.",
   "@partnerPropertyDeactivatedMessage": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerPropertyActionNotFound": "Cơ sở đó không còn khả dụng với tài khoản của bạn.",
@@ -4503,25 +4716,33 @@
   "partnerRoomsCount": "{count, plural, =1{1 loại phòng} other{{count} loại phòng}}",
   "@partnerRoomsCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerRoomsListedCount": "{count, plural, =1{1 đang mở bán} other{{count} đang mở bán}}",
   "@partnerRoomsListedCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerRoomsSoldOutCount": "{count, plural, =1{1 đã hết phòng} other{{count} đã hết phòng}}",
   "@partnerRoomsSoldOutCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerRoomsForProperty": "Phòng tại {name}",
   "@partnerRoomsForProperty": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerRoomsNoPropertyContext": "Chưa chọn cơ sở",
@@ -4546,13 +4767,17 @@
   "partnerRoomListedMessage": "{name} đã được mở bán.",
   "@partnerRoomListedMessage": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerRoomUnlistedMessage": "{name} đã ngừng mở bán.",
   "@partnerRoomUnlistedMessage": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerRoomActionNotFound": "Phòng đó không còn khả dụng với tài khoản của bạn.",
@@ -4561,26 +4786,36 @@
   "partnerRoomGuestsValue": "Tối đa {count} khách",
   "@partnerRoomGuestsValue": {
     "placeholders": {
-      "count": {"type": "String"}
+      "count": {
+        "type": "String"
+      }
     }
   },
   "partnerRoomInventoryValue": "Còn {available} trên {total}",
   "@partnerRoomInventoryValue": {
     "placeholders": {
-      "available": {"type": "String"},
-      "total": {"type": "String"}
+      "available": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
     }
   },
   "partnerRoomPriceFromValue": "Từ {price}",
   "@partnerRoomPriceFromValue": {
     "placeholders": {
-      "price": {"type": "String"}
+      "price": {
+        "type": "String"
+      }
     }
   },
   "partnerRoomSizeValue": "{size} m²",
   "@partnerRoomSizeValue": {
     "placeholders": {
-      "size": {"type": "String"}
+      "size": {
+        "type": "String"
+      }
     }
   },
   "partnerRoomSectionIdentity": "Thông tin nhận dạng",
@@ -4631,7 +4866,9 @@
   "partnerInventoryForProperty": "Tồn phòng tại {name}",
   "@partnerInventoryForProperty": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerInventoryNoPropertyContext": "Chưa chọn cơ sở",
@@ -4644,28 +4881,42 @@
   "partnerInventoryWindow": "{from} – {to} · {count} ngày",
   "@partnerInventoryWindow": {
     "placeholders": {
-      "from": {"type": "String"},
-      "to": {"type": "String"},
-      "count": {"type": "int"}
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerInventoryBookableDays": "{bookable} trên {total} ngày có thể đặt",
   "@partnerInventoryBookableDays": {
     "placeholders": {
-      "bookable": {"type": "int"},
-      "total": {"type": "int"}
+      "bookable": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
     }
   },
   "partnerInventoryTotalAvailable": "{count} đêm phòng còn trống",
   "@partnerInventoryTotalAvailable": {
     "placeholders": {
-      "count": {"type": "String"}
+      "count": {
+        "type": "String"
+      }
     }
   },
   "partnerInventoryStopSellDays": "{count, plural, =1{1 ngày ngừng bán} other{{count} ngày ngừng bán}}",
   "@partnerInventoryStopSellDays": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerInventoryNoPropertiesTitle": "Chưa có cơ sở nào",
@@ -4700,7 +4951,9 @@
   "partnerInventoryInconsistentSummary": "{count, plural, =1{1 ngày có các số không cộng lại bằng tổng} other{{count} ngày có các số không cộng lại bằng tổng}}. Chỉ máy chủ mới sửa được.",
   "@partnerInventoryInconsistentSummary": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerInventoryEditOwnerOnly": "Thay đổi tình trạng phòng chỉ dành cho chủ hồ sơ. Bạn vẫn xem được lịch tại đây.",
@@ -4709,14 +4962,20 @@
   "partnerRatesForProperty": "Giá tại {name}",
   "@partnerRatesForProperty": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerRatesForRoom": "Giá cho {room} tại {property}",
   "@partnerRatesForRoom": {
     "placeholders": {
-      "room": {"type": "String"},
-      "property": {"type": "String"}
+      "room": {
+        "type": "String"
+      },
+      "property": {
+        "type": "String"
+      }
     }
   },
   "partnerRatesNoPropertyContext": "Chưa chọn cơ sở",
@@ -4725,19 +4984,25 @@
   "partnerRatesCount": "{count, plural, =1{1 gói giá} other{{count} gói giá}}",
   "@partnerRatesCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerRatesActiveCount": "{count, plural, =1{1 đang bật} other{{count} đang bật}}",
   "@partnerRatesActiveCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerRatesExpiredCount": "{count, plural, =1{1 đã hết hạn} other{{count} đã hết hạn}}",
   "@partnerRatesExpiredCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerRatesNoPropertiesTitle": "Chưa có cơ sở nào",
@@ -4763,33 +5028,45 @@
   "partnerRatePerNight": "{amount} mỗi đêm",
   "@partnerRatePerNight": {
     "placeholders": {
-      "amount": {"type": "String"}
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "partnerRateValidity": "{from} – {to}",
   "@partnerRateValidity": {
     "placeholders": {
-      "from": {"type": "String"},
-      "to": {"type": "String"}
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
     }
   },
   "partnerRatePriorityValue": "Ưu tiên {value}",
   "@partnerRatePriorityValue": {
     "placeholders": {
-      "value": {"type": "String"}
+      "value": {
+        "type": "String"
+      }
     }
   },
   "partnerRateHasRestrictions": "Có điều kiện",
   "partnerRateNightsValue": "{count} đêm",
   "@partnerRateNightsValue": {
     "placeholders": {
-      "count": {"type": "String"}
+      "count": {
+        "type": "String"
+      }
     }
   },
   "partnerRateDaysValue": "{count} ngày",
   "@partnerRateDaysValue": {
     "placeholders": {
-      "count": {"type": "String"}
+      "count": {
+        "type": "String"
+      }
     }
   },
   "partnerRateActivateAction": "Bật",
@@ -4797,13 +5074,17 @@
   "partnerRateActivatedMessage": "{name} đã được bật.",
   "@partnerRateActivatedMessage": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerRateDeactivatedMessage": "{name} đã được tắt.",
   "@partnerRateDeactivatedMessage": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerRateActionNotFound": "Gói giá đó không còn khả dụng với tài khoản của bạn.",
@@ -4865,15 +5146,21 @@
   "partnerRateOccupancyLabel": "{adults} người lớn, {children} trẻ em",
   "@partnerRateOccupancyLabel": {
     "placeholders": {
-      "adults": {"type": "String"},
-      "children": {"type": "String"}
+      "adults": {
+        "type": "String"
+      },
+      "children": {
+        "type": "String"
+      }
     }
   },
   "partnerPoliciesTitle": "Chính sách & cài đặt",
   "partnerPoliciesForProperty": "Chính sách của {name}",
   "@partnerPoliciesForProperty": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerPoliciesNoPropertyContext": "Chưa chọn cơ sở",
@@ -4905,7 +5192,9 @@
   "partnerPoliciesSettingsUpdated": "Cập nhật lần cuối {time}",
   "@partnerPoliciesSettingsUpdated": {
     "placeholders": {
-      "time": {"type": "String"}
+      "time": {
+        "type": "String"
+      }
     }
   },
   "partnerPoliciesLanguage": "Ngôn ngữ mặc định",
@@ -4936,19 +5225,25 @@
   "partnerPromotionsCount": "{count} khuyến mãi",
   "@partnerPromotionsCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerPromotionsActiveCount": "{count} đang bật",
   "@partnerPromotionsActiveCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerPromotionsExpiredCount": "{count} đã qua ngày kết thúc",
   "@partnerPromotionsExpiredCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "partnerPromotionsCurrencyNote": "API khuyến mãi không trả về đơn vị tiền tệ, nên số tiền khuyến mãi hiển thị không kèm ký hiệu. Phần xem trước giá bên dưới có đơn vị tiền tệ riêng và sẽ hiển thị nó.",
@@ -4985,14 +5280,20 @@
   "partnerPromotionValidity": "{from} – {to}",
   "@partnerPromotionValidity": {
     "placeholders": {
-      "from": {"type": "String"},
-      "to": {"type": "String"}
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
     }
   },
   "partnerPromotionPriorityValue": "Ưu tiên {count}",
   "@partnerPromotionPriorityValue": {
     "placeholders": {
-      "count": {"type": "String"}
+      "count": {
+        "type": "String"
+      }
     }
   },
   "partnerPromotionHasConditions": "Có điều kiện kèm theo",
@@ -5016,7 +5317,9 @@
   "partnerPromotionTargetRoomNamed": "Phòng: {name}",
   "@partnerPromotionTargetRoomNamed": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerPromotionTargetUnknown": "Đối tượng không xác định",
@@ -5027,9 +5330,15 @@
   "partnerPromotionPreviewStay": "{from} đến {to} · {nights} đêm",
   "@partnerPromotionPreviewStay": {
     "placeholders": {
-      "from": {"type": "String"},
-      "to": {"type": "String"},
-      "nights": {"type": "String"}
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "nights": {
+        "type": "String"
+      }
     }
   },
   "partnerPromotionPreviewBase": "Giá gốc",
@@ -5037,7 +5346,9 @@
   "partnerPromotionPreviewRatePlanNamed": "Gói giá: {name}",
   "@partnerPromotionPreviewRatePlanNamed": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerPromotionPreviewDiscount": "Số tiền khuyến mãi giảm",
@@ -5048,19 +5359,25 @@
   "partnerPromotionPreviewAppliedAmount": "-{amount}",
   "@partnerPromotionPreviewAppliedAmount": {
     "placeholders": {
-      "amount": {"type": "String"}
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "partnerPromotionActivatedMessage": "{name} đã được bật.",
   "@partnerPromotionActivatedMessage": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerPromotionDeactivatedMessage": "{name} đã được tắt.",
   "@partnerPromotionDeactivatedMessage": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "partnerPromotionActionNotFound": "Khuyến mãi đó không còn khả dụng với tài khoản của bạn.",
@@ -5091,16 +5408,26 @@
   "partnerVoucherStayValue": "{from} đến {to} · {nights} đêm",
   "@partnerVoucherStayValue": {
     "placeholders": {
-      "from": {"type": "String"},
-      "to": {"type": "String"},
-      "nights": {"type": "String"}
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "nights": {
+        "type": "String"
+      }
     }
   },
   "partnerVoucherOccupancyValue": "{adults} người lớn · {children} trẻ em",
   "@partnerVoucherOccupancyValue": {
     "placeholders": {
-      "adults": {"type": "String"},
-      "children": {"type": "String"}
+      "adults": {
+        "type": "String"
+      },
+      "children": {
+        "type": "String"
+      }
     }
   },
   "partnerVoucherReadOnlyNote": "Chỉ kiểm tra. Việc nhận phòng thực hiện trên đặt phòng, không phải trên màn hình này.",
@@ -5126,28 +5453,42 @@
   "partnerBookingStayRange": "{from} – {to}",
   "@partnerBookingStayRange": {
     "placeholders": {
-      "from": {"type": "String"},
-      "to": {"type": "String"}
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
     }
   },
   "partnerBookingNightsValue": "{count} đêm",
   "@partnerBookingNightsValue": {
     "placeholders": {
-      "count": {"type": "String"}
+      "count": {
+        "type": "String"
+      }
     }
   },
   "partnerBookingOccupancyValue": "{adults} người lớn · {children} trẻ em",
   "@partnerBookingOccupancyValue": {
     "placeholders": {
-      "adults": {"type": "String"},
-      "children": {"type": "String"}
+      "adults": {
+        "type": "String"
+      },
+      "children": {
+        "type": "String"
+      }
     }
   },
   "partnerBookingNightProgressValue": "Đêm {current} trên {total}",
   "@partnerBookingNightProgressValue": {
     "placeholders": {
-      "current": {"type": "String"},
-      "total": {"type": "String"}
+      "current": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
     }
   },
   "partnerBookingStatusPending": "Chờ xử lý",
@@ -5194,35 +5535,53 @@
   "partnerBookingFilterRangeBoth": "Đến từ {from} tới {to}",
   "@partnerBookingFilterRangeBoth": {
     "placeholders": {
-      "from": {"type": "String"},
-      "to": {"type": "String"}
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
     }
   },
   "partnerBookingFilterRangeFrom": "Đến từ ngày {from} trở đi",
   "@partnerBookingFilterRangeFrom": {
     "placeholders": {
-      "from": {"type": "String"}
+      "from": {
+        "type": "String"
+      }
     }
   },
   "partnerBookingFilterRangeTo": "Đến vào hoặc trước ngày {to}",
   "@partnerBookingFilterRangeTo": {
     "placeholders": {
-      "to": {"type": "String"}
+      "to": {
+        "type": "String"
+      }
     }
   },
   "partnerBookingPageRange": "Hiển thị {from}-{to} trên {total}",
   "@partnerBookingPageRange": {
     "placeholders": {
-      "from": {"type": "String"},
-      "to": {"type": "String"},
-      "total": {"type": "String"}
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
     }
   },
   "partnerBookingPagePosition": "Trang {page} trên {total}",
   "@partnerBookingPagePosition": {
     "placeholders": {
-      "page": {"type": "String"},
-      "total": {"type": "String"}
+      "page": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
     }
   },
   "partnerBookingPagePrevious": "Trang trước",
@@ -5291,7 +5650,9 @@
   "partnerBookingAuditByUser": "Nhân viên #{userId}",
   "@partnerBookingAuditByUser": {
     "placeholders": {
-      "userId": {"type": "String"}
+      "userId": {
+        "type": "String"
+      }
     }
   },
   "partnerBookingActionCheckIn": "Nhận phòng",
@@ -5304,8 +5665,12 @@
   "partnerBookingActionConfirm": "{action} cho đặt chỗ {code}? Thao tác này không thể hoàn tác từ trang đối tác, và khách sẽ nhận được thông báo.",
   "@partnerBookingActionConfirm": {
     "placeholders": {
-      "action": {"type": "String"},
-      "code": {"type": "String"}
+      "action": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      }
     }
   },
   "partnerBookingActionConfirmCta": "Xác nhận",
@@ -5313,8 +5678,12 @@
   "partnerBookingActionSucceeded": "Đã {action} cho đặt chỗ {code}.",
   "@partnerBookingActionSucceeded": {
     "placeholders": {
-      "action": {"type": "String"},
-      "code": {"type": "String"}
+      "action": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      }
     }
   },
   "partnerBookingActionRejected": "Máy chủ từ chối thay đổi đó với trạng thái hiện tại của đặt chỗ. Không có gì thay đổi.",
@@ -5330,7 +5699,9 @@
   "partnerFrontDeskConfirm": "Tiếp tục với {code}? Thao tác này thay đổi đặt chỗ, gửi thông báo cho khách và không thể hoàn tác từ trang đối tác.",
   "@partnerFrontDeskConfirm": {
     "placeholders": {
-      "code": {"type": "String"}
+      "code": {
+        "type": "String"
+      }
     }
   },
   "partnerFrontDeskCheckedInTitle": "Khách đã nhận phòng",
@@ -5352,8 +5723,12 @@
   "partnerCalendarWindowRange": "{from} – {to}",
   "@partnerCalendarWindowRange": {
     "placeholders": {
-      "from": {"type": "String"},
-      "to": {"type": "String"}
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
     }
   },
   "partnerCalendarPreviousWeek": "Tuần trước",
@@ -5365,14 +5740,20 @@
   "partnerCalendarRoomsFailed": "Không tải được lịch của {failed} trên {total} phòng. Những hàng đó hiển thị là không đọc được, không phải là trống.",
   "@partnerCalendarRoomsFailed": {
     "placeholders": {
-      "failed": {"type": "String"},
-      "total": {"type": "String"}
+      "failed": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
     }
   },
   "partnerCalendarRoomFailed": "Không tải được {room}.",
   "@partnerCalendarRoomFailed": {
     "placeholders": {
-      "room": {"type": "String"}
+      "room": {
+        "type": "String"
+      }
     }
   },
   "partnerCalendarStateOpen": "Đang mở bán",
@@ -5387,7 +5768,9 @@
   "partnerCalendarSoldValue": "đã bán {count}",
   "@partnerCalendarSoldValue": {
     "placeholders": {
-      "count": {"type": "String"}
+      "count": {
+        "type": "String"
+      }
     }
   },
   "partnerCalendarMetricSellable": "đêm đang mở bán",
@@ -5397,8 +5780,12 @@
   "partnerCalendarNightHeading": "{room} · {date}",
   "@partnerCalendarNightHeading": {
     "placeholders": {
-      "room": {"type": "String"},
-      "date": {"type": "String"}
+      "room": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
     }
   },
   "partnerCalendarCloseNight": "Đóng chi tiết đêm",
@@ -5425,8 +5812,12 @@
   "partnerMetricWindow": "{from} – {to}",
   "@partnerMetricWindow": {
     "placeholders": {
-      "from": {"type": "String"},
-      "to": {"type": "String"}
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
     }
   },
   "partnerMetricAllProperties": "Tất cả cơ sở",
@@ -5439,14 +5830,20 @@
   "partnerMetricSectionsFailed": "Không tải được {count} phần. Các phần đó hiển thị là không có dữ liệu, không phải bằng 0.",
   "@partnerMetricSectionsFailed": {
     "placeholders": {
-      "count": {"type": "String"}
+      "count": {
+        "type": "String"
+      }
     }
   },
   "partnerMetricPeakDay": "Ngày cao nhất {date}, {value}",
   "@partnerMetricPeakDay": {
     "placeholders": {
-      "date": {"type": "String"},
-      "value": {"type": "String"}
+      "date": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      }
     }
   },
   "partnerFinanceTitle": "Tài chính & đối soát",
@@ -5469,7 +5866,9 @@
   "partnerFinanceRateNotice": "Máy chủ đã áp dụng tỷ lệ nền tảng cố định {rate}. Đây là hằng số trong dịch vụ, không phải tỷ lệ đã thương lượng, và ứng dụng không bao giờ tự áp dụng nó.",
   "@partnerFinanceRateNotice": {
     "placeholders": {
-      "rate": {"type": "String"}
+      "rate": {
+        "type": "String"
+      }
     }
   },
   "partnerFinanceRevenueHeading": "Chi tiết doanh thu",
@@ -5565,7 +5964,9 @@
   "partnerAnalyticsMinutesValue": "{value} phút",
   "@partnerAnalyticsMinutesValue": {
     "placeholders": {
-      "value": {"type": "String"}
+      "value": {
+        "type": "String"
+      }
     }
   },
   "partnerReviewsTitle": "Đánh giá của khách",
@@ -5582,19 +5983,25 @@
   "partnerReviewsFilterAllCount": "Tất cả ({count})",
   "@partnerReviewsFilterAllCount": {
     "placeholders": {
-      "count": {"type": "String"}
+      "count": {
+        "type": "String"
+      }
     }
   },
   "partnerReviewsFilterNeedsReplyCount": "Cần trả lời ({count})",
   "@partnerReviewsFilterNeedsReplyCount": {
     "placeholders": {
-      "count": {"type": "String"}
+      "count": {
+        "type": "String"
+      }
     }
   },
   "partnerReviewsFilterRepliedCount": "Đã trả lời ({count})",
   "@partnerReviewsFilterRepliedCount": {
     "placeholders": {
-      "count": {"type": "String"}
+      "count": {
+        "type": "String"
+      }
     }
   },
   "partnerReviewsNeedsReply": "Cần trả lời",
@@ -5603,7 +6010,9 @@
   "partnerReviewsRatingValue": "Chấm {rating} trên 5",
   "@partnerReviewsRatingValue": {
     "placeholders": {
-      "rating": {"type": "String"}
+      "rating": {
+        "type": "String"
+      }
     }
   },
   "partnerReviewsReplyHeading": "Phản hồi của bạn",
@@ -5612,13 +6021,17 @@
   "partnerReviewsRepliedAt": "trả lời {date}",
   "@partnerReviewsRepliedAt": {
     "placeholders": {
-      "date": {"type": "String"}
+      "date": {
+        "type": "String"
+      }
     }
   },
   "partnerReviewsEditedAt": "sửa {date}",
   "@partnerReviewsEditedAt": {
     "placeholders": {
-      "date": {"type": "String"}
+      "date": {
+        "type": "String"
+      }
     }
   },
   "partnerReviewsReplyField": "Trả lời khách này",
@@ -5650,7 +6063,9 @@
   "partnerTeamRemoveConfirm": "Xóa {member} khỏi nhóm? Thao tác này không thể hoàn tác tại đây — sẽ phải thêm lại từ đầu.",
   "@partnerTeamRemoveConfirm": {
     "placeholders": {
-      "member": {"type": "String"}
+      "member": {
+        "type": "String"
+      }
     }
   },
   "partnerTeamInviteHeading": "Thêm thành viên",
@@ -5667,7 +6082,9 @@
   "partnerPayoutMasked": "Kết thúc bằng {last4}",
   "@partnerPayoutMasked": {
     "placeholders": {
-      "last4": {"type": "String"}
+      "last4": {
+        "type": "String"
+      }
     }
   },
   "partnerPayoutMethod": "Hình thức nhận tiền",
@@ -5701,5 +6118,182 @@
   "partnerAccountNotFound": "Bản ghi đó không còn khả dụng với tài khoản của bạn.",
   "partnerAccountConflict": "Máy chủ từ chối vì xung đột với một bản ghi đã có.",
   "partnerAccountValidation": "Hãy kiểm tra lại thông tin rồi thử lại.",
-  "partnerAccountUncertain": "Kết nối bị ngắt trước khi máy chủ xác nhận. Hãy làm mới để xem trạng thái hiện tại trước khi thử lại."
+  "partnerAccountUncertain": "Kết nối bị ngắt trước khi máy chủ xác nhận. Hãy làm mới để xem trạng thái hiện tại trước khi thử lại.",
+  "adminConsoleTitle": "Bảng quản trị",
+  "adminSignedInAs": "Đăng nhập với {email}",
+  "@adminSignedInAs": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "adminNavDashboard": "Tổng quan",
+  "adminNavBookings": "Đặt phòng",
+  "adminNavPayments": "Thanh toán",
+  "adminNavInvoices": "Hóa đơn",
+  "adminNavReviews": "Đánh giá",
+  "adminNavActivityLog": "Nhật ký hoạt động",
+  "adminSectionOverview": "Tổng quan",
+  "adminSectionOperations": "Vận hành",
+  "adminSectionFinance": "Tài chính",
+  "adminSectionCommunity": "Cộng đồng",
+  "adminSectionAudit": "Kiểm toán",
+  "adminAccessDeniedTitle": "Cần quyền quản trị viên",
+  "adminAccessDeniedBody": "Khu vực này chỉ dành cho tài khoản quản trị viên.",
+  "adminAccessDeniedAction": "Quay lại",
+  "adminMenu": "Menu",
+  "adminLoading": "Đang tải…",
+  "adminEmptyTitle": "Không có dữ liệu",
+  "adminEmptyMessage": "Chưa có bản ghi nào phù hợp.",
+  "adminErrorUnauthorized": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
+  "adminErrorForbidden": "Tài khoản này không có quyền quản trị viên.",
+  "adminErrorNotFound": "Không tìm thấy bản ghi.",
+  "adminErrorGeneric": "Không thể tải dữ liệu.",
+  "adminRetry": "Thử lại",
+  "adminRefresh": "Làm mới",
+  "adminValueUnknown": "—",
+  "adminPaginationEmpty": "Không có kết quả",
+  "adminPaginationRange": "Hiển thị {first}–{last} trên {total}",
+  "@adminPaginationRange": {
+    "placeholders": {
+      "first": {
+        "type": "int"
+      },
+      "last": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "adminPaginationPageOf": "Trang {page} / {total}",
+  "@adminPaginationPageOf": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "adminPaginationPrevious": "Trang trước",
+  "adminPaginationNext": "Trang sau",
+  "adminSortAscending": "Sắp xếp tăng dần",
+  "adminSortDescending": "Sắp xếp giảm dần",
+  "adminFilterAll": "Tất cả",
+  "adminFilterStatus": "Trạng thái",
+  "adminSortCreatedAt": "Ngày tạo",
+  "adminSortCheckIn": "Ngày nhận phòng",
+  "adminSortCheckOut": "Ngày trả phòng",
+  "adminSortFinalPrice": "Tổng tiền",
+  "adminSortStatus": "Trạng thái",
+  "adminSortBookingCode": "Mã đặt phòng",
+  "adminSortAmount": "Số tiền",
+  "adminSortPaidAt": "Ngày thanh toán",
+  "adminSortRefundedAt": "Ngày hoàn tiền",
+  "adminSortRating": "Điểm đánh giá",
+  "adminSortApprovedAt": "Ngày duyệt",
+  "adminSortIssuedAt": "Ngày phát hành",
+  "adminSortTotalAmount": "Tổng tiền",
+  "adminDashboardTitle": "Tổng quan nền tảng",
+  "adminDashboardTotalBookings": "Tổng lượt đặt",
+  "adminDashboardGrossRevenue": "Doanh thu gộp",
+  "adminDashboardActiveHotels": "Khách sạn đang hoạt động",
+  "adminDashboardActiveRooms": "Phòng đang hoạt động",
+  "adminDashboardTotalUsers": "Người dùng",
+  "adminDashboardTotalPartners": "Đối tác",
+  "adminDashboardBookingsInRange": "Lượt đặt trong kỳ",
+  "adminDashboardRevenueInRange": "Doanh thu trong kỳ",
+  "adminDashboardBookingsByStatus": "Lượt đặt theo trạng thái",
+  "adminDashboardNoBookings": "Nền tảng chưa có lượt đặt nào.",
+  "adminDashboardRange": "Từ {from} đến {to}",
+  "@adminDashboardRange": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "adminDashboardRangeDefault": "Khoảng thời gian mặc định",
+  "adminDashboardLoadedAt": "Tải lúc {time}",
+  "@adminDashboardLoadedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "adminDashboardNoCurrency": "Điểm cuối này trả về doanh thu không kèm đơn vị tiền tệ.",
+  "adminBookingsTitle": "Đặt phòng",
+  "adminBookingCode": "Mã",
+  "adminBookingHotel": "Khách sạn",
+  "adminBookingRoom": "Phòng",
+  "adminBookingStay": "Thời gian lưu trú",
+  "adminBookingNights": "{count} đêm",
+  "@adminBookingNights": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminBookingTotal": "Tổng tiền",
+  "adminBookingCreated": "Ngày tạo",
+  "adminBookingsEmpty": "Không có lượt đặt nào phù hợp.",
+  "adminPaymentsTitle": "Thanh toán",
+  "adminPaymentCode": "Thanh toán",
+  "adminPaymentBooking": "Đặt phòng",
+  "adminPaymentAmount": "Số tiền",
+  "adminPaymentMethod": "Phương thức",
+  "adminPaymentProvider": "Nhà cung cấp",
+  "adminPaymentPaidAt": "Đã thanh toán",
+  "adminPaymentRefundedAt": "Đã hoàn tiền",
+  "adminPaymentFailureReason": "Lý do thất bại",
+  "adminPaymentsEmpty": "Không có thanh toán nào phù hợp.",
+  "adminReviewsTitle": "Đánh giá",
+  "adminReviewPlace": "Địa điểm",
+  "adminReviewAuthor": "Người viết",
+  "adminReviewRating": "Điểm",
+  "adminReviewContent": "Nội dung",
+  "adminReviewReported": "Bị báo cáo {count} lần",
+  "@adminReviewReported": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminReviewPartnerReply": "Phản hồi của đối tác",
+  "adminReviewNoReply": "Chưa có phản hồi",
+  "adminReviewsEmpty": "Không có đánh giá nào phù hợp.",
+  "adminReviewReadOnlyNotice": "Màn hình này chỉ để xem. Chức năng kiểm duyệt chưa có trong bản này.",
+  "adminInvoicesTitle": "Hóa đơn",
+  "adminInvoiceNumber": "Hóa đơn",
+  "adminInvoiceBooking": "Đặt phòng",
+  "adminInvoiceHotel": "Khách sạn",
+  "adminInvoiceSubtotal": "Tạm tính",
+  "adminInvoiceDiscount": "Giảm giá",
+  "adminInvoiceTax": "Thuế",
+  "adminInvoiceTotal": "Tổng cộng",
+  "adminInvoiceIssuedAt": "Ngày phát hành",
+  "adminInvoicePaidAt": "Ngày thanh toán",
+  "adminInvoicesEmpty": "Không có hóa đơn nào phù hợp.",
+  "adminActivityTitle": "Nhật ký hoạt động",
+  "adminActivityActor": "Người thực hiện",
+  "adminActivityAction": "Hành động",
+  "adminActivityTarget": "Đối tượng",
+  "adminActivityWhen": "Thời điểm",
+  "adminActivityDescription": "Chi tiết",
+  "adminActivityBefore": "Trước",
+  "adminActivityAfter": "Sau",
+  "adminActivitySystemActor": "Hệ thống",
+  "adminActivityEmpty": "Chưa ghi nhận hành động quản trị nào.",
+  "adminActivityFixedOrder": "Mới nhất trước, do máy chủ quy định.",
+  "adminActivityFilterAction": "Hành động"
 }

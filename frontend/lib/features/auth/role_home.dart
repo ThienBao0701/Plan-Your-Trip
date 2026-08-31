@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/app_state.dart';
 import '../home/app_shell.dart';
+import '../admin/admin_routes.dart';
 import '../partner/partner_routes.dart';
 
 /// Chooses the post-authentication landing surface for the signed-in account.
@@ -13,13 +14,12 @@ import '../partner/partner_routes.dart';
 ///
 /// - `PARTNER` lands in the Partner Extranet, which is that account's actual
 ///   workspace.
-/// - `USER`, `ADMIN` and every unrecognised role land in the traveller app,
-///   unchanged. `ADMIN` is deliberately included: admins may *reach* partner
-///   routes (the backend admits `ROLE_ADMIN` on `/api/partner/**`), but partner
+/// - `ADMIN` lands in the Admin CMS (D1b). Admins may also *reach* partner
+///   routes — the backend admits `ROLE_ADMIN` on `/api/partner/**` — but partner
 ///   controllers self-scope to the caller's own partner profile, which an admin
-///   normally does not have — landing them in an empty workspace would be
-///   wrong. Cross-partner administration is the Admin CMS's job, and that has
-///   no frontend yet.
+///   normally does not have, so an admin landing there would see an empty
+///   workspace. Cross-partner administration is the Admin CMS's job.
+/// - `USER` and every unrecognised role land in the traveller app, unchanged.
 class RoleHome extends StatelessWidget {
   const RoleHome({super.key});
 
@@ -28,6 +28,9 @@ class RoleHome extends StatelessWidget {
     final app = AppScope.of(context);
     if (app.role.landsOnPartnerExtranet) {
       return const PartnerRouteGuard();
+    }
+    if (app.role.landsOnAdminConsole) {
+      return const AdminRouteGuard();
     }
     return const AppShell();
   }
