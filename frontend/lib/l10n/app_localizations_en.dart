@@ -12341,4 +12341,269 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adminActivityFilterAction => 'Action';
+
+  @override
+  String get adminNavPartners => 'Partners';
+
+  @override
+  String get adminPartnersEmpty => 'No partners yet.';
+
+  @override
+  String get adminPartnersEmptyFiltered => 'No partners match these filters.';
+
+  @override
+  String get adminPartnerSearchLabel => 'Search partners';
+
+  @override
+  String get adminPartnerSearchHint =>
+      'Business name, representative or contact email';
+
+  @override
+  String get adminPartnerSearchClear => 'Clear search';
+
+  @override
+  String get adminPartnerFilterBusinessType => 'Business type';
+
+  @override
+  String get adminPartnerSortBusinessName => 'Business name';
+
+  @override
+  String get adminPartnerSortSubmittedAt => 'Submitted';
+
+  @override
+  String get adminPartnerColBusiness => 'Business';
+
+  @override
+  String get adminPartnerColType => 'Type';
+
+  @override
+  String get adminPartnerColSubmitted => 'Submitted';
+
+  @override
+  String get adminPartnerColAction => 'Action';
+
+  @override
+  String get adminPartnerOpen => 'Open';
+
+  @override
+  String adminPartnerOpenSemantic(String business) {
+    return 'Open partner $business';
+  }
+
+  @override
+  String get adminPartnerBackToList => 'Back to partners';
+
+  @override
+  String get adminPartnerTabOverview => 'Overview';
+
+  @override
+  String get adminPartnerTabTeam => 'Team';
+
+  @override
+  String get adminPartnerTabActivity => 'Activity';
+
+  @override
+  String get adminPartnerTabSettings => 'Settings';
+
+  @override
+  String get adminPartnerNotFoundTitle => 'Partner not found';
+
+  @override
+  String get adminPartnerNotFoundMessage =>
+      'No partner exists with this id. It may have been removed, or the link may be wrong.';
+
+  @override
+  String get adminPartnerSectionIdentity => 'Business identity';
+
+  @override
+  String get adminPartnerSectionVerification => 'Verification';
+
+  @override
+  String get adminPartnerSectionSummary => 'Summary';
+
+  @override
+  String get adminPartnerRepresentative => 'Representative';
+
+  @override
+  String get adminPartnerContactEmail => 'Business email';
+
+  @override
+  String get adminPartnerContactPhone => 'Phone';
+
+  @override
+  String get adminPartnerAddress => 'Address';
+
+  @override
+  String get adminPartnerTaxCode => 'Tax code';
+
+  @override
+  String get adminPartnerWebsite => 'Website';
+
+  @override
+  String get adminPartnerAccountEmail => 'Account email';
+
+  @override
+  String get adminPartnerApprovedAt => 'Approved';
+
+  @override
+  String get adminPartnerApprovedBy => 'Approved by';
+
+  @override
+  String get adminPartnerRejectedAt => 'Rejected';
+
+  @override
+  String get adminPartnerRejectionReason => 'Rejection reason';
+
+  @override
+  String get adminPartnerSuspensionReason => 'Suspension reason';
+
+  @override
+  String get adminPartnerOwnedProperties => 'Owned properties';
+
+  @override
+  String get adminPartnerTeamSize => 'Team members';
+
+  @override
+  String get adminPartnerPayoutStatus => 'Payout account';
+
+  @override
+  String get adminPartnerSummaryUnavailable => 'Summary could not be loaded.';
+
+  @override
+  String get adminPartnerPropertiesNotListed =>
+      'Property details are managed outside partner management.';
+
+  @override
+  String get adminPartnerApprove => 'Approve';
+
+  @override
+  String get adminPartnerReject => 'Reject';
+
+  @override
+  String get adminPartnerSuspend => 'Suspend';
+
+  @override
+  String get adminPartnerCancel => 'Cancel';
+
+  @override
+  String get adminPartnerApproveTitle => 'Approve this partner?';
+
+  @override
+  String get adminPartnerApproveBody =>
+      'The applicant gains partner access and becomes the owner of their organisation.';
+
+  @override
+  String get adminPartnerRejectTitle => 'Reject this application?';
+
+  @override
+  String get adminPartnerRejectBody =>
+      'The partner is notified and can edit their profile and submit it again.';
+
+  @override
+  String get adminPartnerRejectReasonLabel => 'Reason';
+
+  @override
+  String get adminPartnerRejectReasonRequired => 'A reason is required.';
+
+  @override
+  String get adminPartnerActionUncertain =>
+      'The result of the last action is unknown. This page has been reloaded — check the verification state before trying again.';
+
+  @override
+  String get adminPartnerSuspendedNotice =>
+      'This partner is suspended. There is no way to restore them from the admin console.';
+
+  @override
+  String get adminPartnerSuspendTitle => 'Suspend this partner?';
+
+  @override
+  String get adminPartnerSuspendWarningIrreversible =>
+      'This cannot be reversed from the admin console — there is no restore action.';
+
+  @override
+  String get adminPartnerSuspendWarningBookable =>
+      'Their published properties stay visible and bookable to guests.';
+
+  @override
+  String get adminPartnerSuspendWarningOperations =>
+      'They immediately lose access to bookings, rates, inventory and every other partner tool, so incoming bookings may go unhandled.';
+
+  @override
+  String get adminPartnerSuspendReasonLabel => 'Reason';
+
+  @override
+  String get adminPartnerSuspendReasonOptional => 'Optional';
+
+  @override
+  String get adminPartnerSuspendAcknowledge =>
+      'I understand this cannot be undone here.';
+
+  @override
+  String get adminPartnerSuspendConfirm => 'Suspend partner';
+
+  @override
+  String get adminPartnerTeamEmpty => 'No team members.';
+
+  @override
+  String get adminPartnerTeamReadOnlyNotice =>
+      'Read-only. Team members are managed by the partner.';
+
+  @override
+  String get adminPartnerTeamActive => 'Active';
+
+  @override
+  String get adminPartnerTeamActiveYes => 'Yes';
+
+  @override
+  String get adminPartnerTeamActiveNo => 'No';
+
+  @override
+  String get adminPartnerTeamJoined => 'Joined';
+
+  @override
+  String get adminPartnerActivityEmpty => 'No partner activity recorded.';
+
+  @override
+  String get adminPartnerActivityScopeNotice =>
+      'This partner\'s own operations. Administrator actions appear in the console activity log.';
+
+  @override
+  String get adminPartnerActivityActor => 'By';
+
+  @override
+  String get adminPartnerActivityEntity => 'Entity';
+
+  @override
+  String get adminPartnerSettingsEmpty => 'Settings could not be loaded.';
+
+  @override
+  String get adminPartnerSettingsReadOnlyNotice =>
+      'Read-only. Settings are managed by the partner.';
+
+  @override
+  String get adminPartnerSettingsLanguage => 'Default language';
+
+  @override
+  String get adminPartnerSettingsTimezone => 'Time zone';
+
+  @override
+  String get adminPartnerSettingsEmail => 'Email notifications';
+
+  @override
+  String get adminPartnerSettingsSms => 'SMS notifications';
+
+  @override
+  String get adminPartnerSettingsInApp => 'In-app notifications';
+
+  @override
+  String get adminPartnerSettingsBooking => 'Booking notifications';
+
+  @override
+  String get adminPartnerSettingsPayment => 'Payment notifications';
+
+  @override
+  String get adminPartnerSettingsReview => 'Review notifications';
+
+  @override
+  String get adminPartnerSettingsPromotion => 'Promotion notifications';
 }

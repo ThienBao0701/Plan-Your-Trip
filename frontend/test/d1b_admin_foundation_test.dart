@@ -625,13 +625,18 @@ void main() {
       }
     });
 
-    testWidgets('the menu lists exactly the six D1b destinations',
+    // D2C added Partners as a seventh destination. The assertion stays exact
+    // rather than becoming a lower bound: the point of this test is that the
+    // menu contains what the backend supports and nothing speculative, so a
+    // new entry has to be named here deliberately.
+    testWidgets('the menu lists exactly the console destinations',
         (tester) async {
       await pumpConsole(tester);
       final l10n = await AppLocalizations.delegate.load(const Locale('en'));
       for (final label in [
         l10n.adminNavDashboard,
         l10n.adminNavBookings,
+        l10n.adminNavPartners,
         l10n.adminNavPayments,
         l10n.adminNavInvoices,
         l10n.adminNavReviews,
@@ -639,7 +644,7 @@ void main() {
       ]) {
         expect(find.text(label), findsWidgets);
       }
-      expect(AdminNavigation.destinations, hasLength(6));
+      expect(AdminNavigation.destinations, hasLength(7));
       // Nothing speculative: every destination resolves to a real route.
       for (final d in AdminNavigation.destinations) {
         expect(AdminRoutes.isAdminRoute(d.route), isTrue);

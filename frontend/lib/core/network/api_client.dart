@@ -5984,6 +5984,267 @@ class ApiClient {
   /// controllable, so no `sort` parameter is sent: the trail deliberately has no
   /// sort-injection surface. `from`/`to` are ISO-8601 instants and the backend
   /// answers 400 for an inverted range.
+  // ── Admin: partner management (D2C) ────────────────────────────────────────
+  // The nine endpoints frozen by the D2B contract audit against
+  // `develop@3467d45`. There is deliberately no method for:
+  //   * editing a partner profile   — no PUT /api/admin/partners/{id} exists;
+  //   * listing a partner's places  — no such admin endpoint exists at all;
+  //   * mutating a partner's team   — those are partner-side operations;
+  //   * assign-owner                — real, but the freeze places it in a
+  //     future property/catalogue screen rather than partner management.
+  // Adding any of them here would be a speculative client for a contract the
+  // backend does not offer.
+
+  /// `GET /api/admin/partners` — paginated.
+  /// Filters: `verificationStatus`, `businessType`, `q` (business name,
+  /// representative name or contact email, case-insensitive).
+  /// Sort: `createdAt|updatedAt|businessName|verificationStatus|submittedAt|
+  /// approvedAt|rejectedAt|id`.
+  Future<CollectionApiResult<AdminPage<AdminPartnerRow>>> getAdminPartners({
+    String? verificationStatus,
+    String? businessType,
+    String? query,
+    int? page,
+    int? size,
+    String? sort,
+  }) =>
+      _adminGetPage<AdminPartnerRow>(
+        _adminUri('/admin/partners', {
+          if (verificationStatus != null && verificationStatus.isNotEmpty)
+            'verificationStatus': verificationStatus,
+          if (businessType != null && businessType.isNotEmpty)
+            'businessType': businessType,
+          if (query != null && query.trim().isNotEmpty) 'q': query.trim(),
+          ..._adminPageQuery(page: page, size: size, sort: sort),
+        }),
+        AdminPartnerRow.fromJson,
+      );
+
+  /// `GET /api/admin/partners/{id}` — the canonical existence check.
+  ///
+  /// The console resolves a partner through this call *before* loading any
+  /// sub-resource, because `/team` and `/activity-logs` answer 200 with an
+  /// empty body for an id that does not exist (D2B finding D2A-F3). Treating
+  /// either of those as proof of existence would render a phantom partner.
+  Future<CollectionApiResult<AdminPartnerRow>> getAdminPartner(int partnerId) =>
+      _adminGetObject<AdminPartnerRow>(
+        _adminUri('/admin/partners/$partnerId'),
+        AdminPartnerRow.fromJson,
+      );
+
+  /// `GET /api/admin/partners/{id}/detail` — owned-hotel and team counts plus
+  /// the payout account's status string. No property list, no financial figures.
+  Future<CollectionApiResult<AdminPartnerDetail>> getAdminPartnerDetail(
+          int partnerId) =>
+      _adminGetObject<AdminPartnerDetail>(
+        _adminUri('/admin/partners/$partnerId/detail'),
+        AdminPartnerDetail.fromJson,
+      );
+
+  /// `GET /api/admin/partners/{id}/team` — read-only roster.
+  Future<CollectionApiResult<List<AdminPartnerTeamMember>>>
+      getAdminPartnerTeam(int partnerId) => _adminGetList<AdminPartnerTeamMember>(
+            _adminUri('/admin/partners/$partnerId/team'),
+            AdminPartnerTeamMember.fromJson,
+          );
+
+  /// `GET /api/admin/partners/{id}/settings` — preferences only, read-only.
+  Future<CollectionApiResult<AdminPartnerSettings>> getAdminPartnerSettings(
+          int partnerId) =>
+      _adminGetObject<AdminPartnerSettings>(
+        _adminUri('/admin/partners/$partnerId/settings'),
+        AdminPartnerSettings.fromJson,
+      );
+
+  /// `GET /api/admin/partners/{id}/activity-logs` — paginated, newest first.
+  ///
+  /// The **partner's own** operational log, not the administrative audit trail.
+  /// The endpoint accepts no `sort`: its ordering is fixed server-side, so none
+  /// is sent.
+  Future<CollectionApiResult<AdminPage<AdminPartnerActivityRow>>>
+      getAdminPartnerActivity(
+    int partnerId, {
+    int? page,
+    int? size,
+  }) =>
+          _adminGetPage<AdminPartnerActivityRow>(
+            _adminUri('/admin/partners/$partnerId/activity-logs',
+                _adminPageQuery(page: page, size: size)),
+            AdminPartnerActivityRow.fromJson,
+          );
+
+  /// `POST /api/admin/partners/{id}/approve` — SUBMITTED → APPROVED.
+  ///
+  /// Server-side this also promotes the owning user's role to PARTNER and
+  /// creates their OWNER team row, so it grants access rather than merely
+  /// editing a record. Requires no body. 422 when the profile is not SUBMITTED.
+  Future<CollectionApiResult<AdminPartnerRow>> approveAdminPartner(
+          int partnerId) =>
+      _adminPartnerMutation(
+        () => _client.post(
+          _adminUri('/admin/partners/$partnerId/approve'),
+          headers: _jsonHeaders,
+        ),
+      );
+
+  /// `POST /api/admin/partners/{id}/reject` — SUBMITTED → REJECTED.
+  ///
+  /// `rejectReason` is required by the backend request record, so a blank one
+  /// is refused here rather than spending a round trip. Reversible: the partner
+  /// can edit and resubmit.
+  Future<CollectionApiResult<AdminPartnerRow>> rejectAdminPartner(
+    int partnerId, {
+    required String reason,
+  }) {
+    final trimmed = reason.trim();
+    if (trimmed.isEmpty) {
+      return Future.value(
+          const CollectionApiResult.failure(ApiErrorKind.validation));
+    }
+    return _adminPartnerMutation(
+      () => _client.post(
+        _adminUri('/admin/partners/$partnerId/reject'),
+        headers: _jsonHeaders,
+        body: jsonEncode({'rejectReason': trimmed}),
+      ),
+    );
+  }
+
+  /// `POST /api/admin/partners/{id}/suspend` — APPROVED → SUSPENDED.
+  ///
+  /// **Irreversible.** No reactivate endpoint exists anywhere in the backend
+  /// (D2B finding D2A-F1), and suspension does not unpublish the partner's
+  /// properties, which stay bookable. The reason is optional server-side.
+  ///
+  /// A timeout maps to [ApiErrorKind.uncertain] rather than a clean failure:
+  /// the suspension may well have committed, and there is no undo to offer.
+  Future<CollectionApiResult<AdminPartnerRow>> suspendAdminPartner(
+    int partnerId, {
+    String? reason,
+  }) {
+    final trimmed = reason?.trim();
+    return _adminPartnerMutation(
+      () => _client.post(
+        _adminUri('/admin/partners/$partnerId/suspend'),
+        headers: _jsonHeaders,
+        body: jsonEncode(
+            {if (trimmed != null && trimmed.isNotEmpty) 'reason': trimmed}),
+      ),
+    );
+  }
+
+  /// Shared request/decode path for an admin object response.
+  Future<CollectionApiResult<T>> _adminGetObject<T>(
+    Uri uri,
+    T? Function(Map<String, dynamic>) parse,
+  ) async {
+    try {
+      final res = await _client
+          .get(uri, headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        final parsed = parse(body);
+        if (parsed == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(parsed);
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Shared request/decode path for an admin bare-array response. Used only by
+  /// `/team`, which the backend leaves unpaginated because a staff roster is
+  /// structurally bounded.
+  Future<CollectionApiResult<List<T>>> _adminGetList<T>(
+    Uri uri,
+    T? Function(Map<String, dynamic>) parse,
+  ) async {
+    try {
+      final res = await _client
+          .get(uri, headers: _jsonHeaders)
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final decoded = jsonDecode(res.body);
+        if (decoded is! List) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        final items = <T>[];
+        for (final entry in decoded) {
+          if (entry is! Map<String, dynamic>) continue;
+          final parsed = parse(entry);
+          if (parsed != null) items.add(parsed);
+        }
+        return CollectionApiResult.success(items);
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Shared path for the three lifecycle mutations. Each returns the updated
+  /// `PartnerProfileResponse`, so the caller can refresh from the response
+  /// rather than guessing the new state.
+  Future<CollectionApiResult<AdminPartnerRow>> _adminPartnerMutation(
+    Future<http.Response> Function() send,
+  ) async {
+    try {
+      final res = await send().timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+        }
+        final parsed = AdminPartnerRow.fromJson(body);
+        if (parsed == null) {
+          // The mutation may well have committed; the response just did not
+          // decode. Never report this as a clean failure.
+          return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+        }
+        return CollectionApiResult.success(parsed);
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      // A lifecycle transition cannot be withdrawn, and suspension cannot be
+      // reversed at all — so an unanswered request is uncertain, not failed.
+      return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
   Future<CollectionApiResult<AdminPage<AdminActivityLogRow>>>
       getAdminActivityLogs({
     int? actorUserId,

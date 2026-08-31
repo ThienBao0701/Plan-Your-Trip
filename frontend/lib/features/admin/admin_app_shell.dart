@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/admin/admin_models.dart';
 import '../../core/admin/admin_state.dart';
 import '../../core/app_state.dart';
 import '../../design/app_breakpoints.dart';
@@ -7,6 +8,7 @@ import '../../design/app_spacing.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/glass_widgets.dart';
 import 'admin_feature_states.dart';
+import 'admin_partner_states.dart';
 import 'widgets/admin_widgets.dart';
 import 'admin_navigation.dart';
 import 'admin_routes.dart';
@@ -14,6 +16,8 @@ import 'screens/admin_activity_log_screen.dart';
 import 'screens/admin_bookings_screen.dart';
 import 'screens/admin_dashboard_screen.dart';
 import 'screens/admin_invoices_screen.dart';
+import 'screens/admin_partner_detail_screen.dart';
+import 'screens/admin_partners_screen.dart';
 import 'screens/admin_payments_screen.dart';
 import 'screens/admin_reviews_screen.dart';
 
@@ -51,6 +55,12 @@ class _AdminAppShellState extends State<AdminAppShell> {
   AdminReviewsState? _reviews;
   AdminInvoicesState? _invoices;
   AdminActivityLogState? _activity;
+  AdminPartnersState? _partners;
+
+  /// The partner currently open, or null when the Partners destination is
+  /// showing its list. Detail state is created per partner and disposed when
+  /// another is opened, so two partners can never share a notifier.
+  AdminPartnerDetailState? _partnerDetail;
 
   bool _created = false;
 
@@ -81,6 +91,8 @@ class _AdminAppShellState extends State<AdminAppShell> {
     _reviews?.dispose();
     _invoices?.dispose();
     _activity?.dispose();
+    _partners?.dispose();
+    _partnerDetail?.dispose();
     super.dispose();
   }
 
@@ -97,6 +109,7 @@ class _AdminAppShellState extends State<AdminAppShell> {
     _reviews = AdminReviewsState(api: api);
     _invoices = AdminInvoicesState(api: api);
     _activity = AdminActivityLogState(api: api);
+    _partners = AdminPartnersState(api: api);
 
     // One load for the landing section. Other sections load lazily when first
     // selected, so opening the console does not fan out six requests at once.
@@ -126,14 +139,46 @@ class _AdminAppShellState extends State<AdminAppShell> {
         if (_invoices?.status == AdminLoadStatus.idle) _invoices!.load();
       case AdminRoutes.activityLog:
         if (_activity?.status == AdminLoadStatus.idle) _activity!.load();
+      case AdminRoutes.partners:
+        if (_partners?.status == AdminLoadStatus.idle) _partners!.load();
       default:
         if (_dashboard?.status == AdminLoadStatus.idle) _dashboard!.load();
     }
   }
 
+  /// Opens one partner's detail inside the Partners destination.
+  ///
+  /// A fresh [AdminPartnerDetailState] per partner, and the previous one is
+  /// disposed: reusing a notifier across partners would let a slow response for
+  /// the old id land on the new screen.
+  void _openPartner(AdminPartnerRow row) {
+    final api = AppScope.of(context).api;
+    final previous = _partnerDetail;
+    final next = AdminPartnerDetailState(api: api, partnerId: row.id);
+    setState(() => _partnerDetail = next);
+    previous?.dispose();
+    next.load();
+  }
+
+  void _closePartner() {
+    final previous = _partnerDetail;
+    setState(() => _partnerDetail = null);
+    previous?.dispose();
+    // The lifecycle actions can change a partner's status, so the list is
+    // re-read rather than showing what it held before the detail was opened.
+    _partners?.refresh();
+  }
+
   void _select(String route, {bool closeDrawer = false}) {
     if (closeDrawer && Navigator.of(context).canPop()) {
       Navigator.of(context).pop();
+    }
+    // Leaving Partners drops any open detail, so returning to the
+    // destination starts at the list rather than a stale partner.
+    if (_route != route && _partnerDetail != null) {
+      final previous = _partnerDetail;
+      _partnerDetail = null;
+      previous?.dispose();
     }
     if (_route != route) setState(() => _route = route);
     _loadFor(route);
@@ -148,6 +193,15 @@ class _AdminAppShellState extends State<AdminAppShell> {
       AdminRoutes.reviews => AdminReviewsScreen(state: _reviews!),
       AdminRoutes.invoices => AdminInvoicesScreen(state: _invoices!),
       AdminRoutes.activityLog => AdminActivityLogScreen(state: _activity!),
+      AdminRoutes.partners => _partnerDetail == null
+          ? AdminPartnersScreen(
+              state: _partners!,
+              onOpenPartner: _openPartner,
+            )
+          : AdminPartnerDetailScreen(
+              state: _partnerDetail!,
+              onBack: _closePartner,
+            ),
       _ => AdminDashboardScreen(state: _dashboard!),
     };
   }

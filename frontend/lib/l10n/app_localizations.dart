@@ -21123,6 +21123,504 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Action'**
   String get adminActivityFilterAction;
+
+  /// No description provided for @adminNavPartners.
+  ///
+  /// In en, this message translates to:
+  /// **'Partners'**
+  String get adminNavPartners;
+
+  /// No description provided for @adminPartnersEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No partners yet.'**
+  String get adminPartnersEmpty;
+
+  /// No description provided for @adminPartnersEmptyFiltered.
+  ///
+  /// In en, this message translates to:
+  /// **'No partners match these filters.'**
+  String get adminPartnersEmptyFiltered;
+
+  /// No description provided for @adminPartnerSearchLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Search partners'**
+  String get adminPartnerSearchLabel;
+
+  /// No description provided for @adminPartnerSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Business name, representative or contact email'**
+  String get adminPartnerSearchHint;
+
+  /// No description provided for @adminPartnerSearchClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get adminPartnerSearchClear;
+
+  /// No description provided for @adminPartnerFilterBusinessType.
+  ///
+  /// In en, this message translates to:
+  /// **'Business type'**
+  String get adminPartnerFilterBusinessType;
+
+  /// No description provided for @adminPartnerSortBusinessName.
+  ///
+  /// In en, this message translates to:
+  /// **'Business name'**
+  String get adminPartnerSortBusinessName;
+
+  /// No description provided for @adminPartnerSortSubmittedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitted'**
+  String get adminPartnerSortSubmittedAt;
+
+  /// No description provided for @adminPartnerColBusiness.
+  ///
+  /// In en, this message translates to:
+  /// **'Business'**
+  String get adminPartnerColBusiness;
+
+  /// No description provided for @adminPartnerColType.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get adminPartnerColType;
+
+  /// No description provided for @adminPartnerColSubmitted.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitted'**
+  String get adminPartnerColSubmitted;
+
+  /// No description provided for @adminPartnerColAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Action'**
+  String get adminPartnerColAction;
+
+  /// No description provided for @adminPartnerOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get adminPartnerOpen;
+
+  /// No description provided for @adminPartnerOpenSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Open partner {business}'**
+  String adminPartnerOpenSemantic(String business);
+
+  /// No description provided for @adminPartnerBackToList.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to partners'**
+  String get adminPartnerBackToList;
+
+  /// No description provided for @adminPartnerTabOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'Overview'**
+  String get adminPartnerTabOverview;
+
+  /// No description provided for @adminPartnerTabTeam.
+  ///
+  /// In en, this message translates to:
+  /// **'Team'**
+  String get adminPartnerTabTeam;
+
+  /// No description provided for @adminPartnerTabActivity.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity'**
+  String get adminPartnerTabActivity;
+
+  /// No description provided for @adminPartnerTabSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get adminPartnerTabSettings;
+
+  /// No description provided for @adminPartnerNotFoundTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Partner not found'**
+  String get adminPartnerNotFoundTitle;
+
+  /// No description provided for @adminPartnerNotFoundMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No partner exists with this id. It may have been removed, or the link may be wrong.'**
+  String get adminPartnerNotFoundMessage;
+
+  /// No description provided for @adminPartnerSectionIdentity.
+  ///
+  /// In en, this message translates to:
+  /// **'Business identity'**
+  String get adminPartnerSectionIdentity;
+
+  /// No description provided for @adminPartnerSectionVerification.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification'**
+  String get adminPartnerSectionVerification;
+
+  /// No description provided for @adminPartnerSectionSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Summary'**
+  String get adminPartnerSectionSummary;
+
+  /// No description provided for @adminPartnerRepresentative.
+  ///
+  /// In en, this message translates to:
+  /// **'Representative'**
+  String get adminPartnerRepresentative;
+
+  /// No description provided for @adminPartnerContactEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Business email'**
+  String get adminPartnerContactEmail;
+
+  /// No description provided for @adminPartnerContactPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get adminPartnerContactPhone;
+
+  /// No description provided for @adminPartnerAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get adminPartnerAddress;
+
+  /// No description provided for @adminPartnerTaxCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Tax code'**
+  String get adminPartnerTaxCode;
+
+  /// No description provided for @adminPartnerWebsite.
+  ///
+  /// In en, this message translates to:
+  /// **'Website'**
+  String get adminPartnerWebsite;
+
+  /// No description provided for @adminPartnerAccountEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Account email'**
+  String get adminPartnerAccountEmail;
+
+  /// No description provided for @adminPartnerApprovedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved'**
+  String get adminPartnerApprovedAt;
+
+  /// No description provided for @adminPartnerApprovedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved by'**
+  String get adminPartnerApprovedBy;
+
+  /// No description provided for @adminPartnerRejectedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get adminPartnerRejectedAt;
+
+  /// No description provided for @adminPartnerRejectionReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejection reason'**
+  String get adminPartnerRejectionReason;
+
+  /// No description provided for @adminPartnerSuspensionReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Suspension reason'**
+  String get adminPartnerSuspensionReason;
+
+  /// No description provided for @adminPartnerOwnedProperties.
+  ///
+  /// In en, this message translates to:
+  /// **'Owned properties'**
+  String get adminPartnerOwnedProperties;
+
+  /// No description provided for @adminPartnerTeamSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Team members'**
+  String get adminPartnerTeamSize;
+
+  /// No description provided for @adminPartnerPayoutStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Payout account'**
+  String get adminPartnerPayoutStatus;
+
+  /// No description provided for @adminPartnerSummaryUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Summary could not be loaded.'**
+  String get adminPartnerSummaryUnavailable;
+
+  /// No description provided for @adminPartnerPropertiesNotListed.
+  ///
+  /// In en, this message translates to:
+  /// **'Property details are managed outside partner management.'**
+  String get adminPartnerPropertiesNotListed;
+
+  /// No description provided for @adminPartnerApprove.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve'**
+  String get adminPartnerApprove;
+
+  /// No description provided for @adminPartnerReject.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject'**
+  String get adminPartnerReject;
+
+  /// No description provided for @adminPartnerSuspend.
+  ///
+  /// In en, this message translates to:
+  /// **'Suspend'**
+  String get adminPartnerSuspend;
+
+  /// No description provided for @adminPartnerCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get adminPartnerCancel;
+
+  /// No description provided for @adminPartnerApproveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve this partner?'**
+  String get adminPartnerApproveTitle;
+
+  /// No description provided for @adminPartnerApproveBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The applicant gains partner access and becomes the owner of their organisation.'**
+  String get adminPartnerApproveBody;
+
+  /// No description provided for @adminPartnerRejectTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject this application?'**
+  String get adminPartnerRejectTitle;
+
+  /// No description provided for @adminPartnerRejectBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The partner is notified and can edit their profile and submit it again.'**
+  String get adminPartnerRejectBody;
+
+  /// No description provided for @adminPartnerRejectReasonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason'**
+  String get adminPartnerRejectReasonLabel;
+
+  /// No description provided for @adminPartnerRejectReasonRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'A reason is required.'**
+  String get adminPartnerRejectReasonRequired;
+
+  /// No description provided for @adminPartnerActionUncertain.
+  ///
+  /// In en, this message translates to:
+  /// **'The result of the last action is unknown. This page has been reloaded — check the verification state before trying again.'**
+  String get adminPartnerActionUncertain;
+
+  /// No description provided for @adminPartnerSuspendedNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'This partner is suspended. There is no way to restore them from the admin console.'**
+  String get adminPartnerSuspendedNotice;
+
+  /// No description provided for @adminPartnerSuspendTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Suspend this partner?'**
+  String get adminPartnerSuspendTitle;
+
+  /// No description provided for @adminPartnerSuspendWarningIrreversible.
+  ///
+  /// In en, this message translates to:
+  /// **'This cannot be reversed from the admin console — there is no restore action.'**
+  String get adminPartnerSuspendWarningIrreversible;
+
+  /// No description provided for @adminPartnerSuspendWarningBookable.
+  ///
+  /// In en, this message translates to:
+  /// **'Their published properties stay visible and bookable to guests.'**
+  String get adminPartnerSuspendWarningBookable;
+
+  /// No description provided for @adminPartnerSuspendWarningOperations.
+  ///
+  /// In en, this message translates to:
+  /// **'They immediately lose access to bookings, rates, inventory and every other partner tool, so incoming bookings may go unhandled.'**
+  String get adminPartnerSuspendWarningOperations;
+
+  /// No description provided for @adminPartnerSuspendReasonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason'**
+  String get adminPartnerSuspendReasonLabel;
+
+  /// No description provided for @adminPartnerSuspendReasonOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional'**
+  String get adminPartnerSuspendReasonOptional;
+
+  /// No description provided for @adminPartnerSuspendAcknowledge.
+  ///
+  /// In en, this message translates to:
+  /// **'I understand this cannot be undone here.'**
+  String get adminPartnerSuspendAcknowledge;
+
+  /// No description provided for @adminPartnerSuspendConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Suspend partner'**
+  String get adminPartnerSuspendConfirm;
+
+  /// No description provided for @adminPartnerTeamEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No team members.'**
+  String get adminPartnerTeamEmpty;
+
+  /// No description provided for @adminPartnerTeamReadOnlyNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Read-only. Team members are managed by the partner.'**
+  String get adminPartnerTeamReadOnlyNotice;
+
+  /// No description provided for @adminPartnerTeamActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get adminPartnerTeamActive;
+
+  /// No description provided for @adminPartnerTeamActiveYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get adminPartnerTeamActiveYes;
+
+  /// No description provided for @adminPartnerTeamActiveNo.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get adminPartnerTeamActiveNo;
+
+  /// No description provided for @adminPartnerTeamJoined.
+  ///
+  /// In en, this message translates to:
+  /// **'Joined'**
+  String get adminPartnerTeamJoined;
+
+  /// No description provided for @adminPartnerActivityEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No partner activity recorded.'**
+  String get adminPartnerActivityEmpty;
+
+  /// No description provided for @adminPartnerActivityScopeNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'This partner\'s own operations. Administrator actions appear in the console activity log.'**
+  String get adminPartnerActivityScopeNotice;
+
+  /// No description provided for @adminPartnerActivityActor.
+  ///
+  /// In en, this message translates to:
+  /// **'By'**
+  String get adminPartnerActivityActor;
+
+  /// No description provided for @adminPartnerActivityEntity.
+  ///
+  /// In en, this message translates to:
+  /// **'Entity'**
+  String get adminPartnerActivityEntity;
+
+  /// No description provided for @adminPartnerSettingsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings could not be loaded.'**
+  String get adminPartnerSettingsEmpty;
+
+  /// No description provided for @adminPartnerSettingsReadOnlyNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Read-only. Settings are managed by the partner.'**
+  String get adminPartnerSettingsReadOnlyNotice;
+
+  /// No description provided for @adminPartnerSettingsLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Default language'**
+  String get adminPartnerSettingsLanguage;
+
+  /// No description provided for @adminPartnerSettingsTimezone.
+  ///
+  /// In en, this message translates to:
+  /// **'Time zone'**
+  String get adminPartnerSettingsTimezone;
+
+  /// No description provided for @adminPartnerSettingsEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email notifications'**
+  String get adminPartnerSettingsEmail;
+
+  /// No description provided for @adminPartnerSettingsSms.
+  ///
+  /// In en, this message translates to:
+  /// **'SMS notifications'**
+  String get adminPartnerSettingsSms;
+
+  /// No description provided for @adminPartnerSettingsInApp.
+  ///
+  /// In en, this message translates to:
+  /// **'In-app notifications'**
+  String get adminPartnerSettingsInApp;
+
+  /// No description provided for @adminPartnerSettingsBooking.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking notifications'**
+  String get adminPartnerSettingsBooking;
+
+  /// No description provided for @adminPartnerSettingsPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment notifications'**
+  String get adminPartnerSettingsPayment;
+
+  /// No description provided for @adminPartnerSettingsReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Review notifications'**
+  String get adminPartnerSettingsReview;
+
+  /// No description provided for @adminPartnerSettingsPromotion.
+  ///
+  /// In en, this message translates to:
+  /// **'Promotion notifications'**
+  String get adminPartnerSettingsPromotion;
 }
 
 class _AppLocalizationsDelegate

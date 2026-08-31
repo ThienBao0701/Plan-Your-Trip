@@ -12176,4 +12176,271 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get adminActivityFilterAction => 'Hành động';
+
+  @override
+  String get adminNavPartners => 'Đối tác';
+
+  @override
+  String get adminPartnersEmpty => 'Chưa có đối tác nào.';
+
+  @override
+  String get adminPartnersEmptyFiltered =>
+      'Không có đối tác nào khớp với bộ lọc này.';
+
+  @override
+  String get adminPartnerSearchLabel => 'Tìm đối tác';
+
+  @override
+  String get adminPartnerSearchHint =>
+      'Tên doanh nghiệp, người đại diện hoặc email liên hệ';
+
+  @override
+  String get adminPartnerSearchClear => 'Xoá tìm kiếm';
+
+  @override
+  String get adminPartnerFilterBusinessType => 'Loại hình';
+
+  @override
+  String get adminPartnerSortBusinessName => 'Tên doanh nghiệp';
+
+  @override
+  String get adminPartnerSortSubmittedAt => 'Ngày nộp';
+
+  @override
+  String get adminPartnerColBusiness => 'Doanh nghiệp';
+
+  @override
+  String get adminPartnerColType => 'Loại hình';
+
+  @override
+  String get adminPartnerColSubmitted => 'Ngày nộp';
+
+  @override
+  String get adminPartnerColAction => 'Thao tác';
+
+  @override
+  String get adminPartnerOpen => 'Mở';
+
+  @override
+  String adminPartnerOpenSemantic(String business) {
+    return 'Mở đối tác $business';
+  }
+
+  @override
+  String get adminPartnerBackToList => 'Quay lại danh sách đối tác';
+
+  @override
+  String get adminPartnerTabOverview => 'Tổng quan';
+
+  @override
+  String get adminPartnerTabTeam => 'Nhân sự';
+
+  @override
+  String get adminPartnerTabActivity => 'Hoạt động';
+
+  @override
+  String get adminPartnerTabSettings => 'Cài đặt';
+
+  @override
+  String get adminPartnerNotFoundTitle => 'Không tìm thấy đối tác';
+
+  @override
+  String get adminPartnerNotFoundMessage =>
+      'Không có đối tác nào với mã này. Có thể đối tác đã bị xoá hoặc liên kết không đúng.';
+
+  @override
+  String get adminPartnerSectionIdentity => 'Thông tin doanh nghiệp';
+
+  @override
+  String get adminPartnerSectionVerification => 'Xác minh';
+
+  @override
+  String get adminPartnerSectionSummary => 'Tóm tắt';
+
+  @override
+  String get adminPartnerRepresentative => 'Người đại diện';
+
+  @override
+  String get adminPartnerContactEmail => 'Email doanh nghiệp';
+
+  @override
+  String get adminPartnerContactPhone => 'Điện thoại';
+
+  @override
+  String get adminPartnerAddress => 'Địa chỉ';
+
+  @override
+  String get adminPartnerTaxCode => 'Mã số thuế';
+
+  @override
+  String get adminPartnerWebsite => 'Website';
+
+  @override
+  String get adminPartnerAccountEmail => 'Email tài khoản';
+
+  @override
+  String get adminPartnerApprovedAt => 'Ngày duyệt';
+
+  @override
+  String get adminPartnerApprovedBy => 'Người duyệt';
+
+  @override
+  String get adminPartnerRejectedAt => 'Ngày từ chối';
+
+  @override
+  String get adminPartnerRejectionReason => 'Lý do từ chối';
+
+  @override
+  String get adminPartnerSuspensionReason => 'Lý do tạm ngưng';
+
+  @override
+  String get adminPartnerOwnedProperties => 'Cơ sở sở hữu';
+
+  @override
+  String get adminPartnerTeamSize => 'Số nhân sự';
+
+  @override
+  String get adminPartnerPayoutStatus => 'Tài khoản nhận tiền';
+
+  @override
+  String get adminPartnerSummaryUnavailable => 'Không tải được phần tóm tắt.';
+
+  @override
+  String get adminPartnerPropertiesNotListed =>
+      'Chi tiết cơ sở được quản lý ngoài phần quản lý đối tác.';
+
+  @override
+  String get adminPartnerApprove => 'Duyệt';
+
+  @override
+  String get adminPartnerReject => 'Từ chối';
+
+  @override
+  String get adminPartnerSuspend => 'Tạm ngưng';
+
+  @override
+  String get adminPartnerCancel => 'Huỷ';
+
+  @override
+  String get adminPartnerApproveTitle => 'Duyệt đối tác này?';
+
+  @override
+  String get adminPartnerApproveBody =>
+      'Người nộp hồ sơ sẽ có quyền đối tác và trở thành chủ sở hữu tổ chức của họ.';
+
+  @override
+  String get adminPartnerRejectTitle => 'Từ chối hồ sơ này?';
+
+  @override
+  String get adminPartnerRejectBody =>
+      'Đối tác sẽ được thông báo và có thể chỉnh sửa hồ sơ rồi nộp lại.';
+
+  @override
+  String get adminPartnerRejectReasonLabel => 'Lý do';
+
+  @override
+  String get adminPartnerRejectReasonRequired => 'Cần nhập lý do.';
+
+  @override
+  String get adminPartnerActionUncertain =>
+      'Không rõ kết quả của thao tác vừa rồi. Trang đã được tải lại — hãy kiểm tra trạng thái xác minh trước khi thử lại.';
+
+  @override
+  String get adminPartnerSuspendedNotice =>
+      'Đối tác này đang bị tạm ngưng. Không thể khôi phục từ bảng quản trị.';
+
+  @override
+  String get adminPartnerSuspendTitle => 'Tạm ngưng đối tác này?';
+
+  @override
+  String get adminPartnerSuspendWarningIrreversible =>
+      'Không thể hoàn tác từ bảng quản trị — không có thao tác khôi phục.';
+
+  @override
+  String get adminPartnerSuspendWarningBookable =>
+      'Các cơ sở đã đăng của họ vẫn hiển thị và khách vẫn đặt được.';
+
+  @override
+  String get adminPartnerSuspendWarningOperations =>
+      'Họ mất quyền truy cập ngay lập tức vào đặt phòng, giá, tồn phòng và mọi công cụ đối tác khác, nên các đặt phòng mới có thể không được xử lý.';
+
+  @override
+  String get adminPartnerSuspendReasonLabel => 'Lý do';
+
+  @override
+  String get adminPartnerSuspendReasonOptional => 'Không bắt buộc';
+
+  @override
+  String get adminPartnerSuspendAcknowledge =>
+      'Tôi hiểu rằng thao tác này không thể hoàn tác tại đây.';
+
+  @override
+  String get adminPartnerSuspendConfirm => 'Tạm ngưng đối tác';
+
+  @override
+  String get adminPartnerTeamEmpty => 'Chưa có nhân sự.';
+
+  @override
+  String get adminPartnerTeamReadOnlyNotice =>
+      'Chỉ xem. Nhân sự do đối tác tự quản lý.';
+
+  @override
+  String get adminPartnerTeamActive => 'Đang hoạt động';
+
+  @override
+  String get adminPartnerTeamActiveYes => 'Có';
+
+  @override
+  String get adminPartnerTeamActiveNo => 'Không';
+
+  @override
+  String get adminPartnerTeamJoined => 'Ngày tham gia';
+
+  @override
+  String get adminPartnerActivityEmpty =>
+      'Chưa ghi nhận hoạt động nào của đối tác.';
+
+  @override
+  String get adminPartnerActivityScopeNotice =>
+      'Hoạt động của chính đối tác này. Thao tác của quản trị viên nằm ở nhật ký hoạt động của bảng quản trị.';
+
+  @override
+  String get adminPartnerActivityActor => 'Bởi';
+
+  @override
+  String get adminPartnerActivityEntity => 'Đối tượng';
+
+  @override
+  String get adminPartnerSettingsEmpty => 'Không tải được cài đặt.';
+
+  @override
+  String get adminPartnerSettingsReadOnlyNotice =>
+      'Chỉ xem. Cài đặt do đối tác tự quản lý.';
+
+  @override
+  String get adminPartnerSettingsLanguage => 'Ngôn ngữ mặc định';
+
+  @override
+  String get adminPartnerSettingsTimezone => 'Múi giờ';
+
+  @override
+  String get adminPartnerSettingsEmail => 'Thông báo email';
+
+  @override
+  String get adminPartnerSettingsSms => 'Thông báo SMS';
+
+  @override
+  String get adminPartnerSettingsInApp => 'Thông báo trong ứng dụng';
+
+  @override
+  String get adminPartnerSettingsBooking => 'Thông báo đặt phòng';
+
+  @override
+  String get adminPartnerSettingsPayment => 'Thông báo thanh toán';
+
+  @override
+  String get adminPartnerSettingsReview => 'Thông báo đánh giá';
+
+  @override
+  String get adminPartnerSettingsPromotion => 'Thông báo khuyến mãi';
 }

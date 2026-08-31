@@ -53,6 +53,12 @@ class AdminNavigation {
       label: _bookings,
     ),
     AdminDestination(
+      route: AdminRoutesRefs.partners,
+      section: AdminSection.operations,
+      icon: Icons.storefront_outlined,
+      label: _partners,
+    ),
+    AdminDestination(
       route: AdminRoutesRefs.payments,
       section: AdminSection.finance,
       icon: Icons.payments_outlined,
@@ -113,6 +119,7 @@ class AdminNavigation {
   static String _invoices(AppLocalizations l) => l.adminNavInvoices;
   static String _reviews(AppLocalizations l) => l.adminNavReviews;
   static String _activityLog(AppLocalizations l) => l.adminNavActivityLog;
+  static String _partners(AppLocalizations l) => l.adminNavPartners;
 }
 
 /// Route strings, kept separate from `AdminRoutes` so `AdminNavigation` can be
@@ -127,4 +134,9 @@ class AdminRoutesRefs {
   static const String reviews = '/admin/reviews';
   static const String invoices = '/admin/invoices';
   static const String activityLog = '/admin/activity-log';
+
+  /// D2C. Partner detail is reached from this destination rather than
+  /// being its own menu entry: an operator opens a partner from the list,
+  /// never by typing an id.
+  static const String partners = '/admin/partners';
 }
