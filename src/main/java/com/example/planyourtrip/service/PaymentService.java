@@ -23,6 +23,8 @@ public class PaymentService {
     private final LoyaltyRedemptionService loyaltyRedemptionService;
     private final GiftCardService giftCardService;
     private final InventoryReservationService inventoryReservationService;
+    /** D1a — refunds move money and must leave an administrative trail. */
+    private final AdminActivityLogService adminAudit;
 
     public PaymentService(PaymentRepository paymentRepo,
                           BookingRepository bookingRepo,
@@ -30,7 +32,8 @@ public class PaymentService {
                           NotificationService notificationService,
                           LoyaltyRedemptionService loyaltyRedemptionService,
                           GiftCardService giftCardService,
-                          InventoryReservationService inventoryReservationService) {
+                          InventoryReservationService inventoryReservationService,
+                           AdminActivityLogService adminAudit) {
         this.paymentRepo = paymentRepo;
         this.bookingRepo = bookingRepo;
         this.userRepo    = userRepo;
@@ -38,6 +41,7 @@ public class PaymentService {
         this.loyaltyRedemptionService = loyaltyRedemptionService;
         this.giftCardService = giftCardService;
         this.inventoryReservationService = inventoryReservationService;
+        this.adminAudit = adminAudit;
     }
 
     @Transactional
@@ -193,7 +197,7 @@ public class PaymentService {
     }
 
     @Transactional
-    public PaymentResponse refund(Long paymentId, RefundRequest req) {
+    public PaymentResponse refund(Long adminUserId, Long paymentId, RefundRequest req) {
         Payment payment = paymentRepo.findById(paymentId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND,
                 "Payment not found: " + paymentId));
@@ -207,13 +211,47 @@ public class PaymentService {
         if (req != null && req.reason() != null)
             payment.setFailureReason(req.reason());
 
-        return toResponse(paymentRepo.save(payment));
+        Payment saved = paymentRepo.save(payment);
+
+        // D1a — money movement: record amount, currency, target and the supplied reason only.
+        // Never the provider transaction id, checkout URL, card data or any provider credential.
+        String reason = (req != null && req.reason() != null && !req.reason().isBlank())
+            ? " Reason: " + req.reason() : "";
+        adminAudit.record(adminUserId, "PAYMENT_REFUND", "PAYMENT", saved.getId(),
+            "Refunded " + saved.getAmount() + " " + saved.getCurrency()
+                + " on booking " + (saved.getBooking() != null ? saved.getBooking().getId() : null)
+                + "." + reason,
+            PaymentStatus.PAID.name(), PaymentStatus.REFUNDED.name());
+
+        return toResponse(saved);
     }
 
     @Transactional(readOnly = true)
     public List<PaymentResponse> adminListPayments() {
         return paymentRepo.findAllByOrderByCreatedAtDesc()
             .stream().map(this::toResponse).toList();
+    }
+
+    /** Entity properties an administrator may sort the payment grid by (D1a-12 allowlist). */
+    private static final java.util.Set<String> PAYMENT_SORT_FIELDS = java.util.Set.of(
+        "createdAt", "amount", "status", "paidAt", "refundedAt");
+
+    /** D1a — database-side paginated payment grid, replacing the unbounded list (D0-2). */
+    @Transactional(readOnly = true)
+    public com.example.planyourtrip.dto.PageResponse<PaymentResponse> adminListPaymentsPaged(
+            PaymentStatus status, Long bookingId, Integer page, Integer size, String sort) {
+        org.springframework.data.domain.Pageable pageable =
+            AdminPaging.of(page, size, sort, PAYMENT_SORT_FIELDS, "createdAt");
+        org.springframework.data.jpa.domain.Specification<Payment> spec =
+            (root, q, cb) -> {
+                var predicates = new java.util.ArrayList<jakarta.persistence.criteria.Predicate>();
+                if (status != null) predicates.add(cb.equal(root.get("status"), status));
+                if (bookingId != null) predicates.add(cb.equal(root.get("booking").get("id"), bookingId));
+                return predicates.isEmpty() ? cb.conjunction()
+                    : cb.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
+            };
+        return com.example.planyourtrip.dto.PageResponse.of(
+            paymentRepo.findAll(spec, pageable).map(this::toResponse));
     }
 
     @Transactional(readOnly = true)

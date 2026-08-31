@@ -1,5 +1,6 @@
 package com.example.planyourtrip.controller;
 
+import com.example.planyourtrip.security.AuthUser;
 import com.example.planyourtrip.dto.LoyaltyDto.*;
 import com.example.planyourtrip.service.LoyaltyService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,8 +36,8 @@ public class AdminLoyaltyController {
     @PostMapping("/{userId}/loyalty/grant")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Grant loyalty points (immutable ledger entry; idempotent via idempotencyKey)")
-    public LoyaltyTransactionResponse grant(@PathVariable Long userId,
+    public LoyaltyTransactionResponse grant(@AuthUser Long uid, @PathVariable Long userId,
                                              @Valid @RequestBody LoyaltyGrantRequest req) {
-        return service.adminGrant(userId, req);
+        return service.adminGrant(uid, userId, req);
     }
 }

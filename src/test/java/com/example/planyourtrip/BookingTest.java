@@ -373,9 +373,12 @@ class BookingTest {
             .andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
 
-        JsonNode arr = mapper.readTree(body);
+        JsonNode envelope = mapper.readTree(body);
+        assertTrue(envelope.has("content") && envelope.has("totalElements"),
+            "D1a: admin collections return a PageResponse envelope");
+        JsonNode arr = envelope.get("content");
         assertTrue(arr.isArray());
-        assertTrue(arr.size() >= 2); // at least the 2 seeded bookings
+        assertTrue(envelope.get("totalElements").asLong() >= 2); // at least the 2 seeded bookings
     }
 
     @Test

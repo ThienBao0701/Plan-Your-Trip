@@ -57,15 +57,16 @@ public class AdminPartnerController {
 
     @PostMapping("/{id}/reject")
     @Operation(summary = "Reject a submitted partner profile")
-    public PartnerProfileResponse reject(@PathVariable Long id, @RequestBody @Valid PartnerRejectRequest req) {
-        return service.adminReject(id, req);
+    public PartnerProfileResponse reject(@AuthUser Long uid, @PathVariable Long id,
+                                          @RequestBody @Valid PartnerRejectRequest req) {
+        return service.adminReject(uid, id, req);
     }
 
     @PostMapping("/{id}/suspend")
     @Operation(summary = "Suspend an approved partner profile")
-    public PartnerProfileResponse suspend(@PathVariable Long id,
+    public PartnerProfileResponse suspend(@AuthUser Long uid, @PathVariable Long id,
                                            @RequestBody(required = false) PartnerStatusRequest req) {
-        return service.adminSuspend(id, req);
+        return service.adminSuspend(uid, id, req);
     }
 
     @GetMapping("/{id}/detail")

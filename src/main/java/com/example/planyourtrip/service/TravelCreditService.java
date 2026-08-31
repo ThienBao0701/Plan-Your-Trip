@@ -67,17 +67,21 @@ public class TravelCreditService {
     private final UserRepository userRepo;
     private final CustomerProfileRepository profileRepo;
     private final NotificationService notificationService;
+    /** D1a — admin credit grants/deductions move value and must leave a trail. */
+    private final AdminActivityLogService adminAudit;
 
     public TravelCreditService(TravelCreditAccountRepository accountRepo,
                                 TravelCreditTransactionRepository transactionRepo,
                                 UserRepository userRepo,
                                 CustomerProfileRepository profileRepo,
-                                NotificationService notificationService) {
+                                NotificationService notificationService,
+                               AdminActivityLogService adminAudit) {
         this.accountRepo = accountRepo;
         this.transactionRepo = transactionRepo;
         this.userRepo = userRepo;
         this.profileRepo = profileRepo;
         this.notificationService = notificationService;
+        this.adminAudit = adminAudit;
     }
 
     // ── Customer read paths ──────────────────────────────────────────────────
@@ -154,9 +158,34 @@ public class TravelCreditService {
         return mutate(targetUserId, req, true);
     }
 
+    /**
+     * D1a — the administrator-facing entry point. Kept separate from {@link #grant} because that
+     * method is also driven by system flows (referral rewards, seeding), and a machine-issued
+     * reward must not be recorded as if a human administrator had granted it.
+     */
+    @Transactional
+    public TravelCreditTransactionResponse adminGrant(Long adminUserId, Long targetUserId,
+                                                       TravelCreditAdjustmentRequest req) {
+        TravelCreditTransactionResponse result = grant(targetUserId, req);
+        // Amount + target user id only; no payment or bank detail exists on this path.
+        adminAudit.record(adminUserId, "TRAVEL_CREDIT_GRANT", "USER", targetUserId,
+            "Granted travel credit to user " + targetUserId + " (amount " + req.amount() + ")");
+        return result;
+    }
+
     @Transactional
     public TravelCreditTransactionResponse deduct(Long targetUserId, TravelCreditAdjustmentRequest req) {
         return mutate(targetUserId, req, false);
+    }
+
+    /** D1a — administrator-facing counterpart to {@link #deduct}; see {@link #adminGrant}. */
+    @Transactional
+    public TravelCreditTransactionResponse adminDeduct(Long adminUserId, Long targetUserId,
+                                                        TravelCreditAdjustmentRequest req) {
+        TravelCreditTransactionResponse result = deduct(targetUserId, req);
+        adminAudit.record(adminUserId, "TRAVEL_CREDIT_DEDUCT", "USER", targetUserId,
+            "Deducted travel credit from user " + targetUserId + " (amount " + req.amount() + ")");
+        return result;
     }
 
     // ── Phase 7.15 — checkout integration (called by BookingService) ─────────

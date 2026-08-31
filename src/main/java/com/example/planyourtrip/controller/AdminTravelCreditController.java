@@ -1,5 +1,6 @@
 package com.example.planyourtrip.controller;
 
+import com.example.planyourtrip.security.AuthUser;
 import com.example.planyourtrip.dto.TravelCreditDto.*;
 import com.example.planyourtrip.service.TravelCreditService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,16 +37,16 @@ public class AdminTravelCreditController {
     @PostMapping("/{userId}/travel-credits/grant")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Grant promotional travel credits (immutable ledger entry; idempotent via idempotencyKey)")
-    public TravelCreditTransactionResponse grant(@PathVariable Long userId,
+    public TravelCreditTransactionResponse grant(@AuthUser Long uid, @PathVariable Long userId,
                                                   @Valid @RequestBody TravelCreditAdjustmentRequest req) {
-        return service.grant(userId, req);
+        return service.adminGrant(uid, userId, req);
     }
 
     @PostMapping("/{userId}/travel-credits/deduct")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Deduct promotional travel credits (409 if it would overdraw; idempotent via idempotencyKey)")
-    public TravelCreditTransactionResponse deduct(@PathVariable Long userId,
+    public TravelCreditTransactionResponse deduct(@AuthUser Long uid, @PathVariable Long userId,
                                                    @Valid @RequestBody TravelCreditAdjustmentRequest req) {
-        return service.deduct(userId, req);
+        return service.adminDeduct(uid, userId, req);
     }
 }

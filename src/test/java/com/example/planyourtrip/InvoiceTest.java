@@ -211,9 +211,12 @@ class InvoiceTest {
             .andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
 
-        JsonNode arr = mapper.readTree(body);
+        JsonNode envelope = mapper.readTree(body);
+        assertTrue(envelope.has("content") && envelope.has("totalElements"),
+            "D1a: admin collections return a PageResponse envelope");
+        JsonNode arr = envelope.get("content");
         assertTrue(arr.isArray());
-        assertTrue(arr.size() >= 1);
+        assertTrue(envelope.get("totalElements").asLong() >= 1);
     }
 
     @Test
@@ -314,9 +317,12 @@ class InvoiceTest {
             .andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
 
-        JsonNode arr = mapper.readTree(body);
+        JsonNode envelope = mapper.readTree(body);
+        assertTrue(envelope.has("content") && envelope.has("totalElements"),
+            "D1a: admin collections return a PageResponse envelope");
+        JsonNode arr = envelope.get("content");
         assertTrue(arr.isArray());
-        assertTrue(arr.size() >= 1, "Seeded invoice must exist");
+        assertTrue(envelope.get("totalElements").asLong() >= 1, "Seeded invoice must exist");
     }
 
     // ═══════════════════════════════════════════════════════════════════════════

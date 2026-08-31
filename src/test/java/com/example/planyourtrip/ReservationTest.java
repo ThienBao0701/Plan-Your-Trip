@@ -395,12 +395,12 @@ class ReservationTest {
 
     @Test
     void reservation_adminSearch_byStatus_returnsList() throws Exception {
-        String body = mvc.perform(get("/api/admin/bookings?status=CONFIRMED")
+        String body = mvc.perform(get("/api/admin/bookings?status=CONFIRMED&size=200")
                 .header("Authorization", "Bearer " + adminToken))
             .andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
 
-        JsonNode arr = mapper.readTree(body);
+        JsonNode arr = mapper.readTree(body).get("content");
         assertTrue(arr.isArray());
         for (JsonNode n : arr) {
             assertEquals("CONFIRMED", n.get("status").asText(),
@@ -415,9 +415,12 @@ class ReservationTest {
             .andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
 
-        JsonNode arr = mapper.readTree(body);
+        JsonNode envelope = mapper.readTree(body);
+        assertTrue(envelope.has("content") && envelope.has("totalElements"),
+            "D1a: admin collections return a PageResponse envelope");
+        JsonNode arr = envelope.get("content");
         assertTrue(arr.isArray());
-        assertTrue(arr.size() >= 1, "Should find bookings for guest 'demo'");
+        assertTrue(envelope.get("totalElements").asLong() >= 1, "Should find bookings for guest 'demo'");
     }
 
     @Test
@@ -428,9 +431,12 @@ class ReservationTest {
             .andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
 
-        JsonNode arr = mapper.readTree(body);
+        JsonNode envelope = mapper.readTree(body);
+        assertTrue(envelope.has("content") && envelope.has("totalElements"),
+            "D1a: admin collections return a PageResponse envelope");
+        JsonNode arr = envelope.get("content");
         assertTrue(arr.isArray());
-        assertTrue(arr.size() >= 2);
+        assertTrue(envelope.get("totalElements").asLong() >= 2);
     }
 
     @Test

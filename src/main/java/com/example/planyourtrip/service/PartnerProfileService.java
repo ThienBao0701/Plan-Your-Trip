@@ -21,14 +21,19 @@ public class PartnerProfileService {
     private final NotificationService notificationService;
     private final PartnerTeamMemberRepository partnerTeamMemberRepo;
 
+    /** D1a — partner lifecycle decisions are administrative acts and must leave a trail. */
+    private final AdminActivityLogService adminAudit;
+
     public PartnerProfileService(PartnerProfileRepository partnerProfileRepo,
                                   UserRepository userRepo,
                                   NotificationService notificationService,
-                                  PartnerTeamMemberRepository partnerTeamMemberRepo) {
+                                  PartnerTeamMemberRepository partnerTeamMemberRepo,
+                                  AdminActivityLogService adminAudit) {
         this.partnerProfileRepo = partnerProfileRepo;
         this.userRepo = userRepo;
         this.notificationService = notificationService;
         this.partnerTeamMemberRepo = partnerTeamMemberRepo;
+        this.adminAudit = adminAudit;
     }
 
     @Transactional
@@ -127,6 +132,12 @@ public class PartnerProfileService {
             "Your partner profile has been approved", "Your partner profile has been approved.",
             RelatedEntityType.PARTNER, profile.getId());
 
+        // D1a — inside this @Transactional method, so the audit row commits with the approval or
+        // rolls back with it. Records the business identity, never the applicant's contact details.
+        adminAudit.record(adminUserId, "PARTNER_APPROVE", "PARTNER_PROFILE", profile.getId(),
+            "Approved partner profile '" + profile.getBusinessName() + "'",
+            PartnerVerificationStatus.SUBMITTED.name(), PartnerVerificationStatus.APPROVED.name());
+
         return toResponse(profile);
     }
 
@@ -150,7 +161,7 @@ public class PartnerProfileService {
     }
 
     @Transactional
-    public PartnerProfileResponse adminReject(Long id, PartnerRejectRequest req) {
+    public PartnerProfileResponse adminReject(Long adminUserId, Long id, PartnerRejectRequest req) {
         PartnerProfile profile = profileOrThrow(id);
         if (profile.getVerificationStatus() != PartnerVerificationStatus.SUBMITTED)
             throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY, "Only submitted profiles can be rejected");
@@ -166,11 +177,15 @@ public class PartnerProfileService {
                 ? ": " + req.rejectReason() : "."),
             RelatedEntityType.PARTNER, profile.getId());
 
+        adminAudit.record(adminUserId, "PARTNER_REJECT", "PARTNER_PROFILE", profile.getId(),
+            "Rejected partner profile '" + profile.getBusinessName() + "'",
+            PartnerVerificationStatus.SUBMITTED.name(), PartnerVerificationStatus.REJECTED.name());
+
         return toResponse(profile);
     }
 
     @Transactional
-    public PartnerProfileResponse adminSuspend(Long id, PartnerStatusRequest req) {
+    public PartnerProfileResponse adminSuspend(Long adminUserId, Long id, PartnerStatusRequest req) {
         PartnerProfile profile = profileOrThrow(id);
         if (profile.getVerificationStatus() != PartnerVerificationStatus.APPROVED)
             throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY, "Only approved profiles can be suspended");
@@ -183,6 +198,10 @@ public class PartnerProfileService {
         notificationService.create(profile.getUser().getId(), NotificationType.PARTNER, Priority.NORMAL,
             "Your partner account has been suspended", "Your partner account has been suspended.",
             RelatedEntityType.PARTNER, profile.getId());
+
+        adminAudit.record(adminUserId, "PARTNER_SUSPEND", "PARTNER_PROFILE", profile.getId(),
+            "Suspended partner profile '" + profile.getBusinessName() + "'",
+            PartnerVerificationStatus.APPROVED.name(), PartnerVerificationStatus.SUSPENDED.name());
 
         return toResponse(profile);
     }

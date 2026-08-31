@@ -1,5 +1,9 @@
 package com.example.planyourtrip.controller;
 
+import com.example.planyourtrip.dto.PageResponse;
+
+import com.example.planyourtrip.security.AuthUser;
+
 import com.example.planyourtrip.dto.BookingDto.*;
 import com.example.planyourtrip.service.BookingService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,17 +26,16 @@ public class AdminBookingController {
 
     @GetMapping
     @Operation(summary = "List / search bookings (admin)")
-    public List<BookingSummaryResponse> getAll(
+    public PageResponse<BookingSummaryResponse> getAll(
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String hotel,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestParam(required = false) String guest,
-            @RequestParam(required = false) String bookingCode) {
-        boolean hasFilter = status != null || hotel != null || date != null
-                            || guest != null || bookingCode != null;
-        return hasFilter
-            ? service.adminSearch(status, hotel, date, guest, bookingCode)
-            : service.adminGetAll();
+            @RequestParam(required = false) String bookingCode,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size,
+            @RequestParam(required = false) String sort) {
+        return service.adminSearchPaged(status, hotel, date, guest, bookingCode, page, size, sort);
     }
 
     @GetMapping("/{id}")
@@ -49,9 +52,9 @@ public class AdminBookingController {
 
     @PatchMapping("/{id}/status")
     @Operation(summary = "Force-set booking status (admin override)")
-    public BookingResponse updateStatus(@PathVariable Long id,
+    public BookingResponse updateStatus(@AuthUser Long uid, @PathVariable Long id,
                                          @RequestBody @Valid BookingStatusRequest req) {
-        return service.adminUpdateStatus(id, req.status());
+        return service.adminUpdateStatus(uid, id, req.status());
     }
 
     @PatchMapping("/{id}/check-in")
@@ -81,7 +84,7 @@ public class AdminBookingController {
     @PostMapping("/{id}/refund-to-credits")
     @Operation(summary = "Refund a CANCELLED booking's PAID payment as promotional travel credits "
         + "(booking and payment become REFUNDED; idempotent REFUND_CREDIT ledger row)")
-    public BookingResponse refundToCredits(@PathVariable Long id) {
-        return service.adminRefundToCredits(id);
+    public BookingResponse refundToCredits(@AuthUser Long uid, @PathVariable Long id) {
+        return service.adminRefundToCredits(uid, id);
     }
 }

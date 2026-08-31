@@ -1,5 +1,10 @@
 package com.example.planyourtrip.controller;
 
+import com.example.planyourtrip.model.PaymentStatus;
+
+import com.example.planyourtrip.dto.PageResponse;
+
+import com.example.planyourtrip.security.AuthUser;
 import com.example.planyourtrip.dto.PaymentDto.*;
 import com.example.planyourtrip.service.PaymentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,8 +24,13 @@ public class AdminPaymentController {
 
     @GetMapping
     @Operation(summary = "List all payments")
-    public List<PaymentResponse> getAll() {
-        return service.adminListPayments();
+    public PageResponse<PaymentResponse> getAll(
+            @RequestParam(required = false) PaymentStatus status,
+            @RequestParam(required = false) Long bookingId,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size,
+            @RequestParam(required = false) String sort) {
+        return service.adminListPaymentsPaged(status, bookingId, page, size, sort);
     }
 
     @GetMapping("/{id}")
@@ -31,8 +41,8 @@ public class AdminPaymentController {
 
     @PostMapping("/{id}/refund")
     @Operation(summary = "Refund a PAID payment")
-    public PaymentResponse refund(@PathVariable Long id,
+    public PaymentResponse refund(@AuthUser Long uid, @PathVariable Long id,
                                    @RequestBody(required = false) RefundRequest req) {
-        return service.refund(id, req);
+        return service.refund(uid, id, req);
     }
 }

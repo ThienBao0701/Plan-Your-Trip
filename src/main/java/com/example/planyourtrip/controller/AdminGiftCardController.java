@@ -1,5 +1,6 @@
 package com.example.planyourtrip.controller;
 
+import com.example.planyourtrip.security.AuthUser;
 import com.example.planyourtrip.dto.GiftCardDto.*;
 import com.example.planyourtrip.dto.PageResponse;
 import com.example.planyourtrip.model.GiftCardStatus;
@@ -77,8 +78,8 @@ public class AdminGiftCardController {
 
     @PostMapping("/{id}/adjust")
     @Operation(summary = "Manually credit or debit a gift card balance (immutable ledger row; idempotent via idempotencyKey)")
-    public GiftCardTransactionResponse adjust(@PathVariable Long id, @Valid @RequestBody GiftCardAdjustmentRequest req) {
-        return service.adminAdjust(id, req);
+    public GiftCardTransactionResponse adjust(@AuthUser Long uid, @PathVariable Long id, @Valid @RequestBody GiftCardAdjustmentRequest req) {
+        return service.adminAdjust(uid, id, req);
     }
 
     @GetMapping("/{id}/transactions")

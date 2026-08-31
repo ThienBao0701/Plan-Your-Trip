@@ -63,6 +63,8 @@ public class LoyaltyService {
     private final UserRepository userRepo;
     private final NotificationService notificationService;
     private final CustomerMembershipService customerMembershipService;
+    /** D1a — admin loyalty grants create value and must leave a trail. */
+    private final AdminActivityLogService adminAudit;
 
     /** Booking-completion earn rate: 1 point per 10,000 (of currency unit), floored, minimum 1. */
     private static final BigDecimal POINTS_PER_UNIT = BigDecimal.valueOf(10_000);
@@ -71,12 +73,14 @@ public class LoyaltyService {
                            LoyaltyPointsTransactionRepository transactionRepo,
                            UserRepository userRepo,
                            NotificationService notificationService,
-                           CustomerMembershipService customerMembershipService) {
+                           CustomerMembershipService customerMembershipService,
+                          AdminActivityLogService adminAudit) {
         this.accountRepo = accountRepo;
         this.transactionRepo = transactionRepo;
         this.userRepo = userRepo;
         this.notificationService = notificationService;
         this.customerMembershipService = customerMembershipService;
+        this.adminAudit = adminAudit;
     }
 
     // ── Customer read paths ──────────────────────────────────────────────────
@@ -136,6 +140,20 @@ public class LoyaltyService {
     }
 
     // ── Admin mutation (customers can NEVER grant their own points) ─────────
+
+    /**
+     * D1a — the administrator-facing entry point. {@link #adminGrant(Long, LoyaltyGrantRequest)} is
+     * also driven by system flows (referral rewards), so a machine-issued grant must not be recorded
+     * as a human administrator's action.
+     */
+    @Transactional
+    public LoyaltyTransactionResponse adminGrant(Long adminUserId, Long targetUserId,
+                                                  LoyaltyGrantRequest req) {
+        LoyaltyTransactionResponse result = adminGrant(targetUserId, req);
+        adminAudit.record(adminUserId, "LOYALTY_GRANT", "USER", targetUserId,
+            "Granted " + req.points() + " loyalty points to user " + targetUserId);
+        return result;
+    }
 
     @Transactional
     public LoyaltyTransactionResponse adminGrant(Long targetUserId, LoyaltyGrantRequest req) {

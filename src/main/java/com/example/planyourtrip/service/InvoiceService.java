@@ -121,6 +121,22 @@ public class InvoiceService {
             .stream().map(this::toResponse).toList();
     }
 
+    /** Entity properties an administrator may sort the invoice grid by (D1a-12 allowlist). */
+    private static final java.util.Set<String> INVOICE_SORT_FIELDS = java.util.Set.of(
+        "createdAt", "status", "issuedAt", "totalAmount");
+
+    /** D1a — database-side paginated invoice grid, replacing the unbounded list (D0-2). */
+    @Transactional(readOnly = true)
+    public com.example.planyourtrip.dto.PageResponse<InvoiceResponse> adminListPaged(
+            InvoiceStatus status, Integer page, Integer size, String sort) {
+        org.springframework.data.domain.Pageable pageable =
+            AdminPaging.of(page, size, sort, INVOICE_SORT_FIELDS, "createdAt");
+        org.springframework.data.jpa.domain.Specification<Invoice> spec =
+            (root, q, cb) -> status == null ? cb.conjunction() : cb.equal(root.get("status"), status);
+        return com.example.planyourtrip.dto.PageResponse.of(
+            invoiceRepo.findAll(spec, pageable).map(this::toResponse));
+    }
+
     @Transactional
     public InvoiceResponse adminUpdateStatus(Long invoiceId, InvoiceStatus newStatus) {
         Invoice invoice = invoiceOrThrow(invoiceId);

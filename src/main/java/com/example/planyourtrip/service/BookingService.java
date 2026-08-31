@@ -47,6 +47,8 @@ public class BookingService {
     private final BookingModificationRepository bookingModificationRepo;
     private final VoucherSignatureService voucherSignatureService;
     private final ReviewRepository reviewRepo;
+    /** D1a — admin booking lifecycle and refunds must leave a trail. */
+    private final AdminActivityLogService adminAudit;
 
     private static final Set<BookingStatus> UPCOMING_STATUSES =
         EnumSet.of(BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.CHECK_IN_READY);
@@ -77,7 +79,8 @@ public class BookingService {
                           RatePlanPricingService ratePlanPricingService,
                           BookingModificationRepository bookingModificationRepo,
                           VoucherSignatureService voucherSignatureService,
-                          ReviewRepository reviewRepo) {
+                          ReviewRepository reviewRepo,
+                          AdminActivityLogService adminAudit) {
         this.bookingRepo   = bookingRepo;
         this.roomRepo      = roomRepo;
         this.inventoryRepo = inventoryRepo;
@@ -97,6 +100,7 @@ public class BookingService {
         this.bookingModificationRepo = bookingModificationRepo;
         this.voucherSignatureService = voucherSignatureService;
         this.reviewRepo = reviewRepo;
+        this.adminAudit = adminAudit;
     }
 
     // ── Create ────────────────────────────────────────────────────────────────
@@ -754,21 +758,48 @@ public class BookingService {
     public List<BookingSummaryResponse> adminSearch(String status, String hotel,
                                                      LocalDate date, String guest,
                                                      String bookingCode) {
-        Specification<Booking> spec = Specification
-            .where(BookingSpecification.withStatus(status))
-            .and(BookingSpecification.withHotel(hotel))
-            .and(BookingSpecification.withCheckInDate(date))
-            .and(BookingSpecification.withGuest(guest))
-            .and(BookingSpecification.withBookingCode(bookingCode));
+        Specification<Booking> spec = adminSpec(status, hotel, date, guest, bookingCode);
         return bookingRepo.findAll(spec).stream()
             .sorted(Comparator.comparing(Booking::getCreatedAt).reversed())
             .map(this::toSummary).toList();
     }
 
+    /** Entity properties an administrator may sort the booking grid by (D1a-12 allowlist). */
+    private static final java.util.Set<String> BOOKING_SORT_FIELDS = java.util.Set.of(
+        "createdAt", "checkInDate", "checkOutDate", "finalPrice", "status", "bookingCode");
+
+    /**
+     * D1a — database-side paginated, filtered, sorted admin booking search.
+     *
+     * <p>Replaces the unbounded {@code List} read D0-2 flagged: the page is applied by the database
+     * via {@code findAll(spec, pageable)}, not by slicing a fully materialised list in Java, and the
+     * ordering comes from an allowlisted field rather than a client-supplied expression.
+     */
+    @Transactional(readOnly = true)
+    public com.example.planyourtrip.dto.PageResponse<BookingSummaryResponse> adminSearchPaged(
+            String status, String hotel, LocalDate date, String guest, String bookingCode,
+            Integer page, Integer size, String sort) {
+        Specification<Booking> spec = adminSpec(status, hotel, date, guest, bookingCode);
+        org.springframework.data.domain.Pageable pageable =
+            AdminPaging.of(page, size, sort, BOOKING_SORT_FIELDS, "createdAt");
+        return com.example.planyourtrip.dto.PageResponse.of(
+            bookingRepo.findAll(spec, pageable).map(this::toSummary));
+    }
+
+    private Specification<Booking> adminSpec(String status, String hotel, LocalDate date,
+                                              String guest, String bookingCode) {
+        return Specification
+            .where(BookingSpecification.withStatus(status))
+            .and(BookingSpecification.withHotel(hotel))
+            .and(BookingSpecification.withCheckInDate(date))
+            .and(BookingSpecification.withGuest(guest))
+            .and(BookingSpecification.withBookingCode(bookingCode));
+    }
+
     // ── Admin: force-set status (backward compat — no engine validation) ──────
 
     @Transactional
-    public BookingResponse adminUpdateStatus(Long bookingId, BookingStatus newStatus) {
+    public BookingResponse adminUpdateStatus(Long adminUserId, Long bookingId, BookingStatus newStatus) {
         Booking booking = bookingRepo.findById(bookingId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found: " + bookingId));
 
@@ -810,6 +841,14 @@ public class BookingService {
             // one-way USED→REWARDED gate, so a repeated COMPLETED never re-rewards.
             referralService.qualifyBookingForReferral(saved.getUser().getId(), saved.getId(), saved.getFinalPrice());
         }
+
+        // D1a — an administrator forcing a booking status is a high-consequence override (it can
+        // restore inventory and award points). Records only the transition and the booking id —
+        // never the guest's contact details or the booking's payment data.
+        adminAudit.record(adminUserId, "BOOKING_STATUS_OVERRIDE", "BOOKING", saved.getId(),
+            "Admin set booking " + saved.getId() + " status",
+            old == null ? null : old.name(), newStatus == null ? null : newStatus.name());
+
         return toResponse(saved);
     }
 
@@ -880,7 +919,7 @@ public class BookingService {
      * </ul>
      */
     @Transactional
-    public BookingResponse adminRefundToCredits(Long bookingId) {
+    public BookingResponse adminRefundToCredits(Long adminUserId, Long bookingId) {
         Booking booking = bookingRepo.findById(bookingId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found: " + bookingId));
 
@@ -922,6 +961,11 @@ public class BookingService {
                 + paidPayment.getAmount().toPlainString() + " " + paidPayment.getCurrency()
                 + " in promotional travel credits.",
             RelatedEntityType.BOOKING, saved.getId());
+
+        adminAudit.record(adminUserId, "BOOKING_REFUND_TO_CREDITS", "BOOKING", saved.getId(),
+            "Refunded booking " + saved.getId() + " to travel credits ("
+                + paidPayment.getAmount() + " " + paidPayment.getCurrency() + ")",
+            BookingStatus.CANCELLED.name(), BookingStatus.REFUNDED.name());
 
         return toResponse(saved);
     }

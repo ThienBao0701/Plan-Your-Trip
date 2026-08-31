@@ -27,6 +27,8 @@ public class ReviewService {
     private final NotificationService notificationService;
     private final MediaAssetService mediaAssetService;
     private final MediaAssetRepository mediaAssetRepo;
+    /** D1a — review moderation is an administrative act and must leave a trail. */
+    private final AdminActivityLogService adminAudit;
 
     public ReviewService(ReviewRepository reviewRepo,
                           BookingRepository bookingRepo,
@@ -35,7 +37,8 @@ public class ReviewService {
                           PartnerProfileRepository partnerProfileRepo,
                           NotificationService notificationService,
                           MediaAssetService mediaAssetService,
-                          MediaAssetRepository mediaAssetRepo) {
+                          MediaAssetRepository mediaAssetRepo,
+                          AdminActivityLogService adminAudit) {
         this.reviewRepo = reviewRepo;
         this.bookingRepo = bookingRepo;
         this.placeRepo = placeRepo;
@@ -44,6 +47,7 @@ public class ReviewService {
         this.notificationService = notificationService;
         this.mediaAssetService = mediaAssetService;
         this.mediaAssetRepo = mediaAssetRepo;
+        this.adminAudit = adminAudit;
     }
 
     /** Body-based create route: {@code POST /api/reviews} (bookingId in the payload). */
@@ -153,6 +157,35 @@ public class ReviewService {
             .toList();
     }
 
+    /** Entity properties an administrator may sort the review grid by (D1a-12 allowlist). */
+    private static final java.util.Set<String> REVIEW_SORT_FIELDS = java.util.Set.of(
+        "createdAt", "ratingOverall", "status", "approvedAt");
+
+    /**
+     * D1a — database-side paginated moderation queue, replacing the unbounded list (D0-2).
+     *
+     * <p>{@code loadMediaBatch} is applied to the current page only, so the existing batch lookup
+     * that avoided an N+1 across the whole table now runs against at most {@code size} rows.
+     */
+    @Transactional(readOnly = true)
+    public com.example.planyourtrip.dto.PageResponse<ReviewResponse> adminListReviewsPaged(
+            ReviewStatus status, Long placeId, Integer page, Integer size, String sort) {
+        org.springframework.data.domain.Pageable pageable =
+            AdminPaging.of(page, size, sort, REVIEW_SORT_FIELDS, "createdAt");
+        org.springframework.data.jpa.domain.Specification<Review> spec =
+            (root, q, cb) -> {
+                var predicates = new java.util.ArrayList<jakarta.persistence.criteria.Predicate>();
+                if (status != null) predicates.add(cb.equal(root.get("status"), status));
+                if (placeId != null) predicates.add(cb.equal(root.get("place").get("id"), placeId));
+                return predicates.isEmpty() ? cb.conjunction()
+                    : cb.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
+            };
+        org.springframework.data.domain.Page<Review> pageResult = reviewRepo.findAll(spec, pageable);
+        Map<Long, List<ReviewMediaItem>> media = loadMediaBatch(pageResult.getContent());
+        return com.example.planyourtrip.dto.PageResponse.of(
+            pageResult.map(r -> toResponse(r, media.getOrDefault(r.getId(), List.of()))));
+    }
+
     // ── Phase 7.45 — customer review-media management (reuses MediaAssetService) ──
 
     /**
@@ -194,10 +227,11 @@ public class ReviewService {
     }
 
     @Transactional
-    public ReviewResponse adminModerateReview(Long reviewId, ReviewModerationRequest req) {
+    public ReviewResponse adminModerateReview(Long adminUserId, Long reviewId, ReviewModerationRequest req) {
         Review review = reviewOrThrow(reviewId);
         Instant now = Instant.now();
         ReviewStatus newStatus = req.status();
+        ReviewStatus previousStatus = review.getStatus();
 
         review.setStatus(newStatus);
         if (newStatus == ReviewStatus.APPROVED) {
@@ -225,6 +259,15 @@ public class ReviewService {
                 "Your review was rejected" + (reason != null && !reason.isBlank() ? ": " + reason : ".") ,
                 RelatedEntityType.HOTEL, placeId);
         }
+
+        // D1a — records the moderation decision, not the guest's words. The review body is
+        // deliberately NOT copied into the trail: it is user-generated content that may contain
+        // PII, and the audit question is "which admin changed this review's status", not "what did
+        // the guest write" — which remains readable through the review itself.
+        adminAudit.record(adminUserId, "REVIEW_MODERATE", "REVIEW", review.getId(),
+            "Moderated review " + review.getId() + " on place " + placeId,
+            previousStatus == null ? null : previousStatus.name(),
+            newStatus == null ? null : newStatus.name());
 
         return toResponse(review);
     }

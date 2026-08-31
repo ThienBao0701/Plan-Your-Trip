@@ -1,5 +1,9 @@
 package com.example.planyourtrip.controller;
 
+import com.example.planyourtrip.model.InvoiceStatus;
+
+import com.example.planyourtrip.dto.PageResponse;
+
 import com.example.planyourtrip.dto.InvoiceDto.*;
 import com.example.planyourtrip.security.AuthUser;
 import com.example.planyourtrip.service.InvoiceService;
@@ -21,8 +25,12 @@ public class AdminInvoiceController {
 
     @GetMapping
     @Operation(summary = "List all invoices")
-    public List<InvoiceResponse> getAll() {
-        return service.adminList();
+    public PageResponse<InvoiceResponse> getAll(
+            @RequestParam(required = false) InvoiceStatus status,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size,
+            @RequestParam(required = false) String sort) {
+        return service.adminListPaged(status, page, size, sort);
     }
 
     @GetMapping("/{id}")

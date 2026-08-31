@@ -82,19 +82,23 @@ public class GiftCardService {
     private final UserRepository userRepo;
     private final NotificationService notificationService;
     private final BookingRepository bookingRepo;
+    /** D1a — admin gift-card balance changes move value and must leave a trail. */
+    private final AdminActivityLogService adminAudit;
 
     public GiftCardService(GiftCardRepository giftCardRepo,
                             GiftCardTransactionRepository transactionRepo,
                             GiftCardProductService productService,
                             UserRepository userRepo,
                             NotificationService notificationService,
-                            BookingRepository bookingRepo) {
+                            BookingRepository bookingRepo,
+                           AdminActivityLogService adminAudit) {
         this.giftCardRepo = giftCardRepo;
         this.transactionRepo = transactionRepo;
         this.productService = productService;
         this.userRepo = userRepo;
         this.notificationService = notificationService;
         this.bookingRepo = bookingRepo;
+        this.adminAudit = adminAudit;
     }
 
     // ═════════════════════════════════════════════════════════════════════
@@ -565,7 +569,8 @@ public class GiftCardService {
      * note persisted only on the ledger row — never surfaced in a notification.
      */
     @Transactional
-    public GiftCardTransactionResponse adminAdjust(Long giftCardId, GiftCardAdjustmentRequest req) {
+    public GiftCardTransactionResponse adminAdjust(Long adminUserId, Long giftCardId,
+                                                   GiftCardAdjustmentRequest req) {
         String idempotencyKey = blankToNull(req.idempotencyKey());
         if (idempotencyKey != null) {
             Optional<GiftCardTransaction> existing = transactionRepo.findByIdempotencyKey(idempotencyKey);
@@ -598,6 +603,12 @@ public class GiftCardService {
         if (card.getStatus() == GiftCardStatus.FULLY_REDEEMED && card.getFullyRedeemedAt() == null)
             card.setFullyRedeemedAt(Instant.now());
         giftCardRepo.save(card);
+        // D1a — stored value changed by hand. The gift card CODE is never recorded: only its id and
+        // the balance transition, so the trail cannot be used to redeem the card.
+        adminAudit.record(adminUserId, "GIFT_CARD_ADJUST", "GIFT_CARD", card.getId(),
+            "Adjusted gift card " + card.getId() + " (" + req.direction() + " "
+                + amount.toPlainString() + " " + card.getCurrency() + ")",
+            before.toPlainString(), after.toPlainString());
 
         GiftCardTransaction tx = insertLedger(card, GiftCardTransactionType.ADJUSTMENT, amount, before, after,
             req.description(), req.referenceType(), req.referenceId(), idempotencyKey);
