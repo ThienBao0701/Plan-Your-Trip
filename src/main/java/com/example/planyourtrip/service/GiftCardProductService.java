@@ -26,10 +26,13 @@ public class GiftCardProductService {
 
     private final GiftCardProductRepository productRepo;
     private final GiftCardRepository giftCardRepo;
+    private final AdminActivityLogService adminAudit;
 
-    public GiftCardProductService(GiftCardProductRepository productRepo, GiftCardRepository giftCardRepo) {
+    public GiftCardProductService(GiftCardProductRepository productRepo, GiftCardRepository giftCardRepo,
+                                   AdminActivityLogService adminAudit) {
         this.productRepo = productRepo;
         this.giftCardRepo = giftCardRepo;
+        this.adminAudit = adminAudit;
     }
 
     public List<GiftCardProductResponse> getAll() {
@@ -85,12 +88,19 @@ public class GiftCardProductService {
 
     /** A product referenced by any issued gift card cannot be deleted — deactivate it instead. */
     @Transactional
-    public void delete(Long id) {
+    public void delete(Long adminUserId, Long id) {
         GiftCardProduct product = productOrThrow(id);
         if (giftCardRepo.existsByProductId(id))
             throw new ApiException(HttpStatus.CONFLICT,
                 "Cannot delete a gift card product that has issued gift cards — deactivate it instead");
+        boolean wasActive = product.isActive();
         productRepo.delete(product);
+        // D1c - a delete leaves nothing behind to inspect afterwards, which is precisely why it is
+        // the category of change an audit trail exists for. The row records the product id and a
+        // scalar state, never the operator-supplied product code: free text handed to the audit
+        // guard can trip its card-number rule and roll the deletion back (see D1c-NEW-1).
+        adminAudit.record(adminUserId, "GIFT_CARD_PRODUCT_DELETE", "GIFT_CARD_PRODUCT", id,
+            "Admin deleted gift card product " + id, "active:" + wasActive, null);
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

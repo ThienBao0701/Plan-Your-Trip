@@ -30,12 +30,15 @@ public class RatePlanService {
     private final RatePlanRepository ratePlanRepo;
     private final HotelRoomRepository roomRepo;
     private final RatePlanOccupancyPriceRepository occupancyRepo;
+    private final AdminActivityLogService adminAudit;
 
     public RatePlanService(RatePlanRepository ratePlanRepo, HotelRoomRepository roomRepo,
-                           RatePlanOccupancyPriceRepository occupancyRepo) {
+                           RatePlanOccupancyPriceRepository occupancyRepo,
+                           AdminActivityLogService adminAudit) {
         this.ratePlanRepo  = ratePlanRepo;
         this.roomRepo      = roomRepo;
         this.occupancyRepo = occupancyRepo;
+        this.adminAudit = adminAudit;
     }
 
     // ── Read ────────────────────────────────────────────────────────────────
@@ -91,6 +94,33 @@ public class RatePlanService {
         RatePlan plan = planOrThrow(id);
         applyAndValidate(plan, plan.getHotelRoom().getId(), req, id);
         return toResponse(ratePlanRepo.save(plan));
+    }
+
+    /**
+     * D1c - the audited administrative deletes. They are separate entry points rather than audit
+     * calls inside the shared bodies because {@code PartnerPricingService} deletes a partner's own
+     * rate plans and occupancy prices through those same methods.
+     */
+    @Transactional
+    public void adminDelete(Long adminUserId, Long id) {
+        RatePlan plan = planOrThrow(id);
+        Long roomId = plan.getHotelRoom() == null ? null : plan.getHotelRoom().getId();
+        delete(id);
+        // The owning room, not the operator-supplied plan code - see D1c-NEW-1.
+        adminAudit.record(adminUserId, "RATE_PLAN_DELETE", "RATE_PLAN", id,
+            "Admin deleted rate plan " + id,
+            roomId == null ? null : "room:" + roomId, null);
+    }
+
+    @Transactional
+    public void adminDeleteOccupancyPrice(Long adminUserId, Long occupancyPriceId) {
+        RatePlanOccupancyPrice price = occupancyPriceOrThrow(occupancyPriceId);
+        Long planId = price.getRatePlan() == null ? null : price.getRatePlan().getId();
+        deleteOccupancyPrice(occupancyPriceId);
+        adminAudit.record(adminUserId, "RATE_PLAN_OCCUPANCY_PRICE_DELETE",
+            "RATE_PLAN_OCCUPANCY_PRICE", occupancyPriceId,
+            "Admin deleted occupancy price " + occupancyPriceId,
+            planId == null ? null : "ratePlan:" + planId, null);
     }
 
     @Transactional

@@ -278,9 +278,14 @@ class NotificationTest {
             .andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
 
-        JsonNode arr = mapper.readTree(body);
-        assertTrue(arr.isArray());
+        // D1c - this endpoint returns the PageResponse envelope, not a bare array.
+        JsonNode page = mapper.readTree(body);
+        assertTrue(page.has("content") && page.get("content").isArray());
+        assertTrue(page.has("page") && page.has("size")
+            && page.has("totalElements") && page.has("totalPages"));
+        JsonNode arr = page.get("content");
         assertTrue(arr.size() >= 1);
+        assertTrue(page.get("totalElements").asLong() >= 1);
     }
 
     @Test

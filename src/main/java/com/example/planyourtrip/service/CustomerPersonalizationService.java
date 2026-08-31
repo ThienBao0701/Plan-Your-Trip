@@ -88,6 +88,7 @@ public class CustomerPersonalizationService {
     private final HotelRoomService hotelRoomService;
     private final PromotionService promotionService;
     private final CouponDefinitionService couponDefinitionService;
+    private final AdminActivityLogService adminAudit;
 
     public CustomerPersonalizationService(CustomerRecommendationRepository recRepo,
                                           PersonalizationRuleRepository ruleRepo,
@@ -109,7 +110,8 @@ public class CustomerPersonalizationService {
                                           PlaceService placeService,
                                           HotelRoomService hotelRoomService,
                                           PromotionService promotionService,
-                                          CouponDefinitionService couponDefinitionService) {
+                                          CouponDefinitionService couponDefinitionService,
+                                          AdminActivityLogService adminAudit) {
         this.recRepo = recRepo;
         this.ruleRepo = ruleRepo;
         this.userRepo = userRepo;
@@ -131,6 +133,7 @@ public class CustomerPersonalizationService {
         this.hotelRoomService = hotelRoomService;
         this.promotionService = promotionService;
         this.couponDefinitionService = couponDefinitionService;
+        this.adminAudit = adminAudit;
     }
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -144,6 +147,18 @@ public class CustomerPersonalizationService {
      * the generated set at {@link #MAX_RECOMMENDATIONS}. Reused verbatim by both
      * the customer and admin generation endpoints.
      */
+    @Transactional
+    public RecommendationGenerationResponse adminGenerate(Long adminUserId, Long userId) {
+        RecommendationGenerationResponse result = generate(userId);
+        // D1c - an overload rather than an audit call inside generate(), because the customer
+        // endpoint POST /api/recommendations/generate calls the same method for the caller's own
+        // account. Auditing the shared body would file every customer refresh as an admin action.
+        adminAudit.record(adminUserId, "RECOMMENDATIONS_GENERATE", "USER", userId,
+            "Admin regenerated recommendations for user " + userId,
+            null, "generated:" + result.generatedCount());
+        return result;
+    }
+
     @Transactional
     public RecommendationGenerationResponse generate(Long userId) {
         userOrThrow(userId);

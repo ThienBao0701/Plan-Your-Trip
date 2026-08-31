@@ -10,6 +10,9 @@ import com.example.planyourtrip.repository.UserRepository;
 import com.example.planyourtrip.service.gateway.PaymentGateway;
 import com.example.planyourtrip.service.gateway.PaymentGateway.CallbackVerification;
 import com.example.planyourtrip.service.gateway.PaymentGateway.GatewayCallback;
+import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +23,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -66,6 +70,7 @@ public class PaymentGatewayService {
     private final UserRepository userRepo;
     private final NotificationService notificationService;
     private final PaymentSettlementBridge settlementBridge;
+    private final AdminActivityLogService adminAudit;
     private final Map<PaymentProvider, PaymentGateway> gateways;
 
     public PaymentGatewayService(PaymentSessionRepository sessionRepo,
@@ -74,13 +79,15 @@ public class PaymentGatewayService {
                                  UserRepository userRepo,
                                  NotificationService notificationService,
                                  PaymentSettlementBridge settlementBridge,
-                                 List<PaymentGateway> gatewayBeans) {
+                                 List<PaymentGateway> gatewayBeans,
+                                 AdminActivityLogService adminAudit) {
         this.sessionRepo = sessionRepo;
         this.eventRepo = eventRepo;
         this.bookingRepo = bookingRepo;
         this.userRepo = userRepo;
         this.notificationService = notificationService;
         this.settlementBridge = settlementBridge;
+        this.adminAudit = adminAudit;
         Map<PaymentProvider, PaymentGateway> map = new HashMap<>();
         for (PaymentGateway gw : gatewayBeans) {
             map.put(gw.provider(), gw); // last-wins; in practice one bean per provider
@@ -340,7 +347,7 @@ public class PaymentGatewayService {
 
     /** Time-based expiry sweep (admin-triggered; no scheduler in this phase). */
     @Transactional
-    public ExpirationResultResponse processExpirations() {
+    public ExpirationResultResponse processExpirations(Long adminUserId) {
         Instant now = Instant.now();
         List<PaymentSession> candidates = sessionRepo.findExpirationCandidates(now, EXPIRABLE_STATUSES);
         int expired = 0;
@@ -351,6 +358,9 @@ public class PaymentGatewayService {
             expireInternal(session);
             expired++;
         }
+        adminAudit.record(adminUserId, "PAYMENT_SESSION_EXPIRY_SWEEP", "PAYMENT_SESSION", null,
+            "Admin ran the payment-session expiry sweep: " + expired + " sessions expired",
+            null, "expired:" + expired);
         return new ExpirationResultResponse(expired);
     }
 
@@ -386,10 +396,46 @@ public class PaymentGatewayService {
             .stream().map(this::toEventResponse).toList();
     }
 
+    /** Entity properties an administrator may sort the payment-session grid by (D1c allowlist). */
+    private static final Set<String> SESSION_SORT_FIELDS =
+        Set.of("createdAt", "updatedAt", "expiresAt", "amount", "status", "provider", "id");
+
+    /**
+     * D1c - administrative payment-session search, paged in the database.
+     *
+     * <p>A session row is written for every checkout attempt, including the ones a customer
+     * abandons, so this table grows faster than {@code payment} and never shrinks. The previous
+     * contract returned all of them in one response.
+     *
+     * <p>The row shape is unchanged: this endpoint still returns the same {@code SessionResponse}
+     * it always has. Narrowing that shape is a product decision outside this phase, but paging
+     * does bound how much of it any single request can return.
+     */
     @Transactional(readOnly = true)
-    public List<SessionResponse> adminList() {
-        return sessionRepo.findAllByOrderByCreatedAtDesc().stream()
-            .map(s -> toResponse(s, true)).toList();
+    public com.example.planyourtrip.dto.PageResponse<SessionResponse> adminListPaged(
+            PaymentSessionStatus status, PaymentProvider provider, Long bookingId,
+            String sessionId, Instant from, Instant to,
+            Integer page, Integer size, String sort) {
+
+        if (from != null && to != null && from.isAfter(to)) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "from must not be after to");
+        }
+        Pageable pageable = AdminPaging.of(page, size, sort, SESSION_SORT_FIELDS, "createdAt");
+
+        Specification<PaymentSession> spec = (root, query, cb) -> {
+            List<Predicate> p = new java.util.ArrayList<>();
+            if (status != null) p.add(cb.equal(root.get("status"), status));
+            if (provider != null) p.add(cb.equal(root.get("provider"), provider));
+            if (bookingId != null) p.add(cb.equal(root.get("booking").get("id"), bookingId));
+            if (sessionId != null && !sessionId.isBlank())
+                p.add(cb.equal(root.get("sessionId"), sessionId.trim()));
+            if (from != null) p.add(cb.greaterThanOrEqualTo(root.get("createdAt"), from));
+            if (to != null) p.add(cb.lessThanOrEqualTo(root.get("createdAt"), to));
+            return p.isEmpty() ? cb.conjunction() : cb.and(p.toArray(new Predicate[0]));
+        };
+
+        return com.example.planyourtrip.dto.PageResponse.of(
+            sessionRepo.findAll(spec, pageable).map(x -> toResponse(x, true)));
     }
 
     @Transactional(readOnly = true)

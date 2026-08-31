@@ -1,5 +1,6 @@
 package com.example.planyourtrip.controller;
 
+import com.example.planyourtrip.security.AuthUser;
 import com.example.planyourtrip.dto.PersonalizationDto.*;
 import com.example.planyourtrip.service.PersonalizationRuleService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -71,8 +72,8 @@ public class AdminPersonalizationRuleController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a personalization rule")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.delete(id);
+    public ResponseEntity<Void> delete(@AuthUser Long uid, @PathVariable Long id) {
+        service.delete(uid, id);
         return ResponseEntity.noContent().build();
     }
 }

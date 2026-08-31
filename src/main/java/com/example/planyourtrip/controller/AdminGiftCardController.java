@@ -60,20 +60,20 @@ public class AdminGiftCardController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Admin-issue a gift card (purchaserUserId optional — null for a house/campaign grant); "
         + "response includes the full redeemable code once")
-    public GiftCardResponse issue(@Valid @RequestBody AdminGiftCardIssueRequest req) {
-        return service.issueForAdmin(req);
+    public GiftCardResponse issue(@AuthUser Long uid, @Valid @RequestBody AdminGiftCardIssueRequest req) {
+        return service.issueForAdmin(uid, req);
     }
 
     @PostMapping("/{id}/activate")
     @Operation(summary = "Admin activation for support/testing — bypasses the purchaser/recipient ownership gate")
-    public GiftCardResponse activate(@PathVariable Long id) {
-        return service.adminActivate(id);
+    public GiftCardResponse activate(@AuthUser Long uid, @PathVariable Long id) {
+        return service.adminActivate(uid, id);
     }
 
     @PostMapping("/{id}/cancel")
     @Operation(summary = "Cancel a gift card (zeroes remaining balance; idempotent; no cash refund)")
-    public GiftCardResponse cancel(@PathVariable Long id) {
-        return service.adminCancel(id);
+    public GiftCardResponse cancel(@AuthUser Long uid, @PathVariable Long id) {
+        return service.adminCancel(uid, id);
     }
 
     @PostMapping("/{id}/adjust")
@@ -93,7 +93,7 @@ public class AdminGiftCardController {
 
     @PostMapping("/process-expirations")
     @Operation(summary = "Manually process gift card expirations (no scheduler in this phase; idempotent)")
-    public GiftCardExpirationResultResponse processExpirations() {
-        return service.processExpirations();
+    public GiftCardExpirationResultResponse processExpirations(@AuthUser Long uid) {
+        return service.processExpirations(uid);
     }
 }

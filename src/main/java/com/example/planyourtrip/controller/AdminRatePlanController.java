@@ -1,5 +1,6 @@
 package com.example.planyourtrip.controller;
 
+import com.example.planyourtrip.security.AuthUser;
 import com.example.planyourtrip.dto.RatePlanDto.*;
 import com.example.planyourtrip.model.MealPlanType;
 import com.example.planyourtrip.model.RatePlanType;
@@ -75,8 +76,8 @@ public class AdminRatePlanController {
     @DeleteMapping("/api/admin/rate-plans/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a rate plan")
-    public void delete(@PathVariable Long id) {
-        service.delete(id);
+    public void delete(@AuthUser Long uid, @PathVariable Long id) {
+        service.adminDelete(uid, id);
     }
 
     @PostMapping("/api/admin/rate-plans/{id}/activate")
@@ -125,8 +126,8 @@ public class AdminRatePlanController {
     @DeleteMapping("/api/admin/rate-plan-occupancy-prices/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete an occupancy price")
-    public void deleteOccupancyPrice(@PathVariable Long id) {
-        service.deleteOccupancyPrice(id);
+    public void deleteOccupancyPrice(@AuthUser Long uid, @PathVariable Long id) {
+        service.adminDeleteOccupancyPrice(uid, id);
     }
 
     // ── Validation / pricing preview ──────────────────────────────────────────

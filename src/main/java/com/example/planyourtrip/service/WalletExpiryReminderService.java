@@ -39,13 +39,16 @@ public class WalletExpiryReminderService {
     private final TravelWalletItemRepository walletRepo;
     private final TripPlanReminderRepository reminderRepo;
     private final TravelWalletService walletService;
+    private final AdminActivityLogService adminAudit;
 
     public WalletExpiryReminderService(TravelWalletItemRepository walletRepo,
                                         TripPlanReminderRepository reminderRepo,
-                                        TravelWalletService walletService) {
+                                        TravelWalletService walletService,
+                                        AdminActivityLogService adminAudit) {
         this.walletRepo = walletRepo;
         this.reminderRepo = reminderRepo;
         this.walletService = walletService;
+        this.adminAudit = adminAudit;
     }
 
     // ── Entry points ──────────────────────────────────────────────────────
@@ -58,10 +61,15 @@ public class WalletExpiryReminderService {
     }
 
     @Transactional
-    public WalletExpiryReminderResultResponse generateExpiryRemindersForAllUsers() {
+    public WalletExpiryReminderResultResponse generateExpiryRemindersForAllUsers(Long adminUserId) {
         List<TravelWalletItem> items = walletRepo.findByValidUntilIsNotNullAndExpiryReminderEnabledTrue();
         Set<Long> userIds = items.stream().map(i -> i.getUser().getId()).collect(Collectors.toSet());
         GenTotals totals = generateForAll(items);
+        adminAudit.record(adminUserId, "WALLET_EXPIRY_REMINDER_SWEEP", "TRAVEL_WALLET", null,
+            "Admin ran the wallet expiry-reminder sweep across " + userIds.size() + " users: "
+                + totals.created + " reminders created, " + totals.skipped + " skipped",
+            null, "users:" + userIds.size() + " created:" + totals.created);
+
         return new WalletExpiryReminderResultResponse(userIds.size(), totals.itemsProcessed, totals.created, totals.skipped);
     }
 

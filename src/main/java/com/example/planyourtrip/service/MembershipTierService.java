@@ -38,11 +38,14 @@ public class MembershipTierService {
 
     private final MembershipTierDefinitionRepository tierDefRepo;
     private final MembershipBenefitDefinitionRepository benefitRepo;
+    private final AdminActivityLogService adminAudit;
 
     public MembershipTierService(MembershipTierDefinitionRepository tierDefRepo,
-                                  MembershipBenefitDefinitionRepository benefitRepo) {
+                                  MembershipBenefitDefinitionRepository benefitRepo,
+                                  AdminActivityLogService adminAudit) {
         this.tierDefRepo = tierDefRepo;
         this.benefitRepo = benefitRepo;
+        this.adminAudit = adminAudit;
     }
 
     // ── Tier definitions ─────────────────────────────────────────────────────
@@ -182,9 +185,12 @@ public class MembershipTierService {
     }
 
     @Transactional
-    public void deleteBenefit(Long id) {
+    public void deleteBenefit(Long adminUserId, Long id) {
         MembershipBenefitDefinition b = benefitOrThrow(id);
+        String tier = b.getTier() == null ? null : b.getTier().name();
         benefitRepo.delete(b);
+        adminAudit.record(adminUserId, "MEMBERSHIP_BENEFIT_DELETE", "MEMBERSHIP_BENEFIT", id,
+            "Admin deleted membership benefit definition " + id, tier, null);
     }
 
     private MembershipBenefitDefinition benefitOrThrow(Long id) {

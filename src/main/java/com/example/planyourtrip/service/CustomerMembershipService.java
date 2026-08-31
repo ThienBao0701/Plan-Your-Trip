@@ -77,6 +77,7 @@ public class CustomerMembershipService {
     private final BookingRepository bookingRepo;
     private final UserRepository userRepo;
     private final NotificationService notificationService;
+    private final AdminActivityLogService adminAudit;
 
     /** Recommended default validity window — resets on enrollment/automatic upgrade/reevaluation. */
     private static final long DEFAULT_VALIDITY_MONTHS = 12;
@@ -87,7 +88,8 @@ public class CustomerMembershipService {
                                       LoyaltyAccountRepository loyaltyAccountRepo,
                                       BookingRepository bookingRepo,
                                       UserRepository userRepo,
-                                      NotificationService notificationService) {
+                                      NotificationService notificationService,
+                                      AdminActivityLogService adminAudit) {
         this.membershipRepo = membershipRepo;
         this.historyRepo = historyRepo;
         this.tierService = tierService;
@@ -95,6 +97,7 @@ public class CustomerMembershipService {
         this.bookingRepo = bookingRepo;
         this.userRepo = userRepo;
         this.notificationService = notificationService;
+        this.adminAudit = adminAudit;
     }
 
     // ── Customer: enrollment ─────────────────────────────────────────────────
@@ -333,7 +336,8 @@ public class CustomerMembershipService {
      * count. Documented deviation, not a silent gap.
      */
     @Transactional
-    public CustomerMembershipResponse adminAssign(Long userId, MembershipManualAssignmentRequest req) {
+    public CustomerMembershipResponse adminAssign(Long adminUserId, Long userId,
+                                                   MembershipManualAssignmentRequest req) {
         User user = userOrThrow(userId);
         tierService.activeDefinitionOrThrow(req.tier());
         Instant now = Instant.now();
@@ -365,6 +369,13 @@ public class CustomerMembershipService {
         notify(userId, "Membership tier updated",
             "Your membership tier has been updated to " + tierService.displayName(req.tier()) + ".");
 
+        // D1c - a manual assignment overrides earned eligibility and grants real benefits, so it is
+        // recorded with the tier moved from and to. The operator's free-text reason is deliberately
+        // NOT copied in: it is unvalidated input, and the trail stores only short safe scalars.
+        adminAudit.record(adminUserId, "MEMBERSHIP_MANUAL_ASSIGN", "CUSTOMER_MEMBERSHIP", saved.getId(),
+            "Admin manually assigned membership tier for user " + userId,
+            previous == null ? null : previous.name(), req.tier().name());
+
         return toResponse(saved);
     }
 
@@ -376,16 +387,32 @@ public class CustomerMembershipService {
      * expired" notification) — there is no background scheduler in this phase.
      */
     @Transactional
-    public MembershipEvaluationResultResponse adminReevaluate(Long userId) {
-        return recalculate(membershipOrThrow(userId), "Admin-triggered reevaluation");
+    public MembershipEvaluationResultResponse adminReevaluate(Long adminUserId, Long userId) {
+        CustomerMembership m = membershipOrThrow(userId);
+        MembershipTier before = m.getCurrentTier();
+        MembershipEvaluationResultResponse result = recalculate(m, "Admin-triggered reevaluation");
+        // Recorded even when the tier does not move: "an administrator ran this and nothing
+        // changed" is itself the answer to a later dispute about why a tier did or did not drop.
+        adminAudit.record(adminUserId, "MEMBERSHIP_REEVALUATE", "CUSTOMER_MEMBERSHIP", m.getId(),
+            "Admin re-evaluated membership for user " + userId,
+            before == null ? null : before.name(),
+            result.newTier() == null ? null : result.newTier().name());
+        return result;
     }
 
     /** Clears the manual-assignment flag and immediately recalculates from current qualification metrics. */
     @Transactional
-    public MembershipEvaluationResultResponse clearManualAssignment(Long userId) {
+    public MembershipEvaluationResultResponse clearManualAssignment(Long adminUserId, Long userId) {
         CustomerMembership m = membershipOrThrow(userId);
+        MembershipTier before = m.getCurrentTier();
         m.setManuallyAssigned(false);
-        return recalculate(m, "Manual assignment cleared; tier restored to calculated eligibility");
+        MembershipEvaluationResultResponse result =
+            recalculate(m, "Manual assignment cleared; tier restored to calculated eligibility");
+        adminAudit.record(adminUserId, "MEMBERSHIP_CLEAR_MANUAL", "CUSTOMER_MEMBERSHIP", m.getId(),
+            "Admin cleared the manual membership assignment for user " + userId,
+            before == null ? null : before.name(),
+            result.newTier() == null ? null : result.newTier().name());
+        return result;
     }
 
     private MembershipEvaluationResultResponse recalculate(CustomerMembership m, String trigger) {

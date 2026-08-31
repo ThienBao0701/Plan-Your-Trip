@@ -30,6 +30,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * These tests pin the properties that make the new trail trustworthy — it is written, it captures
  * the actor, it is transactional with the mutation, it refuses credential-shaped text, and it cannot
  * be read by a non-admin.
+ *
+ * <p><b>D1c</b> adds the properties that only matter once the trail covers more than a handful of
+ * endpoints: a batch sweep writes one row per invocation and not one per affected record; an
+ * action a customer performs through a service method the admin path shares must not appear in the
+ * administrative trail at all; a destructive delete is recorded before the evidence disappears;
+ * and nothing anywhere in the stored trail carries credential-shaped text.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -253,5 +259,222 @@ class AdminActivityLogTest {
     private AdminActivityLog latest(String action) {
         var page = auditRepo.search(null, action, null, null, null, null, PageRequest.of(0, 1));
         return page.isEmpty() ? null : page.getContent().get(0);
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // D1c
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /**
+     * A sweep must write exactly ONE summary row per invocation. Recording per affected record
+     * would let one click write an unbounded number of audit rows: the trail would grow with the
+     * data it describes, become unreadable, and turn an operational action into a storage event.
+     */
+    @Test
+    void batchSweep_writesOneSummaryRowPerInvocation_neverOnePerRecord() throws Exception {
+        long before = countOf("PAYMENT_SESSION_EXPIRY_SWEEP");
+
+        mvc.perform(post("/api/admin/payment-sessions/process-expirations")
+                .header("Authorization", "Bearer " + adminToken))
+            .andExpect(status().isOk());
+
+        assertEquals(before + 1, countOf("PAYMENT_SESSION_EXPIRY_SWEEP"),
+            "one sweep must add exactly one audit row");
+
+        AdminActivityLog entry = latest("PAYMENT_SESSION_EXPIRY_SWEEP");
+        assertNotNull(entry);
+        assertEquals(adminUserId, entry.getActorUserId(),
+            "a human ran the sweep, so the row names them rather than SYSTEM");
+        assertNull(entry.getTargetId(), "a sweep has no single target row");
+        assertTrue(entry.getAfterState().startsWith("expired:"),
+            "the summary must carry the count, got: " + entry.getAfterState());
+
+        // A second run adds exactly one more row, not one per candidate it re-examined.
+        mvc.perform(post("/api/admin/payment-sessions/process-expirations")
+                .header("Authorization", "Bearer " + adminToken))
+            .andExpect(status().isOk());
+        assertEquals(before + 2, countOf("PAYMENT_SESSION_EXPIRY_SWEEP"));
+    }
+
+    /** Every batch endpoint records under its own action name, so a sweep is attributable. */
+    @Test
+    void everyBatchEndpoint_recordsExactlyOneSweepRow() throws Exception {
+        String[][] sweeps = {
+            {"/api/admin/travel-credits/process-expirations",          "TRAVEL_CREDIT_EXPIRY_SWEEP"},
+            {"/api/admin/gift-cards/process-expirations",              "GIFT_CARD_EXPIRY_SWEEP"},
+            {"/api/admin/inventory-reservations/process-expirations",  "INVENTORY_HOLD_EXPIRY_SWEEP"},
+            {"/api/admin/loyalty/redemptions/expire-stale",            "LOYALTY_REDEMPTION_EXPIRY_SWEEP"},
+            {"/api/admin/trip-reminders/deliver-due",                  "TRIP_REMINDER_DELIVERY_SWEEP"},
+            {"/api/admin/travel-wallet/generate-expiry-reminders",     "WALLET_EXPIRY_REMINDER_SWEEP"},
+        };
+        for (String[] sweep : sweeps) {
+            long before = countOf(sweep[1]);
+            mvc.perform(post(sweep[0]).header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk());
+            assertEquals(before + 1, countOf(sweep[1]),
+                sweep[0] + " must write exactly one " + sweep[1] + " row");
+            assertEquals(adminUserId, latest(sweep[1]).getActorUserId(), sweep[0]);
+        }
+    }
+
+    /**
+     * The shared-caller guard. {@code LoyaltyRedemptionService.releaseByReference} serves both the
+     * administrative endpoint and the customer's own release endpoint. A customer releasing their
+     * own reservation is not an administrative act and must leave no row in this trail — the same
+     * mistake D1a caught when referral rewards reached the audited credit-grant path.
+     */
+    @Test
+    void customerActionThroughASharedServiceMethod_writesNoAdminRow() throws Exception {
+        long before = countOf("LOYALTY_REDEMPTION_RELEASE");
+
+        mvc.perform(post("/api/loyalty/redemptions/NO-SUCH-REFERENCE/release")
+                .header("Authorization", "Bearer " + userToken))
+            .andExpect(status().is4xxClientError());
+
+        assertEquals(before, countOf("LOYALTY_REDEMPTION_RELEASE"),
+            "a customer-path release must never appear in the administrative trail");
+    }
+
+    /**
+     * A destructive delete is the case an audit trail exists for: afterwards there is no row left
+     * to inspect. The record must therefore be written in the same transaction as the deletion and
+     * must carry enough identity to say what was destroyed.
+     */
+    @Test
+    void deletingAPromotion_isAuditedWithTheIdentityOfWhatWasDestroyed() throws Exception {
+        String code = "D1C-AUDIT-" + System.nanoTime();
+        String created = mvc.perform(post("/api/admin/promotions")
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{"
+                    + "\"name\":\"D1c audit probe\","
+                    + "\"code\":\"" + code + "\","
+                    + "\"promotionType\":\"GENERAL\","
+                    + "\"discountType\":\"PERCENTAGE\","
+                    + "\"discountValue\":5.0,"
+                    + "\"stackable\":false,"
+                    + "\"priority\":0,"
+                    + "\"startDate\":\"" + java.time.LocalDate.now() + "\","
+                    + "\"endDate\":\"" + java.time.LocalDate.now().plusDays(7) + "\""
+                    + "}"))
+            .andExpect(status().isCreated())
+            .andReturn().getResponse().getContentAsString();
+        long promotionId = mapper.readTree(created).get("id").asLong();
+
+        long before = countOf("PROMOTION_DELETE");
+        mvc.perform(delete("/api/admin/promotions/" + promotionId)
+                .header("Authorization", "Bearer " + adminToken))
+            .andExpect(status().isNoContent());
+
+        assertEquals(before + 1, countOf("PROMOTION_DELETE"));
+        AdminActivityLog entry = latest("PROMOTION_DELETE");
+        assertEquals(adminUserId, entry.getActorUserId());
+        assertEquals("PROMOTION", entry.getTargetType());
+        assertEquals(promotionId, entry.getTargetId());
+        // A scalar state, never the operator-supplied code: free text reaching the audit guard
+        // can trip its card-number rule and roll the deletion back (D1c-NEW-1, covered below).
+        assertEquals("active:true", entry.getBeforeState());
+        assertNull(entry.getAfterState(), "nothing exists after a delete");
+
+        // And the deletion really happened — the audit row is not describing a no-op.
+        mvc.perform(get("/api/admin/promotions/" + promotionId)
+                .header("Authorization", "Bearer " + adminToken))
+            .andExpect(status().isNotFound());
+    }
+
+    /**
+     * An invoice is the customer's financial record of a stay, so forcing its status is an
+     * accounting act. The row must carry the status pair and nothing from the billing block on the
+     * same table row.
+     */
+    @Test
+    void invoiceStatusOverride_isAuditedWithBeforeAndAfterOnly() throws Exception {
+        String list = mvc.perform(get("/api/admin/invoices?size=200")
+                .header("Authorization", "Bearer " + adminToken))
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString();
+        JsonNode content = mapper.readTree(list).get("content");
+        if (content.isEmpty()) return;   // nothing seeded to override on this run
+
+        JsonNode invoice = content.get(0);
+        long invoiceId = invoice.get("id").asLong();
+        String current = invoice.get("status").asText();
+
+        long before = countOf("INVOICE_STATUS_OVERRIDE");
+        mvc.perform(patch("/api/admin/invoices/" + invoiceId + "/status")
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"status\":\"" + current + "\"}"))
+            .andExpect(status().isOk());
+
+        assertEquals(before + 1, countOf("INVOICE_STATUS_OVERRIDE"));
+        AdminActivityLog entry = latest("INVOICE_STATUS_OVERRIDE");
+        assertEquals(adminUserId, entry.getActorUserId());
+        assertEquals("INVOICE", entry.getTargetType());
+        assertEquals(invoiceId, entry.getTargetId());
+        assertEquals(current, entry.getBeforeState());
+        assertEquals(current, entry.getAfterState());
+    }
+
+    /**
+     * The whole stored trail is checked, not just the guard in isolation: a wired caller could
+     * pass something credential-shaped that the service would then reject at write time, and this
+     * proves no such value has been accepted by any of the callers the suite exercises.
+     */
+    @Test
+    void noStoredRowCarriesCredentialShapedText() {
+        var page = auditRepo.search(null, null, null, null, null, null, PageRequest.of(0, 200));
+        var forbidden = java.util.regex.Pattern.compile(
+            "(?i)(password|passwd|secret|bearer\\s|eyJ[A-Za-z0-9_-]{10,}|api[_-]?key"
+                + "|private[_-]?key|cvv|iban|swift|\\b\\d{13,19}\\b)");
+        for (AdminActivityLog l : page.getContent()) {
+            for (String field : new String[]{l.getDescription(), l.getBeforeState(), l.getAfterState()}) {
+                if (field == null) continue;
+                assertFalse(forbidden.matcher(field).find(),
+                    "audit row " + l.getId() + " (" + l.getAction() + ") stored credential-shaped text");
+            }
+        }
+    }
+
+    /**
+     * D1c-NEW-1 regression. A promotion code is operator-supplied free text and may legitimately
+     * contain a long run of digits — an internal reference, a date-stamped campaign id. D1a's
+     * credential backstop rejects any 13-19 digit run as a possible card number, and because the
+     * audit write shares the mutation's transaction, feeding it that code made the deletion fail
+     * with a 500 and roll back. The endpoint must not care what the code looks like.
+     */
+    @Test
+    void promotionWithADigitHeavyCode_canStillBeDeleted() throws Exception {
+        String digitHeavy = "CAMPAIGN-4532015112830366";   // 16 digits, card-shaped by regex
+        String created = mvc.perform(post("/api/admin/promotions")
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{"
+                    + "\"name\":\"D1c digit-heavy probe\","
+                    + "\"code\":\"" + digitHeavy + "\","
+                    + "\"promotionType\":\"GENERAL\","
+                    + "\"discountType\":\"PERCENTAGE\","
+                    + "\"discountValue\":5.0,"
+                    + "\"stackable\":false,"
+                    + "\"priority\":0,"
+                    + "\"startDate\":\"" + java.time.LocalDate.now() + "\","
+                    + "\"endDate\":\"" + java.time.LocalDate.now().plusDays(7) + "\""
+                    + "}"))
+            .andExpect(status().isCreated())
+            .andReturn().getResponse().getContentAsString();
+        long id = mapper.readTree(created).get("id").asLong();
+
+        mvc.perform(delete("/api/admin/promotions/" + id)
+                .header("Authorization", "Bearer " + adminToken))
+            .andExpect(status().isNoContent());
+
+        mvc.perform(get("/api/admin/promotions/" + id)
+                .header("Authorization", "Bearer " + adminToken))
+            .andExpect(status().isNotFound());
+    }
+
+    private long countOf(String action) {
+        return auditRepo.search(null, action, null, null, null, null, PageRequest.of(0, 1))
+            .getTotalElements();
     }
 }

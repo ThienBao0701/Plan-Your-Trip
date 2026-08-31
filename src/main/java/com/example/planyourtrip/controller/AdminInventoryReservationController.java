@@ -1,5 +1,6 @@
 package com.example.planyourtrip.controller;
 
+import com.example.planyourtrip.security.AuthUser;
 import com.example.planyourtrip.dto.InventoryReservationDto.*;
 import com.example.planyourtrip.dto.PageResponse;
 import com.example.planyourtrip.model.InventoryReservationStatus;
@@ -43,7 +44,7 @@ public class AdminInventoryReservationController {
 
     @PostMapping("/process-expirations")
     @Operation(summary = "Expiry sweep — release all overdue HELD holds (no scheduler in this phase)")
-    public ExpirationResultResponse processExpirations() {
-        return service.expireOverdueHolds();
+    public ExpirationResultResponse processExpirations(@AuthUser Long uid) {
+        return service.expireOverdueHolds(uid);
     }
 }

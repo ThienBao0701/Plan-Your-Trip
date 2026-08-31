@@ -28,11 +28,14 @@ public class TripReminderDeliveryService {
 
     private final TripPlanReminderRepository reminderRepo;
     private final NotificationService notificationService;
+    private final AdminActivityLogService adminAudit;
 
     public TripReminderDeliveryService(TripPlanReminderRepository reminderRepo,
-                                        NotificationService notificationService) {
+                                        NotificationService notificationService,
+                                        AdminActivityLogService adminAudit) {
         this.reminderRepo = reminderRepo;
         this.notificationService = notificationService;
+        this.adminAudit = adminAudit;
     }
 
     @Transactional(readOnly = true)
@@ -43,7 +46,7 @@ public class TripReminderDeliveryService {
     }
 
     @Transactional
-    public TripReminderDeliveryResultResponse deliverDueReminders() {
+    public TripReminderDeliveryResultResponse deliverDueReminders(Long adminUserId) {
         List<TripPlanReminder> due = reminderRepo
             .findByStatusAndReminderAtLessThanEqualAndDeliveredAtIsNullOrderByReminderAtAsc(
                 TripPlanReminderStatus.PENDING, Instant.now());
@@ -56,15 +59,23 @@ public class TripReminderDeliveryService {
                 case SKIPPED -> skipped++;
             }
         }
+        adminAudit.record(adminUserId, "TRIP_REMINDER_DELIVERY_SWEEP", "TRIP_REMINDER", null,
+            "Admin ran the due-reminder delivery sweep: " + due.size() + " attempted, "
+                + delivered + " delivered, " + failed + " failed, " + skipped + " skipped",
+            null, "attempted:" + due.size() + " delivered:" + delivered);
+
         return new TripReminderDeliveryResultResponse(due.size(), delivered, failed, skipped);
     }
 
     @Transactional
-    public TripReminderDeliveryResultResponse deliverReminder(Long reminderId) {
+    public TripReminderDeliveryResultResponse deliverReminder(Long adminUserId, Long reminderId) {
         TripPlanReminder r = reminderRepo.findById(reminderId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Reminder not found: " + reminderId));
 
         DeliveryOutcome outcome = deliverOne(r);
+        // Single-target delivery, so the reminder id is a meaningful target rather than null.
+        adminAudit.record(adminUserId, "TRIP_REMINDER_DELIVER", "TRIP_REMINDER", r.getId(),
+            "Admin delivered trip reminder " + r.getId(), null, outcome.name());
         return new TripReminderDeliveryResultResponse(
             1,
             outcome == DeliveryOutcome.DELIVERED ? 1 : 0,

@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import com.example.planyourtrip.security.AuthUser;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -99,8 +100,8 @@ public class AdminMembershipController {
     @DeleteMapping("/api/admin/membership/benefits/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a benefit metadata row")
-    public void deleteBenefit(@PathVariable Long id) {
-        tierService.deleteBenefit(id);
+    public void deleteBenefit(@AuthUser Long uid, @PathVariable Long id) {
+        tierService.deleteBenefit(uid, id);
     }
 
     // ── Customer support ──────────────────────────────────────────────────────
@@ -113,20 +114,21 @@ public class AdminMembershipController {
 
     @PostMapping("/api/admin/users/{userId}/membership/assign")
     @Operation(summary = "Manually assign any active tier to a user (creates the membership if none exists)")
-    public CustomerMembershipResponse assign(@PathVariable Long userId,
+    public CustomerMembershipResponse assign(@AuthUser Long uid, @PathVariable Long userId,
                                               @Valid @RequestBody MembershipManualAssignmentRequest req) {
-        return membershipService.adminAssign(userId, req);
+        return membershipService.adminAssign(uid, userId, req);
     }
 
     @PostMapping("/api/admin/users/{userId}/membership/reevaluate")
     @Operation(summary = "Recalculate the user's tier from current qualification metrics — the only path that can downgrade or process an expired validity window")
-    public MembershipEvaluationResultResponse reevaluate(@PathVariable Long userId) {
-        return membershipService.adminReevaluate(userId);
+    public MembershipEvaluationResultResponse reevaluate(@AuthUser Long uid, @PathVariable Long userId) {
+        return membershipService.adminReevaluate(uid, userId);
     }
 
     @PostMapping("/api/admin/users/{userId}/membership/clear-manual-assignment")
     @Operation(summary = "Clear the manuallyAssigned flag and restore the tier to calculated eligibility")
-    public MembershipEvaluationResultResponse clearManualAssignment(@PathVariable Long userId) {
-        return membershipService.clearManualAssignment(userId);
+    public MembershipEvaluationResultResponse clearManualAssignment(@AuthUser Long uid,
+                                                                     @PathVariable Long userId) {
+        return membershipService.clearManualAssignment(uid, userId);
     }
 }

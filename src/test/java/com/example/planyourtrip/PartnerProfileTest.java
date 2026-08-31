@@ -115,9 +115,14 @@ class PartnerProfileTest {
             .andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
 
-        JsonNode arr = mapper.readTree(body);
-        assertTrue(arr.isArray());
+        // D1c - this endpoint returns the PageResponse envelope, not a bare array.
+        JsonNode page = mapper.readTree(body);
+        assertTrue(page.has("content") && page.get("content").isArray());
+        assertTrue(page.has("page") && page.has("size")
+            && page.has("totalElements") && page.has("totalPages"));
+        JsonNode arr = page.get("content");
         assertTrue(arr.size() >= 1);
+        assertTrue(page.get("totalElements").asLong() >= 1);
     }
 
     @Test
@@ -259,12 +264,12 @@ class PartnerProfileTest {
 
     @Test
     void seed_approvedPartnerProfileExists() throws Exception {
-        String body = mvc.perform(get("/api/admin/partners")
+        String body = mvc.perform(get("/api/admin/partners?size=200")
                 .header("Authorization", "Bearer " + adminToken()))
             .andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
 
-        JsonNode arr = mapper.readTree(body);
+        JsonNode arr = mapper.readTree(body).get("content");
         boolean found = false;
         for (JsonNode n : arr) {
             if ("partner@planyourtrip.com".equals(n.get("userEmail").asText())
@@ -355,11 +360,11 @@ class PartnerProfileTest {
     }
 
     private long countAdminProfilesWithUserEmail(String email) throws Exception {
-        String body = mvc.perform(get("/api/admin/partners")
+        String body = mvc.perform(get("/api/admin/partners?size=200")
                 .header("Authorization", "Bearer " + adminToken()))
             .andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
-        JsonNode arr = mapper.readTree(body);
+        JsonNode arr = mapper.readTree(body).get("content");
         long count = 0;
         for (JsonNode n : arr) {
             if (email.equals(n.get("userEmail").asText())) count++;

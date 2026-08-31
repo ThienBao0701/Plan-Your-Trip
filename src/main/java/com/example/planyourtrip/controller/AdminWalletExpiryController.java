@@ -1,5 +1,6 @@
 package com.example.planyourtrip.controller;
 
+import com.example.planyourtrip.security.AuthUser;
 import com.example.planyourtrip.dto.TravelWalletOrganizerDto.WalletExpiryReminderResultResponse;
 import com.example.planyourtrip.service.WalletExpiryReminderService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,7 +30,7 @@ public class AdminWalletExpiryController {
 
     @PostMapping("/generate-expiry-reminders")
     @Operation(summary = "Generate 30/7/1-day-before expiry reminders for every eligible wallet item, system-wide (idempotent)")
-    public WalletExpiryReminderResultResponse generateForAllUsers() {
-        return expiryReminderService.generateExpiryRemindersForAllUsers();
+    public WalletExpiryReminderResultResponse generateForAllUsers(@AuthUser Long uid) {
+        return expiryReminderService.generateExpiryRemindersForAllUsers(uid);
     }
 }

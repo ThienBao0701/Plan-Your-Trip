@@ -22,17 +22,20 @@ public class InvoiceService {
     private final PaymentRepository paymentRepo;
     private final UserRepository userRepo;
     private final NotificationService notificationService;
+    private final AdminActivityLogService adminAudit;
 
     public InvoiceService(InvoiceRepository invoiceRepo,
                            BookingRepository bookingRepo,
                            PaymentRepository paymentRepo,
                            UserRepository userRepo,
-                           NotificationService notificationService) {
+                           NotificationService notificationService,
+                           AdminActivityLogService adminAudit) {
         this.invoiceRepo = invoiceRepo;
         this.bookingRepo = bookingRepo;
         this.paymentRepo = paymentRepo;
         this.userRepo = userRepo;
         this.notificationService = notificationService;
+        this.adminAudit = adminAudit;
     }
 
     @Transactional
@@ -115,12 +118,6 @@ public class InvoiceService {
             .stream().map(this::toSummary).toList();
     }
 
-    @Transactional(readOnly = true)
-    public List<InvoiceResponse> adminList() {
-        return invoiceRepo.findAllByOrderByCreatedAtDesc()
-            .stream().map(this::toResponse).toList();
-    }
-
     /** Entity properties an administrator may sort the invoice grid by (D1a-12 allowlist). */
     private static final java.util.Set<String> INVOICE_SORT_FIELDS = java.util.Set.of(
         "createdAt", "status", "issuedAt", "totalAmount");
@@ -138,25 +135,40 @@ public class InvoiceService {
     }
 
     @Transactional
-    public InvoiceResponse adminUpdateStatus(Long invoiceId, InvoiceStatus newStatus) {
+    public InvoiceResponse adminUpdateStatus(Long adminUserId, Long invoiceId, InvoiceStatus newStatus) {
         Invoice invoice = invoiceOrThrow(invoiceId);
+        InvoiceStatus before = invoice.getStatus();
         Instant now = Instant.now();
         invoice.setStatus(newStatus);
         if (newStatus == InvoiceStatus.PAID && invoice.getPaidAt() == null)
             invoice.setPaidAt(now);
         if (newStatus == InvoiceStatus.CANCELLED && invoice.getCancelledAt() == null)
             invoice.setCancelledAt(now);
-        return toResponse(invoiceRepo.save(invoice));
+        Invoice saved = invoiceRepo.save(invoice);
+        // D1c - an invoice is the customer's financial record of a stay. Forcing it to PAID
+        // without a payment, or away from PAID, is an accounting act and is recorded as one.
+        // Only the status pair and the invoice id are stored - never billing address, tax code
+        // or contact details, all of which live on the same row.
+        adminAudit.record(adminUserId, "INVOICE_STATUS_OVERRIDE", "INVOICE", saved.getId(),
+            "Admin set invoice " + saved.getId() + " status",
+            before == null ? null : before.name(),
+            saved.getStatus() == null ? null : saved.getStatus().name());
+        return toResponse(saved);
     }
 
     @Transactional
-    public InvoiceResponse cancelInvoice(Long invoiceId) {
+    public InvoiceResponse cancelInvoice(Long adminUserId, Long invoiceId) {
         Invoice invoice = invoiceOrThrow(invoiceId);
         if (invoice.getStatus() == InvoiceStatus.CANCELLED)
             throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY, "Invoice is already cancelled");
+        InvoiceStatus before = invoice.getStatus();
         invoice.setStatus(InvoiceStatus.CANCELLED);
         invoice.setCancelledAt(Instant.now());
-        return toResponse(invoiceRepo.save(invoice));
+        Invoice saved = invoiceRepo.save(invoice);
+        adminAudit.record(adminUserId, "INVOICE_CANCEL", "INVOICE", saved.getId(),
+            "Admin cancelled invoice " + saved.getId(),
+            before == null ? null : before.name(), saved.getStatus().name());
+        return toResponse(saved);
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

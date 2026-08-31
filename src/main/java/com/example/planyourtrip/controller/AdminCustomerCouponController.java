@@ -2,6 +2,7 @@ package com.example.planyourtrip.controller;
 
 import com.example.planyourtrip.dto.CouponDto.CustomerCouponResponse;
 import com.example.planyourtrip.service.CustomerCouponService;
+import com.example.planyourtrip.security.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,7 +37,8 @@ public class AdminCustomerCouponController {
     @PostMapping("/{userId}/coupons/{couponId}/revoke")
     @Operation(summary = "Revoke an AVAILABLE claimed coupon (terminal; frees the total-usage slot; "
         + "409 when already used or revoked)")
-    public CustomerCouponResponse revoke(@PathVariable Long userId, @PathVariable Long couponId) {
-        return service.adminRevoke(userId, couponId);
+    public CustomerCouponResponse revoke(@AuthUser Long uid, @PathVariable Long userId,
+                                          @PathVariable Long couponId) {
+        return service.adminRevoke(uid, userId, couponId);
     }
 }

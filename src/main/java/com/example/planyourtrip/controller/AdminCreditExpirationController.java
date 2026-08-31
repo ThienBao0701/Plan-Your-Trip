@@ -1,5 +1,6 @@
 package com.example.planyourtrip.controller;
 
+import com.example.planyourtrip.security.AuthUser;
 import com.example.planyourtrip.dto.TravelCreditDto.CreditExpirationRunResponse;
 import com.example.planyourtrip.service.TravelCreditService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,7 +36,7 @@ public class AdminCreditExpirationController {
     @PostMapping("/process-expirations")
     @Operation(summary = "Expire unspent credits from grants whose expiresAt has passed, system-wide "
         + "(FIFO unconsumed computation; one immutable EXPIRATION ledger row per grant; idempotent across runs)")
-    public CreditExpirationRunResponse processExpirations() {
-        return travelCreditService.processExpirations();
+    public CreditExpirationRunResponse processExpirations(@AuthUser Long uid) {
+        return travelCreditService.processExpirations(uid);
     }
 }

@@ -148,15 +148,6 @@ public class ReviewService {
             .toList();
     }
 
-    @Transactional(readOnly = true)
-    public List<ReviewResponse> adminListReviews() {
-        List<Review> reviews = reviewRepo.findAllByOrderByCreatedAtDesc();
-        Map<Long, List<ReviewMediaItem>> media = loadMediaBatch(reviews);
-        return reviews.stream()
-            .map(r -> toResponse(r, media.getOrDefault(r.getId(), List.of())))
-            .toList();
-    }
-
     /** Entity properties an administrator may sort the review grid by (D1a-12 allowlist). */
     private static final java.util.Set<String> REVIEW_SORT_FIELDS = java.util.Set.of(
         "createdAt", "ratingOverall", "status", "approvedAt");

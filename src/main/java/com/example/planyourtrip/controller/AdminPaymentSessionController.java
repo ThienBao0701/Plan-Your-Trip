@@ -1,12 +1,18 @@
 package com.example.planyourtrip.controller;
 
+import com.example.planyourtrip.security.AuthUser;
+import com.example.planyourtrip.dto.PageResponse;
 import com.example.planyourtrip.dto.PaymentSessionDto.*;
+import com.example.planyourtrip.model.PaymentProvider;
+import com.example.planyourtrip.model.PaymentSessionStatus;
 import com.example.planyourtrip.service.PaymentGatewayService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -24,9 +30,21 @@ public class AdminPaymentSessionController {
     public AdminPaymentSessionController(PaymentGatewayService service) { this.service = service; }
 
     @GetMapping
-    @Operation(summary = "List all payment sessions (newest first)")
-    public List<SessionResponse> list() {
-        return service.adminList();
+    @Operation(summary = "Search payment sessions (admin, paged newest-first)")
+    public PageResponse<SessionResponse> list(
+            @RequestParam(required = false) PaymentSessionStatus status,
+            @RequestParam(required = false) PaymentProvider provider,
+            @RequestParam(required = false) Long bookingId,
+            @RequestParam(required = false) String sessionId,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant from,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant to,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size,
+            @RequestParam(required = false) String sort) {
+        return service.adminListPaged(status, provider, bookingId, sessionId, from, to,
+            page, size, sort);
     }
 
     @GetMapping("/{sessionId}")
@@ -49,7 +67,7 @@ public class AdminPaymentSessionController {
 
     @PostMapping("/process-expirations")
     @Operation(summary = "Time-based expiry sweep of all overdue non-terminal sessions (no scheduler in this phase)")
-    public ExpirationResultResponse processExpirations() {
-        return service.processExpirations();
+    public ExpirationResultResponse processExpirations(@AuthUser Long uid) {
+        return service.processExpirations(uid);
     }
 }

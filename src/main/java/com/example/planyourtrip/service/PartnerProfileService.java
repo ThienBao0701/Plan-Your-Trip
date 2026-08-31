@@ -1,17 +1,23 @@
 package com.example.planyourtrip.service;
 
+import com.example.planyourtrip.dto.PageResponse;
 import com.example.planyourtrip.dto.PartnerProfileDto.*;
 import com.example.planyourtrip.exception.ApiException;
 import com.example.planyourtrip.model.*;
 import com.example.planyourtrip.repository.PartnerProfileRepository;
 import com.example.planyourtrip.repository.PartnerTeamMemberRepository;
 import com.example.planyourtrip.repository.UserRepository;
+import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class PartnerProfileService {
@@ -95,9 +101,41 @@ public class PartnerProfileService {
             profile.getSubmittedAt(), "Partner profile submitted for review");
     }
 
+    /** Entity properties an administrator may sort the partner grid by (D1c allowlist). */
+    private static final Set<String> PARTNER_SORT_FIELDS =
+        Set.of("createdAt", "updatedAt", "businessName", "verificationStatus",
+               "submittedAt", "approvedAt", "rejectedAt", "id");
+
+    /**
+     * D1c - administrative partner search, paged in the database.
+     *
+     * <p>The partner roster grows with the business and is the queue an administrator works
+     * through when approving, rejecting and suspending applications, so it is both unbounded and
+     * the collection most likely to be filtered. {@code q} matches business name, representative
+     * name or contact email, case-insensitively.
+     */
     @Transactional(readOnly = true)
-    public List<PartnerProfileResponse> adminListProfiles() {
-        return partnerProfileRepo.findAllByOrderByCreatedAtDesc().stream().map(this::toResponse).toList();
+    public PageResponse<PartnerProfileResponse> adminListProfilesPaged(
+            PartnerVerificationStatus verificationStatus, BusinessType businessType, String q,
+            Integer page, Integer size, String sort) {
+
+        Pageable pageable = AdminPaging.of(page, size, sort, PARTNER_SORT_FIELDS, "createdAt");
+
+        Specification<PartnerProfile> spec = (root, query, cb) -> {
+            List<Predicate> p = new ArrayList<>();
+            if (verificationStatus != null) p.add(cb.equal(root.get("verificationStatus"), verificationStatus));
+            if (businessType != null) p.add(cb.equal(root.get("businessType"), businessType));
+            if (q != null && !q.isBlank()) {
+                String like = "%" + q.trim().toLowerCase() + "%";
+                p.add(cb.or(
+                    cb.like(cb.lower(root.get("businessName")), like),
+                    cb.like(cb.lower(root.get("representativeName")), like),
+                    cb.like(cb.lower(root.get("email")), like)));
+            }
+            return p.isEmpty() ? cb.conjunction() : cb.and(p.toArray(new Predicate[0]));
+        };
+
+        return PageResponse.of(partnerProfileRepo.findAll(spec, pageable).map(this::toResponse));
     }
 
     @Transactional(readOnly = true)

@@ -226,12 +226,6 @@ public class PaymentService {
         return toResponse(saved);
     }
 
-    @Transactional(readOnly = true)
-    public List<PaymentResponse> adminListPayments() {
-        return paymentRepo.findAllByOrderByCreatedAtDesc()
-            .stream().map(this::toResponse).toList();
-    }
-
     /** Entity properties an administrator may sort the payment grid by (D1a-12 allowlist). */
     private static final java.util.Set<String> PAYMENT_SORT_FIELDS = java.util.Set.of(
         "createdAt", "amount", "status", "paidAt", "refundedAt");

@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import com.example.planyourtrip.security.AuthUser;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -72,8 +73,9 @@ public class AdminHotelController {
     @PostMapping("/{hotelId}/assign-owner")
     @Operation(summary = "Assign a hotel to a partner profile")
     public PartnerHotelResponse assignOwner(
+            @AuthUser Long uid,
             @PathVariable Long hotelId,
             @Valid @RequestBody AssignOwnerRequest req) {
-        return partnerPropertyService.assignOwner(hotelId, req);
+        return partnerPropertyService.assignOwner(uid, hotelId, req);
     }
 }

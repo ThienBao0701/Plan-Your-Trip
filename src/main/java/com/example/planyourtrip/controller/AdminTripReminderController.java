@@ -1,5 +1,6 @@
 package com.example.planyourtrip.controller;
 
+import com.example.planyourtrip.security.AuthUser;
 import com.example.planyourtrip.dto.TripReminderDeliveryDto.TripReminderDeliveryResultResponse;
 import com.example.planyourtrip.service.TripReminderDeliveryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,13 +30,13 @@ public class AdminTripReminderController {
 
     @PostMapping("/deliver-due")
     @Operation(summary = "Trigger delivery of all due reminders, system-wide")
-    public TripReminderDeliveryResultResponse deliverDue() {
-        return deliveryService.deliverDueReminders();
+    public TripReminderDeliveryResultResponse deliverDue(@AuthUser Long uid) {
+        return deliveryService.deliverDueReminders(uid);
     }
 
     @PostMapping("/{id}/deliver")
     @Operation(summary = "Trigger delivery of a single reminder by id")
-    public TripReminderDeliveryResultResponse deliverOne(@PathVariable Long id) {
-        return deliveryService.deliverReminder(id);
+    public TripReminderDeliveryResultResponse deliverOne(@AuthUser Long uid, @PathVariable Long id) {
+        return deliveryService.deliverReminder(uid, id);
     }
 }

@@ -1,5 +1,6 @@
 package com.example.planyourtrip.controller;
 
+import com.example.planyourtrip.security.AuthUser;
 import com.example.planyourtrip.dto.GiftCardDto.GiftCardProductRequest;
 import com.example.planyourtrip.dto.GiftCardDto.GiftCardProductResponse;
 import com.example.planyourtrip.service.GiftCardProductService;
@@ -68,7 +69,7 @@ public class AdminGiftCardProductController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a gift card product (409 if any gift card has been issued against it)")
-    public void delete(@PathVariable Long id) {
-        service.delete(id);
+    public void delete(@AuthUser Long uid, @PathVariable Long id) {
+        service.delete(uid, id);
     }
 }

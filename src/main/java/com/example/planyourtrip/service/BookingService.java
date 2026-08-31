@@ -743,12 +743,6 @@ public class BookingService {
     // ── Admin: list / get ─────────────────────────────────────────────────────
 
     @Transactional(readOnly = true)
-    public List<BookingSummaryResponse> adminGetAll() {
-        return bookingRepo.findAllByOrderByCreatedAtDesc()
-            .stream().map(this::toSummary).toList();
-    }
-
-    @Transactional(readOnly = true)
     public BookingResponse adminGetById(Long bookingId) {
         return toResponse(bookingRepo.findById(bookingId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found: " + bookingId)));
@@ -853,29 +847,51 @@ public class BookingService {
     }
 
     // ── Admin: engine-validated transitions ───────────────────────────────────
+    //
+    // D1c - all four transitions are audited. D1a recorded only the forced status override, but
+    // these paths reach the same booking lifecycle through the transition engine rather than
+    // around it, and check-in/check-out are exactly the actions a guest later disputes. Each
+    // records the transition and the booking id only - never guest contact or payment data.
 
     @Transactional
-    public BookingResponse adminCheckIn(Long bookingId) {
+    public BookingResponse adminCheckIn(Long adminUserId, Long bookingId) {
         Booking booking = bookingRepo.findById(bookingId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found: " + bookingId));
+        BookingStatus before = booking.getStatus();
         statusEngine.transition(booking, BookingStatus.CHECKED_IN);
-        return toResponse(bookingRepo.save(booking));
+        Booking saved = bookingRepo.save(booking);
+        adminAudit.record(adminUserId, "BOOKING_CHECK_IN", "BOOKING", saved.getId(),
+            "Admin checked in booking " + saved.getId(),
+            before == null ? null : before.name(), saved.getStatus().name());
+        return toResponse(saved);
     }
 
     @Transactional
-    public BookingResponse adminCheckOut(Long bookingId) {
+    public BookingResponse adminCheckOut(Long adminUserId, Long bookingId) {
         Booking booking = bookingRepo.findById(bookingId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found: " + bookingId));
+        BookingStatus before = booking.getStatus();
         statusEngine.transition(booking, BookingStatus.CHECKED_OUT);
-        return toResponse(bookingRepo.save(booking));
+        Booking saved = bookingRepo.save(booking);
+        adminAudit.record(adminUserId, "BOOKING_CHECK_OUT", "BOOKING", saved.getId(),
+            "Admin checked out booking " + saved.getId(),
+            before == null ? null : before.name(), saved.getStatus().name());
+        return toResponse(saved);
     }
 
     @Transactional
-    public BookingResponse adminComplete(Long bookingId) {
+    public BookingResponse adminComplete(Long adminUserId, Long bookingId) {
         Booking booking = bookingRepo.findById(bookingId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found: " + bookingId));
+        BookingStatus before = booking.getStatus();
         statusEngine.transition(booking, BookingStatus.COMPLETED);
         Booking saved = bookingRepo.save(booking);
+        // D1c - completing a reservation awards loyalty points and can qualify a referral reward,
+        // so it moves customer value and belongs in the trail alongside the forced status override
+        // that D1a already records.
+        adminAudit.record(adminUserId, "BOOKING_COMPLETE", "BOOKING", saved.getId(),
+            "Admin completed booking " + saved.getId(),
+            before == null ? null : before.name(), saved.getStatus().name());
         // Phase 7.18 — same idempotent loyalty-points hook as adminUpdateStatus above.
         loyaltyService.awardBookingPoints(saved.getUser().getId(), saved.getId(), saved.getFinalPrice());
         // Phase 7.22 — referral qualification, same completion hook (see adminUpdateStatus).
@@ -884,11 +900,16 @@ public class BookingService {
     }
 
     @Transactional
-    public BookingResponse adminArchive(Long bookingId) {
+    public BookingResponse adminArchive(Long adminUserId, Long bookingId) {
         Booking booking = bookingRepo.findById(bookingId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found: " + bookingId));
+        BookingStatus before = booking.getStatus();
         statusEngine.transition(booking, BookingStatus.ARCHIVED);
-        return toResponse(bookingRepo.save(booking));
+        Booking saved = bookingRepo.save(booking);
+        adminAudit.record(adminUserId, "BOOKING_ARCHIVE", "BOOKING", saved.getId(),
+            "Admin archived booking " + saved.getId(),
+            before == null ? null : before.name(), saved.getStatus().name());
+        return toResponse(saved);
     }
 
     // ── Phase 7.16 — Admin: refund a cancelled booking's payment as credits ──

@@ -1,10 +1,13 @@
 package com.example.planyourtrip.controller;
 
+import com.example.planyourtrip.dto.PageResponse;
 import com.example.planyourtrip.dto.PartnerExtranetDto.AdminPartnerDetailResponse;
 import com.example.planyourtrip.dto.PartnerExtranetDto.PartnerActivityLogResponse;
 import com.example.planyourtrip.dto.PartnerProfileDto.*;
 import com.example.planyourtrip.dto.PartnerSettingsDto.PartnerSettingsResponse;
 import com.example.planyourtrip.dto.PartnerSettingsDto.PartnerTeamMemberResponse;
+import com.example.planyourtrip.model.BusinessType;
+import com.example.planyourtrip.model.PartnerVerificationStatus;
 import com.example.planyourtrip.security.AuthUser;
 import com.example.planyourtrip.service.PartnerActivityLogService;
 import com.example.planyourtrip.service.PartnerExtranetService;
@@ -38,9 +41,16 @@ public class AdminPartnerController {
     }
 
     @GetMapping
-    @Operation(summary = "List all partner profiles")
-    public List<PartnerProfileResponse> getAll() {
-        return service.adminListProfiles();
+    @Operation(summary = "Search partner profiles (admin, paged newest-first)")
+    public PageResponse<PartnerProfileResponse> getAll(
+            @RequestParam(required = false) PartnerVerificationStatus verificationStatus,
+            @RequestParam(required = false) BusinessType businessType,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size,
+            @RequestParam(required = false) String sort) {
+        return service.adminListProfilesPaged(verificationStatus, businessType, q,
+            page, size, sort);
     }
 
     @GetMapping("/{id}")
@@ -88,8 +98,11 @@ public class AdminPartnerController {
     }
 
     @GetMapping("/{id}/activity-logs")
-    @Operation(summary = "List a partner's activity log")
-    public List<PartnerActivityLogResponse> activityLogs(@PathVariable Long id) {
-        return activityLogService.adminListByPartner(id);
+    @Operation(summary = "List a partner's activity log (paged newest-first)")
+    public PageResponse<PartnerActivityLogResponse> activityLogs(
+            @PathVariable Long id,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
+        return activityLogService.adminListByPartnerPaged(id, page, size);
     }
 }

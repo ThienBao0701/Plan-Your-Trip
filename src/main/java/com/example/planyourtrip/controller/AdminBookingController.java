@@ -59,26 +59,26 @@ public class AdminBookingController {
 
     @PatchMapping("/{id}/check-in")
     @Operation(summary = "Check in guest (requires CONFIRMED or CHECK_IN_READY)")
-    public BookingResponse checkIn(@PathVariable Long id) {
-        return service.adminCheckIn(id);
+    public BookingResponse checkIn(@AuthUser Long uid, @PathVariable Long id) {
+        return service.adminCheckIn(uid, id);
     }
 
     @PatchMapping("/{id}/check-out")
     @Operation(summary = "Check out guest (requires CHECKED_IN)")
-    public BookingResponse checkOut(@PathVariable Long id) {
-        return service.adminCheckOut(id);
+    public BookingResponse checkOut(@AuthUser Long uid, @PathVariable Long id) {
+        return service.adminCheckOut(uid, id);
     }
 
     @PatchMapping("/{id}/complete")
     @Operation(summary = "Complete reservation (requires CHECKED_OUT)")
-    public BookingResponse complete(@PathVariable Long id) {
-        return service.adminComplete(id);
+    public BookingResponse complete(@AuthUser Long uid, @PathVariable Long id) {
+        return service.adminComplete(uid, id);
     }
 
     @PatchMapping("/{id}/archive")
     @Operation(summary = "Archive reservation (requires COMPLETED)")
-    public BookingResponse archive(@PathVariable Long id) {
-        return service.adminArchive(id);
+    public BookingResponse archive(@AuthUser Long uid, @PathVariable Long id) {
+        return service.adminArchive(uid, id);
     }
 
     @PostMapping("/{id}/refund-to-credits")

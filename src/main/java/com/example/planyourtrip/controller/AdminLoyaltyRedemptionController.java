@@ -2,6 +2,7 @@ package com.example.planyourtrip.controller;
 
 import com.example.planyourtrip.dto.LoyaltyRedemptionDto.*;
 import com.example.planyourtrip.dto.PageResponse;
+import com.example.planyourtrip.security.AuthUser;
 import com.example.planyourtrip.model.LoyaltyRedemptionStatus;
 import com.example.planyourtrip.service.LoyaltyRedemptionPolicyService;
 import com.example.planyourtrip.service.LoyaltyRedemptionService;
@@ -101,19 +102,21 @@ public class AdminLoyaltyRedemptionController {
 
     @PostMapping("/api/admin/loyalty/redemptions/{redemptionReference}/release")
     @Operation(summary = "Release a RESERVED redemption (restores points); idempotent")
-    public RedemptionResponse releaseRedemption(@PathVariable String redemptionReference) {
-        return redemptionService.releaseByReference(null, redemptionReference, true);
+    public RedemptionResponse releaseRedemption(@AuthUser Long uid,
+                                                @PathVariable String redemptionReference) {
+        return redemptionService.releaseByReference(null, redemptionReference, true, uid);
     }
 
     @PostMapping("/api/admin/loyalty/redemptions/{redemptionReference}/refund")
     @Operation(summary = "Refund an APPLIED redemption (restores points); idempotent")
-    public RedemptionResponse refundRedemption(@PathVariable String redemptionReference) {
-        return redemptionService.refundByReference(redemptionReference);
+    public RedemptionResponse refundRedemption(@AuthUser Long uid,
+                                               @PathVariable String redemptionReference) {
+        return redemptionService.refundByReference(uid, redemptionReference);
     }
 
     @PostMapping("/api/admin/loyalty/redemptions/expire-stale")
     @Operation(summary = "Expire stale RESERVED redemptions past their expiry and restore points")
-    public ExpireStaleRunResponse expireStale() {
-        return redemptionService.expireStale();
+    public ExpireStaleRunResponse expireStale(@AuthUser Long uid) {
+        return redemptionService.expireStale(uid);
     }
 }

@@ -1,5 +1,6 @@
 package com.example.planyourtrip.controller;
 
+import com.example.planyourtrip.security.AuthUser;
 import com.example.planyourtrip.dto.PageResponse;
 import com.example.planyourtrip.dto.PersonalizationDto.CustomerRecommendationResponse;
 import com.example.planyourtrip.dto.PersonalizationDto.RecommendationGenerationResponse;
@@ -44,7 +45,7 @@ public class AdminUserRecommendationController {
 
     @PostMapping("/generate")
     @Operation(summary = "Generate recommendations for a user (reuses the customer engine)")
-    public RecommendationGenerationResponse generate(@PathVariable Long userId) {
-        return service.generate(userId);
+    public RecommendationGenerationResponse generate(@AuthUser Long uid, @PathVariable Long userId) {
+        return service.adminGenerate(uid, userId);
     }
 }

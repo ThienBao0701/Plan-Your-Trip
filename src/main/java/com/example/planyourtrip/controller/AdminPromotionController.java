@@ -1,5 +1,6 @@
 package com.example.planyourtrip.controller;
 
+import com.example.planyourtrip.security.AuthUser;
 import com.example.planyourtrip.dto.PromotionDto.*;
 import com.example.planyourtrip.service.PromotionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -52,7 +53,7 @@ public class AdminPromotionController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a promotion")
-    public void delete(@PathVariable Long id) {
-        service.delete(id);
+    public void delete(@AuthUser Long uid, @PathVariable Long id) {
+        service.adminDelete(uid, id);
     }
 }

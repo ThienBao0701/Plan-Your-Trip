@@ -21,17 +21,20 @@ public class PartnerPropertyService {
     private final HotelDetailRepository hotelDetails;
     private final NotificationService notificationService;
     private final PartnerActivityLogService activityLogService;
+    private final AdminActivityLogService adminAudit;
 
     public PartnerPropertyService(PlaceRepository places,
                                    PartnerProfileRepository partnerProfiles,
                                    HotelDetailRepository hotelDetails,
                                    NotificationService notificationService,
-                                   PartnerActivityLogService activityLogService) {
+                                   PartnerActivityLogService activityLogService,
+                                   AdminActivityLogService adminAudit) {
         this.places = places;
         this.partnerProfiles = partnerProfiles;
         this.hotelDetails = hotelDetails;
         this.notificationService = notificationService;
         this.activityLogService = activityLogService;
+        this.adminAudit = adminAudit;
     }
 
     @Transactional(readOnly = true)
@@ -130,7 +133,7 @@ public class PartnerPropertyService {
     }
 
     @Transactional
-    public PartnerHotelResponse assignOwner(Long hotelId, AssignOwnerRequest req) {
+    public PartnerHotelResponse assignOwner(Long adminUserId, Long hotelId, AssignOwnerRequest req) {
         Place place = places.findById(hotelId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Hotel not found: " + hotelId));
         PartnerProfile profile = partnerProfiles.findById(req.partnerProfileId())
@@ -141,8 +144,17 @@ public class PartnerPropertyService {
             throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,
                 "Only an approved partner profile can own a hotel");
 
+        PartnerProfile previousOwner = place.getOwner();
         place.setOwner(profile);
         Place saved = places.save(place);
+
+        // D1c - this is an authorization change, not a catalogue edit: it hands a partner account
+        // the extranet, rates, inventory and booking data for a property. Recorded with both the
+        // outgoing and incoming profile ids so a mis-assignment can be traced and undone.
+        adminAudit.record(adminUserId, "HOTEL_ASSIGN_OWNER", "PLACE", saved.getId(),
+            "Admin assigned hotel " + saved.getId() + " to partner profile " + profile.getId(),
+            previousOwner == null ? null : "partnerProfile:" + previousOwner.getId(),
+            "partnerProfile:" + profile.getId());
 
         notificationService.create(profile.getUser().getId(), NotificationType.PARTNER, Priority.NORMAL,
             "Hotel assigned to your account",

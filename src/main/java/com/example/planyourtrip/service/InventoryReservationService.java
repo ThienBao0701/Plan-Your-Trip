@@ -75,15 +75,18 @@ public class InventoryReservationService {
     private final RoomInventoryRepository inventoryRepo;
     private final BookingRepository bookingRepo;
     private final UserRepository userRepo;
+    private final AdminActivityLogService adminAudit;
 
     public InventoryReservationService(InventoryReservationRepository reservationRepo,
                                        RoomInventoryRepository inventoryRepo,
                                        BookingRepository bookingRepo,
-                                       UserRepository userRepo) {
+                                       UserRepository userRepo,
+                                       AdminActivityLogService adminAudit) {
         this.reservationRepo = reservationRepo;
         this.inventoryRepo = inventoryRepo;
         this.bookingRepo = bookingRepo;
         this.userRepo = userRepo;
+        this.adminAudit = adminAudit;
     }
 
     // ═════════════════════════════════════════════════════════════════════
@@ -244,7 +247,7 @@ public class InventoryReservationService {
      * lock so it never races the payment/cancel paths.
      */
     @Transactional
-    public ExpirationResultResponse expireOverdueHolds() {
+    public ExpirationResultResponse expireOverdueHolds(Long adminUserId) {
         Instant now = Instant.now();
         var candidates = reservationRepo.findExpirationCandidates(now, InventoryReservationStatus.HELD);
         int expired = 0;
@@ -262,6 +265,11 @@ public class InventoryReservationService {
             reservationRepo.save(reservation);
             expired++;
         }
+        // This sweep returns saleable inventory to the pool, so it changes what customers can
+        // book. One summary row per run.
+        adminAudit.record(adminUserId, "INVENTORY_HOLD_EXPIRY_SWEEP", "INVENTORY_RESERVATION", null,
+            "Admin ran the inventory-hold expiry sweep: " + expired + " holds released",
+            null, "expired:" + expired);
         return new ExpirationResultResponse(expired);
     }
 

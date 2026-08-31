@@ -41,13 +41,14 @@ public class AdminInvoiceController {
 
     @PatchMapping("/{id}/status")
     @Operation(summary = "Force-set invoice status (admin override)")
-    public InvoiceResponse updateStatus(@PathVariable Long id, @RequestBody @Valid InvoiceStatusRequest req) {
-        return service.adminUpdateStatus(id, req.status());
+    public InvoiceResponse updateStatus(@AuthUser Long uid, @PathVariable Long id,
+                                         @RequestBody @Valid InvoiceStatusRequest req) {
+        return service.adminUpdateStatus(uid, id, req.status());
     }
 
     @PatchMapping("/{id}/cancel")
     @Operation(summary = "Cancel an invoice (does not cancel the booking)")
-    public InvoiceResponse cancel(@PathVariable Long id) {
-        return service.cancelInvoice(id);
+    public InvoiceResponse cancel(@AuthUser Long uid, @PathVariable Long id) {
+        return service.cancelInvoice(uid, id);
     }
 }

@@ -282,7 +282,7 @@ public class TravelCreditService {
      * row), sent only when something actually expired.
      */
     @Transactional
-    public CreditExpirationRunResponse processExpirations() {
+    public CreditExpirationRunResponse processExpirations(Long adminUserId) {
         LocalDate today = LocalDate.now();
 
         Map<Long, List<TravelCreditTransaction>> candidatesByAccount = new LinkedHashMap<>();
@@ -351,6 +351,13 @@ public class TravelCreditService {
                     RelatedEntityType.SYSTEM, account.getId());
             }
         }
+
+        // D1c - one summary row for the whole sweep. Recording per expired transaction would
+        // write an unbounded number of rows for a single click and make the trail unreadable.
+        adminAudit.record(adminUserId, "TRAVEL_CREDIT_EXPIRY_SWEEP", "TRAVEL_CREDIT", null,
+            "Admin ran the travel-credit expiry sweep: " + expirations.size()
+                + " transactions expired across " + accountsAffected + " accounts",
+            null, "expired:" + expirations.size() + " accounts:" + accountsAffected);
 
         return new CreditExpirationRunResponse(accountsAffected, expirations.size(),
             totalExpired.setScale(2, RoundingMode.HALF_UP), expirations);

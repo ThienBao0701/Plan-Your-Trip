@@ -1,5 +1,6 @@
 package com.example.planyourtrip.service;
 
+import com.example.planyourtrip.dto.PageResponse;
 import com.example.planyourtrip.dto.PartnerExtranetDto.PartnerActivityLogResponse;
 import com.example.planyourtrip.exception.ApiException;
 import com.example.planyourtrip.model.PartnerActivityLog;
@@ -9,6 +10,8 @@ import com.example.planyourtrip.model.User;
 import com.example.planyourtrip.repository.PartnerActivityLogRepository;
 import com.example.planyourtrip.repository.PartnerProfileRepository;
 import com.example.planyourtrip.repository.UserRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,10 +64,22 @@ public class PartnerActivityLogService {
             .stream().map(this::toResponse).toList();
     }
 
+    /**
+     * D1c - one partner's trail, paged in the database.
+     *
+     * <p>This log is append-only and unbounded in time: an active property writes entries for
+     * every rate, inventory and booking action, so the previous whole-trail read grew without
+     * limit for exactly the partners an administrator most needs to inspect. Ordering is fixed
+     * newest-first in the query and is not client-controllable, matching the administrative audit
+     * trail's own read contract.
+     */
     @Transactional(readOnly = true)
-    public List<PartnerActivityLogResponse> adminListByPartner(Long partnerProfileId) {
-        return logRepo.findByPartnerProfileIdOrderByCreatedAtDesc(partnerProfileId)
-            .stream().map(this::toResponse).toList();
+    public PageResponse<PartnerActivityLogResponse> adminListByPartnerPaged(
+            Long partnerProfileId, Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(AdminPaging.safePage(page), AdminPaging.safeSize(size));
+        return PageResponse.of(
+            logRepo.findByPartnerProfileIdOrderByCreatedAtDescIdDesc(partnerProfileId, pageable)
+                .map(this::toResponse));
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

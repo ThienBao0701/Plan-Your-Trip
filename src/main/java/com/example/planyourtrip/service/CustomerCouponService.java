@@ -84,6 +84,7 @@ public class CustomerCouponService {
     private final NotificationService notificationService;
     private final CustomerMembershipRepository customerMembershipRepo;
     private final CustomerMembershipService customerMembershipService;
+    private final AdminActivityLogService adminAudit;
 
     /** RETURNING_USER / customer-level threshold constants — see {@link #evaluateSegment}. */
     private static final Set<BookingStatus> NOT_QUALIFYING_STATUSES =
@@ -103,7 +104,8 @@ public class CustomerCouponService {
                                   PricingEngineService pricingEngineService,
                                   NotificationService notificationService,
                                   CustomerMembershipRepository customerMembershipRepo,
-                                  CustomerMembershipService customerMembershipService) {
+                                  CustomerMembershipService customerMembershipService,
+                                  AdminActivityLogService adminAudit) {
         this.customerCouponRepo = customerCouponRepo;
         this.couponDefinitionRepo = couponDefinitionRepo;
         this.userRepo = userRepo;
@@ -114,6 +116,7 @@ public class CustomerCouponService {
         this.notificationService = notificationService;
         this.customerMembershipRepo = customerMembershipRepo;
         this.customerMembershipService = customerMembershipService;
+        this.adminAudit = adminAudit;
     }
 
     // ── Claim ────────────────────────────────────────────────────────────────
@@ -265,7 +268,7 @@ public class CustomerCouponService {
      * </ul>
      */
     @Transactional
-    public CustomerCouponResponse adminRevoke(Long targetUserId, Long couponId) {
+    public CustomerCouponResponse adminRevoke(Long adminUserId, Long targetUserId, Long couponId) {
         userRepo.findById(targetUserId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found: " + targetUserId));
         CustomerCoupon coupon = customerCouponRepo.findByIdAndUserId(couponId, targetUserId)
@@ -277,6 +280,7 @@ public class CustomerCouponService {
         if (coupon.getStatus() == CustomerCouponStatus.REVOKED)
             throw new ApiException(HttpStatus.CONFLICT, "Coupon is already revoked");
 
+        CustomerCouponStatus before = coupon.getStatus();
         coupon.setStatus(CustomerCouponStatus.REVOKED);
         CustomerCoupon saved = customerCouponRepo.save(coupon);
 
@@ -291,6 +295,13 @@ public class CustomerCouponService {
             "Coupon " + def.getCode() + " (" + def.getName()
                 + ") has been revoked and can no longer be used.",
             RelatedEntityType.PROMOTION, def.getId());
+
+        // D1c - revoking takes spendable value away from a named customer. The customer-coupon row
+        // id is the target; the coupon code itself is never recorded, because a code is redeemable
+        // text and the trail must not become somewhere to harvest one.
+        adminAudit.record(adminUserId, "CUSTOMER_COUPON_REVOKE", "CUSTOMER_COUPON", saved.getId(),
+            "Admin revoked coupon " + saved.getId() + " held by user " + targetUserId,
+            before == null ? null : before.name(), saved.getStatus().name());
 
         return toResponse(saved);
     }

@@ -40,19 +40,22 @@ public class PersonalizationRuleService {
     private final PromotionRepository promotionRepo;
     private final CouponDefinitionRepository couponRepo;
     private final ObjectMapper objectMapper;
+    private final AdminActivityLogService adminAudit;
 
     public PersonalizationRuleService(PersonalizationRuleRepository ruleRepo,
                                        CustomerRecommendationRepository recRepo,
                                        PlaceRepository placeRepo,
                                        PromotionRepository promotionRepo,
                                        CouponDefinitionRepository couponRepo,
-                                       ObjectMapper objectMapper) {
+                                       ObjectMapper objectMapper,
+                                       AdminActivityLogService adminAudit) {
         this.ruleRepo = ruleRepo;
         this.recRepo = recRepo;
         this.placeRepo = placeRepo;
         this.promotionRepo = promotionRepo;
         this.couponRepo = couponRepo;
         this.objectMapper = objectMapper;
+        this.adminAudit = adminAudit;
     }
 
     public List<PersonalizationRuleResponse> getAll() {
@@ -102,11 +105,15 @@ public class PersonalizationRuleService {
     }
 
     @Transactional
-    public void delete(Long id) {
+    public void delete(Long adminUserId, Long id) {
         PersonalizationRule r = ruleOrThrow(id);
+        boolean wasActive = r.isActive();
         // Detach snapshots first so history is preserved and no FK violation occurs.
         recRepo.clearSourceRule(id);
         ruleRepo.delete(r);
+        // Scalar state only - see the note on GiftCardProductService.delete (D1c-NEW-1).
+        adminAudit.record(adminUserId, "PERSONALIZATION_RULE_DELETE", "PERSONALIZATION_RULE", id,
+            "Admin deleted personalization rule " + id, "active:" + wasActive, null);
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

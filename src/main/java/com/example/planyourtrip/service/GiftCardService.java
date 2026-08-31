@@ -127,11 +127,18 @@ public class GiftCardService {
      * grant with no purchaser (e.g. a promotional campaign card).
      */
     @Transactional
-    public GiftCardResponse issueForAdmin(AdminGiftCardIssueRequest req) {
+    public GiftCardResponse issueForAdmin(Long adminUserId, AdminGiftCardIssueRequest req) {
         User purchaser = req.purchaserUserId() != null ? userOrThrow(req.purchaserUserId()) : null;
-        return issueInternal(purchaser, req.productCode(), req.amount(),
+        GiftCardResponse issued = issueInternal(purchaser, req.productCode(), req.amount(),
             req.recipientUserId(), req.recipientEmail(), req.personalMessage(),
             req.idempotencyKey(), GiftCardReferenceType.ADMIN, "Admin issuance");
+        // D1c - issuing stored value out of nothing is the single most sensitive gift-card action.
+        // The card id and amount are recorded; the card's own code never is, because the code is
+        // the bearer credential and the trail must not become a place to harvest one.
+        adminAudit.record(adminUserId, "GIFT_CARD_ISSUE", "GIFT_CARD", issued.id(),
+            "Admin issued gift card " + issued.id(), null,
+            issued.originalAmount() == null ? null : issued.originalAmount().toPlainString());
+        return issued;
     }
 
     private GiftCardResponse issueInternal(User purchaser, String productCode, BigDecimal amount,
@@ -233,11 +240,21 @@ public class GiftCardService {
 
     /** Admin activation for support/testing — bypasses the purchaser/recipient ownership gate. */
     @Transactional
-    public GiftCardResponse adminActivate(Long giftCardId) {
+    public GiftCardResponse adminActivate(Long adminUserId, Long giftCardId) {
         GiftCard card = giftCardOrThrow(giftCardId);
         Long actingUserId = card.getRecipientUser() != null ? card.getRecipientUser().getId()
             : card.getPurchaserUser() != null ? card.getPurchaserUser().getId() : null;
-        return toResponse(activateInternal(actingUserId, card), false);
+        GiftCardStatus before = card.getStatus();
+        GiftCard activated = activateInternal(actingUserId, card);
+        // Activation on the customer's behalf is idempotent: replaying it on an already-ACTIVE
+        // card changes nothing, so only a real state change is recorded and the trail does not
+        // accumulate rows describing actions that did not happen.
+        if (before != activated.getStatus()) {
+            adminAudit.record(adminUserId, "GIFT_CARD_ACTIVATE", "GIFT_CARD", activated.getId(),
+                "Admin activated gift card " + activated.getId(),
+                before == null ? null : before.name(), activated.getStatus().name());
+        }
+        return toResponse(activated, false);
     }
 
     /**
@@ -635,7 +652,7 @@ public class GiftCardService {
      * is created — the balance is simply zeroed on the ledger.
      */
     @Transactional
-    public GiftCardResponse adminCancel(Long giftCardId) {
+    public GiftCardResponse adminCancel(Long adminUserId, Long giftCardId) {
         GiftCard card = giftCardRepo.findByIdForUpdate(giftCardId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Gift card not found: " + giftCardId));
 
@@ -666,6 +683,12 @@ public class GiftCardService {
                 RelatedEntityType.SYSTEM, saved.getId());
         }
 
+        // Recorded after the balance is actually zeroed, so the early idempotent return above
+        // (card already CANCELLED) writes no second row.
+        adminAudit.record(adminUserId, "GIFT_CARD_CANCEL", "GIFT_CARD", saved.getId(),
+            "Admin cancelled gift card " + saved.getId() + " and voided its remaining balance",
+            before.toPlainString(), saved.getCurrentBalance().toPlainString());
+
         return toResponse(saved, false);
     }
 
@@ -681,7 +704,7 @@ public class GiftCardService {
      * query again, backstopped by a per-card idempotency key.
      */
     @Transactional
-    public GiftCardExpirationResultResponse processExpirations() {
+    public GiftCardExpirationResultResponse processExpirations(Long adminUserId) {
         Instant now = Instant.now();
         List<GiftCard> candidates = giftCardRepo.findExpirationCandidates(now, EXPIRABLE_STATUSES);
 
@@ -711,6 +734,10 @@ public class GiftCardService {
             expirations.add(toTransactionResponse(tx));
             totalExpired = totalExpired.add(before);
         }
+
+        adminAudit.record(adminUserId, "GIFT_CARD_EXPIRY_SWEEP", "GIFT_CARD", null,
+            "Admin ran the gift-card expiry sweep: " + expirations.size() + " cards expired",
+            null, "expired:" + expirations.size());
 
         return new GiftCardExpirationResultResponse(expirations.size(),
             totalExpired.setScale(2, RoundingMode.HALF_UP), expirations);

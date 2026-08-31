@@ -21,10 +21,13 @@ public class PromotionService {
 
     private final PromotionRepository promotionRepo;
     private final NotificationService notificationService;
+    private final AdminActivityLogService adminAudit;
 
-    public PromotionService(PromotionRepository promotionRepo, NotificationService notificationService) {
+    public PromotionService(PromotionRepository promotionRepo, NotificationService notificationService,
+                            AdminActivityLogService adminAudit) {
         this.promotionRepo = promotionRepo;
         this.notificationService = notificationService;
+        this.adminAudit = adminAudit;
     }
 
     public List<PromotionResponse> getAll() {
@@ -68,6 +71,22 @@ public class PromotionService {
         }
         fill(p, req);
         return toResponse(promotionRepo.save(p));
+    }
+
+    /**
+     * D1c - the audited administrative delete. It is a separate entry point rather than an audit
+     * call inside {@link #delete(Long)} because {@code PartnerPromotionService} deletes a
+     * partner's own promotion through that method; recording there would file partner activity in
+     * the administrative trail.
+     */
+    @Transactional
+    public void adminDelete(Long adminUserId, Long id) {
+        Promotion promotion = promotionOrThrow(id);
+        boolean wasActive = promotion.isActive();
+        promotionRepo.deleteById(id);
+        // Scalar state only - see the note on GiftCardProductService.delete (D1c-NEW-1).
+        adminAudit.record(adminUserId, "PROMOTION_DELETE", "PROMOTION", id,
+            "Admin deleted promotion " + id, "active:" + wasActive, null);
     }
 
     @Transactional

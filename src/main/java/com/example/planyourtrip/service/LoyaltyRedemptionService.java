@@ -90,6 +90,7 @@ public class LoyaltyRedemptionService {
     private final UserRepository userRepo;
     private final NotificationService notificationService;
     private final CustomerMembershipService customerMembershipService;
+    private final AdminActivityLogService adminAudit;
 
     public LoyaltyRedemptionService(LoyaltyAccountRepository accountRepo,
                                     LoyaltyPointsTransactionRepository transactionRepo,
@@ -98,7 +99,8 @@ public class LoyaltyRedemptionService {
                                     BookingRepository bookingRepo,
                                     UserRepository userRepo,
                                     NotificationService notificationService,
-                                    CustomerMembershipService customerMembershipService) {
+                                    CustomerMembershipService customerMembershipService,
+                                    AdminActivityLogService adminAudit) {
         this.accountRepo = accountRepo;
         this.transactionRepo = transactionRepo;
         this.redemptionRepo = redemptionRepo;
@@ -107,6 +109,7 @@ public class LoyaltyRedemptionService {
         this.userRepo = userRepo;
         this.notificationService = notificationService;
         this.customerMembershipService = customerMembershipService;
+        this.adminAudit = adminAudit;
     }
 
     public record ReserveOutcome(RedemptionResponse response, boolean created) {}
@@ -257,6 +260,19 @@ public class LoyaltyRedemptionService {
 
     @Transactional
     public RedemptionResponse releaseByReference(Long userId, String reference, boolean adminOverride) {
+        return releaseByReference(userId, reference, adminOverride, null);
+    }
+
+    /**
+     * D1c - {@code adminActorId} is the acting administrator and is non-null only on the
+     * administrative path. This overload exists rather than an audit call inside the shared body
+     * because the customer endpoint calls the same method: recording there would file a customer's
+     * own release as an administrative action taken against them - the same trap D1a hit when
+     * referral rewards reached {@code TravelCreditService.grant}.
+     */
+    @Transactional
+    public RedemptionResponse releaseByReference(Long userId, String reference, boolean adminOverride,
+                                                  Long adminActorId) {
         LoyaltyPointsRedemption r = referenceOrThrow(reference);
         if (!adminOverride && !r.getCustomer().getId().equals(userId))
             throw new ApiException(HttpStatus.FORBIDDEN, "Access denied");
@@ -267,8 +283,20 @@ public class LoyaltyRedemptionService {
         if (r.getStatus() != LoyaltyRedemptionStatus.RESERVED)
             throw new ApiException(HttpStatus.CONFLICT,
                 "Only a RESERVED redemption can be released. Current status: " + r.getStatus());
-        return toResponse(restore(r, LoyaltyRedemptionStatus.RELEASED, LoyaltyTransactionType.REDEMPTION_RELEASE,
-            "released"));
+        LoyaltyRedemptionStatus beforeRelease = r.getStatus();
+        LoyaltyPointsRedemption released = restore(r, LoyaltyRedemptionStatus.RELEASED,
+            LoyaltyTransactionType.REDEMPTION_RELEASE, "released");
+        // Only the administrative path records; the customer releasing their own reservation is
+        // not an administrative action. Placed after the idempotent early returns above, so a
+        // replay on an already-terminal redemption writes no second row.
+        if (adminOverride) {
+            adminAudit.record(adminActorId, "LOYALTY_REDEMPTION_RELEASE", "LOYALTY_REDEMPTION",
+                released.getId(),
+                "Admin released loyalty redemption " + released.getId()
+                    + " (" + released.getPointsRedeemed() + " points)",
+                beforeRelease.name(), released.getStatus().name());
+        }
+        return toResponse(released);
     }
 
     // ── Booking-cancellation hook (called by BookingService) ──────────────────
@@ -307,20 +335,28 @@ public class LoyaltyRedemptionService {
 
     /** Explicit admin refund of an APPLIED redemption (APPLIED → REFUNDED). */
     @Transactional
-    public RedemptionResponse refundByReference(String reference) {
+    public RedemptionResponse refundByReference(Long adminUserId, String reference) {
         LoyaltyPointsRedemption r = referenceOrThrow(reference);
         if (r.getStatus() == LoyaltyRedemptionStatus.REFUNDED) return toResponse(r); // idempotent
         if (r.getStatus() != LoyaltyRedemptionStatus.APPLIED)
             throw new ApiException(HttpStatus.CONFLICT,
                 "Only an APPLIED redemption can be refunded. Current status: " + r.getStatus());
-        return toResponse(restore(r, LoyaltyRedemptionStatus.REFUNDED, LoyaltyTransactionType.REDEMPTION_REFUND,
-            "refunded"));
+        LoyaltyRedemptionStatus before = r.getStatus();
+        LoyaltyPointsRedemption refunded = restore(r, LoyaltyRedemptionStatus.REFUNDED,
+            LoyaltyTransactionType.REDEMPTION_REFUND, "refunded");
+        // D1c - a refund puts points back into a customer's balance. Recorded after the early
+        // idempotent return above, so a replay does not add a second row for one restoration.
+        adminAudit.record(adminUserId, "LOYALTY_REDEMPTION_REFUND", "LOYALTY_REDEMPTION", refunded.getId(),
+            "Admin refunded loyalty redemption " + refunded.getId()
+                + " (" + refunded.getPointsRedeemed() + " points)",
+            before.name(), refunded.getStatus().name());
+        return toResponse(refunded);
     }
 
     // ── Expire stale reservations (admin-triggered; no scheduler) ─────────────
 
     @Transactional
-    public ExpireStaleRunResponse expireStale() {
+    public ExpireStaleRunResponse expireStale(Long adminUserId) {
         Instant now = Instant.now();
         List<LoyaltyPointsRedemption> stale =
             redemptionRepo.findByStatusAndExpiresAtLessThanEqual(LoyaltyRedemptionStatus.RESERVED, now);
@@ -334,6 +370,11 @@ public class LoyaltyRedemptionService {
             restored += r.getPointsRedeemed();
             expired.add(toResponse(r));
         }
+        adminAudit.record(adminUserId, "LOYALTY_REDEMPTION_EXPIRY_SWEEP", "LOYALTY_REDEMPTION", null,
+            "Admin ran the stale-redemption sweep: " + expired.size() + " expired, "
+                + restored + " points restored",
+            null, "expired:" + expired.size() + " pointsRestored:" + restored);
+
         return new ExpireStaleRunResponse(expired.size(), restored, expired);
     }
 
