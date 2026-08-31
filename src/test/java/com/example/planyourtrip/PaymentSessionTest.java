@@ -1,5 +1,6 @@
 package com.example.planyourtrip;
 
+import com.example.planyourtrip.model.AdminActivityLog;
 import com.example.planyourtrip.model.CallbackOutcome;
 import com.example.planyourtrip.model.PaymentProvider;
 import com.example.planyourtrip.model.PaymentSession;
@@ -14,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -67,11 +69,15 @@ class PaymentSessionTest {
     @Autowired PlaceRepository placeRepo;
     @Autowired HotelDetailRepository hotelDetailRepo;
     @Autowired HotelRoomRepository hotelRoomRepo;
+    // D1d — the admin force-expire is audited; these read the trail back.
+    @Autowired AdminActivityLogRepository auditRepo;
+    @Autowired UserRepository userRepo;
 
     private String adminToken;
     private String userToken;
     private String partnerToken;
     private Long roomId;
+    private Long adminUserId;
 
     // Inventory is seeded only for days 0–89. This suite books SUITE-KNG (which other
     // suites barely touch, so its 18/night inventory has ample headroom) on distinct
@@ -89,6 +95,7 @@ class PaymentSessionTest {
         roomId = hotelRoomRepo.findAllByHotelDetailId(detailId).stream()
             .filter(r -> "SUITE-KNG".equals(r.getRoomCode()))
             .findFirst().orElseThrow().getId();
+        adminUserId = userRepo.findByEmail("admin@planyourtrip.com").orElseThrow().getId();
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -359,6 +366,159 @@ class PaymentSessionTest {
             .andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
         assertTrue(mapper.readTree(body).get("expiredCount").asInt() >= 0);
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // D1d — ADMIN FORCE-EXPIRE IS AUDITED
+    //
+    // Day offsets 82–89 sit at the tail of the seeded 0–89 inventory range, clear of the
+    // 3–39 windows this suite already uses and the 40–81 windows PaymentProviderIntegrationTest
+    // uses. Every test below builds its own booking and session; none mutates seeded data.
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    @Test
+    void adminExpire_writesOneAuditRow_withActorActionTargetAndTransition() throws Exception {
+        Long bookingId = createBooking(userToken, 82);
+        JsonNode created = createSession(userToken, bookingId, "MOCK");
+        String sessionId = created.get("sessionId").asText();
+        long sessionRowId = created.get("id").asLong();
+        String statusBefore = created.get("status").asText();
+
+        long before = auditCount("PAYMENT_SESSION_EXPIRE");
+
+        JsonNode res = mapper.readTree(mvc.perform(
+                post("/api/admin/payment-sessions/" + sessionId + "/expire")
+                    .header("Authorization", "Bearer " + adminToken))
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString());
+        assertEquals("EXPIRED", res.get("status").asText());
+
+        assertEquals(before + 1, auditCount("PAYMENT_SESSION_EXPIRE"),
+            "one force-expire must write exactly one audit row");
+
+        AdminActivityLog entry = latestAudit("PAYMENT_SESSION_EXPIRE");
+        assertNotNull(entry);
+        assertEquals(adminUserId, entry.getActorUserId(), "actor is the acting administrator");
+        assertEquals("admin@planyourtrip.com", entry.getActorEmail(), "actor email snapshotted");
+        assertEquals("PAYMENT_SESSION", entry.getTargetType());
+        assertEquals(sessionRowId, entry.getTargetId(), "target is the session row id");
+        assertEquals(statusBefore, entry.getBeforeState(), "records the status it moved from");
+        assertEquals("EXPIRED", entry.getAfterState());
+        assertNotNull(entry.getCreatedAt(), "timestamp captured");
+        assertTrue(entry.getDescription().contains(String.valueOf(bookingId)),
+            "the booking id is the safe correlating identifier");
+    }
+
+    /**
+     * A payment session carries three pieces of material that must never reach the trail: the
+     * callback token (a bearer credential), the checkout URL and the provider reference. The
+     * public sessionId is excluded too — it is a random 32-hex handle, and free text of that
+     * shape can contain a 13-19 digit run that the audit service's card-number backstop rejects,
+     * which would abort the transaction and make the session unexpirable.
+     */
+    @Test
+    void adminExpire_auditCarriesNoSessionSecretsOrHandles() throws Exception {
+        Long bookingId = createBooking(userToken, 84);
+        JsonNode created = createSession(userToken, bookingId, "MOCK");
+        String sessionId = created.get("sessionId").asText();
+        String callbackToken = created.get("callbackToken").asText();
+        String checkoutUrl = created.get("checkoutUrl").asText();
+
+        mvc.perform(post("/api/admin/payment-sessions/" + sessionId + "/expire")
+                .header("Authorization", "Bearer " + adminToken))
+            .andExpect(status().isOk());
+
+        AdminActivityLog entry = latestAudit("PAYMENT_SESSION_EXPIRE");
+        for (String field : new String[]{entry.getDescription(), entry.getBeforeState(),
+                                          entry.getAfterState()}) {
+            if (field == null) continue;
+            assertFalse(field.contains(callbackToken), "callback token must never be recorded");
+            assertFalse(field.contains(checkoutUrl), "checkout URL must never be recorded");
+            assertFalse(field.contains(sessionId), "the session handle must not be recorded");
+        }
+    }
+
+    /**
+     * Business failure and audit are one transaction. A session already in a terminal
+     * non-expired state is rejected, the exception rolls the transaction back, and no row is
+     * left behind describing an expiry that did not happen.
+     */
+    @Test
+    void adminExpire_terminalSession_returns422_andWritesNoAudit() throws Exception {
+        Long bookingId = createBooking(userToken, 86);
+        JsonNode created = createSession(userToken, bookingId, "MOCK");
+        String sessionId = created.get("sessionId").asText();
+
+        mvc.perform(post("/api/payment-sessions/" + sessionId + "/cancel")
+                .header("Authorization", "Bearer " + userToken))
+            .andExpect(status().isOk());
+
+        long before = auditCount("PAYMENT_SESSION_EXPIRE");
+        mvc.perform(post("/api/admin/payment-sessions/" + sessionId + "/expire")
+                .header("Authorization", "Bearer " + adminToken))
+            .andExpect(status().isUnprocessableEntity());
+
+        assertEquals(before, auditCount("PAYMENT_SESSION_EXPIRE"),
+            "a rejected expire must leave no audit row");
+    }
+
+    /**
+     * Repeating the call is a no-op on an already-EXPIRED session: the service returns the
+     * current state unchanged. Nothing changed, so nothing is recorded — the same rule D1c
+     * applied to gift-card activation and loyalty release. This test pins the existing service
+     * semantics; it does not introduce a new idempotency rule.
+     */
+    @Test
+    void adminExpire_repeated_isIdempotentAndWritesNoSecondRow() throws Exception {
+        Long bookingId = createBooking(userToken, 88);
+        JsonNode created = createSession(userToken, bookingId, "MOCK");
+        String sessionId = created.get("sessionId").asText();
+
+        long before = auditCount("PAYMENT_SESSION_EXPIRE");
+
+        mvc.perform(post("/api/admin/payment-sessions/" + sessionId + "/expire")
+                .header("Authorization", "Bearer " + adminToken))
+            .andExpect(status().isOk());
+        assertEquals(before + 1, auditCount("PAYMENT_SESSION_EXPIRE"));
+
+        JsonNode replay = mapper.readTree(mvc.perform(
+                post("/api/admin/payment-sessions/" + sessionId + "/expire")
+                    .header("Authorization", "Bearer " + adminToken))
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString());
+        assertEquals("EXPIRED", replay.get("status").asText(), "replay returns the current state");
+
+        assertEquals(before + 1, auditCount("PAYMENT_SESSION_EXPIRE"),
+            "an idempotent replay must not add a second row");
+    }
+
+    @Test
+    void adminExpire_unknownSession_returns404_andWritesNoAudit() throws Exception {
+        long before = auditCount("PAYMENT_SESSION_EXPIRE");
+        mvc.perform(post("/api/admin/payment-sessions/PS-does-not-exist/expire")
+                .header("Authorization", "Bearer " + adminToken))
+            .andExpect(status().isNotFound());
+        assertEquals(before, auditCount("PAYMENT_SESSION_EXPIRE"));
+    }
+
+    @Test
+    void adminExpire_isAdminOnly() throws Exception {
+        String path = "/api/admin/payment-sessions/PS-any/expire";
+        mvc.perform(post(path)).andExpect(status().isUnauthorized());
+        mvc.perform(post(path).header("Authorization", "Bearer " + userToken))
+            .andExpect(status().isForbidden());
+        mvc.perform(post(path).header("Authorization", "Bearer " + partnerToken))
+            .andExpect(status().isForbidden());
+    }
+
+    private long auditCount(String action) {
+        return auditRepo.search(null, action, null, null, null, null, PageRequest.of(0, 1))
+            .getTotalElements();
+    }
+
+    private AdminActivityLog latestAudit(String action) {
+        var page = auditRepo.search(null, action, null, null, null, null, PageRequest.of(0, 1));
+        return page.isEmpty() ? null : page.getContent().get(0);
     }
 
     // ═══════════════════════════════════════════════════════════════════════════

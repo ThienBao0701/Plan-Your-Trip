@@ -332,9 +332,29 @@ public class PaymentGatewayService {
         return toResponse(saved, true);
     }
 
-    /** Admin force-expire of a single non-terminal session (simulates a provider timeout). */
+    /**
+     * Admin force-expire of a single non-terminal session (simulates a provider timeout).
+     *
+     * <h2>D1d — why the audit call lives here and not in {@link #expireInternal}</h2>
+     *
+     * <p>{@code expireInternal} is shared with {@link #processExpirations}, which records ONE
+     * summary row for a whole sweep. Auditing the shared body would replace that single row with
+     * one row per swept session — an unbounded number of audit rows for one click, which is
+     * exactly the failure mode D1c's batch rule exists to prevent. The audit therefore sits on
+     * the admin-only single-target entry point, and the sweep keeps its own summary row.
+     *
+     * <p>The record is written after the state actually changed, so the two early returns above
+     * are unaudited on purpose: an already-EXPIRED session is a no-op (nothing changed, so there
+     * is nothing to record), and a terminal-but-not-expired session throws, which rolls the whole
+     * transaction back. This matches the idempotency semantics D1c established for gift-card
+     * activation and loyalty release/refund — it does not invent a new rule.
+     *
+     * <p>Everything — the status flip, the lifecycle event, the settlement bridge that releases
+     * any held loyalty/gift-card value, and this audit row — happens inside this one
+     * {@code @Transactional} boundary, under the pessimistic lock taken above.
+     */
     @Transactional
-    public SessionResponse expire(String sessionId) {
+    public SessionResponse expire(Long adminUserId, String sessionId) {
         PaymentSession session = sessionRepo.findBySessionIdForUpdate(sessionId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Payment session not found: " + sessionId));
         if (session.getStatus() == PaymentSessionStatus.EXPIRED)
@@ -342,7 +362,25 @@ public class PaymentGatewayService {
         if (session.getStatus().isTerminal())
             throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,
                 "Cannot expire a session in status " + session.getStatus());
-        return toResponse(expireInternal(session), true);
+
+        PaymentSessionStatus before = session.getStatus();
+        boolean hadSettlement = session.getPayment() != null;
+        PaymentSession expired = expireInternal(session);
+
+        // Safe metadata only: the session's own row id as the target, the booking id as the
+        // correlating identifier, and the status pair. The public sessionId string is
+        // deliberately NOT recorded — it is a random 32-hex handle, and free text of that shape
+        // can contain a 13-19 digit run, which the audit service's card-number backstop rejects.
+        // That would abort this transaction and make the session unexpirable (the D1c-NEW-1
+        // failure mode). The callback token, provider reference and checkout URL are likewise
+        // never recorded: those are the session's bearer material.
+        boolean releasedHeldValue = !hadSettlement && expired.getPayment() != null;
+        adminAudit.record(adminUserId, "PAYMENT_SESSION_EXPIRE", "PAYMENT_SESSION", expired.getId(),
+            "Admin force-expired the checkout session for booking " + expired.getBooking().getId()
+                + (releasedHeldValue ? "; held loyalty/gift-card value was released" : ""),
+            before.name(), expired.getStatus().name());
+
+        return toResponse(expired, true);
     }
 
     /** Time-based expiry sweep (admin-triggered; no scheduler in this phase). */

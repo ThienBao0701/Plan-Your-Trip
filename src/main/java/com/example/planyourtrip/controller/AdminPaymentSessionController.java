@@ -61,8 +61,8 @@ public class AdminPaymentSessionController {
 
     @PostMapping("/{sessionId}/expire")
     @Operation(summary = "Force-expire a single non-terminal session (simulates a provider timeout; idempotent)")
-    public SessionResponse expire(@PathVariable String sessionId) {
-        return service.expire(sessionId);
+    public SessionResponse expire(@AuthUser Long uid, @PathVariable String sessionId) {
+        return service.expire(uid, sessionId);
     }
 
     @PostMapping("/process-expirations")

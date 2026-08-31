@@ -22,8 +22,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long>,
 
     List<Review> findByPlaceIdAndStatusOrderByCreatedAtDesc(Long placeId, ReviewStatus status);
 
-    List<Review> findAllByOrderByCreatedAtDesc();
-
     List<Review> findByPlaceIdIn(List<Long> placeIds);
 
     // ── Phase 7.46 — read-only review-analytics aggregates (additive; no mutation) ──
