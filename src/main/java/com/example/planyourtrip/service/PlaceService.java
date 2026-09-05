@@ -56,6 +56,7 @@ public class PlaceService {
     private final AdministrativeUnitRepository locations;
     private final AmenityRepository amenities;
     private final UserRepository users;
+    private final AdminActivityLogService adminAudit;
 
     public PlaceService(PlaceRepository places, PlaceTagRepository tags,
                         PlaceOpeningHourRepository hours, PlaceAmenityRepository placeAmenities,
@@ -63,7 +64,8 @@ public class PlaceService {
                         PlaceMetadataRepository metadataRepo,
                         HotelDetailService hotelDetailService,
                         CategoryRepository categories, AdministrativeUnitRepository locations,
-                        AmenityRepository amenities, UserRepository users) {
+                        AmenityRepository amenities, UserRepository users,
+                        AdminActivityLogService adminAudit) {
         this.places = places;
         this.tags = tags;
         this.hours = hours;
@@ -75,6 +77,7 @@ public class PlaceService {
         this.locations = locations;
         this.amenities = amenities;
         this.users = users;
+        this.adminAudit = adminAudit;
     }
 
     // ─── Public ───────────────────────────────────────────────────────────────
@@ -163,12 +166,22 @@ public class PlaceService {
 
         Place saved = places.save(p);
         saveSubEntities(saved, req);
+        // D3F — every catalog mutation is administrative by construction: the
+        // whole PlaceService write surface is reachable only from
+        // AdminPlaceController (the public PlaceController and the two
+        // recommendation services call read methods only), so the record lives
+        // here rather than in a wrapper. Contrast HotelRoomService, whose write
+        // methods a partner also reaches.
+        adminAudit.record(adminId, "PLACE_CREATE", "PLACE", saved.getId(),
+            "Admin created place " + saved.getId(),
+            null, "status:" + saved.getStatus());
         return toResponse(saved);
     }
 
     @Transactional
-    public PlaceResponse update(Long id, PlaceRequest req) {
+    public PlaceResponse update(Long id, PlaceRequest req, Long adminId) {
         Place p = placeOrThrow(id);
+        PlaceStatus previousStatus = p.getStatus();
 
         PlaceStatus effectiveStatus = req.status() != null ? req.status() : p.getStatus();
         validateFeaturedVerified(req.featured(), req.verified(), effectiveStatus);
@@ -186,13 +199,24 @@ public class PlaceService {
         hours.deleteAllByPlaceId(id);
         placeAmenities.deleteAllByPlaceId(id);
         saveSubEntities(saved, req);
+        // The description names the destructive part explicitly: this endpoint
+        // replaces the place's tags, opening hours and amenities wholesale, and
+        // an operator reading the trail later needs to know that rather than
+        // inferring it from a bare "updated".
+        adminAudit.record(adminId, "PLACE_UPDATE", "PLACE", saved.getId(),
+            "Admin updated place " + saved.getId()
+                + "; tags, opening hours and amenities were replaced",
+            "status:" + previousStatus, "status:" + saved.getStatus());
         return toResponse(saved);
     }
 
     @Transactional
     public PlaceResponse updateStatus(Long id, PlaceStatus newStatus, Long adminId) {
         Place p = placeOrThrow(id);
-        validateTransition(p.getStatus(), newStatus);
+        PlaceStatus previousStatus = p.getStatus();
+        // Recorded after the transition check, so a refused transition leaves
+        // no trace of an action that never happened.
+        validateTransition(previousStatus, newStatus);
 
         p.setStatus(newStatus);
 
@@ -201,23 +225,47 @@ public class PlaceService {
             if (p.getApprovedAt() == null) p.setApprovedAt(Instant.now());
         }
 
-        return toResponse(places.save(p));
+        Place saved = places.save(p);
+        // ARCHIVED is terminal — nothing in the backend moves a place out of it
+        // — so the trail names that rather than leaving the reader to know the
+        // transition table.
+        adminAudit.record(adminId, "PLACE_STATUS_UPDATE", "PLACE", saved.getId(),
+            "Admin moved place " + saved.getId() + " from " + previousStatus
+                + " to " + newStatus
+                + (newStatus == ARCHIVED ? "; ARCHIVED is terminal" : ""),
+            "status:" + previousStatus, "status:" + newStatus);
+        return toResponse(saved);
     }
 
     @Transactional
-    public PlaceResponse updateFeatured(Long id, boolean featured) {
+    public PlaceResponse updateFeatured(Long id, boolean featured, Long adminId) {
         Place p = placeOrThrow(id);
+        boolean previous = p.isFeatured();
         if (featured) validateFeaturedVerified(true, false, p.getStatus());
         p.setFeatured(featured);
-        return toResponse(places.save(p));
+        Place saved = places.save(p);
+        // The endpoint is mutative even when the value is unchanged — it saves
+        // and answers 200 either way — so the call is recorded either way, and
+        // the before/after pair is what tells a reader it changed nothing.
+        adminAudit.record(adminId, "PLACE_FEATURED_UPDATE", "PLACE", saved.getId(),
+            "Admin set featured=" + featured + " on place " + saved.getId()
+                + (previous == featured ? " (unchanged)" : ""),
+            "featured:" + previous, "featured:" + featured);
+        return toResponse(saved);
     }
 
     @Transactional
-    public PlaceResponse updateVerified(Long id, boolean verified) {
+    public PlaceResponse updateVerified(Long id, boolean verified, Long adminId) {
         Place p = placeOrThrow(id);
+        boolean previous = p.isVerified();
         if (verified) validateFeaturedVerified(false, true, p.getStatus());
         p.setVerified(verified);
-        return toResponse(places.save(p));
+        Place saved = places.save(p);
+        adminAudit.record(adminId, "PLACE_VERIFIED_UPDATE", "PLACE", saved.getId(),
+            "Admin set verified=" + verified + " on place " + saved.getId()
+                + (previous == verified ? " (unchanged)" : ""),
+            "verified:" + previous, "verified:" + verified);
+        return toResponse(saved);
     }
 
     // ─── Detail builder ───────────────────────────────────────────────────────
@@ -281,8 +329,10 @@ public class PlaceService {
     }
 
     @Transactional
-    public PlaceMetadataResponse upsertMetadata(Long placeId, PlaceMetadataRequest req) {
+    public PlaceMetadataResponse upsertMetadata(Long placeId, PlaceMetadataRequest req,
+                                                 Long adminId) {
         Place place = placeOrThrow(placeId);
+        boolean existed = metadataRepo.findByPlaceId(placeId).isPresent();
         PlaceMetadata m = metadataRepo.findByPlaceId(placeId).orElseGet(() -> {
             PlaceMetadata fresh = new PlaceMetadata();
             fresh.setPlace(place);
@@ -313,7 +363,17 @@ public class PlaceService {
         m.setOutdoor(req.outdoor());
         m.setRainyDaySuitable(req.rainyDaySuitable());
         m.setNotes(req.notes());
-        return toMetadataResponse(metadataRepo.save(m));
+        PlaceMetadata saved = metadataRepo.save(m);
+        // Targeted at the PLACE, not at the metadata row: metadata is a
+        // one-to-one extension of a place, has no independent lifecycle, and an
+        // operator searching the trail looks up the place. Only whether the row
+        // was created or replaced is recorded — the payload is ~25 fields of
+        // recommendation signals, and dumping them would be a request dump.
+        adminAudit.record(adminId, "PLACE_METADATA_UPSERT", "PLACE", place.getId(),
+            "Admin " + (existed ? "replaced" : "created")
+                + " recommendation metadata for place " + place.getId(),
+            existed ? "metadata:present" : "metadata:absent", "metadata:present");
+        return toMetadataResponse(saved);
     }
 
     private PlaceMetadataResponse toMetadataResponse(PlaceMetadata m) {

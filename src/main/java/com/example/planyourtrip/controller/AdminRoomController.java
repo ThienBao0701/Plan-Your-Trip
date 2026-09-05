@@ -2,6 +2,7 @@ package com.example.planyourtrip.controller;
 
 import com.example.planyourtrip.dto.HotelRoomDto.HotelRoomRequest;
 import com.example.planyourtrip.dto.HotelRoomDto.HotelRoomResponse;
+import com.example.planyourtrip.security.AuthUser;
 import com.example.planyourtrip.service.HotelRoomService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,8 +30,9 @@ public class AdminRoomController {
 
     @PostMapping("/api/admin/rooms")
     @ResponseStatus(HttpStatus.CREATED)
-    public HotelRoomResponse create(@Valid @RequestBody HotelRoomRequest req) {
-        return service.create(req);
+    public HotelRoomResponse create(@Valid @RequestBody HotelRoomRequest req,
+                                    @AuthUser Long adminId) {
+        return service.adminCreate(adminId, req);
     }
 
     @GetMapping("/api/admin/rooms/{id}")
@@ -40,13 +42,14 @@ public class AdminRoomController {
 
     @PutMapping("/api/admin/rooms/{id}")
     public HotelRoomResponse update(@PathVariable Long id,
-                                    @Valid @RequestBody HotelRoomRequest req) {
-        return service.update(id, req);
+                                    @Valid @RequestBody HotelRoomRequest req,
+                                    @AuthUser Long adminId) {
+        return service.adminUpdate(adminId, id, req);
     }
 
     @PatchMapping("/api/admin/rooms/{id}/deactivate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deactivate(@PathVariable Long id) {
-        service.deactivate(id);
+    public void deactivate(@PathVariable Long id, @AuthUser Long adminId) {
+        service.adminDeactivate(adminId, id);
     }
 }

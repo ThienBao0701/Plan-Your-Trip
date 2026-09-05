@@ -22,17 +22,20 @@ public class HotelRoomService {
     private final RoomAmenityRepository roomAmenityRepo;
     private final MediaAssetRepository mediaAssetRepo;
     private final AmenityRepository amenityRepo;
+    private final AdminActivityLogService adminAudit;
 
     public HotelRoomService(HotelRoomRepository roomRepo,
                             HotelDetailRepository hotelDetailRepo,
                             RoomAmenityRepository roomAmenityRepo,
                             MediaAssetRepository mediaAssetRepo,
-                            AmenityRepository amenityRepo) {
+                            AmenityRepository amenityRepo,
+                            AdminActivityLogService adminAudit) {
         this.roomRepo        = roomRepo;
         this.hotelDetailRepo = hotelDetailRepo;
         this.roomAmenityRepo = roomAmenityRepo;
         this.mediaAssetRepo  = mediaAssetRepo;
         this.amenityRepo     = amenityRepo;
+        this.adminAudit      = adminAudit;
     }
 
     public List<HotelRoomResponse> getByPlaceId(Long placeId, boolean activeOnly) {
@@ -51,6 +54,62 @@ public class HotelRoomService {
 
     public HotelRoomResponse getById(Long id) {
         return toResponse(roomOrThrow(id));
+    }
+
+    /**
+     * D3F — the audited entry points for an administrator managing rooms.
+     *
+     * <p>They delegate rather than recording inside {@link #create}, {@link #update} and
+     * {@link #deactivate}, because those three are also how a <em>partner</em> manages the rooms of
+     * a property they own: {@code PartnerRoomService} calls all of them
+     * ({@code update}, {@code activate}, {@code deactivate}). Auditing the shared bodies would file
+     * a partner's own housekeeping as an administrative action — the same trap D1c hit when
+     * referral rewards reached the audited credit-grant path, and the reason
+     * {@code MediaAssetService} grew {@code adminCreate}/{@code adminDeactivate}.
+     *
+     * <p>Each wrapper is {@code @Transactional}, so the delegate and the audit row share one
+     * transaction: a failed mutation rolls the audit back with it, and a failed audit rolls the
+     * mutation back.
+     */
+    @Transactional
+    public HotelRoomResponse adminCreate(Long adminUserId, HotelRoomRequest req) {
+        HotelRoomResponse created = create(req);
+        adminAudit.record(adminUserId, "ROOM_CREATE", "HOTEL_ROOM", created.id(),
+            "Admin created room " + created.id() + " on place " + req.placeId(),
+            null, "active:" + created.active());
+        return created;
+    }
+
+    /** See {@link #adminCreate}. */
+    @Transactional
+    public HotelRoomResponse adminUpdate(Long adminUserId, Long id, HotelRoomRequest req) {
+        HotelRoom before = roomOrThrow(id);
+        boolean wasActive = before.isActive();
+        HotelRoomResponse updated = update(id, req);
+        // The room's amenity set is replaced wholesale by the update, which is
+        // the part an operator would not guess from a bare "updated".
+        adminAudit.record(adminUserId, "ROOM_UPDATE", "HOTEL_ROOM", id,
+            "Admin updated room " + id + "; amenities were replaced",
+            "active:" + wasActive, "active:" + updated.active());
+        return updated;
+    }
+
+    /**
+     * See {@link #adminCreate}. Deactivation is a soft delete: the row stays and the admin API
+     * exposes no counterpart, so the trail is the only record that it happened.
+     */
+    @Transactional
+    public void adminDeactivate(Long adminUserId, Long id) {
+        HotelRoom before = roomOrThrow(id);
+        boolean wasActive = before.isActive();
+        Long placeId = before.getHotelDetail() == null ? null
+            : before.getHotelDetail().getPlace().getId();
+        deactivate(id);
+        adminAudit.record(adminUserId, "ROOM_DEACTIVATE", "HOTEL_ROOM", id,
+            "Admin deactivated room " + id
+                + (placeId == null ? "" : " on place " + placeId)
+                + (wasActive ? "" : "; it was already inactive"),
+            "active:" + wasActive, "active:false");
     }
 
     @Transactional

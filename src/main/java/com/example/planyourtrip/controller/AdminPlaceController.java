@@ -60,8 +60,9 @@ public class AdminPlaceController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Update a place")
-    public PlaceResponse update(@PathVariable Long id, @Valid @RequestBody PlaceRequest req) {
-        return service.update(id, req);
+    public PlaceResponse update(@PathVariable Long id, @Valid @RequestBody PlaceRequest req,
+                                @AuthUser Long adminId) {
+        return service.update(id, req, adminId);
     }
 
     @PatchMapping("/{id}/status")
@@ -75,21 +76,24 @@ public class AdminPlaceController {
 
     @PatchMapping("/{id}/featured")
     @Operation(summary = "Set featured flag (APPROVED or PUBLISHED only)")
-    public PlaceResponse updateFeatured(@PathVariable Long id, @RequestBody PlaceFlagRequest req) {
-        return service.updateFeatured(id, req.value());
+    public PlaceResponse updateFeatured(@PathVariable Long id, @RequestBody PlaceFlagRequest req,
+                                        @AuthUser Long adminId) {
+        return service.updateFeatured(id, req.value(), adminId);
     }
 
     @PatchMapping("/{id}/verified")
     @Operation(summary = "Set verified flag (APPROVED or PUBLISHED only)")
-    public PlaceResponse updateVerified(@PathVariable Long id, @RequestBody PlaceFlagRequest req) {
-        return service.updateVerified(id, req.value());
+    public PlaceResponse updateVerified(@PathVariable Long id, @RequestBody PlaceFlagRequest req,
+                                        @AuthUser Long adminId) {
+        return service.updateVerified(id, req.value(), adminId);
     }
 
     @PutMapping("/{id}/metadata")
     @Operation(summary = "Upsert place metadata (recommendation signals)")
     public PlaceMetadataResponse upsertMetadata(
             @PathVariable Long id,
-            @Valid @RequestBody PlaceMetadataRequest req) {
-        return service.upsertMetadata(id, req);
+            @Valid @RequestBody PlaceMetadataRequest req,
+            @AuthUser Long adminId) {
+        return service.upsertMetadata(id, req, adminId);
     }
 }
