@@ -978,6 +978,7 @@ void main() {
         '',
         '   ',
         'javascript:alert(1)',
+        'vbscript:msgbox(1)',
         'data:image/png;base64,AAA',
         'file:///etc/passwd',
         'ftp://cdn.test/a.jpg',
