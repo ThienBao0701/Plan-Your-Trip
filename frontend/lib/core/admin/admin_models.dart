@@ -1248,3 +1248,210 @@ class AdminCatalogRoom {
     );
   }
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// D3C-B — Admin Media (URL registry)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/// `MediaType` — the three values the backend enum declares.
+///
+/// [unknown] exists so a value added server-side later renders as itself rather
+/// than crashing a parse, and so nothing that depends on a *known* type (cover
+/// eligibility) is ever granted to a value this build does not understand.
+enum AdminMediaType {
+  image('IMAGE'),
+  video('VIDEO'),
+  document('DOCUMENT'),
+  unknown('');
+
+  final String wire;
+  const AdminMediaType(this.wire);
+
+  static AdminMediaType parse(String? raw) {
+    for (final t in AdminMediaType.values) {
+      if (t != AdminMediaType.unknown && t.wire == raw) return t;
+    }
+    return AdminMediaType.unknown;
+  }
+
+  /// `MediaAssetService` refuses a cover that is not an IMAGE, on create, on
+  /// update and on `setCover` alike.
+  bool get canBeCover => this == AdminMediaType.image;
+
+  /// Only an IMAGE is worth attempting to render. A VIDEO or DOCUMENT URL is
+  /// not an image, and `Image.network` would simply fail on it.
+  bool get isRenderableAsImage => this == AdminMediaType.image;
+
+  /// The three values a create/update form may offer. [unknown] is never
+  /// offered — it is a read-side fallback only.
+  static List<AdminMediaType> get selectable => const [
+        AdminMediaType.image,
+        AdminMediaType.video,
+        AdminMediaType.document
+      ];
+}
+
+/// `MediaOwnerType`.
+///
+/// The backend enum has five members, but they are not equal in what the admin
+/// API actually lets a console do with them:
+///
+/// * `SUBMISSION` has no entity at all — `validateOwnerExists` answers 400.
+/// * `ROOM`, `REVIEW` and `TRIP_DOCUMENT` can be *created* through
+///   `POST /api/admin/media`, but there is no admin endpoint that lists them
+///   back. The only admin read is `GET /api/admin/places/{placeId}/media`.
+/// * `PLACE` is therefore the only owner an administrator can create, see,
+///   edit, deactivate, re-cover and reorder — a complete loop.
+///
+/// [isAdminManageable] encodes that, and the console offers only those owners.
+/// Creating a ROOM asset from here would produce a row the same console could
+/// never find again.
+enum AdminMediaOwnerType {
+  place('PLACE'),
+  room('ROOM'),
+  review('REVIEW'),
+  tripDocument('TRIP_DOCUMENT'),
+  submission('SUBMISSION'),
+  unknown('');
+
+  final String wire;
+  const AdminMediaOwnerType(this.wire);
+
+  static AdminMediaOwnerType parse(String? raw) {
+    for (final t in AdminMediaOwnerType.values) {
+      if (t != AdminMediaOwnerType.unknown && t.wire == raw) return t;
+    }
+    return AdminMediaOwnerType.unknown;
+  }
+
+  /// The backend rejects SUBMISSION outright.
+  bool get isSupportedByBackend =>
+      this != AdminMediaOwnerType.submission &&
+      this != AdminMediaOwnerType.unknown;
+
+  /// Has a complete admin read+write loop. See the class doc.
+  bool get isAdminManageable => this == AdminMediaOwnerType.place;
+
+  static List<AdminMediaOwnerType> get manageable =>
+      AdminMediaOwnerType.values.where((t) => t.isAdminManageable).toList();
+}
+
+/// One row of `MediaAssetResponse`.
+class AdminMediaAsset {
+  final int id;
+  final AdminMediaOwnerType ownerType;
+  final int? ownerId;
+  final String? url;
+  final String? thumbnailUrl;
+  final AdminMediaType mediaType;
+  final String? altText;
+  final int sortOrder;
+  final bool cover;
+  final bool active;
+  final int? uploadedByUserId;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+
+  const AdminMediaAsset({
+    required this.id,
+    required this.ownerType,
+    required this.ownerId,
+    required this.url,
+    required this.thumbnailUrl,
+    required this.mediaType,
+    required this.altText,
+    required this.sortOrder,
+    required this.cover,
+    required this.active,
+    required this.uploadedByUserId,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  static AdminMediaAsset? fromJson(Map<String, dynamic> json) {
+    final id = _asInt(json['id']);
+    if (id == null) return null;
+    return AdminMediaAsset(
+      id: id,
+      ownerType: AdminMediaOwnerType.parse(_asString(json['ownerType'])),
+      ownerId: _asInt(json['ownerId']),
+      url: _asString(json['url']),
+      thumbnailUrl: _asString(json['thumbnailUrl']),
+      mediaType: AdminMediaType.parse(_asString(json['mediaType'])),
+      altText: _asString(json['altText']),
+      sortOrder: _asInt(json['sortOrder']) ?? 0,
+      cover: json['cover'] == true,
+      active: json['active'] == true,
+      uploadedByUserId: _asInt(json['uploadedByUserId']),
+      createdAt: _asInstant(json['createdAt']),
+      updatedAt: _asInstant(json['updatedAt']),
+    );
+  }
+
+  /// The URL the *preview* uses — the thumbnail when one was registered, since
+  /// that is what it is for, otherwise the asset itself. Never rewritten.
+  String? get previewUrl =>
+      (thumbnailUrl != null && thumbnailUrl!.trim().isNotEmpty)
+          ? thumbnailUrl
+          : url;
+
+  /// True when the URL carries a query string. A media URL can legitimately be
+  /// a signed link, and D3M's audit trail redacts exactly this part — so the
+  /// console does not print it on a list either.
+  bool get urlHasQuery => AdminMediaUrl.hasQuery(url);
+
+  /// Origin + path, mirroring the backend's own `redactUrl`. This is a *display*
+  /// form only: [url] stays intact for the preview and for the edit form, so
+  /// saving can never silently rewrite what the operator registered.
+  String get displayUrl => AdminMediaUrl.redact(url) ?? (url ?? '');
+}
+
+/// URL rules shared by the media models, the media state and the media forms.
+///
+/// [isAcceptable] mirrors `MediaAssetService.validateUrl` — absolute, http or
+/// https, with a host. It is a convenience so an obviously bad value is caught
+/// before a round trip; it deliberately does **not** add rules of its own (no
+/// host allowlist, no extension check), because the server is the authority and
+/// a stricter client would silently reject values the product accepts.
+class AdminMediaUrl {
+  const AdminMediaUrl._();
+
+  static const Set<String> allowedSchemes = {'http', 'https'};
+
+  static bool isAcceptable(String? value) {
+    if (value == null || value.trim().isEmpty) return false;
+    final uri = Uri.tryParse(value.trim());
+    if (uri == null || !uri.hasScheme) return false;
+    if (!allowedSchemes.contains(uri.scheme.toLowerCase())) return false;
+    return uri.host.isNotEmpty;
+  }
+
+  static bool hasQuery(String? value) {
+    if (value == null || value.trim().isEmpty) return false;
+    final uri = Uri.tryParse(value.trim());
+    return uri != null && uri.query.isNotEmpty;
+  }
+
+  /// Scheme, host and path only. Returns null for a null/blank input and the
+  /// original string when it cannot be parsed — never a guess.
+  static String? redact(String? value) {
+    if (value == null || value.trim().isEmpty) return null;
+    final uri = Uri.tryParse(value.trim());
+    if (uri == null || uri.host.isEmpty) return value.trim();
+    // The query is dropped either way; [hasQuery] is what tells the UI to say
+    // so, rather than printing a possibly-signed parameter on a list.
+    return '${uri.scheme}://${uri.host}${uri.path}';
+  }
+}
+
+/// One entry of `MediaReorderRequest.items`.
+///
+/// The backend rejects a repeated `mediaId` **and** a repeated `sortOrder`
+/// rather than normalising either, so a caller builds a complete, conflict-free
+/// ordering for one gallery and submits it whole.
+class AdminMediaOrder {
+  final int mediaId;
+  final int sortOrder;
+
+  const AdminMediaOrder({required this.mediaId, required this.sortOrder});
+}

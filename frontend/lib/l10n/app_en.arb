@@ -6453,5 +6453,89 @@
   "adminCatalogMediaCover": "Cover",
   "adminCatalogMediaHasCover": "Set",
   "adminCatalogMediaNoCover": "None",
-  "adminCatalogMediaReadOnlyNotice": "Read-only. Media management is a separate admin surface."
+  "adminCatalogMediaReadOnlyNotice": "Read-only. Media management is a separate admin surface.",
+  "adminNavMedia": "Media",
+  "adminMediaPickOwnerTitle": "Choose a place",
+  "adminMediaOwnerScopeNotice": "Media is managed per place. The admin API can only read a place's gallery, so rooms, reviews and trip documents are not managed here.",
+  "adminMediaPlaceSearchLabel": "Search places",
+  "adminMediaPlaceSearchClear": "Clear search",
+  "adminMediaPlaceSearchHint": "Showing the first {count} matches. Narrow the search to find a specific place.",
+  "@adminMediaPlaceSearchHint": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminMediaNoPlacesFound": "No places match this search.",
+  "adminMediaOpenGallerySemantic": "Open the gallery for {name}",
+  "@adminMediaOpenGallerySemantic": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "adminMediaBackToPlaces": "Back to places",
+  "adminMediaEmptyTitle": "No media",
+  "adminMediaEmptyMessage": "This place has no registered media yet.",
+  "adminMediaUrlRegistryNotice": "Media is registered by URL. There is no file upload — paste an existing http or https address.",
+  "adminMediaAmbiguousOrderNotice": "Two or more items share a position, so their order is undefined. Moving any item renumbers the whole gallery and resolves it.",
+  "adminMediaNoCoverNotice": "No cover is set for this place.",
+  "adminMediaCoverIs": "Cover: item {id}",
+  "@adminMediaCoverIs": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
+  "adminMediaActionUncertain": "The result of the last action is unknown. The gallery has been reloaded — check it before trying again, because deactivation cannot be undone here.",
+  "adminMediaDismissNotice": "Dismiss",
+  "adminMediaAssetSemantic": "Media item {id}",
+  "@adminMediaAssetSemantic": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
+  "adminMediaUrl": "URL",
+  "adminMediaUrlHelper": "An absolute http or https address, including the host.",
+  "adminMediaUrlQueryHidden": "A query string is present and is not shown here.",
+  "adminMediaThumbnailUrl": "Thumbnail URL",
+  "adminMediaThumbnailUrlOptional": "Thumbnail URL (optional)",
+  "adminMediaType": "Type",
+  "adminMediaAltText": "Alt text",
+  "adminMediaAltTextOptional": "Alt text (optional)",
+  "adminMediaSortOrder": "Position",
+  "adminMediaSortOrderOptional": "Position (optional)",
+  "adminMediaActive": "Active",
+  "adminMediaInactive": "Inactive",
+  "adminMediaCover": "Cover",
+  "adminMediaPreviewUnavailable": "Preview unavailable",
+  "adminMediaPreviewNotAnImage": "Not an image",
+  "adminMediaAdd": "Add media",
+  "adminMediaAddTitle": "Register media",
+  "adminMediaEdit": "Edit",
+  "adminMediaEditTitle": "Edit media",
+  "adminMediaSave": "Save",
+  "adminMediaCreate": "Register",
+  "adminMediaSetCover": "Set as cover",
+  "adminMediaSetAsCover": "Use as the cover image",
+  "adminMediaCoverReplacesPrevious": "The place's current cover, if any, stops being the cover.",
+  "adminMediaCoverImageOnly": "Only an image can be the cover.",
+  "adminMediaMoveUp": "Move up",
+  "adminMediaMoveDown": "Move down",
+  "adminMediaEditReplacesNotice": "Saving replaces every field shown here. Clearing a box clears the stored value.",
+  "adminMediaUrlRequired": "A URL is required.",
+  "adminMediaUrlInvalid": "Enter an absolute http or https URL with a host.",
+  "adminMediaSortOrderInvalid": "Position must be a whole number of 0 or more.",
+  "adminMediaDeactivate": "Deactivate",
+  "adminMediaDeactivateTitle": "Deactivate this media?",
+  "adminMediaDeactivateWarningHidden": "It disappears from the place's public gallery immediately.",
+  "adminMediaDeactivateWarningNoRestore": "There is no way to reactivate it from the admin console.",
+  "adminMediaDeactivateWarningCover": "This item is the cover. The place will have no cover afterwards — nothing is promoted in its place.",
+  "adminMediaDeactivateAcknowledge": "I understand this cannot be undone here.",
+  "adminMediaDeactivateConfirm": "Deactivate media"
 }

@@ -12805,4 +12805,195 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get adminCatalogMediaReadOnlyNotice =>
       'Read-only. Media management is a separate admin surface.';
+
+  @override
+  String get adminNavMedia => 'Media';
+
+  @override
+  String get adminMediaPickOwnerTitle => 'Choose a place';
+
+  @override
+  String get adminMediaOwnerScopeNotice =>
+      'Media is managed per place. The admin API can only read a place\'s gallery, so rooms, reviews and trip documents are not managed here.';
+
+  @override
+  String get adminMediaPlaceSearchLabel => 'Search places';
+
+  @override
+  String get adminMediaPlaceSearchClear => 'Clear search';
+
+  @override
+  String adminMediaPlaceSearchHint(int count) {
+    return 'Showing the first $count matches. Narrow the search to find a specific place.';
+  }
+
+  @override
+  String get adminMediaNoPlacesFound => 'No places match this search.';
+
+  @override
+  String adminMediaOpenGallerySemantic(String name) {
+    return 'Open the gallery for $name';
+  }
+
+  @override
+  String get adminMediaBackToPlaces => 'Back to places';
+
+  @override
+  String get adminMediaEmptyTitle => 'No media';
+
+  @override
+  String get adminMediaEmptyMessage =>
+      'This place has no registered media yet.';
+
+  @override
+  String get adminMediaUrlRegistryNotice =>
+      'Media is registered by URL. There is no file upload — paste an existing http or https address.';
+
+  @override
+  String get adminMediaAmbiguousOrderNotice =>
+      'Two or more items share a position, so their order is undefined. Moving any item renumbers the whole gallery and resolves it.';
+
+  @override
+  String get adminMediaNoCoverNotice => 'No cover is set for this place.';
+
+  @override
+  String adminMediaCoverIs(int id) {
+    return 'Cover: item $id';
+  }
+
+  @override
+  String get adminMediaActionUncertain =>
+      'The result of the last action is unknown. The gallery has been reloaded — check it before trying again, because deactivation cannot be undone here.';
+
+  @override
+  String get adminMediaDismissNotice => 'Dismiss';
+
+  @override
+  String adminMediaAssetSemantic(int id) {
+    return 'Media item $id';
+  }
+
+  @override
+  String get adminMediaUrl => 'URL';
+
+  @override
+  String get adminMediaUrlHelper =>
+      'An absolute http or https address, including the host.';
+
+  @override
+  String get adminMediaUrlQueryHidden =>
+      'A query string is present and is not shown here.';
+
+  @override
+  String get adminMediaThumbnailUrl => 'Thumbnail URL';
+
+  @override
+  String get adminMediaThumbnailUrlOptional => 'Thumbnail URL (optional)';
+
+  @override
+  String get adminMediaType => 'Type';
+
+  @override
+  String get adminMediaAltText => 'Alt text';
+
+  @override
+  String get adminMediaAltTextOptional => 'Alt text (optional)';
+
+  @override
+  String get adminMediaSortOrder => 'Position';
+
+  @override
+  String get adminMediaSortOrderOptional => 'Position (optional)';
+
+  @override
+  String get adminMediaActive => 'Active';
+
+  @override
+  String get adminMediaInactive => 'Inactive';
+
+  @override
+  String get adminMediaCover => 'Cover';
+
+  @override
+  String get adminMediaPreviewUnavailable => 'Preview unavailable';
+
+  @override
+  String get adminMediaPreviewNotAnImage => 'Not an image';
+
+  @override
+  String get adminMediaAdd => 'Add media';
+
+  @override
+  String get adminMediaAddTitle => 'Register media';
+
+  @override
+  String get adminMediaEdit => 'Edit';
+
+  @override
+  String get adminMediaEditTitle => 'Edit media';
+
+  @override
+  String get adminMediaSave => 'Save';
+
+  @override
+  String get adminMediaCreate => 'Register';
+
+  @override
+  String get adminMediaSetCover => 'Set as cover';
+
+  @override
+  String get adminMediaSetAsCover => 'Use as the cover image';
+
+  @override
+  String get adminMediaCoverReplacesPrevious =>
+      'The place\'s current cover, if any, stops being the cover.';
+
+  @override
+  String get adminMediaCoverImageOnly => 'Only an image can be the cover.';
+
+  @override
+  String get adminMediaMoveUp => 'Move up';
+
+  @override
+  String get adminMediaMoveDown => 'Move down';
+
+  @override
+  String get adminMediaEditReplacesNotice =>
+      'Saving replaces every field shown here. Clearing a box clears the stored value.';
+
+  @override
+  String get adminMediaUrlRequired => 'A URL is required.';
+
+  @override
+  String get adminMediaUrlInvalid =>
+      'Enter an absolute http or https URL with a host.';
+
+  @override
+  String get adminMediaSortOrderInvalid =>
+      'Position must be a whole number of 0 or more.';
+
+  @override
+  String get adminMediaDeactivate => 'Deactivate';
+
+  @override
+  String get adminMediaDeactivateTitle => 'Deactivate this media?';
+
+  @override
+  String get adminMediaDeactivateWarningHidden =>
+      'It disappears from the place\'s public gallery immediately.';
+
+  @override
+  String get adminMediaDeactivateWarningNoRestore =>
+      'There is no way to reactivate it from the admin console.';
+
+  @override
+  String get adminMediaDeactivateWarningCover =>
+      'This item is the cover. The place will have no cover afterwards — nothing is promoted in its place.';
+
+  @override
+  String get adminMediaDeactivateAcknowledge =>
+      'I understand this cannot be undone here.';
+
+  @override
+  String get adminMediaDeactivateConfirm => 'Deactivate media';
 }

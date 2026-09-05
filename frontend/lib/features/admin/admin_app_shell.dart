@@ -9,6 +9,7 @@ import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/glass_widgets.dart';
 import 'admin_feature_states.dart';
 import 'admin_catalog_states.dart';
+import 'admin_media_states.dart';
 import 'admin_partner_states.dart';
 import 'widgets/admin_widgets.dart';
 import 'admin_navigation.dart';
@@ -18,6 +19,7 @@ import 'screens/admin_bookings_screen.dart';
 import 'screens/admin_dashboard_screen.dart';
 import 'screens/admin_invoices_screen.dart';
 import 'screens/admin_catalog_screen.dart';
+import 'screens/admin_media_screen.dart';
 import 'screens/admin_partner_detail_screen.dart';
 import 'screens/admin_place_detail_screen.dart';
 import 'screens/admin_partners_screen.dart';
@@ -67,6 +69,8 @@ class _AdminAppShellState extends State<AdminAppShell> {
 
   AdminCatalogPlacesState? _catalog;
 
+  AdminMediaState? _media;
+
   /// The place currently open, or null when the Catalog destination is showing
   /// its list. Created per place and disposed when another is opened, so a slow
   /// response for the previous id cannot land on the new screen.
@@ -104,6 +108,7 @@ class _AdminAppShellState extends State<AdminAppShell> {
     _partners?.dispose();
     _partnerDetail?.dispose();
     _catalog?.dispose();
+    _media?.dispose();
     _placeDetail?.dispose();
     super.dispose();
   }
@@ -123,6 +128,7 @@ class _AdminAppShellState extends State<AdminAppShell> {
     _activity = AdminActivityLogState(api: api);
     _partners = AdminPartnersState(api: api);
     _catalog = AdminCatalogPlacesState(api: api);
+    _media = AdminMediaState(api: api);
 
     // One load for the landing section. Other sections load lazily when first
     // selected, so opening the console does not fan out six requests at once.
@@ -156,6 +162,12 @@ class _AdminAppShellState extends State<AdminAppShell> {
         if (_partners?.status == AdminLoadStatus.idle) _partners!.load();
       case AdminRoutes.catalog:
         if (_catalog?.status == AdminLoadStatus.idle) _catalog!.load();
+      case AdminRoutes.media:
+        // There is no gallery to preload — media has no owner until a place is
+        // chosen — so what loads first is the place picker's options.
+        if (_media?.placeSearchStatus == AdminLoadStatus.idle) {
+          _media!.searchPlaces('');
+        }
       default:
         if (_dashboard?.status == AdminLoadStatus.idle) _dashboard!.load();
     }
@@ -240,6 +252,7 @@ class _AdminAppShellState extends State<AdminAppShell> {
               state: _placeDetail!,
               onBack: _closePlace,
             ),
+      AdminRoutes.media => AdminMediaScreen(state: _media!),
       AdminRoutes.partners => _partnerDetail == null
           ? AdminPartnersScreen(
               state: _partners!,

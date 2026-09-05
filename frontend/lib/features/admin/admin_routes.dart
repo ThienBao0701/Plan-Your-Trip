@@ -26,6 +26,7 @@ class AdminRoutes {
   static const String activityLog = AdminRoutesRefs.activityLog;
   static const String partners = AdminRoutesRefs.partners;
   static const String catalog = AdminRoutesRefs.catalog;
+  static const String media = AdminRoutesRefs.media;
 
   static bool isAdminRoute(String route) =>
       route == namespace || route.startsWith('$namespace/');

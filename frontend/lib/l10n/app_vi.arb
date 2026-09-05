@@ -6453,5 +6453,89 @@
   "adminCatalogMediaCover": "Ảnh bìa",
   "adminCatalogMediaHasCover": "Đã đặt",
   "adminCatalogMediaNoCover": "Chưa có",
-  "adminCatalogMediaReadOnlyNotice": "Chỉ xem. Quản lý ảnh nằm ở một khu vực quản trị riêng."
+  "adminCatalogMediaReadOnlyNotice": "Chỉ xem. Quản lý ảnh nằm ở một khu vực quản trị riêng.",
+  "adminNavMedia": "Thư viện",
+  "adminMediaPickOwnerTitle": "Chọn một địa điểm",
+  "adminMediaOwnerScopeNotice": "Ảnh và video được quản lý theo từng địa điểm. API quản trị chỉ đọc được thư viện của địa điểm, nên phòng, đánh giá và tài liệu chuyến đi không được quản lý ở đây.",
+  "adminMediaPlaceSearchLabel": "Tìm địa điểm",
+  "adminMediaPlaceSearchClear": "Xoá tìm kiếm",
+  "adminMediaPlaceSearchHint": "Đang hiển thị {count} kết quả đầu tiên. Hãy thu hẹp tìm kiếm để tìm đúng địa điểm.",
+  "@adminMediaPlaceSearchHint": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminMediaNoPlacesFound": "Không có địa điểm nào khớp với tìm kiếm này.",
+  "adminMediaOpenGallerySemantic": "Mở thư viện của {name}",
+  "@adminMediaOpenGallerySemantic": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "adminMediaBackToPlaces": "Quay lại danh sách địa điểm",
+  "adminMediaEmptyTitle": "Chưa có ảnh hoặc video",
+  "adminMediaEmptyMessage": "Địa điểm này chưa đăng ký ảnh hoặc video nào.",
+  "adminMediaUrlRegistryNotice": "Ảnh và video được đăng ký bằng đường dẫn. Không có tải tệp lên — hãy dán một địa chỉ http hoặc https có sẵn.",
+  "adminMediaAmbiguousOrderNotice": "Có từ hai mục trở lên cùng vị trí nên thứ tự không xác định. Di chuyển bất kỳ mục nào sẽ đánh số lại toàn bộ thư viện và xử lý việc này.",
+  "adminMediaNoCoverNotice": "Địa điểm này chưa đặt ảnh bìa.",
+  "adminMediaCoverIs": "Ảnh bìa: mục {id}",
+  "@adminMediaCoverIs": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
+  "adminMediaActionUncertain": "Không rõ kết quả của thao tác vừa rồi. Thư viện đã được tải lại — hãy kiểm tra trước khi thử lại, vì thao tác ngừng sử dụng không thể hoàn tác tại đây.",
+  "adminMediaDismissNotice": "Bỏ qua",
+  "adminMediaAssetSemantic": "Mục {id}",
+  "@adminMediaAssetSemantic": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
+  "adminMediaUrl": "Đường dẫn",
+  "adminMediaUrlHelper": "Địa chỉ http hoặc https đầy đủ, bao gồm tên miền.",
+  "adminMediaUrlQueryHidden": "Đường dẫn có tham số truy vấn và không được hiển thị ở đây.",
+  "adminMediaThumbnailUrl": "Đường dẫn ảnh thu nhỏ",
+  "adminMediaThumbnailUrlOptional": "Đường dẫn ảnh thu nhỏ (không bắt buộc)",
+  "adminMediaType": "Loại",
+  "adminMediaAltText": "Văn bản thay thế",
+  "adminMediaAltTextOptional": "Văn bản thay thế (không bắt buộc)",
+  "adminMediaSortOrder": "Vị trí",
+  "adminMediaSortOrderOptional": "Vị trí (không bắt buộc)",
+  "adminMediaActive": "Đang dùng",
+  "adminMediaInactive": "Ngừng dùng",
+  "adminMediaCover": "Ảnh bìa",
+  "adminMediaPreviewUnavailable": "Không xem trước được",
+  "adminMediaPreviewNotAnImage": "Không phải ảnh",
+  "adminMediaAdd": "Thêm ảnh hoặc video",
+  "adminMediaAddTitle": "Đăng ký ảnh hoặc video",
+  "adminMediaEdit": "Sửa",
+  "adminMediaEditTitle": "Sửa ảnh hoặc video",
+  "adminMediaSave": "Lưu",
+  "adminMediaCreate": "Đăng ký",
+  "adminMediaSetCover": "Đặt làm ảnh bìa",
+  "adminMediaSetAsCover": "Dùng làm ảnh bìa",
+  "adminMediaCoverReplacesPrevious": "Ảnh bìa hiện tại của địa điểm, nếu có, sẽ thôi là ảnh bìa.",
+  "adminMediaCoverImageOnly": "Chỉ ảnh mới có thể làm ảnh bìa.",
+  "adminMediaMoveUp": "Chuyển lên",
+  "adminMediaMoveDown": "Chuyển xuống",
+  "adminMediaEditReplacesNotice": "Lưu sẽ thay thế mọi trường hiển thị ở đây. Xoá trống một ô sẽ xoá giá trị đã lưu.",
+  "adminMediaUrlRequired": "Cần nhập đường dẫn.",
+  "adminMediaUrlInvalid": "Hãy nhập đường dẫn http hoặc https đầy đủ, có tên miền.",
+  "adminMediaSortOrderInvalid": "Vị trí phải là số nguyên từ 0 trở lên.",
+  "adminMediaDeactivate": "Ngừng dùng",
+  "adminMediaDeactivateTitle": "Ngừng dùng mục này?",
+  "adminMediaDeactivateWarningHidden": "Mục này sẽ biến mất khỏi thư viện công khai của địa điểm ngay lập tức.",
+  "adminMediaDeactivateWarningNoRestore": "Không thể kích hoạt lại từ bảng quản trị.",
+  "adminMediaDeactivateWarningCover": "Mục này đang là ảnh bìa. Sau thao tác này địa điểm sẽ không có ảnh bìa — không có mục nào được chọn thay thế.",
+  "adminMediaDeactivateAcknowledge": "Tôi hiểu rằng thao tác này không thể hoàn tác tại đây.",
+  "adminMediaDeactivateConfirm": "Ngừng dùng mục này"
 }

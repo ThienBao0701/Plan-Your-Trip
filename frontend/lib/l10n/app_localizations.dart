@@ -21987,6 +21987,342 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Read-only. Media management is a separate admin surface.'**
   String get adminCatalogMediaReadOnlyNotice;
+
+  /// No description provided for @adminNavMedia.
+  ///
+  /// In en, this message translates to:
+  /// **'Media'**
+  String get adminNavMedia;
+
+  /// No description provided for @adminMediaPickOwnerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a place'**
+  String get adminMediaPickOwnerTitle;
+
+  /// No description provided for @adminMediaOwnerScopeNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Media is managed per place. The admin API can only read a place\'s gallery, so rooms, reviews and trip documents are not managed here.'**
+  String get adminMediaOwnerScopeNotice;
+
+  /// No description provided for @adminMediaPlaceSearchLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Search places'**
+  String get adminMediaPlaceSearchLabel;
+
+  /// No description provided for @adminMediaPlaceSearchClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get adminMediaPlaceSearchClear;
+
+  /// No description provided for @adminMediaPlaceSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing the first {count} matches. Narrow the search to find a specific place.'**
+  String adminMediaPlaceSearchHint(int count);
+
+  /// No description provided for @adminMediaNoPlacesFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No places match this search.'**
+  String get adminMediaNoPlacesFound;
+
+  /// No description provided for @adminMediaOpenGallerySemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the gallery for {name}'**
+  String adminMediaOpenGallerySemantic(String name);
+
+  /// No description provided for @adminMediaBackToPlaces.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to places'**
+  String get adminMediaBackToPlaces;
+
+  /// No description provided for @adminMediaEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No media'**
+  String get adminMediaEmptyTitle;
+
+  /// No description provided for @adminMediaEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This place has no registered media yet.'**
+  String get adminMediaEmptyMessage;
+
+  /// No description provided for @adminMediaUrlRegistryNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Media is registered by URL. There is no file upload — paste an existing http or https address.'**
+  String get adminMediaUrlRegistryNotice;
+
+  /// No description provided for @adminMediaAmbiguousOrderNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Two or more items share a position, so their order is undefined. Moving any item renumbers the whole gallery and resolves it.'**
+  String get adminMediaAmbiguousOrderNotice;
+
+  /// No description provided for @adminMediaNoCoverNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'No cover is set for this place.'**
+  String get adminMediaNoCoverNotice;
+
+  /// No description provided for @adminMediaCoverIs.
+  ///
+  /// In en, this message translates to:
+  /// **'Cover: item {id}'**
+  String adminMediaCoverIs(int id);
+
+  /// No description provided for @adminMediaActionUncertain.
+  ///
+  /// In en, this message translates to:
+  /// **'The result of the last action is unknown. The gallery has been reloaded — check it before trying again, because deactivation cannot be undone here.'**
+  String get adminMediaActionUncertain;
+
+  /// No description provided for @adminMediaDismissNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get adminMediaDismissNotice;
+
+  /// No description provided for @adminMediaAssetSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Media item {id}'**
+  String adminMediaAssetSemantic(int id);
+
+  /// No description provided for @adminMediaUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'URL'**
+  String get adminMediaUrl;
+
+  /// No description provided for @adminMediaUrlHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'An absolute http or https address, including the host.'**
+  String get adminMediaUrlHelper;
+
+  /// No description provided for @adminMediaUrlQueryHidden.
+  ///
+  /// In en, this message translates to:
+  /// **'A query string is present and is not shown here.'**
+  String get adminMediaUrlQueryHidden;
+
+  /// No description provided for @adminMediaThumbnailUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Thumbnail URL'**
+  String get adminMediaThumbnailUrl;
+
+  /// No description provided for @adminMediaThumbnailUrlOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Thumbnail URL (optional)'**
+  String get adminMediaThumbnailUrlOptional;
+
+  /// No description provided for @adminMediaType.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get adminMediaType;
+
+  /// No description provided for @adminMediaAltText.
+  ///
+  /// In en, this message translates to:
+  /// **'Alt text'**
+  String get adminMediaAltText;
+
+  /// No description provided for @adminMediaAltTextOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Alt text (optional)'**
+  String get adminMediaAltTextOptional;
+
+  /// No description provided for @adminMediaSortOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Position'**
+  String get adminMediaSortOrder;
+
+  /// No description provided for @adminMediaSortOrderOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Position (optional)'**
+  String get adminMediaSortOrderOptional;
+
+  /// No description provided for @adminMediaActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get adminMediaActive;
+
+  /// No description provided for @adminMediaInactive.
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive'**
+  String get adminMediaInactive;
+
+  /// No description provided for @adminMediaCover.
+  ///
+  /// In en, this message translates to:
+  /// **'Cover'**
+  String get adminMediaCover;
+
+  /// No description provided for @adminMediaPreviewUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview unavailable'**
+  String get adminMediaPreviewUnavailable;
+
+  /// No description provided for @adminMediaPreviewNotAnImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Not an image'**
+  String get adminMediaPreviewNotAnImage;
+
+  /// No description provided for @adminMediaAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add media'**
+  String get adminMediaAdd;
+
+  /// No description provided for @adminMediaAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Register media'**
+  String get adminMediaAddTitle;
+
+  /// No description provided for @adminMediaEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get adminMediaEdit;
+
+  /// No description provided for @adminMediaEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit media'**
+  String get adminMediaEditTitle;
+
+  /// No description provided for @adminMediaSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get adminMediaSave;
+
+  /// No description provided for @adminMediaCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Register'**
+  String get adminMediaCreate;
+
+  /// No description provided for @adminMediaSetCover.
+  ///
+  /// In en, this message translates to:
+  /// **'Set as cover'**
+  String get adminMediaSetCover;
+
+  /// No description provided for @adminMediaSetAsCover.
+  ///
+  /// In en, this message translates to:
+  /// **'Use as the cover image'**
+  String get adminMediaSetAsCover;
+
+  /// No description provided for @adminMediaCoverReplacesPrevious.
+  ///
+  /// In en, this message translates to:
+  /// **'The place\'s current cover, if any, stops being the cover.'**
+  String get adminMediaCoverReplacesPrevious;
+
+  /// No description provided for @adminMediaCoverImageOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Only an image can be the cover.'**
+  String get adminMediaCoverImageOnly;
+
+  /// No description provided for @adminMediaMoveUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Move up'**
+  String get adminMediaMoveUp;
+
+  /// No description provided for @adminMediaMoveDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Move down'**
+  String get adminMediaMoveDown;
+
+  /// No description provided for @adminMediaEditReplacesNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving replaces every field shown here. Clearing a box clears the stored value.'**
+  String get adminMediaEditReplacesNotice;
+
+  /// No description provided for @adminMediaUrlRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'A URL is required.'**
+  String get adminMediaUrlRequired;
+
+  /// No description provided for @adminMediaUrlInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an absolute http or https URL with a host.'**
+  String get adminMediaUrlInvalid;
+
+  /// No description provided for @adminMediaSortOrderInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Position must be a whole number of 0 or more.'**
+  String get adminMediaSortOrderInvalid;
+
+  /// No description provided for @adminMediaDeactivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Deactivate'**
+  String get adminMediaDeactivate;
+
+  /// No description provided for @adminMediaDeactivateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Deactivate this media?'**
+  String get adminMediaDeactivateTitle;
+
+  /// No description provided for @adminMediaDeactivateWarningHidden.
+  ///
+  /// In en, this message translates to:
+  /// **'It disappears from the place\'s public gallery immediately.'**
+  String get adminMediaDeactivateWarningHidden;
+
+  /// No description provided for @adminMediaDeactivateWarningNoRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'There is no way to reactivate it from the admin console.'**
+  String get adminMediaDeactivateWarningNoRestore;
+
+  /// No description provided for @adminMediaDeactivateWarningCover.
+  ///
+  /// In en, this message translates to:
+  /// **'This item is the cover. The place will have no cover afterwards — nothing is promoted in its place.'**
+  String get adminMediaDeactivateWarningCover;
+
+  /// No description provided for @adminMediaDeactivateAcknowledge.
+  ///
+  /// In en, this message translates to:
+  /// **'I understand this cannot be undone here.'**
+  String get adminMediaDeactivateAcknowledge;
+
+  /// No description provided for @adminMediaDeactivateConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Deactivate media'**
+  String get adminMediaDeactivateConfirm;
 }
 
 class _AppLocalizationsDelegate

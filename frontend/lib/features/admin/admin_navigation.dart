@@ -65,6 +65,12 @@ class AdminNavigation {
       label: _catalog,
     ),
     AdminDestination(
+      route: AdminRoutesRefs.media,
+      section: AdminSection.catalog,
+      icon: Icons.photo_library_outlined,
+      label: _media,
+    ),
+    AdminDestination(
       route: AdminRoutesRefs.payments,
       section: AdminSection.finance,
       icon: Icons.payments_outlined,
@@ -128,6 +134,7 @@ class AdminNavigation {
   static String _activityLog(AppLocalizations l) => l.adminNavActivityLog;
   static String _partners(AppLocalizations l) => l.adminNavPartners;
   static String _catalog(AppLocalizations l) => l.adminNavCatalog;
+  static String _media(AppLocalizations l) => l.adminNavMedia;
 }
 
 /// Route strings, kept separate from `AdminRoutes` so `AdminNavigation` can be
@@ -150,4 +157,9 @@ class AdminRoutesRefs {
 
   /// D3C-A. Place detail is reached from this destination, same convention.
   static const String catalog = '/admin/catalog';
+
+  /// D3C-B. One place's media gallery. The admin media API has no "list all
+  /// media" read, so this destination opens on a place picker rather than on a
+  /// grid of every asset.
+  static const String media = '/admin/media';
 }

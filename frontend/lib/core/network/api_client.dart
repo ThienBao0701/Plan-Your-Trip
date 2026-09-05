@@ -6149,6 +6149,250 @@ class ApiClient {
     }
   }
 
+  // ── Admin: media assets (D3C-B) ────────────────────────────────────────────
+  // `AdminMediaController` on `develop@5afaa45`, verbatim. Six operations and
+  // no more:
+  //
+  //   GET   /api/admin/places/{placeId}/media   list one place's gallery
+  //   POST  /api/admin/media                    create (201)
+  //   PUT   /api/admin/media/{id}               update
+  //   PATCH /api/admin/media/{id}/deactivate    soft delete, no body
+  //   PATCH /api/admin/media/cover              {"mediaId": n}
+  //   PATCH /api/admin/media/reorder            {"items":[{mediaId,sortOrder}]}
+  //
+  // This is a **URL registry**, not an upload service: every operation is JSON
+  // over an absolute http/https URL. There is deliberately no multipart
+  // request, no file part and no upload progress anywhere in this client,
+  // because the backend exposes nothing that would accept one.
+  //
+  // There is also no method for reading media by any owner other than a place:
+  // the controller has exactly one admin read and it is place-scoped.
+
+  /// `GET /api/admin/places/{placeId}/media` — the whole gallery, **including
+  /// inactive assets**, ordered by `sortOrder` ascending.
+  ///
+  /// Answers 404 when the place itself does not exist (the controller resolves
+  /// it before delegating), which is distinct from a place that simply has no
+  /// media and answers `[]`.
+  Future<CollectionApiResult<List<AdminMediaAsset>>> getAdminPlaceMedia(
+          int placeId) =>
+      _adminGetList<AdminMediaAsset>(
+        _adminUri('/admin/places/$placeId/media'),
+        AdminMediaAsset.fromJson,
+      );
+
+  /// `POST /api/admin/media` — answers **201**, not 200.
+  ///
+  /// `ownerType`, `ownerId`, `url` and `mediaType` are `@NotNull`/`@NotBlank`;
+  /// the rest are optional and are omitted rather than sent as null, so the
+  /// backend's own defaults (`sortOrder` 0, `cover` false) apply.
+  Future<CollectionApiResult<AdminMediaAsset>> createAdminMedia({
+    required String ownerType,
+    required int ownerId,
+    required String url,
+    required String mediaType,
+    String? thumbnailUrl,
+    String? altText,
+    int? sortOrder,
+    bool? cover,
+  }) =>
+      _adminMediaMutation(
+        () => _client.post(
+          _adminUri('/admin/media'),
+          headers: _jsonHeaders,
+          body: jsonEncode(_mediaBody(
+            ownerType: ownerType,
+            ownerId: ownerId,
+            url: url,
+            mediaType: mediaType,
+            thumbnailUrl: thumbnailUrl,
+            altText: altText,
+            sortOrder: sortOrder,
+            cover: cover,
+          )),
+        ),
+      );
+
+  /// `PUT /api/admin/media/{id}`.
+  ///
+  /// `ownerType`/`ownerId` are still required by the DTO's validation but are
+  /// **ignored by the service** — an update may not re-target an asset. The
+  /// caller therefore passes the asset's own owner back, never a new one.
+  ///
+  /// The update is a full replace of the editable fields: an omitted
+  /// `altText`/`thumbnailUrl` clears the stored value, so the form prefills
+  /// from the asset rather than sending a partial body.
+  Future<CollectionApiResult<AdminMediaAsset>> updateAdminMedia(
+    int mediaId, {
+    required String ownerType,
+    required int ownerId,
+    required String url,
+    required String mediaType,
+    String? thumbnailUrl,
+    String? altText,
+    int? sortOrder,
+    bool? cover,
+  }) =>
+      _adminMediaMutation(
+        () => _client.put(
+          _adminUri('/admin/media/$mediaId'),
+          headers: _jsonHeaders,
+          body: jsonEncode(_mediaBody(
+            ownerType: ownerType,
+            ownerId: ownerId,
+            url: url,
+            mediaType: mediaType,
+            thumbnailUrl: thumbnailUrl,
+            altText: altText,
+            sortOrder: sortOrder,
+            cover: cover,
+          )),
+        ),
+      );
+
+  /// `PATCH /api/admin/media/{id}/deactivate` — a soft delete with no body.
+  ///
+  /// The asset becomes inactive and, if it was the cover, stops being the
+  /// cover. Nothing is promoted in its place, and **no endpoint reactivates
+  /// it**, so the console offers no restore.
+  Future<CollectionApiResult<AdminMediaAsset>> deactivateAdminMedia(
+          int mediaId) =>
+      _adminMediaMutation(
+        () => _client.patch(
+          _adminUri('/admin/media/$mediaId/deactivate'),
+          headers: _jsonHeaders,
+        ),
+      );
+
+  /// `PATCH /api/admin/media/cover` — body `{"mediaId": n}`.
+  ///
+  /// The target must be **active** (404 otherwise) and an IMAGE (400
+  /// otherwise). The service clears the owner's previous cover under a
+  /// pessimistic lock, so a gallery holds at most one — and, once a cover is
+  /// deactivated, possibly none.
+  Future<CollectionApiResult<AdminMediaAsset>> setAdminMediaCover(
+          int mediaId) =>
+      _adminMediaMutation(
+        () => _client.patch(
+          _adminUri('/admin/media/cover'),
+          headers: _jsonHeaders,
+          body: jsonEncode({'mediaId': mediaId}),
+        ),
+      );
+
+  /// `PATCH /api/admin/media/reorder` — body
+  /// `{"items":[{"mediaId":n,"sortOrder":n}, …]}`, answering the updated rows.
+  ///
+  /// The service rejects a repeated `mediaId`, a repeated `sortOrder`, and any
+  /// mix of owners, each with a 400. The caller therefore submits one gallery's
+  /// complete ordering rather than a single moved row.
+  Future<CollectionApiResult<List<AdminMediaAsset>>> reorderAdminMedia(
+          List<AdminMediaOrder> items) =>
+      _adminMediaListMutation(
+        () => _client.patch(
+          _adminUri('/admin/media/reorder'),
+          headers: _jsonHeaders,
+          body: jsonEncode({
+            'items': [
+              for (final i in items)
+                {'mediaId': i.mediaId, 'sortOrder': i.sortOrder},
+            ],
+          }),
+        ),
+      );
+
+  /// `MediaAssetRequest`, with the optional members omitted when absent so the
+  /// backend applies its own defaults instead of receiving an explicit null.
+  Map<String, Object?> _mediaBody({
+    required String ownerType,
+    required int ownerId,
+    required String url,
+    required String mediaType,
+    String? thumbnailUrl,
+    String? altText,
+    int? sortOrder,
+    bool? cover,
+  }) =>
+      {
+        'ownerType': ownerType,
+        'ownerId': ownerId,
+        'url': url.trim(),
+        'mediaType': mediaType,
+        if (thumbnailUrl != null && thumbnailUrl.trim().isNotEmpty)
+          'thumbnailUrl': thumbnailUrl.trim(),
+        if (altText != null && altText.trim().isNotEmpty)
+          'altText': altText.trim(),
+        if (sortOrder != null) 'sortOrder': sortOrder,
+        if (cover != null) 'cover': cover,
+      };
+
+  /// Shared decode for the four media mutations that answer one asset. Create
+  /// answers 201 and the rest answer 200, so both are accepted.
+  Future<CollectionApiResult<AdminMediaAsset>> _adminMediaMutation(
+    Future<http.Response> Function() send,
+  ) async {
+    try {
+      final res = await send().timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final body = _decodeJsonMap(res).data;
+        final parsed = body == null ? null : AdminMediaAsset.fromJson(body);
+        if (parsed == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+        }
+        return CollectionApiResult.success(parsed);
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      // Deactivation cannot be undone through this API, so an unanswered
+      // request is uncertain rather than failed and must not be blindly
+      // retried.
+      return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// Reorder is the one media mutation that answers an array.
+  Future<CollectionApiResult<List<AdminMediaAsset>>> _adminMediaListMutation(
+    Future<http.Response> Function() send,
+  ) async {
+    try {
+      final res = await send().timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final decoded = jsonDecode(res.body);
+        if (decoded is! List) {
+          return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+        }
+        final items = <AdminMediaAsset>[];
+        for (final entry in decoded) {
+          if (entry is! Map<String, dynamic>) continue;
+          final parsed = AdminMediaAsset.fromJson(entry);
+          if (parsed != null) items.add(parsed);
+        }
+        return CollectionApiResult.success(items);
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
   // ── Admin: partner management (D2C) ────────────────────────────────────────
   // The nine endpoints frozen by the D2B contract audit against
   // `develop@3467d45`. There is deliberately no method for:

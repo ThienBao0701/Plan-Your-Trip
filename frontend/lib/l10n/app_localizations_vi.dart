@@ -12643,4 +12643,197 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get adminCatalogMediaReadOnlyNotice =>
       'Chỉ xem. Quản lý ảnh nằm ở một khu vực quản trị riêng.';
+
+  @override
+  String get adminNavMedia => 'Thư viện';
+
+  @override
+  String get adminMediaPickOwnerTitle => 'Chọn một địa điểm';
+
+  @override
+  String get adminMediaOwnerScopeNotice =>
+      'Ảnh và video được quản lý theo từng địa điểm. API quản trị chỉ đọc được thư viện của địa điểm, nên phòng, đánh giá và tài liệu chuyến đi không được quản lý ở đây.';
+
+  @override
+  String get adminMediaPlaceSearchLabel => 'Tìm địa điểm';
+
+  @override
+  String get adminMediaPlaceSearchClear => 'Xoá tìm kiếm';
+
+  @override
+  String adminMediaPlaceSearchHint(int count) {
+    return 'Đang hiển thị $count kết quả đầu tiên. Hãy thu hẹp tìm kiếm để tìm đúng địa điểm.';
+  }
+
+  @override
+  String get adminMediaNoPlacesFound =>
+      'Không có địa điểm nào khớp với tìm kiếm này.';
+
+  @override
+  String adminMediaOpenGallerySemantic(String name) {
+    return 'Mở thư viện của $name';
+  }
+
+  @override
+  String get adminMediaBackToPlaces => 'Quay lại danh sách địa điểm';
+
+  @override
+  String get adminMediaEmptyTitle => 'Chưa có ảnh hoặc video';
+
+  @override
+  String get adminMediaEmptyMessage =>
+      'Địa điểm này chưa đăng ký ảnh hoặc video nào.';
+
+  @override
+  String get adminMediaUrlRegistryNotice =>
+      'Ảnh và video được đăng ký bằng đường dẫn. Không có tải tệp lên — hãy dán một địa chỉ http hoặc https có sẵn.';
+
+  @override
+  String get adminMediaAmbiguousOrderNotice =>
+      'Có từ hai mục trở lên cùng vị trí nên thứ tự không xác định. Di chuyển bất kỳ mục nào sẽ đánh số lại toàn bộ thư viện và xử lý việc này.';
+
+  @override
+  String get adminMediaNoCoverNotice => 'Địa điểm này chưa đặt ảnh bìa.';
+
+  @override
+  String adminMediaCoverIs(int id) {
+    return 'Ảnh bìa: mục $id';
+  }
+
+  @override
+  String get adminMediaActionUncertain =>
+      'Không rõ kết quả của thao tác vừa rồi. Thư viện đã được tải lại — hãy kiểm tra trước khi thử lại, vì thao tác ngừng sử dụng không thể hoàn tác tại đây.';
+
+  @override
+  String get adminMediaDismissNotice => 'Bỏ qua';
+
+  @override
+  String adminMediaAssetSemantic(int id) {
+    return 'Mục $id';
+  }
+
+  @override
+  String get adminMediaUrl => 'Đường dẫn';
+
+  @override
+  String get adminMediaUrlHelper =>
+      'Địa chỉ http hoặc https đầy đủ, bao gồm tên miền.';
+
+  @override
+  String get adminMediaUrlQueryHidden =>
+      'Đường dẫn có tham số truy vấn và không được hiển thị ở đây.';
+
+  @override
+  String get adminMediaThumbnailUrl => 'Đường dẫn ảnh thu nhỏ';
+
+  @override
+  String get adminMediaThumbnailUrlOptional =>
+      'Đường dẫn ảnh thu nhỏ (không bắt buộc)';
+
+  @override
+  String get adminMediaType => 'Loại';
+
+  @override
+  String get adminMediaAltText => 'Văn bản thay thế';
+
+  @override
+  String get adminMediaAltTextOptional => 'Văn bản thay thế (không bắt buộc)';
+
+  @override
+  String get adminMediaSortOrder => 'Vị trí';
+
+  @override
+  String get adminMediaSortOrderOptional => 'Vị trí (không bắt buộc)';
+
+  @override
+  String get adminMediaActive => 'Đang dùng';
+
+  @override
+  String get adminMediaInactive => 'Ngừng dùng';
+
+  @override
+  String get adminMediaCover => 'Ảnh bìa';
+
+  @override
+  String get adminMediaPreviewUnavailable => 'Không xem trước được';
+
+  @override
+  String get adminMediaPreviewNotAnImage => 'Không phải ảnh';
+
+  @override
+  String get adminMediaAdd => 'Thêm ảnh hoặc video';
+
+  @override
+  String get adminMediaAddTitle => 'Đăng ký ảnh hoặc video';
+
+  @override
+  String get adminMediaEdit => 'Sửa';
+
+  @override
+  String get adminMediaEditTitle => 'Sửa ảnh hoặc video';
+
+  @override
+  String get adminMediaSave => 'Lưu';
+
+  @override
+  String get adminMediaCreate => 'Đăng ký';
+
+  @override
+  String get adminMediaSetCover => 'Đặt làm ảnh bìa';
+
+  @override
+  String get adminMediaSetAsCover => 'Dùng làm ảnh bìa';
+
+  @override
+  String get adminMediaCoverReplacesPrevious =>
+      'Ảnh bìa hiện tại của địa điểm, nếu có, sẽ thôi là ảnh bìa.';
+
+  @override
+  String get adminMediaCoverImageOnly => 'Chỉ ảnh mới có thể làm ảnh bìa.';
+
+  @override
+  String get adminMediaMoveUp => 'Chuyển lên';
+
+  @override
+  String get adminMediaMoveDown => 'Chuyển xuống';
+
+  @override
+  String get adminMediaEditReplacesNotice =>
+      'Lưu sẽ thay thế mọi trường hiển thị ở đây. Xoá trống một ô sẽ xoá giá trị đã lưu.';
+
+  @override
+  String get adminMediaUrlRequired => 'Cần nhập đường dẫn.';
+
+  @override
+  String get adminMediaUrlInvalid =>
+      'Hãy nhập đường dẫn http hoặc https đầy đủ, có tên miền.';
+
+  @override
+  String get adminMediaSortOrderInvalid =>
+      'Vị trí phải là số nguyên từ 0 trở lên.';
+
+  @override
+  String get adminMediaDeactivate => 'Ngừng dùng';
+
+  @override
+  String get adminMediaDeactivateTitle => 'Ngừng dùng mục này?';
+
+  @override
+  String get adminMediaDeactivateWarningHidden =>
+      'Mục này sẽ biến mất khỏi thư viện công khai của địa điểm ngay lập tức.';
+
+  @override
+  String get adminMediaDeactivateWarningNoRestore =>
+      'Không thể kích hoạt lại từ bảng quản trị.';
+
+  @override
+  String get adminMediaDeactivateWarningCover =>
+      'Mục này đang là ảnh bìa. Sau thao tác này địa điểm sẽ không có ảnh bìa — không có mục nào được chọn thay thế.';
+
+  @override
+  String get adminMediaDeactivateAcknowledge =>
+      'Tôi hiểu rằng thao tác này không thể hoàn tác tại đây.';
+
+  @override
+  String get adminMediaDeactivateConfirm => 'Ngừng dùng mục này';
 }
