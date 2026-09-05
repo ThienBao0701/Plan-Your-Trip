@@ -76,6 +76,12 @@ class _AdminAppShellState extends State<AdminAppShell> {
   /// response for the previous id cannot land on the new screen.
   AdminPlaceDetailState? _placeDetail;
 
+  /// D3D — true while the media destination is showing a gallery that was
+  /// opened from an open place detail. It changes only what "back" means; the
+  /// gallery's own owner binding lives in [AdminMediaState] and is not derived
+  /// from this flag.
+  bool _mediaOpenedFromPlaceDetail = false;
+
   bool _created = false;
 
   @override
@@ -197,6 +203,42 @@ class _AdminAppShellState extends State<AdminAppShell> {
     next.load();
   }
 
+  /// D3D — opens the media gallery for the place currently on screen.
+  ///
+  /// The id comes from [AdminPlaceDetailState.placeId], which is what the
+  /// detail was constructed with and what its own reads use; nothing is taken
+  /// from the rendered name. The place detail is deliberately **not** disposed,
+  /// so going back returns to it rather than rebuilding it from scratch.
+  void _openMediaForPlace() {
+    final detail = _placeDetail;
+    if (detail == null) return;
+    _media?.openPlace(
+      placeId: detail.placeId,
+      placeName: detail.place?.name,
+    );
+    setState(() {
+      _mediaOpenedFromPlaceDetail = true;
+      _route = AdminRoutes.media;
+    });
+    AdminScope.maybeOf(context)?.setActiveRoute(AdminRoutes.media);
+  }
+
+  /// Returns from the media gallery to the place it was opened from.
+  void _closeMediaToPlace() {
+    setState(() {
+      _mediaOpenedFromPlaceDetail = false;
+      _route = AdminRoutes.catalog;
+    });
+    // The detail's cover URL and gallery list come from
+    // `GET /api/admin/places/{id}`, so a media change makes them stale. Only
+    // the place is re-read — rooms cannot have changed — and only when
+    // something actually changed, so a look-but-don't-touch visit is free.
+    if (_media?.galleryChanged ?? false) {
+      _placeDetail?.refreshPlaceOnly();
+    }
+    AdminScope.maybeOf(context)?.setActiveRoute(AdminRoutes.catalog);
+  }
+
   void _closePlace() {
     final previous = _placeDetail;
     setState(() => _placeDetail = null);
@@ -230,6 +272,15 @@ class _AdminAppShellState extends State<AdminAppShell> {
       _placeDetail = null;
       previous?.dispose();
     }
+    // Choosing a destination from the rail is not a return from the gallery —
+    // including re-choosing the one already shown, which is still an explicit
+    // "take me to Media", not a way back to a place. So the origin is dropped,
+    // and it is dropped inside setState: on the already-current destination
+    // nothing else changes, and without a rebuild the back control would keep
+    // pointing at a place the operator has just navigated away from.
+    if (_mediaOpenedFromPlaceDetail) {
+      setState(() => _mediaOpenedFromPlaceDetail = false);
+    }
     if (_route != route) setState(() => _route = route);
     _loadFor(route);
     AdminScope.maybeOf(context)?.setActiveRoute(route);
@@ -251,8 +302,14 @@ class _AdminAppShellState extends State<AdminAppShell> {
           : AdminPlaceDetailScreen(
               state: _placeDetail!,
               onBack: _closePlace,
+              onManageMedia: _openMediaForPlace,
             ),
-      AdminRoutes.media => AdminMediaScreen(state: _media!),
+      AdminRoutes.media => AdminMediaScreen(
+          state: _media!,
+          onBackToPlace: _mediaOpenedFromPlaceDetail && _placeDetail != null
+              ? _closeMediaToPlace
+              : null,
+        ),
       AdminRoutes.partners => _partnerDetail == null
           ? AdminPartnersScreen(
               state: _partners!,

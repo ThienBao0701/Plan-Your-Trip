@@ -6537,5 +6537,24 @@
   "adminMediaDeactivateWarningNoRestore": "There is no way to reactivate it from the admin console.",
   "adminMediaDeactivateWarningCover": "This item is the cover. The place will have no cover afterwards — nothing is promoted in its place.",
   "adminMediaDeactivateAcknowledge": "I understand this cannot be undone here.",
-  "adminMediaDeactivateConfirm": "Deactivate media"
+  "adminMediaDeactivateConfirm": "Deactivate media",
+  "adminCatalogManageMedia": "Manage media",
+  "adminCatalogManageMediaSemantic": "Open the media gallery for {name}",
+  "@adminCatalogManageMediaSemantic": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "adminMediaBackToPlaceDetail": "Back to place details",
+  "adminMediaOwnerContext": "Place #{id} — all media below belongs to this place",
+  "@adminMediaOwnerContext": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
+  "adminMediaOwnerMismatch": "This gallery could not be shown: the server returned media belonging to a different place. Nothing here can be changed until the response matches the place that was requested."
 }

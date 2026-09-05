@@ -1455,3 +1455,27 @@ class AdminMediaOrder {
 
   const AdminMediaOrder({required this.mediaId, required this.sortOrder});
 }
+
+/// D3D — the canonical identity of the gallery a media surface is bound to.
+///
+/// The media console can be reached two ways: through its own place picker, and
+/// directly from a place's detail screen. Both must arrive at the *same* kind of
+/// owner, carried as an id rather than reconstructed from anything on screen —
+/// a name, a heading, a form field. This type is that identity.
+///
+/// [name] is display-only and may be absent; nothing about a request is ever
+/// derived from it.
+class AdminMediaOwner {
+  final AdminMediaOwnerType type;
+  final int id;
+  final String? name;
+
+  /// The only owner this console manages. See [AdminMediaOwnerType].
+  const AdminMediaOwner.place({required this.id, this.name})
+      : type = AdminMediaOwnerType.place;
+
+  /// True when [asset] genuinely belongs to this owner. A mutation is refused
+  /// unless this holds, so a stale or mismatched row can never be re-targeted.
+  bool owns(AdminMediaAsset asset) =>
+      asset.ownerType == type && asset.ownerId == id;
+}

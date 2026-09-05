@@ -12836,4 +12836,24 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get adminMediaDeactivateConfirm => 'Ngừng dùng mục này';
+
+  @override
+  String get adminCatalogManageMedia => 'Quản lý thư viện';
+
+  @override
+  String adminCatalogManageMediaSemantic(String name) {
+    return 'Mở thư viện ảnh của $name';
+  }
+
+  @override
+  String get adminMediaBackToPlaceDetail => 'Quay lại chi tiết địa điểm';
+
+  @override
+  String adminMediaOwnerContext(int id) {
+    return 'Địa điểm #$id — toàn bộ mục bên dưới thuộc về địa điểm này';
+  }
+
+  @override
+  String get adminMediaOwnerMismatch =>
+      'Không thể hiển thị thư viện này: máy chủ trả về mục thuộc một địa điểm khác. Không thể thay đổi gì ở đây cho đến khi phản hồi khớp với địa điểm đã yêu cầu.';
 }

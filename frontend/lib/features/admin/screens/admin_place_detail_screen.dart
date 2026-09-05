@@ -22,10 +22,16 @@ class AdminPlaceDetailScreen extends StatelessWidget {
   final AdminPlaceDetailState state;
   final VoidCallback onBack;
 
+  /// D3D — opens this place's media gallery. Optional: the screen is still
+  /// complete without it, and the gallery card stays read-only when no handler
+  /// is supplied, so nothing here implies an action the host cannot perform.
+  final VoidCallback? onManageMedia;
+
   const AdminPlaceDetailScreen({
     super.key,
     required this.state,
     required this.onBack,
+    this.onManageMedia,
   });
 
   @override
@@ -87,7 +93,7 @@ class AdminPlaceDetailScreen extends StatelessWidget {
                   const SizedBox(height: AppSpacing.sm),
                   _RoomsCard(state: state),
                   const SizedBox(height: AppSpacing.sm),
-                  _GalleryCard(place: place),
+                  _GalleryCard(place: place, onManageMedia: onManageMedia),
                 ],
               ),
             ),
@@ -535,8 +541,9 @@ class _RoomsCard extends StatelessWidget {
 /// freeze keeps the URL out of any clickable affordance — it renders as text.
 class _GalleryCard extends StatelessWidget {
   final AdminPlaceDetail place;
+  final VoidCallback? onManageMedia;
 
-  const _GalleryCard({required this.place});
+  const _GalleryCard({required this.place, this.onManageMedia});
 
   @override
   Widget build(BuildContext context) {
@@ -563,6 +570,27 @@ class _GalleryCard extends StatelessWidget {
             const SizedBox(height: AppSpacing.xs),
             Text(l10n.adminCatalogMediaReadOnlyNotice,
                 style: theme.textTheme.labelSmall),
+            if (onManageMedia != null) ...[
+              const SizedBox(height: AppSpacing.xs),
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: Semantics(
+                  // A node of its own that keeps its own label: annotating the
+                  // button directly merges this name with the button's text
+                  // into one string, and the control stops being addressable
+                  // by the name that says which place it opens.
+                  container: true,
+                  explicitChildNodes: true,
+                  label: l10n.adminCatalogManageMediaSemantic(
+                      place.name ?? l10n.adminValueUnknown),
+                  child: OutlinedButton.icon(
+                    onPressed: onManageMedia,
+                    icon: const Icon(Icons.photo_library_outlined, size: 18),
+                    label: Text(l10n.adminCatalogManageMedia),
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),

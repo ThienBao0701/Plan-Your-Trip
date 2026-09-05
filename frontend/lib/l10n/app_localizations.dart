@@ -22323,6 +22323,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Deactivate media'**
   String get adminMediaDeactivateConfirm;
+
+  /// No description provided for @adminCatalogManageMedia.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage media'**
+  String get adminCatalogManageMedia;
+
+  /// No description provided for @adminCatalogManageMediaSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the media gallery for {name}'**
+  String adminCatalogManageMediaSemantic(String name);
+
+  /// No description provided for @adminMediaBackToPlaceDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to place details'**
+  String get adminMediaBackToPlaceDetail;
+
+  /// No description provided for @adminMediaOwnerContext.
+  ///
+  /// In en, this message translates to:
+  /// **'Place #{id} — all media below belongs to this place'**
+  String adminMediaOwnerContext(int id);
+
+  /// No description provided for @adminMediaOwnerMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'This gallery could not be shown: the server returned media belonging to a different place. Nothing here can be changed until the response matches the place that was requested.'**
+  String get adminMediaOwnerMismatch;
 }
 
 class _AppLocalizationsDelegate

@@ -12996,4 +12996,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adminMediaDeactivateConfirm => 'Deactivate media';
+
+  @override
+  String get adminCatalogManageMedia => 'Manage media';
+
+  @override
+  String adminCatalogManageMediaSemantic(String name) {
+    return 'Open the media gallery for $name';
+  }
+
+  @override
+  String get adminMediaBackToPlaceDetail => 'Back to place details';
+
+  @override
+  String adminMediaOwnerContext(int id) {
+    return 'Place #$id — all media below belongs to this place';
+  }
+
+  @override
+  String get adminMediaOwnerMismatch =>
+      'This gallery could not be shown: the server returned media belonging to a different place. Nothing here can be changed until the response matches the place that was requested.';
 }

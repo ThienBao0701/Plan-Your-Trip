@@ -20,13 +20,23 @@ import '../widgets/admin_widgets.dart';
 class AdminMediaScreen extends StatelessWidget {
   final AdminMediaState state;
 
-  const AdminMediaScreen({super.key, required this.state});
+  /// D3D — supplied when the gallery was opened from a place's detail screen,
+  /// in which case "back" means that screen rather than the picker. Null when
+  /// the destination was entered from the navigation rail, so the picker stays
+  /// the correct way back and no navigation loop is created.
+  final VoidCallback? onBackToPlace;
+
+  const AdminMediaScreen({
+    super.key,
+    required this.state,
+    this.onBackToPlace,
+  });
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
         animation: state,
         builder: (context, _) => state.hasSelection
-            ? _Gallery(state: state)
+            ? _Gallery(state: state, onBackToPlace: onBackToPlace)
             : _PlacePicker(state: state),
       );
 }
@@ -179,27 +189,37 @@ class _PlacePickerState extends State<_PlacePicker> {
 
 class _Gallery extends StatelessWidget {
   final AdminMediaState state;
+  final VoidCallback? onBackToPlace;
 
-  const _Gallery({required this.state});
+  const _Gallery({required this.state, this.onBackToPlace});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final place = state.selectedPlace!;
+    final place = state.owner!;
 
-    final body = state.isReady && !state.isEmpty
-        ? AdminResponsiveGrid(
-            wide: (context) => _AssetList(state: state, wide: true),
-            narrow: (context) => _AssetList(state: state, wide: false),
-          )
-        : AdminStateView(
-            status: state.status,
-            message: state.errorMessage,
-            emptyTitle: l10n.adminMediaEmptyTitle,
-            emptyMessage: l10n.adminMediaEmptyMessage,
+    final body = state.ownerMismatch
+        // Deliberately not the generic error card: the operator needs to know
+        // the response did not match the gallery that was asked for, and that
+        // nothing here may be acted on until it does.
+        ? AdminStateView(
+            status: AdminLoadStatus.error,
+            message: l10n.adminMediaOwnerMismatch,
             onRetry: state.refresh,
-          );
+          )
+        : state.isReady && !state.isEmpty
+            ? AdminResponsiveGrid(
+                wide: (context) => _AssetList(state: state, wide: true),
+                narrow: (context) => _AssetList(state: state, wide: false),
+              )
+            : AdminStateView(
+                status: state.status,
+                message: state.errorMessage,
+                emptyTitle: l10n.adminMediaEmptyTitle,
+                emptyMessage: l10n.adminMediaEmptyMessage,
+                onRetry: state.refresh,
+              );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -211,13 +231,29 @@ class _Gallery extends StatelessWidget {
             children: [
               IconButton(
                 icon: const Icon(Icons.arrow_back),
-                tooltip: l10n.adminMediaBackToPlaces,
-                onPressed: state.isMutating ? null : state.clearSelection,
+                tooltip: onBackToPlace == null
+                    ? l10n.adminMediaBackToPlaces
+                    : l10n.adminMediaBackToPlaceDetail,
+                onPressed: state.isMutating
+                    ? null
+                    : (onBackToPlace ?? state.clearSelection),
               ),
               Expanded(
-                child: Text(AdminFormats.text(context, place.name),
-                    style: theme.textTheme.titleMedium,
-                    overflow: TextOverflow.ellipsis),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(AdminFormats.text(context, place.name),
+                        style: theme.textTheme.titleMedium,
+                        overflow: TextOverflow.ellipsis),
+                    // The id is the thing every request on this screen is
+                    // actually bound to, so an operator can confirm at a glance
+                    // which gallery they are editing.
+                    Text(l10n.adminMediaOwnerContext(place.id),
+                        style: theme.textTheme.labelSmall,
+                        overflow: TextOverflow.ellipsis),
+                  ],
+                ),
               ),
             ],
           ),
@@ -627,7 +663,7 @@ Future<void> _confirmDeactivate(
     context: context,
     builder: (ctx) => _DeactivateDialog(asset: asset),
   );
-  if (ok == true) await state.deactivateMedia(asset.id);
+  if (ok == true) await state.deactivateMedia(asset);
 }
 
 class _MediaFormResult {

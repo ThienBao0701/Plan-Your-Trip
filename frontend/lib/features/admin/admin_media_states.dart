@@ -38,7 +38,11 @@ class AdminMediaState extends ChangeNotifier {
   List<AdminPlaceRow> _placeOptions = const [];
   AdminLoadStatus _placeSearchStatus = AdminLoadStatus.idle;
   String? _placeSearchError;
-  AdminPlaceRow? _selectedPlace;
+
+  /// The gallery currently open, as a canonical id — never a widget, a row
+  /// object or a piece of display text. D3D added the second entry point (a
+  /// place's detail screen), and both routes converge here.
+  AdminMediaOwner? _owner;
 
   /// A picker, not a grid: the first page of matches is enough to choose from,
   /// and the UI says so rather than implying the list is complete.
@@ -48,8 +52,21 @@ class AdminMediaState extends ChangeNotifier {
   List<AdminPlaceRow> get placeOptions => _placeOptions;
   AdminLoadStatus get placeSearchStatus => _placeSearchStatus;
   String? get placeSearchError => _placeSearchError;
-  AdminPlaceRow? get selectedPlace => _selectedPlace;
-  bool get hasSelection => _selectedPlace != null;
+  AdminMediaOwner? get owner => _owner;
+  bool get hasSelection => _owner != null;
+
+  /// True when the last authoritative read returned an asset that does not
+  /// belong to [owner]. The gallery is not rendered and no mutation is
+  /// permitted in that state: the console does not repair server data, and it
+  /// does not act on rows it cannot vouch for.
+  bool get ownerMismatch => _ownerMismatch;
+  bool _ownerMismatch = false;
+
+  /// Set by any successful mutation, cleared when a gallery is opened. The
+  /// shell reads it to decide whether a place's detail actually needs
+  /// re-reading on the way back — so an untouched visit costs no extra GET.
+  bool get galleryChanged => _galleryChanged;
+  bool _galleryChanged = false;
 
   /// The owner types this console can manage — `PLACE` alone. Exposed so the UI
   /// and its tests read the same source rather than restating the rule.
@@ -133,10 +150,21 @@ class AdminMediaState extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Selects a place and loads its gallery.
-  Future<void> selectPlace(AdminPlaceRow place) {
-    _selectedPlace = place;
+  /// Picker entry point. Only [AdminPlaceRow.id] is carried forward; the name
+  /// is display-only.
+  Future<void> selectPlace(AdminPlaceRow place) =>
+      openPlace(placeId: place.id, placeName: place.name);
+
+  /// D3D — the entry point used when a place is already open elsewhere.
+  ///
+  /// Takes the id the caller already holds authoritatively. It is deliberately
+  /// not derived from any rendered text, and nothing in the media UI can change
+  /// it afterwards: switching galleries means opening another one.
+  Future<void> openPlace({required int placeId, String? placeName}) {
+    _owner = AdminMediaOwner.place(id: placeId, name: placeName);
     _items = const [];
+    _ownerMismatch = false;
+    _galleryChanged = false;
     _mutationError = null;
     _mutationUncertain = false;
     notifyListeners();
@@ -147,8 +175,10 @@ class AdminMediaState extends ChangeNotifier {
   /// a later selection can never render the previous place's assets.
   void clearSelection() {
     _loadToken++;
-    _selectedPlace = null;
+    _owner = null;
     _items = const [];
+    _ownerMismatch = false;
+    _galleryChanged = false;
     _status = AdminLoadStatus.idle;
     _error = null;
     _mutationError = null;
@@ -159,19 +189,34 @@ class AdminMediaState extends ChangeNotifier {
   // ── gallery ───────────────────────────────────────────────────────────────
 
   Future<void> load() async {
-    final place = _selectedPlace;
+    final place = _owner;
     if (place == null) return;
 
     final token = ++_loadToken;
     _status = AdminLoadStatus.loading;
     _error = null;
+    _ownerMismatch = false;
     notifyListeners();
 
     final result = await api.getAdminPlaceMedia(place.id);
     if (token != _loadToken) return;
 
     if (result.success && result.data != null) {
-      _items = result.data!;
+      final rows = result.data!;
+      // D3D — every row is checked against the owner this screen is bound to.
+      // The endpoint is place-scoped, so a foreign row means the response does
+      // not match the request; rendering it would put another place's assets
+      // under this place's actions. Nothing is filtered or corrected: the
+      // gallery refuses to load and says so.
+      if (rows.any((a) => !place.owns(a))) {
+        _items = const [];
+        _ownerMismatch = true;
+        _status = AdminLoadStatus.error;
+        _error = null;
+        notifyListeners();
+        return;
+      }
+      _items = rows;
       _status = AdminLoadStatus.ready;
     } else {
       _items = const [];
@@ -197,10 +242,10 @@ class AdminMediaState extends ChangeNotifier {
     int? sortOrder,
     bool cover = false,
   }) {
-    final place = _selectedPlace;
-    if (place == null) return Future.value(false);
+    final place = _owner;
+    if (place == null || _ownerMismatch) return Future.value(false);
     return _mutate(() => api.createAdminMedia(
-          ownerType: AdminMediaOwnerType.place.wire,
+          ownerType: place.type.wire,
           ownerId: place.id,
           url: url,
           mediaType: mediaType.wire,
@@ -209,6 +254,20 @@ class AdminMediaState extends ChangeNotifier {
           sortOrder: sortOrder,
           cover: cover ? true : null,
         ));
+  }
+
+  /// D3D — every write target must be a row this gallery actually loaded, for
+  /// the owner this screen is bound to.
+  ///
+  /// Without it, a mutation takes whatever asset object it is handed: a stale
+  /// row kept from a previously open place, or an id assembled anywhere else,
+  /// would reach the backend under the current operator's session. Membership
+  /// is checked by identity *and* by owner, so neither half alone is enough.
+  bool ownsAsset(AdminMediaAsset asset) {
+    final place = _owner;
+    if (place == null || _ownerMismatch) return false;
+    if (!place.owns(asset)) return false;
+    return _items.any((a) => a.id == asset.id);
   }
 
   /// `PUT /api/admin/media/{id}`.
@@ -225,7 +284,7 @@ class AdminMediaState extends ChangeNotifier {
     bool? cover,
   }) {
     final ownerId = asset.ownerId;
-    if (ownerId == null) return Future.value(false);
+    if (ownerId == null || !ownsAsset(asset)) return Future.value(false);
     return _mutate(() => api.updateAdminMedia(
           asset.id,
           ownerType: asset.ownerType.wire,
@@ -239,8 +298,12 @@ class AdminMediaState extends ChangeNotifier {
         ));
   }
 
-  Future<bool> deactivateMedia(int mediaId) =>
-      _mutate(() => api.deactivateAdminMedia(mediaId));
+  /// Takes the asset rather than a bare id: an id alone carries no owner, so
+  /// there would be nothing to check it against.
+  Future<bool> deactivateMedia(AdminMediaAsset asset) {
+    if (!ownsAsset(asset)) return Future.value(false);
+    return _mutate(() => api.deactivateAdminMedia(asset.id));
+  }
 
   /// Only an active IMAGE can become the cover; the backend answers 404 for an
   /// inactive asset and 400 for a non-image, so the UI does not offer either.
@@ -250,7 +313,10 @@ class AdminMediaState extends ChangeNotifier {
   }
 
   bool canSetCover(AdminMediaAsset asset) =>
-      asset.active && asset.mediaType.canBeCover && !asset.cover;
+      ownsAsset(asset) &&
+      asset.active &&
+      asset.mediaType.canBeCover &&
+      !asset.cover;
 
   /// Moves one asset one position and submits the **whole** gallery's ordering.
   ///
@@ -259,6 +325,7 @@ class AdminMediaState extends ChangeNotifier {
   /// also what resolves any pre-existing tie. Nothing is reordered locally —
   /// the list is re-read afterwards.
   Future<bool> moveMedia(AdminMediaAsset asset, {required bool up}) {
+    if (!ownsAsset(asset)) return Future.value(false);
     final index = _items.indexWhere((a) => a.id == asset.id);
     if (index < 0) return Future.value(false);
     final target = up ? index - 1 : index + 1;
@@ -301,6 +368,11 @@ class AdminMediaState extends ChangeNotifier {
 
     if (result.success) {
       _mutationError = null;
+      // Recorded before the reload: the place's own detail carries a cover URL
+      // and a gallery list, and this is what tells the shell they are now out
+      // of date. A visit that changed nothing leaves it false and costs no
+      // extra read.
+      _galleryChanged = true;
       notifyListeners();
       await load();
       return true;

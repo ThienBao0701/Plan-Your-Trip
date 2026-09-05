@@ -220,6 +220,34 @@ class AdminPlaceDetailState extends ChangeNotifier {
 
   Future<void> refresh() => load();
 
+  /// D3D — re-reads the place alone, leaving the rooms request out.
+  ///
+  /// Returning from the media surface can change this screen's cover URL and
+  /// gallery list, both of which come from `GET /api/admin/places/{id}`.
+  /// Nothing a media action does can affect the rooms, so a full [load] here
+  /// would spend a second request re-fetching data that cannot have changed.
+  Future<void> refreshPlaceOnly() async {
+    if (_place == null) return;
+    final token = ++_loadToken;
+    final result = await api.getAdminPlace(placeId);
+    if (token != _loadToken) return;
+    if (result.success && result.data != null) {
+      _place = result.data;
+      _status = AdminLoadStatus.ready;
+      notifyListeners();
+      return;
+    }
+    // A failure here is a failure of the whole screen: the place either
+    // vanished or can no longer be read, and showing the previous snapshot as
+    // if it were current would be exactly the stale state this exists to stop.
+    _place = null;
+    _rooms = const [];
+    _roomsStatus = AdminLoadStatus.idle;
+    _status = adminStatusFor(result.errorKind);
+    _error = result.message;
+    notifyListeners();
+  }
+
   Future<void> _loadRooms(int token) async {
     _roomsStatus = AdminLoadStatus.loading;
     notifyListeners();

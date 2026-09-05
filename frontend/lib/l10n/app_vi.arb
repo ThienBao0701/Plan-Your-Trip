@@ -6537,5 +6537,24 @@
   "adminMediaDeactivateWarningNoRestore": "Không thể kích hoạt lại từ bảng quản trị.",
   "adminMediaDeactivateWarningCover": "Mục này đang là ảnh bìa. Sau thao tác này địa điểm sẽ không có ảnh bìa — không có mục nào được chọn thay thế.",
   "adminMediaDeactivateAcknowledge": "Tôi hiểu rằng thao tác này không thể hoàn tác tại đây.",
-  "adminMediaDeactivateConfirm": "Ngừng dùng mục này"
+  "adminMediaDeactivateConfirm": "Ngừng dùng mục này",
+  "adminCatalogManageMedia": "Quản lý thư viện",
+  "adminCatalogManageMediaSemantic": "Mở thư viện ảnh của {name}",
+  "@adminCatalogManageMediaSemantic": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "adminMediaBackToPlaceDetail": "Quay lại chi tiết địa điểm",
+  "adminMediaOwnerContext": "Địa điểm #{id} — toàn bộ mục bên dưới thuộc về địa điểm này",
+  "@adminMediaOwnerContext": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
+  "adminMediaOwnerMismatch": "Không thể hiển thị thư viện này: máy chủ trả về mục thuộc một địa điểm khác. Không thể thay đổi gì ở đây cho đến khi phản hồi khớp với địa điểm đã yêu cầu."
 }

@@ -358,7 +358,7 @@ void main() {
       expect(find.text('Choose a place'), findsOneWidget);
       await tester.tap(find.text('Grand Palace'));
       await settle(tester);
-      expect(state.selectedPlace?.id, 1);
+      expect(state.owner?.id, 1);
       expect(find.text('Add media'), findsOneWidget);
     });
 
@@ -371,7 +371,7 @@ void main() {
 
       await tester.tap(find.byTooltip('Back to places'));
       await settle(tester);
-      expect(state.selectedPlace, isNull);
+      expect(state.owner, isNull);
       expect(state.items, isEmpty);
       expect(find.text('Choose a place'), findsOneWidget);
     });
@@ -605,7 +605,7 @@ void main() {
     test('PATCHes the deactivate path with no body', () async {
       final c = clientFor((_) => routes());
       final state = await galleryState(c.api);
-      await state.deactivateMedia(5);
+      await state.deactivateMedia(state.items.single);
       final patch = c.sent
           .firstWhere((r) => r.url.path == '/api/admin/media/5/deactivate');
       expect(patch.method, 'PATCH');
@@ -828,7 +828,7 @@ void main() {
       expect(reads(), before + 1, reason: 'set cover reloads');
 
       final afterCover = reads();
-      await state.deactivateMedia(5);
+      await state.deactivateMedia(state.items.single);
       expect(reads(), afterCover + 1, reason: 'deactivate reloads');
     });
 
@@ -848,7 +848,7 @@ void main() {
       final c = clientFor((_) => r);
       final state = await galleryState(c.api);
 
-      final ok = await state.deactivateMedia(5);
+      final ok = await state.deactivateMedia(state.items.single);
       expect(ok, isFalse);
       expect(state.mutationUncertain, isTrue,
           reason: 'the warning outlives the reload that follows it');
@@ -858,8 +858,9 @@ void main() {
     test('a second mutation is refused while one is in flight', () async {
       final c = clientFor((_) => routes());
       final state = await galleryState(c.api);
-      final first = state.deactivateMedia(5);
-      final second = state.deactivateMedia(5);
+      final asset5 = state.items.single;
+      final first = state.deactivateMedia(asset5);
+      final second = state.deactivateMedia(asset5);
       expect(await second, isFalse);
       await first;
       expect(c.sent.where((r) => r.url.path == '/api/admin/media/5/deactivate'),
