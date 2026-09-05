@@ -1,5 +1,7 @@
 package com.example.planyourtrip;
 
+import com.example.planyourtrip.model.AdminActivityLog;
+import com.example.planyourtrip.repository.AdminActivityLogRepository;
 import com.example.planyourtrip.repository.AdministrativeUnitRepository;
 import com.example.planyourtrip.repository.CategoryRepository;
 import com.example.planyourtrip.repository.PlaceRepository;
@@ -10,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -36,6 +39,8 @@ class MediaAssetTest {
     @Autowired PlaceRepository placeRepo;
     @Autowired CategoryRepository categoryRepo;
     @Autowired AdministrativeUnitRepository locationRepo;
+    // D3M — the five admin media mutations are audited; these read the trail back.
+    @Autowired AdminActivityLogRepository auditRepo;
 
     private String adminToken;
     private Long hotelPlaceId;
@@ -297,6 +302,302 @@ class MediaAssetTest {
         assertTrue(firstImg.has("url"));
         assertTrue(firstImg.has("sortOrder"));
         assertTrue(firstImg.has("cover"));
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // D3M — URL security
+    //
+    // Every media URL ends up in Flutter's Image.network and never in a link
+    // launcher, so an off-list scheme is not a live script-injection path today.
+    // It is unrenderable data reaching guests as a permanently broken image, and
+    // a scheme the client could treat differently tomorrow — so the server is the
+    // authoritative guard rather than the UI.
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    @Test
+    void createMedia_rejectsSchemesTheProductCannotRender() throws Exception {
+        for (String url : new String[]{
+            "javascript:alert(1)",
+            "vbscript:msgbox(1)",
+            "data:image/svg+xml;base64,PHN2Zz48L3N2Zz4=",
+            "file:///etc/passwd",
+            "ftp://example.test/a.jpg",
+        }) {
+            mvc.perform(post("/api/admin/media")
+                    .header("Authorization", "Bearer " + adminToken)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("""
+                        {"ownerType":"PLACE","ownerId":%d,"url":"%s","mediaType":"IMAGE"}
+                        """.formatted(scratchPlaceId, url)))
+                .andExpect(status().isBadRequest());
+        }
+    }
+
+    @Test
+    void createMedia_rejectsRelativeAndProtocolRelativeUrls() throws Exception {
+        // A protocol-relative URL's effective scheme depends on the page rendering it
+        // rather than on the stored value, so it is not a safe thing to persist.
+        for (String url : new String[]{"/images/a.jpg", "images/a.jpg", "//cdn.test/a.jpg"}) {
+            mvc.perform(post("/api/admin/media")
+                    .header("Authorization", "Bearer " + adminToken)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("""
+                        {"ownerType":"PLACE","ownerId":%d,"url":"%s","mediaType":"IMAGE"}
+                        """.formatted(scratchPlaceId, url)))
+                .andExpect(status().isBadRequest());
+        }
+    }
+
+    @Test
+    void createMedia_acceptsHttpAndHttps() throws Exception {
+        assertNotNull(addMedia(scratchPlaceId, "https://cdn.test/ok.jpg", false, 0));
+        assertNotNull(addMedia(scratchPlaceId, "http://cdn.test/ok2.jpg", false, 1));
+    }
+
+    @Test
+    void updateMedia_appliesTheSameUrlPolicy() throws Exception {
+        Long id = addMedia(scratchPlaceId, "https://cdn.test/before.jpg", false, 0);
+        mvc.perform(put("/api/admin/media/" + id)
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"ownerType":"PLACE","ownerId":%d,"url":"javascript:alert(1)","mediaType":"IMAGE"}
+                    """.formatted(scratchPlaceId)))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void createMedia_rejectsADangerousThumbnailUrlToo() throws Exception {
+        mvc.perform(post("/api/admin/media")
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"ownerType":"PLACE","ownerId":%d,"url":"https://cdn.test/a.jpg",
+                     "thumbnailUrl":"javascript:alert(1)","mediaType":"IMAGE"}
+                    """.formatted(scratchPlaceId)))
+            .andExpect(status().isBadRequest());
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // D3M — target validation
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    @Test
+    void createMedia_rejectsEveryUnknownOwnerNotJustPlace() throws Exception {
+        // Previously only PLACE was resolved, so a ROOM / REVIEW / TRIP_DOCUMENT id
+        // that did not exist was accepted and surfaced on whatever later took that id.
+        for (String ownerType : new String[]{"PLACE", "ROOM", "REVIEW", "TRIP_DOCUMENT"}) {
+            mvc.perform(post("/api/admin/media")
+                    .header("Authorization", "Bearer " + adminToken)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("""
+                        {"ownerType":"%s","ownerId":99999999,"url":"https://cdn.test/a.jpg","mediaType":"IMAGE"}
+                        """.formatted(ownerType)))
+                .andExpect(status().isNotFound());
+        }
+    }
+
+    @Test
+    void createMedia_rejectsSubmissionAsUnsupported() throws Exception {
+        // SUBMISSION is declared in MediaOwnerType but no such entity exists anywhere,
+        // so it can only ever produce a dangling reference.
+        mvc.perform(post("/api/admin/media")
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"ownerType":"SUBMISSION","ownerId":1,"url":"https://cdn.test/a.jpg","mediaType":"IMAGE"}
+                    """))
+            .andExpect(status().isBadRequest());
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // D3M — audit
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    @Test
+    void everyAdminMediaMutation_isAudited() throws Exception {
+        long c0 = auditCount("MEDIA_CREATE");
+        Long a = addMedia(scratchPlaceId, "https://cdn.test/audit-a.jpg", false, 0);
+        assertEquals(c0 + 1, auditCount("MEDIA_CREATE"));
+
+        AdminActivityLog created = latestAudit("MEDIA_CREATE");
+        assertEquals("MEDIA_ASSET", created.getTargetType());
+        assertEquals(a, created.getTargetId());
+        assertNotNull(created.getActorUserId(), "the acting administrator is recorded");
+        assertNotNull(created.getCreatedAt());
+
+        Long b = addMedia(scratchPlaceId, "https://cdn.test/audit-b.jpg", false, 1);
+
+        long u0 = auditCount("MEDIA_UPDATE");
+        mvc.perform(put("/api/admin/media/" + a)
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"ownerType":"PLACE","ownerId":%d,"url":"https://cdn.test/audit-a2.jpg","mediaType":"IMAGE"}
+                    """.formatted(scratchPlaceId)))
+            .andExpect(status().isOk());
+        assertEquals(u0 + 1, auditCount("MEDIA_UPDATE"));
+
+        long s0 = auditCount("MEDIA_SET_COVER");
+        mvc.perform(patch("/api/admin/media/cover")
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"mediaId\":%d}".formatted(a)))
+            .andExpect(status().isOk());
+        assertEquals(s0 + 1, auditCount("MEDIA_SET_COVER"));
+
+        long r0 = auditCount("MEDIA_REORDER");
+        mvc.perform(patch("/api/admin/media/reorder")
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"items":[{"mediaId":%d,"sortOrder":0},{"mediaId":%d,"sortOrder":1}]}
+                    """.formatted(b, a)))
+            .andExpect(status().isOk());
+        assertEquals(r0 + 1, auditCount("MEDIA_REORDER"),
+            "one row for the whole reorder, not one per asset");
+
+        long d0 = auditCount("MEDIA_DEACTIVATE");
+        mvc.perform(patch("/api/admin/media/" + a + "/deactivate")
+                .header("Authorization", "Bearer " + adminToken))
+            .andExpect(status().isOk());
+        assertEquals(d0 + 1, auditCount("MEDIA_DEACTIVATE"));
+        assertTrue(latestAudit("MEDIA_DEACTIVATE").getDescription().contains("cover"),
+            "losing the cover is the fact an operator needs later");
+    }
+
+    @Test
+    void auditNeverStoresAUrlQueryString() throws Exception {
+        // A media URL can legitimately carry a signed query parameter; the trail keeps
+        // origin and path so it stays useful without preserving a bearer value.
+        addMedia(scratchPlaceId, "https://cdn.test/signed.jpg?token=SECRETVALUE", false, 0);
+        AdminActivityLog entry = latestAudit("MEDIA_CREATE");
+        for (String field : new String[]{entry.getDescription(), entry.getBeforeState(),
+                                          entry.getAfterState()}) {
+            if (field == null) continue;
+            assertFalse(field.contains("SECRETVALUE"), "query string must be redacted");
+        }
+        assertTrue(entry.getAfterState().contains("cdn.test/signed.jpg"),
+            "origin and path are still recorded");
+    }
+
+    @Test
+    void aRejectedMutationWritesNoAuditRow() throws Exception {
+        // The audit shares the mutation's transaction, so a rejected request must leave
+        // nothing behind describing a change that did not happen.
+        long before = auditCount("MEDIA_CREATE");
+        mvc.perform(post("/api/admin/media")
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"ownerType":"PLACE","ownerId":%d,"url":"javascript:alert(1)","mediaType":"IMAGE"}
+                    """.formatted(scratchPlaceId)))
+            .andExpect(status().isBadRequest());
+        assertEquals(before, auditCount("MEDIA_CREATE"));
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // D3M — cover invariant and reorder validation
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    @Test
+    void coverInvariantIsAtMostOne_andZeroIsLegal() throws Exception {
+        Long a = addMedia(scratchPlaceId, "https://cdn.test/c1.jpg", true, 0);
+        Long b = addMedia(scratchPlaceId, "https://cdn.test/c2.jpg", true, 1);
+
+        // Setting a second cover unsets the first: at most one, never two.
+        assertEquals(1, countCovers(scratchPlaceId));
+
+        mvc.perform(patch("/api/admin/media/cover")
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"mediaId\":%d}".formatted(a)))
+            .andExpect(status().isOk());
+        assertEquals(1, countCovers(scratchPlaceId));
+
+        // Deactivating the cover leaves the gallery with none. That is the supported
+        // state, not a defect: PlaceService.resolveCoverUrl falls back to the first
+        // active image on purpose, so no promotion is performed and none is invented.
+        mvc.perform(patch("/api/admin/media/" + a + "/deactivate")
+                .header("Authorization", "Bearer " + adminToken))
+            .andExpect(status().isOk());
+        assertEquals(0, countCovers(scratchPlaceId), "zero covers is a legal state");
+        assertNotNull(b);
+    }
+
+    @Test
+    void reorder_rejectsDuplicateMediaIdAndDuplicateSortOrder() throws Exception {
+        Long a = addMedia(scratchPlaceId, "https://cdn.test/r1.jpg", false, 0);
+        Long b = addMedia(scratchPlaceId, "https://cdn.test/r2.jpg", false, 1);
+
+        mvc.perform(patch("/api/admin/media/reorder")
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"items":[{"mediaId":%d,"sortOrder":0},{"mediaId":%d,"sortOrder":1}]}
+                    """.formatted(a, a)))
+            .andExpect(status().isBadRequest());
+
+        mvc.perform(patch("/api/admin/media/reorder")
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"items":[{"mediaId":%d,"sortOrder":3},{"mediaId":%d,"sortOrder":3}]}
+                    """.formatted(a, b)))
+            .andExpect(status().isBadRequest());
+
+        // The valid form still works.
+        mvc.perform(patch("/api/admin/media/reorder")
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"items":[{"mediaId":%d,"sortOrder":0},{"mediaId":%d,"sortOrder":1}]}
+                    """.formatted(b, a)))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    void adminMediaMutations_areAdminOnly() throws Exception {
+        String userToken = login("demo@planyourtrip.com", "demo123456");
+        mvc.perform(post("/api/admin/media")).andExpect(status().isUnauthorized());
+        mvc.perform(post("/api/admin/media")
+                .header("Authorization", "Bearer " + userToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"ownerType":"PLACE","ownerId":%d,"url":"https://cdn.test/x.jpg","mediaType":"IMAGE"}
+                    """.formatted(scratchPlaceId)))
+            .andExpect(status().isForbidden());
+    }
+
+    private String login(String email, String password) throws Exception {
+        String body = mvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"email\":\"%s\",\"password\":\"%s\"}".formatted(email, password)))
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString();
+        return mapper.readTree(body).get("token").asText();
+    }
+
+    private long auditCount(String action) {
+        return auditRepo.search(null, action, null, null, null, null, PageRequest.of(0, 1))
+            .getTotalElements();
+    }
+
+    private AdminActivityLog latestAudit(String action) {
+        var page = auditRepo.search(null, action, null, null, null, null, PageRequest.of(0, 1));
+        return page.isEmpty() ? null : page.getContent().get(0);
+    }
+
+    private int countCovers(Long placeId) throws Exception {
+        String body = mvc.perform(get("/api/admin/places/" + placeId + "/media")
+                .header("Authorization", "Bearer " + adminToken))
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString();
+        int covers = 0;
+        for (JsonNode m : mapper.readTree(body)) {
+            if (m.get("cover").asBoolean() && m.get("active").asBoolean()) covers++;
+        }
+        return covers;
     }
 
     // ─── Helpers ──────────────────────────────────────────────────────────────

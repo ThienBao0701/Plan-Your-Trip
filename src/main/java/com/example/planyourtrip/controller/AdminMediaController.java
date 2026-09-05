@@ -42,32 +42,35 @@ public class AdminMediaController {
     public MediaAssetResponse create(
             @Valid @RequestBody MediaAssetRequest req,
             @AuthUser Long adminId) {
-        return mediaService.create(req, adminId);
+        return mediaService.adminCreate(adminId, req);
     }
 
     @PutMapping("/api/admin/media/{id}")
     @Operation(summary = "Update a media asset")
     public MediaAssetResponse update(
+            @AuthUser Long adminId,
             @PathVariable Long id,
             @Valid @RequestBody MediaAssetRequest req) {
-        return mediaService.update(id, req);
+        return mediaService.update(adminId, id, req);
     }
 
     @PatchMapping("/api/admin/media/{id}/deactivate")
     @Operation(summary = "Deactivate a media asset (soft delete)")
-    public MediaAssetResponse deactivate(@PathVariable Long id) {
-        return mediaService.deactivate(id);
+    public MediaAssetResponse deactivate(@AuthUser Long adminId, @PathVariable Long id) {
+        return mediaService.adminDeactivate(adminId, id);
     }
 
     @PatchMapping("/api/admin/media/cover")
     @Operation(summary = "Set cover media for an owner (unsets previous cover)")
-    public MediaAssetResponse setCover(@Valid @RequestBody MediaCoverRequest req) {
-        return mediaService.setCover(req);
+    public MediaAssetResponse setCover(@AuthUser Long adminId,
+                                       @Valid @RequestBody MediaCoverRequest req) {
+        return mediaService.setCover(adminId, req);
     }
 
     @PatchMapping("/api/admin/media/reorder")
     @Operation(summary = "Reorder media assets (all must belong to same owner)")
-    public List<MediaAssetResponse> reorder(@Valid @RequestBody MediaReorderRequest req) {
-        return mediaService.reorder(req);
+    public List<MediaAssetResponse> reorder(@AuthUser Long adminId,
+                                            @Valid @RequestBody MediaReorderRequest req) {
+        return mediaService.reorder(adminId, req);
     }
 }
