@@ -44,16 +44,18 @@ public class AdminHotelController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create hotel detail (placeId required in body)")
-    public HotelDetailResponse create(@Valid @RequestBody HotelDetailRequest req) {
-        return service.create(req);
+    public HotelDetailResponse create(@Valid @RequestBody HotelDetailRequest req,
+                                      @AuthUser Long adminId) {
+        return service.create(req, adminId);
     }
 
     @PutMapping("/{placeId}")
     @Operation(summary = "Update hotel detail")
     public HotelDetailResponse update(
             @PathVariable Long placeId,
-            @Valid @RequestBody HotelDetailRequest req) {
-        return service.update(placeId, req);
+            @Valid @RequestBody HotelDetailRequest req,
+            @AuthUser Long adminId) {
+        return service.update(placeId, req, adminId);
     }
 
     @GetMapping("/{placeId}/experience")
@@ -66,8 +68,9 @@ public class AdminHotelController {
     @Operation(summary = "Atomically replace hotel experience data")
     public ExperienceResponse updateExperience(
             @PathVariable Long placeId,
-            @RequestBody ExperienceRequest req) {
-        return experienceService.updateExperience(placeId, req);
+            @RequestBody ExperienceRequest req,
+            @AuthUser Long adminId) {
+        return experienceService.updateExperience(placeId, req, adminId);
     }
 
     @PostMapping("/{hotelId}/assign-owner")
