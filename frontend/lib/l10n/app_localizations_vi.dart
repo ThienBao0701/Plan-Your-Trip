@@ -12443,4 +12443,204 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get adminPartnerSettingsPromotion => 'Thông báo khuyến mãi';
+
+  @override
+  String get adminNavCatalog => 'Danh mục';
+
+  @override
+  String get adminSectionCatalog => 'Danh mục';
+
+  @override
+  String get adminCatalogEmpty => 'Chưa có địa điểm nào.';
+
+  @override
+  String get adminCatalogEmptyFiltered =>
+      'Không có địa điểm nào khớp với bộ lọc này.';
+
+  @override
+  String get adminCatalogSearchLabel => 'Tìm địa điểm';
+
+  @override
+  String get adminCatalogSearchClear => 'Xoá tìm kiếm';
+
+  @override
+  String get adminCatalogFilterFeatured => 'Nổi bật';
+
+  @override
+  String get adminCatalogFilterVerified => 'Đã xác minh';
+
+  @override
+  String get adminCatalogSortLabel => 'Sắp xếp';
+
+  @override
+  String get adminCatalogSortNewest => 'Mới nhất';
+
+  @override
+  String get adminCatalogSortRatingDesc => 'Đánh giá cao nhất';
+
+  @override
+  String get adminCatalogSortPriceAsc => 'Giá: thấp đến cao';
+
+  @override
+  String get adminCatalogSortPriceDesc => 'Giá: cao đến thấp';
+
+  @override
+  String get adminCatalogSortNameAsc => 'Tên A–Z';
+
+  @override
+  String get adminCatalogOrderingNotice =>
+      'Các địa điểm có cùng giá trị sắp xếp có thể đổi thứ tự giữa các trang.';
+
+  @override
+  String get adminCatalogColName => 'Tên';
+
+  @override
+  String get adminCatalogColCategory => 'Danh mục';
+
+  @override
+  String get adminCatalogColLocation => 'Khu vực';
+
+  @override
+  String get adminCatalogColRating => 'Đánh giá';
+
+  @override
+  String get adminCatalogColFlags => 'Nhãn';
+
+  @override
+  String adminCatalogOpenSemantic(String name) {
+    return 'Mở địa điểm $name';
+  }
+
+  @override
+  String get adminCatalogBackToList => 'Quay lại danh mục';
+
+  @override
+  String get adminCatalogNotFoundTitle => 'Không tìm thấy địa điểm';
+
+  @override
+  String get adminCatalogNotFoundMessage =>
+      'Không có địa điểm nào với mã này. Có thể địa điểm đã bị xoá hoặc liên kết không đúng.';
+
+  @override
+  String get adminCatalogActionUncertain =>
+      'Không rõ kết quả của thao tác vừa rồi. Trang đã được tải lại — hãy kiểm tra trạng thái trước khi thử lại.';
+
+  @override
+  String get adminCatalogSectionLifecycle => 'Vòng đời';
+
+  @override
+  String get adminCatalogSectionFlags => 'Xác minh và hiển thị nổi bật';
+
+  @override
+  String get adminCatalogSectionIdentity => 'Thông tin';
+
+  @override
+  String get adminCatalogSectionRooms => 'Phòng';
+
+  @override
+  String get adminCatalogSectionMedia => 'Thư viện ảnh';
+
+  @override
+  String get adminCatalogPublicVisibility => 'Hiển thị với khách';
+
+  @override
+  String get adminCatalogVisibleToGuests => 'Đang hiển thị và đặt được';
+
+  @override
+  String get adminCatalogHiddenFromGuests => 'Không hiển thị với khách';
+
+  @override
+  String get adminCatalogNoTransitions =>
+      'Không có thay đổi trạng thái nào khả dụng.';
+
+  @override
+  String get adminCatalogArchivedNotice =>
+      'Địa điểm này đã lưu trữ. Không thể khôi phục từ bảng quản trị.';
+
+  @override
+  String get adminCatalogArchive => 'Lưu trữ';
+
+  @override
+  String get adminCatalogArchiveTitle => 'Lưu trữ địa điểm này?';
+
+  @override
+  String get adminCatalogArchiveWarningIrreversible =>
+      'Không thể hoàn tác từ bảng quản trị — không có thao tác khôi phục.';
+
+  @override
+  String get adminCatalogArchiveWarningVisibility =>
+      'Địa điểm sẽ biến mất khỏi tìm kiếm và trang công khai ngay lập tức.';
+
+  @override
+  String get adminCatalogArchiveWarningRooms =>
+      'Phòng, giá và tồn phòng của địa điểm không bị thay đổi và không được giải phóng.';
+
+  @override
+  String get adminCatalogArchiveAcknowledge =>
+      'Tôi hiểu rằng thao tác này không thể hoàn tác tại đây.';
+
+  @override
+  String get adminCatalogArchiveConfirm => 'Lưu trữ địa điểm';
+
+  @override
+  String get adminCatalogFlagsRequireApproved =>
+      'Chỉ có thể bật xác minh và nổi bật cho địa điểm đã duyệt hoặc đã đăng.';
+
+  @override
+  String get adminCatalogPriceLevel => 'Mức giá';
+
+  @override
+  String get adminCatalogTags => 'Thẻ';
+
+  @override
+  String get adminCatalogAmenities => 'Tiện ích';
+
+  @override
+  String get adminCatalogReadOnlyNotice =>
+      'Chỉ xem. Việc sửa địa điểm sẽ thay thế toàn bộ thẻ, giờ mở cửa và tiện ích, nên không được cung cấp ở đây.';
+
+  @override
+  String get adminCatalogNotAHotel =>
+      'Địa điểm này không có thông tin khách sạn nên không có phòng.';
+
+  @override
+  String get adminCatalogRoomsEmpty => 'Chưa có phòng.';
+
+  @override
+  String get adminCatalogRoomsUnavailable => 'Không tải được danh sách phòng.';
+
+  @override
+  String get adminCatalogRoomActive => 'Đang hoạt động';
+
+  @override
+  String get adminCatalogRoomInactive => 'Ngừng hoạt động';
+
+  @override
+  String get adminCatalogRoomCode => 'Mã';
+
+  @override
+  String get adminCatalogRoomType => 'Loại';
+
+  @override
+  String get adminCatalogRoomQuantity => 'Số phòng';
+
+  @override
+  String get adminCatalogRoomsBoundaryNotice =>
+      'Tồn phòng và giá được quản lý ngoài danh mục.';
+
+  @override
+  String get adminCatalogMediaCount => 'Số ảnh';
+
+  @override
+  String get adminCatalogMediaCover => 'Ảnh bìa';
+
+  @override
+  String get adminCatalogMediaHasCover => 'Đã đặt';
+
+  @override
+  String get adminCatalogMediaNoCover => 'Chưa có';
+
+  @override
+  String get adminCatalogMediaReadOnlyNotice =>
+      'Chỉ xem. Quản lý ảnh nằm ở một khu vực quản trị riêng.';
 }

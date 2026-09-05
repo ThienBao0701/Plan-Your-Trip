@@ -4,7 +4,7 @@ import '../../l10n/app_localizations.dart';
 
 /// Sidebar grouping. The Admin CMS is information-dense, so destinations are
 /// grouped rather than presented as one flat list.
-enum AdminSection { overview, operations, finance, community, audit }
+enum AdminSection { overview, operations, catalog, finance, community, audit }
 
 /// One destination in the Admin CMS shell.
 ///
@@ -59,6 +59,12 @@ class AdminNavigation {
       label: _partners,
     ),
     AdminDestination(
+      route: AdminRoutesRefs.catalog,
+      section: AdminSection.catalog,
+      icon: Icons.place_outlined,
+      label: _catalog,
+    ),
+    AdminDestination(
       route: AdminRoutesRefs.payments,
       section: AdminSection.finance,
       icon: Icons.payments_outlined,
@@ -107,6 +113,7 @@ class AdminNavigation {
       switch (section) {
         AdminSection.overview => l10n.adminSectionOverview,
         AdminSection.operations => l10n.adminSectionOperations,
+        AdminSection.catalog => l10n.adminSectionCatalog,
         AdminSection.finance => l10n.adminSectionFinance,
         AdminSection.community => l10n.adminSectionCommunity,
         AdminSection.audit => l10n.adminSectionAudit,
@@ -120,6 +127,7 @@ class AdminNavigation {
   static String _reviews(AppLocalizations l) => l.adminNavReviews;
   static String _activityLog(AppLocalizations l) => l.adminNavActivityLog;
   static String _partners(AppLocalizations l) => l.adminNavPartners;
+  static String _catalog(AppLocalizations l) => l.adminNavCatalog;
 }
 
 /// Route strings, kept separate from `AdminRoutes` so `AdminNavigation` can be
@@ -139,4 +147,7 @@ class AdminRoutesRefs {
   /// being its own menu entry: an operator opens a partner from the list,
   /// never by typing an id.
   static const String partners = '/admin/partners';
+
+  /// D3C-A. Place detail is reached from this destination, same convention.
+  static const String catalog = '/admin/catalog';
 }

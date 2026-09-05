@@ -25,6 +25,7 @@ class AdminRoutes {
   static const String invoices = AdminRoutesRefs.invoices;
   static const String activityLog = AdminRoutesRefs.activityLog;
   static const String partners = AdminRoutesRefs.partners;
+  static const String catalog = AdminRoutesRefs.catalog;
 
   static bool isAdminRoute(String route) =>
       route == namespace || route.startsWith('$namespace/');

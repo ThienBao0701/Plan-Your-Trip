@@ -12606,4 +12606,203 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adminPartnerSettingsPromotion => 'Promotion notifications';
+
+  @override
+  String get adminNavCatalog => 'Catalog';
+
+  @override
+  String get adminSectionCatalog => 'Catalog';
+
+  @override
+  String get adminCatalogEmpty => 'No places yet.';
+
+  @override
+  String get adminCatalogEmptyFiltered => 'No places match these filters.';
+
+  @override
+  String get adminCatalogSearchLabel => 'Search places';
+
+  @override
+  String get adminCatalogSearchClear => 'Clear search';
+
+  @override
+  String get adminCatalogFilterFeatured => 'Featured';
+
+  @override
+  String get adminCatalogFilterVerified => 'Verified';
+
+  @override
+  String get adminCatalogSortLabel => 'Sort';
+
+  @override
+  String get adminCatalogSortNewest => 'Newest';
+
+  @override
+  String get adminCatalogSortRatingDesc => 'Highest rated';
+
+  @override
+  String get adminCatalogSortPriceAsc => 'Price: low to high';
+
+  @override
+  String get adminCatalogSortPriceDesc => 'Price: high to low';
+
+  @override
+  String get adminCatalogSortNameAsc => 'Name A–Z';
+
+  @override
+  String get adminCatalogOrderingNotice =>
+      'Places with the same sort value may change order between pages.';
+
+  @override
+  String get adminCatalogColName => 'Name';
+
+  @override
+  String get adminCatalogColCategory => 'Category';
+
+  @override
+  String get adminCatalogColLocation => 'Location';
+
+  @override
+  String get adminCatalogColRating => 'Rating';
+
+  @override
+  String get adminCatalogColFlags => 'Flags';
+
+  @override
+  String adminCatalogOpenSemantic(String name) {
+    return 'Open place $name';
+  }
+
+  @override
+  String get adminCatalogBackToList => 'Back to catalog';
+
+  @override
+  String get adminCatalogNotFoundTitle => 'Place not found';
+
+  @override
+  String get adminCatalogNotFoundMessage =>
+      'No place exists with this id. It may have been removed, or the link may be wrong.';
+
+  @override
+  String get adminCatalogActionUncertain =>
+      'The result of the last action is unknown. This page has been reloaded — check the status before trying again.';
+
+  @override
+  String get adminCatalogSectionLifecycle => 'Lifecycle';
+
+  @override
+  String get adminCatalogSectionFlags => 'Verification and placement';
+
+  @override
+  String get adminCatalogSectionIdentity => 'Identity';
+
+  @override
+  String get adminCatalogSectionRooms => 'Rooms';
+
+  @override
+  String get adminCatalogSectionMedia => 'Gallery';
+
+  @override
+  String get adminCatalogPublicVisibility => 'Guest visibility';
+
+  @override
+  String get adminCatalogVisibleToGuests => 'Visible and bookable';
+
+  @override
+  String get adminCatalogHiddenFromGuests => 'Not visible to guests';
+
+  @override
+  String get adminCatalogNoTransitions =>
+      'No status change is available from here.';
+
+  @override
+  String get adminCatalogArchivedNotice =>
+      'This place is archived. There is no way to restore it from the admin console.';
+
+  @override
+  String get adminCatalogArchive => 'Archive';
+
+  @override
+  String get adminCatalogArchiveTitle => 'Archive this place?';
+
+  @override
+  String get adminCatalogArchiveWarningIrreversible =>
+      'This cannot be reversed from the admin console — there is no restore action.';
+
+  @override
+  String get adminCatalogArchiveWarningVisibility =>
+      'The place disappears from guest search and its public page immediately.';
+
+  @override
+  String get adminCatalogArchiveWarningRooms =>
+      'Its rooms, rates and inventory are left untouched and are not released.';
+
+  @override
+  String get adminCatalogArchiveAcknowledge =>
+      'I understand this cannot be undone here.';
+
+  @override
+  String get adminCatalogArchiveConfirm => 'Archive place';
+
+  @override
+  String get adminCatalogFlagsRequireApproved =>
+      'Verified and featured can only be turned on for an approved or published place.';
+
+  @override
+  String get adminCatalogPriceLevel => 'Price level';
+
+  @override
+  String get adminCatalogTags => 'Tags';
+
+  @override
+  String get adminCatalogAmenities => 'Amenities';
+
+  @override
+  String get adminCatalogReadOnlyNotice =>
+      'Read-only. Editing a place replaces its tags, opening hours and amenities wholesale, so it is not offered here.';
+
+  @override
+  String get adminCatalogNotAHotel =>
+      'This place has no hotel detail, so it has no rooms.';
+
+  @override
+  String get adminCatalogRoomsEmpty => 'No rooms.';
+
+  @override
+  String get adminCatalogRoomsUnavailable => 'Rooms could not be loaded.';
+
+  @override
+  String get adminCatalogRoomActive => 'Active';
+
+  @override
+  String get adminCatalogRoomInactive => 'Inactive';
+
+  @override
+  String get adminCatalogRoomCode => 'Code';
+
+  @override
+  String get adminCatalogRoomType => 'Type';
+
+  @override
+  String get adminCatalogRoomQuantity => 'Rooms';
+
+  @override
+  String get adminCatalogRoomsBoundaryNotice =>
+      'Inventory and rates are managed outside the catalog.';
+
+  @override
+  String get adminCatalogMediaCount => 'Images';
+
+  @override
+  String get adminCatalogMediaCover => 'Cover';
+
+  @override
+  String get adminCatalogMediaHasCover => 'Set';
+
+  @override
+  String get adminCatalogMediaNoCover => 'None';
+
+  @override
+  String get adminCatalogMediaReadOnlyNotice =>
+      'Read-only. Media management is a separate admin surface.';
 }

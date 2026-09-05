@@ -21621,6 +21621,372 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Promotion notifications'**
   String get adminPartnerSettingsPromotion;
+
+  /// No description provided for @adminNavCatalog.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalog'**
+  String get adminNavCatalog;
+
+  /// No description provided for @adminSectionCatalog.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalog'**
+  String get adminSectionCatalog;
+
+  /// No description provided for @adminCatalogEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No places yet.'**
+  String get adminCatalogEmpty;
+
+  /// No description provided for @adminCatalogEmptyFiltered.
+  ///
+  /// In en, this message translates to:
+  /// **'No places match these filters.'**
+  String get adminCatalogEmptyFiltered;
+
+  /// No description provided for @adminCatalogSearchLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Search places'**
+  String get adminCatalogSearchLabel;
+
+  /// No description provided for @adminCatalogSearchClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get adminCatalogSearchClear;
+
+  /// No description provided for @adminCatalogFilterFeatured.
+  ///
+  /// In en, this message translates to:
+  /// **'Featured'**
+  String get adminCatalogFilterFeatured;
+
+  /// No description provided for @adminCatalogFilterVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified'**
+  String get adminCatalogFilterVerified;
+
+  /// No description provided for @adminCatalogSortLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort'**
+  String get adminCatalogSortLabel;
+
+  /// No description provided for @adminCatalogSortNewest.
+  ///
+  /// In en, this message translates to:
+  /// **'Newest'**
+  String get adminCatalogSortNewest;
+
+  /// No description provided for @adminCatalogSortRatingDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Highest rated'**
+  String get adminCatalogSortRatingDesc;
+
+  /// No description provided for @adminCatalogSortPriceAsc.
+  ///
+  /// In en, this message translates to:
+  /// **'Price: low to high'**
+  String get adminCatalogSortPriceAsc;
+
+  /// No description provided for @adminCatalogSortPriceDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Price: high to low'**
+  String get adminCatalogSortPriceDesc;
+
+  /// No description provided for @adminCatalogSortNameAsc.
+  ///
+  /// In en, this message translates to:
+  /// **'Name A–Z'**
+  String get adminCatalogSortNameAsc;
+
+  /// No description provided for @adminCatalogOrderingNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Places with the same sort value may change order between pages.'**
+  String get adminCatalogOrderingNotice;
+
+  /// No description provided for @adminCatalogColName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get adminCatalogColName;
+
+  /// No description provided for @adminCatalogColCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get adminCatalogColCategory;
+
+  /// No description provided for @adminCatalogColLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get adminCatalogColLocation;
+
+  /// No description provided for @adminCatalogColRating.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating'**
+  String get adminCatalogColRating;
+
+  /// No description provided for @adminCatalogColFlags.
+  ///
+  /// In en, this message translates to:
+  /// **'Flags'**
+  String get adminCatalogColFlags;
+
+  /// No description provided for @adminCatalogOpenSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Open place {name}'**
+  String adminCatalogOpenSemantic(String name);
+
+  /// No description provided for @adminCatalogBackToList.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to catalog'**
+  String get adminCatalogBackToList;
+
+  /// No description provided for @adminCatalogNotFoundTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Place not found'**
+  String get adminCatalogNotFoundTitle;
+
+  /// No description provided for @adminCatalogNotFoundMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No place exists with this id. It may have been removed, or the link may be wrong.'**
+  String get adminCatalogNotFoundMessage;
+
+  /// No description provided for @adminCatalogActionUncertain.
+  ///
+  /// In en, this message translates to:
+  /// **'The result of the last action is unknown. This page has been reloaded — check the status before trying again.'**
+  String get adminCatalogActionUncertain;
+
+  /// No description provided for @adminCatalogSectionLifecycle.
+  ///
+  /// In en, this message translates to:
+  /// **'Lifecycle'**
+  String get adminCatalogSectionLifecycle;
+
+  /// No description provided for @adminCatalogSectionFlags.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification and placement'**
+  String get adminCatalogSectionFlags;
+
+  /// No description provided for @adminCatalogSectionIdentity.
+  ///
+  /// In en, this message translates to:
+  /// **'Identity'**
+  String get adminCatalogSectionIdentity;
+
+  /// No description provided for @adminCatalogSectionRooms.
+  ///
+  /// In en, this message translates to:
+  /// **'Rooms'**
+  String get adminCatalogSectionRooms;
+
+  /// No description provided for @adminCatalogSectionMedia.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery'**
+  String get adminCatalogSectionMedia;
+
+  /// No description provided for @adminCatalogPublicVisibility.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest visibility'**
+  String get adminCatalogPublicVisibility;
+
+  /// No description provided for @adminCatalogVisibleToGuests.
+  ///
+  /// In en, this message translates to:
+  /// **'Visible and bookable'**
+  String get adminCatalogVisibleToGuests;
+
+  /// No description provided for @adminCatalogHiddenFromGuests.
+  ///
+  /// In en, this message translates to:
+  /// **'Not visible to guests'**
+  String get adminCatalogHiddenFromGuests;
+
+  /// No description provided for @adminCatalogNoTransitions.
+  ///
+  /// In en, this message translates to:
+  /// **'No status change is available from here.'**
+  String get adminCatalogNoTransitions;
+
+  /// No description provided for @adminCatalogArchivedNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'This place is archived. There is no way to restore it from the admin console.'**
+  String get adminCatalogArchivedNotice;
+
+  /// No description provided for @adminCatalogArchive.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive'**
+  String get adminCatalogArchive;
+
+  /// No description provided for @adminCatalogArchiveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive this place?'**
+  String get adminCatalogArchiveTitle;
+
+  /// No description provided for @adminCatalogArchiveWarningIrreversible.
+  ///
+  /// In en, this message translates to:
+  /// **'This cannot be reversed from the admin console — there is no restore action.'**
+  String get adminCatalogArchiveWarningIrreversible;
+
+  /// No description provided for @adminCatalogArchiveWarningVisibility.
+  ///
+  /// In en, this message translates to:
+  /// **'The place disappears from guest search and its public page immediately.'**
+  String get adminCatalogArchiveWarningVisibility;
+
+  /// No description provided for @adminCatalogArchiveWarningRooms.
+  ///
+  /// In en, this message translates to:
+  /// **'Its rooms, rates and inventory are left untouched and are not released.'**
+  String get adminCatalogArchiveWarningRooms;
+
+  /// No description provided for @adminCatalogArchiveAcknowledge.
+  ///
+  /// In en, this message translates to:
+  /// **'I understand this cannot be undone here.'**
+  String get adminCatalogArchiveAcknowledge;
+
+  /// No description provided for @adminCatalogArchiveConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive place'**
+  String get adminCatalogArchiveConfirm;
+
+  /// No description provided for @adminCatalogFlagsRequireApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified and featured can only be turned on for an approved or published place.'**
+  String get adminCatalogFlagsRequireApproved;
+
+  /// No description provided for @adminCatalogPriceLevel.
+  ///
+  /// In en, this message translates to:
+  /// **'Price level'**
+  String get adminCatalogPriceLevel;
+
+  /// No description provided for @adminCatalogTags.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get adminCatalogTags;
+
+  /// No description provided for @adminCatalogAmenities.
+  ///
+  /// In en, this message translates to:
+  /// **'Amenities'**
+  String get adminCatalogAmenities;
+
+  /// No description provided for @adminCatalogReadOnlyNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Read-only. Editing a place replaces its tags, opening hours and amenities wholesale, so it is not offered here.'**
+  String get adminCatalogReadOnlyNotice;
+
+  /// No description provided for @adminCatalogNotAHotel.
+  ///
+  /// In en, this message translates to:
+  /// **'This place has no hotel detail, so it has no rooms.'**
+  String get adminCatalogNotAHotel;
+
+  /// No description provided for @adminCatalogRoomsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No rooms.'**
+  String get adminCatalogRoomsEmpty;
+
+  /// No description provided for @adminCatalogRoomsUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Rooms could not be loaded.'**
+  String get adminCatalogRoomsUnavailable;
+
+  /// No description provided for @adminCatalogRoomActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get adminCatalogRoomActive;
+
+  /// No description provided for @adminCatalogRoomInactive.
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive'**
+  String get adminCatalogRoomInactive;
+
+  /// No description provided for @adminCatalogRoomCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Code'**
+  String get adminCatalogRoomCode;
+
+  /// No description provided for @adminCatalogRoomType.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get adminCatalogRoomType;
+
+  /// No description provided for @adminCatalogRoomQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Rooms'**
+  String get adminCatalogRoomQuantity;
+
+  /// No description provided for @adminCatalogRoomsBoundaryNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Inventory and rates are managed outside the catalog.'**
+  String get adminCatalogRoomsBoundaryNotice;
+
+  /// No description provided for @adminCatalogMediaCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Images'**
+  String get adminCatalogMediaCount;
+
+  /// No description provided for @adminCatalogMediaCover.
+  ///
+  /// In en, this message translates to:
+  /// **'Cover'**
+  String get adminCatalogMediaCover;
+
+  /// No description provided for @adminCatalogMediaHasCover.
+  ///
+  /// In en, this message translates to:
+  /// **'Set'**
+  String get adminCatalogMediaHasCover;
+
+  /// No description provided for @adminCatalogMediaNoCover.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get adminCatalogMediaNoCover;
+
+  /// No description provided for @adminCatalogMediaReadOnlyNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Read-only. Media management is a separate admin surface.'**
+  String get adminCatalogMediaReadOnlyNotice;
 }
 
 class _AppLocalizationsDelegate

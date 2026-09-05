@@ -8,6 +8,7 @@ import '../../design/app_spacing.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/glass_widgets.dart';
 import 'admin_feature_states.dart';
+import 'admin_catalog_states.dart';
 import 'admin_partner_states.dart';
 import 'widgets/admin_widgets.dart';
 import 'admin_navigation.dart';
@@ -16,7 +17,9 @@ import 'screens/admin_activity_log_screen.dart';
 import 'screens/admin_bookings_screen.dart';
 import 'screens/admin_dashboard_screen.dart';
 import 'screens/admin_invoices_screen.dart';
+import 'screens/admin_catalog_screen.dart';
 import 'screens/admin_partner_detail_screen.dart';
+import 'screens/admin_place_detail_screen.dart';
 import 'screens/admin_partners_screen.dart';
 import 'screens/admin_payments_screen.dart';
 import 'screens/admin_reviews_screen.dart';
@@ -62,6 +65,13 @@ class _AdminAppShellState extends State<AdminAppShell> {
   /// another is opened, so two partners can never share a notifier.
   AdminPartnerDetailState? _partnerDetail;
 
+  AdminCatalogPlacesState? _catalog;
+
+  /// The place currently open, or null when the Catalog destination is showing
+  /// its list. Created per place and disposed when another is opened, so a slow
+  /// response for the previous id cannot land on the new screen.
+  AdminPlaceDetailState? _placeDetail;
+
   bool _created = false;
 
   @override
@@ -93,6 +103,8 @@ class _AdminAppShellState extends State<AdminAppShell> {
     _activity?.dispose();
     _partners?.dispose();
     _partnerDetail?.dispose();
+    _catalog?.dispose();
+    _placeDetail?.dispose();
     super.dispose();
   }
 
@@ -110,6 +122,7 @@ class _AdminAppShellState extends State<AdminAppShell> {
     _invoices = AdminInvoicesState(api: api);
     _activity = AdminActivityLogState(api: api);
     _partners = AdminPartnersState(api: api);
+    _catalog = AdminCatalogPlacesState(api: api);
 
     // One load for the landing section. Other sections load lazily when first
     // selected, so opening the console does not fan out six requests at once.
@@ -141,6 +154,8 @@ class _AdminAppShellState extends State<AdminAppShell> {
         if (_activity?.status == AdminLoadStatus.idle) _activity!.load();
       case AdminRoutes.partners:
         if (_partners?.status == AdminLoadStatus.idle) _partners!.load();
+      case AdminRoutes.catalog:
+        if (_catalog?.status == AdminLoadStatus.idle) _catalog!.load();
       default:
         if (_dashboard?.status == AdminLoadStatus.idle) _dashboard!.load();
     }
@@ -158,6 +173,24 @@ class _AdminAppShellState extends State<AdminAppShell> {
     setState(() => _partnerDetail = next);
     previous?.dispose();
     next.load();
+  }
+
+  /// Opens one place's detail inside the Catalog destination.
+  void _openPlace(AdminPlaceRow row) {
+    final api = AppScope.of(context).api;
+    final previous = _placeDetail;
+    final next = AdminPlaceDetailState(api: api, placeId: row.id);
+    setState(() => _placeDetail = next);
+    previous?.dispose();
+    next.load();
+  }
+
+  void _closePlace() {
+    final previous = _placeDetail;
+    setState(() => _placeDetail = null);
+    previous?.dispose();
+    // Status and flag changes alter what the list shows, so it is re-read.
+    _catalog?.refresh();
   }
 
   void _closePartner() {
@@ -180,6 +213,11 @@ class _AdminAppShellState extends State<AdminAppShell> {
       _partnerDetail = null;
       previous?.dispose();
     }
+    if (_route != route && _placeDetail != null) {
+      final previous = _placeDetail;
+      _placeDetail = null;
+      previous?.dispose();
+    }
     if (_route != route) setState(() => _route = route);
     _loadFor(route);
     AdminScope.maybeOf(context)?.setActiveRoute(route);
@@ -193,6 +231,15 @@ class _AdminAppShellState extends State<AdminAppShell> {
       AdminRoutes.reviews => AdminReviewsScreen(state: _reviews!),
       AdminRoutes.invoices => AdminInvoicesScreen(state: _invoices!),
       AdminRoutes.activityLog => AdminActivityLogScreen(state: _activity!),
+      AdminRoutes.catalog => _placeDetail == null
+          ? AdminCatalogScreen(
+              state: _catalog!,
+              onOpenPlace: _openPlace,
+            )
+          : AdminPlaceDetailScreen(
+              state: _placeDetail!,
+              onBack: _closePlace,
+            ),
       AdminRoutes.partners => _partnerDetail == null
           ? AdminPartnersScreen(
               state: _partners!,

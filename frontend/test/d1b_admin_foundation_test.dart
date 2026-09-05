@@ -637,6 +637,7 @@ void main() {
         l10n.adminNavDashboard,
         l10n.adminNavBookings,
         l10n.adminNavPartners,
+        l10n.adminNavCatalog,
         l10n.adminNavPayments,
         l10n.adminNavInvoices,
         l10n.adminNavReviews,
@@ -644,7 +645,7 @@ void main() {
       ]) {
         expect(find.text(label), findsWidgets);
       }
-      expect(AdminNavigation.destinations, hasLength(7));
+      expect(AdminNavigation.destinations, hasLength(8));
       // Nothing speculative: every destination resolves to a real route.
       for (final d in AdminNavigation.destinations) {
         expect(AdminRoutes.isAdminRoute(d.route), isTrue);

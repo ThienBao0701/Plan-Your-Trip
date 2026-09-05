@@ -815,7 +815,8 @@ class AdminPartnerSettings {
       bookingNotificationEnabled: json['bookingNotificationEnabled'] == true,
       paymentNotificationEnabled: json['paymentNotificationEnabled'] == true,
       reviewNotificationEnabled: json['reviewNotificationEnabled'] == true,
-      promotionNotificationEnabled: json['promotionNotificationEnabled'] == true,
+      promotionNotificationEnabled:
+          json['promotionNotificationEnabled'] == true,
     );
   }
 }
@@ -863,6 +864,387 @@ class AdminPartnerActivityRow {
       entityId: _asInt(json['entityId']),
       description: _asString(json['description']),
       createdAt: _asInstant(json['createdAt']),
+    );
+  }
+}
+// ── Catalog (D3C-A) ──────────────────────────────────────────────────────────
+// Verified against `develop@3467d45`: AdminPlaceController, AdminRoomController
+// and PlaceService.ALLOWED_TRANSITIONS. Nothing here is inferred from the D3B
+// document alone — every field and every transition was re-read from source.
+
+/// The seven states of `PlaceStatus`, exactly as the backend spells them.
+///
+/// Parsing fails closed to [unknown] rather than defaulting to a plausible
+/// state: mapping an unrecognised value onto PUBLISHED or DRAFT would make the
+/// console assert something about a place that the backend never said.
+enum AdminPlaceStatus {
+  draft('DRAFT'),
+  pendingReview('PENDING_REVIEW'),
+  approved('APPROVED'),
+  published('PUBLISHED'),
+  hidden('HIDDEN'),
+  rejected('REJECTED'),
+  archived('ARCHIVED'),
+  unknown('');
+
+  final String wire;
+  const AdminPlaceStatus(this.wire);
+
+  static AdminPlaceStatus parse(String? raw) {
+    if (raw == null) return AdminPlaceStatus.unknown;
+    for (final s in AdminPlaceStatus.values) {
+      if (s != AdminPlaceStatus.unknown && s.wire == raw) return s;
+    }
+    return AdminPlaceStatus.unknown;
+  }
+
+  /// `PlaceService.ALLOWED_TRANSITIONS`, mirrored exactly. Anything outside this
+  /// map answers 400, so the console offers only what the backend accepts —
+  /// and [unknown] offers nothing at all.
+  static const Map<AdminPlaceStatus, List<AdminPlaceStatus>> _transitions = {
+    AdminPlaceStatus.draft: [
+      AdminPlaceStatus.pendingReview,
+      AdminPlaceStatus.approved,
+      AdminPlaceStatus.published,
+      AdminPlaceStatus.hidden,
+      AdminPlaceStatus.archived,
+    ],
+    AdminPlaceStatus.pendingReview: [
+      AdminPlaceStatus.approved,
+      AdminPlaceStatus.rejected,
+      AdminPlaceStatus.hidden,
+      AdminPlaceStatus.archived,
+    ],
+    AdminPlaceStatus.approved: [
+      AdminPlaceStatus.published,
+      AdminPlaceStatus.hidden,
+      AdminPlaceStatus.archived,
+    ],
+    AdminPlaceStatus.published: [
+      AdminPlaceStatus.hidden,
+      AdminPlaceStatus.archived,
+    ],
+    AdminPlaceStatus.hidden: [
+      AdminPlaceStatus.published,
+      AdminPlaceStatus.archived,
+    ],
+    AdminPlaceStatus.rejected: [
+      AdminPlaceStatus.draft,
+      AdminPlaceStatus.archived,
+    ],
+    // Terminal. Nothing in the backend moves a place out of ARCHIVED, so the
+    // console must never imply otherwise.
+    AdminPlaceStatus.archived: [],
+    AdminPlaceStatus.unknown: [],
+  };
+
+  List<AdminPlaceStatus> get allowedNext =>
+      _transitions[this] ?? const <AdminPlaceStatus>[];
+
+  bool canTransitionTo(AdminPlaceStatus target) => allowedNext.contains(target);
+
+  /// `validateFeaturedVerified`: both flags may only be set **true** on an
+  /// APPROVED or PUBLISHED place. Clearing either is unguarded in both
+  /// directions, so the console allows it from any state.
+  bool get canSetFlagsTrue =>
+      this == AdminPlaceStatus.approved || this == AdminPlaceStatus.published;
+
+  /// ARCHIVED is reachable from every other state and has no exit.
+  bool get isTerminal => this == AdminPlaceStatus.archived;
+
+  /// Guest-visible. Public reads gate strictly on `status == PUBLISHED`.
+  bool get isPubliclyVisible => this == AdminPlaceStatus.published;
+}
+
+/// A named reference the catalog DTOs embed for category, subcategory and
+/// location. `type`, `icon` and `color` exist on `CategoryRef` but the console
+/// renders only the name, so they are not modelled.
+class AdminCatalogRef {
+  final int id;
+  final String? name;
+  final String? slug;
+
+  const AdminCatalogRef(
+      {required this.id, required this.name, required this.slug});
+
+  static AdminCatalogRef? fromJson(Map<String, dynamic>? json) {
+    if (json == null) return null;
+    final id = _asInt(json['id']);
+    if (id == null) return null;
+    return AdminCatalogRef(
+      id: id,
+      name: _asString(json['name']),
+      slug: _asString(json['slug']),
+    );
+  }
+}
+
+/// A row of `GET /api/admin/places` — `PlaceDto.PlaceSummaryResponse`.
+class AdminPlaceRow {
+  final int id;
+  final String? name;
+  final String? slug;
+  final AdminCatalogRef? category;
+  final AdminCatalogRef? subcategory;
+  final AdminCatalogRef? location;
+  final String? address;
+  final String? shortDescription;
+  final int priceLevel;
+  final double ratingAvg;
+  final int reviewCount;
+  final AdminPlaceStatus status;
+  final bool featured;
+  final bool verified;
+  final String? coverImageUrl;
+  final DateTime? createdAt;
+
+  const AdminPlaceRow({
+    required this.id,
+    required this.name,
+    required this.slug,
+    required this.category,
+    required this.subcategory,
+    required this.location,
+    required this.address,
+    required this.shortDescription,
+    required this.priceLevel,
+    required this.ratingAvg,
+    required this.reviewCount,
+    required this.status,
+    required this.featured,
+    required this.verified,
+    required this.coverImageUrl,
+    required this.createdAt,
+  });
+
+  static AdminPlaceRow? fromJson(Map<String, dynamic> json) {
+    final id = _asInt(json['id']);
+    if (id == null) return null;
+    return AdminPlaceRow(
+      id: id,
+      name: _asString(json['name']),
+      slug: _asString(json['slug']),
+      category:
+          AdminCatalogRef.fromJson(json['category'] as Map<String, dynamic>?),
+      subcategory: AdminCatalogRef.fromJson(
+          json['subcategory'] as Map<String, dynamic>?),
+      // The list DTO calls it administrativeUnit; the detail DTO calls the same
+      // thing location. Both are read here so one model serves both.
+      location: AdminCatalogRef.fromJson((json['administrativeUnit'] ??
+          json['location']) as Map<String, dynamic>?),
+      address: _asString(json['address']),
+      shortDescription: _asString(json['shortDescription']),
+      priceLevel: _asInt(json['priceLevel']) ?? 0,
+      ratingAvg: _asDouble(json['ratingAvg']) ?? 0,
+      reviewCount: _asInt(json['reviewCount']) ?? 0,
+      status: AdminPlaceStatus.parse(_asString(json['status'])),
+      featured: json['featured'] == true,
+      verified: json['verified'] == true,
+      coverImageUrl: _asString(json['coverImageUrl']),
+      createdAt: _asInstant(json['createdAt']),
+    );
+  }
+}
+
+/// One image in a place's gallery — `PlaceDetailResponse.ImageRef`.
+///
+/// Read-only in D3C-A. Media *mutations* are D3C-B, and the D3B media freeze
+/// keeps the URL out of any clickable affordance.
+class AdminCatalogImage {
+  final int id;
+  final String? url;
+  final String? thumbnailUrl;
+  final String? altText;
+  final int sortOrder;
+  final bool cover;
+
+  const AdminCatalogImage({
+    required this.id,
+    required this.url,
+    required this.thumbnailUrl,
+    required this.altText,
+    required this.sortOrder,
+    required this.cover,
+  });
+
+  static AdminCatalogImage? fromJson(Map<String, dynamic> json) {
+    final id = _asInt(json['id']);
+    if (id == null) return null;
+    return AdminCatalogImage(
+      id: id,
+      url: _asString(json['url']),
+      thumbnailUrl: _asString(json['thumbnailUrl']),
+      altText: _asString(json['altText']),
+      sortOrder: _asInt(json['sortOrder']) ?? 0,
+      cover: json['cover'] == true,
+    );
+  }
+}
+
+/// `GET /api/admin/places/{id}` — `PlaceDetailResponse`.
+///
+/// `similarPlaces`, `groupedOpeningHours` and the full `metadata` block are
+/// returned by the backend but not modelled: the console shows none of them,
+/// and a model field nothing renders is a maintenance cost with no reader.
+class AdminPlaceDetail {
+  final int id;
+  final String? name;
+  final String? slug;
+  final String? shortDescription;
+  final String? description;
+  final String? address;
+  final String? googleMapUrl;
+  final double? latitude;
+  final double? longitude;
+  final AdminCatalogRef? category;
+  final AdminCatalogRef? subcategory;
+  final AdminCatalogRef? location;
+  final double ratingAvg;
+  final int ratingCount;
+  final int priceLevel;
+  final bool featured;
+  final bool verified;
+  final AdminPlaceStatus status;
+  final List<String> tags;
+  final List<String> amenities;
+  final String? coverImageUrl;
+  final List<AdminCatalogImage> gallery;
+
+  /// True when the backend embedded a `hotelDetail` block — the only reliable
+  /// signal that this place is a hotel and therefore has rooms.
+  final bool isHotel;
+
+  const AdminPlaceDetail({
+    required this.id,
+    required this.name,
+    required this.slug,
+    required this.shortDescription,
+    required this.description,
+    required this.address,
+    required this.googleMapUrl,
+    required this.latitude,
+    required this.longitude,
+    required this.category,
+    required this.subcategory,
+    required this.location,
+    required this.ratingAvg,
+    required this.ratingCount,
+    required this.priceLevel,
+    required this.featured,
+    required this.verified,
+    required this.status,
+    required this.tags,
+    required this.amenities,
+    required this.coverImageUrl,
+    required this.gallery,
+    required this.isHotel,
+  });
+
+  static AdminPlaceDetail? fromJson(Map<String, dynamic> json) {
+    final id = _asInt(json['id']);
+    if (id == null) return null;
+
+    List<String> names(Object? raw, String key) {
+      if (raw is! List) return const [];
+      final out = <String>[];
+      for (final e in raw) {
+        if (e is Map<String, dynamic>) {
+          final v = _asString(e[key]);
+          if (v != null) out.add(v);
+        }
+      }
+      return out;
+    }
+
+    final gallery = <AdminCatalogImage>[];
+    final rawGallery = json['galleryImages'];
+    if (rawGallery is List) {
+      for (final e in rawGallery) {
+        if (e is Map<String, dynamic>) {
+          final img = AdminCatalogImage.fromJson(e);
+          if (img != null) gallery.add(img);
+        }
+      }
+    }
+
+    return AdminPlaceDetail(
+      id: id,
+      name: _asString(json['name']),
+      slug: _asString(json['slug']),
+      shortDescription: _asString(json['shortDescription']),
+      description: _asString(json['description']),
+      address: _asString(json['address']),
+      googleMapUrl: _asString(json['googleMapUrl']),
+      latitude: _asDouble(json['latitude']),
+      longitude: _asDouble(json['longitude']),
+      category:
+          AdminCatalogRef.fromJson(json['category'] as Map<String, dynamic>?),
+      subcategory: AdminCatalogRef.fromJson(
+          json['subcategory'] as Map<String, dynamic>?),
+      location:
+          AdminCatalogRef.fromJson(json['location'] as Map<String, dynamic>?),
+      ratingAvg: _asDouble(json['ratingAvg']) ?? 0,
+      ratingCount: _asInt(json['ratingCount']) ?? 0,
+      priceLevel: _asInt(json['priceLevel']) ?? 0,
+      featured: json['featured'] == true,
+      verified: json['verified'] == true,
+      status: AdminPlaceStatus.parse(_asString(json['status'])),
+      tags: names(json['tags'], 'tag'),
+      amenities: names(json['amenities'], 'name'),
+      coverImageUrl: _asString(json['coverImageUrl']),
+      gallery: gallery,
+      isHotel: json['hotelDetail'] is Map,
+    );
+  }
+}
+
+/// A row of `GET /api/admin/hotels/{placeId}/rooms` — `HotelRoomResponse`.
+///
+/// Catalog fields only. Inventory (`availableQuantity` is a live operations
+/// figure) and pricing are shown as read-only context, never as controls: they
+/// belong to Admin Operations and Admin Commercial respectively.
+class AdminCatalogRoom {
+  final int id;
+  final String? roomName;
+  final String? roomCode;
+  final String? roomType;
+  final String? bedType;
+  final int? bedCount;
+  final int? maxGuests;
+  final double? roomSizeSqm;
+  final int? quantity;
+  final bool active;
+  final String? coverImageUrl;
+
+  const AdminCatalogRoom({
+    required this.id,
+    required this.roomName,
+    required this.roomCode,
+    required this.roomType,
+    required this.bedType,
+    required this.bedCount,
+    required this.maxGuests,
+    required this.roomSizeSqm,
+    required this.quantity,
+    required this.active,
+    required this.coverImageUrl,
+  });
+
+  static AdminCatalogRoom? fromJson(Map<String, dynamic> json) {
+    final id = _asInt(json['id']);
+    if (id == null) return null;
+    return AdminCatalogRoom(
+      id: id,
+      roomName: _asString(json['roomName']),
+      roomCode: _asString(json['roomCode']),
+      roomType: _asString(json['roomType']),
+      bedType: _asString(json['bedType']),
+      bedCount: _asInt(json['bedCount']),
+      maxGuests: _asInt(json['maxGuests']),
+      roomSizeSqm: _asDouble(json['roomSizeSqm']),
+      quantity: _asInt(json['quantity']),
+      active: json['active'] == true,
+      coverImageUrl: _asString(json['coverImageUrl']),
     );
   }
 }

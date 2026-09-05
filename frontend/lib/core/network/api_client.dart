@@ -5984,6 +5984,171 @@ class ApiClient {
   /// controllable, so no `sort` parameter is sent: the trail deliberately has no
   /// sort-injection surface. `from`/`to` are ISO-8601 instants and the backend
   /// answers 400 for an inverted range.
+  // ── Admin: catalog (D3C-A) ─────────────────────────────────────────────────
+  // The Admin place surface predates D1a and does NOT follow the AdminPaging
+  // convention the other admin grids use. Consumed exactly as it is, not
+  // normalised:
+  //
+  //   * `size` is bean-validated `@Min(1) @Max(100)`, so an oversized request is
+  //     answered with **400** rather than clamped. The client therefore never
+  //     sends more than 100 -- see [adminCatalogMaxPageSize].
+  //   * `sort` is a closed token vocabulary (`newest`, `rating_desc`, ...), not
+  //     the `field,dir` string every other admin grid speaks. An unrecognised
+  //     token is silently ignored and the default applied, so the client only
+  //     ever sends a token from [adminCatalogSortTokens].
+  //   * the backend sort carries no id tiebreaker, so rows sharing the sort key
+  //     can reorder between requests. That is a backend property this client
+  //     cannot fix without inventing a contract; it is surfaced, not hidden.
+  //
+  // Deliberately absent: no place editor (PUT /api/admin/places/{id} is a
+  // destructive full replace that deletes tags, opening hours and amenities and
+  // rebuilds them from the body), no place delete (none exists), and no
+  // assign-owner (the D3B catalog freeze placed it out of scope).
+
+  /// The backend's `@Max(100)` on `size`. Exceeding it is a 400, not a clamp.
+  static const int adminCatalogMaxPageSize = 100;
+
+  /// `PlaceService.resolveSort`'s closed switch, verbatim.
+  static const List<String> adminCatalogSortTokens = [
+    'newest',
+    'rating_desc',
+    'price_asc',
+    'price_desc',
+    'name_asc',
+  ];
+
+  /// `GET /api/admin/places` — paginated, all statuses.
+  /// Filters: `q`, `categoryId`, `status`, `locationId`, `featured`, `verified`.
+  Future<CollectionApiResult<AdminPage<AdminPlaceRow>>> getAdminPlaces({
+    String? query,
+    int? categoryId,
+    String? status,
+    int? locationId,
+    bool? featured,
+    bool? verified,
+    int? page,
+    int? size,
+    String? sort,
+  }) {
+    final effectiveSize = size == null
+        ? null
+        : (size > adminCatalogMaxPageSize ? adminCatalogMaxPageSize : size);
+    return _adminGetPage<AdminPlaceRow>(
+      _adminUri('/admin/places', {
+        if (query != null && query.trim().isNotEmpty) 'q': query.trim(),
+        if (categoryId != null) 'categoryId': '$categoryId',
+        if (status != null && status.isNotEmpty) 'status': status,
+        if (locationId != null) 'locationId': '$locationId',
+        if (featured != null) 'featured': '$featured',
+        if (verified != null) 'verified': '$verified',
+        if (page != null) 'page': '$page',
+        if (effectiveSize != null) 'size': '$effectiveSize',
+        // Only ever a token the backend's switch recognises.
+        if (sort != null && adminCatalogSortTokens.contains(sort)) 'sort': sort,
+      }),
+      AdminPlaceRow.fromJson,
+    );
+  }
+
+  /// `GET /api/admin/places/{id}` — the canonical existence check for a place.
+  Future<CollectionApiResult<AdminPlaceDetail>> getAdminPlace(int placeId) =>
+      _adminGetObject<AdminPlaceDetail>(
+        _adminUri('/admin/places/$placeId'),
+        AdminPlaceDetail.fromJson,
+      );
+
+  /// `GET /api/admin/hotels/{placeId}/rooms`.
+  ///
+  /// Answers **404 for a place that is not a hotel** — that is "no hotel detail
+  /// exists here", not a failure, and the caller distinguishes the two.
+  Future<CollectionApiResult<List<AdminCatalogRoom>>> getAdminPlaceRooms(
+          int placeId) =>
+      _adminGetList<AdminCatalogRoom>(
+        _adminUri('/admin/hotels/$placeId/rooms'),
+        AdminCatalogRoom.fromJson,
+      );
+
+  /// `PATCH /api/admin/places/{id}/status` — body `{"status": "..."}`.
+  ///
+  /// The backend validates the transition against its own table and answers 400
+  /// for anything illegal. Moving to `ARCHIVED` is irreversible: no transition
+  /// leaves it.
+  Future<CollectionApiResult<AdminPlaceRow>> setAdminPlaceStatus(
+    int placeId, {
+    required String status,
+  }) =>
+      _adminPlaceMutation(
+        () => _client.patch(
+          _adminUri('/admin/places/$placeId/status'),
+          headers: _jsonHeaders,
+          body: jsonEncode({'status': status}),
+        ),
+      );
+
+  /// `PATCH /api/admin/places/{id}/verified` — body `{"value": bool}`.
+  /// Setting **true** requires APPROVED or PUBLISHED; clearing is unguarded.
+  Future<CollectionApiResult<AdminPlaceRow>> setAdminPlaceVerified(
+    int placeId, {
+    required bool value,
+  }) =>
+      _adminPlaceMutation(
+        () => _client.patch(
+          _adminUri('/admin/places/$placeId/verified'),
+          headers: _jsonHeaders,
+          body: jsonEncode({'value': value}),
+        ),
+      );
+
+  /// `PATCH /api/admin/places/{id}/featured` — body `{"value": bool}`.
+  /// Same guard as verified.
+  Future<CollectionApiResult<AdminPlaceRow>> setAdminPlaceFeatured(
+    int placeId, {
+    required bool value,
+  }) =>
+      _adminPlaceMutation(
+        () => _client.patch(
+          _adminUri('/admin/places/$placeId/featured'),
+          headers: _jsonHeaders,
+          body: jsonEncode({'value': value}),
+        ),
+      );
+
+  /// Shared path for the three catalog mutations. Each returns the updated
+  /// `PlaceResponse`, whose fields overlap `PlaceSummaryResponse` closely enough
+  /// for [AdminPlaceRow] to read; the caller reloads the detail regardless.
+  Future<CollectionApiResult<AdminPlaceRow>> _adminPlaceMutation(
+    Future<http.Response> Function() send,
+  ) async {
+    try {
+      final res = await send().timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+        }
+        final parsed = AdminPlaceRow.fromJson(body);
+        if (parsed == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+        }
+        return CollectionApiResult.success(parsed);
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      // Archiving cannot be undone, so an unanswered request is uncertain
+      // rather than failed and must never be blindly retried.
+      return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
   // ── Admin: partner management (D2C) ────────────────────────────────────────
   // The nine endpoints frozen by the D2B contract audit against
   // `develop@3467d45`. There is deliberately no method for:
@@ -6042,11 +6207,12 @@ class ApiClient {
       );
 
   /// `GET /api/admin/partners/{id}/team` — read-only roster.
-  Future<CollectionApiResult<List<AdminPartnerTeamMember>>>
-      getAdminPartnerTeam(int partnerId) => _adminGetList<AdminPartnerTeamMember>(
-            _adminUri('/admin/partners/$partnerId/team'),
-            AdminPartnerTeamMember.fromJson,
-          );
+  Future<CollectionApiResult<List<AdminPartnerTeamMember>>> getAdminPartnerTeam(
+          int partnerId) =>
+      _adminGetList<AdminPartnerTeamMember>(
+        _adminUri('/admin/partners/$partnerId/team'),
+        AdminPartnerTeamMember.fromJson,
+      );
 
   /// `GET /api/admin/partners/{id}/settings` — preferences only, read-only.
   Future<CollectionApiResult<AdminPartnerSettings>> getAdminPartnerSettings(
@@ -6269,5 +6435,4 @@ class ApiClient {
             }),
             AdminActivityLogRow.fromJson,
           );
-
 }
