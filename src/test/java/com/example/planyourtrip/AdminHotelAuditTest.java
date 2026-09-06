@@ -640,12 +640,9 @@ class AdminHotelAuditTest {
         List<String> actions =
             List.of("HOTEL_DETAIL_CREATE", "HOTEL_DETAIL_UPDATE", "HOTEL_EXPERIENCE_UPDATE");
 
+        // D3J: exhaustive rather than the first page of 200 — see AdminAuditScan.
         for (String action : actions) {
-            var rows = auditRepo
-                .search(null, action, null, null, null, null, PageRequest.of(0, 200))
-                .getContent();
-            assertFalse(rows.isEmpty(), action + " produced no rows to inspect");
-            for (AdminActivityLog log : rows) {
+            var result = AdminAuditScan.scanAction(auditRepo, action, log -> {
                 for (String field : List.of(
                         String.valueOf(log.getDescription()),
                         String.valueOf(log.getBeforeState()),
@@ -653,7 +650,9 @@ class AdminHotelAuditTest {
                     assertFalse(forbidden.matcher(field).find(),
                         action + " wrote unsafe text: " + field);
                 }
-            }
+            });
+            result.assertComplete();
+            assertTrue(result.scanned() > 0, action + " produced no rows to inspect");
         }
     }
 

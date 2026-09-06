@@ -498,12 +498,12 @@ class AdminPersonalizationReferenceAuditTest {
         List<String> forbidden = List.of("password", "passwd", "secret", "bearer ", "api_key",
             "api-key", "apikey", "private_key", "private-key", "jwt", "cvv", "iban", "swift",
             "authorization", "cookie", "eyj");
+        // D3J: exhaustive over every stored row for each action, not the newest 50.
         for (String action : actions) {
-            for (JsonNode row : mapper.readTree(
-                    adminGet("/api/admin/activity-logs?action=" + action + "&size=50")).get("content")) {
-                String blob = (row.get("description").asText("") + " "
-                    + row.get("beforeState").asText("") + " "
-                    + row.get("afterState").asText("")).toLowerCase();
+            AdminAuditScan.scanAction(auditRepo, action, row -> {
+                String blob = (String.valueOf(row.getDescription()) + " "
+                    + String.valueOf(row.getBeforeState()) + " "
+                    + String.valueOf(row.getAfterState())).toLowerCase();
                 for (String word : forbidden) {
                     assertFalse(blob.contains(word),
                         action + " persisted credential-shaped text (" + word + "): " + blob);
@@ -512,10 +512,10 @@ class AdminPersonalizationReferenceAuditTest {
                     assertTrue(run.length() < 13,
                         action + " persisted a " + run.length() + "-digit run: " + blob);
                 }
-                assertTrue(row.get("beforeState").asText("").length() <= 500);
-                assertTrue(row.get("afterState").asText("").length() <= 500);
-                assertTrue(row.get("description").asText("").length() <= 4000);
-            }
+                assertTrue(row.getBeforeState() == null || row.getBeforeState().length() <= 500);
+                assertTrue(row.getAfterState() == null || row.getAfterState().length() <= 500);
+                assertTrue(row.getDescription() == null || row.getDescription().length() <= 4000);
+            }).assertComplete();
         }
 
         for (String targetType : List.of("PERSONALIZATION_RULE", "AMENITY", "CATEGORY", "LOCATION")) {

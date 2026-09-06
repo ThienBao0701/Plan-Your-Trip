@@ -538,10 +538,9 @@ class AdminCatalogRoomAuditTest {
             "PLACE_FEATURED_UPDATE", "PLACE_METADATA_UPSERT",
             "ROOM_CREATE", "ROOM_UPDATE", "ROOM_DEACTIVATE");
 
+        // D3J: exhaustive rather than the first page of 200 — see AdminAuditScan.
         for (String action : actions) {
-            for (AdminActivityLog log : auditRepo
-                    .search(null, action, null, null, null, null, PageRequest.of(0, 200))
-                    .getContent()) {
+            AdminAuditScan.scanAction(auditRepo, action, log -> {
                 for (String field : List.of(
                         String.valueOf(log.getDescription()),
                         String.valueOf(log.getBeforeState()),
@@ -549,7 +548,7 @@ class AdminCatalogRoomAuditTest {
                     assertFalse(forbidden.matcher(field).find(),
                         action + " wrote credential-shaped text: " + field);
                 }
-            }
+            }).assertComplete();
         }
     }
 

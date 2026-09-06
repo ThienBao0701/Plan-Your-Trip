@@ -631,18 +631,18 @@ class AdminPricingCommercialAuditTest {
                 + "definition and there is no delete endpoint for one. Its refusal path is covered by "
                 + "tierCreateOnAnAlreadyDefinedTierConflictsAndRecordsNothing.");
 
+        // D3J: every row for each action, not the newest 20 — see AdminAuditScan.
         for (String action : actions) {
-            List<AdminActivityLog> rows = auditRepo
-                .search(null, action, null, null, null, null, PageRequest.of(0, 20)).getContent();
-            assertFalse(rows.isEmpty(), action + " produced no audit row");
-            for (AdminActivityLog row : rows) {
+            var result = AdminAuditScan.scanAction(auditRepo, action, row -> {
                 assertEquals(adminUserId, row.getActorUserId(), action + " recorded the wrong actor");
                 assertNotNull(row.getTargetType(), action + " recorded no target type");
                 assertNotNull(row.getTargetId(), action + " recorded no target id");
                 assertTrue(row.getBeforeState() == null || row.getBeforeState().length() <= 500);
                 assertTrue(row.getAfterState() == null || row.getAfterState().length() <= 500);
                 assertTrue(row.getDescription().length() <= 4000);
-            }
+            });
+            result.assertComplete();
+            assertTrue(result.scanned() > 0, action + " produced no audit row");
         }
     }
 

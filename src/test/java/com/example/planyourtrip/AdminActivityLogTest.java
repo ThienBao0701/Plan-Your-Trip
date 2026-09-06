@@ -423,17 +423,22 @@ class AdminActivityLogTest {
      */
     @Test
     void noStoredRowCarriesCredentialShapedText() {
-        var page = auditRepo.search(null, null, null, null, null, null, PageRequest.of(0, 200));
         var forbidden = java.util.regex.Pattern.compile(
             "(?i)(password|passwd|secret|bearer\\s|eyJ[A-Za-z0-9_-]{10,}|api[_-]?key"
                 + "|private[_-]?key|cvv|iban|swift|\\b\\d{13,19}\\b)");
-        for (AdminActivityLog l : page.getContent()) {
+        // D3J: this read one page of 200 and called it the whole trail. It was written when the
+        // trail held a few dozen rows; by D3I the suite produces several times that, and newest-
+        // first ordering meant the rows it silently stopped checking were the oldest ones.
+        var result = AdminAuditScan.scanAll(auditRepo, l -> {
             for (String field : new String[]{l.getDescription(), l.getBeforeState(), l.getAfterState()}) {
                 if (field == null) continue;
                 assertFalse(forbidden.matcher(field).find(),
                     "audit row " + l.getId() + " (" + l.getAction() + ") stored credential-shaped text");
             }
-        }
+        });
+        result.assertComplete();
+        assertEquals(auditRepo.count(), result.declaredTotal(),
+            "the scan must cover the whole table, not a page of it");
     }
 
     /**
