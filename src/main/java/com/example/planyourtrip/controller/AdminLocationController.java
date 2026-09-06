@@ -1,5 +1,6 @@
 package com.example.planyourtrip.controller;
 
+import com.example.planyourtrip.security.AuthUser;
 import com.example.planyourtrip.dto.LocationDto.LocationRequest;
 import com.example.planyourtrip.dto.LocationDto.LocationResponse;
 import com.example.planyourtrip.dto.StatusRequest;
@@ -34,19 +35,21 @@ public class AdminLocationController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a location")
-    public LocationResponse create(@Valid @RequestBody LocationRequest req) {
-        return service.create(req);
+    public LocationResponse create(@AuthUser Long uid, @Valid @RequestBody LocationRequest req) {
+        return service.create(uid, req);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update a location")
-    public LocationResponse update(@PathVariable Long id, @Valid @RequestBody LocationRequest req) {
-        return service.update(id, req);
+    public LocationResponse update(@AuthUser Long uid, @PathVariable Long id,
+                                   @Valid @RequestBody LocationRequest req) {
+        return service.update(uid, id, req);
     }
 
     @PatchMapping("/{id}/status")
     @Operation(summary = "Activate or deactivate a location")
-    public LocationResponse updateStatus(@PathVariable Long id, @RequestBody StatusRequest req) {
-        return service.updateStatus(id, req.active());
+    public LocationResponse updateStatus(@AuthUser Long uid, @PathVariable Long id,
+                                         @RequestBody StatusRequest req) {
+        return service.updateStatus(uid, id, req.active());
     }
 }

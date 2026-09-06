@@ -1,5 +1,6 @@
 package com.example.planyourtrip.controller;
 
+import com.example.planyourtrip.security.AuthUser;
 import com.example.planyourtrip.dto.AmenityDto.AmenityRequest;
 import com.example.planyourtrip.dto.AmenityDto.AmenityResponse;
 import com.example.planyourtrip.dto.StatusRequest;
@@ -34,19 +35,21 @@ public class AdminAmenityController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create an amenity")
-    public AmenityResponse create(@Valid @RequestBody AmenityRequest req) {
-        return service.create(req);
+    public AmenityResponse create(@AuthUser Long uid, @Valid @RequestBody AmenityRequest req) {
+        return service.create(uid, req);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update an amenity")
-    public AmenityResponse update(@PathVariable Long id, @Valid @RequestBody AmenityRequest req) {
-        return service.update(id, req);
+    public AmenityResponse update(@AuthUser Long uid, @PathVariable Long id,
+                                  @Valid @RequestBody AmenityRequest req) {
+        return service.update(uid, id, req);
     }
 
     @PatchMapping("/{id}/status")
     @Operation(summary = "Activate or deactivate an amenity")
-    public AmenityResponse updateStatus(@PathVariable Long id, @RequestBody StatusRequest req) {
-        return service.updateStatus(id, req.active());
+    public AmenityResponse updateStatus(@AuthUser Long uid, @PathVariable Long id,
+                                        @RequestBody StatusRequest req) {
+        return service.updateStatus(uid, id, req.active());
     }
 }

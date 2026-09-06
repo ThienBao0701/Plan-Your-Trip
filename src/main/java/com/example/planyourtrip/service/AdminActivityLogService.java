@@ -167,6 +167,34 @@ public class AdminActivityLogService {
         return s;
     }
 
+    /**
+     * D3I - renders a short piece of operator-supplied text for a state string, bounded and
+     * guaranteed not to trip {@link #FORBIDDEN}.
+     *
+     * <p>Every phase before this one solved the problem by excluding operator text from state
+     * strings entirely, and for pricing and commercial configuration that was the right call: the
+     * names and codes there carry no audit value that the scalars do not already carry. Reference
+     * data is the case where that stops being true. The whole question an amenity or category audit
+     * row has to answer is "who renamed this, and to what", and the request DTOs put no
+     * {@code @Size} bound on {@code name}, {@code slug}, {@code code} or {@code type}, so the text
+     * cannot simply be passed through either - an operator could type anything, and because the
+     * audit write shares the mutation's transaction, a value matching the credential guard would
+     * roll back the perfectly legitimate rename being recorded.
+     *
+     * <p>So the text is bounded to {@code max} characters with its whitespace collapsed, and then
+     * checked against the same guard {@link #reject} uses. Anything that matches is replaced with a
+     * marker rather than stored. This is strictly more conservative than the guard, never less: it
+     * is not a way to get credential-shaped text into the trail, it is a way to keep a legitimate
+     * rename from being rolled back by one.
+     */
+    static String safeText(String value, int max) {
+        if (value == null) return "-";
+        String s = value.trim().replaceAll("\\s+", " ");
+        if (s.isEmpty()) return "-";
+        if (s.length() > max) s = s.substring(0, max) + "...";
+        return FORBIDDEN.matcher(s).find() ? "(redacted)" : s;
+    }
+
     private static void reject(String value) {
         if (value != null && FORBIDDEN.matcher(value).find()) {
             throw new IllegalArgumentException(

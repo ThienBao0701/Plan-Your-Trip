@@ -17,9 +17,11 @@ import java.util.List;
 public class AmenityService {
 
     private final AmenityRepository repo;
+    private final AdminActivityLogService adminAudit;
 
-    public AmenityService(AmenityRepository repo) {
+    public AmenityService(AmenityRepository repo, AdminActivityLogService adminAudit) {
         this.repo = repo;
+        this.adminAudit = adminAudit;
     }
 
     public List<AmenityResponse> getAll(String group) {
@@ -29,31 +31,64 @@ public class AmenityService {
         return list.stream().map(this::toResponse).toList();
     }
 
+    // -- D3I . audited administrative writes -----------------------------------
+    //
+    // Reference data, but administrative reference data: deactivating a category or a location
+    // removes it from every place that hangs off it, and renaming one silently changes what
+    // customers see. The three writes below are reached only from AdminAmenityController -
+    // AmenityController is read-only and DataInitializer seeds through the repository directly -
+    // so the audit is inline with the actor first.
+    //
+    // Operator text goes through AdminActivityLogService.safeText: these request DTOs put no @Size
+    // bound on name or slug, and "who renamed this, and to what" is the whole question a reference
+    // data audit row exists to answer, so the text is bounded and guard-checked rather than
+    // dropped. Long free text (description, icon, colour, cover image URL, fullPath) is excluded.
+
     @Transactional
-    public AmenityResponse create(AmenityRequest req) {
+    public AmenityResponse create(Long adminUserId, AmenityRequest req) {
         String slug = resolveSlug(req.slug(), req.name());
         if (repo.existsBySlug(slug))
             throw new ApiException(HttpStatus.CONFLICT, "Slug already exists: " + slug);
         Amenity a = new Amenity();
         fill(a, req, slug);
-        return toResponse(repo.save(a));
+        AmenityResponse saved = toResponse(repo.save(a));
+        adminAudit.record(adminUserId, "AMENITY_CREATE", "AMENITY", saved.id(),
+            "Admin created amenity " + saved.id(), null, summarise(saved));
+        return saved;
     }
 
     @Transactional
-    public AmenityResponse update(Long id, AmenityRequest req) {
+    public AmenityResponse update(Long adminUserId, Long id, AmenityRequest req) {
         Amenity a = getOrThrow(id);
+        // Snapshot to an immutable record before fill() mutates the managed entity.
+        String before = summarise(toResponse(a));
         String slug = resolveSlug(req.slug(), req.name());
         if (!slug.equals(a.getSlug()) && repo.existsBySlug(slug))
             throw new ApiException(HttpStatus.CONFLICT, "Slug already exists: " + slug);
         fill(a, req, slug);
-        return toResponse(repo.save(a));
+        AmenityResponse saved = toResponse(repo.save(a));
+        adminAudit.record(adminUserId, "AMENITY_UPDATE", "AMENITY", id,
+            "Admin updated amenity " + id, before, summarise(saved));
+        return saved;
     }
 
     @Transactional
-    public AmenityResponse updateStatus(Long id, boolean active) {
+    public AmenityResponse updateStatus(Long adminUserId, Long id, boolean active) {
         Amenity a = getOrThrow(id);
+        String before = summarise(toResponse(a));
         a.setActive(active);
-        return toResponse(repo.save(a));
+        AmenityResponse saved = toResponse(repo.save(a));
+        adminAudit.record(adminUserId, "AMENITY_STATUS_UPDATE", "AMENITY", id,
+            "Admin set amenity " + id + " active=" + active, before, summarise(saved));
+        return saved;
+    }
+
+    private static String summarise(AmenityResponse a) {
+        return "active:" + a.active()
+            + " group:" + AdminActivityLogService.safeText(a.groupName(), 24)
+            + " sortOrder:" + AdminActivityLogService.safeNumber(a.sortOrder())
+            + " slug:" + AdminActivityLogService.safeText(a.slug(), 40)
+            + " name:" + AdminActivityLogService.safeText(a.name(), 40);
     }
 
     private void fill(Amenity a, AmenityRequest req, String slug) {

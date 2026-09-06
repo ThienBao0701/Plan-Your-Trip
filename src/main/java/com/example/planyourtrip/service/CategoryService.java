@@ -18,9 +18,11 @@ import java.util.List;
 public class CategoryService {
 
     private final CategoryRepository repo;
+    private final AdminActivityLogService adminAudit;
 
-    public CategoryService(CategoryRepository repo) {
+    public CategoryService(CategoryRepository repo, AdminActivityLogService adminAudit) {
         this.repo = repo;
+        this.adminAudit = adminAudit;
     }
 
     public List<CategoryResponse> getAll() {
@@ -31,31 +33,66 @@ public class CategoryService {
         return repo.findByParentIsNull().stream().map(this::toTreeResponse).toList();
     }
 
+    // -- D3I . audited administrative writes -----------------------------------
+    //
+    // Reference data, but administrative reference data: deactivating a category or a location
+    // removes it from every place that hangs off it, and renaming one silently changes what
+    // customers see. The three writes below are reached only from AdminCategoryController -
+    // CategoryController is read-only and DataInitializer seeds through the repository directly -
+    // so the audit is inline with the actor first.
+    //
+    // Operator text goes through AdminActivityLogService.safeText: these request DTOs put no @Size
+    // bound on name or slug, and "who renamed this, and to what" is the whole question a reference
+    // data audit row exists to answer, so the text is bounded and guard-checked rather than
+    // dropped. Long free text (description, icon, colour, cover image URL, fullPath) is excluded.
+
     @Transactional
-    public CategoryResponse create(CategoryRequest req) {
+    public CategoryResponse create(Long adminUserId, CategoryRequest req) {
         String slug = resolveSlug(req.slug(), req.name());
         if (repo.existsBySlug(slug))
             throw new ApiException(HttpStatus.CONFLICT, "Slug already exists: " + slug);
         Category cat = new Category();
         fill(cat, req, slug);
-        return toResponse(repo.save(cat));
+        CategoryResponse saved = toResponse(repo.save(cat));
+        adminAudit.record(adminUserId, "CATEGORY_CREATE", "CATEGORY", saved.id(),
+            "Admin created category " + saved.id(), null, summarise(saved));
+        return saved;
     }
 
     @Transactional
-    public CategoryResponse update(Long id, CategoryRequest req) {
+    public CategoryResponse update(Long adminUserId, Long id, CategoryRequest req) {
         Category cat = getOrThrow(id);
+        // Snapshot to an immutable record before fill() mutates the managed entity.
+        String before = summarise(toResponse(cat));
         String slug = resolveSlug(req.slug(), req.name());
         if (!slug.equals(cat.getSlug()) && repo.existsBySlug(slug))
             throw new ApiException(HttpStatus.CONFLICT, "Slug already exists: " + slug);
         fill(cat, req, slug);
-        return toResponse(repo.save(cat));
+        CategoryResponse saved = toResponse(repo.save(cat));
+        adminAudit.record(adminUserId, "CATEGORY_UPDATE", "CATEGORY", id,
+            "Admin updated category " + id, before, summarise(saved));
+        return saved;
     }
 
     @Transactional
-    public CategoryResponse updateStatus(Long id, boolean active) {
+    public CategoryResponse updateStatus(Long adminUserId, Long id, boolean active) {
         Category cat = getOrThrow(id);
+        String before = summarise(toResponse(cat));
         cat.setActive(active);
-        return toResponse(repo.save(cat));
+        CategoryResponse saved = toResponse(repo.save(cat));
+        adminAudit.record(adminUserId, "CATEGORY_STATUS_UPDATE", "CATEGORY", id,
+            "Admin set category " + id + " active=" + active, before, summarise(saved));
+        return saved;
+    }
+
+    /** The cover image URL is deliberately excluded - it can be a signed URL. */
+    private static String summarise(CategoryResponse c) {
+        return "active:" + c.active()
+            + " parent:" + c.parentId()
+            + " type:" + AdminActivityLogService.safeText(c.type(), 24)
+            + " sortOrder:" + AdminActivityLogService.safeNumber(c.sortOrder())
+            + " slug:" + AdminActivityLogService.safeText(c.slug(), 40)
+            + " name:" + AdminActivityLogService.safeText(c.name(), 40);
     }
 
     private void fill(Category cat, CategoryRequest req, String slug) {

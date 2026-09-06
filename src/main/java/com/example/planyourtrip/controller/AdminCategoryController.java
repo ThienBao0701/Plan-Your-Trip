@@ -1,5 +1,6 @@
 package com.example.planyourtrip.controller;
 
+import com.example.planyourtrip.security.AuthUser;
 import com.example.planyourtrip.dto.CategoryDto.CategoryRequest;
 import com.example.planyourtrip.dto.CategoryDto.CategoryResponse;
 import com.example.planyourtrip.dto.StatusRequest;
@@ -34,19 +35,21 @@ public class AdminCategoryController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a category")
-    public CategoryResponse create(@Valid @RequestBody CategoryRequest req) {
-        return service.create(req);
+    public CategoryResponse create(@AuthUser Long uid, @Valid @RequestBody CategoryRequest req) {
+        return service.create(uid, req);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update a category")
-    public CategoryResponse update(@PathVariable Long id, @Valid @RequestBody CategoryRequest req) {
-        return service.update(id, req);
+    public CategoryResponse update(@AuthUser Long uid, @PathVariable Long id,
+                                   @Valid @RequestBody CategoryRequest req) {
+        return service.update(uid, id, req);
     }
 
     @PatchMapping("/{id}/status")
     @Operation(summary = "Activate or deactivate a category")
-    public CategoryResponse updateStatus(@PathVariable Long id, @RequestBody StatusRequest req) {
-        return service.updateStatus(id, req.active());
+    public CategoryResponse updateStatus(@AuthUser Long uid, @PathVariable Long id,
+                                         @RequestBody StatusRequest req) {
+        return service.updateStatus(uid, id, req.active());
     }
 }

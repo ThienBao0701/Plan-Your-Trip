@@ -47,27 +47,28 @@ public class AdminPersonalizationRuleController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a personalization rule (duplicate ruleCode rejected with 409)")
-    public PersonalizationRuleResponse create(@Valid @RequestBody PersonalizationRuleRequest req) {
-        return service.create(req);
+    public PersonalizationRuleResponse create(@AuthUser Long uid,
+            @Valid @RequestBody PersonalizationRuleRequest req) {
+        return service.create(uid, req);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update a personalization rule")
-    public PersonalizationRuleResponse update(@PathVariable Long id,
+    public PersonalizationRuleResponse update(@AuthUser Long uid, @PathVariable Long id,
                                               @Valid @RequestBody PersonalizationRuleRequest req) {
-        return service.update(id, req);
+        return service.update(uid, id, req);
     }
 
     @PatchMapping("/{id}/activate")
     @Operation(summary = "Activate a personalization rule")
-    public PersonalizationRuleResponse activate(@PathVariable Long id) {
-        return service.activate(id);
+    public PersonalizationRuleResponse activate(@AuthUser Long uid, @PathVariable Long id) {
+        return service.activate(uid, id);
     }
 
     @PatchMapping("/{id}/deactivate")
     @Operation(summary = "Deactivate a personalization rule")
-    public PersonalizationRuleResponse deactivate(@PathVariable Long id) {
-        return service.deactivate(id);
+    public PersonalizationRuleResponse deactivate(@AuthUser Long uid, @PathVariable Long id) {
+        return service.deactivate(uid, id);
     }
 
     @DeleteMapping("/{id}")

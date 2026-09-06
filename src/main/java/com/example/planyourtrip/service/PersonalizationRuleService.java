@@ -66,20 +66,36 @@ public class PersonalizationRuleService {
         return toResponse(ruleOrThrow(id));
     }
 
+    // -- D3I . audited administrative writes -----------------------------------
+    //
+    // Every write below is reached only from AdminPersonalizationRuleController: nothing else in
+    // main/ holds a PersonalizationRuleService, and DataInitializer seeds rules through
+    // PersonalizationRuleRepository directly rather than through this class. So the audit is
+    // inline and the actor is the first parameter, matching delete() below.
+    //
+    // A personalization rule decides which offers a customer is shown, so the trail records the
+    // targeting decision: rule type, priority, active state, validity window, minimum tier and the
+    // resolved hard-target ids. configurationJson is deliberately NOT stored - see summariseConfig.
+
     @Transactional
-    public PersonalizationRuleResponse create(PersonalizationRuleRequest req) {
+    public PersonalizationRuleResponse create(Long adminUserId, PersonalizationRuleRequest req) {
         String code = normalizeCode(req.ruleCode());
         if (ruleRepo.existsByRuleCodeIgnoreCase(code))
             throw new ApiException(HttpStatus.CONFLICT, "Personalization rule already exists: " + code);
         PersonalizationRule r = new PersonalizationRule();
         r.setRuleCode(code);
         fill(r, req);
-        return toResponse(ruleRepo.save(r));
+        PersonalizationRuleResponse saved = toResponse(ruleRepo.save(r));
+        adminAudit.record(adminUserId, "PERSONALIZATION_RULE_CREATE", "PERSONALIZATION_RULE",
+            saved.id(), "Admin created personalization rule " + saved.id(), null, summarise(saved));
+        return saved;
     }
 
     @Transactional
-    public PersonalizationRuleResponse update(Long id, PersonalizationRuleRequest req) {
+    public PersonalizationRuleResponse update(Long adminUserId, Long id, PersonalizationRuleRequest req) {
         PersonalizationRule r = ruleOrThrow(id);
+        // Snapshot to an immutable record before fill() mutates the managed entity.
+        String before = summarise(toResponse(r));
         String code = normalizeCode(req.ruleCode());
         ruleRepo.findByRuleCodeIgnoreCase(code)
             .filter(other -> !other.getId().equals(id))
@@ -87,21 +103,72 @@ public class PersonalizationRuleService {
                 "Another personalization rule already uses code: " + code); });
         r.setRuleCode(code);
         fill(r, req);
-        return toResponse(ruleRepo.save(r));
+        PersonalizationRuleResponse saved = toResponse(ruleRepo.save(r));
+        adminAudit.record(adminUserId, "PERSONALIZATION_RULE_UPDATE", "PERSONALIZATION_RULE", id,
+            "Admin updated personalization rule " + id, before, summarise(saved));
+        return saved;
     }
 
     @Transactional
-    public PersonalizationRuleResponse activate(Long id) {
+    public PersonalizationRuleResponse activate(Long adminUserId, Long id) {
         PersonalizationRule r = ruleOrThrow(id);
+        String before = summarise(toResponse(r));
         r.setActive(true);
-        return toResponse(ruleRepo.save(r));
+        PersonalizationRuleResponse saved = toResponse(ruleRepo.save(r));
+        adminAudit.record(adminUserId, "PERSONALIZATION_RULE_ACTIVATE", "PERSONALIZATION_RULE", id,
+            "Admin activated personalization rule " + id, before, summarise(saved));
+        return saved;
     }
 
     @Transactional
-    public PersonalizationRuleResponse deactivate(Long id) {
+    public PersonalizationRuleResponse deactivate(Long adminUserId, Long id) {
         PersonalizationRule r = ruleOrThrow(id);
+        String before = summarise(toResponse(r));
         r.setActive(false);
-        return toResponse(ruleRepo.save(r));
+        PersonalizationRuleResponse saved = toResponse(ruleRepo.save(r));
+        adminAudit.record(adminUserId, "PERSONALIZATION_RULE_DEACTIVATE", "PERSONALIZATION_RULE", id,
+            "Admin deactivated personalization rule " + id, before, summarise(saved));
+        return saved;
+    }
+
+    /** Targeting decision only. ruleCode and name are bounded and guard-checked; config is shaped. */
+    private String summarise(PersonalizationRuleResponse r) {
+        return "active:" + r.active()
+            + " type:" + r.ruleType()
+            + " priority:" + AdminActivityLogService.safeNumber(r.priority())
+            + " minTier:" + r.minimumMembershipTier()
+            + " validity:" + r.validFrom() + ".." + r.validUntil()
+            + " placeType:" + AdminActivityLogService.safeText(r.targetPlaceType(), 24)
+            + " targets:place=" + r.targetPlaceId() + ",hotel=" + r.targetHotelId()
+            + ",promo=" + r.targetPromotionId() + ",coupon=" + r.targetCouponDefinitionId()
+            + " code:" + AdminActivityLogService.safeText(r.ruleCode(), 40)
+            + " name:" + AdminActivityLogService.safeText(r.name(), 40)
+            + " " + summariseConfig(r.configurationJson());
+    }
+
+    /**
+     * A shape summary of configurationJson, never its content.
+     *
+     * <p>The column is {@code TEXT} and the only write-side validation is that the value parses as
+     * JSON, so an operator can put an arbitrary document of arbitrary size in it. Serialising that
+     * into the audit trail would turn the trail into a payload store, would blow past the 500-char
+     * state budget on anything non-trivial, and would hand whatever the operator typed - including
+     * anything credential-shaped - straight to the audit guard, which shares this transaction and
+     * would roll the rule change back. The size and top-level shape are enough to answer "did the
+     * tuning change, and by roughly how much"; the document itself is still readable on the rule.
+     */
+    private String summariseConfig(String json) {
+        if (json == null || json.isBlank()) return "config:none";
+        try {
+            var node = objectMapper.readTree(json);
+            String kind = node.isObject() ? "object" : node.isArray() ? "array" : node.getNodeType().toString().toLowerCase();
+            int size = node.isObject() || node.isArray() ? node.size() : 0;
+            return "config:" + kind + "(entries=" + size + ",bytes=" + json.length() + ")";
+        } catch (Exception e) {
+            // fill() validates the JSON before this runs, so this is unreachable in practice; a
+            // shape summary must never be the thing that fails a mutation.
+            return "config:unparseable(bytes=" + json.length() + ")";
+        }
     }
 
     @Transactional
