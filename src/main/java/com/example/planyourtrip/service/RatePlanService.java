@@ -123,6 +123,117 @@ public class RatePlanService {
             planId == null ? null : "ratePlan:" + planId, null);
     }
 
+    // ── D3H · audited administrative writes ───────────────────────────────────
+    //
+    // Separate entry points for exactly the reason the two deletes above are. Every body they
+    // delegate to is also a partner's write path: PartnerPricingService drives create, update,
+    // setActive, duplicate, addOccupancyPrice and updateOccupancyPrice for a partner's own rate
+    // plans, and PartnerCalendarService drives create. Recording inside those bodies would file
+    // partner pricing activity in the administrative trail — the D1c trap.
+    //
+    // The state strings carry scalars, enums, ids and dates only. They deliberately omit the
+    // operator-supplied rateName, code and description: free text handed to the audit guard can
+    // trip its credential rule and roll the whole pricing change back (D1c-NEW-1). Amounts go
+    // through num(), because a precision-15 price can legitimately reach thirteen digits.
+
+    @Transactional
+    public RatePlanResponse adminCreate(Long adminUserId, Long roomId, RatePlanRequest req) {
+        RatePlanResponse created = create(roomId, req);
+        adminAudit.record(adminUserId, "RATE_PLAN_CREATE", "RATE_PLAN", created.id(),
+            "Admin created rate plan " + created.id() + " for room " + roomId,
+            null, summarise(created));
+        return created;
+    }
+
+    @Transactional
+    public RatePlanResponse adminUpdate(Long adminUserId, Long id, RatePlanRequest req) {
+        // Snapshot through toResponse first: the record holds copies, so the string below cannot
+        // be re-read off the managed entity after applyAndValidate has already mutated it.
+        String before = summarise(toResponse(planOrThrow(id)));
+        RatePlanResponse updated = update(id, req);
+        adminAudit.record(adminUserId, "RATE_PLAN_UPDATE", "RATE_PLAN", id,
+            "Admin updated rate plan " + id, before, summarise(updated));
+        return updated;
+    }
+
+    @Transactional
+    public RatePlanResponse adminActivate(Long adminUserId, Long id) {
+        String before = summarise(toResponse(planOrThrow(id)));
+        RatePlanResponse updated = setActive(id, true);
+        adminAudit.record(adminUserId, "RATE_PLAN_ACTIVATE", "RATE_PLAN", id,
+            "Admin activated rate plan " + id, before, summarise(updated));
+        return updated;
+    }
+
+    @Transactional
+    public RatePlanResponse adminDeactivate(Long adminUserId, Long id) {
+        String before = summarise(toResponse(planOrThrow(id)));
+        RatePlanResponse updated = setActive(id, false);
+        adminAudit.record(adminUserId, "RATE_PLAN_DEACTIVATE", "RATE_PLAN", id,
+            "Admin deactivated rate plan " + id, before, summarise(updated));
+        return updated;
+    }
+
+    @Transactional
+    public RatePlanResponse adminDuplicate(Long adminUserId, Long id, RatePlanDuplicateRequest req) {
+        RatePlanResponse copy = duplicate(id, req);
+        // The target is the row this call created, not the row it was copied from — the source id
+        // belongs in the description, where it explains the provenance without claiming to be the
+        // mutated object.
+        adminAudit.record(adminUserId, "RATE_PLAN_DUPLICATE", "RATE_PLAN", copy.id(),
+            "Admin duplicated rate plan " + id + " into rate plan " + copy.id(),
+            null, summarise(copy));
+        return copy;
+    }
+
+    @Transactional
+    public RatePlanOccupancyPriceResponse adminAddOccupancyPrice(
+            Long adminUserId, Long ratePlanId, RatePlanOccupancyPriceRequest req) {
+        RatePlanOccupancyPriceResponse created = addOccupancyPrice(ratePlanId, req);
+        adminAudit.record(adminUserId, "RATE_PLAN_OCCUPANCY_PRICE_CREATE",
+            "RATE_PLAN_OCCUPANCY_PRICE", created.id(),
+            "Admin added occupancy price " + created.id() + " to rate plan " + ratePlanId,
+            null, summarise(created));
+        return created;
+    }
+
+    @Transactional
+    public RatePlanOccupancyPriceResponse adminUpdateOccupancyPrice(
+            Long adminUserId, Long occupancyPriceId, RatePlanOccupancyPriceRequest req) {
+        String before = summarise(toOccupancyResponse(occupancyPriceOrThrow(occupancyPriceId)));
+        RatePlanOccupancyPriceResponse updated = updateOccupancyPrice(occupancyPriceId, req);
+        adminAudit.record(adminUserId, "RATE_PLAN_OCCUPANCY_PRICE_UPDATE",
+            "RATE_PLAN_OCCUPANCY_PRICE", occupancyPriceId,
+            "Admin updated occupancy price " + occupancyPriceId, before, summarise(updated));
+        return updated;
+    }
+
+    /** Commercially significant scalars only — no operator free text. See the note above. */
+    private static String summarise(RatePlanResponse p) {
+        return "active:" + p.active()
+            + " price:" + num(p.pricePerNight())
+            + " type:" + p.rateType()
+            + " meal:" + p.mealPlanType()
+            + " cancellation:" + p.cancellationPolicyType()
+            + " refundable:" + p.refundable()
+            + " source:" + p.sourceType()
+            + " parent:" + p.parentRatePlanId()
+            + " window:" + p.startDate() + ".." + p.endDate()
+            + " priority:" + p.priority();
+    }
+
+    private static String summarise(RatePlanOccupancyPriceResponse op) {
+        return "adults:" + op.adults()
+            + " children:" + op.children()
+            + " price:" + num(op.pricePerNight())
+            + " childSupplement:" + num(op.childSupplement())
+            + " extraBedSupplement:" + num(op.extraBedSupplement());
+    }
+
+    private static String num(Object value) {
+        return AdminActivityLogService.safeNumber(value);
+    }
+
     @Transactional
     public void delete(Long id) {
         RatePlan plan = planOrThrow(id);

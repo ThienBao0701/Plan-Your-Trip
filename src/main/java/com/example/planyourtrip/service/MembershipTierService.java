@@ -58,8 +58,23 @@ public class MembershipTierService {
         return toResponse(definitionOrThrow(tier));
     }
 
+    // -- D3H . audited administrative writes -----------------------------------
+    //
+    // Every write on this service is reached only from AdminMembershipController;
+    // CustomerMembershipService consumes the read helpers (activeTiersOrderedBySortOrder,
+    // resolveMultiplier, displayName, activeDefinitionOrThrow) and never a write. The audit is
+    // therefore inline, with the actor first, matching deleteBenefit below.
+    //
+    // A tier definition sets the earning multiplier and the thresholds that qualify a customer for
+    // it, so an edit silently re-prices loyalty for everyone in that tier; the before/after pair
+    // records every qualification and multiplier scalar. The targetId is the definition row's own
+    // id, not the tier enum in the path - the trail addresses rows, and the tier travels in the
+    // state string where it belongs. Operator free text (displayName, description, benefit name,
+    // textValue) is excluded (D1c-NEW-1).
+
     @Transactional
-    public MembershipTierDefinitionResponse createTierDefinition(MembershipTierDefinitionRequest req) {
+    public MembershipTierDefinitionResponse createTierDefinition(Long adminUserId,
+                                                                  MembershipTierDefinitionRequest req) {
         if (tierDefRepo.findByTier(req.tier()).isPresent())
             throw new ApiException(HttpStatus.CONFLICT, "Tier definition already exists: " + req.tier());
 
@@ -67,29 +82,68 @@ public class MembershipTierService {
         def.setTier(req.tier());
         fill(def, req);
         if (req.active() == null) def.setActive(true);
-        return toResponse(tierDefRepo.save(def));
+        MembershipTierDefinitionResponse saved = toResponse(tierDefRepo.save(def));
+        adminAudit.record(adminUserId, "MEMBERSHIP_TIER_CREATE", "MEMBERSHIP_TIER", saved.id(),
+            "Admin created membership tier definition " + saved.id(), null, summarise(saved));
+        return saved;
     }
 
     @Transactional
-    public MembershipTierDefinitionResponse updateTierDefinition(MembershipTier tier, MembershipTierDefinitionRequest req) {
+    public MembershipTierDefinitionResponse updateTierDefinition(Long adminUserId, MembershipTier tier,
+                                                                  MembershipTierDefinitionRequest req) {
         MembershipTierDefinition def = definitionOrThrow(tier);
+        // Snapshot to an immutable record before fill() mutates the managed entity.
+        String before = summarise(toResponse(def));
         fill(def, req);
         if (req.active() != null) def.setActive(req.active());
-        return toResponse(tierDefRepo.save(def));
+        MembershipTierDefinitionResponse saved = toResponse(tierDefRepo.save(def));
+        adminAudit.record(adminUserId, "MEMBERSHIP_TIER_UPDATE", "MEMBERSHIP_TIER", saved.id(),
+            "Admin updated membership tier definition " + saved.id(), before, summarise(saved));
+        return saved;
     }
 
     @Transactional
-    public MembershipTierDefinitionResponse activateTierDefinition(MembershipTier tier) {
+    public MembershipTierDefinitionResponse activateTierDefinition(Long adminUserId, MembershipTier tier) {
         MembershipTierDefinition def = definitionOrThrow(tier);
+        String before = summarise(toResponse(def));
         def.setActive(true);
-        return toResponse(tierDefRepo.save(def));
+        MembershipTierDefinitionResponse saved = toResponse(tierDefRepo.save(def));
+        adminAudit.record(adminUserId, "MEMBERSHIP_TIER_ACTIVATE", "MEMBERSHIP_TIER", saved.id(),
+            "Admin activated membership tier definition " + saved.id(), before, summarise(saved));
+        return saved;
     }
 
     @Transactional
-    public MembershipTierDefinitionResponse deactivateTierDefinition(MembershipTier tier) {
+    public MembershipTierDefinitionResponse deactivateTierDefinition(Long adminUserId, MembershipTier tier) {
         MembershipTierDefinition def = definitionOrThrow(tier);
+        String before = summarise(toResponse(def));
         def.setActive(false);
-        return toResponse(tierDefRepo.save(def));
+        MembershipTierDefinitionResponse saved = toResponse(tierDefRepo.save(def));
+        adminAudit.record(adminUserId, "MEMBERSHIP_TIER_DEACTIVATE", "MEMBERSHIP_TIER", saved.id(),
+            "Admin deactivated membership tier definition " + saved.id(), before, summarise(saved));
+        return saved;
+    }
+
+    private static String summarise(MembershipTierDefinitionResponse d) {
+        return "tier:" + d.tier()
+            + " active:" + d.active()
+            + " minLifetimePoints:" + num(d.minimumLifetimePoints())
+            + " minCompletedBookings:" + num(d.minimumCompletedBookings())
+            + " pointsMultiplier:" + num(d.pointsMultiplier())
+            + " redemptionMultiplier:" + num(d.redemptionDiscountMultiplier())
+            + " sortOrder:" + num(d.sortOrder());
+    }
+
+    private static String summarise(MembershipBenefitResponse b) {
+        return "tier:" + b.tier()
+            + " type:" + b.benefitType()
+            + " active:" + b.active()
+            + " numericValue:" + num(b.numericValue())
+            + " sortOrder:" + num(b.sortOrder());
+    }
+
+    private static String num(Object value) {
+        return AdminActivityLogService.safeNumber(value);
     }
 
     /** Only active rows participate in qualification — see {@code CustomerMembershipService#computeQualifiedTier}. */
@@ -169,19 +223,26 @@ public class MembershipTierService {
     }
 
     @Transactional
-    public MembershipBenefitResponse createBenefit(MembershipBenefitRequest req) {
+    public MembershipBenefitResponse createBenefit(Long adminUserId, MembershipBenefitRequest req) {
         MembershipBenefitDefinition b = new MembershipBenefitDefinition();
         fill(b, req);
         if (req.active() == null) b.setActive(true);
-        return toBenefitResponse(benefitRepo.save(b));
+        MembershipBenefitResponse saved = toBenefitResponse(benefitRepo.save(b));
+        adminAudit.record(adminUserId, "MEMBERSHIP_BENEFIT_CREATE", "MEMBERSHIP_BENEFIT", saved.id(),
+            "Admin created membership benefit definition " + saved.id(), null, summarise(saved));
+        return saved;
     }
 
     @Transactional
-    public MembershipBenefitResponse updateBenefit(Long id, MembershipBenefitRequest req) {
+    public MembershipBenefitResponse updateBenefit(Long adminUserId, Long id, MembershipBenefitRequest req) {
         MembershipBenefitDefinition b = benefitOrThrow(id);
+        String before = summarise(toBenefitResponse(b));
         fill(b, req);
         if (req.active() != null) b.setActive(req.active());
-        return toBenefitResponse(benefitRepo.save(b));
+        MembershipBenefitResponse saved = toBenefitResponse(benefitRepo.save(b));
+        adminAudit.record(adminUserId, "MEMBERSHIP_BENEFIT_UPDATE", "MEMBERSHIP_BENEFIT", id,
+            "Admin updated membership benefit definition " + id, before, summarise(saved));
+        return saved;
     }
 
     @Transactional

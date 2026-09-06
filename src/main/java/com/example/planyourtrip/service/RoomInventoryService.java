@@ -60,11 +60,80 @@ public class RoomInventoryService {
 
     private final RoomInventoryRepository inventoryRepo;
     private final HotelRoomRepository roomRepo;
+    private final AdminActivityLogService adminAudit;
 
     public RoomInventoryService(RoomInventoryRepository inventoryRepo,
-                                 HotelRoomRepository roomRepo) {
+                                 HotelRoomRepository roomRepo,
+                                 AdminActivityLogService adminAudit) {
         this.inventoryRepo = inventoryRepo;
         this.roomRepo      = roomRepo;
+        this.adminAudit    = adminAudit;
+    }
+
+    // ── D3H · audited administrative writes ───────────────────────────────────
+    //
+    // Inventory is the one surface on this service where the two audiences already diverge, and the
+    // audit follows that existing seam rather than inventing a new one. The Authority overloads
+    // below are shared: PartnerCalendarService reaches update(..., PARTNER) and
+    // bulkUpsert(..., PARTNER) for a partner's own calendar, so recording in those bodies would
+    // file partner calendar work as administrative activity. These wrappers are the admin entry
+    // points and are the only place an admin actor is known.
+    //
+    // Counters are small bounded ints and dates, so they are safe to record verbatim; there is no
+    // operator free text on this surface at all.
+
+    @Transactional
+    public RoomInventoryResponse adminCreate(Long adminUserId, Long roomId, RoomInventoryRequest req) {
+        RoomInventoryResponse created = create(roomId, req);
+        adminAudit.record(adminUserId, "ROOM_INVENTORY_CREATE", "ROOM_INVENTORY", created.id(),
+            "Admin created inventory for room " + roomId + " on " + created.inventoryDate(),
+            null, summarise(created));
+        return created;
+    }
+
+    @Transactional
+    public RoomInventoryResponse adminUpdate(Long adminUserId, Long roomId, LocalDate date,
+                                              RoomInventoryRequest req) {
+        // Snapshot before the lock-read-modify-write below mutates the managed row. toResponse
+        // yields a record of copies, so this string cannot drift under us.
+        String before = inventoryRepo.findByHotelRoomIdAndInventoryDate(roomId, date)
+            .map(inv -> summarise(toResponse(inv))).orElse(null);
+        RoomInventoryResponse updated = update(roomId, date, req, Authority.ADMIN);
+        adminAudit.record(adminUserId, "ROOM_INVENTORY_UPDATE", "ROOM_INVENTORY", updated.id(),
+            "Admin updated inventory for room " + roomId + " on " + date, before, summarise(updated));
+        return updated;
+    }
+
+    @Transactional
+    public List<RoomInventoryResponse> adminBulkUpsert(Long adminUserId, Long roomId,
+                                                        BulkInventoryRequest req) {
+        List<RoomInventoryResponse> saved = bulkUpsert(roomId, req, Authority.ADMIN);
+        // A bulk save has no single mutated child row, so the target is the room whose calendar was
+        // rewritten — the object an investigator would actually look up. Naming one arbitrary
+        // RoomInventory id out of N would be a worse answer than naming the room. The affected span
+        // and row count go in the description; the per-row detail stays in the calendar itself.
+        LocalDate first = saved.stream().map(RoomInventoryResponse::inventoryDate)
+            .filter(java.util.Objects::nonNull).min(LocalDate::compareTo).orElse(null);
+        LocalDate last = saved.stream().map(RoomInventoryResponse::inventoryDate)
+            .filter(java.util.Objects::nonNull).max(LocalDate::compareTo).orElse(null);
+        adminAudit.record(adminUserId, "ROOM_INVENTORY_BULK_UPSERT", "HOTEL_ROOM", roomId,
+            "Admin bulk-upserted " + saved.size() + " inventory day(s) for room " + roomId
+                + (first == null ? "" : " covering " + first + ".." + last),
+            null, "days:" + saved.size() + " window:" + first + ".." + last);
+        return saved;
+    }
+
+    /** Bounded counters and flags only — this surface carries no operator-supplied text. */
+    private static String summarise(RoomInventoryResponse r) {
+        return "date:" + r.inventoryDate()
+            + " total:" + r.totalInventory()
+            + " available:" + r.availableInventory()
+            + " blocked:" + r.blockedInventory()
+            + " sold:" + r.soldInventory()
+            + " maintenance:" + r.maintenanceInventory()
+            + " stopSell:" + r.stopSell()
+            + " closedArrival:" + r.closedArrival()
+            + " closedDeparture:" + r.closedDeparture();
     }
 
     public InventoryCalendarResponse getCalendar(Long roomId,

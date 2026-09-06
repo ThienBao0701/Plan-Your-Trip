@@ -30,11 +30,14 @@ public class ReferralCampaignService {
 
     private final ReferralCampaignRepository campaignRepo;
     private final CouponDefinitionRepository couponDefinitionRepo;
+    private final AdminActivityLogService adminAudit;
 
     public ReferralCampaignService(ReferralCampaignRepository campaignRepo,
-                                    CouponDefinitionRepository couponDefinitionRepo) {
+                                    CouponDefinitionRepository couponDefinitionRepo,
+                                    AdminActivityLogService adminAudit) {
         this.campaignRepo = campaignRepo;
         this.couponDefinitionRepo = couponDefinitionRepo;
+        this.adminAudit = adminAudit;
     }
 
     public List<ReferralCampaignResponse> getAll() {
@@ -45,8 +48,19 @@ public class ReferralCampaignService {
         return toResponse(campaignOrThrow(id));
     }
 
+    // ── D3H · audited administrative writes ───────────────────────────────────
+    //
+    // These four are reached only from AdminReferralController; ReferralService consumes
+    // resolveApplicable, a read. The audit is therefore inline, with the actor first.
+    //
+    // A referral campaign is a standing promise to mint points and credit for two parties on every
+    // qualifying booking, so its reward economics are exactly what an investigator needs after the
+    // fact: the before/after pair records both sides' points, coupon-definition id and credit
+    // amount, plus the qualifying threshold and the effective window. The operator-supplied code
+    // and name are excluded (D1c-NEW-1), as is the currency string.
+
     @Transactional
-    public ReferralCampaignResponse create(ReferralCampaignRequest req) {
+    public ReferralCampaignResponse create(Long adminUserId, ReferralCampaignRequest req) {
         String code = req.code().trim();
         if (campaignRepo.findByCodeIgnoreCase(code).isPresent())
             throw new ApiException(HttpStatus.CONFLICT, "Referral campaign already exists: " + code);
@@ -54,12 +68,17 @@ public class ReferralCampaignService {
         ReferralCampaign c = new ReferralCampaign();
         c.setCode(code);
         fill(c, req);
-        return toResponse(campaignRepo.save(c));
+        ReferralCampaignResponse saved = toResponse(campaignRepo.save(c));
+        adminAudit.record(adminUserId, "REFERRAL_CAMPAIGN_CREATE", "REFERRAL_CAMPAIGN", saved.id(),
+            "Admin created referral campaign " + saved.id(), null, summarise(saved));
+        return saved;
     }
 
     @Transactional
-    public ReferralCampaignResponse update(Long id, ReferralCampaignRequest req) {
+    public ReferralCampaignResponse update(Long adminUserId, Long id, ReferralCampaignRequest req) {
         ReferralCampaign c = campaignOrThrow(id);
+        // Snapshot to an immutable record before fill() mutates the managed entity.
+        String before = summarise(toResponse(c));
         String code = req.code().trim();
         campaignRepo.findByCodeIgnoreCase(code)
             .filter(other -> !other.getId().equals(id))
@@ -67,21 +86,48 @@ public class ReferralCampaignService {
                 "Another referral campaign already uses code: " + code); });
         c.setCode(code);
         fill(c, req);
-        return toResponse(campaignRepo.save(c));
+        ReferralCampaignResponse saved = toResponse(campaignRepo.save(c));
+        adminAudit.record(adminUserId, "REFERRAL_CAMPAIGN_UPDATE", "REFERRAL_CAMPAIGN", id,
+            "Admin updated referral campaign " + id, before, summarise(saved));
+        return saved;
     }
 
     @Transactional
-    public ReferralCampaignResponse activate(Long id) {
+    public ReferralCampaignResponse activate(Long adminUserId, Long id) {
         ReferralCampaign c = campaignOrThrow(id);
+        String before = summarise(toResponse(c));
         c.setActive(true);
-        return toResponse(campaignRepo.save(c));
+        ReferralCampaignResponse saved = toResponse(campaignRepo.save(c));
+        adminAudit.record(adminUserId, "REFERRAL_CAMPAIGN_ACTIVATE", "REFERRAL_CAMPAIGN", id,
+            "Admin activated referral campaign " + id, before, summarise(saved));
+        return saved;
     }
 
     @Transactional
-    public ReferralCampaignResponse deactivate(Long id) {
+    public ReferralCampaignResponse deactivate(Long adminUserId, Long id) {
         ReferralCampaign c = campaignOrThrow(id);
+        String before = summarise(toResponse(c));
         c.setActive(false);
-        return toResponse(campaignRepo.save(c));
+        ReferralCampaignResponse saved = toResponse(campaignRepo.save(c));
+        adminAudit.record(adminUserId, "REFERRAL_CAMPAIGN_DEACTIVATE", "REFERRAL_CAMPAIGN", id,
+            "Admin deactivated referral campaign " + id, before, summarise(saved));
+        return saved;
+    }
+
+    private static String summarise(ReferralCampaignResponse c) {
+        return "active:" + c.active()
+            + " minQualifying:" + num(c.minimumQualifyingBookingAmount())
+            + " inviterPoints:" + num(c.inviterRewardPoints())
+            + " inviterCoupon:" + c.inviterRewardCouponDefinitionId()
+            + " inviterCredit:" + num(c.inviterRewardCreditAmount())
+            + " inviteePoints:" + num(c.inviteeRewardPoints())
+            + " inviteeCoupon:" + c.inviteeRewardCouponDefinitionId()
+            + " inviteeCredit:" + num(c.inviteeRewardCreditAmount())
+            + " effective:" + c.effectiveFrom() + ".." + c.effectiveUntil();
+    }
+
+    private static String num(Object value) {
+        return AdminActivityLogService.safeNumber(value);
     }
 
     /** The one campaign in force at {@code at} (newest applicable window), or 409 if none — mirrors {@code LoyaltyRedemptionPolicyService#resolveApplicable}. */

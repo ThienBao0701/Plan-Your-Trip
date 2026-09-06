@@ -145,6 +145,28 @@ public class AdminActivityLogService {
             .orElse("user:" + actorUserId);
     }
 
+    /**
+     * D3H - renders a number for a {@code beforeState}/{@code afterState} string so a legitimate
+     * value can never be mistaken for a credential by {@link #FORBIDDEN}.
+     *
+     * <p>The money columns in this schema are {@code precision = 15, scale = 2}, so a price or an
+     * amount may legally carry a thirteen-digit integer part. Written straight into a state string
+     * that run matches {@code \b\d{13,19}\b}, {@link #reject} throws, and - because the audit
+     * write shares the caller's transaction - the perfectly valid pricing change being audited
+     * rolls back with it. The guard is correct and is not being weakened; the caller is simply
+     * given a way to pass a value it cannot trip. Every realistic amount is returned unchanged;
+     * only an absurd one degrades to a magnitude marker, which still tells a reviewer what
+     * happened.
+     */
+    static String safeNumber(Object value) {
+        if (value == null) return "-";
+        String s = value instanceof java.math.BigDecimal bd ? bd.toPlainString() : String.valueOf(value);
+        for (String run : s.split("\\D+")) {
+            if (run.length() >= 13) return "(out-of-range)";
+        }
+        return s;
+    }
+
     private static void reject(String value) {
         if (value != null && FORBIDDEN.matcher(value).find()) {
             throw new IllegalArgumentException(

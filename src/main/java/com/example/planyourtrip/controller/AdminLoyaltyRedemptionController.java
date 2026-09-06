@@ -55,27 +55,28 @@ public class AdminLoyaltyRedemptionController {
     @PostMapping("/api/admin/loyalty/redemption-policies")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a redemption policy (duplicate policyCode rejected with 409)")
-    public RedemptionPolicyResponse createPolicy(@Valid @RequestBody RedemptionPolicyRequest req) {
-        return policyService.create(req);
+    public RedemptionPolicyResponse createPolicy(@AuthUser Long uid,
+                                                 @Valid @RequestBody RedemptionPolicyRequest req) {
+        return policyService.create(uid, req);
     }
 
     @PutMapping("/api/admin/loyalty/redemption-policies/{id}")
     @Operation(summary = "Update a redemption policy")
-    public RedemptionPolicyResponse updatePolicy(@PathVariable Long id,
+    public RedemptionPolicyResponse updatePolicy(@AuthUser Long uid, @PathVariable Long id,
                                                  @Valid @RequestBody RedemptionPolicyRequest req) {
-        return policyService.update(id, req);
+        return policyService.update(uid, id, req);
     }
 
     @PostMapping("/api/admin/loyalty/redemption-policies/{id}/activate")
     @Operation(summary = "Activate a redemption policy")
-    public RedemptionPolicyResponse activatePolicy(@PathVariable Long id) {
-        return policyService.activate(id);
+    public RedemptionPolicyResponse activatePolicy(@AuthUser Long uid, @PathVariable Long id) {
+        return policyService.activate(uid, id);
     }
 
     @PostMapping("/api/admin/loyalty/redemption-policies/{id}/deactivate")
     @Operation(summary = "Deactivate a redemption policy")
-    public RedemptionPolicyResponse deactivatePolicy(@PathVariable Long id) {
-        return policyService.deactivate(id);
+    public RedemptionPolicyResponse deactivatePolicy(@AuthUser Long uid, @PathVariable Long id) {
+        return policyService.deactivate(uid, id);
     }
 
     // ── Redemption administration ──────────────────────────────────────────────

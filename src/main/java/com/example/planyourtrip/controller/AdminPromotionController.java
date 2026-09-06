@@ -33,8 +33,8 @@ public class AdminPromotionController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a promotion")
-    public PromotionResponse create(@Valid @RequestBody PromotionRequest req) {
-        return service.create(req);
+    public PromotionResponse create(@AuthUser Long uid, @Valid @RequestBody PromotionRequest req) {
+        return service.adminCreate(uid, req);
     }
 
     @GetMapping("/{id}")
@@ -45,9 +45,9 @@ public class AdminPromotionController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Update a promotion")
-    public PromotionResponse update(@PathVariable Long id,
+    public PromotionResponse update(@AuthUser Long uid, @PathVariable Long id,
                                      @Valid @RequestBody PromotionRequest req) {
-        return service.update(id, req);
+        return service.adminUpdate(uid, id, req);
     }
 
     @DeleteMapping("/{id}")

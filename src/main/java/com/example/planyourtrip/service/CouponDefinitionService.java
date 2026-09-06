@@ -45,13 +45,16 @@ public class CouponDefinitionService {
     private final CouponDefinitionRepository couponRepo;
     private final PlaceRepository placeRepo;
     private final HotelRoomRepository hotelRoomRepo;
+    private final AdminActivityLogService adminAudit;
 
     public CouponDefinitionService(CouponDefinitionRepository couponRepo,
                                     PlaceRepository placeRepo,
-                                    HotelRoomRepository hotelRoomRepo) {
+                                    HotelRoomRepository hotelRoomRepo,
+                                    AdminActivityLogService adminAudit) {
         this.couponRepo = couponRepo;
         this.placeRepo = placeRepo;
         this.hotelRoomRepo = hotelRoomRepo;
+        this.adminAudit = adminAudit;
     }
 
     public List<CouponDefinitionResponse> getAll() {
@@ -62,8 +65,20 @@ public class CouponDefinitionService {
         return toResponse(definitionOrThrow(id));
     }
 
+    // ── D3H · audited administrative writes ───────────────────────────────────
+    //
+    // Every method below is reached only from AdminCouponDefinitionController — CustomerCouponService
+    // reuses this class's read helpers (definitionOrThrow, toResponse, normalizeCode) but never its
+    // writes — so the audit is inline and the actor is the first parameter, matching the sibling
+    // GiftCardProductService.
+    //
+    // State strings carry scalars, enums, ids and dates only. They deliberately omit the
+    // operator-supplied code, name, description and placeType: free text handed to the audit guard
+    // can trip its credential rule and roll the whole change back (D1c-NEW-1). Amounts go through
+    // num() because a precision-15 discount value can legitimately reach thirteen digits.
+
     @Transactional
-    public CouponDefinitionResponse create(CouponDefinitionRequest req) {
+    public CouponDefinitionResponse create(Long adminUserId, CouponDefinitionRequest req) {
         String code = normalizeCode(req.code());
         validate(req);
         if (couponRepo.existsByCodeIgnoreCase(code))
@@ -72,33 +87,69 @@ public class CouponDefinitionService {
         CouponDefinition def = new CouponDefinition();
         fill(def, req, code);
         if (req.active() == null) def.setActive(true);
-        return toResponse(couponRepo.save(def));
+        CouponDefinitionResponse saved = toResponse(couponRepo.save(def));
+        adminAudit.record(adminUserId, "COUPON_DEFINITION_CREATE", "COUPON_DEFINITION", saved.id(),
+            "Admin created coupon definition " + saved.id(), null, summarise(saved));
+        return saved;
     }
 
     @Transactional
-    public CouponDefinitionResponse update(Long id, CouponDefinitionRequest req) {
+    public CouponDefinitionResponse update(Long adminUserId, Long id, CouponDefinitionRequest req) {
         CouponDefinition def = definitionOrThrow(id);
+        // Snapshot to an immutable record before fill() mutates the managed entity.
+        String before = summarise(toResponse(def));
         String code = normalizeCode(req.code());
         validate(req);
         if (!code.equalsIgnoreCase(def.getCode()) && couponRepo.existsByCodeIgnoreCase(code))
             throw new ApiException(HttpStatus.CONFLICT, "Coupon code already exists: " + code);
 
         fill(def, req, code);
-        return toResponse(couponRepo.save(def));
+        CouponDefinitionResponse saved = toResponse(couponRepo.save(def));
+        adminAudit.record(adminUserId, "COUPON_DEFINITION_UPDATE", "COUPON_DEFINITION", id,
+            "Admin updated coupon definition " + id, before, summarise(saved));
+        return saved;
     }
 
     @Transactional
-    public CouponDefinitionResponse activate(Long id) {
+    public CouponDefinitionResponse activate(Long adminUserId, Long id) {
         CouponDefinition def = definitionOrThrow(id);
+        String before = summarise(toResponse(def));
         def.setActive(true);
-        return toResponse(couponRepo.save(def));
+        CouponDefinitionResponse saved = toResponse(couponRepo.save(def));
+        adminAudit.record(adminUserId, "COUPON_DEFINITION_ACTIVATE", "COUPON_DEFINITION", id,
+            "Admin activated coupon definition " + id, before, summarise(saved));
+        return saved;
     }
 
     @Transactional
-    public CouponDefinitionResponse deactivate(Long id) {
+    public CouponDefinitionResponse deactivate(Long adminUserId, Long id) {
         CouponDefinition def = definitionOrThrow(id);
+        String before = summarise(toResponse(def));
         def.setActive(false);
-        return toResponse(couponRepo.save(def));
+        CouponDefinitionResponse saved = toResponse(couponRepo.save(def));
+        adminAudit.record(adminUserId, "COUPON_DEFINITION_DEACTIVATE", "COUPON_DEFINITION", id,
+            "Admin deactivated coupon definition " + id, before, summarise(saved));
+        return saved;
+    }
+
+    private static String summarise(CouponDefinitionResponse c) {
+        return "active:" + c.active()
+            + " discountType:" + c.discountType()
+            + " value:" + num(c.discountValue())
+            + " maxDiscount:" + num(c.maxDiscountAmount())
+            + " minSpend:" + num(c.minimumSpend())
+            + " validity:" + c.validFrom() + ".." + c.validUntil()
+            + " totalLimit:" + num(c.totalUsageLimit())
+            + " perUser:" + num(c.usageLimitPerUser())
+            + " target:" + c.targetType() + "/" + c.targetId()
+            + " minStay:" + num(c.minimumStayNights())
+            + " segment:" + c.customerSegment()
+            + " firstBookingOnly:" + c.firstBookingOnly()
+            + " minTier:" + c.minimumTier();
+    }
+
+    private static String num(Object value) {
+        return AdminActivityLogService.safeNumber(value);
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

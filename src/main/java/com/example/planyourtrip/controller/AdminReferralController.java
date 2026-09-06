@@ -1,6 +1,7 @@
 package com.example.planyourtrip.controller;
 
 import com.example.planyourtrip.dto.ReferralDto.*;
+import com.example.planyourtrip.security.AuthUser;
 import com.example.planyourtrip.service.ReferralCampaignService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -43,26 +44,27 @@ public class AdminReferralController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a referral campaign (duplicate code rejected with 409)")
-    public ReferralCampaignResponse create(@Valid @RequestBody ReferralCampaignRequest req) {
-        return service.create(req);
+    public ReferralCampaignResponse create(@AuthUser Long uid,
+                                           @Valid @RequestBody ReferralCampaignRequest req) {
+        return service.create(uid, req);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update a referral campaign")
-    public ReferralCampaignResponse update(@PathVariable Long id,
+    public ReferralCampaignResponse update(@AuthUser Long uid, @PathVariable Long id,
                                            @Valid @RequestBody ReferralCampaignRequest req) {
-        return service.update(id, req);
+        return service.update(uid, id, req);
     }
 
     @PostMapping("/{id}/activate")
     @Operation(summary = "Activate a referral campaign")
-    public ReferralCampaignResponse activate(@PathVariable Long id) {
-        return service.activate(id);
+    public ReferralCampaignResponse activate(@AuthUser Long uid, @PathVariable Long id) {
+        return service.activate(uid, id);
     }
 
     @PostMapping("/{id}/deactivate")
     @Operation(summary = "Deactivate a referral campaign")
-    public ReferralCampaignResponse deactivate(@PathVariable Long id) {
-        return service.deactivate(id);
+    public ReferralCampaignResponse deactivate(@AuthUser Long uid, @PathVariable Long id) {
+        return service.deactivate(uid, id);
     }
 }

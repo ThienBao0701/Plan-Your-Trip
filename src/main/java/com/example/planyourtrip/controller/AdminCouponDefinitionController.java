@@ -1,5 +1,6 @@
 package com.example.planyourtrip.controller;
 
+import com.example.planyourtrip.security.AuthUser;
 import com.example.planyourtrip.dto.CouponDto.CouponDefinitionRequest;
 import com.example.planyourtrip.dto.CouponDto.CouponDefinitionResponse;
 import com.example.planyourtrip.dto.CouponDto.CouponEligibilityResponse;
@@ -47,8 +48,9 @@ public class AdminCouponDefinitionController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a coupon definition (code unique case-insensitively)")
-    public CouponDefinitionResponse create(@Valid @RequestBody CouponDefinitionRequest req) {
-        return service.create(req);
+    public CouponDefinitionResponse create(@AuthUser Long uid,
+                                            @Valid @RequestBody CouponDefinitionRequest req) {
+        return service.create(uid, req);
     }
 
     @GetMapping("/{id}")
@@ -59,21 +61,21 @@ public class AdminCouponDefinitionController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Update a coupon definition")
-    public CouponDefinitionResponse update(@PathVariable Long id,
+    public CouponDefinitionResponse update(@AuthUser Long uid, @PathVariable Long id,
                                             @Valid @RequestBody CouponDefinitionRequest req) {
-        return service.update(id, req);
+        return service.update(uid, id, req);
     }
 
     @PatchMapping("/{id}/activate")
     @Operation(summary = "Activate a coupon definition")
-    public CouponDefinitionResponse activate(@PathVariable Long id) {
-        return service.activate(id);
+    public CouponDefinitionResponse activate(@AuthUser Long uid, @PathVariable Long id) {
+        return service.activate(uid, id);
     }
 
     @PatchMapping("/{id}/deactivate")
     @Operation(summary = "Deactivate a coupon definition")
-    public CouponDefinitionResponse deactivate(@PathVariable Long id) {
-        return service.deactivate(id);
+    public CouponDefinitionResponse deactivate(@AuthUser Long uid, @PathVariable Long id) {
+        return service.deactivate(uid, id);
     }
 
     @GetMapping("/{id}/eligibility-preview")

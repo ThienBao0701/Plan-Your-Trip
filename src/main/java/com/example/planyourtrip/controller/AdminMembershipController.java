@@ -46,8 +46,9 @@ public class AdminMembershipController {
     @PostMapping("/api/admin/membership/tiers")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a tier definition (one row per tier — duplicate tier rejected with 409)")
-    public MembershipTierDefinitionResponse createTier(@Valid @RequestBody MembershipTierDefinitionRequest req) {
-        return tierService.createTierDefinition(req);
+    public MembershipTierDefinitionResponse createTier(@AuthUser Long uid,
+            @Valid @RequestBody MembershipTierDefinitionRequest req) {
+        return tierService.createTierDefinition(uid, req);
     }
 
     @GetMapping("/api/admin/membership/tiers/{tier}")
@@ -58,21 +59,21 @@ public class AdminMembershipController {
 
     @PutMapping("/api/admin/membership/tiers/{tier}")
     @Operation(summary = "Update a tier definition's thresholds/multiplier/metadata")
-    public MembershipTierDefinitionResponse updateTier(@PathVariable MembershipTier tier,
+    public MembershipTierDefinitionResponse updateTier(@AuthUser Long uid, @PathVariable MembershipTier tier,
                                                          @Valid @RequestBody MembershipTierDefinitionRequest req) {
-        return tierService.updateTierDefinition(tier, req);
+        return tierService.updateTierDefinition(uid, tier, req);
     }
 
     @PatchMapping("/api/admin/membership/tiers/{tier}/activate")
     @Operation(summary = "Activate a tier definition (participates in qualification again)")
-    public MembershipTierDefinitionResponse activateTier(@PathVariable MembershipTier tier) {
-        return tierService.activateTierDefinition(tier);
+    public MembershipTierDefinitionResponse activateTier(@AuthUser Long uid, @PathVariable MembershipTier tier) {
+        return tierService.activateTierDefinition(uid, tier);
     }
 
     @PatchMapping("/api/admin/membership/tiers/{tier}/deactivate")
     @Operation(summary = "Deactivate a tier definition (excluded from qualification and multiplier resolution)")
-    public MembershipTierDefinitionResponse deactivateTier(@PathVariable MembershipTier tier) {
-        return tierService.deactivateTierDefinition(tier);
+    public MembershipTierDefinitionResponse deactivateTier(@AuthUser Long uid, @PathVariable MembershipTier tier) {
+        return tierService.deactivateTierDefinition(uid, tier);
     }
 
     // ── Benefit definitions (metadata only) ──────────────────────────────────
@@ -86,15 +87,16 @@ public class AdminMembershipController {
     @PostMapping("/api/admin/membership/benefits")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a benefit metadata row for a tier")
-    public MembershipBenefitResponse createBenefit(@Valid @RequestBody MembershipBenefitRequest req) {
-        return tierService.createBenefit(req);
+    public MembershipBenefitResponse createBenefit(@AuthUser Long uid,
+            @Valid @RequestBody MembershipBenefitRequest req) {
+        return tierService.createBenefit(uid, req);
     }
 
     @PutMapping("/api/admin/membership/benefits/{id}")
     @Operation(summary = "Update a benefit metadata row")
-    public MembershipBenefitResponse updateBenefit(@PathVariable Long id,
+    public MembershipBenefitResponse updateBenefit(@AuthUser Long uid, @PathVariable Long id,
                                                      @Valid @RequestBody MembershipBenefitRequest req) {
-        return tierService.updateBenefit(id, req);
+        return tierService.updateBenefit(uid, id, req);
     }
 
     @DeleteMapping("/api/admin/membership/benefits/{id}")

@@ -1,6 +1,7 @@
 package com.example.planyourtrip.controller;
 
 import com.example.planyourtrip.dto.RoomInventoryDto.*;
+import com.example.planyourtrip.security.AuthUser;
 import com.example.planyourtrip.service.RoomInventoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -39,24 +40,25 @@ public class AdminInventoryController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create inventory for a specific date")
-    public RoomInventoryResponse create(@PathVariable Long roomId,
+    public RoomInventoryResponse create(@AuthUser Long uid, @PathVariable Long roomId,
                                          @Valid @RequestBody RoomInventoryRequest req) {
-        return service.create(roomId, req);
+        return service.adminCreate(uid, roomId, req);
     }
 
     @PutMapping("/{date}")
     @Operation(summary = "Update inventory for a specific date")
     public RoomInventoryResponse update(
+            @AuthUser Long uid,
             @PathVariable Long roomId,
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @Valid @RequestBody RoomInventoryRequest req) {
-        return service.update(roomId, date, req);
+        return service.adminUpdate(uid, roomId, date, req);
     }
 
     @PostMapping("/bulk")
     @Operation(summary = "Bulk upsert inventory (create or update per date)")
-    public List<RoomInventoryResponse> bulkUpsert(@PathVariable Long roomId,
+    public List<RoomInventoryResponse> bulkUpsert(@AuthUser Long uid, @PathVariable Long roomId,
                                                    @Valid @RequestBody BulkInventoryRequest req) {
-        return service.bulkUpsert(roomId, req);
+        return service.adminBulkUpsert(uid, roomId, req);
     }
 }

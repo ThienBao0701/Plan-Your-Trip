@@ -26,9 +26,12 @@ import java.util.List;
 public class LoyaltyRedemptionPolicyService {
 
     private final LoyaltyRedemptionPolicyRepository policyRepo;
+    private final AdminActivityLogService adminAudit;
 
-    public LoyaltyRedemptionPolicyService(LoyaltyRedemptionPolicyRepository policyRepo) {
+    public LoyaltyRedemptionPolicyService(LoyaltyRedemptionPolicyRepository policyRepo,
+                                           AdminActivityLogService adminAudit) {
         this.policyRepo = policyRepo;
+        this.adminAudit = adminAudit;
     }
 
     public List<RedemptionPolicyResponse> getAll() {
@@ -39,8 +42,19 @@ public class LoyaltyRedemptionPolicyService {
         return toResponse(policyOrThrow(id));
     }
 
+    // ── D3H · audited administrative writes ───────────────────────────────────
+    //
+    // These four are reached only from AdminLoyaltyRedemptionController; LoyaltyRedemptionService
+    // consumes resolveApplicable, a read. The audit is therefore inline, with the actor first.
+    //
+    // This policy sets the exchange rate between loyalty points and money, so a silent edit is a
+    // direct route to giving away revenue: the before/after pair records every rate-bearing scalar
+    // (pointsPerUnit, valuePerUnit, the redemption floor/increment, the discount ceiling and the
+    // minimum payable) so a change in economics is reconstructable from the trail alone. The
+    // operator-supplied policyCode and displayName are excluded (D1c-NEW-1).
+
     @Transactional
-    public RedemptionPolicyResponse create(RedemptionPolicyRequest req) {
+    public RedemptionPolicyResponse create(Long adminUserId, RedemptionPolicyRequest req) {
         String code = req.policyCode().trim();
         if (policyRepo.findByPolicyCodeIgnoreCase(code).isPresent())
             throw new ApiException(HttpStatus.CONFLICT, "Redemption policy already exists: " + code);
@@ -48,12 +62,18 @@ public class LoyaltyRedemptionPolicyService {
         LoyaltyRedemptionPolicy p = new LoyaltyRedemptionPolicy();
         p.setPolicyCode(code);
         fill(p, req);
-        return toResponse(policyRepo.save(p));
+        RedemptionPolicyResponse saved = toResponse(policyRepo.save(p));
+        adminAudit.record(adminUserId, "LOYALTY_REDEMPTION_POLICY_CREATE",
+            "LOYALTY_REDEMPTION_POLICY", saved.id(),
+            "Admin created loyalty redemption policy " + saved.id(), null, summarise(saved));
+        return saved;
     }
 
     @Transactional
-    public RedemptionPolicyResponse update(Long id, RedemptionPolicyRequest req) {
+    public RedemptionPolicyResponse update(Long adminUserId, Long id, RedemptionPolicyRequest req) {
         LoyaltyRedemptionPolicy p = policyOrThrow(id);
+        // Snapshot to an immutable record before fill() mutates the managed entity.
+        String before = summarise(toResponse(p));
         String code = req.policyCode().trim();
         policyRepo.findByPolicyCodeIgnoreCase(code)
             .filter(other -> !other.getId().equals(id))
@@ -61,21 +81,50 @@ public class LoyaltyRedemptionPolicyService {
                 "Another redemption policy already uses code: " + code); });
         p.setPolicyCode(code);
         fill(p, req);
-        return toResponse(policyRepo.save(p));
+        RedemptionPolicyResponse saved = toResponse(policyRepo.save(p));
+        adminAudit.record(adminUserId, "LOYALTY_REDEMPTION_POLICY_UPDATE",
+            "LOYALTY_REDEMPTION_POLICY", id,
+            "Admin updated loyalty redemption policy " + id, before, summarise(saved));
+        return saved;
     }
 
     @Transactional
-    public RedemptionPolicyResponse activate(Long id) {
+    public RedemptionPolicyResponse activate(Long adminUserId, Long id) {
         LoyaltyRedemptionPolicy p = policyOrThrow(id);
+        String before = summarise(toResponse(p));
         p.setActive(true);
-        return toResponse(policyRepo.save(p));
+        RedemptionPolicyResponse saved = toResponse(policyRepo.save(p));
+        adminAudit.record(adminUserId, "LOYALTY_REDEMPTION_POLICY_ACTIVATE",
+            "LOYALTY_REDEMPTION_POLICY", id,
+            "Admin activated loyalty redemption policy " + id, before, summarise(saved));
+        return saved;
     }
 
     @Transactional
-    public RedemptionPolicyResponse deactivate(Long id) {
+    public RedemptionPolicyResponse deactivate(Long adminUserId, Long id) {
         LoyaltyRedemptionPolicy p = policyOrThrow(id);
+        String before = summarise(toResponse(p));
         p.setActive(false);
-        return toResponse(policyRepo.save(p));
+        RedemptionPolicyResponse saved = toResponse(policyRepo.save(p));
+        adminAudit.record(adminUserId, "LOYALTY_REDEMPTION_POLICY_DEACTIVATE",
+            "LOYALTY_REDEMPTION_POLICY", id,
+            "Admin deactivated loyalty redemption policy " + id, before, summarise(saved));
+        return saved;
+    }
+
+    private static String summarise(RedemptionPolicyResponse p) {
+        return "active:" + p.active()
+            + " pointsPerUnit:" + num(p.pointsPerUnit())
+            + " valuePerUnit:" + num(p.valuePerUnit())
+            + " minPoints:" + num(p.minimumRedemptionPoints())
+            + " increment:" + num(p.redemptionIncrementPoints())
+            + " maxDiscountPct:" + num(p.maximumDiscountPercentage())
+            + " minFinalPayable:" + num(p.minimumFinalPayableAmount())
+            + " effective:" + p.effectiveFrom() + ".." + p.effectiveUntil();
+    }
+
+    private static String num(Object value) {
+        return AdminActivityLogService.safeNumber(value);
     }
 
     /** The one policy in force at {@code at} (newest applicable window), or 404-style error if none. */

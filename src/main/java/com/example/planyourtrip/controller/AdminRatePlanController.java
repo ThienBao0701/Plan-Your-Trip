@@ -55,9 +55,9 @@ public class AdminRatePlanController {
     @PostMapping("/api/admin/rooms/{roomId}/rate-plans")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a rate plan for a room")
-    public RatePlanResponse create(@PathVariable Long roomId,
+    public RatePlanResponse create(@AuthUser Long uid, @PathVariable Long roomId,
                                     @Valid @RequestBody RatePlanRequest req) {
-        return service.create(roomId, req);
+        return service.adminCreate(uid, roomId, req);
     }
 
     @GetMapping("/api/admin/rate-plans/{id}")
@@ -68,9 +68,9 @@ public class AdminRatePlanController {
 
     @PutMapping("/api/admin/rate-plans/{id}")
     @Operation(summary = "Update a rate plan")
-    public RatePlanResponse update(@PathVariable Long id,
+    public RatePlanResponse update(@AuthUser Long uid, @PathVariable Long id,
                                     @Valid @RequestBody RatePlanRequest req) {
-        return service.update(id, req);
+        return service.adminUpdate(uid, id, req);
     }
 
     @DeleteMapping("/api/admin/rate-plans/{id}")
@@ -82,22 +82,22 @@ public class AdminRatePlanController {
 
     @PostMapping("/api/admin/rate-plans/{id}/activate")
     @Operation(summary = "Activate a rate plan")
-    public RatePlanResponse activate(@PathVariable Long id) {
-        return service.setActive(id, true);
+    public RatePlanResponse activate(@AuthUser Long uid, @PathVariable Long id) {
+        return service.adminActivate(uid, id);
     }
 
     @PostMapping("/api/admin/rate-plans/{id}/deactivate")
     @Operation(summary = "Deactivate a rate plan")
-    public RatePlanResponse deactivate(@PathVariable Long id) {
-        return service.setActive(id, false);
+    public RatePlanResponse deactivate(@AuthUser Long uid, @PathVariable Long id) {
+        return service.adminDeactivate(uid, id);
     }
 
     @PostMapping("/api/admin/rate-plans/{id}/duplicate")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Duplicate a rate plan")
-    public RatePlanResponse duplicate(@PathVariable Long id,
+    public RatePlanResponse duplicate(@AuthUser Long uid, @PathVariable Long id,
                                       @RequestBody(required = false) RatePlanDuplicateRequest req) {
-        return service.duplicate(id, req);
+        return service.adminDuplicate(uid, id, req);
     }
 
     // ── Occupancy prices ──────────────────────────────────────────────────────
@@ -111,16 +111,16 @@ public class AdminRatePlanController {
     @PostMapping("/api/admin/rate-plans/{id}/occupancy-prices")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Add an occupancy price to a rate plan")
-    public RatePlanOccupancyPriceResponse addOccupancyPrice(@PathVariable Long id,
+    public RatePlanOccupancyPriceResponse addOccupancyPrice(@AuthUser Long uid, @PathVariable Long id,
                                                             @Valid @RequestBody RatePlanOccupancyPriceRequest req) {
-        return service.addOccupancyPrice(id, req);
+        return service.adminAddOccupancyPrice(uid, id, req);
     }
 
     @PutMapping("/api/admin/rate-plan-occupancy-prices/{id}")
     @Operation(summary = "Update an occupancy price")
-    public RatePlanOccupancyPriceResponse updateOccupancyPrice(@PathVariable Long id,
+    public RatePlanOccupancyPriceResponse updateOccupancyPrice(@AuthUser Long uid, @PathVariable Long id,
                                                                @Valid @RequestBody RatePlanOccupancyPriceRequest req) {
-        return service.updateOccupancyPrice(id, req);
+        return service.adminUpdateOccupancyPrice(uid, id, req);
     }
 
     @DeleteMapping("/api/admin/rate-plan-occupancy-prices/{id}")

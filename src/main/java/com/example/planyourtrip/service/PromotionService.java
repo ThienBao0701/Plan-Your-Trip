@@ -89,6 +89,51 @@ public class PromotionService {
             "Admin deleted promotion " + id, "active:" + wasActive, null);
     }
 
+    /**
+     * D3H - the audited administrative create/update, separate entry points for the same reason
+     * {@link #adminDelete} is: {@code PartnerPromotionService} creates and updates a partner's own
+     * promotions through {@link #create} and {@link #update}, so recording inside those bodies
+     * would file partner activity in the administrative trail.
+     *
+     * <p>The state strings carry scalars, enums, ids and dates only - never the operator-supplied
+     * name, code or description (D1c-NEW-1). Amounts go through {@code num()} because a
+     * precision-15 discount value can legitimately reach thirteen digits.
+     */
+    @Transactional
+    public PromotionResponse adminCreate(Long adminUserId, PromotionRequest req) {
+        PromotionResponse created = create(req);
+        adminAudit.record(adminUserId, "PROMOTION_CREATE", "PROMOTION", created.id(),
+            "Admin created promotion " + created.id(), null, summarise(created));
+        return created;
+    }
+
+    @Transactional
+    public PromotionResponse adminUpdate(Long adminUserId, Long id, PromotionRequest req) {
+        String before = summarise(toResponse(promotionOrThrow(id)));
+        PromotionResponse updated = update(id, req);
+        adminAudit.record(adminUserId, "PROMOTION_UPDATE", "PROMOTION", id,
+            "Admin updated promotion " + id, before, summarise(updated));
+        return updated;
+    }
+
+    private static String summarise(PromotionResponse p) {
+        return "active:" + p.active()
+            + " type:" + p.promotionType()
+            + " discountType:" + p.discountType()
+            + " value:" + num(p.discountValue())
+            + " maxDiscount:" + num(p.maxDiscountAmount())
+            + " minStay:" + num(p.minimumStay())
+            + " minSpend:" + num(p.minimumSpend())
+            + " stackable:" + p.stackable()
+            + " priority:" + num(p.priority())
+            + " window:" + p.startDate() + ".." + p.endDate()
+            + " target:" + p.targetType() + "/" + p.targetId();
+    }
+
+    private static String num(Object value) {
+        return AdminActivityLogService.safeNumber(value);
+    }
+
     @Transactional
     public void delete(Long id) {
         promotionOrThrow(id);

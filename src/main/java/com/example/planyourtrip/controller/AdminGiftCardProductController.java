@@ -44,26 +44,27 @@ public class AdminGiftCardProductController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a gift card product (duplicate productCode rejected case-insensitively with 409)")
-    public GiftCardProductResponse create(@Valid @RequestBody GiftCardProductRequest req) {
-        return service.create(req);
+    public GiftCardProductResponse create(@AuthUser Long uid, @Valid @RequestBody GiftCardProductRequest req) {
+        return service.adminCreate(uid, req);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update a gift card product")
-    public GiftCardProductResponse update(@PathVariable Long id, @Valid @RequestBody GiftCardProductRequest req) {
-        return service.update(id, req);
+    public GiftCardProductResponse update(@AuthUser Long uid, @PathVariable Long id,
+                                           @Valid @RequestBody GiftCardProductRequest req) {
+        return service.update(uid, id, req);
     }
 
     @PatchMapping("/{id}/activate")
     @Operation(summary = "Activate a gift card product")
-    public GiftCardProductResponse activate(@PathVariable Long id) {
-        return service.activate(id);
+    public GiftCardProductResponse activate(@AuthUser Long uid, @PathVariable Long id) {
+        return service.activate(uid, id);
     }
 
     @PatchMapping("/{id}/deactivate")
     @Operation(summary = "Deactivate a gift card product")
-    public GiftCardProductResponse deactivate(@PathVariable Long id) {
-        return service.deactivate(id);
+    public GiftCardProductResponse deactivate(@AuthUser Long uid, @PathVariable Long id) {
+        return service.deactivate(uid, id);
     }
 
     @DeleteMapping("/{id}")
