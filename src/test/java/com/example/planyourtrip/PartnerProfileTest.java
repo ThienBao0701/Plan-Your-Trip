@@ -262,22 +262,41 @@ class PartnerProfileTest {
     // SEED VERIFICATION
     // ═══════════════════════════════════════════════════════════════════════════
 
+    /**
+     * D3K — page through the whole list rather than trusting the first page.
+     *
+     * <p>This read one page of {@code size=200} and treated it as the whole table.
+     * {@code /api/admin/partners} sorts by {@code createdAt} descending and clamps {@code size} to
+     * 200, and the seeded partner is the oldest profile in the database — so as soon as the suite
+     * has created about two hundred throwaway partners, the seeded one slides off the first page
+     * and an existence check silently degrades into "is it among the newest two hundred". It is the
+     * same first-page-as-full-scan assumption D3J removed from the audit scans, and it surfaced
+     * here the moment D3K added two more partner-creating tests.
+     */
     @Test
     void seed_approvedPartnerProfileExists() throws Exception {
-        String body = mvc.perform(get("/api/admin/partners?size=200")
-                .header("Authorization", "Bearer " + adminToken()))
-            .andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString();
-
-        JsonNode arr = mapper.readTree(body).get("content");
         boolean found = false;
-        for (JsonNode n : arr) {
-            if ("partner@planyourtrip.com".equals(n.get("userEmail").asText())
-                    && "APPROVED".equals(n.get("verificationStatus").asText())) {
-                found = true;
-                break;
+        int page = 0;
+        int totalPages = 1;
+
+        while (page < totalPages && !found) {
+            JsonNode body = mapper.readTree(mvc.perform(
+                    get("/api/admin/partners?size=200&page=" + page)
+                        .header("Authorization", "Bearer " + adminToken()))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString());
+
+            totalPages = body.get("totalPages").asInt();
+            for (JsonNode n : body.get("content")) {
+                if ("partner@planyourtrip.com".equals(n.get("userEmail").asText())
+                        && "APPROVED".equals(n.get("verificationStatus").asText())) {
+                    found = true;
+                    break;
+                }
             }
+            page++;
         }
+
         assertTrue(found, "Seeded approved partner profile must exist for partner@planyourtrip.com");
     }
 

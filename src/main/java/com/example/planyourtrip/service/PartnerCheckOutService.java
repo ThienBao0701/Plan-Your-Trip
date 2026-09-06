@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 
@@ -66,6 +67,26 @@ public class PartnerCheckOutService {
 
     /** H-FIX 3 — supplies "today" in the property's configured timezone, never the server's. */
     private final PartnerBusinessZoneService businessZone;
+
+    /**
+     * D3K — how far {@code actualCheckInAt} may sit ahead of the current wall clock before a
+     * check-out is treated as physically impossible.
+     *
+     * <p>The guard below exists to reject a check-out recorded <em>before</em> its own check-in.
+     * It was written as an exact {@code Instant.now().isBefore(checkedInAt)}, which is the wrong
+     * comparison for two wall-clock readings taken in different requests: {@link Instant#now()} is
+     * not monotonic, and the margin it is being asked to resolve is tiny. A guest checked out
+     * immediately after being checked in — a front desk correcting a mistake, and the shape every
+     * check-out test uses — leaves roughly four milliseconds between the two readings. Any backward
+     * movement of the system clock larger than that, which is ordinary on an NTP-disciplined host,
+     * turned a perfectly legitimate check-out into a 422.
+     *
+     * <p>One minute preserves the rule's intent exactly. A check-in timestamp that is genuinely in
+     * the future — the corrupt data the guard is for — is out by hours or days, not by part of a
+     * minute; nothing within a minute of "now" is a real inversion, only clock noise. The rejection
+     * still fires for everything it was written to catch.
+     */
+    private static final Duration CLOCK_SKEW_TOLERANCE = Duration.ofMinutes(1);
 
     public PartnerCheckOutService(PartnerVoucherVerificationService verificationService,
                                   BookingStatusEngineService statusEngine,
@@ -145,7 +166,7 @@ public class PartnerCheckOutService {
      */
     private void validateCheckOutWindow(Booking booking) {
         Instant checkedInAt = booking.getActualCheckInAt();
-        if (checkedInAt != null && Instant.now().isBefore(checkedInAt)) {
+        if (checkedInAt != null && Instant.now().plus(CLOCK_SKEW_TOLERANCE).isBefore(checkedInAt)) {
             throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,
                 "Cannot check out before check-in");
         }

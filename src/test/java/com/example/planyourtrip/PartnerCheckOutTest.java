@@ -251,6 +251,53 @@ class PartnerCheckOutTest {
         assertEquals(0, auditRepo.countByBookingId(bookingId));
     }
 
+    /**
+     * D3K — the "cannot check out before check-in" guard must tolerate clock noise.
+     *
+     * <p>This is the flake that made this class fail roughly one full-suite run in four. Checking a
+     * guest out immediately after checking them in leaves about four milliseconds between the
+     * instant the engine stamped on the booking and the instant the guard reads back; the guard
+     * compared them exactly, so any backward step of the (non-monotonic) system clock larger than
+     * that margin rejected a completely valid check-out with 422. Stamping the check-in a few
+     * seconds ahead of the clock reproduces that inversion deterministically, with no sleeping and
+     * no retrying.
+     */
+    @Test
+    void checkInInstantSlightlyAheadOfTheClock_stillChecksOut() throws Exception {
+        OwnedHotelRoom r = setupOwnedHotelRoom("SkewAhead");
+        String guestToken = registerGuest();
+        Long bookingId = createAndConfirmBooking(guestToken, r.roomId(), today.plusDays(1), today.plusDays(3));
+        driveToCheckedIn(r.partner().token(), guestToken, bookingId);
+        // Five seconds of skew — far beyond the few milliseconds a real check-out has to spare,
+        // far inside the tolerance the guard now allows.
+        setActualCheckInAt(bookingId, Instant.now().plusSeconds(5));
+        String payload = fetchVoucherPayload(guestToken, bookingId);
+
+        checkOutByPayload(r.partner().token(), payload).andExpect(status().isOk());
+
+        assertEquals(BookingStatus.CHECKED_OUT, bookingRepo.findById(bookingId).orElseThrow().getStatus());
+        assertEquals(1, auditRepo.countByBookingId(bookingId));
+    }
+
+    /**
+     * D3K — and the guard must still do its job. A check-in timestamp genuinely in the future is
+     * corrupt data, not clock noise, and is still refused.
+     */
+    @Test
+    void checkInInstantFarInTheFuture_isStillRejected() throws Exception {
+        OwnedHotelRoom r = setupOwnedHotelRoom("SkewFuture");
+        String guestToken = registerGuest();
+        Long bookingId = createAndConfirmBooking(guestToken, r.roomId(), today.plusDays(1), today.plusDays(3));
+        driveToCheckedIn(r.partner().token(), guestToken, bookingId);
+        setActualCheckInAt(bookingId, Instant.now().plus(2, ChronoUnit.HOURS));
+        String payload = fetchVoucherPayload(guestToken, bookingId);
+
+        checkOutByPayload(r.partner().token(), payload).andExpect(status().isUnprocessableEntity());
+
+        assertEquals(BookingStatus.CHECKED_IN, bookingRepo.findById(bookingId).orElseThrow().getStatus());
+        assertEquals(0, auditRepo.countByBookingId(bookingId));
+    }
+
     // ═══════════════════════════════════════════════════════════════════════════
     // OWNERSHIP / SIGNATURE → uniform 404
     // ═══════════════════════════════════════════════════════════════════════════
@@ -402,6 +449,13 @@ class PartnerCheckOutTest {
     private void setStatus(Long bookingId, BookingStatus status) {
         Booking b = bookingRepo.findById(bookingId).orElseThrow();
         b.setStatus(status);
+        bookingRepo.save(b);
+    }
+
+    /** D3K — stamp the recorded check-in instant, to reproduce clock skew without sleeping. */
+    private void setActualCheckInAt(Long bookingId, Instant at) {
+        Booking b = bookingRepo.findById(bookingId).orElseThrow();
+        b.setActualCheckInAt(at);
         bookingRepo.save(b);
     }
 
