@@ -124,7 +124,11 @@ public class CustomerCouponService {
     @Transactional
     public CustomerCouponResponse claim(Long userId, String rawCode) {
         String code = CouponDefinitionService.normalizeCode(rawCode);
-        CouponDefinition def = couponDefinitionRepo.findByCodeIgnoreCase(code)
+        // D4 — resolve AND lock in one step, so the counter this method is about to check is read
+        // under the lock rather than before it. The check-then-increment below is then atomic
+        // against a concurrent claim of the same coupon; previously both claims read the
+        // pre-increment count, both passed, and the campaign issued more than it authorised.
+        CouponDefinition def = couponDefinitionRepo.findByCodeIgnoreCaseForUpdate(code)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Coupon code not found: " + code));
 
         LocalDate today = LocalDate.now();
@@ -186,7 +190,10 @@ public class CustomerCouponService {
      */
     @Transactional
     public CustomerCouponResponse issueDirectly(Long userId, Long couponDefinitionId) {
-        CouponDefinition def = couponDefinitionRepo.findById(couponDefinitionId)
+        // D4 — this path skips the claim-time limit checks by design, but it still increments the
+        // shared counter, so it takes the same write lock: otherwise a referral grant landing
+        // alongside a customer claim loses one of the two increments.
+        CouponDefinition def = couponDefinitionRepo.findByIdForUpdate(couponDefinitionId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND,
                 "Coupon definition not found: " + couponDefinitionId));
         User user = userRepo.findById(userId)
@@ -200,6 +207,12 @@ public class CustomerCouponService {
      * {@link CustomerCoupon} row, increment the definition's usage count and send
      * the standard "Coupon added" notification. Callers own their own
      * precondition checks before invoking this.
+     *
+     * <p>D4 — {@code def} MUST already be locked. This method increments the shared
+     * {@code currentUsageCount}, so it has to be reached with the definition row held under
+     * {@code CouponDefinitionRepository#findByCodeIgnoreCaseForUpdate} or
+     * {@code #findByIdForUpdate}; both current callers do that. A future caller that loads the
+     * definition unlocked would silently reintroduce the over-issuance race this lock closed.
      */
     private CustomerCoupon issueCoupon(User user, CouponDefinition def) {
         CustomerCoupon coupon = new CustomerCoupon();
@@ -284,7 +297,12 @@ public class CustomerCouponService {
         coupon.setStatus(CustomerCouponStatus.REVOKED);
         CustomerCoupon saved = customerCouponRepo.save(coupon);
 
-        CouponDefinition def = coupon.getCouponDefinition();
+        // D4 — the decrement is the same contended read-modify-write as the claim increment, so it
+        // takes the same write lock. Revoking beside a concurrent claim would otherwise lose one of
+        // the two updates and leave currentUsageCount disagreeing with the coupons actually issued.
+        CouponDefinition def = couponDefinitionRepo
+            .findByIdForUpdate(coupon.getCouponDefinition().getId())
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Coupon definition not found"));
         if (def.getCurrentUsageCount() > 0) {
             def.setCurrentUsageCount(def.getCurrentUsageCount() - 1);
             couponDefinitionRepo.save(def);
@@ -429,8 +447,15 @@ public class CustomerCouponService {
     @Transactional
     public CheckoutCouponResult validateForCheckout(Long userId, String rawCode, EligibilityContext ctx) {
         String code = CouponDefinitionService.normalizeCode(rawCode);
-        List<CustomerCoupon> claims =
-            customerCouponRepo.findByUserIdAndCouponDefinitionCodeOrderByClaimedAtAsc(userId, code);
+        // D4 — lock the caller's claims of this coupon before deciding which one is AVAILABLE.
+        // markUsedForBooking runs later in this same booking transaction, so without the lock two
+        // simultaneous bookings both saw the same AVAILABLE claim and both consumed it: one
+        // single-use coupon, two discounts. Resolving the definition first keeps the locked query
+        // on customer_coupons alone; an unknown code has no claims either way, so the 404 below is
+        // unchanged for both "no such code" and "not claimed by this user".
+        List<CustomerCoupon> claims = couponDefinitionRepo.findByCodeIgnoreCase(code)
+            .map(def -> customerCouponRepo.findForCheckoutForUpdate(userId, def.getId()))
+            .orElseGet(List::of);
         if (claims.isEmpty())
             throw new ApiException(HttpStatus.NOT_FOUND, "Coupon not found: " + code);
 
