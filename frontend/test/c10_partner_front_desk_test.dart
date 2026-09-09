@@ -151,6 +151,8 @@ void main() {
         'reviews',
         'finance',
         'analytics',
+        // D6 shipped notifications; still no separate check-in destination.
+        'notifications',
         'settings',
       ]);
       // There is deliberately no separate check-in destination.

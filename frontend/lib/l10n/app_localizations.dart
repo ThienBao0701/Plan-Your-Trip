@@ -22557,6 +22557,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This conversation is closed. Sending a reply reopens it for the guest.'**
   String get partnerMessagesClosedNotice;
+
+  /// No description provided for @partnerNotificationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get partnerNotificationsTitle;
+
+  /// No description provided for @partnerNotificationsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything your account has received, newest first.'**
+  String get partnerNotificationsSubtitle;
+
+  /// No description provided for @partnerNotificationsLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading notifications…'**
+  String get partnerNotificationsLoading;
+
+  /// No description provided for @partnerNotificationsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No notifications yet'**
+  String get partnerNotificationsEmptyTitle;
+
+  /// No description provided for @partnerNotificationsEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Updates about your properties, bookings, reviews and guest messages will appear here.'**
+  String get partnerNotificationsEmptyMessage;
+
+  /// No description provided for @partnerNotificationsInboxNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'This is your account\'s complete inbox. It can include platform announcements and personal travel updates as well as property activity — the server does not label notifications by audience.'**
+  String get partnerNotificationsInboxNotice;
+
+  /// No description provided for @partnerNotificationsUnpaginatedNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'This inbox is not paginated — every notification the server returned is shown.'**
+  String get partnerNotificationsUnpaginatedNotice;
+
+  /// No description provided for @partnerNotificationsUnreadLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get partnerNotificationsUnreadLabel;
+
+  /// No description provided for @partnerNotificationsMarkRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as read'**
+  String get partnerNotificationsMarkRead;
+
+  /// No description provided for @partnerNotificationsMarkAllRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark all as read'**
+  String get partnerNotificationsMarkAllRead;
+
+  /// No description provided for @partnerNotificationsMarkedRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Marked as read.'**
+  String get partnerNotificationsMarkedRead;
+
+  /// No description provided for @partnerNotificationsMarkedAllRead.
+  ///
+  /// In en, this message translates to:
+  /// **'All notifications marked as read.'**
+  String get partnerNotificationsMarkedAllRead;
+
+  /// No description provided for @partnerNotificationsDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get partnerNotificationsDelete;
+
+  /// No description provided for @partnerNotificationsDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this notification?'**
+  String get partnerNotificationsDeleteTitle;
+
+  /// No description provided for @partnerNotificationsDeleteMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'It will be removed from the server permanently. There is no archive and this cannot be undone.'**
+  String get partnerNotificationsDeleteMessage;
+
+  /// No description provided for @partnerNotificationsDeleteCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete permanently'**
+  String get partnerNotificationsDeleteCta;
+
+  /// No description provided for @partnerNotificationsDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification deleted.'**
+  String get partnerNotificationsDeleted;
+
+  /// No description provided for @partnerNotificationsActionFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'That could not be completed. Nothing was changed.'**
+  String get partnerNotificationsActionFailed;
+
+  /// No description provided for @partnerNotificationsActionBusy.
+  ///
+  /// In en, this message translates to:
+  /// **'Please wait for the current action to finish.'**
+  String get partnerNotificationsActionBusy;
+
+  /// No description provided for @partnerNotificationsActionNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This notification no longer exists. Refresh to see the current list.'**
+  String get partnerNotificationsActionNotFound;
+
+  /// No description provided for @partnerNotificationsNoDestination.
+  ///
+  /// In en, this message translates to:
+  /// **'This notification does not link to a screen in the partner workspace.'**
+  String get partnerNotificationsNoDestination;
+
+  /// No description provided for @partnerNotificationsTypeUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification'**
+  String get partnerNotificationsTypeUnknown;
 }
 
 class _AppLocalizationsDelegate

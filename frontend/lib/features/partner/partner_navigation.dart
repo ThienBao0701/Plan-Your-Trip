@@ -203,6 +203,7 @@ class PartnerNavigation {
       selectedIcon: Icons.notifications_rounded,
       group: PartnerNavGroup.account,
       badge: PartnerNavBadge.unreadNotifications,
+      implemented: true,
     ),
     PartnerDestination(
       key: 'settings',

@@ -12976,4 +12976,80 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get partnerMessagesClosedNotice =>
       'Cuộc trò chuyện này đã đóng. Gửi trả lời sẽ mở lại cuộc trò chuyện cho khách.';
+
+  @override
+  String get partnerNotificationsTitle => 'Thông báo';
+
+  @override
+  String get partnerNotificationsSubtitle =>
+      'Toàn bộ thông báo tài khoản của bạn đã nhận, mới nhất trước.';
+
+  @override
+  String get partnerNotificationsLoading => 'Đang tải thông báo…';
+
+  @override
+  String get partnerNotificationsEmptyTitle => 'Chưa có thông báo nào';
+
+  @override
+  String get partnerNotificationsEmptyMessage =>
+      'Các cập nhật về cơ sở, đặt phòng, đánh giá và tin nhắn của khách sẽ xuất hiện ở đây.';
+
+  @override
+  String get partnerNotificationsInboxNotice =>
+      'Đây là toàn bộ hộp thư của tài khoản bạn. Nó có thể gồm cả thông báo chung của nền tảng và cập nhật chuyến đi cá nhân, không chỉ hoạt động của cơ sở — máy chủ không phân loại thông báo theo đối tượng nhận.';
+
+  @override
+  String get partnerNotificationsUnpaginatedNotice =>
+      'Hộp thư này không phân trang — tất cả thông báo máy chủ trả về đều được hiển thị.';
+
+  @override
+  String get partnerNotificationsUnreadLabel => 'Mới';
+
+  @override
+  String get partnerNotificationsMarkRead => 'Đánh dấu đã đọc';
+
+  @override
+  String get partnerNotificationsMarkAllRead => 'Đánh dấu tất cả đã đọc';
+
+  @override
+  String get partnerNotificationsMarkedRead => 'Đã đánh dấu là đã đọc.';
+
+  @override
+  String get partnerNotificationsMarkedAllRead =>
+      'Đã đánh dấu tất cả thông báo là đã đọc.';
+
+  @override
+  String get partnerNotificationsDelete => 'Xóa';
+
+  @override
+  String get partnerNotificationsDeleteTitle => 'Xóa thông báo này?';
+
+  @override
+  String get partnerNotificationsDeleteMessage =>
+      'Thông báo sẽ bị xóa vĩnh viễn khỏi máy chủ. Không có mục lưu trữ và không thể hoàn tác.';
+
+  @override
+  String get partnerNotificationsDeleteCta => 'Xóa vĩnh viễn';
+
+  @override
+  String get partnerNotificationsDeleted => 'Đã xóa thông báo.';
+
+  @override
+  String get partnerNotificationsActionFailed =>
+      'Không thể thực hiện. Không có gì thay đổi.';
+
+  @override
+  String get partnerNotificationsActionBusy =>
+      'Vui lòng đợi thao tác hiện tại hoàn tất.';
+
+  @override
+  String get partnerNotificationsActionNotFound =>
+      'Thông báo này không còn tồn tại. Hãy tải lại để xem danh sách hiện tại.';
+
+  @override
+  String get partnerNotificationsNoDestination =>
+      'Thông báo này không liên kết tới màn hình nào trong không gian làm việc của đối tác.';
+
+  @override
+  String get partnerNotificationsTypeUnknown => 'Thông báo';
 }

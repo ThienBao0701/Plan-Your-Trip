@@ -13136,4 +13136,80 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get partnerMessagesClosedNotice =>
       'This conversation is closed. Sending a reply reopens it for the guest.';
+
+  @override
+  String get partnerNotificationsTitle => 'Notifications';
+
+  @override
+  String get partnerNotificationsSubtitle =>
+      'Everything your account has received, newest first.';
+
+  @override
+  String get partnerNotificationsLoading => 'Loading notifications…';
+
+  @override
+  String get partnerNotificationsEmptyTitle => 'No notifications yet';
+
+  @override
+  String get partnerNotificationsEmptyMessage =>
+      'Updates about your properties, bookings, reviews and guest messages will appear here.';
+
+  @override
+  String get partnerNotificationsInboxNotice =>
+      'This is your account\'s complete inbox. It can include platform announcements and personal travel updates as well as property activity — the server does not label notifications by audience.';
+
+  @override
+  String get partnerNotificationsUnpaginatedNotice =>
+      'This inbox is not paginated — every notification the server returned is shown.';
+
+  @override
+  String get partnerNotificationsUnreadLabel => 'New';
+
+  @override
+  String get partnerNotificationsMarkRead => 'Mark as read';
+
+  @override
+  String get partnerNotificationsMarkAllRead => 'Mark all as read';
+
+  @override
+  String get partnerNotificationsMarkedRead => 'Marked as read.';
+
+  @override
+  String get partnerNotificationsMarkedAllRead =>
+      'All notifications marked as read.';
+
+  @override
+  String get partnerNotificationsDelete => 'Delete';
+
+  @override
+  String get partnerNotificationsDeleteTitle => 'Delete this notification?';
+
+  @override
+  String get partnerNotificationsDeleteMessage =>
+      'It will be removed from the server permanently. There is no archive and this cannot be undone.';
+
+  @override
+  String get partnerNotificationsDeleteCta => 'Delete permanently';
+
+  @override
+  String get partnerNotificationsDeleted => 'Notification deleted.';
+
+  @override
+  String get partnerNotificationsActionFailed =>
+      'That could not be completed. Nothing was changed.';
+
+  @override
+  String get partnerNotificationsActionBusy =>
+      'Please wait for the current action to finish.';
+
+  @override
+  String get partnerNotificationsActionNotFound =>
+      'This notification no longer exists. Refresh to see the current list.';
+
+  @override
+  String get partnerNotificationsNoDestination =>
+      'This notification does not link to a screen in the partner workspace.';
+
+  @override
+  String get partnerNotificationsTypeUnknown => 'Notification';
 }

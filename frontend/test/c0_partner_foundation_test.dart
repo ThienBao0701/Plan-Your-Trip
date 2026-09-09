@@ -743,8 +743,9 @@ void main() {
       // (Reservations & front desk), C9 added the property-calendar view to
       // the calendar destination C4 already held (leaving the ledger unchanged),
       // C10 concluded no new destination was warranted, C11 shipped finance and
-      // analytics, C12 shipped reviews, and D5 shipped messages (the guest↔host
-      // conversation module). This
+      // analytics, C12 shipped reviews, D5 shipped messages (the guest↔host
+      // conversation module) and D6 shipped notifications, completing the set.
+      // This
       // list is a deliberate ledger — it
       // must be updated consciously each phase, so a destination flipped to
       // implemented without a real screen behind it fails here first.
@@ -754,17 +755,18 @@ void main() {
           .toList();
       expect(implemented, [
         'dashboard', 'hotels', 'rooms', 'calendar', 'pricing', 'bookings',
-        'messages', 'promotions', 'reviews', 'finance', 'analytics', 'settings',
+        'messages', 'promotions', 'reviews', 'finance', 'analytics',
+        'notifications', 'settings',
       ]);
 
-      // Everything else must still be unimplemented.
+      // D6 shipped the last one, so nothing remains planned. The ledger stays
+      // exhaustive: a destination flipped to implemented without a real screen
+      // behind it still fails the list assertion above.
       final planned = PartnerNavigation.destinations
           .where((d) => !d.implemented)
           .map((d) => d.key)
           .toSet();
-      expect(planned, {
-        'notifications',
-      });
+      expect(planned, isEmpty);
     });
 
     test('settings write access mirrors the backend team-role rule', () {
@@ -822,26 +824,46 @@ void main() {
       expect(find.text('Bay View Hue'), findsOneWidget);
     });
 
-    testWidgets('selecting a planned module shows a placeholder, not data',
+    testWidgets('a planned module shows a placeholder, not data',
         (tester) async {
+      // Every shipped destination is now built — Finance in C11, Reviews in
+      // C12, Messages in D5, Notifications in D6 — so there is no real
+      // destination left to tap for this. The guarantee still matters for the
+      // next unbuilt module, so it is asserted against the placeholder itself
+      // with a destination that is deliberately not in the shipped set.
+      //
+      // Every original expectation is retained: planned badge, the route it
+      // names, and no fabricated data.
+      const planned = PartnerDestination(
+        key: 'not-yet-built',
+        route: '/partner/not-yet-built',
+        icon: Icons.construction_outlined,
+        selectedIcon: Icons.construction_rounded,
+        group: PartnerNavGroup.account,
+      );
+      expect(planned.implemented, isFalse,
+          reason: 'destinations default to unbuilt');
+      expect(
+        PartnerNavigation.destinations.any((d) => d.key == planned.key),
+        isFalse,
+        reason: 'this destination must not be one of the shipped thirteen',
+      );
+
       final app = partnerApp(partnerClient());
       await pumpSized(
         tester,
-        testApp(child: const PartnerRouteGuard(), app: app),
+        testApp(
+          child: const PartnerModuleScreen(destination: planned),
+          app: app,
+        ),
         const Size(1400, 1000),
       );
 
       final l10n = AppLocalizationsEn();
-      // Notifications is the one module still unbuilt. This example has moved
-      // three times as phases landed — Finance in C11, Reviews in C12, Messages
-      // in D5 — while the assertion itself is unchanged.
-      await tester.tap(find.text(l10n.partnerNavNotifications));
-      await tester.pumpAndSettle();
-
       expect(find.byType(PartnerModuleScreen), findsOneWidget);
       expect(find.byType(PartnerDashboardScreen), findsNothing);
       expect(find.text(l10n.partnerModulePlannedBadge), findsOneWidget);
-      expect(find.text('Route: /partner/notifications'), findsOneWidget);
+      expect(find.text('Route: /partner/not-yet-built'), findsOneWidget);
     });
 
     testWidgets('collapses to a drawer on a phone without breaking layout',

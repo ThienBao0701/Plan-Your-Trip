@@ -11,6 +11,7 @@ import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/glass_widgets.dart';
 import 'partner_dashboard_screen.dart';
 import 'messages/partner_messages_screen.dart';
+import 'notifications/partner_notifications_screen.dart';
 import 'partner_module_screen.dart';
 import 'partner_navigation.dart';
 import 'properties/partner_properties_screen.dart';
@@ -453,6 +454,7 @@ class _PartnerWorkArea extends StatelessWidget {
                     'messages' => const PartnerMessagesScreen(),
                     'finance' => const PartnerFinanceScreen(),
                     'analytics' => const PartnerAnalyticsScreen(),
+                    'notifications' => const PartnerNotificationsScreen(),
                     'reviews' => const PartnerReviewsScreen(),
                     'settings' => const PartnerSettingsScreen(),
                     _ => PartnerModuleScreen(destination: destination),
