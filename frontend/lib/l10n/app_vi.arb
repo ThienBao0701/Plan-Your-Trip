@@ -6556,5 +6556,77 @@
       }
     }
   },
-  "adminMediaOwnerMismatch": "Không thể hiển thị thư viện này: máy chủ trả về mục thuộc một địa điểm khác. Không thể thay đổi gì ở đây cho đến khi phản hồi khớp với địa điểm đã yêu cầu."
+  "adminMediaOwnerMismatch": "Không thể hiển thị thư viện này: máy chủ trả về mục thuộc một địa điểm khác. Không thể thay đổi gì ở đây cho đến khi phản hồi khớp với địa điểm đã yêu cầu.",
+  "partnerMessagesTitle": "Tin nhắn",
+  "partnerMessagesSubtitle": "Tin nhắn của khách về các đặt phòng tại cơ sở bạn sở hữu.",
+  "partnerMessagesLoading": "Đang tải cuộc trò chuyện…",
+  "partnerMessagesEmptyTitle": "Chưa có tin nhắn nào từ khách",
+  "partnerMessagesEmptyMessage": "Khi khách bắt đầu trao đổi về một đặt phòng của họ, cuộc trò chuyện sẽ xuất hiện ở đây.",
+  "partnerMessagesUnpaginatedNotice": "Hộp thư này không phân trang — tất cả cuộc trò chuyện máy chủ trả về đều được hiển thị.",
+  "partnerMessagesUnreadBadge": "{count} chưa đọc",
+  "@partnerMessagesUnreadBadge": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "partnerMessagesUnreadTotal": "{count} tin chưa đọc trong {total} cuộc trò chuyện",
+  "@partnerMessagesUnreadTotal": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "partnerMessagesNoPreview": "Chưa có tin nhắn",
+  "partnerMessagesNoSubject": "Không có tiêu đề",
+  "partnerMessagesBookingLabel": "Đặt phòng {code}",
+  "@partnerMessagesBookingLabel": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerMessagesGuestLabel": "Khách: {name}",
+  "@partnerMessagesGuestLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerMessagesOpenSemantic": "Mở cuộc trò chuyện của đặt phòng {code}",
+  "@partnerMessagesOpenSemantic": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerMessagesBackToInbox": "Quay lại hộp thư",
+  "partnerMessagesThreadLoading": "Đang tải cuộc trò chuyện…",
+  "partnerMessagesThreadEmpty": "Cuộc trò chuyện này chưa có tin nhắn nào.",
+  "partnerMessagesUnavailableTitle": "Không mở được cuộc trò chuyện",
+  "partnerMessagesUnavailableMessage": "Không thể mở cuộc trò chuyện này. Có thể nó không còn tồn tại. Hãy quay lại hộp thư và tải lại.",
+  "partnerMessagesSenderHost": "Bạn",
+  "partnerMessagesSenderGuest": "Khách",
+  "partnerMessagesSenderSupport": "Hỗ trợ",
+  "partnerMessagesStatusOpen": "Đang mở",
+  "partnerMessagesStatusClosed": "Đã đóng",
+  "partnerMessagesStatusArchived": "Đã lưu trữ",
+  "partnerMessagesComposerLabel": "Trả lời khách",
+  "partnerMessagesComposerHint": "Nhập nội dung trả lời…",
+  "partnerMessagesSend": "Gửi",
+  "partnerMessagesSending": "Đang gửi…",
+  "partnerMessagesSendEmpty": "Hãy nhập nội dung trước khi gửi.",
+  "partnerMessagesSent": "Đã gửi tin nhắn.",
+  "partnerMessagesSendFailed": "Không gửi được tin nhắn.",
+  "partnerMessagesSendUncertain": "Kết nối đã hết thời gian chờ và tin nhắn của bạn có thể đã được gửi. Hãy mở lại cuộc trò chuyện để kiểm tra trước khi soạn lại — hệ thống sẽ không tự động gửi lại.",
+  "partnerMessagesArchivedNotice": "Cuộc trò chuyện này đã được lưu trữ và không thể nhận thêm tin nhắn.",
+  "partnerMessagesClosedNotice": "Cuộc trò chuyện này đã đóng. Gửi trả lời sẽ mở lại cuộc trò chuyện cho khách."
 }

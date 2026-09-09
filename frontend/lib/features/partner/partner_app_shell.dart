@@ -10,6 +10,7 @@ import '../../design/app_spacing.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/glass_widgets.dart';
 import 'partner_dashboard_screen.dart';
+import 'messages/partner_messages_screen.dart';
 import 'partner_module_screen.dart';
 import 'partner_navigation.dart';
 import 'properties/partner_properties_screen.dart';
@@ -449,6 +450,7 @@ class _PartnerWorkArea extends StatelessWidget {
                     'pricing' => const PartnerRatesScreen(),
                     'promotions' => const PartnerPromotionsScreen(),
                     'bookings' => const PartnerBookingsScreen(),
+                    'messages' => const PartnerMessagesScreen(),
                     'finance' => const PartnerFinanceScreen(),
                     'analytics' => const PartnerAnalyticsScreen(),
                     'reviews' => const PartnerReviewsScreen(),

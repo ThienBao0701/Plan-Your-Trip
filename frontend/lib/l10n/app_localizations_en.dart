@@ -13016,4 +13016,124 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get adminMediaOwnerMismatch =>
       'This gallery could not be shown: the server returned media belonging to a different place. Nothing here can be changed until the response matches the place that was requested.';
+
+  @override
+  String get partnerMessagesTitle => 'Messages';
+
+  @override
+  String get partnerMessagesSubtitle =>
+      'Guest messages about bookings at the properties you own.';
+
+  @override
+  String get partnerMessagesLoading => 'Loading conversations…';
+
+  @override
+  String get partnerMessagesEmptyTitle => 'No guest messages yet';
+
+  @override
+  String get partnerMessagesEmptyMessage =>
+      'When a guest starts a conversation about one of their bookings, it appears here.';
+
+  @override
+  String get partnerMessagesUnpaginatedNotice =>
+      'This inbox is not paginated — every conversation the server returned is shown.';
+
+  @override
+  String partnerMessagesUnreadBadge(int count) {
+    return '$count unread';
+  }
+
+  @override
+  String partnerMessagesUnreadTotal(int count, int total) {
+    return '$count unread across $total conversations';
+  }
+
+  @override
+  String get partnerMessagesNoPreview => 'No messages yet';
+
+  @override
+  String get partnerMessagesNoSubject => 'No subject';
+
+  @override
+  String partnerMessagesBookingLabel(String code) {
+    return 'Booking $code';
+  }
+
+  @override
+  String partnerMessagesGuestLabel(String name) {
+    return 'Guest: $name';
+  }
+
+  @override
+  String partnerMessagesOpenSemantic(String code) {
+    return 'Open the conversation for booking $code';
+  }
+
+  @override
+  String get partnerMessagesBackToInbox => 'Back to inbox';
+
+  @override
+  String get partnerMessagesThreadLoading => 'Loading conversation…';
+
+  @override
+  String get partnerMessagesThreadEmpty =>
+      'This conversation has no messages yet.';
+
+  @override
+  String get partnerMessagesUnavailableTitle => 'Conversation not available';
+
+  @override
+  String get partnerMessagesUnavailableMessage =>
+      'This conversation could not be opened. It may no longer exist. Return to the inbox and refresh.';
+
+  @override
+  String get partnerMessagesSenderHost => 'You';
+
+  @override
+  String get partnerMessagesSenderGuest => 'Guest';
+
+  @override
+  String get partnerMessagesSenderSupport => 'Support';
+
+  @override
+  String get partnerMessagesStatusOpen => 'Open';
+
+  @override
+  String get partnerMessagesStatusClosed => 'Closed';
+
+  @override
+  String get partnerMessagesStatusArchived => 'Archived';
+
+  @override
+  String get partnerMessagesComposerLabel => 'Reply to the guest';
+
+  @override
+  String get partnerMessagesComposerHint => 'Write your reply…';
+
+  @override
+  String get partnerMessagesSend => 'Send';
+
+  @override
+  String get partnerMessagesSending => 'Sending…';
+
+  @override
+  String get partnerMessagesSendEmpty => 'Write a message before sending.';
+
+  @override
+  String get partnerMessagesSent => 'Message sent.';
+
+  @override
+  String get partnerMessagesSendFailed => 'The message could not be sent.';
+
+  @override
+  String get partnerMessagesSendUncertain =>
+      'The connection timed out and your message may already have been sent. Reopen this conversation to check before writing it again — it will not be sent automatically.';
+
+  @override
+  String get partnerMessagesArchivedNotice =>
+      'This conversation was archived and can no longer receive messages.';
+
+  @override
+  String get partnerMessagesClosedNotice =>
+      'This conversation is closed. Sending a reply reopens it for the guest.';
 }

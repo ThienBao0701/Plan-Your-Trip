@@ -12856,4 +12856,124 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get adminMediaOwnerMismatch =>
       'Không thể hiển thị thư viện này: máy chủ trả về mục thuộc một địa điểm khác. Không thể thay đổi gì ở đây cho đến khi phản hồi khớp với địa điểm đã yêu cầu.';
+
+  @override
+  String get partnerMessagesTitle => 'Tin nhắn';
+
+  @override
+  String get partnerMessagesSubtitle =>
+      'Tin nhắn của khách về các đặt phòng tại cơ sở bạn sở hữu.';
+
+  @override
+  String get partnerMessagesLoading => 'Đang tải cuộc trò chuyện…';
+
+  @override
+  String get partnerMessagesEmptyTitle => 'Chưa có tin nhắn nào từ khách';
+
+  @override
+  String get partnerMessagesEmptyMessage =>
+      'Khi khách bắt đầu trao đổi về một đặt phòng của họ, cuộc trò chuyện sẽ xuất hiện ở đây.';
+
+  @override
+  String get partnerMessagesUnpaginatedNotice =>
+      'Hộp thư này không phân trang — tất cả cuộc trò chuyện máy chủ trả về đều được hiển thị.';
+
+  @override
+  String partnerMessagesUnreadBadge(int count) {
+    return '$count chưa đọc';
+  }
+
+  @override
+  String partnerMessagesUnreadTotal(int count, int total) {
+    return '$count tin chưa đọc trong $total cuộc trò chuyện';
+  }
+
+  @override
+  String get partnerMessagesNoPreview => 'Chưa có tin nhắn';
+
+  @override
+  String get partnerMessagesNoSubject => 'Không có tiêu đề';
+
+  @override
+  String partnerMessagesBookingLabel(String code) {
+    return 'Đặt phòng $code';
+  }
+
+  @override
+  String partnerMessagesGuestLabel(String name) {
+    return 'Khách: $name';
+  }
+
+  @override
+  String partnerMessagesOpenSemantic(String code) {
+    return 'Mở cuộc trò chuyện của đặt phòng $code';
+  }
+
+  @override
+  String get partnerMessagesBackToInbox => 'Quay lại hộp thư';
+
+  @override
+  String get partnerMessagesThreadLoading => 'Đang tải cuộc trò chuyện…';
+
+  @override
+  String get partnerMessagesThreadEmpty =>
+      'Cuộc trò chuyện này chưa có tin nhắn nào.';
+
+  @override
+  String get partnerMessagesUnavailableTitle => 'Không mở được cuộc trò chuyện';
+
+  @override
+  String get partnerMessagesUnavailableMessage =>
+      'Không thể mở cuộc trò chuyện này. Có thể nó không còn tồn tại. Hãy quay lại hộp thư và tải lại.';
+
+  @override
+  String get partnerMessagesSenderHost => 'Bạn';
+
+  @override
+  String get partnerMessagesSenderGuest => 'Khách';
+
+  @override
+  String get partnerMessagesSenderSupport => 'Hỗ trợ';
+
+  @override
+  String get partnerMessagesStatusOpen => 'Đang mở';
+
+  @override
+  String get partnerMessagesStatusClosed => 'Đã đóng';
+
+  @override
+  String get partnerMessagesStatusArchived => 'Đã lưu trữ';
+
+  @override
+  String get partnerMessagesComposerLabel => 'Trả lời khách';
+
+  @override
+  String get partnerMessagesComposerHint => 'Nhập nội dung trả lời…';
+
+  @override
+  String get partnerMessagesSend => 'Gửi';
+
+  @override
+  String get partnerMessagesSending => 'Đang gửi…';
+
+  @override
+  String get partnerMessagesSendEmpty => 'Hãy nhập nội dung trước khi gửi.';
+
+  @override
+  String get partnerMessagesSent => 'Đã gửi tin nhắn.';
+
+  @override
+  String get partnerMessagesSendFailed => 'Không gửi được tin nhắn.';
+
+  @override
+  String get partnerMessagesSendUncertain =>
+      'Kết nối đã hết thời gian chờ và tin nhắn của bạn có thể đã được gửi. Hãy mở lại cuộc trò chuyện để kiểm tra trước khi soạn lại — hệ thống sẽ không tự động gửi lại.';
+
+  @override
+  String get partnerMessagesArchivedNotice =>
+      'Cuộc trò chuyện này đã được lưu trữ và không thể nhận thêm tin nhắn.';
+
+  @override
+  String get partnerMessagesClosedNotice =>
+      'Cuộc trò chuyện này đã đóng. Gửi trả lời sẽ mở lại cuộc trò chuyện cho khách.';
 }

@@ -5573,6 +5573,149 @@ class ApiClient {
     }
   }
 
+  // ── Partner conversations (/api/partner/conversations, D5) ─────────────────
+  // The host side of the guest↔host thread the customer already has under
+  // `/api/me/conversations` (UI-41). Same DTOs, same models — a **different**
+  // bounded context, so these are separate methods against `/api/partner/**`
+  // rather than a parameterized version of the customer ones.
+  //
+  // What the backend gives a partner (`PartnerConversationController`):
+  //
+  // | Capability | Endpoint | D5 |
+  // |---|---|---|
+  // | List my hotels' threads | `GET /api/partner/conversations` | ✅ |
+  // | Read one thread | `GET /api/partner/conversations/{id}` | ✅ |
+  // | Reply as the host | `POST /api/partner/conversations/{id}/messages` | ✅ 201 |
+  // | Mark incoming read | `PATCH /api/partner/conversations/{id}/read` | ✅ |
+  // | Close the thread | `PATCH /api/partner/conversations/{id}/close` | ⛔ D5 excludes it |
+  // | Start a thread | — | ⛔ guests only |
+  //
+  // Close is deliberately absent: a CLOSED conversation silently reopens the
+  // moment the guest sends anything (`ConversationService.sendMessage`), so the
+  // control would promise a state the backend does not keep.
+  //
+  // The list is **unpaginated** — `getPartnerConversations` takes no page or
+  // size because the endpoint accepts none and returns the complete inbox.
+  //
+  // Authorization is entirely the server's: `/api/partner/**` admits PARTNER and
+  // ADMIN, then the service resolves the caller's own `PartnerProfile`. A
+  // conversation belonging to another partner answers **404**, never 403 — the
+  // client must not distinguish "not yours" from "does not exist".
+
+  /// `GET /api/partner/conversations` — every thread for hotels this partner
+  /// owns, newest activity first, **complete and unpaginated**.
+  ///
+  /// `unreadCount` on each row counts the messages the *partner* has not read;
+  /// the shell's Messages badge is the sum of exactly these, so the two agree by
+  /// construction.
+  Future<CollectionApiResult<List<RealConversationSummary>>>
+      getPartnerConversations() => _partnerGetList(
+            _partnerUri('/partner/conversations'),
+            RealConversationSummary.fromJson,
+          );
+
+  /// `GET /api/partner/conversations/{id}` — one thread with its messages,
+  /// ordered oldest-first by the backend. 404 for an unknown thread *and* for
+  /// one owned by another partner.
+  Future<CollectionApiResult<RealConversation>> getPartnerConversation(
+    int id,
+  ) =>
+      _partnerGetObject(
+        _partnerUri('/partner/conversations/$id'),
+        RealConversation.fromJson,
+      );
+
+  /// `POST /api/partner/conversations/{id}/messages` — reply as the host.
+  ///
+  /// **Success is HTTP 201 and nothing else.** The backend has no idempotency
+  /// key, no dedup and no unique constraint, so a repeated POST creates a second
+  /// message. A timeout therefore returns [ApiErrorKind.uncertain] — the message
+  /// may already be stored — and the caller must re-read the thread rather than
+  /// send again. Never retry this call automatically.
+  ///
+  /// 400 if the body is blank (pre-empted here), 422 if the thread is ARCHIVED,
+  /// 404 if it is unknown or another partner's.
+  Future<CollectionApiResult<RealMessage>> sendPartnerConversationMessage(
+    int id,
+    String body,
+  ) async {
+    final trimmed = body.trim();
+    if (trimmed.isEmpty) {
+      // Mirrors the backend's `@NotBlank` rather than spending a round trip.
+      return const CollectionApiResult.failure(ApiErrorKind.validation);
+    }
+    try {
+      final res = await _client
+          .post(
+            _partnerUri('/partner/conversations/$id/messages'),
+            headers: _jsonHeaders,
+            body: jsonEncode({'body': trimmed}),
+          )
+          .timeout(_collectionsTimeout);
+      // 201 only. A 200 here would mean the contract changed under us, and
+      // treating it as success would be inventing one.
+      if (res.statusCode == 201) {
+        final data = _decodeJsonMap(res).data;
+        if (data == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealMessage.fromJson(data));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      // The message may have been committed. Duplicates are possible, so this
+      // is never a clean failure and never a retry.
+      return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
+  /// `PATCH /api/partner/conversations/{id}/read` — mark the guest's messages
+  /// in this thread as read by the host.
+  ///
+  /// Idempotent and safe to repeat: it flips `readByPartner` on rows that are
+  /// still false and returns the updated conversation. This is what actually
+  /// clears `unreadCount` — sending a reply does not.
+  Future<CollectionApiResult<RealConversation>> markPartnerConversationRead(
+    int id,
+  ) async {
+    try {
+      final res = await _client
+          .patch(
+            _partnerUri('/partner/conversations/$id/read'),
+            headers: _jsonHeaders,
+          )
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.malformed);
+        }
+        return CollectionApiResult.success(RealConversation.fromJson(body));
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.timeout);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
   /// `POST /api/partner/team` — invite a member by email with a role.
   /// **OWNER only** (`requireOwner`).
   Future<CollectionApiResult<PartnerTeamMember>> addPartnerTeamMember({

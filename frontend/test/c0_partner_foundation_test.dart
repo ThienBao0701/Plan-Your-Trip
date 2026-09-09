@@ -743,7 +743,8 @@ void main() {
       // (Reservations & front desk), C9 added the property-calendar view to
       // the calendar destination C4 already held (leaving the ledger unchanged),
       // C10 concluded no new destination was warranted, C11 shipped finance and
-      // analytics, and C12 shipped reviews. This
+      // analytics, C12 shipped reviews, and D5 shipped messages (the guest↔host
+      // conversation module). This
       // list is a deliberate ledger — it
       // must be updated consciously each phase, so a destination flipped to
       // implemented without a real screen behind it fails here first.
@@ -753,7 +754,7 @@ void main() {
           .toList();
       expect(implemented, [
         'dashboard', 'hotels', 'rooms', 'calendar', 'pricing', 'bookings',
-        'promotions', 'reviews', 'finance', 'analytics', 'settings',
+        'messages', 'promotions', 'reviews', 'finance', 'analytics', 'settings',
       ]);
 
       // Everything else must still be unimplemented.
@@ -762,7 +763,7 @@ void main() {
           .map((d) => d.key)
           .toSet();
       expect(planned, {
-        'messages', 'notifications',
+        'notifications',
       });
     });
 
@@ -831,16 +832,16 @@ void main() {
       );
 
       final l10n = AppLocalizationsEn();
-      // Messages is still unbuilt. This example has moved twice as phases
-      // landed — Finance in C11, Reviews in C12 — while the assertion itself is
-      // unchanged.
-      await tester.tap(find.text(l10n.partnerNavMessages));
+      // Notifications is the one module still unbuilt. This example has moved
+      // three times as phases landed — Finance in C11, Reviews in C12, Messages
+      // in D5 — while the assertion itself is unchanged.
+      await tester.tap(find.text(l10n.partnerNavNotifications));
       await tester.pumpAndSettle();
 
       expect(find.byType(PartnerModuleScreen), findsOneWidget);
       expect(find.byType(PartnerDashboardScreen), findsNothing);
       expect(find.text(l10n.partnerModulePlannedBadge), findsOneWidget);
-      expect(find.text('Route: /partner/messages'), findsOneWidget);
+      expect(find.text('Route: /partner/notifications'), findsOneWidget);
     });
 
     testWidgets('collapses to a drawer on a phone without breaking layout',

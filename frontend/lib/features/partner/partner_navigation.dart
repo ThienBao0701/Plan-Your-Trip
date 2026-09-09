@@ -160,6 +160,7 @@ class PartnerNavigation {
       selectedIcon: Icons.forum_rounded,
       group: PartnerNavGroup.operations,
       badge: PartnerNavBadge.unreadMessages,
+      implemented: true,
     ),
     PartnerDestination(
       key: 'promotions',

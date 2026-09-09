@@ -341,9 +341,9 @@ void main() {
           .where((d) => !d.implemented)
           .map((d) => d.key)
           .toSet();
-      // Messages and Notifications remain, and C12 did not invent a
-      // destination for team, payout or profile.
-      expect(planned, {'messages', 'notifications'});
+      // Notifications remains (D5 has since shipped Messages), and C12 did not
+      // invent a destination for team, payout or profile.
+      expect(planned, {'notifications'});
     });
 
     test('the review list uses the endpoint UI-29 already implemented',

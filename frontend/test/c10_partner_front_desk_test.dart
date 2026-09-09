@@ -143,6 +143,8 @@ void main() {
         'calendar',
         'pricing',
         'bookings',
+        // D5 shipped messages; the check-in/check-out conclusion is unaffected.
+        'messages',
         'promotions',
         // C11 added finance and analytics, C12 reviews; the check-in/check-out
         // conclusion is unaffected by either.

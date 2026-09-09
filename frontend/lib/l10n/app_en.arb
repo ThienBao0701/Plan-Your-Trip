@@ -6556,5 +6556,77 @@
       }
     }
   },
-  "adminMediaOwnerMismatch": "This gallery could not be shown: the server returned media belonging to a different place. Nothing here can be changed until the response matches the place that was requested."
+  "adminMediaOwnerMismatch": "This gallery could not be shown: the server returned media belonging to a different place. Nothing here can be changed until the response matches the place that was requested.",
+  "partnerMessagesTitle": "Messages",
+  "partnerMessagesSubtitle": "Guest messages about bookings at the properties you own.",
+  "partnerMessagesLoading": "Loading conversations…",
+  "partnerMessagesEmptyTitle": "No guest messages yet",
+  "partnerMessagesEmptyMessage": "When a guest starts a conversation about one of their bookings, it appears here.",
+  "partnerMessagesUnpaginatedNotice": "This inbox is not paginated — every conversation the server returned is shown.",
+  "partnerMessagesUnreadBadge": "{count} unread",
+  "@partnerMessagesUnreadBadge": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "partnerMessagesUnreadTotal": "{count} unread across {total} conversations",
+  "@partnerMessagesUnreadTotal": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "partnerMessagesNoPreview": "No messages yet",
+  "partnerMessagesNoSubject": "No subject",
+  "partnerMessagesBookingLabel": "Booking {code}",
+  "@partnerMessagesBookingLabel": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerMessagesGuestLabel": "Guest: {name}",
+  "@partnerMessagesGuestLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerMessagesOpenSemantic": "Open the conversation for booking {code}",
+  "@partnerMessagesOpenSemantic": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerMessagesBackToInbox": "Back to inbox",
+  "partnerMessagesThreadLoading": "Loading conversation…",
+  "partnerMessagesThreadEmpty": "This conversation has no messages yet.",
+  "partnerMessagesUnavailableTitle": "Conversation not available",
+  "partnerMessagesUnavailableMessage": "This conversation could not be opened. It may no longer exist. Return to the inbox and refresh.",
+  "partnerMessagesSenderHost": "You",
+  "partnerMessagesSenderGuest": "Guest",
+  "partnerMessagesSenderSupport": "Support",
+  "partnerMessagesStatusOpen": "Open",
+  "partnerMessagesStatusClosed": "Closed",
+  "partnerMessagesStatusArchived": "Archived",
+  "partnerMessagesComposerLabel": "Reply to the guest",
+  "partnerMessagesComposerHint": "Write your reply…",
+  "partnerMessagesSend": "Send",
+  "partnerMessagesSending": "Sending…",
+  "partnerMessagesSendEmpty": "Write a message before sending.",
+  "partnerMessagesSent": "Message sent.",
+  "partnerMessagesSendFailed": "The message could not be sent.",
+  "partnerMessagesSendUncertain": "The connection timed out and your message may already have been sent. Reopen this conversation to check before writing it again — it will not be sent automatically.",
+  "partnerMessagesArchivedNotice": "This conversation was archived and can no longer receive messages.",
+  "partnerMessagesClosedNotice": "This conversation is closed. Sending a reply reopens it for the guest."
 }

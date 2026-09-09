@@ -22353,6 +22353,210 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This gallery could not be shown: the server returned media belonging to a different place. Nothing here can be changed until the response matches the place that was requested.'**
   String get adminMediaOwnerMismatch;
+
+  /// No description provided for @partnerMessagesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Messages'**
+  String get partnerMessagesTitle;
+
+  /// No description provided for @partnerMessagesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest messages about bookings at the properties you own.'**
+  String get partnerMessagesSubtitle;
+
+  /// No description provided for @partnerMessagesLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading conversations…'**
+  String get partnerMessagesLoading;
+
+  /// No description provided for @partnerMessagesEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No guest messages yet'**
+  String get partnerMessagesEmptyTitle;
+
+  /// No description provided for @partnerMessagesEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'When a guest starts a conversation about one of their bookings, it appears here.'**
+  String get partnerMessagesEmptyMessage;
+
+  /// No description provided for @partnerMessagesUnpaginatedNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'This inbox is not paginated — every conversation the server returned is shown.'**
+  String get partnerMessagesUnpaginatedNotice;
+
+  /// No description provided for @partnerMessagesUnreadBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} unread'**
+  String partnerMessagesUnreadBadge(int count);
+
+  /// No description provided for @partnerMessagesUnreadTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} unread across {total} conversations'**
+  String partnerMessagesUnreadTotal(int count, int total);
+
+  /// No description provided for @partnerMessagesNoPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'No messages yet'**
+  String get partnerMessagesNoPreview;
+
+  /// No description provided for @partnerMessagesNoSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'No subject'**
+  String get partnerMessagesNoSubject;
+
+  /// No description provided for @partnerMessagesBookingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking {code}'**
+  String partnerMessagesBookingLabel(String code);
+
+  /// No description provided for @partnerMessagesGuestLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest: {name}'**
+  String partnerMessagesGuestLabel(String name);
+
+  /// No description provided for @partnerMessagesOpenSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the conversation for booking {code}'**
+  String partnerMessagesOpenSemantic(String code);
+
+  /// No description provided for @partnerMessagesBackToInbox.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to inbox'**
+  String get partnerMessagesBackToInbox;
+
+  /// No description provided for @partnerMessagesThreadLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading conversation…'**
+  String get partnerMessagesThreadLoading;
+
+  /// No description provided for @partnerMessagesThreadEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'This conversation has no messages yet.'**
+  String get partnerMessagesThreadEmpty;
+
+  /// No description provided for @partnerMessagesUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Conversation not available'**
+  String get partnerMessagesUnavailableTitle;
+
+  /// No description provided for @partnerMessagesUnavailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This conversation could not be opened. It may no longer exist. Return to the inbox and refresh.'**
+  String get partnerMessagesUnavailableMessage;
+
+  /// No description provided for @partnerMessagesSenderHost.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get partnerMessagesSenderHost;
+
+  /// No description provided for @partnerMessagesSenderGuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest'**
+  String get partnerMessagesSenderGuest;
+
+  /// No description provided for @partnerMessagesSenderSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Support'**
+  String get partnerMessagesSenderSupport;
+
+  /// No description provided for @partnerMessagesStatusOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get partnerMessagesStatusOpen;
+
+  /// No description provided for @partnerMessagesStatusClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed'**
+  String get partnerMessagesStatusClosed;
+
+  /// No description provided for @partnerMessagesStatusArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived'**
+  String get partnerMessagesStatusArchived;
+
+  /// No description provided for @partnerMessagesComposerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reply to the guest'**
+  String get partnerMessagesComposerLabel;
+
+  /// No description provided for @partnerMessagesComposerHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Write your reply…'**
+  String get partnerMessagesComposerHint;
+
+  /// No description provided for @partnerMessagesSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get partnerMessagesSend;
+
+  /// No description provided for @partnerMessagesSending.
+  ///
+  /// In en, this message translates to:
+  /// **'Sending…'**
+  String get partnerMessagesSending;
+
+  /// No description provided for @partnerMessagesSendEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a message before sending.'**
+  String get partnerMessagesSendEmpty;
+
+  /// No description provided for @partnerMessagesSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Message sent.'**
+  String get partnerMessagesSent;
+
+  /// No description provided for @partnerMessagesSendFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The message could not be sent.'**
+  String get partnerMessagesSendFailed;
+
+  /// No description provided for @partnerMessagesSendUncertain.
+  ///
+  /// In en, this message translates to:
+  /// **'The connection timed out and your message may already have been sent. Reopen this conversation to check before writing it again — it will not be sent automatically.'**
+  String get partnerMessagesSendUncertain;
+
+  /// No description provided for @partnerMessagesArchivedNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'This conversation was archived and can no longer receive messages.'**
+  String get partnerMessagesArchivedNotice;
+
+  /// No description provided for @partnerMessagesClosedNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'This conversation is closed. Sending a reply reopens it for the guest.'**
+  String get partnerMessagesClosedNotice;
 }
 
 class _AppLocalizationsDelegate
