@@ -6292,6 +6292,79 @@ class ApiClient {
     }
   }
 
+  // ── Admin: review moderation (D8) ──────────────────────────────────────────
+  // `AdminReviewController.moderate` on `develop@e6bc020`, verbatim:
+  //
+  //   PATCH /api/admin/reviews/{id}/moderate
+  //   body  {"status": <ReviewStatus>, "rejectReason": String?}
+  //   200   ReviewResponse   (a superset of the row the grid already parses)
+  //
+  // `ReviewModerationRequest` validates `status` with `@NotNull` and nothing
+  // else, so a blank/absent status is a 400. `rejectReason` is free text and is
+  // stored only when the target status is REJECTED.
+  //
+  // What the backend does besides setting the status — all of it server-side,
+  // none of it re-implemented here:
+  //   * stamps `approvedAt` (APPROVED) or `rejectedAt` + `rejectReason` (REJECTED)
+  //   * recalculates the place's rating for APPROVED, REJECTED and HIDDEN
+  //   * notifies the review's author for APPROVED and REJECTED only
+  //   * writes a `REVIEW_MODERATE` audit row with before/after status
+  //
+  // The backend imposes **no** transition rules: any status may follow any
+  // other. The client therefore does not invent one.
+
+  /// `PATCH /api/admin/reviews/{id}/moderate` — set a review's moderation
+  /// status. Returns the updated review as the grid's own row type.
+  ///
+  /// [rejectReason] is sent only when it is non-empty; the backend keeps it for
+  /// REJECTED and shows it to the review's author in their notification.
+  ///
+  /// A timeout is [ApiErrorKind.uncertain] rather than a failure: the write may
+  /// have landed, and repeating it would send the author a second notification
+  /// and write a second audit row. The caller must re-read, never blind-retry.
+  Future<CollectionApiResult<AdminReviewRow>> moderateAdminReview(
+    int reviewId, {
+    required String status,
+    String? rejectReason,
+  }) async {
+    final reason = rejectReason?.trim();
+    try {
+      final res = await _client
+          .patch(
+            _adminUri('/admin/reviews/$reviewId/moderate'),
+            headers: _jsonHeaders,
+            body: jsonEncode({
+              'status': status,
+              if (reason != null && reason.isNotEmpty) 'rejectReason': reason,
+            }),
+          )
+          .timeout(_collectionsTimeout);
+      if (res.statusCode == 200) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+        }
+        final parsed = AdminReviewRow.fromJson(body);
+        if (parsed == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+        }
+        return CollectionApiResult.success(parsed);
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
+
   // ── Admin: media assets (D3C-B) ────────────────────────────────────────────
   // `AdminMediaController` on `develop@5afaa45`, verbatim. Six operations and
   // no more:

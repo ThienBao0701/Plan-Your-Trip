@@ -254,10 +254,106 @@ class AdminReviewsState extends AdminPagedState<AdminReviewRow> {
         sort: sort,
       );
 
+  // ── Moderation (D8) ───────────────────────────────────────────────────────
+  //
+  // `PATCH /api/admin/reviews/{id}/moderate` is the only mutation this grid
+  // performs. The backend imposes **no** transition rules — any status may
+  // follow any other — so none is invented here. What the server does on top of
+  // the status change (rating recalculation, notifying the author on APPROVED
+  // and REJECTED, the `REVIEW_MODERATE` audit row) is its business and is not
+  // mirrored client-side.
+
+  /// The statuses this console can set. `ReviewStatus` also contains `PENDING`
+  /// and `REPORTED`; neither is offered as an action because moving a review
+  /// *back* to either is not a moderation decision the product defines.
+  static const List<String> moderatableStatuses = [
+    'APPROVED',
+    'REJECTED',
+    'HIDDEN',
+  ];
+
+  int? _moderatingId;
+  String? _moderationError;
+  bool _moderationUncertain = false;
+
+  /// The review currently being moderated, or null. Single-flight: a second
+  /// request is refused while one is in flight, because a repeat would notify
+  /// the author twice and write a second audit row.
+  int? get moderatingId => _moderatingId;
+  bool get isModerating => _moderatingId != null;
+  bool isModeratingReview(int reviewId) => _moderatingId == reviewId;
+
+  String? get moderationError => _moderationError;
+
+  /// True when a moderation request went unanswered. The write may have landed,
+  /// so the page is reloaded and the operator is told to look before retrying.
+  bool get moderationUncertain => _moderationUncertain;
+
+  void clearModerationFeedback() {
+    if (_moderationError == null && !_moderationUncertain) return;
+    _moderationError = null;
+    _moderationUncertain = false;
+    notifyListeners();
+  }
+
+  /// Moderates one review.
+  ///
+  /// Returns true only on a confirmed 200. Nothing is changed locally on the
+  /// way in: on success the current page is re-read, so the row, its
+  /// `approvedAt`/`rejectedAt` stamps and the place's recalculated rating all
+  /// come from the server. Reloading the *current* page (rather than resetting
+  /// to the first) preserves where the operator was.
+  Future<bool> moderate(
+    int reviewId, {
+    required String status,
+    String? rejectReason,
+  }) async {
+    if (_moderatingId != null) return false;
+    if (!moderatableStatuses.contains(status)) return false;
+
+    _moderatingId = reviewId;
+    _moderationError = null;
+    _moderationUncertain = false;
+    notifyListeners();
+
+    final result = await api.moderateAdminReview(
+      reviewId,
+      status: status,
+      rejectReason: rejectReason,
+    );
+
+    _moderatingId = null;
+
+    if (result.success) {
+      notifyListeners();
+      // Re-read rather than patching the row: the status change also moves
+      // server-side timestamps and the place's aggregate rating.
+      await load();
+      return true;
+    }
+
+    _moderationUncertain = result.errorKind == ApiErrorKind.uncertain;
+    _moderationError = result.message;
+    notifyListeners();
+
+    if (_moderationUncertain) {
+      await load();
+      // load() clears transient state, but the uncertainty outlives it: the
+      // author may already have been notified, so a blind retry is not safe.
+      _moderationUncertain = true;
+      _moderationError = null;
+      notifyListeners();
+    }
+    return false;
+  }
+
   @override
   void reset() {
     _status = null;
     _placeId = null;
+    _moderatingId = null;
+    _moderationError = null;
+    _moderationUncertain = false;
     super.reset();
   }
 }

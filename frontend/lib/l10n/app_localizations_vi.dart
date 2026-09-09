@@ -12105,10 +12105,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get adminReviewsEmpty => 'Không có đánh giá nào phù hợp.';
 
   @override
-  String get adminReviewReadOnlyNotice =>
-      'Màn hình này chỉ để xem. Chức năng kiểm duyệt chưa có trong bản này.';
-
-  @override
   String get adminInvoicesTitle => 'Hóa đơn';
 
   @override
@@ -13052,4 +13048,72 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get partnerNotificationsTypeUnknown => 'Thông báo';
+
+  @override
+  String get adminReviewModerationNotice =>
+      'Kiểm duyệt thay đổi những gì khách nhìn thấy. Mọi thao tác đều được xác nhận trước và ghi vào nhật ký hoạt động.';
+
+  @override
+  String get adminReviewApprove => 'Duyệt';
+
+  @override
+  String get adminReviewReject => 'Từ chối';
+
+  @override
+  String get adminReviewHide => 'Ẩn';
+
+  @override
+  String get adminReviewActionCurrent => 'Đánh giá này đã ở trạng thái đó.';
+
+  @override
+  String get adminReviewApproveTitle => 'Duyệt đánh giá này?';
+
+  @override
+  String get adminReviewApproveWarning =>
+      'Đánh giá sẽ hiển thị công khai, được tính vào điểm của địa điểm và người viết sẽ nhận được thông báo.';
+
+  @override
+  String get adminReviewApproveConfirm => 'Duyệt đánh giá';
+
+  @override
+  String get adminReviewRejectTitle => 'Từ chối đánh giá này?';
+
+  @override
+  String get adminReviewRejectWarning =>
+      'Đánh giá vẫn bị ẩn với khách và người viết sẽ nhận được thông báo kèm lý do bạn nhập bên dưới.';
+
+  @override
+  String get adminReviewRejectConfirm => 'Từ chối đánh giá';
+
+  @override
+  String get adminReviewRejectReasonLabel => 'Lý do từ chối';
+
+  @override
+  String get adminReviewRejectReasonHelp =>
+      'Sẽ được gửi tới người viết đánh giá. Hãy nêu đúng sự việc.';
+
+  @override
+  String get adminReviewRejectReasonRequired =>
+      'Hãy nhập lý do trước khi từ chối.';
+
+  @override
+  String get adminReviewHideTitle => 'Ẩn đánh giá này?';
+
+  @override
+  String get adminReviewHideWarning =>
+      'Đánh giá sẽ biến mất khỏi trang công khai của địa điểm và không còn được tính vào điểm. Người viết không nhận được thông báo.';
+
+  @override
+  String get adminReviewHideConfirm => 'Ẩn đánh giá';
+
+  @override
+  String get adminReviewModerated => 'Đã cập nhật đánh giá.';
+
+  @override
+  String get adminReviewModerationFailed =>
+      'Không thể cập nhật đánh giá. Không có gì thay đổi.';
+
+  @override
+  String get adminReviewModerationUncertain =>
+      'Không rõ kết quả của thao tác vừa rồi. Trang đã được tải lại — hãy kiểm tra trạng thái đánh giá trước khi thử lại.';
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/admin/admin_models.dart';
+import '../../../design/app_radii.dart';
 import '../../../design/app_spacing.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/glass_widgets.dart';
@@ -13,10 +14,19 @@ import '../widgets/admin_widgets.dart';
 /// D0 verified live that `content` is present for an administrator and absent
 /// for a partner. That asymmetry is the reason moderation belongs here.
 ///
-/// Moderation itself (`PATCH /api/admin/reviews/{id}/moderate`) exists and is
-/// audited as of D1a, but is **not** wired in D1b: it changes what the public
-/// sees and needs an explicit confirmation flow. A visible notice says so
-/// rather than leaving an operator to guess why no control is present.
+/// ## Moderation (D8)
+///
+/// `PATCH /api/admin/reviews/{id}/moderate` is wired here. It changes what the
+/// public sees, so nothing happens on a single tap: Approve, Reject and Hide
+/// each open a confirmation that states the consequence, and Reject additionally
+/// requires a reason, because the backend forwards it to the review's author.
+///
+/// The three offered statuses are `APPROVED`, `REJECTED` and `HIDDEN`.
+/// `ReviewStatus` also contains `PENDING` and `REPORTED`; neither is offered,
+/// because moving a review back to either is not a moderation decision the
+/// product defines. The backend imposes **no** transition rules, so the only
+/// thing disabled here is the action matching the row's current status — an
+/// affordance, not an invented rule.
 class AdminReviewsScreen extends StatelessWidget {
   final AdminReviewsState state;
 
@@ -41,7 +51,7 @@ class AdminReviewsScreen extends StatelessWidget {
       animation: state,
       builder: (context, _) {
         final body = state.isReady && !state.isEmpty
-            ? _ReviewsList(rows: state.rows)
+            ? _ReviewsList(state: state)
             : AdminStateView(
                 status: state.status,
                 message: state.errorMessage,
@@ -56,8 +66,24 @@ class AdminReviewsScreen extends StatelessWidget {
           toolbar: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(l10n.adminReviewReadOnlyNotice,
+              Text(l10n.adminReviewModerationNotice,
+                  key: const Key('admin-reviews-moderation-notice'),
                   style: Theme.of(context).textTheme.bodySmall),
+              if (state.moderationUncertain) ...[
+                const SizedBox(height: AppSpacing.xs),
+                _ModerationBanner(
+                  key: const Key('admin-reviews-uncertain'),
+                  warning: true,
+                  message: l10n.adminReviewModerationUncertain,
+                ),
+              ] else if (state.moderationError != null) ...[
+                const SizedBox(height: AppSpacing.xs),
+                _ModerationBanner(
+                  key: const Key('admin-reviews-error'),
+                  warning: false,
+                  message: state.moderationError!,
+                ),
+              ],
               const SizedBox(height: AppSpacing.xs),
               AdminFilterChips(
                 values: AdminReviewsState.statusValues,
@@ -86,17 +112,52 @@ class AdminReviewsScreen extends StatelessWidget {
   }
 }
 
+class _ModerationBanner extends StatelessWidget {
+  final String message;
+  final bool warning;
+
+  const _ModerationBanner({
+    super.key,
+    required this.message,
+    required this.warning,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final color = warning ? scheme.tertiary : scheme.error;
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.sm),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: .10),
+        borderRadius: BorderRadius.circular(AppRadii.sm),
+      ),
+      child: Row(
+        children: [
+          Icon(warning ? Icons.warning_amber_rounded : Icons.error_outline,
+              size: 18, color: color),
+          const SizedBox(width: AppSpacing.xs),
+          Expanded(
+            child: Text(message, style: Theme.of(context).textTheme.bodySmall),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// Reviews are prose, so a card list reads better than a table at every width —
 /// this is the one admin grid that does not switch to a `DataTable`.
 class _ReviewsList extends StatelessWidget {
-  final List<AdminReviewRow> rows;
+  final AdminReviewsState state;
 
-  const _ReviewsList({required this.rows});
+  const _ReviewsList({required this.state});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final rows = state.rows;
     return ListView.separated(
       padding: const EdgeInsets.all(AppSpacing.md),
       itemCount: rows.length,
@@ -164,11 +225,215 @@ class _ReviewsList extends StatelessWidget {
                 if (r.hasPartnerReply)
                   Text(r.partnerReply!.content!,
                       style: theme.textTheme.bodySmall),
+                const SizedBox(height: AppSpacing.sm),
+                _ModerationActions(state: state, review: r),
               ],
             ),
           ),
         );
       },
+    );
+  }
+}
+
+class _ModerationActions extends StatelessWidget {
+  final AdminReviewsState state;
+  final AdminReviewRow review;
+
+  const _ModerationActions({required this.state, required this.review});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    if (state.isModeratingReview(review.id)) {
+      return Align(
+        alignment: AlignmentDirectional.centerStart,
+        child: SizedBox(
+          key: Key('admin-review-moderating-${review.id}'),
+          width: 20,
+          height: 20,
+          child: const CircularProgressIndicator(strokeWidth: 2),
+        ),
+      );
+    }
+
+    // Single-flight is global: while any review is being moderated no other
+    // action is offered, because a second request would notify another author
+    // and write another audit row before the first has settled.
+    final busy = state.isModerating;
+
+    Widget action(
+        String status, String label, String keySuffix, VoidCallback onPressed) {
+      final isCurrent = review.status == status;
+      return Tooltip(
+        message: isCurrent ? l10n.adminReviewActionCurrent : label,
+        child: TextButton(
+          key: Key('admin-review-$keySuffix-${review.id}'),
+          onPressed: (busy || isCurrent) ? null : onPressed,
+          child: Text(label),
+        ),
+      );
+    }
+
+    return Wrap(
+      spacing: AppSpacing.xs,
+      children: [
+        action('APPROVED', l10n.adminReviewApprove, 'approve',
+            () => _confirmSimple(context, 'APPROVED')),
+        action('REJECTED', l10n.adminReviewReject, 'reject',
+            () => _confirmReject(context)),
+        action('HIDDEN', l10n.adminReviewHide, 'hide',
+            () => _confirmSimple(context, 'HIDDEN')),
+      ],
+    );
+  }
+
+  /// Approve and Hide need only an acknowledgement of the consequence.
+  Future<void> _confirmSimple(BuildContext context, String status) async {
+    final l10n = AppLocalizations.of(context)!;
+    final approving = status == 'APPROVED';
+
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        key: Key('admin-review-confirm-${status.toLowerCase()}'),
+        icon: const Icon(Icons.gavel_rounded),
+        title: Text(approving
+            ? l10n.adminReviewApproveTitle
+            : l10n.adminReviewHideTitle),
+        content: Text(approving
+            ? l10n.adminReviewApproveWarning
+            : l10n.adminReviewHideWarning),
+        actions: [
+          TextButton(
+            key: const Key('admin-review-confirm-cancel'),
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(l10n.adminPartnerCancel),
+          ),
+          FilledButton(
+            key: const Key('admin-review-confirm-ok'),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(approving
+                ? l10n.adminReviewApproveConfirm
+                : l10n.adminReviewHideConfirm),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !context.mounted) return;
+    await _send(context, status: status);
+  }
+
+  /// Rejecting forwards a reason to the review's author, so the dialog collects
+  /// one and refuses to submit without it.
+  Future<void> _confirmReject(BuildContext context) async {
+    final reason = await showDialog<String>(
+      context: context,
+      builder: (ctx) => const _RejectDialog(),
+    );
+    if (reason == null || !context.mounted) return;
+    await _send(context, status: 'REJECTED', rejectReason: reason);
+  }
+
+  Future<void> _send(
+    BuildContext context, {
+    required String status,
+    String? rejectReason,
+  }) async {
+    final l10n = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    final ok = await state.moderate(
+      review.id,
+      status: status,
+      rejectReason: rejectReason,
+    );
+    if (!context.mounted) return;
+    // The uncertain case has its own persistent banner; a transient snackbar
+    // would understate it.
+    if (!ok && state.moderationUncertain) return;
+    messenger?.showSnackBar(SnackBar(
+      content: Text(
+          ok ? l10n.adminReviewModerated : l10n.adminReviewModerationFailed),
+    ));
+  }
+}
+
+/// Returns the trimmed reason on confirm, or null on cancel.
+class _RejectDialog extends StatefulWidget {
+  const _RejectDialog();
+
+  @override
+  State<_RejectDialog> createState() => _RejectDialogState();
+}
+
+class _RejectDialogState extends State<_RejectDialog> {
+  final TextEditingController _controller = TextEditingController();
+  bool _showError = false;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final reason = _controller.text.trim();
+    if (reason.isEmpty) {
+      setState(() => _showError = true);
+      return;
+    }
+    Navigator.of(context).pop(reason);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final scheme = Theme.of(context).colorScheme;
+    return AlertDialog(
+      key: const Key('admin-review-confirm-rejected'),
+      icon: Icon(Icons.gavel_rounded, color: scheme.error),
+      title: Text(l10n.adminReviewRejectTitle),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.adminReviewRejectWarning),
+          const SizedBox(height: AppSpacing.sm),
+          TextField(
+            key: const Key('admin-review-reject-reason'),
+            controller: _controller,
+            autofocus: true,
+            minLines: 2,
+            maxLines: 4,
+            onChanged: (_) {
+              if (_showError) setState(() => _showError = false);
+            },
+            decoration: InputDecoration(
+              labelText: l10n.adminReviewRejectReasonLabel,
+              helperText: l10n.adminReviewRejectReasonHelp,
+              helperMaxLines: 2,
+              errorText:
+                  _showError ? l10n.adminReviewRejectReasonRequired : null,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppRadii.sm),
+              ),
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          key: const Key('admin-review-confirm-cancel'),
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.adminPartnerCancel),
+        ),
+        FilledButton(
+          key: const Key('admin-review-confirm-ok'),
+          onPressed: _submit,
+          child: Text(l10n.adminReviewRejectConfirm),
+        ),
+      ],
     );
   }
 }

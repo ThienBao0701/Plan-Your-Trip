@@ -601,8 +601,14 @@ void main() {
       await pumpConsole(tester, route: AdminRoutes.reviews);
       expect(find.textContaining('sea view room was spotless'), findsOneWidget);
       final l10n = await AppLocalizations.delegate.load(const Locale('en'));
-      expect(find.text(l10n.adminReviewReadOnlyNotice), findsOneWidget,
-          reason: 'the absence of moderation must be stated, not implied');
+      // D1b asserted that the *absence* of moderation was stated. D8 shipped
+      // moderation, so the same guarantee now applies to its presence: the
+      // consequence must be stated, not implied. Asserting the actions too
+      // stops this passing on notice text alone.
+      expect(find.text(l10n.adminReviewModerationNotice), findsOneWidget,
+          reason: 'the consequence of moderation must be stated, not implied');
+      expect(find.byKey(const Key('admin-review-approve-1')), findsOneWidget,
+          reason: 'moderation is live as of D8');
     });
 
     testWidgets('activity log distinguishes a system actor', (tester) async {

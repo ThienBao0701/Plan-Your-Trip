@@ -20980,12 +20980,6 @@ abstract class AppLocalizations {
   /// **'No reviews match these filters.'**
   String get adminReviewsEmpty;
 
-  /// No description provided for @adminReviewReadOnlyNotice.
-  ///
-  /// In en, this message translates to:
-  /// **'This view is read-only. Moderation is not available in this release.'**
-  String get adminReviewReadOnlyNotice;
-
   /// No description provided for @adminInvoicesTitle.
   ///
   /// In en, this message translates to:
@@ -22689,6 +22683,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Notification'**
   String get partnerNotificationsTypeUnknown;
+
+  /// No description provided for @adminReviewModerationNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderation changes what guests see. Every action is confirmed first and recorded in the activity log.'**
+  String get adminReviewModerationNotice;
+
+  /// No description provided for @adminReviewApprove.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve'**
+  String get adminReviewApprove;
+
+  /// No description provided for @adminReviewReject.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject'**
+  String get adminReviewReject;
+
+  /// No description provided for @adminReviewHide.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide'**
+  String get adminReviewHide;
+
+  /// No description provided for @adminReviewActionCurrent.
+  ///
+  /// In en, this message translates to:
+  /// **'This review already has that status.'**
+  String get adminReviewActionCurrent;
+
+  /// No description provided for @adminReviewApproveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve this review?'**
+  String get adminReviewApproveTitle;
+
+  /// No description provided for @adminReviewApproveWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'It becomes publicly visible, counts towards the place\'s rating, and its author is notified.'**
+  String get adminReviewApproveWarning;
+
+  /// No description provided for @adminReviewApproveConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve review'**
+  String get adminReviewApproveConfirm;
+
+  /// No description provided for @adminReviewRejectTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject this review?'**
+  String get adminReviewRejectTitle;
+
+  /// No description provided for @adminReviewRejectWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'It stays hidden from guests and its author is notified, together with the reason you give below.'**
+  String get adminReviewRejectWarning;
+
+  /// No description provided for @adminReviewRejectConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject review'**
+  String get adminReviewRejectConfirm;
+
+  /// No description provided for @adminReviewRejectReasonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason for rejection'**
+  String get adminReviewRejectReasonLabel;
+
+  /// No description provided for @adminReviewRejectReasonHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent to the review\'s author. Keep it factual.'**
+  String get adminReviewRejectReasonHelp;
+
+  /// No description provided for @adminReviewRejectReasonRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a reason before rejecting.'**
+  String get adminReviewRejectReasonRequired;
+
+  /// No description provided for @adminReviewHideTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide this review?'**
+  String get adminReviewHideTitle;
+
+  /// No description provided for @adminReviewHideWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'It disappears from the place\'s public page and stops counting towards its rating. Its author is not notified.'**
+  String get adminReviewHideWarning;
+
+  /// No description provided for @adminReviewHideConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide review'**
+  String get adminReviewHideConfirm;
+
+  /// No description provided for @adminReviewModerated.
+  ///
+  /// In en, this message translates to:
+  /// **'Review updated.'**
+  String get adminReviewModerated;
+
+  /// No description provided for @adminReviewModerationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The review could not be updated. Nothing was changed.'**
+  String get adminReviewModerationFailed;
+
+  /// No description provided for @adminReviewModerationUncertain.
+  ///
+  /// In en, this message translates to:
+  /// **'The result of the last action is unknown. This page has been reloaded — check the review\'s status before trying again.'**
+  String get adminReviewModerationUncertain;
 }
 
 class _AppLocalizationsDelegate

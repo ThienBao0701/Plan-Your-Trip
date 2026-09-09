@@ -12270,10 +12270,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adminReviewsEmpty => 'No reviews match these filters.';
 
   @override
-  String get adminReviewReadOnlyNotice =>
-      'This view is read-only. Moderation is not available in this release.';
-
-  @override
   String get adminInvoicesTitle => 'Invoices';
 
   @override
@@ -13212,4 +13208,72 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get partnerNotificationsTypeUnknown => 'Notification';
+
+  @override
+  String get adminReviewModerationNotice =>
+      'Moderation changes what guests see. Every action is confirmed first and recorded in the activity log.';
+
+  @override
+  String get adminReviewApprove => 'Approve';
+
+  @override
+  String get adminReviewReject => 'Reject';
+
+  @override
+  String get adminReviewHide => 'Hide';
+
+  @override
+  String get adminReviewActionCurrent => 'This review already has that status.';
+
+  @override
+  String get adminReviewApproveTitle => 'Approve this review?';
+
+  @override
+  String get adminReviewApproveWarning =>
+      'It becomes publicly visible, counts towards the place\'s rating, and its author is notified.';
+
+  @override
+  String get adminReviewApproveConfirm => 'Approve review';
+
+  @override
+  String get adminReviewRejectTitle => 'Reject this review?';
+
+  @override
+  String get adminReviewRejectWarning =>
+      'It stays hidden from guests and its author is notified, together with the reason you give below.';
+
+  @override
+  String get adminReviewRejectConfirm => 'Reject review';
+
+  @override
+  String get adminReviewRejectReasonLabel => 'Reason for rejection';
+
+  @override
+  String get adminReviewRejectReasonHelp =>
+      'Sent to the review\'s author. Keep it factual.';
+
+  @override
+  String get adminReviewRejectReasonRequired =>
+      'Enter a reason before rejecting.';
+
+  @override
+  String get adminReviewHideTitle => 'Hide this review?';
+
+  @override
+  String get adminReviewHideWarning =>
+      'It disappears from the place\'s public page and stops counting towards its rating. Its author is not notified.';
+
+  @override
+  String get adminReviewHideConfirm => 'Hide review';
+
+  @override
+  String get adminReviewModerated => 'Review updated.';
+
+  @override
+  String get adminReviewModerationFailed =>
+      'The review could not be updated. Nothing was changed.';
+
+  @override
+  String get adminReviewModerationUncertain =>
+      'The result of the last action is unknown. This page has been reloaded — check the review\'s status before trying again.';
 }
