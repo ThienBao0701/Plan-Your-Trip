@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
@@ -54,6 +55,39 @@ public class NotificationService {
     @Transactional
     public NotificationResponse createSystem(Long recipientUserId, String title, String message) {
         return create(recipientUserId, NotificationType.SYSTEM, Priority.NORMAL, title, message, null, null);
+    }
+
+    /**
+     * D9 — the same write as {@link #create}, but in a transaction of its own.
+     *
+     * <p>Exists for <b>secondary</b> notifications: ones whose failure must never undo the business
+     * operation that triggered them. {@link #create} is {@code REQUIRED} and therefore joins its
+     * caller, which is correct for a notification the caller considers part of its own unit of work
+     * — but it means a failure inside it marks the caller's transaction rollback-only, and catching
+     * the exception upstream does <em>not</em> clear that flag: the caller's commit would then fail
+     * with {@code UnexpectedRollbackException}. Suspending the caller's transaction is the only way
+     * a caller can genuinely carry on.
+     *
+     * <p>The caller is still responsible for catching and logging: {@code REQUIRES_NEW} isolates the
+     * rollback, it does not stop the exception propagating.
+     *
+     * <p><b>Trade-off, deliberately accepted:</b> because this commits independently, a notification
+     * written here survives even if the caller's own transaction later rolls back. Callers must
+     * therefore invoke it as late as possible, once the operation is otherwise complete.
+     *
+     * <p>Nothing else changes: same entity, same server-generated {@code createdAt}, same
+     * {@code dispatch} extension point. This is not a second notification path — it is the same one
+     * with a different transaction boundary.
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public NotificationResponse createInNewTransaction(
+            Long recipientUserId, NotificationType type, Priority priority,
+            String title, String message,
+            RelatedEntityType relatedEntityType, Long relatedEntityId) {
+        // Self-invocation is intentional: this method is the proxied entry point that opens the new
+        // transaction, so the delegate simply runs inside it.
+        return create(recipientUserId, type, priority, title, message,
+            relatedEntityType, relatedEntityId);
     }
 
     @Transactional

@@ -7,6 +7,8 @@ import com.example.planyourtrip.exception.ApiException;
 import com.example.planyourtrip.model.*;
 import com.example.planyourtrip.repository.*;
 import com.example.planyourtrip.security.VoucherSignatureService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,8 @@ import java.util.Set;
 
 @Service
 public class BookingService {
+
+    private static final Logger log = LoggerFactory.getLogger(BookingService.class);
 
     private final BookingRepository bookingRepo;
     private final HotelRoomRepository roomRepo;
@@ -279,6 +283,15 @@ public class BookingService {
         if (req.giftCardCode() != null && !req.giftCardCode().isBlank())
             giftCardService.redeemForBooking(userId, req.giftCardCode(), booking);
 
+        // D9 — tell the hotel's owner a booking arrived. Deliberately the LAST thing this method
+        // does: it commits in its own transaction, so anything that could still fail must already
+        // have run. Best effort — a booking is never lost because a notification could not be
+        // written. The customer-side notification for CREATE does not exist yet (Q151) and is a
+        // separate follow-up; D9 does not add it.
+        notifyHotelOwner(booking, "New booking",
+            "Booking " + booking.getBookingCode() + " was created for "
+                + booking.getCheckInDate() + " to " + booking.getCheckOutDate() + ".");
+
         return toResponse(booking);
     }
 
@@ -517,6 +530,12 @@ public class BookingService {
             "Your booking " + saved.getBookingCode() + " has been cancelled.",
             RelatedEntityType.BOOKING, saved.getId());
 
+        // D9 — the customer notification above is unchanged and still joins this transaction.
+        // The owner's is secondary and isolated; it is emitted after it.
+        notifyHotelOwner(saved, "Booking cancelled",
+            "Booking " + saved.getBookingCode() + " for "
+                + saved.getCheckInDate() + " to " + saved.getCheckOutDate() + " was cancelled.");
+
         return toResponse(saved);
     }
 
@@ -729,7 +748,66 @@ public class BookingService {
                 + ", new total " + newTotalPrice.toPlainString() + " " + saved.getCurrency() + ".",
             RelatedEntityType.BOOKING, saved.getId());
 
+        // D9 — the owner needs the new stay dates. Price is deliberately omitted: it is the
+        // guest's commercial detail, and the operator's own booking view already carries it.
+        notifyHotelOwner(saved, "Booking modified",
+            "Booking " + saved.getBookingCode() + " was changed. New stay: "
+                + saved.getCheckInDate() + " to " + saved.getCheckOutDate() + ".");
+
         return toResponse(saved);
+    }
+
+    // ── D9: partner booking notifications ─────────────────────────────────────
+    //
+    // Scope: CREATE, MODIFY and CANCEL only — the three events Q156 names. The remaining
+    // lifecycle events (confirm, refund, complete, check-in, check-out, no-show, archive) are
+    // deliberately NOT notified here.
+    //
+    // No duplication is possible with `BookingStatusEngineService`: the engine is the single
+    // source of truth for transition notifications and covers CHECKED_IN, CHECKED_OUT, COMPLETED,
+    // ARCHIVED and NO_SHOW. None of those is a D9 event, and none of D9's three events routes
+    // through the engine — create, cancel and refund set `Booking.status` directly, and modify
+    // does not change status at all. The two sets are disjoint by construction.
+    //
+    // Known limitation, accepted for D9: these rows carry `NotificationType.BOOKING`, the same
+    // type a partner's own personal travel booking produces. `Notification` has one ownership
+    // axis (`recipientUser`) and no audience discriminator, so a partner who also travels cannot
+    // tell the two apart server-side. Introducing a discriminator is a schema change and belongs
+    // to a future Notification Audience Model phase; inventing a type or filtering the D6 centre
+    // would misrepresent the data rather than fix it.
+
+    /**
+     * Notifies the hotel's owning partner about a booking event — best effort.
+     *
+     * <p>Silent, by design, when there is nobody to tell: an unassigned hotel, an owner without a
+     * user, or an owner whose profile is not {@code APPROVED} (a DRAFT, SUBMITTED, REJECTED or
+     * SUSPENDED partner does not receive operational traffic). Only the profile-owning user is
+     * notified; team members are not, which matches every other partner surface.
+     *
+     * <p>Failure isolation: the write runs in its own transaction
+     * ({@link NotificationService#createInNewTransaction}) and any exception is caught and logged
+     * here. Both halves are needed — {@code REQUIRES_NEW} stops a failed notification marking this
+     * booking's transaction rollback-only, and the catch stops it propagating. The booking
+     * therefore succeeds even when the notification cannot be written.
+     */
+    private void notifyHotelOwner(Booking booking, String title, String message) {
+        Place hotel = booking.getHotel();
+        if (hotel == null) return;
+
+        PartnerProfile owner = hotel.getOwner();
+        if (owner == null || owner.getUser() == null) return;
+        if (owner.getVerificationStatus() != PartnerVerificationStatus.APPROVED) return;
+
+        try {
+            notificationService.createInNewTransaction(
+                owner.getUser().getId(), NotificationType.BOOKING, Priority.NORMAL,
+                title, message, RelatedEntityType.BOOKING, booking.getId());
+        } catch (RuntimeException e) {
+            // Observable, never silent: the booking stands and the operator simply did not get
+            // told. Ids only — no guest data reaches the log.
+            log.warn("Partner booking notification failed for booking {} (owner profile {}): {}",
+                booking.getId(), owner.getId(), e.toString());
+        }
     }
 
     /** True when any checkout benefit (coupon / travel credit / loyalty / gift card) is attached. */
