@@ -11,6 +11,7 @@ import 'admin_feature_states.dart';
 import 'admin_catalog_states.dart';
 import 'admin_media_states.dart';
 import 'admin_partner_states.dart';
+import 'admin_reference_states.dart';
 import 'widgets/admin_widgets.dart';
 import 'admin_navigation.dart';
 import 'admin_routes.dart';
@@ -24,6 +25,7 @@ import 'screens/admin_partner_detail_screen.dart';
 import 'screens/admin_place_detail_screen.dart';
 import 'screens/admin_partners_screen.dart';
 import 'screens/admin_payments_screen.dart';
+import 'screens/admin_reference_data_screen.dart';
 import 'screens/admin_reviews_screen.dart';
 
 /// The Admin CMS shell.
@@ -71,6 +73,11 @@ class _AdminAppShellState extends State<AdminAppShell> {
 
   AdminMediaState? _media;
 
+  /// D10 — one destination, two notifiers. They are independent reads against
+  /// independent endpoints, so a failure on one tab never blanks the other.
+  AdminAmenitiesState? _amenities;
+  AdminCategoriesState? _categories;
+
   /// The place currently open, or null when the Catalog destination is showing
   /// its list. Created per place and disposed when another is opened, so a slow
   /// response for the previous id cannot land on the new screen.
@@ -115,6 +122,8 @@ class _AdminAppShellState extends State<AdminAppShell> {
     _partnerDetail?.dispose();
     _catalog?.dispose();
     _media?.dispose();
+    _amenities?.dispose();
+    _categories?.dispose();
     _placeDetail?.dispose();
     super.dispose();
   }
@@ -135,6 +144,8 @@ class _AdminAppShellState extends State<AdminAppShell> {
     _partners = AdminPartnersState(api: api);
     _catalog = AdminCatalogPlacesState(api: api);
     _media = AdminMediaState(api: api);
+    _amenities = AdminAmenitiesState(api: api);
+    _categories = AdminCategoriesState(api: api);
 
     // One load for the landing section. Other sections load lazily when first
     // selected, so opening the console does not fan out six requests at once.
@@ -174,6 +185,11 @@ class _AdminAppShellState extends State<AdminAppShell> {
         if (_media?.placeSearchStatus == AdminLoadStatus.idle) {
           _media!.searchPlaces('');
         }
+      case AdminRoutes.referenceData:
+        // Only the tab that is actually shown. The screen loads the other one
+        // the first time it is selected, so opening this destination is one
+        // request, not two.
+        if (_amenities?.status == AdminLoadStatus.idle) _amenities!.load();
       default:
         if (_dashboard?.status == AdminLoadStatus.idle) _dashboard!.load();
     }
@@ -304,6 +320,10 @@ class _AdminAppShellState extends State<AdminAppShell> {
               onBack: _closePlace,
               onManageMedia: _openMediaForPlace,
             ),
+      AdminRoutes.referenceData => AdminReferenceDataScreen(
+          amenities: _amenities!,
+          categories: _categories!,
+        ),
       AdminRoutes.media => AdminMediaScreen(
           state: _media!,
           onBackToPlace: _mediaOpenedFromPlaceDetail && _placeDetail != null

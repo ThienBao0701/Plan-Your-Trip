@@ -6895,4 +6895,290 @@ class ApiClient {
             }),
             AdminActivityLogRow.fromJson,
           );
+
+  // ── Admin: reference data (D10) ────────────────────────────────────────────
+  //
+  // `AdminAmenityController` and `AdminCategoryController` on
+  // `develop@f26bb97`, verbatim:
+  //
+  //   GET   /api/admin/{amenities,categories}          -> bare JSON array, 200
+  //   POST  /api/admin/{amenities,categories}          -> the created row, 201
+  //   PUT   /api/admin/{amenities,categories}/{id}     -> the updated row, 200
+  //   PATCH /api/admin/{amenities,categories}/{id}/status
+  //         body {"active": bool}                      -> the updated row, 200
+  //
+  // **There is no DELETE**, for either domain, for any role. That is the whole
+  // contract, and the console offers nothing beyond it.
+  //
+  // The reads return a bare array rather than a `PageResponse`, so they go
+  // through [_adminGetList] and never through [_adminGetPage].
+  //
+  // `PUT` is a **full replace**: `AmenityService.fill` / `CategoryService.fill`
+  // assign every column from the request, so an omitted field is written as
+  // null. These methods therefore take every editable field and the caller
+  // prefills from the row rather than sending a partial body.
+
+  Future<CollectionApiResult<List<AdminAmenity>>> getAdminAmenities() =>
+      _adminGetList<AdminAmenity>(
+        _adminUri('/admin/amenities'),
+        AdminAmenity.fromJson,
+      );
+
+  /// `POST /api/admin/amenities` — 201 with the created row.
+  ///
+  /// `slug` is optional: the backend derives it from the name via
+  /// `SlugUtils.toSlug` when it is absent. A duplicate slug is a 409 carrying
+  /// the server's own message, which is surfaced rather than replaced.
+  Future<CollectionApiResult<AdminAmenity>> createAdminAmenity({
+    required String name,
+    String? slug,
+    String? icon,
+    String? groupName,
+    String? description,
+    int? sortOrder,
+  }) =>
+      _adminReferenceMutation<AdminAmenity>(
+        () => _client.post(
+          _adminUri('/admin/amenities'),
+          headers: _jsonHeaders,
+          body: jsonEncode(_amenityBody(
+            name: name,
+            slug: slug,
+            icon: icon,
+            groupName: groupName,
+            description: description,
+            sortOrder: sortOrder,
+          )),
+        ),
+        AdminAmenity.fromJson,
+      );
+
+  /// `PUT /api/admin/amenities/{id}`.
+  ///
+  /// `slug` is deliberately **not** a parameter. The backend would accept a new
+  /// one, but `HotelRoomService` resolves room amenities *by slug*
+  /// (`findBySlug(...).ifPresent(...)`, silently skipping an unmatched value),
+  /// so a rename would quietly drop that amenity from later partner room saves.
+  /// The caller passes the row's existing slug through, unchanged.
+  Future<CollectionApiResult<AdminAmenity>> updateAdminAmenity(
+    int amenityId, {
+    required String name,
+    required String? slug,
+    String? icon,
+    String? groupName,
+    String? description,
+    int? sortOrder,
+  }) =>
+      _adminReferenceMutation<AdminAmenity>(
+        () => _client.put(
+          _adminUri('/admin/amenities/$amenityId'),
+          headers: _jsonHeaders,
+          body: jsonEncode(_amenityBody(
+            name: name,
+            slug: slug,
+            icon: icon,
+            groupName: groupName,
+            description: description,
+            sortOrder: sortOrder,
+          )),
+        ),
+        AdminAmenity.fromJson,
+      );
+
+  /// `PATCH /api/admin/amenities/{id}/status`.
+  ///
+  /// `active` is always sent explicitly. `StatusRequest` is a record with a
+  /// primitive `boolean` and the controller does **not** annotate it `@Valid`,
+  /// so an empty body `{}` deserializes to `active = false` — a silent
+  /// deactivation. Nothing here ever sends a body without the key.
+  Future<CollectionApiResult<AdminAmenity>> setAdminAmenityActive(
+    int amenityId, {
+    required bool active,
+  }) =>
+      _adminReferenceMutation<AdminAmenity>(
+        () => _client.patch(
+          _adminUri('/admin/amenities/$amenityId/status'),
+          headers: _jsonHeaders,
+          body: jsonEncode({'active': active}),
+        ),
+        AdminAmenity.fromJson,
+      );
+
+  Future<CollectionApiResult<List<AdminCategory>>> getAdminCategories() =>
+      _adminGetList<AdminCategory>(
+        _adminUri('/admin/categories'),
+        AdminCategory.fromJson,
+      );
+
+  /// `POST /api/admin/categories` — 201 with the created row.
+  ///
+  /// A null [parentId] creates a root category, which is what the backend does
+  /// with an absent `parentId`.
+  Future<CollectionApiResult<AdminCategory>> createAdminCategory({
+    required String name,
+    String? slug,
+    int? parentId,
+    String? type,
+    String? icon,
+    String? color,
+    String? coverImageUrl,
+    int? sortOrder,
+  }) =>
+      _adminReferenceMutation<AdminCategory>(
+        () => _client.post(
+          _adminUri('/admin/categories'),
+          headers: _jsonHeaders,
+          body: jsonEncode(_categoryBody(
+            name: name,
+            slug: slug,
+            parentId: parentId,
+            type: type,
+            icon: icon,
+            color: color,
+            coverImageUrl: coverImageUrl,
+            sortOrder: sortOrder,
+          )),
+        ),
+        AdminCategory.fromJson,
+      );
+
+  /// `PUT /api/admin/categories/{id}`.
+  ///
+  /// `slug` is passed through unchanged for the same reason as the amenity
+  /// update: a slug is a reference other code resolves by, and the console does
+  /// not rewrite one after creation.
+  Future<CollectionApiResult<AdminCategory>> updateAdminCategory(
+    int categoryId, {
+    required String name,
+    required String? slug,
+    int? parentId,
+    String? type,
+    String? icon,
+    String? color,
+    String? coverImageUrl,
+    int? sortOrder,
+  }) =>
+      _adminReferenceMutation<AdminCategory>(
+        () => _client.put(
+          _adminUri('/admin/categories/$categoryId'),
+          headers: _jsonHeaders,
+          body: jsonEncode(_categoryBody(
+            name: name,
+            slug: slug,
+            parentId: parentId,
+            type: type,
+            icon: icon,
+            color: color,
+            coverImageUrl: coverImageUrl,
+            sortOrder: sortOrder,
+          )),
+        ),
+        AdminCategory.fromJson,
+      );
+
+  /// `PATCH /api/admin/categories/{id}/status` — see
+  /// [setAdminAmenityActive] for why `active` is never omitted.
+  Future<CollectionApiResult<AdminCategory>> setAdminCategoryActive(
+    int categoryId, {
+    required bool active,
+  }) =>
+      _adminReferenceMutation<AdminCategory>(
+        () => _client.patch(
+          _adminUri('/admin/categories/$categoryId/status'),
+          headers: _jsonHeaders,
+          body: jsonEncode({'active': active}),
+        ),
+        AdminCategory.fromJson,
+      );
+
+  /// `AmenityRequest`, in full. Every editable column is present because the
+  /// update is a full replace; a blank optional field is sent as `null` so the
+  /// form and the stored row agree on what "cleared" means.
+  Map<String, Object?> _amenityBody({
+    required String name,
+    String? slug,
+    String? icon,
+    String? groupName,
+    String? description,
+    int? sortOrder,
+  }) =>
+      {
+        'name': name,
+        'slug': _blankToNull(slug),
+        'icon': _blankToNull(icon),
+        'groupName': _blankToNull(groupName),
+        'description': _blankToNull(description),
+        'sortOrder': sortOrder,
+      };
+
+  /// `CategoryRequest`, in full — including `color`, which the record declares
+  /// and `fill` assigns unconditionally. Omitting it would clear a stored
+  /// colour on every save.
+  Map<String, Object?> _categoryBody({
+    required String name,
+    String? slug,
+    int? parentId,
+    String? type,
+    String? icon,
+    String? color,
+    String? coverImageUrl,
+    int? sortOrder,
+  }) =>
+      {
+        'parentId': parentId,
+        'name': name,
+        'slug': _blankToNull(slug),
+        'type': _blankToNull(type),
+        'icon': _blankToNull(icon),
+        'color': _blankToNull(color),
+        'coverImageUrl': _blankToNull(coverImageUrl),
+        'sortOrder': sortOrder,
+      };
+
+  String? _blankToNull(String? v) {
+    final t = v?.trim();
+    return (t == null || t.isEmpty) ? null : t;
+  }
+
+  /// Shared request/decode path for the eight reference-data mutations.
+  ///
+  /// Accepts **200 and 201** — create answers 201, update and status answer
+  /// 200 — and parses the returned row so the caller never has to guess the new
+  /// state. A refusal keeps the backend's own message (409 "Slug already
+  /// exists: …" is the one an operator most needs to read verbatim).
+  ///
+  /// A timeout or an unparseable success is [ApiErrorKind.uncertain], not a
+  /// failure: the write may well have committed, and a blind retry of a create
+  /// would produce either a duplicate or a confusing 409.
+  Future<CollectionApiResult<T>> _adminReferenceMutation<T>(
+    Future<http.Response> Function() send,
+    T? Function(Map<String, dynamic>) parse,
+  ) async {
+    try {
+      final res = await send().timeout(_collectionsTimeout);
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final body = _decodeJsonMap(res).data;
+        if (body == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+        }
+        final parsed = parse(body);
+        if (parsed == null) {
+          return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+        }
+        return CollectionApiResult.success(parsed);
+      }
+      return CollectionApiResult.failure(
+        _errorKindForStatus(res.statusCode),
+        _safeServerMessage(_decodeJsonMap(res).data),
+      );
+    } on TimeoutException {
+      return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+    } on http.ClientException {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    } on FormatException {
+      return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+    } catch (_) {
+      return const CollectionApiResult.failure(ApiErrorKind.network);
+    }
+  }
 }

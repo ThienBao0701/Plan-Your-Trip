@@ -13114,6 +13114,205 @@ class AppLocalizationsVi extends AppLocalizations {
       'Không thể cập nhật đánh giá. Không có gì thay đổi.';
 
   @override
+  String get adminNavReferenceData => 'Dữ liệu tham chiếu';
+
+  @override
+  String get adminReferenceTabAmenities => 'Tiện nghi';
+
+  @override
+  String get adminReferenceTabCategories => 'Danh mục';
+
+  @override
+  String get adminReferenceCmsStatusNotice =>
+      'Trạng thái CMS chỉ đánh dấu mục này đang hoạt động trong bảng quản trị. Hiện nó không lọc kết quả của API công khai hay API khách hàng — backend có lưu cờ này nhưng không truy vấn nào áp dụng nó.';
+
+  @override
+  String get adminReferenceNoDeleteNotice =>
+      'Không thể xoá dữ liệu tham chiếu. API quản trị chỉ cung cấp xem danh sách, tạo mới, cập nhật và đổi trạng thái CMS.';
+
+  @override
+  String get adminReferenceOrderingNotice =>
+      'Các dòng hiển thị theo thứ tự máy chủ trả về. Backend không sắp xếp và không dùng trường thứ tự để sắp xếp.';
+
+  @override
+  String get adminReferenceUpdateReplacesNotice =>
+      'Khi lưu, mọi trường của mục này bị ghi đè, nên để trống một ô sẽ xoá giá trị đã lưu.';
+
+  @override
+  String get adminReferenceSlugHelper =>
+      'Để trống thì máy chủ tự tạo slug từ tên. Slug không đổi được sau khi mục đã được tạo.';
+
+  @override
+  String get adminReferenceSlugFixedNotice =>
+      'Slug cố định sau khi tạo. Các phần khác của hệ thống tra cứu mục này theo slug nên không cho sửa ở đây.';
+
+  @override
+  String get adminReferenceTypeNotice =>
+      'Loại được dùng để nhắm mã giảm giá và quy tắc cá nhân hoá, nên phải chọn từ các giá trị sẵn có thay vì tự nhập.';
+
+  @override
+  String get adminReferenceParentGuardNotice =>
+      'Danh mục này và toàn bộ danh mục con của nó không được liệt kê, nên không thể đặt danh mục cha là con của chính nó.';
+
+  @override
+  String get adminReferenceStatusPublicNotice =>
+      'Thao tác này chỉ đổi trạng thái CMS. Nó không đảm bảo mục này bị loại khỏi kết quả của API công khai hay API khách hàng.';
+
+  @override
+  String get adminReferenceNewAmenity => 'Tiện nghi mới';
+
+  @override
+  String get adminReferenceNewCategory => 'Danh mục mới';
+
+  @override
+  String get adminReferenceRefresh => 'Tải lại';
+
+  @override
+  String get adminReferenceEdit => 'Sửa';
+
+  @override
+  String get adminReferenceSave => 'Lưu';
+
+  @override
+  String get adminReferenceCreate => 'Tạo';
+
+  @override
+  String get adminReferenceDismiss => 'Đóng';
+
+  @override
+  String get adminReferenceAmenityCreateTitle => 'Tiện nghi mới';
+
+  @override
+  String get adminReferenceAmenityEditTitle => 'Sửa tiện nghi';
+
+  @override
+  String get adminReferenceCategoryCreateTitle => 'Danh mục mới';
+
+  @override
+  String get adminReferenceCategoryEditTitle => 'Sửa danh mục';
+
+  @override
+  String get adminReferenceFieldName => 'Tên';
+
+  @override
+  String get adminReferenceFieldSlug => 'Slug';
+
+  @override
+  String get adminReferenceFieldIcon => 'Biểu tượng';
+
+  @override
+  String get adminReferenceFieldGroup => 'Nhóm';
+
+  @override
+  String get adminReferenceFieldDescription => 'Mô tả';
+
+  @override
+  String get adminReferenceFieldSortOrder => 'Thứ tự';
+
+  @override
+  String get adminReferenceFieldType => 'Loại';
+
+  @override
+  String get adminReferenceFieldParent => 'Danh mục cha';
+
+  @override
+  String get adminReferenceFieldColor => 'Màu';
+
+  @override
+  String get adminReferenceFieldCoverImageUrl => 'Đường dẫn ảnh bìa';
+
+  @override
+  String get adminReferenceParentNone => 'Không có cha (cấp cao nhất)';
+
+  @override
+  String get adminReferenceValueNotSet => 'Chưa đặt';
+
+  @override
+  String get adminReferenceNameRequired => 'Hãy nhập tên.';
+
+  @override
+  String get adminReferenceSortOrderInvalid =>
+      'Hãy nhập một số nguyên, hoặc để trống.';
+
+  @override
+  String get adminReferenceColName => 'Tên';
+
+  @override
+  String get adminReferenceColSlug => 'Slug';
+
+  @override
+  String get adminReferenceColGroup => 'Nhóm';
+
+  @override
+  String get adminReferenceColType => 'Loại';
+
+  @override
+  String get adminReferenceColParent => 'Cha';
+
+  @override
+  String get adminReferenceColSortOrder => 'Thứ tự';
+
+  @override
+  String get adminReferenceColCmsStatus => 'Trạng thái CMS';
+
+  @override
+  String get adminReferenceColAction => 'Thao tác';
+
+  @override
+  String get adminReferenceStatusActive => 'Đang bật trong CMS';
+
+  @override
+  String get adminReferenceStatusInactive => 'Đang tắt trong CMS';
+
+  @override
+  String get adminReferenceActivate => 'Bật trong CMS';
+
+  @override
+  String get adminReferenceDeactivate => 'Tắt trong CMS';
+
+  @override
+  String get adminReferenceActivateTitle => 'Bật trong CMS?';
+
+  @override
+  String get adminReferenceDeactivateTitle => 'Tắt trong CMS?';
+
+  @override
+  String adminReferenceActivateBody(String name) {
+    return '$name sẽ được đánh dấu đang bật trong CMS.';
+  }
+
+  @override
+  String adminReferenceDeactivateBody(String name) {
+    return '$name sẽ được đánh dấu đang tắt trong CMS.';
+  }
+
+  @override
+  String get adminReferenceStatusConfirm => 'Cập nhật trạng thái CMS';
+
+  @override
+  String get adminReferenceMutationFailed =>
+      'Không lưu được mục này. Chưa có gì thay đổi.';
+
+  @override
+  String get adminReferenceDuplicateSlug =>
+      'Slug này đã được dùng. Hãy chọn tên hoặc slug khác.';
+
+  @override
+  String get adminReferenceMutationUncertain =>
+      'Không rõ kết quả của thao tác vừa rồi. Danh sách đã được tải lại — hãy kiểm tra trước khi thử lại.';
+
+  @override
+  String get adminReferenceEmptyAmenities => 'Chưa có tiện nghi nào.';
+
+  @override
+  String get adminReferenceEmptyCategories => 'Chưa có danh mục nào.';
+
+  @override
+  String adminReferenceEditSemantic(String name) {
+    return 'Sửa $name';
+  }
+
+  @override
   String get adminReviewModerationUncertain =>
       'Không rõ kết quả của thao tác vừa rồi. Trang đã được tải lại — hãy kiểm tra trạng thái đánh giá trước khi thử lại.';
 }

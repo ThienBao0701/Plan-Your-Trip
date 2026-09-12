@@ -71,6 +71,12 @@ class AdminNavigation {
       label: _media,
     ),
     AdminDestination(
+      route: AdminRoutesRefs.referenceData,
+      section: AdminSection.catalog,
+      icon: Icons.category_outlined,
+      label: _referenceData,
+    ),
+    AdminDestination(
       route: AdminRoutesRefs.payments,
       section: AdminSection.finance,
       icon: Icons.payments_outlined,
@@ -135,6 +141,7 @@ class AdminNavigation {
   static String _partners(AppLocalizations l) => l.adminNavPartners;
   static String _catalog(AppLocalizations l) => l.adminNavCatalog;
   static String _media(AppLocalizations l) => l.adminNavMedia;
+  static String _referenceData(AppLocalizations l) => l.adminNavReferenceData;
 }
 
 /// Route strings, kept separate from `AdminRoutes` so `AdminNavigation` can be
@@ -162,4 +169,11 @@ class AdminRoutesRefs {
   /// media" read, so this destination opens on a place picker rather than on a
   /// grid of every asset.
   static const String media = '/admin/media';
+
+  /// D10. Amenities and categories, as two tabs of one destination rather than
+  /// two menu entries: they are the same four-operation contract over two
+  /// small vocabularies, and an operator curating one is usually curating the
+  /// other. Locations are deliberately absent — that contract is heavier and
+  /// is its own phase.
+  static const String referenceData = '/admin/reference-data';
 }

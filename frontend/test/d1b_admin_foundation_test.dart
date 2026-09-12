@@ -631,10 +631,11 @@ void main() {
       }
     });
 
-    // D2C added Partners as a seventh destination. The assertion stays exact
-    // rather than becoming a lower bound: the point of this test is that the
-    // menu contains what the backend supports and nothing speculative, so a
-    // new entry has to be named here deliberately.
+    // D2C added Partners as a seventh destination; D10 added Reference Data as
+    // the tenth. The assertion stays exact rather than becoming a lower bound:
+    // the point of this test is that the menu contains what the backend
+    // supports and nothing speculative, so a new entry has to be named here
+    // deliberately.
     testWidgets('the menu lists exactly the console destinations',
         (tester) async {
       await pumpConsole(tester);
@@ -645,6 +646,7 @@ void main() {
         l10n.adminNavPartners,
         l10n.adminNavCatalog,
         l10n.adminNavMedia,
+        l10n.adminNavReferenceData,
         l10n.adminNavPayments,
         l10n.adminNavInvoices,
         l10n.adminNavReviews,
@@ -652,7 +654,7 @@ void main() {
       ]) {
         expect(find.text(label), findsWidgets);
       }
-      expect(AdminNavigation.destinations, hasLength(9));
+      expect(AdminNavigation.destinations, hasLength(10));
       // Nothing speculative: every destination resolves to a real route.
       for (final d in AdminNavigation.destinations) {
         expect(AdminRoutes.isAdminRoute(d.route), isTrue);

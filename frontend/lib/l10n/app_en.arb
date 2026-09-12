@@ -6669,5 +6669,86 @@
   "adminReviewHideConfirm": "Hide review",
   "adminReviewModerated": "Review updated.",
   "adminReviewModerationFailed": "The review could not be updated. Nothing was changed.",
+  "adminNavReferenceData": "Reference data",
+  "adminReferenceTabAmenities": "Amenities",
+  "adminReferenceTabCategories": "Categories",
+  "adminReferenceCmsStatusNotice": "CMS status controls whether an entry is marked active in this console. It does not currently filter public or customer API results — the backend stores the flag but no read applies it.",
+  "adminReferenceNoDeleteNotice": "Reference entries cannot be deleted. The admin API provides list, create, update and CMS status only.",
+  "adminReferenceOrderingNotice": "Rows appear in the order the server returned them. The backend applies no ordering and does not sort by sort order.",
+  "adminReferenceUpdateReplacesNotice": "Saving replaces every field on this entry, so clearing a box clears the stored value.",
+  "adminReferenceSlugHelper": "Leave blank and the server derives the slug from the name. It cannot be changed after the entry is created.",
+  "adminReferenceSlugFixedNotice": "The slug is fixed after creation. Other parts of the system resolve this entry by slug, so it is not editable here.",
+  "adminReferenceTypeNotice": "Type is used to target coupons and personalization rules, so it is chosen from existing values rather than typed.",
+  "adminReferenceParentGuardNotice": "This category and everything beneath it are not offered, so a parent cannot be set to a child of itself.",
+  "adminReferenceStatusPublicNotice": "This changes CMS status only. It does not guarantee the entry is removed from public or customer API results.",
+  "adminReferenceNewAmenity": "New amenity",
+  "adminReferenceNewCategory": "New category",
+  "adminReferenceRefresh": "Refresh",
+  "adminReferenceEdit": "Edit",
+  "adminReferenceSave": "Save",
+  "adminReferenceCreate": "Create",
+  "adminReferenceDismiss": "Dismiss",
+  "adminReferenceAmenityCreateTitle": "New amenity",
+  "adminReferenceAmenityEditTitle": "Edit amenity",
+  "adminReferenceCategoryCreateTitle": "New category",
+  "adminReferenceCategoryEditTitle": "Edit category",
+  "adminReferenceFieldName": "Name",
+  "adminReferenceFieldSlug": "Slug",
+  "adminReferenceFieldIcon": "Icon",
+  "adminReferenceFieldGroup": "Group",
+  "adminReferenceFieldDescription": "Description",
+  "adminReferenceFieldSortOrder": "Sort order",
+  "adminReferenceFieldType": "Type",
+  "adminReferenceFieldParent": "Parent category",
+  "adminReferenceFieldColor": "Colour",
+  "adminReferenceFieldCoverImageUrl": "Cover image URL",
+  "adminReferenceParentNone": "No parent (top level)",
+  "adminReferenceValueNotSet": "Not set",
+  "adminReferenceNameRequired": "Enter a name.",
+  "adminReferenceSortOrderInvalid": "Enter a whole number, or leave blank.",
+  "adminReferenceColName": "Name",
+  "adminReferenceColSlug": "Slug",
+  "adminReferenceColGroup": "Group",
+  "adminReferenceColType": "Type",
+  "adminReferenceColParent": "Parent",
+  "adminReferenceColSortOrder": "Sort order",
+  "adminReferenceColCmsStatus": "CMS status",
+  "adminReferenceColAction": "Actions",
+  "adminReferenceStatusActive": "Active in CMS",
+  "adminReferenceStatusInactive": "Inactive in CMS",
+  "adminReferenceActivate": "Activate in CMS",
+  "adminReferenceDeactivate": "Deactivate in CMS",
+  "adminReferenceActivateTitle": "Activate in CMS?",
+  "adminReferenceDeactivateTitle": "Deactivate in CMS?",
+  "adminReferenceActivateBody": "{name} will be marked active in the CMS.",
+  "@adminReferenceActivateBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "adminReferenceDeactivateBody": "{name} will be marked inactive in the CMS.",
+  "@adminReferenceDeactivateBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "adminReferenceStatusConfirm": "Update CMS status",
+  "adminReferenceMutationFailed": "The entry could not be saved. Nothing was changed.",
+  "adminReferenceDuplicateSlug": "That slug is already in use. Choose a different name or slug.",
+  "adminReferenceMutationUncertain": "The result of the last action is unknown. This list has been reloaded — check it before trying again.",
+  "adminReferenceEmptyAmenities": "No amenities yet.",
+  "adminReferenceEmptyCategories": "No categories yet.",
+  "adminReferenceEditSemantic": "Edit {name}",
+  "@adminReferenceEditSemantic": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "adminReviewModerationUncertain": "The result of the last action is unknown. This page has been reloaded — check the review's status before trying again."
 }

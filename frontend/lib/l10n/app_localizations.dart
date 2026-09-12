@@ -22798,6 +22798,366 @@ abstract class AppLocalizations {
   /// **'The review could not be updated. Nothing was changed.'**
   String get adminReviewModerationFailed;
 
+  /// No description provided for @adminNavReferenceData.
+  ///
+  /// In en, this message translates to:
+  /// **'Reference data'**
+  String get adminNavReferenceData;
+
+  /// No description provided for @adminReferenceTabAmenities.
+  ///
+  /// In en, this message translates to:
+  /// **'Amenities'**
+  String get adminReferenceTabAmenities;
+
+  /// No description provided for @adminReferenceTabCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get adminReferenceTabCategories;
+
+  /// No description provided for @adminReferenceCmsStatusNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'CMS status controls whether an entry is marked active in this console. It does not currently filter public or customer API results — the backend stores the flag but no read applies it.'**
+  String get adminReferenceCmsStatusNotice;
+
+  /// No description provided for @adminReferenceNoDeleteNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Reference entries cannot be deleted. The admin API provides list, create, update and CMS status only.'**
+  String get adminReferenceNoDeleteNotice;
+
+  /// No description provided for @adminReferenceOrderingNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Rows appear in the order the server returned them. The backend applies no ordering and does not sort by sort order.'**
+  String get adminReferenceOrderingNotice;
+
+  /// No description provided for @adminReferenceUpdateReplacesNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving replaces every field on this entry, so clearing a box clears the stored value.'**
+  String get adminReferenceUpdateReplacesNotice;
+
+  /// No description provided for @adminReferenceSlugHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave blank and the server derives the slug from the name. It cannot be changed after the entry is created.'**
+  String get adminReferenceSlugHelper;
+
+  /// No description provided for @adminReferenceSlugFixedNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'The slug is fixed after creation. Other parts of the system resolve this entry by slug, so it is not editable here.'**
+  String get adminReferenceSlugFixedNotice;
+
+  /// No description provided for @adminReferenceTypeNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Type is used to target coupons and personalization rules, so it is chosen from existing values rather than typed.'**
+  String get adminReferenceTypeNotice;
+
+  /// No description provided for @adminReferenceParentGuardNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'This category and everything beneath it are not offered, so a parent cannot be set to a child of itself.'**
+  String get adminReferenceParentGuardNotice;
+
+  /// No description provided for @adminReferenceStatusPublicNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'This changes CMS status only. It does not guarantee the entry is removed from public or customer API results.'**
+  String get adminReferenceStatusPublicNotice;
+
+  /// No description provided for @adminReferenceNewAmenity.
+  ///
+  /// In en, this message translates to:
+  /// **'New amenity'**
+  String get adminReferenceNewAmenity;
+
+  /// No description provided for @adminReferenceNewCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'New category'**
+  String get adminReferenceNewCategory;
+
+  /// No description provided for @adminReferenceRefresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get adminReferenceRefresh;
+
+  /// No description provided for @adminReferenceEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get adminReferenceEdit;
+
+  /// No description provided for @adminReferenceSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get adminReferenceSave;
+
+  /// No description provided for @adminReferenceCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get adminReferenceCreate;
+
+  /// No description provided for @adminReferenceDismiss.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get adminReferenceDismiss;
+
+  /// No description provided for @adminReferenceAmenityCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New amenity'**
+  String get adminReferenceAmenityCreateTitle;
+
+  /// No description provided for @adminReferenceAmenityEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit amenity'**
+  String get adminReferenceAmenityEditTitle;
+
+  /// No description provided for @adminReferenceCategoryCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New category'**
+  String get adminReferenceCategoryCreateTitle;
+
+  /// No description provided for @adminReferenceCategoryEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit category'**
+  String get adminReferenceCategoryEditTitle;
+
+  /// No description provided for @adminReferenceFieldName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get adminReferenceFieldName;
+
+  /// No description provided for @adminReferenceFieldSlug.
+  ///
+  /// In en, this message translates to:
+  /// **'Slug'**
+  String get adminReferenceFieldSlug;
+
+  /// No description provided for @adminReferenceFieldIcon.
+  ///
+  /// In en, this message translates to:
+  /// **'Icon'**
+  String get adminReferenceFieldIcon;
+
+  /// No description provided for @adminReferenceFieldGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Group'**
+  String get adminReferenceFieldGroup;
+
+  /// No description provided for @adminReferenceFieldDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get adminReferenceFieldDescription;
+
+  /// No description provided for @adminReferenceFieldSortOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort order'**
+  String get adminReferenceFieldSortOrder;
+
+  /// No description provided for @adminReferenceFieldType.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get adminReferenceFieldType;
+
+  /// No description provided for @adminReferenceFieldParent.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent category'**
+  String get adminReferenceFieldParent;
+
+  /// No description provided for @adminReferenceFieldColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Colour'**
+  String get adminReferenceFieldColor;
+
+  /// No description provided for @adminReferenceFieldCoverImageUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Cover image URL'**
+  String get adminReferenceFieldCoverImageUrl;
+
+  /// No description provided for @adminReferenceParentNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No parent (top level)'**
+  String get adminReferenceParentNone;
+
+  /// No description provided for @adminReferenceValueNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set'**
+  String get adminReferenceValueNotSet;
+
+  /// No description provided for @adminReferenceNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a name.'**
+  String get adminReferenceNameRequired;
+
+  /// No description provided for @adminReferenceSortOrderInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a whole number, or leave blank.'**
+  String get adminReferenceSortOrderInvalid;
+
+  /// No description provided for @adminReferenceColName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get adminReferenceColName;
+
+  /// No description provided for @adminReferenceColSlug.
+  ///
+  /// In en, this message translates to:
+  /// **'Slug'**
+  String get adminReferenceColSlug;
+
+  /// No description provided for @adminReferenceColGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Group'**
+  String get adminReferenceColGroup;
+
+  /// No description provided for @adminReferenceColType.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get adminReferenceColType;
+
+  /// No description provided for @adminReferenceColParent.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent'**
+  String get adminReferenceColParent;
+
+  /// No description provided for @adminReferenceColSortOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort order'**
+  String get adminReferenceColSortOrder;
+
+  /// No description provided for @adminReferenceColCmsStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'CMS status'**
+  String get adminReferenceColCmsStatus;
+
+  /// No description provided for @adminReferenceColAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Actions'**
+  String get adminReferenceColAction;
+
+  /// No description provided for @adminReferenceStatusActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active in CMS'**
+  String get adminReferenceStatusActive;
+
+  /// No description provided for @adminReferenceStatusInactive.
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive in CMS'**
+  String get adminReferenceStatusInactive;
+
+  /// No description provided for @adminReferenceActivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Activate in CMS'**
+  String get adminReferenceActivate;
+
+  /// No description provided for @adminReferenceDeactivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Deactivate in CMS'**
+  String get adminReferenceDeactivate;
+
+  /// No description provided for @adminReferenceActivateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Activate in CMS?'**
+  String get adminReferenceActivateTitle;
+
+  /// No description provided for @adminReferenceDeactivateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Deactivate in CMS?'**
+  String get adminReferenceDeactivateTitle;
+
+  /// No description provided for @adminReferenceActivateBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} will be marked active in the CMS.'**
+  String adminReferenceActivateBody(String name);
+
+  /// No description provided for @adminReferenceDeactivateBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} will be marked inactive in the CMS.'**
+  String adminReferenceDeactivateBody(String name);
+
+  /// No description provided for @adminReferenceStatusConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Update CMS status'**
+  String get adminReferenceStatusConfirm;
+
+  /// No description provided for @adminReferenceMutationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The entry could not be saved. Nothing was changed.'**
+  String get adminReferenceMutationFailed;
+
+  /// No description provided for @adminReferenceDuplicateSlug.
+  ///
+  /// In en, this message translates to:
+  /// **'That slug is already in use. Choose a different name or slug.'**
+  String get adminReferenceDuplicateSlug;
+
+  /// No description provided for @adminReferenceMutationUncertain.
+  ///
+  /// In en, this message translates to:
+  /// **'The result of the last action is unknown. This list has been reloaded — check it before trying again.'**
+  String get adminReferenceMutationUncertain;
+
+  /// No description provided for @adminReferenceEmptyAmenities.
+  ///
+  /// In en, this message translates to:
+  /// **'No amenities yet.'**
+  String get adminReferenceEmptyAmenities;
+
+  /// No description provided for @adminReferenceEmptyCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'No categories yet.'**
+  String get adminReferenceEmptyCategories;
+
+  /// No description provided for @adminReferenceEditSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit {name}'**
+  String adminReferenceEditSemantic(String name);
+
   /// No description provided for @adminReviewModerationUncertain.
   ///
   /// In en, this message translates to:

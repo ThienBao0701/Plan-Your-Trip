@@ -13274,6 +13274,205 @@ class AppLocalizationsEn extends AppLocalizations {
       'The review could not be updated. Nothing was changed.';
 
   @override
+  String get adminNavReferenceData => 'Reference data';
+
+  @override
+  String get adminReferenceTabAmenities => 'Amenities';
+
+  @override
+  String get adminReferenceTabCategories => 'Categories';
+
+  @override
+  String get adminReferenceCmsStatusNotice =>
+      'CMS status controls whether an entry is marked active in this console. It does not currently filter public or customer API results — the backend stores the flag but no read applies it.';
+
+  @override
+  String get adminReferenceNoDeleteNotice =>
+      'Reference entries cannot be deleted. The admin API provides list, create, update and CMS status only.';
+
+  @override
+  String get adminReferenceOrderingNotice =>
+      'Rows appear in the order the server returned them. The backend applies no ordering and does not sort by sort order.';
+
+  @override
+  String get adminReferenceUpdateReplacesNotice =>
+      'Saving replaces every field on this entry, so clearing a box clears the stored value.';
+
+  @override
+  String get adminReferenceSlugHelper =>
+      'Leave blank and the server derives the slug from the name. It cannot be changed after the entry is created.';
+
+  @override
+  String get adminReferenceSlugFixedNotice =>
+      'The slug is fixed after creation. Other parts of the system resolve this entry by slug, so it is not editable here.';
+
+  @override
+  String get adminReferenceTypeNotice =>
+      'Type is used to target coupons and personalization rules, so it is chosen from existing values rather than typed.';
+
+  @override
+  String get adminReferenceParentGuardNotice =>
+      'This category and everything beneath it are not offered, so a parent cannot be set to a child of itself.';
+
+  @override
+  String get adminReferenceStatusPublicNotice =>
+      'This changes CMS status only. It does not guarantee the entry is removed from public or customer API results.';
+
+  @override
+  String get adminReferenceNewAmenity => 'New amenity';
+
+  @override
+  String get adminReferenceNewCategory => 'New category';
+
+  @override
+  String get adminReferenceRefresh => 'Refresh';
+
+  @override
+  String get adminReferenceEdit => 'Edit';
+
+  @override
+  String get adminReferenceSave => 'Save';
+
+  @override
+  String get adminReferenceCreate => 'Create';
+
+  @override
+  String get adminReferenceDismiss => 'Dismiss';
+
+  @override
+  String get adminReferenceAmenityCreateTitle => 'New amenity';
+
+  @override
+  String get adminReferenceAmenityEditTitle => 'Edit amenity';
+
+  @override
+  String get adminReferenceCategoryCreateTitle => 'New category';
+
+  @override
+  String get adminReferenceCategoryEditTitle => 'Edit category';
+
+  @override
+  String get adminReferenceFieldName => 'Name';
+
+  @override
+  String get adminReferenceFieldSlug => 'Slug';
+
+  @override
+  String get adminReferenceFieldIcon => 'Icon';
+
+  @override
+  String get adminReferenceFieldGroup => 'Group';
+
+  @override
+  String get adminReferenceFieldDescription => 'Description';
+
+  @override
+  String get adminReferenceFieldSortOrder => 'Sort order';
+
+  @override
+  String get adminReferenceFieldType => 'Type';
+
+  @override
+  String get adminReferenceFieldParent => 'Parent category';
+
+  @override
+  String get adminReferenceFieldColor => 'Colour';
+
+  @override
+  String get adminReferenceFieldCoverImageUrl => 'Cover image URL';
+
+  @override
+  String get adminReferenceParentNone => 'No parent (top level)';
+
+  @override
+  String get adminReferenceValueNotSet => 'Not set';
+
+  @override
+  String get adminReferenceNameRequired => 'Enter a name.';
+
+  @override
+  String get adminReferenceSortOrderInvalid =>
+      'Enter a whole number, or leave blank.';
+
+  @override
+  String get adminReferenceColName => 'Name';
+
+  @override
+  String get adminReferenceColSlug => 'Slug';
+
+  @override
+  String get adminReferenceColGroup => 'Group';
+
+  @override
+  String get adminReferenceColType => 'Type';
+
+  @override
+  String get adminReferenceColParent => 'Parent';
+
+  @override
+  String get adminReferenceColSortOrder => 'Sort order';
+
+  @override
+  String get adminReferenceColCmsStatus => 'CMS status';
+
+  @override
+  String get adminReferenceColAction => 'Actions';
+
+  @override
+  String get adminReferenceStatusActive => 'Active in CMS';
+
+  @override
+  String get adminReferenceStatusInactive => 'Inactive in CMS';
+
+  @override
+  String get adminReferenceActivate => 'Activate in CMS';
+
+  @override
+  String get adminReferenceDeactivate => 'Deactivate in CMS';
+
+  @override
+  String get adminReferenceActivateTitle => 'Activate in CMS?';
+
+  @override
+  String get adminReferenceDeactivateTitle => 'Deactivate in CMS?';
+
+  @override
+  String adminReferenceActivateBody(String name) {
+    return '$name will be marked active in the CMS.';
+  }
+
+  @override
+  String adminReferenceDeactivateBody(String name) {
+    return '$name will be marked inactive in the CMS.';
+  }
+
+  @override
+  String get adminReferenceStatusConfirm => 'Update CMS status';
+
+  @override
+  String get adminReferenceMutationFailed =>
+      'The entry could not be saved. Nothing was changed.';
+
+  @override
+  String get adminReferenceDuplicateSlug =>
+      'That slug is already in use. Choose a different name or slug.';
+
+  @override
+  String get adminReferenceMutationUncertain =>
+      'The result of the last action is unknown. This list has been reloaded — check it before trying again.';
+
+  @override
+  String get adminReferenceEmptyAmenities => 'No amenities yet.';
+
+  @override
+  String get adminReferenceEmptyCategories => 'No categories yet.';
+
+  @override
+  String adminReferenceEditSemantic(String name) {
+    return 'Edit $name';
+  }
+
+  @override
   String get adminReviewModerationUncertain =>
       'The result of the last action is unknown. This page has been reloaded — check the review\'s status before trying again.';
 }

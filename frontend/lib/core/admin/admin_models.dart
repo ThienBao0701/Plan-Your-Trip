@@ -1479,3 +1479,196 @@ class AdminMediaOwner {
   bool owns(AdminMediaAsset asset) =>
       asset.ownerType == type && asset.ownerId == id;
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// D10 — Admin reference data
+// ═══════════════════════════════════════════════════════════════════════════
+//
+// `AmenityResponse` and `CategoryResponse` on `develop@f26bb97`, field for
+// field. Both are flat records with no envelope: the admin reads return a bare
+// JSON array, not a `PageResponse`, so nothing here touches [AdminPage].
+//
+// Every field the backend declares as nullable stays nullable. `active` is a
+// Java primitive `boolean` and therefore always present — but it is parsed the
+// same defensive way as everywhere else in this file (`== true`), so a missing
+// or non-boolean value reads as false rather than throwing.
+
+/// One row of `GET /api/admin/amenities`.
+class AdminAmenity {
+  final int id;
+  final String? name;
+  final String? slug;
+  final String? icon;
+  final String? groupName;
+  final String? description;
+  final int? sortOrder;
+  final bool active;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+
+  const AdminAmenity({
+    required this.id,
+    required this.name,
+    required this.slug,
+    required this.icon,
+    required this.groupName,
+    required this.description,
+    required this.sortOrder,
+    required this.active,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  /// Null when the row carries no usable id. Every admin action addresses a row
+  /// by id, so a row without one cannot be acted on and is dropped rather than
+  /// rendered as an untouchable entry.
+  static AdminAmenity? fromJson(Map<String, dynamic> json) {
+    final id = _asInt(json['id']);
+    if (id == null) return null;
+    return AdminAmenity(
+      id: id,
+      name: _asString(json['name']),
+      slug: _asString(json['slug']),
+      icon: _asString(json['icon']),
+      groupName: _asString(json['groupName']),
+      description: _asString(json['description']),
+      sortOrder: _asInt(json['sortOrder']),
+      active: json['active'] == true,
+      createdAt: _asInstant(json['createdAt']),
+      updatedAt: _asInstant(json['updatedAt']),
+    );
+  }
+}
+
+/// One row of `GET /api/admin/categories`.
+///
+/// `parentId` is the only hierarchy signal the flat list carries — the nested
+/// `GET /api/categories/tree` shape is a public endpoint and is not used by the
+/// console. The grid therefore resolves a parent's *name* from the rows it
+/// already holds rather than by a second request.
+class AdminCategory {
+  final int id;
+  final int? parentId;
+  final String? name;
+  final String? slug;
+  final String? type;
+  final String? icon;
+  final String? color;
+  final String? coverImageUrl;
+  final int? sortOrder;
+  final bool active;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+
+  const AdminCategory({
+    required this.id,
+    required this.parentId,
+    required this.name,
+    required this.slug,
+    required this.type,
+    required this.icon,
+    required this.color,
+    required this.coverImageUrl,
+    required this.sortOrder,
+    required this.active,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  /// True when this category sits at the top of the tree.
+  bool get isRoot => parentId == null;
+
+  static AdminCategory? fromJson(Map<String, dynamic> json) {
+    final id = _asInt(json['id']);
+    if (id == null) return null;
+    return AdminCategory(
+      id: id,
+      parentId: _asInt(json['parentId']),
+      name: _asString(json['name']),
+      slug: _asString(json['slug']),
+      type: _asString(json['type']),
+      icon: _asString(json['icon']),
+      color: _asString(json['color']),
+      coverImageUrl: _asString(json['coverImageUrl']),
+      sortOrder: _asInt(json['sortOrder']),
+      active: json['active'] == true,
+      createdAt: _asInstant(json['createdAt']),
+      updatedAt: _asInstant(json['updatedAt']),
+    );
+  }
+}
+
+/// Vocabularies for the two reference pickers.
+///
+/// <h4>Why these are not free text</h4>
+///
+/// `Amenity.groupName` and `Category.type` are plain, unvalidated `String`
+/// columns on the backend — nothing rejects a typo. `Category.type` is matched
+/// by `CustomerCouponService` against `CouponDefinition.placeType`
+/// (`equalsIgnoreCase`) and by `PersonalizationRule` targeting, so a mistyped
+/// value silently stops live coupons from matching, with no error anywhere. A
+/// picker is the client-side guard against that.
+///
+/// <h4>Where the values come from</h4>
+///
+/// **Primarily from the data itself**: [optionsFrom] collects the distinct
+/// values present in the rows the console actually loaded, which is what keeps
+/// the picker correct as the product's vocabulary moves. [seededGroupNames] and
+/// [seededCategoryTypes] are a *fallback for an empty list only* — a first-run
+/// database with no rows yet would otherwise offer nothing to choose from. They
+/// are transcribed from `DataInitializer` on `develop@f26bb97`, **not** from
+/// `AmenityController`'s Swagger summary, which documents five groups and omits
+/// the `ATTRACTION` group the seed actually creates.
+class AdminReferenceVocabulary {
+  const AdminReferenceVocabulary._();
+
+  /// The six amenity groups `DataInitializer` seeds. `ATTRACTION` is included
+  /// deliberately: it exists in the data and dropping it would make the picker
+  /// unable to reproduce rows the product already has.
+  static const List<String> seededGroupNames = [
+    'ATTRACTION',
+    'CAFE',
+    'GENERAL',
+    'HOTEL',
+    'RESTAURANT',
+    'ROOM',
+  ];
+
+  /// The ten category types `DataInitializer` seeds, on roots and children
+  /// alike (a child carries its root's type).
+  static const List<String> seededCategoryTypes = [
+    'ACCOMMODATION',
+    'ATTRACTION',
+    'CAFE',
+    'ENTERTAINMENT',
+    'FOOD',
+    'PHOTO_SPOT',
+    'SHOPPING',
+    'TOUR',
+    'TRANSPORTATION',
+    'WELLNESS',
+  ];
+
+  /// Distinct, sorted, non-blank values observed in [values], falling back to
+  /// [fallback] when nothing was observed.
+  ///
+  /// [current] is always included even when no other row uses it, so opening
+  /// the edit dialog for a row whose stored value has since become unique never
+  /// silently rewrites it to something else.
+  static List<String> optionsFrom(
+    Iterable<String?> values, {
+    required List<String> fallback,
+    String? current,
+  }) {
+    final seen = <String>{};
+    for (final v in values) {
+      final t = v?.trim();
+      if (t != null && t.isNotEmpty) seen.add(t);
+    }
+    if (seen.isEmpty) seen.addAll(fallback);
+    final c = current?.trim();
+    if (c != null && c.isNotEmpty) seen.add(c);
+    final out = seen.toList()..sort();
+    return out;
+  }
+}

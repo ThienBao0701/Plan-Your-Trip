@@ -1,0 +1,1356 @@
+import 'package:flutter/material.dart';
+
+import '../../../core/admin/admin_models.dart';
+import '../../../design/app_spacing.dart';
+import '../../../l10n/app_localizations.dart';
+import '../../../shared/widgets/glass_widgets.dart';
+import '../admin_reference_states.dart';
+import '../widgets/admin_widgets.dart';
+
+/// D10 — Admin Reference Data: amenities and categories, in one destination.
+///
+/// <h4>What the backend offers, and therefore what this screen offers</h4>
+///
+/// `AdminAmenityController` and `AdminCategoryController` expose exactly four
+/// operations each: list, create, update, and set a boolean `active`. **There
+/// is no delete endpoint** — not for admins, not for anyone — so this screen
+/// renders no delete control, no archive action and no wording that implies
+/// a row can be removed.
+///
+/// <h4>What `active` actually does</h4>
+///
+/// Nothing, downstream. `Amenity.active`, `Category.active` and
+/// `AdministrativeUnit.active` are read in exactly one place in the backend —
+/// the response mappers — and no query, specification or service filters on
+/// them. `GET /api/amenities` and `GET /api/categories` return inactive rows to
+/// the public just the same. The flag is therefore presented as **CMS status**
+/// and every surface that mentions it says so; nothing here claims a customer-
+/// facing effect the server does not deliver.
+class AdminReferenceDataScreen extends StatefulWidget {
+  final AdminAmenitiesState amenities;
+  final AdminCategoriesState categories;
+
+  /// Which tab opens first. Exists so a test can target either tab directly
+  /// without driving a gesture.
+  final int initialTab;
+
+  const AdminReferenceDataScreen({
+    super.key,
+    required this.amenities,
+    required this.categories,
+    this.initialTab = 0,
+  });
+
+  @override
+  State<AdminReferenceDataScreen> createState() =>
+      _AdminReferenceDataScreenState();
+}
+
+class _AdminReferenceDataScreenState extends State<AdminReferenceDataScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabs = TabController(
+    length: 2,
+    vsync: this,
+    initialIndex: widget.initialTab.clamp(0, 1),
+  )..addListener(_onTabChanged);
+
+  @override
+  void initState() {
+    super.initState();
+    // Each tab loads the first time it is shown, never both at once. Deferred
+    // past the frame because load() notifies, and notifying while the tree is
+    // still building is the defect this convention exists to avoid.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _loadCurrentTab();
+    });
+  }
+
+  @override
+  void dispose() {
+    _tabs.removeListener(_onTabChanged);
+    _tabs.dispose();
+    super.dispose();
+  }
+
+  void _onTabChanged() {
+    if (_tabs.indexIsChanging) return;
+    setState(_loadCurrentTab);
+  }
+
+  /// Idle-guarded, so returning to a tab keeps its rows instead of refetching.
+  ///
+  /// Written as a branch rather than a shared variable: the two notifiers have
+  /// different type arguments, so their least upper bound is `ChangeNotifier`
+  /// and a common variable would need a cast that buys nothing.
+  void _loadCurrentTab() {
+    if (_tabs.index == 0) {
+      if (widget.amenities.status == AdminLoadStatus.idle) {
+        widget.amenities.load();
+      }
+    } else if (widget.categories.status == AdminLoadStatus.idle) {
+      widget.categories.load();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Padding(
+          padding: EdgeInsets.fromLTRB(
+              AppSpacing.md, AppSpacing.sm, AppSpacing.md, 0),
+          child: _CmsScopeNotice(),
+        ),
+        TabBar(
+          controller: _tabs,
+          tabs: [
+            Tab(text: l10n.adminReferenceTabAmenities),
+            Tab(text: l10n.adminReferenceTabCategories),
+          ],
+        ),
+        Expanded(
+          child: TabBarView(
+            controller: _tabs,
+            children: [
+              _AmenitiesTab(state: widget.amenities),
+              _CategoriesTab(state: widget.categories),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// The two statements an operator has to be able to read before touching
+/// anything here: the status flag is CMS-only, and nothing can be deleted.
+class _CmsScopeNotice extends StatelessWidget {
+  const _CmsScopeNotice();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    return Container(
+      key: const Key('admin-reference-cms-notice'),
+      padding: const EdgeInsets.all(AppSpacing.sm),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.info_outline,
+              size: 18, color: theme.colorScheme.onSurfaceVariant),
+          const SizedBox(width: AppSpacing.xs),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l10n.adminReferenceCmsStatusNotice,
+                    style: theme.textTheme.labelSmall),
+                const SizedBox(height: AppSpacing.xxs),
+                Text(l10n.adminReferenceNoDeleteNotice,
+                    style: theme.textTheme.labelSmall),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Shared chrome
+// ═══════════════════════════════════════════════════════════════════════════
+
+/// Banner for the outcome of the last mutation.
+///
+/// `uncertain` is kept visually distinct from a plain failure: the write may
+/// have committed, so the remedy is "look at the list", never "press it again".
+class _MutationBanner extends StatelessWidget {
+  final AdminReferenceListState<Object?> state;
+
+  const _MutationBanner({required this.state});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final uncertain = state.mutationUncertain;
+    final conflict = state.mutationConflict;
+    final error = state.mutationError;
+    if (!uncertain && !conflict && error == null) {
+      return const SizedBox.shrink();
+    }
+
+    final scheme = theme.colorScheme;
+    final background =
+        uncertain ? scheme.tertiaryContainer : scheme.errorContainer;
+    final foreground =
+        uncertain ? scheme.onTertiaryContainer : scheme.onErrorContainer;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+          AppSpacing.md, AppSpacing.sm, AppSpacing.md, 0),
+      child: Container(
+        key: const Key('admin-reference-mutation-banner'),
+        padding: const EdgeInsets.all(AppSpacing.sm),
+        decoration: BoxDecoration(
+          color: background,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(uncertain ? Icons.help_outline : Icons.error_outline_rounded,
+                size: 18, color: foreground),
+            const SizedBox(width: AppSpacing.xs),
+            Expanded(
+              child: Text(
+                uncertain
+                    ? l10n.adminReferenceMutationUncertain
+                    // The backend's own message is the useful one here — a
+                    // 409 names the slug that is already taken. The
+                    // duplicate-slug string is the fallback for when that
+                    // message did not survive sanitisation.
+                    : (error ??
+                        (conflict
+                            ? l10n.adminReferenceDuplicateSlug
+                            : l10n.adminReferenceMutationFailed)),
+                style: theme.textTheme.bodySmall?.copyWith(color: foreground),
+              ),
+            ),
+            TextButton(
+              onPressed: state.dismissMutationNotice,
+              child: Text(l10n.adminReferenceDismiss),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Refresh + create, plus the note that the list order is the server's.
+class _ReferenceToolbar extends StatelessWidget {
+  final AdminReferenceListState<Object?> state;
+  final String createLabel;
+  final Key createKey;
+  final VoidCallback onCreate;
+
+  const _ReferenceToolbar({
+    required this.state,
+    required this.createLabel,
+    required this.createKey,
+    required this.onCreate,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final busy = state.isLoading || state.isMutating;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Wrap(
+          spacing: AppSpacing.xs,
+          runSpacing: AppSpacing.xs,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            FilledButton.icon(
+              key: createKey,
+              onPressed: busy ? null : onCreate,
+              icon: const Icon(Icons.add),
+              label: Text(createLabel),
+            ),
+            OutlinedButton.icon(
+              onPressed: busy ? null : state.refresh,
+              icon: const Icon(Icons.refresh),
+              label: Text(l10n.adminReferenceRefresh),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.xxs),
+        // The backend applies no ordering and never uses `sortOrder` to sort,
+        // so the rows arrive in whatever order the database returned. Said
+        // plainly rather than hidden behind a client-side re-sort that would
+        // only look authoritative.
+        Text(l10n.adminReferenceOrderingNotice,
+            style: Theme.of(context).textTheme.labelSmall),
+      ],
+    );
+  }
+}
+
+/// The CMS-status pill. Colour is always paired with text, never the only cue.
+class _CmsStatusChip extends StatelessWidget {
+  final bool active;
+
+  const _CmsStatusChip({required this.active});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final scheme = Theme.of(context).colorScheme;
+    final color = active ? scheme.primary : scheme.outline;
+    return Container(
+      padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.xs, vertical: AppSpacing.xxs),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+              active ? Icons.check_circle_outline : Icons.remove_circle_outline,
+              size: 14,
+              color: color),
+          const SizedBox(width: AppSpacing.xxs),
+          Text(
+            active
+                ? l10n.adminReferenceStatusActive
+                : l10n.adminReferenceStatusInactive,
+            style: Theme.of(context)
+                .textTheme
+                .labelSmall
+                ?.copyWith(color: color, fontWeight: FontWeight.w600),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Confirmation for a CMS-status change.
+///
+/// Both directions are confirmed, and both repeat the CMS-only scope: an
+/// operator deactivating a row must not walk away believing customers stopped
+/// seeing it.
+Future<bool> _confirmStatus(
+  BuildContext context, {
+  required String name,
+  required bool activating,
+}) async {
+  final l10n = AppLocalizations.of(context)!;
+  final ok = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: Text(activating
+          ? l10n.adminReferenceActivateTitle
+          : l10n.adminReferenceDeactivateTitle),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(activating
+                ? l10n.adminReferenceActivateBody(name)
+                : l10n.adminReferenceDeactivateBody(name)),
+            const SizedBox(height: AppSpacing.xs),
+            Text(l10n.adminReferenceStatusPublicNotice,
+                style: Theme.of(ctx).textTheme.labelSmall),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(ctx).pop(),
+          child: Text(l10n.adminPartnerCancel),
+        ),
+        FilledButton(
+          key: const Key('admin-reference-status-confirm'),
+          onPressed: () => Navigator.of(ctx).pop(true),
+          child: Text(l10n.adminReferenceStatusConfirm),
+        ),
+      ],
+    ),
+  );
+  return ok == true;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Amenities
+// ═══════════════════════════════════════════════════════════════════════════
+
+class _AmenitiesTab extends StatelessWidget {
+  final AdminAmenitiesState state;
+
+  const _AmenitiesTab({required this.state});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return AnimatedBuilder(
+      animation: state,
+      builder: (context, _) {
+        final rows = state.items;
+        final body = state.isReady && rows.isNotEmpty
+            ? AdminResponsiveGrid(
+                wide: (context) => _AmenityTable(state: state, rows: rows),
+                narrow: (context) => _AmenityCards(state: state, rows: rows),
+              )
+            : AdminStateView(
+                status: state.status,
+                message: state.errorMessage,
+                emptyMessage: l10n.adminReferenceEmptyAmenities,
+                onRetry: state.refresh,
+              );
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _MutationBanner(state: state),
+            Expanded(
+              child: AdminGridScaffold(
+                isLoading: state.isLoading,
+                toolbar: _ReferenceToolbar(
+                  state: state,
+                  createLabel: l10n.adminReferenceNewAmenity,
+                  createKey: const Key('admin-reference-new-amenity'),
+                  onCreate: () => _openAmenityForm(context, state, null),
+                ),
+                body: body,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _AmenityTable extends StatelessWidget {
+  final AdminAmenitiesState state;
+  final List<AdminAmenity> rows;
+
+  const _AmenityTable({required this.state, required this.rows});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: DataTable(
+          columns: [
+            DataColumn(label: Text(l10n.adminReferenceColName)),
+            DataColumn(label: Text(l10n.adminReferenceColSlug)),
+            DataColumn(label: Text(l10n.adminReferenceColGroup)),
+            DataColumn(label: Text(l10n.adminReferenceColSortOrder)),
+            DataColumn(label: Text(l10n.adminReferenceColCmsStatus)),
+            DataColumn(label: Text(l10n.adminReferenceColAction)),
+          ],
+          rows: [
+            for (final r in rows)
+              DataRow(cells: [
+                DataCell(Text(AdminFormats.text(context, r.name))),
+                DataCell(Text(AdminFormats.text(context, r.slug))),
+                DataCell(Text(AdminFormats.text(context, r.groupName))),
+                DataCell(
+                    Text(r.sortOrder?.toString() ?? l10n.adminValueUnknown)),
+                DataCell(_CmsStatusChip(active: r.active)),
+                DataCell(_AmenityActions(state: state, row: r, inline: true)),
+              ]),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AmenityCards extends StatelessWidget {
+  final AdminAmenitiesState state;
+  final List<AdminAmenity> rows;
+
+  const _AmenityCards({required this.state, required this.rows});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    return ListView.separated(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      itemCount: rows.length,
+      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
+      itemBuilder: (context, i) {
+        final r = rows[i];
+        return OceanGlassCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(AdminFormats.text(context, r.name),
+                        style: theme.textTheme.titleSmall),
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  _CmsStatusChip(active: r.active),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              AdminCardRow(
+                  label: l10n.adminReferenceColSlug,
+                  value: AdminFormats.text(context, r.slug)),
+              AdminCardRow(
+                  label: l10n.adminReferenceColGroup,
+                  value: AdminFormats.text(context, r.groupName)),
+              AdminCardRow(
+                  label: l10n.adminReferenceColSortOrder,
+                  value: r.sortOrder?.toString() ?? l10n.adminValueUnknown),
+              const SizedBox(height: AppSpacing.xs),
+              _AmenityActions(state: state, row: r),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Lays the row actions out for the surface they are on.
+///
+/// A `DataTable` row has a fixed height: a [Wrap] that flows onto a second line
+/// paints outside the row's bounds, which leaves the wrapped control visible but
+/// unable to receive a tap. So tables get a single-line [Row] and let the column
+/// widen, while the narrow-viewport cards keep the [Wrap] they need for large
+/// text scales.
+class _ActionBar extends StatelessWidget {
+  final bool inline;
+  final List<Widget> children;
+
+  const _ActionBar({required this.inline, required this.children});
+
+  @override
+  Widget build(BuildContext context) => inline
+      ? Row(mainAxisSize: MainAxisSize.min, children: children)
+      : Wrap(spacing: AppSpacing.xxs, children: children);
+}
+
+class _AmenityActions extends StatelessWidget {
+  final AdminAmenitiesState state;
+  final AdminAmenity row;
+  final bool inline;
+
+  const _AmenityActions({
+    required this.state,
+    required this.row,
+    this.inline = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final busy = state.isMutating || state.isLoading;
+    final name = row.name ?? l10n.adminValueUnknown;
+    return _ActionBar(
+      inline: inline,
+      children: [
+        Semantics(
+          button: true,
+          label: l10n.adminReferenceEditSemantic(name),
+          child: TextButton(
+            key: Key('admin-reference-amenity-edit-${row.id}'),
+            onPressed:
+                busy ? null : () => _openAmenityForm(context, state, row),
+            child: Text(l10n.adminReferenceEdit),
+          ),
+        ),
+        TextButton(
+          key: Key('admin-reference-amenity-status-${row.id}'),
+          onPressed: busy
+              ? null
+              : () async {
+                  final target = !row.active;
+                  final ok = await _confirmStatus(context,
+                      name: name, activating: target);
+                  if (!ok) return;
+                  await state.setActive(row, active: target);
+                },
+          child: Text(row.active
+              ? l10n.adminReferenceDeactivate
+              : l10n.adminReferenceActivate),
+        ),
+      ],
+    );
+  }
+}
+
+Future<void> _openAmenityForm(
+  BuildContext context,
+  AdminAmenitiesState state,
+  AdminAmenity? existing,
+) async {
+  final result = await showDialog<_AmenityFormResult>(
+    context: context,
+    builder: (ctx) => _AmenityFormDialog(
+      existing: existing,
+      groupOptions: state.groupOptions(current: existing?.groupName),
+    ),
+  );
+  if (result == null) return;
+  if (existing == null) {
+    await state.create(
+      name: result.name,
+      slug: result.slug,
+      icon: result.icon,
+      groupName: result.groupName,
+      description: result.description,
+      sortOrder: result.sortOrder,
+    );
+  } else {
+    await state.update(
+      existing,
+      name: result.name,
+      icon: result.icon,
+      groupName: result.groupName,
+      description: result.description,
+      sortOrder: result.sortOrder,
+    );
+  }
+}
+
+class _AmenityFormResult {
+  final String name;
+  final String? slug;
+  final String? icon;
+  final String? groupName;
+  final String? description;
+  final int? sortOrder;
+
+  const _AmenityFormResult({
+    required this.name,
+    required this.slug,
+    required this.icon,
+    required this.groupName,
+    required this.description,
+    required this.sortOrder,
+  });
+}
+
+/// One form for create and update.
+///
+/// It offers exactly the six fields `AmenityRequest` carries. Slug is the one
+/// asymmetry: editable on create (or left blank for the server to derive), and
+/// **read-only** afterwards, because `HotelRoomService` resolves room amenities
+/// by slug and silently skips a value it cannot match.
+class _AmenityFormDialog extends StatefulWidget {
+  final AdminAmenity? existing;
+  final List<String> groupOptions;
+
+  const _AmenityFormDialog({
+    required this.existing,
+    required this.groupOptions,
+  });
+
+  @override
+  State<_AmenityFormDialog> createState() => _AmenityFormDialogState();
+}
+
+class _AmenityFormDialogState extends State<_AmenityFormDialog> {
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _name =
+      TextEditingController(text: widget.existing?.name ?? '');
+  late final TextEditingController _slug =
+      TextEditingController(text: widget.existing?.slug ?? '');
+  late final TextEditingController _icon =
+      TextEditingController(text: widget.existing?.icon ?? '');
+  late final TextEditingController _description =
+      TextEditingController(text: widget.existing?.description ?? '');
+  late final TextEditingController _sortOrder =
+      TextEditingController(text: widget.existing?.sortOrder?.toString() ?? '');
+
+  late String? _group = widget.existing?.groupName;
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _slug.dispose();
+    _icon.dispose();
+    _description.dispose();
+    _sortOrder.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+    final slug = _slug.text.trim();
+    Navigator.of(context).pop(_AmenityFormResult(
+      name: _name.text.trim(),
+      slug: slug.isEmpty ? null : slug,
+      icon: _icon.text.trim().isEmpty ? null : _icon.text.trim(),
+      groupName: _group,
+      description:
+          _description.text.trim().isEmpty ? null : _description.text.trim(),
+      sortOrder: int.tryParse(_sortOrder.text.trim()),
+    ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final editing = widget.existing != null;
+    return AlertDialog(
+      title: Text(editing
+          ? l10n.adminReferenceAmenityEditTitle
+          : l10n.adminReferenceAmenityCreateTitle),
+      content: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _NameField(controller: _name),
+              const SizedBox(height: AppSpacing.xs),
+              _SlugField(controller: _slug, editing: editing),
+              const SizedBox(height: AppSpacing.xs),
+              _VocabularyPicker(
+                label: l10n.adminReferenceFieldGroup,
+                value: _group,
+                options: widget.groupOptions,
+                pickerKey: const Key('admin-reference-group-picker'),
+                onChanged: (v) => setState(() => _group = v),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              _PlainField(
+                  controller: _icon, label: l10n.adminReferenceFieldIcon),
+              const SizedBox(height: AppSpacing.xs),
+              _PlainField(
+                  controller: _description,
+                  label: l10n.adminReferenceFieldDescription),
+              const SizedBox(height: AppSpacing.xs),
+              _SortOrderField(controller: _sortOrder),
+              if (editing) ...[
+                const SizedBox(height: AppSpacing.xs),
+                Text(l10n.adminReferenceUpdateReplacesNotice,
+                    style: Theme.of(context).textTheme.labelSmall),
+              ],
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.adminPartnerCancel),
+        ),
+        FilledButton(
+          key: const Key('admin-reference-form-submit'),
+          onPressed: _submit,
+          child: Text(
+              editing ? l10n.adminReferenceSave : l10n.adminReferenceCreate),
+        ),
+      ],
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Categories
+// ═══════════════════════════════════════════════════════════════════════════
+
+class _CategoriesTab extends StatelessWidget {
+  final AdminCategoriesState state;
+
+  const _CategoriesTab({required this.state});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return AnimatedBuilder(
+      animation: state,
+      builder: (context, _) {
+        final rows = state.items;
+        final body = state.isReady && rows.isNotEmpty
+            ? AdminResponsiveGrid(
+                wide: (context) => _CategoryTable(state: state, rows: rows),
+                narrow: (context) => _CategoryCards(state: state, rows: rows),
+              )
+            : AdminStateView(
+                status: state.status,
+                message: state.errorMessage,
+                emptyMessage: l10n.adminReferenceEmptyCategories,
+                onRetry: state.refresh,
+              );
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _MutationBanner(state: state),
+            Expanded(
+              child: AdminGridScaffold(
+                isLoading: state.isLoading,
+                toolbar: _ReferenceToolbar(
+                  state: state,
+                  createLabel: l10n.adminReferenceNewCategory,
+                  createKey: const Key('admin-reference-new-category'),
+                  onCreate: () => _openCategoryForm(context, state, null),
+                ),
+                body: body,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _CategoryTable extends StatelessWidget {
+  final AdminCategoriesState state;
+  final List<AdminCategory> rows;
+
+  const _CategoryTable({required this.state, required this.rows});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: DataTable(
+          columns: [
+            DataColumn(label: Text(l10n.adminReferenceColName)),
+            DataColumn(label: Text(l10n.adminReferenceColSlug)),
+            DataColumn(label: Text(l10n.adminReferenceColType)),
+            DataColumn(label: Text(l10n.adminReferenceColParent)),
+            DataColumn(label: Text(l10n.adminReferenceColSortOrder)),
+            DataColumn(label: Text(l10n.adminReferenceColCmsStatus)),
+            DataColumn(label: Text(l10n.adminReferenceColAction)),
+          ],
+          rows: [
+            for (final r in rows)
+              DataRow(cells: [
+                DataCell(Text(AdminFormats.text(context, r.name))),
+                DataCell(Text(AdminFormats.text(context, r.slug))),
+                DataCell(Text(AdminFormats.text(context, r.type))),
+                DataCell(Text(r.isRoot
+                    ? l10n.adminReferenceParentNone
+                    : AdminFormats.text(context, state.parentNameOf(r)))),
+                DataCell(
+                    Text(r.sortOrder?.toString() ?? l10n.adminValueUnknown)),
+                DataCell(_CmsStatusChip(active: r.active)),
+                DataCell(_CategoryActions(state: state, row: r, inline: true)),
+              ]),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CategoryCards extends StatelessWidget {
+  final AdminCategoriesState state;
+  final List<AdminCategory> rows;
+
+  const _CategoryCards({required this.state, required this.rows});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    return ListView.separated(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      itemCount: rows.length,
+      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
+      itemBuilder: (context, i) {
+        final r = rows[i];
+        return OceanGlassCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(AdminFormats.text(context, r.name),
+                        style: theme.textTheme.titleSmall),
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  _CmsStatusChip(active: r.active),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              AdminCardRow(
+                  label: l10n.adminReferenceColSlug,
+                  value: AdminFormats.text(context, r.slug)),
+              AdminCardRow(
+                  label: l10n.adminReferenceColType,
+                  value: AdminFormats.text(context, r.type)),
+              AdminCardRow(
+                label: l10n.adminReferenceColParent,
+                value: r.isRoot
+                    ? l10n.adminReferenceParentNone
+                    : AdminFormats.text(context, state.parentNameOf(r)),
+              ),
+              AdminCardRow(
+                  label: l10n.adminReferenceColSortOrder,
+                  value: r.sortOrder?.toString() ?? l10n.adminValueUnknown),
+              const SizedBox(height: AppSpacing.xs),
+              _CategoryActions(state: state, row: r),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _CategoryActions extends StatelessWidget {
+  final AdminCategoriesState state;
+  final AdminCategory row;
+  final bool inline;
+
+  const _CategoryActions({
+    required this.state,
+    required this.row,
+    this.inline = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final busy = state.isMutating || state.isLoading;
+    final name = row.name ?? l10n.adminValueUnknown;
+    return _ActionBar(
+      inline: inline,
+      children: [
+        Semantics(
+          button: true,
+          label: l10n.adminReferenceEditSemantic(name),
+          child: TextButton(
+            key: Key('admin-reference-category-edit-${row.id}'),
+            onPressed:
+                busy ? null : () => _openCategoryForm(context, state, row),
+            child: Text(l10n.adminReferenceEdit),
+          ),
+        ),
+        TextButton(
+          key: Key('admin-reference-category-status-${row.id}'),
+          onPressed: busy
+              ? null
+              : () async {
+                  final target = !row.active;
+                  final ok = await _confirmStatus(context,
+                      name: name, activating: target);
+                  if (!ok) return;
+                  await state.setActive(row, active: target);
+                },
+          child: Text(row.active
+              ? l10n.adminReferenceDeactivate
+              : l10n.adminReferenceActivate),
+        ),
+      ],
+    );
+  }
+}
+
+Future<void> _openCategoryForm(
+  BuildContext context,
+  AdminCategoriesState state,
+  AdminCategory? existing,
+) async {
+  final result = await showDialog<_CategoryFormResult>(
+    context: context,
+    builder: (ctx) => _CategoryFormDialog(
+      existing: existing,
+      typeOptions: state.typeOptions(current: existing?.type),
+      parentOptions: state.parentOptions(editing: existing),
+    ),
+  );
+  if (result == null) return;
+  if (existing == null) {
+    await state.create(
+      name: result.name,
+      slug: result.slug,
+      parentId: result.parentId,
+      type: result.type,
+      icon: result.icon,
+      color: result.color,
+      coverImageUrl: result.coverImageUrl,
+      sortOrder: result.sortOrder,
+    );
+  } else {
+    await state.update(
+      existing,
+      name: result.name,
+      parentId: result.parentId,
+      type: result.type,
+      icon: result.icon,
+      color: result.color,
+      coverImageUrl: result.coverImageUrl,
+      sortOrder: result.sortOrder,
+    );
+  }
+}
+
+class _CategoryFormResult {
+  final String name;
+  final String? slug;
+  final int? parentId;
+  final String? type;
+  final String? icon;
+  final String? color;
+  final String? coverImageUrl;
+  final int? sortOrder;
+
+  const _CategoryFormResult({
+    required this.name,
+    required this.slug,
+    required this.parentId,
+    required this.type,
+    required this.icon,
+    required this.color,
+    required this.coverImageUrl,
+    required this.sortOrder,
+  });
+}
+
+/// One form for create and update.
+///
+/// It offers exactly the eight fields `CategoryRequest` carries — `color`
+/// included. `CategoryService.fill` assigns every column from the request, so a
+/// field this form omitted would be written as null on every save.
+class _CategoryFormDialog extends StatefulWidget {
+  final AdminCategory? existing;
+  final List<String> typeOptions;
+  final List<AdminCategory> parentOptions;
+
+  const _CategoryFormDialog({
+    required this.existing,
+    required this.typeOptions,
+    required this.parentOptions,
+  });
+
+  @override
+  State<_CategoryFormDialog> createState() => _CategoryFormDialogState();
+}
+
+class _CategoryFormDialogState extends State<_CategoryFormDialog> {
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _name =
+      TextEditingController(text: widget.existing?.name ?? '');
+  late final TextEditingController _slug =
+      TextEditingController(text: widget.existing?.slug ?? '');
+  late final TextEditingController _icon =
+      TextEditingController(text: widget.existing?.icon ?? '');
+  late final TextEditingController _color =
+      TextEditingController(text: widget.existing?.color ?? '');
+  late final TextEditingController _coverImageUrl =
+      TextEditingController(text: widget.existing?.coverImageUrl ?? '');
+  late final TextEditingController _sortOrder =
+      TextEditingController(text: widget.existing?.sortOrder?.toString() ?? '');
+
+  late String? _type = widget.existing?.type;
+
+  /// The stored parent is preserved only when it is still an offerable option.
+  /// A parent that has become a descendant (data already containing a cycle)
+  /// would otherwise be a dropdown value with no matching item, which throws.
+  late int? _parentId =
+      widget.parentOptions.any((c) => c.id == widget.existing?.parentId)
+          ? widget.existing?.parentId
+          : null;
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _slug.dispose();
+    _icon.dispose();
+    _color.dispose();
+    _coverImageUrl.dispose();
+    _sortOrder.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+    String? trimmed(TextEditingController c) {
+      final t = c.text.trim();
+      return t.isEmpty ? null : t;
+    }
+
+    Navigator.of(context).pop(_CategoryFormResult(
+      name: _name.text.trim(),
+      slug: trimmed(_slug),
+      parentId: _parentId,
+      type: _type,
+      icon: trimmed(_icon),
+      color: trimmed(_color),
+      coverImageUrl: trimmed(_coverImageUrl),
+      sortOrder: int.tryParse(_sortOrder.text.trim()),
+    ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final editing = widget.existing != null;
+    return AlertDialog(
+      title: Text(editing
+          ? l10n.adminReferenceCategoryEditTitle
+          : l10n.adminReferenceCategoryCreateTitle),
+      content: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _NameField(controller: _name),
+              const SizedBox(height: AppSpacing.xs),
+              _SlugField(controller: _slug, editing: editing),
+              const SizedBox(height: AppSpacing.xs),
+              _VocabularyPicker(
+                label: l10n.adminReferenceFieldType,
+                value: _type,
+                options: widget.typeOptions,
+                pickerKey: const Key('admin-reference-type-picker'),
+                onChanged: (v) => setState(() => _type = v),
+              ),
+              const SizedBox(height: AppSpacing.xxs),
+              Text(l10n.adminReferenceTypeNotice,
+                  style: Theme.of(context).textTheme.labelSmall),
+              const SizedBox(height: AppSpacing.xs),
+              Semantics(
+                container: true,
+                explicitChildNodes: true,
+                label: l10n.adminReferenceFieldParent,
+                child: DropdownButtonFormField<int?>(
+                  key: const Key('admin-reference-parent-picker'),
+                  initialValue: _parentId,
+                  isExpanded: true,
+                  decoration: InputDecoration(
+                      labelText: l10n.adminReferenceFieldParent),
+                  items: [
+                    DropdownMenuItem<int?>(
+                      value: null,
+                      child: Text(l10n.adminReferenceParentNone),
+                    ),
+                    for (final c in widget.parentOptions)
+                      DropdownMenuItem<int?>(
+                        value: c.id,
+                        child: Text(c.name ?? '#${c.id}',
+                            overflow: TextOverflow.ellipsis),
+                      ),
+                  ],
+                  onChanged: (v) => setState(() => _parentId = v),
+                ),
+              ),
+              if (editing) ...[
+                const SizedBox(height: AppSpacing.xxs),
+                Text(l10n.adminReferenceParentGuardNotice,
+                    style: Theme.of(context).textTheme.labelSmall),
+              ],
+              const SizedBox(height: AppSpacing.xs),
+              _PlainField(
+                  controller: _icon, label: l10n.adminReferenceFieldIcon),
+              const SizedBox(height: AppSpacing.xs),
+              _PlainField(
+                  controller: _color, label: l10n.adminReferenceFieldColor),
+              const SizedBox(height: AppSpacing.xs),
+              _PlainField(
+                  controller: _coverImageUrl,
+                  label: l10n.adminReferenceFieldCoverImageUrl),
+              const SizedBox(height: AppSpacing.xs),
+              _SortOrderField(controller: _sortOrder),
+              if (editing) ...[
+                const SizedBox(height: AppSpacing.xs),
+                Text(l10n.adminReferenceUpdateReplacesNotice,
+                    style: Theme.of(context).textTheme.labelSmall),
+              ],
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.adminPartnerCancel),
+        ),
+        FilledButton(
+          key: const Key('admin-reference-form-submit'),
+          onPressed: _submit,
+          child: Text(
+              editing ? l10n.adminReferenceSave : l10n.adminReferenceCreate),
+        ),
+      ],
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Shared form fields
+// ═══════════════════════════════════════════════════════════════════════════
+
+/// `@NotBlank name` is the only validation either backend DTO declares, so it
+/// is the only validation this form adds. No length cap is invented: neither
+/// request record carries a `@Size`.
+class _NameField extends StatelessWidget {
+  final TextEditingController controller;
+
+  const _NameField({required this.controller});
+
+  static const Key fieldKey = Key('admin-reference-name-field');
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Semantics(
+      textField: true,
+      label: l10n.adminReferenceFieldName,
+      child: TextFormField(
+        key: fieldKey,
+        controller: controller,
+        decoration: InputDecoration(labelText: l10n.adminReferenceFieldName),
+        validator: (v) => (v == null || v.trim().isEmpty)
+            ? l10n.adminReferenceNameRequired
+            : null,
+      ),
+    );
+  }
+}
+
+/// Editable on create, read-only afterwards — see the class doc on
+/// `_AmenityFormDialog` for why.
+class _SlugField extends StatelessWidget {
+  final TextEditingController controller;
+  final bool editing;
+
+  const _SlugField({required this.controller, required this.editing});
+
+  static const Key fieldKey = Key('admin-reference-slug-field');
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Semantics(
+      textField: true,
+      readOnly: editing,
+      label: l10n.adminReferenceFieldSlug,
+      child: TextFormField(
+        key: fieldKey,
+        controller: controller,
+        enabled: !editing,
+        readOnly: editing,
+        autocorrect: false,
+        decoration: InputDecoration(
+          labelText: l10n.adminReferenceFieldSlug,
+          helperText: editing
+              ? l10n.adminReferenceSlugFixedNotice
+              : l10n.adminReferenceSlugHelper,
+          helperMaxLines: 3,
+        ),
+      ),
+    );
+  }
+}
+
+class _PlainField extends StatelessWidget {
+  final TextEditingController controller;
+  final String label;
+
+  const _PlainField({required this.controller, required this.label});
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        textField: true,
+        label: label,
+        child: TextFormField(
+          controller: controller,
+          decoration: InputDecoration(labelText: label),
+        ),
+      );
+}
+
+/// `sortOrder` is an unbounded `Integer` on both DTOs — negatives included — so
+/// the only thing rejected here is text that is not an integer at all.
+class _SortOrderField extends StatelessWidget {
+  final TextEditingController controller;
+
+  const _SortOrderField({required this.controller});
+
+  static const Key fieldKey = Key('admin-reference-sort-order-field');
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Semantics(
+      textField: true,
+      label: l10n.adminReferenceFieldSortOrder,
+      child: TextFormField(
+        key: fieldKey,
+        controller: controller,
+        keyboardType: TextInputType.number,
+        decoration:
+            InputDecoration(labelText: l10n.adminReferenceFieldSortOrder),
+        validator: (v) {
+          final t = v?.trim() ?? '';
+          if (t.isEmpty) return null;
+          return int.tryParse(t) == null
+              ? l10n.adminReferenceSortOrderInvalid
+              : null;
+        },
+      ),
+    );
+  }
+}
+
+/// A closed picker over values observed in the data.
+///
+/// Both vocabularies it serves — `Amenity.groupName` and `Category.type` — are
+/// unvalidated `String` columns the backend will accept anything into, and
+/// `Category.type` is matched against `CouponDefinition.placeType` by live
+/// coupon targeting. A free text field here would let a typo break that
+/// silently, so no "add a new value" affordance is offered.
+class _VocabularyPicker extends StatelessWidget {
+  final String label;
+  final String? value;
+  final List<String> options;
+  final ValueChanged<String?> onChanged;
+  final Key pickerKey;
+
+  const _VocabularyPicker({
+    required this.label,
+    required this.value,
+    required this.options,
+    required this.onChanged,
+    required this.pickerKey,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Semantics(
+      container: true,
+      explicitChildNodes: true,
+      label: label,
+      child: DropdownButtonFormField<String?>(
+        key: pickerKey,
+        initialValue: options.contains(value) ? value : null,
+        isExpanded: true,
+        decoration: InputDecoration(labelText: label),
+        items: [
+          DropdownMenuItem<String?>(
+            value: null,
+            child: Text(l10n.adminReferenceValueNotSet),
+          ),
+          for (final o in options)
+            DropdownMenuItem<String?>(
+                value: o, child: Text(o, overflow: TextOverflow.ellipsis)),
+        ],
+        onChanged: onChanged,
+      ),
+    );
+  }
+}
