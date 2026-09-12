@@ -344,3 +344,148 @@ class AdminCategoriesState extends AdminReferenceListState<AdminCategory> {
   Future<bool> setActive(AdminCategory row, {required bool active}) =>
       mutate(() => api.setAdminCategoryActive(row.id, active: active));
 }
+
+/// `/api/admin/locations` — list, create, update, set CMS status.
+///
+/// <h4>Why several fields are carried but never edited</h4>
+///
+/// `PUT` is a full replace, and four of the columns it rewrites are ones this
+/// console deliberately does not let an operator change:
+///
+///  * `parentId` — the backend has no cycle guard and does not recompute a
+///    subtree after a reparent, so a parent picker here could orphan a whole
+///    branch from `/api/locations/roots`;
+///  * `fullPath` — caller-supplied, never derived, and **customer-visible**: it
+///    rides in `PlaceDto.LocationRef` and the traveller app parses it to show a
+///    place's province;
+///  * `level` — never derived and validated against nothing;
+///  * `latitude`/`longitude` — no range or pairing validation exists.
+///
+/// So [update] takes only the five editable fields and passes the stored value
+/// of every other one straight back. Nothing is cleared by omission.
+class AdminLocationsState extends AdminReferenceListState<AdminLocation> {
+  AdminLocationsState({required super.api});
+
+  @override
+  Future<CollectionApiResult<List<AdminLocation>>> fetch() =>
+      api.getAdminLocations();
+
+  // ── client-side filter ────────────────────────────────────────────────────
+  //
+  // `GET /api/admin/locations` is `repo.findAll()` with no page, sort, filter
+  // or search parameter, so the filter is applied here over rows already held.
+  // It covers name, slug, code and oldName — the same four columns the
+  // backend's own public search query covers, so the two agree on what
+  // "matches" means even though this one never leaves the client.
+
+  String _filter = '';
+
+  String get filter => _filter;
+  bool get hasFilter => _filter.trim().isNotEmpty;
+
+  void setFilter(String value) {
+    if (value == _filter) return;
+    _filter = value;
+    notifyListeners();
+  }
+
+  void clearFilter() => setFilter('');
+
+  /// The rows the grid renders — every loaded row when no filter is set.
+  List<AdminLocation> get visibleItems {
+    if (!hasFilter) return items;
+    return items.where((l) => l.matchesFilter(_filter)).toList(growable: false);
+  }
+
+  /// True when rows exist but the filter matches none of them. Distinct from
+  /// [isEmpty], so "no results for this search" is never shown as "no
+  /// locations exist" — and neither is ever shown for a failed load.
+  bool get isFilteredEmpty =>
+      isReady && items.isNotEmpty && visibleItems.isEmpty;
+
+  @override
+  void reset() {
+    _filter = '';
+    super.reset();
+  }
+
+  // ── hierarchy (read-only) ─────────────────────────────────────────────────
+
+  /// The row with this id among the loaded rows, or null.
+  AdminLocation? byId(int? id) {
+    if (id == null) return null;
+    for (final l in items) {
+      if (l.id == id) return l;
+    }
+    return null;
+  }
+
+  /// Display name of [row]'s parent, or null when it is a root or the parent is
+  /// not among the loaded rows. Resolved from rows already held — the admin API
+  /// has no per-id read, so a second request is not an option anyway.
+  String? parentNameOf(AdminLocation row) => byId(row.parentId)?.name;
+
+  // ── mutations ─────────────────────────────────────────────────────────────
+
+  /// Creates a **root** location.
+  ///
+  /// D11 offers no parent control, so `parentId` is always null. `fullPath` is
+  /// passed by the caller as the value it previewed, and `level`, `latitude`
+  /// and `longitude` are left unset — the backend derives none of them and the
+  /// console invents none.
+  Future<bool> create({
+    required String name,
+    required String type,
+    String? slug,
+    String? code,
+    String? oldName,
+    String? fullPath,
+    int? sortOrder,
+  }) =>
+      mutate(() => api.createAdminLocation(
+            name: name,
+            type: type,
+            slug: slug,
+            code: code,
+            oldName: oldName,
+            fullPath: fullPath,
+            sortOrder: sortOrder,
+          ));
+
+  /// Updates the five editable fields and echoes everything else back.
+  ///
+  /// [code] follows the console's one extra rule: a stored code is never
+  /// cleared. A caller passing null or blank for a row that has one keeps the
+  /// stored value, so an accidental empty box cannot drop a business key that
+  /// `DataInitializer` resolves rows by. Replacing it with a new value is
+  /// allowed, and clearing a code that was already absent is a no-op.
+  Future<bool> update(
+    AdminLocation row, {
+    required String name,
+    required String type,
+    String? code,
+    String? oldName,
+    int? sortOrder,
+  }) {
+    final trimmed = code?.trim();
+    final nextCode = (trimmed == null || trimmed.isEmpty) ? row.code : trimmed;
+    return mutate(() => api.updateAdminLocation(
+          row.id,
+          name: name,
+          type: type,
+          code: nextCode,
+          oldName: oldName,
+          sortOrder: sortOrder,
+          // Preserved verbatim — see the class doc.
+          slug: row.slug,
+          parentId: row.parentId,
+          fullPath: row.fullPath,
+          level: row.level,
+          latitude: row.latitude,
+          longitude: row.longitude,
+        ));
+  }
+
+  Future<bool> setActive(AdminLocation row, {required bool active}) =>
+      mutate(() => api.setAdminLocationActive(row.id, active: active));
+}

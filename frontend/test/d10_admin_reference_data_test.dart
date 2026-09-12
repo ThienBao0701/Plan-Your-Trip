@@ -319,8 +319,12 @@ void main() {
     final api = ApiClient(client: client ?? d10Client())..demoMode = false;
     final amenities = AdminAmenitiesState(api: api);
     final categories = AdminCategoriesState(api: api);
+    // D11 added a third tab to this screen. It is never opened here, so no
+    // location request is made and every assertion below is unaffected.
+    final locations = AdminLocationsState(api: api);
     addTearDown(amenities.dispose);
     addTearDown(categories.dispose);
+    addTearDown(locations.dispose);
 
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1.0;
@@ -335,6 +339,7 @@ void main() {
         body: AdminReferenceDataScreen(
           amenities: amenities,
           categories: categories,
+          locations: locations,
           initialTab: initialTab,
         ),
       ),

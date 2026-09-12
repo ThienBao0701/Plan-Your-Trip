@@ -29,8 +29,9 @@ import '../widgets/admin_widgets.dart';
 class AdminReferenceDataScreen extends StatefulWidget {
   final AdminAmenitiesState amenities;
   final AdminCategoriesState categories;
+  final AdminLocationsState locations;
 
-  /// Which tab opens first. Exists so a test can target either tab directly
+  /// Which tab opens first. Exists so a test can target any tab directly
   /// without driving a gesture.
   final int initialTab;
 
@@ -38,6 +39,7 @@ class AdminReferenceDataScreen extends StatefulWidget {
     super.key,
     required this.amenities,
     required this.categories,
+    required this.locations,
     this.initialTab = 0,
   });
 
@@ -49,9 +51,9 @@ class AdminReferenceDataScreen extends StatefulWidget {
 class _AdminReferenceDataScreenState extends State<AdminReferenceDataScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabs = TabController(
-    length: 2,
+    length: 3,
     vsync: this,
-    initialIndex: widget.initialTab.clamp(0, 1),
+    initialIndex: widget.initialTab.clamp(0, 2),
   )..addListener(_onTabChanged);
 
   @override
@@ -79,16 +81,24 @@ class _AdminReferenceDataScreenState extends State<AdminReferenceDataScreen>
 
   /// Idle-guarded, so returning to a tab keeps its rows instead of refetching.
   ///
-  /// Written as a branch rather than a shared variable: the two notifiers have
-  /// different type arguments, so their least upper bound is `ChangeNotifier`
-  /// and a common variable would need a cast that buys nothing.
+  /// Written as a branch rather than a shared variable: the three notifiers
+  /// have different type arguments, so their least upper bound is
+  /// `ChangeNotifier` and a common variable would need a cast that buys
+  /// nothing.
   void _loadCurrentTab() {
-    if (_tabs.index == 0) {
-      if (widget.amenities.status == AdminLoadStatus.idle) {
-        widget.amenities.load();
-      }
-    } else if (widget.categories.status == AdminLoadStatus.idle) {
-      widget.categories.load();
+    switch (_tabs.index) {
+      case 0:
+        if (widget.amenities.status == AdminLoadStatus.idle) {
+          widget.amenities.load();
+        }
+      case 1:
+        if (widget.categories.status == AdminLoadStatus.idle) {
+          widget.categories.load();
+        }
+      default:
+        if (widget.locations.status == AdminLoadStatus.idle) {
+          widget.locations.load();
+        }
     }
   }
 
@@ -108,6 +118,7 @@ class _AdminReferenceDataScreenState extends State<AdminReferenceDataScreen>
           tabs: [
             Tab(text: l10n.adminReferenceTabAmenities),
             Tab(text: l10n.adminReferenceTabCategories),
+            Tab(text: l10n.adminReferenceTabLocations),
           ],
         ),
         Expanded(
@@ -116,6 +127,7 @@ class _AdminReferenceDataScreenState extends State<AdminReferenceDataScreen>
             children: [
               _AmenitiesTab(state: widget.amenities),
               _CategoriesTab(state: widget.categories),
+              _LocationsTab(state: widget.locations),
             ],
           ),
         ),
@@ -175,7 +187,13 @@ class _CmsScopeNotice extends StatelessWidget {
 class _MutationBanner extends StatelessWidget {
   final AdminReferenceListState<Object?> state;
 
-  const _MutationBanner({required this.state});
+  /// Shown for a 409 whose server message did not survive sanitisation.
+  /// Amenities and categories have one conflict axis, so the default names the
+  /// slug; locations have two, so that tab supplies its own wording rather than
+  /// blaming a field the operator may not have touched.
+  final String? conflictLabel;
+
+  const _MutationBanner({required this.state, this.conflictLabel});
 
   @override
   Widget build(BuildContext context) {
@@ -220,7 +238,8 @@ class _MutationBanner extends StatelessWidget {
                     // message did not survive sanitisation.
                     : (error ??
                         (conflict
-                            ? l10n.adminReferenceDuplicateSlug
+                            ? (conflictLabel ??
+                                l10n.adminReferenceDuplicateSlug)
                             : l10n.adminReferenceMutationFailed)),
                 style: theme.textTheme.bodySmall?.copyWith(color: foreground),
               ),
@@ -243,11 +262,17 @@ class _ReferenceToolbar extends StatelessWidget {
   final Key createKey;
   final VoidCallback onCreate;
 
+  /// Rendered under the buttons. Only Locations uses it, for its client-side
+  /// filter — the other two surfaces hold far fewer rows than the backend's own
+  /// search would need to be worth wiring.
+  final Widget? extra;
+
   const _ReferenceToolbar({
     required this.state,
     required this.createLabel,
     required this.createKey,
     required this.onCreate,
+    this.extra,
   });
 
   @override
@@ -275,6 +300,10 @@ class _ReferenceToolbar extends StatelessWidget {
             ),
           ],
         ),
+        if (extra != null) ...[
+          const SizedBox(height: AppSpacing.xs),
+          extra!,
+        ],
         const SizedBox(height: AppSpacing.xxs),
         // The backend applies no ordering and never uses `sortOrder` to sort,
         // so the rows arrive in whatever order the database returned. Said
@@ -1190,6 +1219,611 @@ class _CategoryFormDialogState extends State<_CategoryFormDialog> {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// Locations
+// ═══════════════════════════════════════════════════════════════════════════
+//
+// `AdministrativeUnit` on the backend; **Location** everywhere a person reads
+// it. Nothing is renamed on either side.
+//
+// Five fields are editable — name, code, type, oldName, sortOrder. Everything
+// else the row carries is shown read-only and echoed back on save, because
+// `PUT` is a full replace and the backend derives none of it:
+//
+//  * `parentId` — no cycle guard, and a reparent does not recompute the
+//    subtree, so a parent picker here could orphan a branch from
+//    `/api/locations/roots`;
+//  * `fullPath` — customer-visible through `PlaceDto.LocationRef`;
+//  * `level` — derived from nothing, validated against nothing;
+//  * `latitude`/`longitude` — no range or pairing validation.
+
+class _LocationsTab extends StatelessWidget {
+  final AdminLocationsState state;
+
+  const _LocationsTab({required this.state});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return AnimatedBuilder(
+      animation: state,
+      builder: (context, _) {
+        final rows = state.visibleItems;
+        final body = state.isReady && rows.isNotEmpty
+            ? AdminResponsiveGrid(
+                wide: (context) => _LocationTable(state: state, rows: rows),
+                narrow: (context) => _LocationCards(state: state, rows: rows),
+              )
+            : AdminStateView(
+                status: state.status,
+                message: state.errorMessage,
+                // "No match for this search" and "no locations exist" are
+                // different facts, and neither is ever shown for a failure.
+                emptyMessage: state.isFilteredEmpty
+                    ? l10n.adminLocationFilterEmpty
+                    : l10n.adminLocationEmpty,
+                onRetry: state.refresh,
+              );
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _MutationBanner(
+              state: state,
+              conflictLabel: l10n.adminLocationDuplicateCodeOrSlug,
+            ),
+            Expanded(
+              child: AdminGridScaffold(
+                isLoading: state.isLoading,
+                toolbar: _ReferenceToolbar(
+                  state: state,
+                  createLabel: l10n.adminLocationNew,
+                  createKey: const Key('admin-reference-new-location'),
+                  onCreate: () => _openLocationForm(context, state, null),
+                  extra: _LocationFilterField(state: state),
+                ),
+                body: body,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// Client-side only: the admin list endpoint takes no search parameter, so
+/// filtering happens over rows already held rather than pretending to query.
+class _LocationFilterField extends StatefulWidget {
+  final AdminLocationsState state;
+
+  const _LocationFilterField({required this.state});
+
+  @override
+  State<_LocationFilterField> createState() => _LocationFilterFieldState();
+}
+
+class _LocationFilterFieldState extends State<_LocationFilterField> {
+  late final TextEditingController _controller =
+      TextEditingController(text: widget.state.filter);
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Semantics(
+      textField: true,
+      label: l10n.adminLocationFilterLabel,
+      child: TextField(
+        key: const Key('admin-reference-location-filter'),
+        controller: _controller,
+        decoration: InputDecoration(
+          isDense: true,
+          prefixIcon: const Icon(Icons.search),
+          labelText: l10n.adminLocationFilterLabel,
+          helperText: l10n.adminLocationFilterHelper,
+          helperMaxLines: 2,
+          suffixIcon: _controller.text.isEmpty
+              ? null
+              : IconButton(
+                  icon: const Icon(Icons.clear),
+                  tooltip: l10n.adminLocationFilterClear,
+                  onPressed: () {
+                    _controller.clear();
+                    widget.state.clearFilter();
+                    setState(() {});
+                  },
+                ),
+        ),
+        onChanged: (v) {
+          widget.state.setFilter(v);
+          setState(() {});
+        },
+      ),
+    );
+  }
+}
+
+String _coordinatesLabel(BuildContext context, AdminLocation row) {
+  final l10n = AppLocalizations.of(context)!;
+  if (!row.hasCoordinates) return l10n.adminValueUnknown;
+  return '${row.latitude!.toStringAsFixed(4)}, '
+      '${row.longitude!.toStringAsFixed(4)}';
+}
+
+String _parentLabel(
+    BuildContext context, AdminLocationsState state, AdminLocation row) {
+  final l10n = AppLocalizations.of(context)!;
+  if (row.isRoot) return l10n.adminReferenceParentNone;
+  return state.parentNameOf(row) ?? '#${row.parentId}';
+}
+
+class _LocationTable extends StatelessWidget {
+  final AdminLocationsState state;
+  final List<AdminLocation> rows;
+
+  const _LocationTable({required this.state, required this.rows});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: DataTable(
+          columns: [
+            DataColumn(label: Text(l10n.adminReferenceColName)),
+            DataColumn(label: Text(l10n.adminLocationColCode)),
+            DataColumn(label: Text(l10n.adminReferenceColSlug)),
+            DataColumn(label: Text(l10n.adminReferenceColType)),
+            DataColumn(label: Text(l10n.adminReferenceColParent)),
+            DataColumn(label: Text(l10n.adminLocationColLevel)),
+            DataColumn(label: Text(l10n.adminLocationColCoordinates)),
+            DataColumn(label: Text(l10n.adminReferenceColCmsStatus)),
+            DataColumn(label: Text(l10n.adminReferenceColAction)),
+          ],
+          rows: [
+            for (final r in rows)
+              DataRow(cells: [
+                DataCell(Text(AdminFormats.text(context, r.name))),
+                DataCell(Text(AdminFormats.text(context, r.code))),
+                DataCell(Text(AdminFormats.text(context, r.slug))),
+                DataCell(Text(AdminFormats.text(context, r.type))),
+                DataCell(Text(_parentLabel(context, state, r))),
+                DataCell(Text(r.level?.toString() ?? l10n.adminValueUnknown)),
+                DataCell(Text(_coordinatesLabel(context, r))),
+                DataCell(_CmsStatusChip(active: r.active)),
+                DataCell(_LocationActions(state: state, row: r, inline: true)),
+              ]),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LocationCards extends StatelessWidget {
+  final AdminLocationsState state;
+  final List<AdminLocation> rows;
+
+  const _LocationCards({required this.state, required this.rows});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    return ListView.separated(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      itemCount: rows.length,
+      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
+      itemBuilder: (context, i) {
+        final r = rows[i];
+        return OceanGlassCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(AdminFormats.text(context, r.name),
+                        style: theme.textTheme.titleSmall),
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  _CmsStatusChip(active: r.active),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              AdminCardRow(
+                  label: l10n.adminLocationColCode,
+                  value: AdminFormats.text(context, r.code)),
+              AdminCardRow(
+                  label: l10n.adminReferenceColSlug,
+                  value: AdminFormats.text(context, r.slug)),
+              AdminCardRow(
+                  label: l10n.adminReferenceColType,
+                  value: AdminFormats.text(context, r.type)),
+              AdminCardRow(
+                  label: l10n.adminReferenceColParent,
+                  value: _parentLabel(context, state, r)),
+              AdminCardRow(
+                  label: l10n.adminLocationColLevel,
+                  value: r.level?.toString() ?? l10n.adminValueUnknown),
+              AdminCardRow(
+                  label: l10n.adminLocationColCoordinates,
+                  value: _coordinatesLabel(context, r)),
+              const SizedBox(height: AppSpacing.xs),
+              _LocationActions(state: state, row: r),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _LocationActions extends StatelessWidget {
+  final AdminLocationsState state;
+  final AdminLocation row;
+  final bool inline;
+
+  const _LocationActions({
+    required this.state,
+    required this.row,
+    this.inline = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final busy = state.isMutating || state.isLoading;
+    final name = row.name ?? l10n.adminValueUnknown;
+    return _ActionBar(
+      inline: inline,
+      children: [
+        Semantics(
+          button: true,
+          label: l10n.adminReferenceEditSemantic(name),
+          child: TextButton(
+            key: Key('admin-reference-location-edit-${row.id}'),
+            onPressed:
+                busy ? null : () => _openLocationForm(context, state, row),
+            child: Text(l10n.adminReferenceEdit),
+          ),
+        ),
+        TextButton(
+          key: Key('admin-reference-location-status-${row.id}'),
+          onPressed: busy
+              ? null
+              : () async {
+                  final target = !row.active;
+                  final ok = await _confirmStatus(context,
+                      name: name, activating: target);
+                  if (!ok) return;
+                  await state.setActive(row, active: target);
+                },
+          child: Text(row.active
+              ? l10n.adminReferenceDeactivate
+              : l10n.adminReferenceActivate),
+        ),
+      ],
+    );
+  }
+}
+
+Future<void> _openLocationForm(
+  BuildContext context,
+  AdminLocationsState state,
+  AdminLocation? existing,
+) async {
+  final result = await showDialog<_LocationFormResult>(
+    context: context,
+    builder: (ctx) => _LocationFormDialog(existing: existing),
+  );
+  if (result == null) return;
+  if (existing == null) {
+    await state.create(
+      name: result.name,
+      type: result.type,
+      slug: result.slug,
+      code: result.code,
+      oldName: result.oldName,
+      fullPath: result.fullPath,
+      sortOrder: result.sortOrder,
+    );
+  } else {
+    await state.update(
+      existing,
+      name: result.name,
+      type: result.type,
+      code: result.code,
+      oldName: result.oldName,
+      sortOrder: result.sortOrder,
+    );
+  }
+}
+
+class _LocationFormResult {
+  final String name;
+  final String type;
+  final String? slug;
+  final String? code;
+  final String? oldName;
+  final String? fullPath;
+  final int? sortOrder;
+
+  const _LocationFormResult({
+    required this.name,
+    required this.type,
+    required this.slug,
+    required this.code,
+    required this.oldName,
+    required this.fullPath,
+    required this.sortOrder,
+  });
+}
+
+/// One form for create and update.
+///
+/// Create makes a **top-level** location: D11 offers no parent control at all,
+/// because the backend neither guards cycles nor recomputes a subtree after a
+/// reparent. The form says so rather than leaving it to be discovered.
+class _LocationFormDialog extends StatefulWidget {
+  final AdminLocation? existing;
+
+  const _LocationFormDialog({required this.existing});
+
+  @override
+  State<_LocationFormDialog> createState() => _LocationFormDialogState();
+}
+
+class _LocationFormDialogState extends State<_LocationFormDialog> {
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _name =
+      TextEditingController(text: widget.existing?.name ?? '');
+  late final TextEditingController _slug =
+      TextEditingController(text: widget.existing?.slug ?? '');
+  late final TextEditingController _code =
+      TextEditingController(text: widget.existing?.code ?? '');
+  late final TextEditingController _oldName =
+      TextEditingController(text: widget.existing?.oldName ?? '');
+  late final TextEditingController _sortOrder =
+      TextEditingController(text: widget.existing?.sortOrder?.toString() ?? '');
+
+  late String _type = widget.existing?.type ?? AdminLocationType.values.first;
+
+  @override
+  void initState() {
+    super.initState();
+    // The create form previews the exact `fullPath` it will send, and that
+    // preview is the name, so it has to follow the name as it is typed.
+    if (widget.existing == null) _name.addListener(_onNameChanged);
+  }
+
+  void _onNameChanged() => setState(() {});
+
+  @override
+  void dispose() {
+    if (widget.existing == null) _name.removeListener(_onNameChanged);
+    _name.dispose();
+    _slug.dispose();
+    _code.dispose();
+    _oldName.dispose();
+    _sortOrder.dispose();
+    super.dispose();
+  }
+
+  /// What a new root location's path will be.
+  ///
+  /// `DataInitializer` builds a path as
+  /// `parent != null ? parent.fullPath + " > " + name : name`. D11 only creates
+  /// roots, so the second branch is the whole rule and there is nothing to
+  /// infer. It is shown read-only so the operator sees exactly what is stored.
+  String get _fullPathPreview => _name.text.trim();
+
+  String? _validateCode(String? v) {
+    final existing = widget.existing;
+    if (existing == null || existing.code == null) return null;
+    final t = v?.trim() ?? '';
+    if (t.isEmpty) {
+      return AppLocalizations.of(context)!.adminLocationCodeCannotBeCleared;
+    }
+    return null;
+  }
+
+  void _submit() {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+    String? trimmed(TextEditingController c) {
+      final t = c.text.trim();
+      return t.isEmpty ? null : t;
+    }
+
+    final creating = widget.existing == null;
+    Navigator.of(context).pop(_LocationFormResult(
+      name: _name.text.trim(),
+      type: _type,
+      slug: creating ? trimmed(_slug) : widget.existing!.slug,
+      code: trimmed(_code),
+      oldName: trimmed(_oldName),
+      fullPath: creating ? _fullPathPreview : widget.existing!.fullPath,
+      sortOrder: int.tryParse(_sortOrder.text.trim()),
+    ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final existing = widget.existing;
+    final editing = existing != null;
+    return AlertDialog(
+      title: Text(editing
+          ? l10n.adminLocationEditTitle
+          : l10n.adminLocationCreateTitle),
+      content: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _NameField(controller: _name),
+              const SizedBox(height: AppSpacing.xs),
+              Semantics(
+                textField: true,
+                label: l10n.adminLocationFieldCode,
+                child: TextFormField(
+                  key: const Key('admin-reference-location-code-field'),
+                  controller: _code,
+                  autocorrect: false,
+                  decoration: InputDecoration(
+                    labelText: l10n.adminLocationFieldCode,
+                    helperText: editing && existing.code != null
+                        ? l10n.adminLocationCodeHelperFixed
+                        : l10n.adminLocationCodeHelper,
+                    helperMaxLines: 3,
+                  ),
+                  validator: _validateCode,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              _SlugField(controller: _slug, editing: editing),
+              const SizedBox(height: AppSpacing.xs),
+              Semantics(
+                container: true,
+                explicitChildNodes: true,
+                label: l10n.adminReferenceFieldType,
+                child: DropdownButtonFormField<String>(
+                  key: const Key('admin-reference-location-type-picker'),
+                  initialValue: _type,
+                  isExpanded: true,
+                  decoration:
+                      InputDecoration(labelText: l10n.adminReferenceFieldType),
+                  items: [
+                    for (final t
+                        in AdminLocationType.optionsWith(existing?.type))
+                      DropdownMenuItem(value: t, child: Text(t)),
+                  ],
+                  onChanged: (v) => setState(() => _type = v ?? _type),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              _PlainField(
+                controller: _oldName,
+                label: l10n.adminLocationFieldOldName,
+                fieldKey: const Key('admin-reference-location-oldname-field'),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              _SortOrderField(controller: _sortOrder),
+              const SizedBox(height: AppSpacing.sm),
+
+              // ── read-only, preserved on save ──────────────────────────────
+              Text(l10n.adminLocationReadOnlyNotice,
+                  style: Theme.of(context).textTheme.labelSmall),
+              const SizedBox(height: AppSpacing.xs),
+              _ReadOnlyValue(
+                label: l10n.adminReferenceFieldParent,
+                value: editing
+                    ? (existing.isRoot
+                        ? l10n.adminReferenceParentNone
+                        : '#${existing.parentId}')
+                    : l10n.adminReferenceParentNone,
+                note: editing ? null : l10n.adminLocationCreateRootNotice,
+              ),
+              _ReadOnlyValue(
+                label: l10n.adminLocationFieldFullPath,
+                value: editing
+                    ? (existing.fullPath ?? l10n.adminValueUnknown)
+                    : (_fullPathPreview.isEmpty
+                        ? l10n.adminValueUnknown
+                        : _fullPathPreview),
+                note: editing
+                    ? l10n.adminLocationFullPathPreservedNotice
+                    : l10n.adminLocationFullPathPreviewNotice,
+              ),
+              _ReadOnlyValue(
+                label: l10n.adminLocationFieldLevel,
+                value: existing?.level?.toString() ?? l10n.adminValueUnknown,
+              ),
+              _ReadOnlyValue(
+                label: l10n.adminLocationFieldCoordinates,
+                value: editing
+                    ? _coordinatesLabel(context, existing)
+                    : l10n.adminValueUnknown,
+              ),
+              if (editing) ...[
+                const SizedBox(height: AppSpacing.xs),
+                Text(l10n.adminReferenceUpdateReplacesNotice,
+                    style: Theme.of(context).textTheme.labelSmall),
+              ],
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.adminPartnerCancel),
+        ),
+        FilledButton(
+          key: const Key('admin-reference-form-submit'),
+          onPressed: _submit,
+          child: Text(
+              editing ? l10n.adminReferenceSave : l10n.adminReferenceCreate),
+        ),
+      ],
+    );
+  }
+}
+
+/// A value the console shows but never lets an operator change.
+///
+/// Deliberately **not** a disabled `TextFormField`: a text box that cannot be
+/// typed into still reads as an input, and these four are not inputs at all.
+class _ReadOnlyValue extends StatelessWidget {
+  final String label;
+  final String value;
+  final String? note;
+
+  const _ReadOnlyValue({
+    required this.label,
+    required this.value,
+    this.note,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+      child: Semantics(
+        container: true,
+        readOnly: true,
+        label: label,
+        value: value,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(label,
+                style: theme.textTheme.labelSmall
+                    ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+            Text(value, style: theme.textTheme.bodyMedium),
+            if (note != null)
+              Text(note!,
+                  style: theme.textTheme.labelSmall
+                      ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // Shared form fields
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -1260,13 +1894,22 @@ class _PlainField extends StatelessWidget {
   final TextEditingController controller;
   final String label;
 
-  const _PlainField({required this.controller, required this.label});
+  /// Applied to the `TextFormField` itself rather than to this wrapper, so a
+  /// test that enumerates the dialog's inputs sees it.
+  final Key? fieldKey;
+
+  const _PlainField({
+    required this.controller,
+    required this.label,
+    this.fieldKey,
+  });
 
   @override
   Widget build(BuildContext context) => Semantics(
         textField: true,
         label: label,
         child: TextFormField(
+          key: fieldKey,
           controller: controller,
           decoration: InputDecoration(labelText: label),
         ),

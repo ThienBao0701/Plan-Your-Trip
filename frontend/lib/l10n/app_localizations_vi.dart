@@ -13313,6 +13313,91 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
+  String get adminReferenceTabLocations => 'Địa danh';
+
+  @override
+  String get adminLocationNew => 'Địa danh mới';
+
+  @override
+  String get adminLocationCreateTitle => 'Địa danh mới';
+
+  @override
+  String get adminLocationEditTitle => 'Sửa địa danh';
+
+  @override
+  String get adminLocationColCode => 'Mã';
+
+  @override
+  String get adminLocationColLevel => 'Cấp';
+
+  @override
+  String get adminLocationColCoordinates => 'Toạ độ';
+
+  @override
+  String get adminLocationFieldCode => 'Mã';
+
+  @override
+  String get adminLocationFieldOldName => 'Tên cũ';
+
+  @override
+  String get adminLocationFieldFullPath => 'Đường dẫn đầy đủ';
+
+  @override
+  String get adminLocationFieldLevel => 'Cấp';
+
+  @override
+  String get adminLocationFieldCoordinates => 'Toạ độ';
+
+  @override
+  String get adminLocationCodeHelper =>
+      'Không bắt buộc. Là khoá nghiệp vụ ngắn để các hệ thống khác tra cứu địa danh này.';
+
+  @override
+  String get adminLocationCodeHelperFixed =>
+      'Mã có thể được thay bằng giá trị khác nhưng không thể xoá — các hệ thống khác tra cứu địa danh này theo mã.';
+
+  @override
+  String get adminLocationCodeCannotBeCleared =>
+      'Không thể xoá mã. Hãy nhập mã thay thế, hoặc giữ nguyên mã hiện tại.';
+
+  @override
+  String get adminLocationReadOnlyNotice =>
+      'Các giá trị bên dưới do máy chủ lưu và không sửa được ở đây. Chúng được gửi lại nguyên vẹn khi lưu.';
+
+  @override
+  String get adminLocationCreateRootNotice =>
+      'Địa danh mới được tạo ở cấp cao nhất. Bảng quản trị này không cho chọn hay đổi địa danh cha.';
+
+  @override
+  String get adminLocationFullPathPreviewNotice =>
+      'Đây là đường dẫn sẽ được lưu cho địa danh mới.';
+
+  @override
+  String get adminLocationFullPathPreservedNotice =>
+      'Khách hàng nhìn thấy giá trị này ở các địa điểm thuộc địa danh. Được gửi lại đúng như đang lưu.';
+
+  @override
+  String get adminLocationEmpty => 'Chưa có địa danh nào.';
+
+  @override
+  String get adminLocationFilterEmpty =>
+      'Không có địa danh nào khớp tìm kiếm này.';
+
+  @override
+  String get adminLocationFilterLabel => 'Tìm địa danh';
+
+  @override
+  String get adminLocationFilterHelper =>
+      'Lọc trong các địa danh đã tải, theo tên, slug, mã hoặc tên cũ.';
+
+  @override
+  String get adminLocationFilterClear => 'Xoá tìm kiếm';
+
+  @override
+  String get adminLocationDuplicateCodeOrSlug =>
+      'Mã hoặc slug này đã được dùng. Hãy chọn giá trị khác.';
+
+  @override
   String get adminReviewModerationUncertain =>
       'Không rõ kết quả của thao tác vừa rồi. Trang đã được tải lại — hãy kiểm tra trạng thái đánh giá trước khi thử lại.';
 }

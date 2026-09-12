@@ -73,10 +73,12 @@ class _AdminAppShellState extends State<AdminAppShell> {
 
   AdminMediaState? _media;
 
-  /// D10 — one destination, two notifiers. They are independent reads against
-  /// independent endpoints, so a failure on one tab never blanks the other.
+  /// D10/D11 — one destination, three notifiers. They are independent reads
+  /// against independent endpoints, so a failure on one tab never blanks the
+  /// others.
   AdminAmenitiesState? _amenities;
   AdminCategoriesState? _categories;
+  AdminLocationsState? _locations;
 
   /// The place currently open, or null when the Catalog destination is showing
   /// its list. Created per place and disposed when another is opened, so a slow
@@ -124,6 +126,7 @@ class _AdminAppShellState extends State<AdminAppShell> {
     _media?.dispose();
     _amenities?.dispose();
     _categories?.dispose();
+    _locations?.dispose();
     _placeDetail?.dispose();
     super.dispose();
   }
@@ -146,6 +149,7 @@ class _AdminAppShellState extends State<AdminAppShell> {
     _media = AdminMediaState(api: api);
     _amenities = AdminAmenitiesState(api: api);
     _categories = AdminCategoriesState(api: api);
+    _locations = AdminLocationsState(api: api);
 
     // One load for the landing section. Other sections load lazily when first
     // selected, so opening the console does not fan out six requests at once.
@@ -323,6 +327,7 @@ class _AdminAppShellState extends State<AdminAppShell> {
       AdminRoutes.referenceData => AdminReferenceDataScreen(
           amenities: _amenities!,
           categories: _categories!,
+          locations: _locations!,
         ),
       AdminRoutes.media => AdminMediaScreen(
           state: _media!,

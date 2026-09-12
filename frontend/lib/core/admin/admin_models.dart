@@ -1672,3 +1672,137 @@ class AdminReferenceVocabulary {
     return out;
   }
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// D11 — Admin locations
+// ═══════════════════════════════════════════════════════════════════════════
+//
+// `LocationDto.LocationResponse` on `develop@f26bb97`, field for field. The
+// backend entity is `AdministrativeUnit` in table `administrative_units`; every
+// REST path, both controllers, both DTOs and this console say **Location**, and
+// nothing is renamed on either side.
+//
+// Like the other two reference reads, `GET /api/admin/locations` returns a bare
+// JSON array with no envelope, no ordering and no paging.
+
+/// One row of `GET /api/admin/locations`.
+///
+/// Four of these fields are **server-owned** as far as this console is
+/// concerned — `parentId`, `fullPath`, `level`, `latitude`/`longitude` — but
+/// they still live on the model, because `PUT` is a full replace: an update
+/// that omitted them would write null over each one. They are carried so they
+/// can be echoed back unchanged.
+class AdminLocation {
+  final int id;
+  final int? parentId;
+  final String? code;
+  final String? name;
+  final String? slug;
+  final String? type;
+  final int? level;
+  final String? oldName;
+  final String? fullPath;
+  final double? latitude;
+  final double? longitude;
+  final int? sortOrder;
+  final bool active;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+
+  const AdminLocation({
+    required this.id,
+    required this.parentId,
+    required this.code,
+    required this.name,
+    required this.slug,
+    required this.type,
+    required this.level,
+    required this.oldName,
+    required this.fullPath,
+    required this.latitude,
+    required this.longitude,
+    required this.sortOrder,
+    required this.active,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  /// Null when the row carries no usable id — every action addresses a row by
+  /// id, so a row without one is dropped rather than rendered untouchable.
+  static AdminLocation? fromJson(Map<String, dynamic> json) {
+    final id = _asInt(json['id']);
+    if (id == null) return null;
+    return AdminLocation(
+      id: id,
+      parentId: _asInt(json['parentId']),
+      code: _asString(json['code']),
+      name: _asString(json['name']),
+      slug: _asString(json['slug']),
+      type: _asString(json['type']),
+      level: _asInt(json['level']),
+      oldName: _asString(json['oldName']),
+      fullPath: _asString(json['fullPath']),
+      latitude: _asDouble(json['latitude']),
+      longitude: _asDouble(json['longitude']),
+      sortOrder: _asInt(json['sortOrder']),
+      active: json['active'] == true,
+      createdAt: _asInstant(json['createdAt']),
+      updatedAt: _asInstant(json['updatedAt']),
+    );
+  }
+
+  /// True when this location sits at the top of the tree.
+  bool get isRoot => parentId == null;
+
+  /// True when the server stored a usable coordinate pair. A lone latitude or
+  /// longitude is not rendered as a position, because half a pair is not one —
+  /// the backend enforces no pairing rule, so the console checks.
+  bool get hasCoordinates => latitude != null && longitude != null;
+
+  /// Lower-cased haystack for the client-side filter: name, slug, code and
+  /// oldName, which is also what the backend's own search query covers.
+  String get searchHaystack => [
+        name,
+        slug,
+        code,
+        oldName,
+      ].whereType<String>().join(' ').toLowerCase();
+
+  bool matchesFilter(String query) {
+    final q = query.trim().toLowerCase();
+    return q.isEmpty || searchHaystack.contains(q);
+  }
+}
+
+/// The closed `UnitType` vocabulary, transcribed from the backend enum.
+///
+/// Unlike `Amenity.groupName` and `Category.type` — unvalidated strings, so the
+/// console derives their pickers from observed data — `LocationRequest.type` is
+/// a `@NotNull UnitType`. The server rejects anything else with a 400, so the
+/// list is fixed rather than discovered, and **no value may be added here that
+/// the backend enum does not declare.**
+///
+/// `WARD` and `COMMUNE` are included because the enum declares them, even
+/// though `DataInitializer` seeds no instance of either. Which parent/child
+/// pairings are legal is **not** encoded: the backend enforces no rule, and the
+/// console does not invent one.
+class AdminLocationType {
+  const AdminLocationType._();
+
+  static const List<String> values = [
+    'COUNTRY',
+    'PROVINCE',
+    'CITY',
+    'WARD',
+    'COMMUNE',
+    'AREA',
+  ];
+
+  /// [current] is appended when the stored value is not one this build knows,
+  /// so opening the edit dialog for such a row cannot silently rewrite it.
+  static List<String> optionsWith(String? current) {
+    final c = current?.trim();
+    if (c == null || c.isEmpty || values.contains(c)) return values;
+    return [...values, c];
+  }
+}

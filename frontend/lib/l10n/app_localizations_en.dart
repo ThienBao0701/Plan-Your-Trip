@@ -13473,6 +13473,90 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get adminReferenceTabLocations => 'Locations';
+
+  @override
+  String get adminLocationNew => 'New location';
+
+  @override
+  String get adminLocationCreateTitle => 'New location';
+
+  @override
+  String get adminLocationEditTitle => 'Edit location';
+
+  @override
+  String get adminLocationColCode => 'Code';
+
+  @override
+  String get adminLocationColLevel => 'Level';
+
+  @override
+  String get adminLocationColCoordinates => 'Coordinates';
+
+  @override
+  String get adminLocationFieldCode => 'Code';
+
+  @override
+  String get adminLocationFieldOldName => 'Former name';
+
+  @override
+  String get adminLocationFieldFullPath => 'Full path';
+
+  @override
+  String get adminLocationFieldLevel => 'Level';
+
+  @override
+  String get adminLocationFieldCoordinates => 'Coordinates';
+
+  @override
+  String get adminLocationCodeHelper =>
+      'Optional. A short business key other systems match this location by.';
+
+  @override
+  String get adminLocationCodeHelperFixed =>
+      'A code can be replaced but not removed — other systems match this location by it.';
+
+  @override
+  String get adminLocationCodeCannotBeCleared =>
+      'A code cannot be removed. Enter a replacement, or leave the existing one in place.';
+
+  @override
+  String get adminLocationReadOnlyNotice =>
+      'The values below are stored by the server and are not editable here. They are saved back unchanged.';
+
+  @override
+  String get adminLocationCreateRootNotice =>
+      'New locations are created at the top level. A parent cannot be chosen or changed in this console.';
+
+  @override
+  String get adminLocationFullPathPreviewNotice =>
+      'This is the path that will be stored for the new location.';
+
+  @override
+  String get adminLocationFullPathPreservedNotice =>
+      'Shown to customers on places in this location. Saved back exactly as it is stored.';
+
+  @override
+  String get adminLocationEmpty => 'No locations yet.';
+
+  @override
+  String get adminLocationFilterEmpty => 'No locations match this search.';
+
+  @override
+  String get adminLocationFilterLabel => 'Search locations';
+
+  @override
+  String get adminLocationFilterHelper =>
+      'Filters the locations already loaded, by name, slug, code or former name.';
+
+  @override
+  String get adminLocationFilterClear => 'Clear search';
+
+  @override
+  String get adminLocationDuplicateCodeOrSlug =>
+      'That code or slug is already in use. Choose a different one.';
+
+  @override
   String get adminReviewModerationUncertain =>
       'The result of the last action is unknown. This page has been reloaded — check the review\'s status before trying again.';
 }

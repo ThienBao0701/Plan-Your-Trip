@@ -7181,4 +7181,158 @@ class ApiClient {
       return const CollectionApiResult.failure(ApiErrorKind.network);
     }
   }
+
+  // ── Admin: locations (D11) ────────────────────────────────────────────────
+  //
+  // `AdminLocationController` on `develop@f26bb97`, verbatim:
+  //
+  //   GET   /api/admin/locations             -> bare JSON array, 200
+  //   POST  /api/admin/locations             -> the created row, 201
+  //   PUT   /api/admin/locations/{id}        -> the updated row, 200
+  //   PATCH /api/admin/locations/{id}/status -> the updated row, 200
+  //
+  // **No DELETE**, for any role. Two independent 409 axes — `slug` and `code`
+  // — where amenities and categories have only one.
+  //
+  // `PUT` is a full replace: `LocationService.fill` assigns all eleven columns
+  // from the request, so a field the caller omits is written as null. Several
+  // of those columns are ones this console deliberately does not edit —
+  // `parentId`, `slug`, `level`, `fullPath`, `latitude`, `longitude` — and one
+  // of them, `fullPath`, is **customer-visible**: it rides in
+  // `PlaceDto.LocationRef` and the traveller app parses it to show a place's
+  // province. So every one of them is a required parameter here rather than an
+  // optional one, and the caller passes the stored value straight back.
+
+  Future<CollectionApiResult<List<AdminLocation>>> getAdminLocations() =>
+      _adminGetList<AdminLocation>(
+        _adminUri('/admin/locations'),
+        AdminLocation.fromJson,
+      );
+
+  /// `POST /api/admin/locations` — 201 with the created row.
+  ///
+  /// `type` is required by `LocationRequest` (`@NotNull UnitType`); an unknown
+  /// value fails deserialization with a 400. `slug` is optional — the backend
+  /// derives it from the name when absent. Either uniqueness axis can answer
+  /// 409, and the server's own message says which.
+  Future<CollectionApiResult<AdminLocation>> createAdminLocation({
+    required String name,
+    required String type,
+    String? slug,
+    String? code,
+    String? oldName,
+    String? fullPath,
+    int? parentId,
+    int? level,
+    double? latitude,
+    double? longitude,
+    int? sortOrder,
+  }) =>
+      _adminReferenceMutation<AdminLocation>(
+        () => _client.post(
+          _adminUri('/admin/locations'),
+          headers: _jsonHeaders,
+          body: jsonEncode(_locationBody(
+            name: name,
+            type: type,
+            slug: slug,
+            code: code,
+            oldName: oldName,
+            fullPath: fullPath,
+            parentId: parentId,
+            level: level,
+            latitude: latitude,
+            longitude: longitude,
+            sortOrder: sortOrder,
+          )),
+        ),
+        AdminLocation.fromJson,
+      );
+
+  /// `PUT /api/admin/locations/{id}`.
+  ///
+  /// Every parameter the console does not let an operator change is **required**
+  /// on purpose. Making them optional would let a caller omit one by accident,
+  /// and the backend would then null it — silently clearing a parent link, a
+  /// hierarchy path a customer reads, or a coordinate pair.
+  Future<CollectionApiResult<AdminLocation>> updateAdminLocation(
+    int locationId, {
+    required String name,
+    required String type,
+    required String? slug,
+    required String? code,
+    required String? oldName,
+    required String? fullPath,
+    required int? parentId,
+    required int? level,
+    required double? latitude,
+    required double? longitude,
+    int? sortOrder,
+  }) =>
+      _adminReferenceMutation<AdminLocation>(
+        () => _client.put(
+          _adminUri('/admin/locations/$locationId'),
+          headers: _jsonHeaders,
+          body: jsonEncode(_locationBody(
+            name: name,
+            type: type,
+            slug: slug,
+            code: code,
+            oldName: oldName,
+            fullPath: fullPath,
+            parentId: parentId,
+            level: level,
+            latitude: latitude,
+            longitude: longitude,
+            sortOrder: sortOrder,
+          )),
+        ),
+        AdminLocation.fromJson,
+      );
+
+  /// `PATCH /api/admin/locations/{id}/status` — see [setAdminAmenityActive] for
+  /// why `active` is never omitted.
+  Future<CollectionApiResult<AdminLocation>> setAdminLocationActive(
+    int locationId, {
+    required bool active,
+  }) =>
+      _adminReferenceMutation<AdminLocation>(
+        () => _client.patch(
+          _adminUri('/admin/locations/$locationId/status'),
+          headers: _jsonHeaders,
+          body: jsonEncode({'active': active}),
+        ),
+        AdminLocation.fromJson,
+      );
+
+  /// `LocationRequest`, in full — all eleven fields, every time.
+  ///
+  /// `nameNormalized` is absent because the record does not declare it: the
+  /// entity derives it in `@PrePersist`/`@PreUpdate` from the name.
+  Map<String, Object?> _locationBody({
+    required String name,
+    required String type,
+    String? slug,
+    String? code,
+    String? oldName,
+    String? fullPath,
+    int? parentId,
+    int? level,
+    double? latitude,
+    double? longitude,
+    int? sortOrder,
+  }) =>
+      {
+        'parentId': parentId,
+        'code': _blankToNull(code),
+        'name': name,
+        'slug': _blankToNull(slug),
+        'type': type,
+        'level': level,
+        'oldName': _blankToNull(oldName),
+        'fullPath': _blankToNull(fullPath),
+        'latitude': latitude,
+        'longitude': longitude,
+        'sortOrder': sortOrder,
+      };
 }

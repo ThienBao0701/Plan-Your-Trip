@@ -23158,6 +23158,156 @@ abstract class AppLocalizations {
   /// **'Edit {name}'**
   String adminReferenceEditSemantic(String name);
 
+  /// No description provided for @adminReferenceTabLocations.
+  ///
+  /// In en, this message translates to:
+  /// **'Locations'**
+  String get adminReferenceTabLocations;
+
+  /// No description provided for @adminLocationNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New location'**
+  String get adminLocationNew;
+
+  /// No description provided for @adminLocationCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New location'**
+  String get adminLocationCreateTitle;
+
+  /// No description provided for @adminLocationEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit location'**
+  String get adminLocationEditTitle;
+
+  /// No description provided for @adminLocationColCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Code'**
+  String get adminLocationColCode;
+
+  /// No description provided for @adminLocationColLevel.
+  ///
+  /// In en, this message translates to:
+  /// **'Level'**
+  String get adminLocationColLevel;
+
+  /// No description provided for @adminLocationColCoordinates.
+  ///
+  /// In en, this message translates to:
+  /// **'Coordinates'**
+  String get adminLocationColCoordinates;
+
+  /// No description provided for @adminLocationFieldCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Code'**
+  String get adminLocationFieldCode;
+
+  /// No description provided for @adminLocationFieldOldName.
+  ///
+  /// In en, this message translates to:
+  /// **'Former name'**
+  String get adminLocationFieldOldName;
+
+  /// No description provided for @adminLocationFieldFullPath.
+  ///
+  /// In en, this message translates to:
+  /// **'Full path'**
+  String get adminLocationFieldFullPath;
+
+  /// No description provided for @adminLocationFieldLevel.
+  ///
+  /// In en, this message translates to:
+  /// **'Level'**
+  String get adminLocationFieldLevel;
+
+  /// No description provided for @adminLocationFieldCoordinates.
+  ///
+  /// In en, this message translates to:
+  /// **'Coordinates'**
+  String get adminLocationFieldCoordinates;
+
+  /// No description provided for @adminLocationCodeHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional. A short business key other systems match this location by.'**
+  String get adminLocationCodeHelper;
+
+  /// No description provided for @adminLocationCodeHelperFixed.
+  ///
+  /// In en, this message translates to:
+  /// **'A code can be replaced but not removed — other systems match this location by it.'**
+  String get adminLocationCodeHelperFixed;
+
+  /// No description provided for @adminLocationCodeCannotBeCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'A code cannot be removed. Enter a replacement, or leave the existing one in place.'**
+  String get adminLocationCodeCannotBeCleared;
+
+  /// No description provided for @adminLocationReadOnlyNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'The values below are stored by the server and are not editable here. They are saved back unchanged.'**
+  String get adminLocationReadOnlyNotice;
+
+  /// No description provided for @adminLocationCreateRootNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'New locations are created at the top level. A parent cannot be chosen or changed in this console.'**
+  String get adminLocationCreateRootNotice;
+
+  /// No description provided for @adminLocationFullPathPreviewNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'This is the path that will be stored for the new location.'**
+  String get adminLocationFullPathPreviewNotice;
+
+  /// No description provided for @adminLocationFullPathPreservedNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Shown to customers on places in this location. Saved back exactly as it is stored.'**
+  String get adminLocationFullPathPreservedNotice;
+
+  /// No description provided for @adminLocationEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No locations yet.'**
+  String get adminLocationEmpty;
+
+  /// No description provided for @adminLocationFilterEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No locations match this search.'**
+  String get adminLocationFilterEmpty;
+
+  /// No description provided for @adminLocationFilterLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Search locations'**
+  String get adminLocationFilterLabel;
+
+  /// No description provided for @adminLocationFilterHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Filters the locations already loaded, by name, slug, code or former name.'**
+  String get adminLocationFilterHelper;
+
+  /// No description provided for @adminLocationFilterClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get adminLocationFilterClear;
+
+  /// No description provided for @adminLocationDuplicateCodeOrSlug.
+  ///
+  /// In en, this message translates to:
+  /// **'That code or slug is already in use. Choose a different one.'**
+  String get adminLocationDuplicateCodeOrSlug;
+
   /// No description provided for @adminReviewModerationUncertain.
   ///
   /// In en, this message translates to:
