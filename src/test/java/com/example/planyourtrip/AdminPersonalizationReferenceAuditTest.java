@@ -226,7 +226,9 @@ class AdminPersonalizationReferenceAuditTest {
     @Test
     void locationCreateUpdateAndStatusAreAudited() throws Exception {
         String slug = "d3i-location-" + suffix();
-        Long id = idOf(adminPost("/api/admin/locations", location("D3I Town", slug, "CITY", 2), 201));
+        // D13: a CITY may only sit under a COUNTRY, so the probe is created under the seeded one.
+        Long id = idOf(adminPost("/api/admin/locations",
+            location("D3I Town", slug, "CITY", 2, vietnamId()), 201));
         try {
             AdminActivityLog created = one("LOCATION_CREATE", id);
             assertEquals("LOCATION", created.getTargetType());
@@ -235,7 +237,8 @@ class AdminPersonalizationReferenceAuditTest {
             assertTrue(created.getAfterState().contains("name:D3I Town"), created.getAfterState());
             assertTrue(created.getAfterState().contains("type:CITY"), created.getAfterState());
 
-            adminPut("/api/admin/locations/" + id, location("D3I City", slug, "PROVINCE", 1), 200);
+            adminPut("/api/admin/locations/" + id,
+                location("D3I City", slug, "PROVINCE", 1, vietnamId()), 200);
             AdminActivityLog updated = one("LOCATION_UPDATE", id);
             assertTrue(updated.getBeforeState().contains("name:D3I Town"), updated.getBeforeState());
             assertTrue(updated.getBeforeState().contains("type:CITY"), updated.getBeforeState());
@@ -279,11 +282,12 @@ class AdminPersonalizationReferenceAuditTest {
 
         // 409 — duplicate location slug.
         String slug = "d3i-dup-" + suffix();
-        Long taken = idOf(adminPost("/api/admin/locations", location("D3I Dup", slug, "CITY", 2), 201));
+        Long taken = idOf(adminPost("/api/admin/locations",
+            location("D3I Dup", slug, "CITY", 2, vietnamId()), 201));
         mvc.perform(post("/api/admin/locations")
                 .header("Authorization", "Bearer " + adminToken)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(location("D3I Dup Two", slug, "CITY", 2)))
+                .content(location("D3I Dup Two", slug, "CITY", 2, vietnamId())))
             .andExpect(status().isConflict());
 
         // 400 — a MANUAL rule with no target.
@@ -669,11 +673,22 @@ class AdminPersonalizationReferenceAuditTest {
             """.formatted(quote(name), slug, sortOrder);
     }
 
-    private static String location(String name, String slug, String type, int level) {
+    /**
+     * D13 — every location probe now carries a parent. The hierarchy matrix allows only a COUNTRY
+     * at top level, and these probes are CITY and PROVINCE rows, so they are created under the
+     * seeded country rather than floating free as they did before.
+     */
+    private static String location(String name, String slug, String type, int level,
+                                   Long parentId) {
         return """
-            {"name":%s,"slug":"%s","code":"D3I%s","type":"%s","level":%d,
+            {"name":%s,"slug":"%s","code":"D3I%s","type":"%s","level":%d,"parentId":%d,
              "latitude":10.5,"longitude":107.25,"sortOrder":3}
-            """.formatted(quote(name), slug, suffix().substring(0, 4).toUpperCase(), type, level);
+            """.formatted(quote(name), slug, suffix().substring(0, 4).toUpperCase(), type, level,
+                parentId);
+    }
+
+    private Long vietnamId() {
+        return locationRepo.findByCode("VN").orElseThrow().getId();
     }
 
     private static String quote(String raw) {

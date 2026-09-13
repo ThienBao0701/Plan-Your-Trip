@@ -4,6 +4,7 @@ import com.example.planyourtrip.dto.LocationDto.LocationRequest;
 import com.example.planyourtrip.dto.LocationDto.LocationResponse;
 import com.example.planyourtrip.exception.ApiException;
 import com.example.planyourtrip.model.AdministrativeUnit;
+import com.example.planyourtrip.model.UnitType;
 import com.example.planyourtrip.repository.AdministrativeUnitRepository;
 import com.example.planyourtrip.util.SlugUtils;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -39,6 +43,36 @@ public class LocationService {
      * malformed legacy data can never turn a request into an unbounded loop.
      */
     private static final int MAX_TREE_DEPTH = 64;
+
+    /**
+     * D13 — the canonical location hierarchy, and the only place it is written down.
+     *
+     * <pre>
+     *   COUNTRY  → top level only
+     *   PROVINCE → COUNTRY
+     *   CITY     → COUNTRY
+     *   AREA     → PROVINCE or CITY
+     * </pre>
+     *
+     * <p>A type that is absent from this map is <b>not assignable</b>. {@code WARD} and
+     * {@code COMMUNE} are declared by {@link UnitType} but have no agreed place in the tree, so
+     * they are reserved: never a root, never a child, never the target of a type change. This
+     * deliberately gives them no parent semantics rather than guessing at one.
+     *
+     * <p>{@code COUNTRY}'s entry is empty because a country has no legal parent; its only legal
+     * position is top level, which {@link #isAllowedPlacement} expresses as a {@code null} parent.
+     */
+    private static final Map<UnitType, Set<UnitType>> ALLOWED_PARENTS;
+
+    static {
+        Map<UnitType, Set<UnitType>> matrix = new EnumMap<>(UnitType.class);
+        matrix.put(UnitType.COUNTRY, Collections.unmodifiableSet(EnumSet.noneOf(UnitType.class)));
+        matrix.put(UnitType.PROVINCE, Collections.unmodifiableSet(EnumSet.of(UnitType.COUNTRY)));
+        matrix.put(UnitType.CITY, Collections.unmodifiableSet(EnumSet.of(UnitType.COUNTRY)));
+        matrix.put(UnitType.AREA,
+            Collections.unmodifiableSet(EnumSet.of(UnitType.PROVINCE, UnitType.CITY)));
+        ALLOWED_PARENTS = Collections.unmodifiableMap(matrix);
+    }
 
     private final AdministrativeUnitRepository repo;
     private final AdminActivityLogService adminAudit;
@@ -105,6 +139,7 @@ public class LocationService {
         // guard is still called so the two write paths share one rule and a later change cannot
         // quietly skip it on create.
         AdministrativeUnit parent = resolveParent(null, req.parentId());
+        validatePlacement(req.type(), parent, null);
         fill(unit, req, slug, parent);
         LocationResponse saved = toResponse(repo.save(unit));
         adminAudit.record(adminUserId, "LOCATION_CREATE", "LOCATION", saved.id(),
@@ -123,6 +158,9 @@ public class LocationService {
         if (req.code() != null && !req.code().equals(unit.getCode()) && repo.existsByCode(req.code()))
             throw new ApiException(HttpStatus.CONFLICT, "Code already exists: " + req.code());
         AdministrativeUnit parent = resolveParent(id, req.parentId());
+        // Before fill(), so the node still carries its current type for the child check and a
+        // refusal never touches the managed entity.
+        validatePlacement(req.type(), parent, unit);
         fill(unit, req, slug, parent);
         AdministrativeUnit persisted = repo.save(unit);
         // The node's own path has just been rewritten from the live hierarchy; every descendant
@@ -220,6 +258,70 @@ public class LocationService {
                 "A location cannot be moved under its own descendant: " + parentId);
         }
         return parent;
+    }
+
+    // ── D13: the hierarchy matrix ─────────────────────────────────────────────
+    //
+    // Runs after resolveParent, so the order a caller observes is: missing parent (404), self-parent
+    // (400), descendant cycle (400), then placement (400). The D12 guards keep answering first and
+    // with their own messages; the matrix only ever speaks about a request that is otherwise sound.
+
+    /** True when [type] has a place in the canonical hierarchy — false for WARD and COMMUNE. */
+    public static boolean isAssignable(UnitType type) {
+        return type != null && ALLOWED_PARENTS.containsKey(type);
+    }
+
+    /**
+     * Whether a location of [type] may sit directly under a parent of [parentType].
+     *
+     * @param parentType the parent's type, or {@code null} for top level
+     */
+    public static boolean isAllowedPlacement(UnitType type, UnitType parentType) {
+        if (!isAssignable(type)) return false;
+        if (parentType == null) return type == UnitType.COUNTRY;
+        return ALLOWED_PARENTS.get(type).contains(parentType);
+    }
+
+    /**
+     * Validates the resulting local hierarchy: the node against its parent and, when its type is
+     * changing, every direct child against the node's new type.
+     *
+     * <p>Direct children are sufficient. A child's parent is the node itself, so the node's type
+     * is the only thing about a child's placement this mutation can change; grandchildren hang off
+     * the children, whose types are not being changed here.
+     *
+     * @param self the row being updated (still carrying its current type), or {@code null} on create
+     * @throws ApiException 400 with a message naming which rule the request broke
+     */
+    private void validatePlacement(UnitType type, AdministrativeUnit parent, AdministrativeUnit self) {
+        if (!isAssignable(type)) {
+            throw new ApiException(HttpStatus.BAD_REQUEST,
+                "Location type " + type + " is reserved and cannot be used");
+        }
+        if (parent == null) {
+            if (type != UnitType.COUNTRY) {
+                throw new ApiException(HttpStatus.BAD_REQUEST,
+                    "Only a COUNTRY can be a top-level location; a " + type + " needs a parent");
+            }
+        } else if (type == UnitType.COUNTRY) {
+            throw new ApiException(HttpStatus.BAD_REQUEST,
+                "A COUNTRY must be a top-level location and cannot have a parent");
+        } else if (!isAllowedPlacement(type, parent.getType())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST,
+                "A " + type + " cannot be placed under a " + parent.getType()
+                    + "; allowed parents: " + ALLOWED_PARENTS.get(type));
+        }
+
+        if (self != null && self.getId() != null && self.getType() != type) {
+            for (AdministrativeUnit child : repo.findByParentId(self.getId())) {
+                if (!isAllowedPlacement(child.getType(), type)) {
+                    throw new ApiException(HttpStatus.BAD_REQUEST,
+                        "Cannot change location " + self.getId() + " to " + type
+                            + ": child location " + child.getId() + " (" + child.getType()
+                            + ") is not allowed under a " + type);
+                }
+            }
+        }
     }
 
     /**

@@ -4,6 +4,7 @@ import com.example.planyourtrip.config.LocationPathBackfill;
 import com.example.planyourtrip.config.LocationPathBackfill.BackfillResult;
 import com.example.planyourtrip.config.LocationPathBackfillRunner;
 import com.example.planyourtrip.model.AdministrativeUnit;
+import com.example.planyourtrip.model.UnitType;
 import com.example.planyourtrip.repository.AdministrativeUnitRepository;
 import com.example.planyourtrip.repository.UserRepository;
 import com.example.planyourtrip.service.LocationService;
@@ -19,9 +20,16 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -44,6 +52,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *       saved-place searches. A stale or hand-typed value changes what customers can find.</li>
  *   <li><b>A blank public search no longer dumps the table.</b></li>
  * </ol>
+ *
+ * <p><b>D13</b> adds the hierarchy matrix — COUNTRY top level only, PROVINCE and CITY under a
+ * COUNTRY, AREA under a PROVINCE or CITY, WARD and COMMUNE reserved. Every fixture below that
+ * used to build {@code CITY → CITY} chains or top-level CITY rows now builds a legal shape instead;
+ * what each test asserts is unchanged unless the old fixture only worked because the hierarchy was
+ * unconstrained, and those cases say so where they are.
  *
  * <p>Everything else about the surface is asserted here precisely because it must <em>not</em> have
  * moved: the four admin operations, both 409 axes, the 404 on an unknown parent, and the shape of
@@ -90,13 +104,13 @@ class LocationHierarchyContractTest {
     void duplicateSlugIsRejectedWithConflict() throws Exception {
         String slug = "d12-dup-slug-" + suffix();
         Long first = idOf(adminPost("/api/admin/locations",
-            location("D12 Dup One", slug, "CITY", null, code()), 201));
+            location("D12 Dup One", slug, "COUNTRY", null, code()), 201));
         assertNotNull(first);
 
         mvc.perform(post("/api/admin/locations")
                 .header("Authorization", "Bearer " + adminToken)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(location("D12 Dup Two", slug, "CITY", null, code())))
+                .content(location("D12 Dup Two", slug, "COUNTRY", null, code())))
             .andExpect(status().isConflict())
             .andExpect(jsonPath("$.message").value(containsSlug(slug)));
     }
@@ -105,13 +119,14 @@ class LocationHierarchyContractTest {
     void duplicateCodeIsRejectedWithConflict() throws Exception {
         String sharedCode = code();
         Long first = idOf(adminPost("/api/admin/locations",
-            location("D12 Code One", "d12-code-one-" + suffix(), "CITY", null, sharedCode), 201));
+            location("D12 Code One", "d12-code-one-" + suffix(), "COUNTRY", null, sharedCode),
+            201));
         assertNotNull(first);
 
         String body = mvc.perform(post("/api/admin/locations")
                 .header("Authorization", "Bearer " + adminToken)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(location("D12 Code Two", "d12-code-two-" + suffix(), "CITY", null,
+                .content(location("D12 Code Two", "d12-code-two-" + suffix(), "COUNTRY", null,
                     sharedCode)))
             .andExpect(status().isConflict())
             .andReturn().getResponse().getContentAsString();
@@ -148,7 +163,10 @@ class LocationHierarchyContractTest {
                 .header("Authorization", "Bearer " + adminToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(location("D12 Self", slugOf(id), "COUNTRY", id, codeOf(id))))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest())
+            // D13: the D12 guard still answers first. A COUNTRY with a parent is also illegal under
+            // the matrix, so the message is what proves which rule refused it.
+            .andExpect(jsonPath("$.message").value(containsText("own parent")));
 
         assertNull(locationRepo.findById(id).orElseThrow().getParent(),
             "a refused move must leave the parent exactly as it was");
@@ -157,14 +175,15 @@ class LocationHierarchyContractTest {
     @Test
     void aDirectTwoNodeCycleIsRejected() throws Exception {
         Long a = newRoot("D12 Cycle A");
-        Long b = newChild("D12 Cycle B", a);
+        Long b = newCity("D12 Cycle B", a);
 
         // A -> B would make A a child of its own child.
         mvc.perform(put("/api/admin/locations/" + a)
                 .header("Authorization", "Bearer " + adminToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(location("D12 Cycle A", slugOf(a), "COUNTRY", b, codeOf(a))))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.message").value(containsText("own descendant")));
 
         assertNull(locationRepo.findById(a).orElseThrow().getParent());
         assertEquals(a, locationRepo.findById(b).orElseThrow().getParent().getId());
@@ -173,15 +192,16 @@ class LocationHierarchyContractTest {
     @Test
     void aLongerCycleIsRejected() throws Exception {
         Long a = newRoot("D12 Deep A");
-        Long b = newChild("D12 Deep B", a);
-        Long c = newChild("D12 Deep C", b);
+        Long b = newCity("D12 Deep B", a);
+        Long c = newArea("D12 Deep C", b);
 
         // A -> C: C is A's grandchild, so this is A -> B -> C -> A.
         mvc.perform(put("/api/admin/locations/" + a)
                 .header("Authorization", "Bearer " + adminToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(location("D12 Deep A", slugOf(a), "COUNTRY", c, codeOf(a))))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.message").value(containsText("own descendant")));
 
         assertNull(locationRepo.findById(a).orElseThrow().getParent());
         assertEquals(b, locationRepo.findById(c).orElseThrow().getParent().getId());
@@ -191,7 +211,7 @@ class LocationHierarchyContractTest {
     void aValidReparentStillSucceeds() throws Exception {
         Long oldParent = newRoot("D12 Old Parent");
         Long newParent = newRoot("D12 New Parent");
-        Long child = newChild("D12 Mover", oldParent);
+        Long child = newCity("D12 Mover", oldParent);
 
         adminPut("/api/admin/locations/" + child,
             location("D12 Mover", slugOf(child), "CITY", newParent, codeOf(child)), 200);
@@ -199,18 +219,25 @@ class LocationHierarchyContractTest {
         assertEquals(newParent, locationRepo.findById(child).orElseThrow().getParent().getId());
     }
 
+    /**
+     * D13 changed this behaviour on purpose. Only a COUNTRY may be top level and a COUNTRY can
+     * never be a child, so there is no legal "detach to root" left: a child that is not a COUNTRY
+     * has no top-level position to move to. Before D13 this test proved a detached CITY's path
+     * collapsed to its own name; that path rule for top-level rows is still pinned by
+     * {@link #rootCreateDerivesItsOwnPath}.
+     */
     @Test
-    void aNodeMayBeDetachedBackToRoot() throws Exception {
+    void aChildCannotBeDetachedToTopLevel() throws Exception {
         Long parent = newRoot("D12 Detach Parent");
-        Long child = newChild("D12 Detach Child", parent);
+        Long child = newCity("D12 Detach Child", parent);
+        String pathBefore = pathOf(child);
 
-        adminPut("/api/admin/locations/" + child,
-            location("D12 Detach Child", slugOf(child), "CITY", null, codeOf(child)), 200);
+        String message = rejectedPut(child,
+            location("D12 Detach Child", slugOf(child), "CITY", null, codeOf(child)));
+        assertTrue(message.contains("top-level"), message);
 
-        AdministrativeUnit saved = locationRepo.findById(child).orElseThrow();
-        assertNull(saved.getParent());
-        assertEquals("D12 Detach Child", saved.getFullPath(),
-            "a detached node's path collapses to its own name");
+        assertEquals(parent, parentOf(child), "a refused detach leaves the parent where it was");
+        assertEquals(pathBefore, pathOf(child));
     }
 
     // ══════════════════════════════════════════════════════════════════════════
@@ -226,7 +253,7 @@ class LocationHierarchyContractTest {
     @Test
     void childCreateDerivesFromItsParent() throws Exception {
         Long parent = newRoot("D12 Path Parent");
-        Long child = newChild("D12 Path Child", parent);
+        Long child = newCity("D12 Path Child", parent);
         assertEquals("D12 Path Parent" + LocationService.PATH_SEPARATOR + "D12 Path Child",
             pathOf(child));
     }
@@ -234,8 +261,8 @@ class LocationHierarchyContractTest {
     @Test
     void aGrandchildCarriesTheWholeAncestry() throws Exception {
         Long a = newRoot("D12 A");
-        Long b = newChild("D12 B", a);
-        Long c = newChild("D12 C", b);
+        Long b = newCity("D12 B", a);
+        Long c = newArea("D12 C", b);
         assertEquals("D12 A > D12 B > D12 C", pathOf(c),
             "the separator stays the one DataInitializer has always written");
     }
@@ -243,7 +270,7 @@ class LocationHierarchyContractTest {
     @Test
     void aCallerSuppliedPathIsIgnoredOnCreate() throws Exception {
         String body = """
-            {"name":"D12 Liar","slug":"d12-liar-%s","code":"%s","type":"CITY",
+            {"name":"D12 Liar","slug":"d12-liar-%s","code":"%s","type":"COUNTRY",
              "fullPath":"Totally > Made > Up"}
             """.formatted(suffix(), code());
         Long id = idOf(adminPost("/api/admin/locations", body, 201));
@@ -254,7 +281,7 @@ class LocationHierarchyContractTest {
     @Test
     void aCallerSuppliedPathIsIgnoredOnUpdate() throws Exception {
         Long parent = newRoot("D12 Honest Parent");
-        Long child = newChild("D12 Honest Child", parent);
+        Long child = newCity("D12 Honest Child", parent);
 
         String body = """
             {"name":"D12 Honest Child","slug":"%s","code":"%s","type":"CITY","parentId":%d,
@@ -268,7 +295,7 @@ class LocationHierarchyContractTest {
     @Test
     void anAbsentPathIsStillDerivedRatherThanNulled() throws Exception {
         Long parent = newRoot("D12 Absent Parent");
-        Long child = newChild("D12 Absent Child", parent);
+        Long child = newCity("D12 Absent Child", parent);
 
         // No fullPath key at all — the old contract would have written null, which reaches
         // customers through PlaceDto.LocationRef.
@@ -282,20 +309,27 @@ class LocationHierarchyContractTest {
 
     @Test
     void renamingRecalculatesTheNodeAndEveryDescendant() throws Exception {
+        // D13: the canonical tree is three tiers deep, so the old four-tier CITY chain is gone.
+        // The rename of a middle node still reaches its child, and a rename of the root is what
+        // now has to reach a grandchild.
         Long country = newRoot("D12 Vietnam");
-        Long city = newChild("D12 Ho Chi Minh City", country);
-        Long district = newChild("D12 District 1", city);
-        Long ward = newChild("D12 Ward 5", district);
+        Long city = newCity("D12 Ho Chi Minh City", country);
+        Long area = newArea("D12 District 1", city);
 
-        assertEquals("D12 Vietnam > D12 Ho Chi Minh City > D12 District 1 > D12 Ward 5",
-            pathOf(ward));
+        assertEquals("D12 Vietnam > D12 Ho Chi Minh City > D12 District 1", pathOf(area));
 
         adminPut("/api/admin/locations/" + city,
             location("D12 Ho Chi Minh", slugOf(city), "CITY", country, codeOf(city)), 200);
 
         assertEquals("D12 Vietnam > D12 Ho Chi Minh", pathOf(city));
-        assertEquals("D12 Vietnam > D12 Ho Chi Minh > D12 District 1", pathOf(district));
-        assertEquals("D12 Vietnam > D12 Ho Chi Minh > D12 District 1 > D12 Ward 5", pathOf(ward),
+        assertEquals("D12 Vietnam > D12 Ho Chi Minh > D12 District 1", pathOf(area));
+
+        adminPut("/api/admin/locations/" + country,
+            location("D12 Viet Nam", slugOf(country), "COUNTRY", null, codeOf(country)), 200);
+
+        assertEquals("D12 Viet Nam", pathOf(country));
+        assertEquals("D12 Viet Nam > D12 Ho Chi Minh", pathOf(city));
+        assertEquals("D12 Viet Nam > D12 Ho Chi Minh > D12 District 1", pathOf(area),
             "a rename must not leave a grandchild pointing at the old name");
     }
 
@@ -303,8 +337,8 @@ class LocationHierarchyContractTest {
     void reparentingRecalculatesTheNodeAndEveryDescendant() throws Exception {
         Long vietnam = newRoot("D12 Old Country");
         Long laos = newRoot("D12 New Country");
-        Long city = newChild("D12 Da Nang", vietnam);
-        Long district = newChild("D12 Hai Chau", city);
+        Long city = newCity("D12 Da Nang", vietnam);
+        Long district = newArea("D12 Hai Chau", city);
 
         assertEquals("D12 Old Country > D12 Da Nang > D12 Hai Chau", pathOf(district));
 
@@ -318,10 +352,10 @@ class LocationHierarchyContractTest {
     @Test
     void anUntouchedSiblingSubtreeIsLeftAlone() throws Exception {
         Long country = newRoot("D12 Stable Country");
-        Long moved = newChild("D12 Moved", country);
-        Long movedChild = newChild("D12 Moved Child", moved);
-        Long sibling = newChild("D12 Sibling", country);
-        Long siblingChild = newChild("D12 Sibling Child", sibling);
+        Long moved = newCity("D12 Moved", country);
+        Long movedChild = newArea("D12 Moved Child", moved);
+        Long sibling = newCity("D12 Sibling", country);
+        Long siblingChild = newArea("D12 Sibling Child", sibling);
 
         String siblingPathBefore = pathOf(sibling);
         String siblingChildPathBefore = pathOf(siblingChild);
@@ -337,8 +371,8 @@ class LocationHierarchyContractTest {
     @Test
     void aRefusedUpdateLeavesNoPartialSubtreeState() throws Exception {
         Long country = newRoot("D12 Atomic Country");
-        Long city = newChild("D12 Atomic City", country);
-        Long district = newChild("D12 Atomic District", city);
+        Long city = newCity("D12 Atomic City", country);
+        Long district = newArea("D12 Atomic District", city);
         Long other = newRoot("D12 Atomic Other");
         String takenSlug = slugOf(other);
 
@@ -369,6 +403,245 @@ class LocationHierarchyContractTest {
     }
 
     // ══════════════════════════════════════════════════════════════════════════
+    // D13 — THE HIERARCHY MATRIX
+    //
+    //   COUNTRY  → top level only
+    //   PROVINCE → COUNTRY
+    //   CITY     → COUNTRY
+    //   AREA     → PROVINCE | CITY
+    //   WARD, COMMUNE → reserved: never a root, never a child
+    // ══════════════════════════════════════════════════════════════════════════
+
+    @Test
+    void theMatrixAllowsExactlyTheCanonicalPlacements() {
+        Set<String> allowed = Set.of(
+            "COUNTRY>null", "PROVINCE>COUNTRY", "CITY>COUNTRY", "AREA>PROVINCE", "AREA>CITY");
+        List<UnitType> parents = new ArrayList<>(Arrays.asList(UnitType.values()));
+        parents.add(null);
+
+        int checked = 0;
+        for (UnitType type : UnitType.values()) {
+            for (UnitType parent : parents) {
+                assertEquals(allowed.contains(type + ">" + parent),
+                    LocationService.isAllowedPlacement(type, parent),
+                    type + " under " + (parent == null ? "no parent" : parent));
+                checked++;
+            }
+        }
+        assertEquals(UnitType.values().length * (UnitType.values().length + 1), checked,
+            "every type against every parent type and top level");
+        assertFalse(LocationService.isAssignable(UnitType.WARD));
+        assertFalse(LocationService.isAssignable(UnitType.COMMUNE));
+    }
+
+    @Test
+    void aCountryCannotHaveAParent() throws Exception {
+        Long host = newRoot("D13 Host Country");
+        String slug = "d13-nested-country-" + suffix();
+
+        String message = rejectedPost(
+            location("D13 Nested Country", slug, "COUNTRY", host, code()));
+
+        assertTrue(message.contains("cannot have a parent"), message);
+        assertTrue(locationRepo.findBySlug(slug).isEmpty(), "nothing may be created");
+    }
+
+    @Test
+    void onlyACountryMayBeTopLevel() throws Exception {
+        for (String type : List.of("PROVINCE", "CITY", "AREA")) {
+            String slug = "d13-root-" + type.toLowerCase() + "-" + suffix();
+            String message = rejectedPost(location("D13 Root " + type, slug, type, null, code()));
+            assertTrue(message.contains("top-level"), type + ": " + message);
+            assertTrue(locationRepo.findBySlug(slug).isEmpty(), type + " must not be created");
+        }
+        for (String type : List.of("WARD", "COMMUNE")) {
+            String slug = "d13-root-" + type.toLowerCase() + "-" + suffix();
+            String message = rejectedPost(location("D13 Root " + type, slug, type, null, code()));
+            assertTrue(message.contains("reserved"), type + ": " + message);
+            assertTrue(locationRepo.findBySlug(slug).isEmpty(), type + " must not be created");
+        }
+    }
+
+    @Test
+    void theFourCanonicalPlacementsAreAccepted() throws Exception {
+        Long country = newRoot("D13 Canon Country");
+        Long province = newProvince("D13 Canon Province", country);
+        Long city = newCity("D13 Canon City", country);
+        Long provinceArea = newArea("D13 Canon Province Area", province);
+        Long cityArea = newArea("D13 Canon City Area", city);
+
+        assertEquals(country, parentOf(province));
+        assertEquals(country, parentOf(city));
+        assertEquals(province, parentOf(provinceArea));
+        assertEquals(city, parentOf(cityArea));
+        assertEquals("D13 Canon Country > D13 Canon Province > D13 Canon Province Area",
+            pathOf(provinceArea));
+        assertEquals("D13 Canon Country > D13 Canon City > D13 Canon City Area", pathOf(cityArea));
+    }
+
+    @Test
+    void everyForbiddenPlacementIsRefused() throws Exception {
+        Long country = newRoot("D13 Forbid Country");
+        Long province = newProvince("D13 Forbid Province", country);
+        Long city = newCity("D13 Forbid City", country);
+        Long area = newArea("D13 Forbid Area", province);
+
+        record Case(String type, Long parent, String fragment) {}
+        List<Case> cases = List.of(
+            new Case("PROVINCE", city, "cannot be placed under"),
+            new Case("CITY", province, "cannot be placed under"),
+            new Case("AREA", area, "cannot be placed under"),
+            new Case("PROVINCE", province, "cannot be placed under"),
+            new Case("CITY", city, "cannot be placed under"),
+            new Case("AREA", country, "cannot be placed under"),
+            new Case("PROVINCE", area, "cannot be placed under"),
+            new Case("CITY", area, "cannot be placed under"),
+            new Case("WARD", country, "reserved"),
+            new Case("WARD", province, "reserved"),
+            new Case("WARD", city, "reserved"),
+            new Case("WARD", area, "reserved"),
+            new Case("COMMUNE", country, "reserved"),
+            new Case("COMMUNE", province, "reserved"),
+            new Case("COMMUNE", city, "reserved"),
+            new Case("COMMUNE", area, "reserved"));
+
+        for (Case c : cases) {
+            String slug = "d13-forbid-" + suffix();
+            String message = rejectedPost(
+                location("D13 Forbidden " + c.type(), slug, c.type(), c.parent(), code()));
+            assertTrue(message.contains(c.fragment()), c + ": " + message);
+            assertTrue(locationRepo.findBySlug(slug).isEmpty(), c + " must not be created");
+        }
+    }
+
+    @Test
+    void aTypeChangeThatStaysValidIsAccepted() throws Exception {
+        Long country = newRoot("D13 Swap Country");
+        Long node = newProvince("D13 Swap Node", country);
+        Long child = newArea("D13 Swap Child", node);
+
+        adminPut("/api/admin/locations/" + node,
+            location("D13 Swap Node", slugOf(node), "CITY", country, codeOf(node)), 200);
+
+        assertEquals(UnitType.CITY, typeOf(node));
+        assertEquals(country, parentOf(node));
+        assertEquals(node, parentOf(child), "an AREA is as legal under a CITY as under a PROVINCE");
+    }
+
+    @Test
+    void aTypeChangeIllegalUnderTheCurrentParentIsRefused() throws Exception {
+        Long country = newRoot("D13 Demote Country");
+        Long node = newProvince("D13 Demote Node", country);
+
+        String message = rejectedPut(node,
+            location("D13 Demote Node", slugOf(node), "AREA", country, codeOf(node)));
+
+        assertTrue(message.contains("cannot be placed under"), message);
+        assertEquals(UnitType.PROVINCE, typeOf(node), "a refused change leaves the type as it was");
+    }
+
+    @Test
+    void aTypeChangeThatWouldStrandAnExistingChildIsRefused() throws Exception {
+        // Under the matrix, a type change that is legal for the node's parent can only break a
+        // child when it arrives together with a move: CITY → AREA is illegal under a COUNTRY but
+        // legal under a PROVINCE, and an AREA may have no children at all.
+        Long country = newRoot("D13 Strand Country");
+        Long node = newCity("D13 Strand Node", country);
+        Long child = newArea("D13 Strand Child", node);
+        Long province = newProvince("D13 Strand Province", country);
+
+        String message = rejectedPut(node,
+            location("D13 Strand Node", slugOf(node), "AREA", province, codeOf(node)));
+
+        assertTrue(message.contains("child location " + child), message);
+        assertEquals(UnitType.CITY, typeOf(node));
+        assertEquals(country, parentOf(node), "neither the type change nor the move may half-apply");
+        assertEquals(node, parentOf(child));
+        assertEquals("D13 Strand Country > D13 Strand Node > D13 Strand Child", pathOf(child));
+    }
+
+    @Test
+    void aTypeChangeToAReservedTypeIsRefused() throws Exception {
+        Long country = newRoot("D13 Reserve Country");
+        Long node = newCity("D13 Reserve Node", country);
+
+        for (String reserved : List.of("WARD", "COMMUNE")) {
+            String message = rejectedPut(node,
+                location("D13 Reserve Node", slugOf(node), reserved, country, codeOf(node)));
+            assertTrue(message.contains("reserved"), reserved + ": " + message);
+            assertEquals(UnitType.CITY, typeOf(node));
+        }
+    }
+
+    @Test
+    void anAreaMayMoveBetweenAProvinceAndACity() throws Exception {
+        Long country = newRoot("D13 Move Country");
+        Long province = newProvince("D13 Move Province", country);
+        Long city = newCity("D13 Move City", country);
+        Long area = newArea("D13 Move Area", province);
+        assertEquals("D13 Move Country > D13 Move Province > D13 Move Area", pathOf(area));
+
+        adminPut("/api/admin/locations/" + area,
+            location("D13 Move Area", slugOf(area), "AREA", city, codeOf(area)), 200);
+
+        assertEquals(city, parentOf(area));
+        assertEquals("D13 Move Country > D13 Move City > D13 Move Area", pathOf(area),
+            "the D12 derivation still follows a matrix-legal move");
+    }
+
+    @Test
+    void aMoveUnderATypeIncompatibleParentIsRefused() throws Exception {
+        Long country = newRoot("D13 Bad Move Country");
+        Long province = newProvince("D13 Bad Move Province", country);
+        Long area = newArea("D13 Bad Move Area", province);
+        String pathBefore = pathOf(area);
+
+        String message = rejectedPut(area,
+            location("D13 Bad Move Area", slugOf(area), "AREA", country, codeOf(area)));
+
+        assertTrue(message.contains("cannot be placed under"), message);
+        assertEquals(province, parentOf(area));
+        assertEquals(pathBefore, pathOf(area));
+    }
+
+    /**
+     * The seeded tree must already satisfy the matrix, or enforcing it would strand real data.
+     *
+     * <p>Walked from the seeded country rather than over the whole table: in a full-suite run other
+     * classes write locations straight through the repository (top-level PROVINCE rows, a
+     * deliberately cyclic pair) to exercise unrelated services, and those bypass this contract.
+     */
+    @Test
+    void theSeededTreeSatisfiesTheMatrix() {
+        AdministrativeUnit vietnam = locationRepo.findByCode("VN").orElseThrow();
+        assertNull(vietnam.getParent(), "the seeded country is top level");
+        assertTrue(LocationService.isAllowedPlacement(vietnam.getType(), null));
+
+        Map<UnitType, Integer> counts = new EnumMap<>(UnitType.class);
+        Set<Long> seen = new HashSet<>();
+        Deque<AdministrativeUnit> queue = new ArrayDeque<>(List.of(vietnam));
+        while (!queue.isEmpty()) {
+            AdministrativeUnit node = queue.poll();
+            if (!seen.add(node.getId())) continue;
+            counts.merge(node.getType(), 1, Integer::sum);
+            for (AdministrativeUnit child : locationRepo.findByParentId(node.getId())) {
+                assertTrue(LocationService.isAllowedPlacement(child.getType(), node.getType()),
+                    child.getCode() + " (" + child.getType() + ") under " + node.getCode()
+                        + " (" + node.getType() + ")");
+                queue.add(child);
+            }
+        }
+
+        assertTrue(seen.size() >= 45, "all 45 seeded locations are reachable: " + seen.size());
+        assertEquals(1, counts.get(UnitType.COUNTRY), counts.toString());
+        assertTrue(counts.getOrDefault(UnitType.PROVINCE, 0) >= 29, counts.toString());
+        assertTrue(counts.getOrDefault(UnitType.CITY, 0) >= 5, counts.toString());
+        assertTrue(counts.getOrDefault(UnitType.AREA, 0) >= 10, counts.toString());
+        assertNull(counts.get(UnitType.WARD), "WARD is reserved and never seeded");
+        assertNull(counts.get(UnitType.COMMUNE), "COMMUNE is reserved and never seeded");
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
     // PUBLIC ENDPOINTS
     // ══════════════════════════════════════════════════════════════════════════
 
@@ -388,8 +661,8 @@ class LocationHierarchyContractTest {
     @Test
     void publicChildrenReturnsOneLevelAndFourOhFoursOnAnUnknownParent() throws Exception {
         Long parent = newRoot("D12 Public Parent");
-        Long child = newChild("D12 Public Child", parent);
-        newChild("D12 Public Grandchild", child);
+        Long child = newCity("D12 Public Child", parent);
+        newArea("D12 Public Grandchild", child);
 
         String body = mvc.perform(get("/api/locations/" + parent + "/children"))
             .andExpect(status().isOk())
@@ -423,7 +696,7 @@ class LocationHierarchyContractTest {
     void aKeywordSearchStillWorksExactlyAsBefore() throws Exception {
         String unique = "D12Findable" + suffix();
         Long id = idOf(adminPost("/api/admin/locations",
-            location(unique, "d12-find-" + suffix(), "CITY", null, code()), 201));
+            location(unique, "d12-find-" + suffix(), "COUNTRY", null, code()), 201));
 
         String body = mvc.perform(get("/api/locations/search").param("keyword", unique))
             .andExpect(status().isOk())
@@ -629,9 +902,56 @@ class LocationHierarchyContractTest {
             location(name, slugFor(name), "COUNTRY", null, code()), 201));
     }
 
-    private Long newChild(String name, Long parentId) throws Exception {
+    private Long newProvince(String name, Long countryId) throws Exception {
+        return newTyped(name, "PROVINCE", countryId);
+    }
+
+    private Long newCity(String name, Long countryId) throws Exception {
+        return newTyped(name, "CITY", countryId);
+    }
+
+    private Long newArea(String name, Long parentId) throws Exception {
+        return newTyped(name, "AREA", parentId);
+    }
+
+    private Long newTyped(String name, String type, Long parentId) throws Exception {
         return idOf(adminPost("/api/admin/locations",
-            location(name, slugFor(name), "CITY", parentId, code()), 201));
+            location(name, slugFor(name), type, parentId, code()), 201));
+    }
+
+    private Long parentOf(Long id) {
+        AdministrativeUnit parent = locationRepo.findById(id).orElseThrow().getParent();
+        return parent == null ? null : parent.getId();
+    }
+
+    private UnitType typeOf(Long id) {
+        return locationRepo.findById(id).orElseThrow().getType();
+    }
+
+    /** POSTs a location that must be refused with 400, and returns the server's message. */
+    private String rejectedPost(String body) throws Exception {
+        return messageOf(mvc.perform(post("/api/admin/locations")
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(MediaType.APPLICATION_JSON).content(body))
+            .andExpect(status().isBadRequest())
+            .andReturn().getResponse().getContentAsString());
+    }
+
+    /** PUTs a location update that must be refused with 400, and returns the server's message. */
+    private String rejectedPut(Long id, String body) throws Exception {
+        return messageOf(mvc.perform(put("/api/admin/locations/" + id)
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(MediaType.APPLICATION_JSON).content(body))
+            .andExpect(status().isBadRequest())
+            .andReturn().getResponse().getContentAsString());
+    }
+
+    private String messageOf(String body) throws Exception {
+        return mapper.readTree(body).get("message").asText();
+    }
+
+    private static org.hamcrest.Matcher<String> containsText(String fragment) {
+        return org.hamcrest.Matchers.containsString(fragment);
     }
 
     private String pathOf(Long id) {
