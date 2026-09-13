@@ -1687,11 +1687,12 @@ class AdminReferenceVocabulary {
 
 /// One row of `GET /api/admin/locations`.
 ///
-/// Four of these fields are **server-owned** as far as this console is
-/// concerned — `parentId`, `fullPath`, `level`, `latitude`/`longitude` — but
-/// they still live on the model, because `PUT` is a full replace: an update
-/// that omitted them would write null over each one. They are carried so they
-/// can be echoed back unchanged.
+/// Three of these fields are **server-owned** as far as this console is
+/// concerned — `fullPath` (derived by the server on every write), `level` and
+/// `latitude`/`longitude` — but they still live on the model, because `PUT` is
+/// a full replace: an update that omitted them would write null over each one.
+/// They are carried so they can be echoed back unchanged. `parentId` is chosen
+/// with the parent picker (D13).
 class AdminLocation {
   final int id;
   final int? parentId;
@@ -1783,9 +1784,23 @@ class AdminLocation {
 /// the backend enum does not declare.**
 ///
 /// `WARD` and `COMMUNE` are included because the enum declares them, even
-/// though `DataInitializer` seeds no instance of either. Which parent/child
-/// pairings are legal is **not** encoded: the backend enforces no rule, and the
-/// console does not invent one.
+/// though `DataInitializer` seeds no instance of either.
+///
+/// <h4>Hierarchy (D13)</h4>
+///
+/// The backend enforces which parent a location of each type may have, and
+/// this class mirrors that matrix so the form can refuse an impossible
+/// combination before sending it:
+///
+///     COUNTRY  → top level only
+///     PROVINCE → COUNTRY
+///     CITY     → COUNTRY
+///     AREA     → PROVINCE or CITY
+///
+/// `WARD` and `COMMUNE` are **reserved**: they have no place in the hierarchy,
+/// so they are never a valid choice — not at top level and not under anything.
+/// The mirror is a convenience; the backend re-validates every write and stays
+/// the authority.
 class AdminLocationType {
   const AdminLocationType._();
 
@@ -1797,6 +1812,33 @@ class AdminLocationType {
     'COMMUNE',
     'AREA',
   ];
+
+  /// Declared by the enum, with no place in the hierarchy.
+  static const Set<String> reserved = {'WARD', 'COMMUNE'};
+
+  /// The parent types each assignable type allows. `COUNTRY` maps to an empty
+  /// set because its only legal position is top level ([allowsRoot]).
+  static const Map<String, Set<String>> allowedParents = {
+    'COUNTRY': <String>{},
+    'PROVINCE': {'COUNTRY'},
+    'CITY': {'COUNTRY'},
+    'AREA': {'PROVINCE', 'CITY'},
+  };
+
+  /// True when a location of [type] may be saved at all — false for the
+  /// reserved types, for null and for any value this build does not know.
+  static bool isAssignable(String? type) => allowedParents.containsKey(type);
+
+  static bool isReserved(String? type) => reserved.contains(type);
+
+  /// True when a location of [type] may sit at top level.
+  static bool allowsRoot(String? type) => type == 'COUNTRY';
+
+  /// True when a location of [type] may sit directly under a location of
+  /// [parentType].
+  static bool allowsParent(String? type, String? parentType) =>
+      parentType != null &&
+      (allowedParents[type]?.contains(parentType) ?? false);
 
   /// [current] is appended when the stored value is not one this build knows,
   /// so opening the edit dialog for such a row cannot silently rewrite it.

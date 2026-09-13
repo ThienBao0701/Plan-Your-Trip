@@ -13365,16 +13365,45 @@ class AppLocalizationsVi extends AppLocalizations {
       'Các giá trị bên dưới do máy chủ lưu và không sửa được ở đây. Chúng được gửi lại nguyên vẹn khi lưu.';
 
   @override
-  String get adminLocationCreateRootNotice =>
-      'Địa danh mới được tạo ở cấp cao nhất. Bảng quản trị này không cho chọn hay đổi địa danh cha.';
+  String get adminLocationFieldParent => 'Địa danh cha';
 
   @override
-  String get adminLocationFullPathPreviewNotice =>
-      'Đây là đường dẫn sẽ được lưu cho địa danh mới.';
+  String get adminLocationParentHint => 'Chọn địa danh cha';
 
   @override
-  String get adminLocationFullPathPreservedNotice =>
-      'Khách hàng nhìn thấy giá trị này ở các địa điểm thuộc địa danh. Được gửi lại đúng như đang lưu.';
+  String get adminLocationParentRequired =>
+      'Loại này cần có địa danh cha. Chỉ COUNTRY mới được ở cấp cao nhất.';
+
+  @override
+  String get adminLocationParentNoCandidates =>
+      'Không có địa danh nào đã tải có thể làm cha cho loại này.';
+
+  @override
+  String get adminLocationParentCleared =>
+      'Địa danh cha trước đó không thể chứa loại này nên đã bị bỏ chọn. Hãy chọn địa danh cha mới.';
+
+  @override
+  String get adminLocationParentGuardNotice =>
+      'Địa danh này và toàn bộ địa danh bên dưới không được liệt kê, nên không thể đặt nó dưới chính nó.';
+
+  @override
+  String get adminLocationHierarchyRule =>
+      'COUNTRY ở cấp cao nhất. PROVINCE hoặc CITY nằm dưới một COUNTRY. AREA nằm dưới một PROVINCE hoặc CITY.';
+
+  @override
+  String get adminLocationTypeReservedMarker => 'Dành riêng — không dùng được';
+
+  @override
+  String get adminLocationTypeUnavailable =>
+      'Không thể lưu loại này. WARD và COMMUNE được dành riêng; hãy chọn COUNTRY, PROVINCE, CITY hoặc AREA.';
+
+  @override
+  String get adminLocationTypeBlockedByChildren =>
+      'Địa danh này có địa danh con không thể nằm dưới loại này. Hãy giữ loại hiện tại, hoặc chuyển các địa danh con đó trước.';
+
+  @override
+  String get adminLocationFullPathGeneratedNotice =>
+      'Máy chủ tự tạo từ địa danh cha và tên khi lưu. Bản xem trước này chỉ để tham khảo.';
 
   @override
   String get adminLocationEmpty => 'Chưa có địa danh nào.';

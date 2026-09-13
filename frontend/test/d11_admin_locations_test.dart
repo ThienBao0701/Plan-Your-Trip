@@ -21,24 +21,28 @@ import 'package:planyourtrip_frontend/l10n/app_localizations_en.dart';
 import 'package:planyourtrip_frontend/l10n/app_localizations_vi.dart';
 
 /// D11 — Admin locations, the third tab of the Reference Data destination.
+/// D13 — the parent picker, and the location hierarchy it mirrors.
 ///
-/// Fixtures mirror `LocationDto.LocationResponse` on `develop@f26bb97`. Where a
-/// test asserts an **absence** — no parent picker, no `fullPath` box, no level
-/// or coordinate editor, no delete — that absence is the requirement, and each
-/// one has a reason in the backend:
+/// Fixtures mirror `LocationDto.LocationResponse`. Where a test asserts an
+/// **absence** — no `fullPath` box, no level or coordinate editor, no delete —
+/// that absence is the requirement, and each one has a reason in the backend:
 ///
-///  * `parentId` — `CategoryService`-style reparenting with no cycle guard, and
-///    no recomputation of a moved subtree, so a parent control could orphan a
-///    branch from `/api/locations/roots`;
-///  * `fullPath` — caller-supplied, never derived, and **customer-visible**: it
-///    rides in `PlaceDto.LocationRef` and the traveller app parses it to show a
-///    place's province;
+///  * `fullPath` — **customer-visible**: it rides in `PlaceDto.LocationRef` and
+///    the traveller app parses it to show a place's province. Since D12 the
+///    server derives it on every write, so the form previews it and never
+///    edits it;
 ///  * `level` — derived from nothing and validated against nothing;
 ///  * `latitude`/`longitude` — no range and no pairing validation;
 ///  * delete — no endpoint exists, for any role.
 ///
-/// And because `PUT` is a full replace, every one of those must be **sent back
-/// unchanged** rather than merely left out of the form.
+/// `parentId` was on that list until D13. The backend now guards cycles,
+/// recomputes a moved subtree's paths and enforces the hierarchy — COUNTRY top
+/// level only; PROVINCE and CITY under a COUNTRY; AREA under a PROVINCE or
+/// CITY; WARD and COMMUNE reserved — so the console offers a parent picker that
+/// mirrors those rules. Section 8 pins it.
+///
+/// And because `PUT` is a full replace, every field the form does not edit must
+/// be **sent back unchanged** rather than merely left out of the form.
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
@@ -123,6 +127,101 @@ void main() {
           longitude: 106.6297,
           sortOrder: 2,
         ),
+      ];
+
+  /// D13 — a tree shaped by the hierarchy, plus the legacy shapes the picker
+  /// must never offer as a parent.
+  List<Map<String, dynamic>> hierarchy() => [
+        countryRow(), // 1 COUNTRY
+        locationRow(2, parentId: 1), // CITY
+        locationRow(3,
+            parentId: 1,
+            code: 'HCM',
+            name: 'TP Hồ Chí Minh',
+            slug: 'tp-ho-chi-minh',
+            fullPath: 'Vietnam > TP Hồ Chí Minh'),
+        locationRow(10,
+            parentId: 1,
+            code: 'KHO',
+            name: 'Khánh Hòa',
+            slug: 'khanh-hoa',
+            type: 'PROVINCE',
+            fullPath: 'Vietnam > Khánh Hòa'),
+        locationRow(11,
+            parentId: 10,
+            code: 'NT',
+            name: 'Nha Trang',
+            slug: 'nha-trang',
+            type: 'AREA',
+            level: 3,
+            fullPath: 'Vietnam > Khánh Hòa > Nha Trang'),
+        locationRow(12,
+            parentId: 2,
+            code: 'ST',
+            name: 'Sơn Trà',
+            slug: 'son-tra',
+            type: 'AREA',
+            level: 3,
+            fullPath: 'Vietnam > Đà Nẵng > Sơn Trà'),
+        locationRow(13,
+            parentId: 1,
+            code: 'LDG',
+            name: 'Lâm Đồng',
+            slug: 'lam-dong',
+            type: 'PROVINCE',
+            fullPath: 'Vietnam > Lâm Đồng',
+            active: false),
+        locationRow(20,
+            code: 'LA',
+            name: 'Lào',
+            slug: 'lao',
+            type: 'COUNTRY',
+            level: 0,
+            fullPath: 'Lào'),
+        locationRow(21,
+            parentId: 20,
+            code: 'VTE',
+            name: 'Viêng Chăn',
+            slug: 'vieng-chan',
+            fullPath: 'Lào > Viêng Chăn'),
+        // Legacy shapes: rendered in the grid, never offered as a parent.
+        locationRow(30,
+            parentId: 999,
+            code: 'ORP',
+            name: 'Orphan City',
+            slug: 'orphan-city',
+            fullPath: 'Gone > Orphan City'),
+        locationRow(31,
+            code: 'LRP',
+            name: 'Legacy Root Province',
+            slug: 'legacy-root-province',
+            type: 'PROVINCE',
+            fullPath: 'Legacy Root Province'),
+        locationRow(32,
+            parentId: 31,
+            code: 'ULR',
+            name: 'Under Legacy Root',
+            slug: 'under-legacy-root',
+            fullPath: 'Legacy Root Province > Under Legacy Root'),
+        locationRow(33,
+            parentId: 34,
+            code: 'LPA',
+            name: 'Loop A',
+            slug: 'loop-a',
+            fullPath: 'Loop A'),
+        locationRow(34,
+            parentId: 33,
+            code: 'LPB',
+            name: 'Loop B',
+            slug: 'loop-b',
+            fullPath: 'Loop B'),
+        locationRow(35,
+            parentId: 3,
+            code: 'WRD',
+            name: 'Legacy Ward',
+            slug: 'legacy-ward',
+            type: 'WARD',
+            fullPath: 'Vietnam > TP Hồ Chí Minh > Legacy Ward'),
       ];
 
   late List<String> requestLog;
@@ -381,7 +480,47 @@ void main() {
             of: find.byType(AlertDialog),
             matching: find.byType(DropdownButtonFormField<String>)))
         .map(keyOf);
-    return {...fields, ...drops};
+    final parents = tester
+        .widgetList<DropdownButtonFormField<int?>>(find.descendant(
+            of: find.byType(AlertDialog),
+            matching: find.byType(DropdownButtonFormField<int?>)))
+        .map(keyOf);
+    return {...fields, ...drops, ...parents};
+  }
+
+  const parentPickerKey = 'admin-reference-location-parent-picker';
+  const typePickerKey = 'admin-reference-location-type-picker';
+
+  /// Every item a dialog picker offers, enabled or not — read from the widget,
+  /// so the answer does not depend on which menu happens to be painted.
+  List<DropdownMenuItem<T>> pickerItems<T>(WidgetTester tester, String key) =>
+      tester
+          .widget<DropdownButton<T>>(find.descendant(
+              of: find.byKey(Key(key)),
+              matching: find.byType(DropdownButton<T>)))
+          .items!;
+
+  /// The parent ids the picker offers, with `null` standing for top level.
+  List<int?> parentChoices(WidgetTester tester) => [
+        for (final item in pickerItems<int?>(tester, parentPickerKey))
+          item.value
+      ];
+
+  Future<void> chooseType(WidgetTester tester, String value) async {
+    await tapKey(tester, typePickerKey);
+    await tester.tap(
+        find.byKey(Key('admin-reference-location-type-option-$value')).last);
+    await tester.pumpAndSettle();
+  }
+
+  Future<void> chooseParent(WidgetTester tester, int? id) async {
+    await tapKey(tester, parentPickerKey);
+    await tester.tap(find
+        .byKey(Key(id == null
+            ? 'admin-reference-location-parent-root'
+            : 'admin-reference-location-parent-option-$id'))
+        .last);
+    await tester.pumpAndSettle();
   }
 
   // ═════════════════════════════════════════════════════════════════════════
@@ -744,28 +883,35 @@ void main() {
           reason: 'a confirmed create is followed by a re-read');
     });
 
-    testWidgets('creates a top level location and says so', (tester) async {
+    testWidgets('creates a top level COUNTRY by default', (tester) async {
+      // D13: create is no longer root-only. The default type is COUNTRY, and a
+      // COUNTRY has exactly one position — top level — so that is all it is
+      // offered.
       await pumpLocations(tester);
       await openCreate(tester);
-      expect(find.text(en.adminLocationCreateRootNotice), findsOneWidget);
+      expect(parentChoices(tester), [null]);
       await type(tester, 'admin-reference-name-field', 'Côn Đảo');
       await submitForm(tester);
+      expect(lastWrite()['type'], 'COUNTRY');
       expect(lastWrite()['parentId'], isNull);
       expect(lastWrite()['level'], isNull);
       expect(lastWrite()['latitude'], isNull);
       expect(lastWrite()['longitude'], isNull);
     });
 
-    testWidgets('previews the exact path it will store', (tester) async {
+    testWidgets('previews the path the server will derive', (tester) async {
+      // D13: the preview is a guide. Since D12 the server derives the stored
+      // path itself, and the notice says so.
       await pumpLocations(tester);
       await openCreate(tester);
-      expect(find.text(en.adminLocationFullPathPreviewNotice), findsOneWidget);
+      expect(
+          find.text(en.adminLocationFullPathGeneratedNotice), findsOneWidget);
       await type(tester, 'admin-reference-name-field', 'Côn Đảo');
       expect(find.text('Côn Đảo'), findsWidgets,
           reason: 'the preview follows the name as it is typed');
       await submitForm(tester);
       expect(lastWrite()['fullPath'], 'Côn Đảo',
-          reason: "a root's path is its name — DataInitializer's own rule");
+          reason: "a top-level path is its name — the server's own rule");
     });
 
     testWidgets('a blank slug is sent as null so the server derives it',
@@ -843,7 +989,8 @@ void main() {
       expect(countOf('PUT /api/admin/locations/2'), 1);
       expect(lastWrite()['name'], 'Da Nang City');
       // The six preserved values, each for its own reason.
-      expect(lastWrite()['parentId'], 1, reason: 'no reparenting from here');
+      expect(lastWrite()['parentId'], 1,
+          reason: 'an untouched parent is sent back as it is stored');
       expect(lastWrite()['fullPath'], 'Vietnam > Đà Nẵng',
           reason: 'customer-visible through PlaceDto.LocationRef');
       expect(lastWrite()['level'], 2, reason: 'derived from nothing');
@@ -871,9 +1018,11 @@ void main() {
       }
     });
 
-    testWidgets('a root stays a root', (tester) async {
+    testWidgets('a COUNTRY stays top level', (tester) async {
+      // D13: a COUNTRY is offered no parent at all, so a rename cannot move it.
       await pumpLocations(tester);
       await openEdit(tester, 1);
+      expect(parentChoices(tester), [null]);
       await type(tester, 'admin-reference-name-field', 'Viet Nam');
       await submitForm(tester);
       expect(lastWrite()['parentId'], isNull);
@@ -924,7 +1073,8 @@ void main() {
       addTearDown(state.dispose);
       await state.load();
       final row = state.byId(2)!;
-      await state.update(row, name: row.name!, type: row.type!, code: '  ');
+      await state.update(row,
+          name: row.name!, type: row.type!, parentId: row.parentId, code: '  ');
       expect(lastWrite()['code'], 'DNG');
     });
 
@@ -938,12 +1088,13 @@ void main() {
       addTearDown(state.dispose);
       await state.load();
       final row = state.byId(4)!;
-      await state.update(row, name: 'Nowhere', type: 'AREA');
+      await state.update(row,
+          name: 'Nowhere', type: 'AREA', parentId: row.parentId);
       expect(lastWrite()['code'], isNull,
           reason: 'there is no code to preserve, so none is invented');
     });
 
-    testWidgets('the type picker offers the closed backend enum',
+    testWidgets('the type picker lists the closed backend enum',
         (tester) async {
       await pumpLocations(tester);
       await openEdit(tester, 2);
@@ -960,8 +1111,15 @@ void main() {
       await tapVisible(tester, picker);
       for (final entry in before.entries) {
         expect(find.text(entry.key).evaluate().length, greaterThan(entry.value),
-            reason: '${entry.key} is declared by UnitType and must be offered');
+            reason: '${entry.key} is declared by UnitType and must be listed');
       }
+      // D13: listed is not selectable. WARD and COMMUNE have no place in the
+      // hierarchy, so they are disabled and marked as reserved.
+      for (final item in pickerItems<String>(tester, typePickerKey)) {
+        expect(item.enabled, !AdminLocationType.isReserved(item.value),
+            reason: '${item.value}');
+      }
+      expect(find.text(en.adminLocationTypeReservedMarker), findsWidgets);
     });
 
     testWidgets('the former name and sort order are editable', (tester) async {
@@ -1114,7 +1272,7 @@ void main() {
       expectNoDeleteAffordance();
     });
 
-    testWidgets('the edit dialog exposes exactly five inputs and one picker',
+    testWidgets('the edit dialog exposes exactly five inputs and two pickers',
         (tester) async {
       await pumpLocations(tester);
       await openEdit(tester, 2);
@@ -1127,22 +1285,27 @@ void main() {
             'admin-reference-location-oldname-field',
             'admin-reference-sort-order-field',
             'admin-reference-location-type-picker',
+            parentPickerKey,
           },
           reason: 'a control for any read-only field would show up here');
     });
 
-    testWidgets('there is no parent picker, on create or on edit',
+    testWidgets('the parent is chosen from a picker, on create and on edit',
         (tester) async {
+      // D13 reverses D11's absence: the backend now guards cycles, recomputes
+      // a moved subtree's paths and enforces the hierarchy.
       await pumpLocations(tester);
       for (final open in [
         () => openCreate(tester),
         () => openEdit(tester, 2),
       ]) {
         await open();
-        expect(find.byKey(const Key('admin-reference-parent-picker')),
-            findsNothing);
-        expect(find.byType(DropdownButtonFormField<int?>), findsNothing,
-            reason: 'reparenting has no cycle guard and no path recomputation');
+        final picker = find.byKey(const Key(parentPickerKey));
+        expect(picker, findsOneWidget);
+        expect(find.byType(DropdownButtonFormField<int?>), findsOneWidget);
+        expect(find.descendant(of: picker, matching: find.byType(TextField)),
+            findsNothing,
+            reason: 'a parent is chosen, never typed');
         expect(find.text(en.adminLocationReadOnlyNotice), findsOneWidget);
         await tapVisible(tester, find.text(en.adminPartnerCancel));
       }
@@ -1164,7 +1327,7 @@ void main() {
       // They are shown, read-only, so the operator can see what is preserved.
       expect(find.text('Vietnam > Đà Nẵng'), findsWidgets);
       expect(
-          find.text(en.adminLocationFullPathPreservedNotice), findsOneWidget);
+          find.text(en.adminLocationFullPathGeneratedNotice), findsOneWidget);
     });
 
     testWidgets('there is no tree editor and no drag reordering',
@@ -1243,5 +1406,364 @@ void main() {
           findsNothing);
       expect(state.mutationConflict, isFalse);
     });
+  });
+
+  // ═════════════════════════════════════════════════════════════════════════
+  // 8. Hierarchy (D13) — the mirror, the candidates, the picker
+  // ═════════════════════════════════════════════════════════════════════════
+
+  group('hierarchy mirror', () {
+    test('the placement rules are exactly the backend matrix', () {
+      const allowed = {
+        'COUNTRY>top',
+        'PROVINCE>COUNTRY',
+        'CITY>COUNTRY',
+        'AREA>PROVINCE',
+        'AREA>CITY',
+      };
+      for (final t in AdminLocationType.values) {
+        expect(AdminLocationType.allowsRoot(t), allowed.contains('$t>top'),
+            reason: '$t at top level');
+        for (final parent in AdminLocationType.values) {
+          expect(AdminLocationType.allowsParent(t, parent),
+              allowed.contains('$t>$parent'),
+              reason: '$t under $parent');
+        }
+      }
+    });
+
+    test('WARD and COMMUNE stay in the enum but are reserved', () {
+      expect(AdminLocationType.values, containsAll(['WARD', 'COMMUNE']));
+      for (final t in ['WARD', 'COMMUNE']) {
+        expect(AdminLocationType.isReserved(t), isTrue);
+        expect(AdminLocationType.isAssignable(t), isFalse);
+      }
+      for (final t in ['COUNTRY', 'PROVINCE', 'CITY', 'AREA']) {
+        expect(AdminLocationType.isAssignable(t), isTrue);
+        expect(AdminLocationType.isReserved(t), isFalse);
+      }
+      expect(AdminLocationType.isAssignable(null), isFalse);
+      expect(AdminLocationType.isAssignable('DISTRICT'), isFalse);
+    });
+  });
+
+  group('parent candidates', () {
+    Future<AdminLocationsState> loaded() async {
+      final state = AdminLocationsState(
+          api: ApiClient(client: d11Client(locations: hierarchy())));
+      addTearDown(state.dispose);
+      await state.load();
+      return state;
+    }
+
+    List<int> ids(List<AdminLocation> rows) => [for (final l in rows) l.id];
+
+    test('a PROVINCE or a CITY is offered only well-formed countries',
+        () async {
+      final state = await loaded();
+      expect(ids(state.parentOptions(type: 'PROVINCE')), [1, 20]);
+      expect(ids(state.parentOptions(type: 'CITY')), [1, 20]);
+    });
+
+    test('an AREA is offered every well-formed province and city', () async {
+      final state = await loaded();
+      expect(ids(state.parentOptions(type: 'AREA')), [2, 3, 10, 13, 21]);
+    });
+
+    test('an inactive location remains a valid parent', () async {
+      final state = await loaded();
+      expect(state.byId(13)!.active, isFalse);
+      expect(ids(state.parentOptions(type: 'AREA')), contains(13),
+          reason: 'CMS status has no bearing on the hierarchy');
+    });
+
+    test('a COUNTRY, a reserved type and an unknown type are offered nothing',
+        () async {
+      final state = await loaded();
+      for (final t in ['COUNTRY', 'WARD', 'COMMUNE', 'DISTRICT', null]) {
+        expect(state.parentOptions(type: t), isEmpty, reason: '$t');
+      }
+    });
+
+    test('types that cannot hold the location are never offered', () async {
+      final state = await loaded();
+      final forProvince = ids(state.parentOptions(type: 'PROVINCE'));
+      for (final id in [2, 3, 10, 11, 12, 13, 21]) {
+        expect(forProvince, isNot(contains(id)), reason: 'row $id');
+      }
+      final forArea = ids(state.parentOptions(type: 'AREA'));
+      for (final id in [1, 20, 11, 12]) {
+        expect(forArea, isNot(contains(id)), reason: 'row $id');
+      }
+    });
+
+    test('orphans, cycles and legacy placements are never offered', () async {
+      final state = await loaded();
+      final wellFormed = state.wellFormedIds();
+      expect(wellFormed, {1, 2, 3, 10, 11, 12, 13, 20, 21});
+      for (final t in ['PROVINCE', 'CITY', 'AREA']) {
+        final offered = ids(state.parentOptions(type: t));
+        for (final id in [30, 31, 32, 33, 34, 35]) {
+          expect(offered, isNot(contains(id)), reason: '$t: row $id');
+        }
+      }
+    });
+
+    test('the location itself is excluded on update', () async {
+      final state = await loaded();
+      // Khánh Hòa, reconsidered as an AREA: every other province and city is
+      // offered, never itself.
+      expect(ids(state.parentOptions(type: 'AREA', editing: state.byId(10))),
+          [2, 3, 13, 21]);
+    });
+
+    test('every descendant is excluded on update', () async {
+      final state = await loaded();
+      expect(state.descendantIdsOf(1), {2, 3, 10, 11, 12, 13, 35});
+      // Vietnam, reconsidered as an AREA: only Viêng Chăn is not beneath it.
+      expect(
+          ids(state.parentOptions(type: 'AREA', editing: state.byId(1))), [21]);
+    });
+
+    test('a cycle in the data is walked once and cannot hang', () async {
+      final state = await loaded();
+      expect(state.descendantIdsOf(33), {34});
+      expect(state.descendantIdsOf(34), {33});
+    });
+
+    test('a type change that would strand a direct child is detected',
+        () async {
+      final state = await loaded();
+      final daNang = state.byId(2)!;
+      expect(state.typeChangeStrandsChildren(daNang, 'AREA'), isTrue,
+          reason: 'Sơn Trà cannot sit under an AREA');
+      expect(state.typeChangeStrandsChildren(daNang, 'PROVINCE'), isFalse,
+          reason: 'an AREA sits under a PROVINCE as well');
+      expect(state.typeChangeStrandsChildren(daNang, 'CITY'), isFalse,
+          reason: 'an unchanged type has nothing to check');
+    });
+
+    test('candidates come from the loaded rows, with no request', () async {
+      final state = await loaded();
+      final before = requestLog.length;
+      state.parentOptions(type: 'AREA');
+      state.parentOptions(type: 'CITY', editing: state.byId(2));
+      state.wellFormedIds();
+      expect(requestLog.length, before);
+    });
+  });
+
+  group('parent picker', () {
+    Future<AdminLocationsState> pumpTree(WidgetTester tester) =>
+        pumpLocations(tester, client: d11Client(locations: hierarchy()));
+
+    for (final t in ['PROVINCE', 'CITY', 'AREA']) {
+      testWidgets('top level is not offered to $t', (tester) async {
+        await pumpTree(tester);
+        await openCreate(tester);
+        expect(parentChoices(tester), [null]);
+        await chooseType(tester, t);
+        expect(parentChoices(tester), isNot(contains(null)));
+        expect(find.byKey(const Key('admin-reference-location-parent-root')),
+            findsNothing);
+      });
+    }
+
+    testWidgets('the picker offers exactly what the state computes',
+        (tester) async {
+      final state = await pumpTree(tester);
+      await openCreate(tester);
+      await chooseType(tester, 'AREA');
+      expect(parentChoices(tester),
+          [for (final l in state.parentOptions(type: 'AREA')) l.id]);
+      expect(parentChoices(tester), [2, 3, 10, 13, 21]);
+    });
+
+    testWidgets('on edit, the location and its descendants are not offered',
+        (tester) async {
+      await pumpTree(tester);
+      await openEdit(tester, 1);
+      await chooseType(tester, 'AREA');
+      expect(parentChoices(tester), [21],
+          reason: 'everything else that could hold an AREA is under Vietnam');
+      expect(find.text(en.adminLocationParentGuardNotice), findsOneWidget);
+    });
+
+    testWidgets('creates a PROVINCE under a COUNTRY', (tester) async {
+      await pumpTree(tester);
+      await openCreate(tester);
+      await type(tester, 'admin-reference-name-field', 'Bình Định');
+      await chooseType(tester, 'PROVINCE');
+      await chooseParent(tester, 1);
+      expect(find.text('Vietnam > Bình Định'), findsOneWidget,
+          reason: 'the preview follows the chosen parent');
+      await submitForm(tester);
+      expect(countOf('POST /api/admin/locations'), 1);
+      expect(lastWrite()['type'], 'PROVINCE');
+      expect(lastWrite()['parentId'], 1);
+      expect(lastWrite()['fullPath'], 'Vietnam > Bình Định',
+          reason: 'sent as previewed; the server derives its own');
+      expect(lastWrite()['level'], isNull,
+          reason: 'the console never derives a level');
+    });
+
+    testWidgets('creates a CITY under a COUNTRY', (tester) async {
+      await pumpTree(tester);
+      await openCreate(tester);
+      await type(tester, 'admin-reference-name-field', 'Pakse');
+      await chooseType(tester, 'CITY');
+      await chooseParent(tester, 20);
+      expect(find.text('Lào > Pakse'), findsOneWidget);
+      await submitForm(tester);
+      expect(lastWrite()['type'], 'CITY');
+      expect(lastWrite()['parentId'], 20);
+    });
+
+    for (final entry in {
+      10: 'Vietnam > Khánh Hòa > Cam Ranh',
+      2: 'Vietnam > Đà Nẵng > Cam Ranh',
+    }.entries) {
+      testWidgets('creates an AREA under ${entry.value.split(' > ')[1]}',
+          (tester) async {
+        await pumpTree(tester);
+        await openCreate(tester);
+        await type(tester, 'admin-reference-name-field', 'Cam Ranh');
+        await chooseType(tester, 'AREA');
+        await chooseParent(tester, entry.key);
+        expect(find.text(entry.value), findsOneWidget);
+        await submitForm(tester);
+        expect(lastWrite()['type'], 'AREA');
+        expect(lastWrite()['parentId'], entry.key);
+      });
+    }
+
+    testWidgets('an inactive parent is offered, marked, and accepted',
+        (tester) async {
+      await pumpTree(tester);
+      await openCreate(tester);
+      await type(tester, 'admin-reference-name-field', 'Đà Lạt');
+      await chooseType(tester, 'AREA');
+      await chooseParent(tester, 13);
+      expect(
+          find.descendant(
+              of: find.byKey(const Key(parentPickerKey)),
+              matching: find.text(en.adminReferenceStatusInactive)),
+          findsOneWidget);
+      await submitForm(tester);
+      expect(lastWrite()['type'], 'AREA');
+      expect(lastWrite()['parentId'], 13);
+    });
+
+    testWidgets('reparents an AREA from a PROVINCE to a CITY', (tester) async {
+      await pumpTree(tester);
+      await openEdit(tester, 11);
+      expect(parentChoices(tester), [2, 3, 10, 13, 21]);
+      await chooseParent(tester, 2);
+      expect(find.text('Vietnam > Đà Nẵng > Nha Trang'), findsOneWidget);
+      await submitForm(tester);
+
+      expect(countOf('PUT /api/admin/locations/11'), 1);
+      expect(lastWrite()['type'], 'AREA');
+      expect(lastWrite()['parentId'], 2);
+      // Everything the form does not edit still goes back as stored.
+      expect(lastWrite()['slug'], 'nha-trang');
+      expect(lastWrite()['code'], 'NT');
+      expect(lastWrite()['level'], 3);
+      expect(lastWrite()['latitude'], 16.0544);
+      expect(lastWrite()['longitude'], 108.2022);
+      expect(lastWrite()['fullPath'], 'Vietnam > Khánh Hòa > Nha Trang',
+          reason: 'echoed, never invented: the server derives the moved path');
+      expect(countOf('GET /api/admin/locations'), 2,
+          reason: 'a confirmed move is followed by a re-read');
+      expectNoDeleteAffordance();
+    });
+
+    testWidgets('a type change the parent still allows keeps the parent',
+        (tester) async {
+      await pumpTree(tester);
+      await openEdit(tester, 10);
+      await chooseType(tester, 'CITY');
+      expect(find.text(en.adminLocationParentCleared), findsNothing);
+      await submitForm(tester);
+      expect(lastWrite()['type'], 'CITY');
+      expect(lastWrite()['parentId'], 1);
+    });
+
+    testWidgets('a PROVINCE with no parent is refused before any request',
+        (tester) async {
+      await pumpTree(tester);
+      final before = requestLog.length;
+      await openCreate(tester);
+      await type(tester, 'admin-reference-name-field', 'Floating');
+      await chooseType(tester, 'PROVINCE');
+      await submitForm(tester);
+      expect(find.text(en.adminLocationParentRequired), findsOneWidget);
+      expect(requestLog.length, before,
+          reason: 'a top-level PROVINCE is never sent');
+      expect(find.byType(AlertDialog), findsOneWidget);
+    });
+
+    testWidgets('a type the chosen parent cannot hold clears it, and says so',
+        (tester) async {
+      await pumpTree(tester);
+      final before = requestLog.length;
+      await openEdit(tester, 11);
+      await chooseType(tester, 'CITY');
+      expect(find.byKey(const Key('admin-reference-location-parent-cleared')),
+          findsOneWidget);
+      expect(find.text(en.adminLocationParentCleared), findsOneWidget);
+      expect(parentChoices(tester), [1, 20]);
+      await submitForm(tester);
+      expect(find.text(en.adminLocationParentRequired), findsOneWidget,
+          reason: 'the cleared parent is not silently replaced by top level');
+      expect(requestLog.length, before);
+    });
+
+    testWidgets('a type change that would strand a child is refused',
+        (tester) async {
+      await pumpTree(tester);
+      final before = requestLog.length;
+      await openEdit(tester, 2);
+      await chooseType(tester, 'AREA');
+      await chooseParent(tester, 10);
+      await submitForm(tester);
+      expect(find.text(en.adminLocationTypeBlockedByChildren), findsOneWidget,
+          reason: 'Sơn Trà cannot sit under an AREA');
+      expect(requestLog.length, before);
+    });
+
+    testWidgets('a legacy WARD cannot be saved as it is', (tester) async {
+      await pumpTree(tester);
+      final before = requestLog.length;
+      await openEdit(tester, 35);
+      expect(parentChoices(tester), isEmpty,
+          reason: 'a reserved type has no place to go');
+      await submitForm(tester);
+      expect(find.text(en.adminLocationTypeUnavailable), findsOneWidget);
+      expect(requestLog.length, before);
+    });
+
+    testWidgets('the path is previewed from the parent, never edited',
+        (tester) async {
+      await pumpTree(tester);
+      await openEdit(tester, 11);
+      expect(find.text('Vietnam > Khánh Hòa > Nha Trang'), findsOneWidget);
+      expect(
+          find.text(en.adminLocationFullPathGeneratedNotice), findsOneWidget);
+      expect(
+          dialogInputKeys(tester)
+              .contains('admin-reference-location-fullpath-field'),
+          isFalse);
+    });
+
+    for (final entry in {'en': en, 'vi': vi}.entries) {
+      testWidgets('${entry.key} labels the parent picker', (tester) async {
+        await pumpLocations(tester, locale: Locale(entry.key));
+        await openCreate(tester);
+        expect(find.text(entry.value.adminLocationFieldParent), findsWidgets);
+        expect(
+            find.text(entry.value.adminLocationHierarchyRule), findsOneWidget);
+      });
+    }
   });
 }

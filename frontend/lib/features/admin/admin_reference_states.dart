@@ -347,22 +347,28 @@ class AdminCategoriesState extends AdminReferenceListState<AdminCategory> {
 
 /// `/api/admin/locations` — list, create, update, set CMS status.
 ///
+/// <h4>Hierarchy (D13)</h4>
+///
+/// The backend guards cycles, recomputes a moved subtree's paths and enforces
+/// the location hierarchy (see [AdminLocationType]), so this console lets an
+/// operator choose a parent. [parentOptions] narrows the picker to parents the
+/// backend would accept. It is a convenience, not the rule: every write is
+/// re-validated server-side.
+///
 /// <h4>Why several fields are carried but never edited</h4>
 ///
-/// `PUT` is a full replace, and four of the columns it rewrites are ones this
+/// `PUT` is a full replace, and three of the columns it rewrites are ones this
 /// console deliberately does not let an operator change:
 ///
-///  * `parentId` — the backend has no cycle guard and does not recompute a
-///    subtree after a reparent, so a parent picker here could orphan a whole
-///    branch from `/api/locations/roots`;
-///  * `fullPath` — caller-supplied, never derived, and **customer-visible**: it
-///    rides in `PlaceDto.LocationRef` and the traveller app parses it to show a
-///    place's province;
+///  * `fullPath` — **customer-visible**: it rides in `PlaceDto.LocationRef` and
+///    the traveller app parses it to show a place's province. The server
+///    derives it on every write, so the value sent is ignored, but it is echoed
+///    rather than invented;
 ///  * `level` — never derived and validated against nothing;
 ///  * `latitude`/`longitude` — no range or pairing validation exists.
 ///
-/// So [update] takes only the five editable fields and passes the stored value
-/// of every other one straight back. Nothing is cleared by omission.
+/// So [update] takes the six editable fields and passes the stored value of
+/// every other one straight back. Nothing is cleared by omission.
 class AdminLocationsState extends AdminReferenceListState<AdminLocation> {
   AdminLocationsState({required super.api});
 
@@ -409,7 +415,7 @@ class AdminLocationsState extends AdminReferenceListState<AdminLocation> {
     super.reset();
   }
 
-  // ── hierarchy (read-only) ─────────────────────────────────────────────────
+  // ── hierarchy ─────────────────────────────────────────────────────────────
 
   /// The row with this id among the loaded rows, or null.
   AdminLocation? byId(int? id) {
@@ -425,17 +431,116 @@ class AdminLocationsState extends AdminReferenceListState<AdminLocation> {
   /// has no per-id read, so a second request is not an option anyway.
   String? parentNameOf(AdminLocation row) => byId(row.parentId)?.name;
 
+  // Every question the parent picker asks is answered from the rows already
+  // loaded: the list carries `parentId`, and there is deliberately no tree or
+  // candidate endpoint to ask instead.
+
+  Map<int, List<AdminLocation>> _childrenIndex() {
+    final index = <int, List<AdminLocation>>{};
+    for (final l in items) {
+      final p = l.parentId;
+      if (p != null) (index[p] ??= <AdminLocation>[]).add(l);
+    }
+    return index;
+  }
+
+  /// Every id reachable downwards from [locationId], excluding itself.
+  ///
+  /// Breadth-first over the `parentId` edges in the loaded rows, with a visited
+  /// set — so a cycle already present in the data is walked once and cannot
+  /// hang the picker.
+  Set<int> descendantIdsOf(int locationId) {
+    final index = _childrenIndex();
+    final out = <int>{};
+    final queue = <int>[
+      for (final c in index[locationId] ?? const <AdminLocation>[]) c.id
+    ];
+    while (queue.isNotEmpty) {
+      final id = queue.removeAt(0);
+      if (id == locationId || !out.add(id)) continue;
+      queue
+          .addAll([for (final c in index[id] ?? const <AdminLocation>[]) c.id]);
+    }
+    return out;
+  }
+
+  /// Ids of the rows that sit in a well-formed tree: reachable from a top-level
+  /// COUNTRY through placements the hierarchy allows at every step.
+  ///
+  /// Everything else — an orphan whose parent is not loaded, a row caught in a
+  /// cycle, a legacy top-level PROVINCE and everything beneath it, a row of a
+  /// reserved or unknown type — is left out, so it is never offered as a
+  /// parent. Those rows still render in the grid; they are only not offered.
+  Set<int> wellFormedIds() {
+    final index = _childrenIndex();
+    final out = <int>{};
+    final queue = <AdminLocation>[
+      for (final l in items)
+        if (l.parentId == null && AdminLocationType.allowsRoot(l.type)) l
+    ];
+    while (queue.isNotEmpty) {
+      final node = queue.removeAt(0);
+      if (!out.add(node.id)) continue;
+      for (final child in index[node.id] ?? const <AdminLocation>[]) {
+        if (AdminLocationType.allowsParent(child.type, node.type)) {
+          queue.add(child);
+        }
+      }
+    }
+    return out;
+  }
+
+  /// The parents the picker may offer to a location of [type].
+  ///
+  /// Excludes rows outside [wellFormedIds]; on update, the location itself and
+  /// every descendant, because either would make it its own ancestor; and every
+  /// row whose type cannot hold [type]. Inactive rows are **not** excluded —
+  /// CMS status has no bearing on the hierarchy.
+  ///
+  /// A COUNTRY is offered none (its only position is top level, which the
+  /// picker offers on its own), and neither is a reserved or unknown type.
+  ///
+  /// **A client-side convenience only.** The backend validates every placement
+  /// again and answers 400 for one it refuses.
+  List<AdminLocation> parentOptions({
+    required String? type,
+    AdminLocation? editing,
+  }) {
+    if (!AdminLocationType.isAssignable(type) ||
+        AdminLocationType.allowsRoot(type)) {
+      return const <AdminLocation>[];
+    }
+    final valid = wellFormedIds();
+    final blocked = editing == null
+        ? const <int>{}
+        : {...descendantIdsOf(editing.id), editing.id};
+    return List<AdminLocation>.unmodifiable(items.where((l) =>
+        valid.contains(l.id) &&
+        !blocked.contains(l.id) &&
+        AdminLocationType.allowsParent(type, l.type)));
+  }
+
+  /// True when changing [row] to [type] would leave one of its loaded direct
+  /// children in a placement the hierarchy forbids — the check the backend
+  /// makes on a type change. Direct children are enough: a child's placement
+  /// depends only on its own parent, which is [row].
+  bool typeChangeStrandsChildren(AdminLocation row, String? type) {
+    if (type == row.type) return false;
+    return items.any((c) =>
+        c.parentId == row.id && !AdminLocationType.allowsParent(c.type, type));
+  }
+
   // ── mutations ─────────────────────────────────────────────────────────────
 
-  /// Creates a **root** location.
+  /// Creates a location under [parentId], or at top level when it is null.
   ///
-  /// D11 offers no parent control, so `parentId` is always null. `fullPath` is
-  /// passed by the caller as the value it previewed, and `level`, `latitude`
-  /// and `longitude` are left unset — the backend derives none of them and the
-  /// console invents none.
+  /// `fullPath` is passed as the value the form previewed; the server ignores
+  /// it and derives its own. `level`, `latitude` and `longitude` are left unset
+  /// — the console invents none of them.
   Future<bool> create({
     required String name,
     required String type,
+    int? parentId,
     String? slug,
     String? code,
     String? oldName,
@@ -445,6 +550,7 @@ class AdminLocationsState extends AdminReferenceListState<AdminLocation> {
       mutate(() => api.createAdminLocation(
             name: name,
             type: type,
+            parentId: parentId,
             slug: slug,
             code: code,
             oldName: oldName,
@@ -452,7 +558,11 @@ class AdminLocationsState extends AdminReferenceListState<AdminLocation> {
             sortOrder: sortOrder,
           ));
 
-  /// Updates the five editable fields and echoes everything else back.
+  /// Updates the six editable fields and echoes everything else back.
+  ///
+  /// [parentId] is required, and null means top level: on a full-replace `PUT`
+  /// an omitted parent is a move to the top, so every caller must say where the
+  /// row goes.
   ///
   /// [code] follows the console's one extra rule: a stored code is never
   /// cleared. A caller passing null or blank for a row that has one keeps the
@@ -463,6 +573,7 @@ class AdminLocationsState extends AdminReferenceListState<AdminLocation> {
     AdminLocation row, {
     required String name,
     required String type,
+    required int? parentId,
     String? code,
     String? oldName,
     int? sortOrder,
@@ -473,12 +584,12 @@ class AdminLocationsState extends AdminReferenceListState<AdminLocation> {
           row.id,
           name: name,
           type: type,
+          parentId: parentId,
           code: nextCode,
           oldName: oldName,
           sortOrder: sortOrder,
           // Preserved verbatim — see the class doc.
           slug: row.slug,
-          parentId: row.parentId,
           fullPath: row.fullPath,
           level: row.level,
           latitude: row.latitude,

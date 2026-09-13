@@ -1225,16 +1225,19 @@ class _CategoryFormDialogState extends State<_CategoryFormDialog> {
 // `AdministrativeUnit` on the backend; **Location** everywhere a person reads
 // it. Nothing is renamed on either side.
 //
-// Five fields are editable — name, code, type, oldName, sortOrder. Everything
-// else the row carries is shown read-only and echoed back on save, because
-// `PUT` is a full replace and the backend derives none of it:
+// Six fields are editable — name, code, type, parent, oldName, sortOrder.
+// Everything else the row carries is shown read-only and echoed back on save,
+// because `PUT` is a full replace:
 //
-//  * `parentId` — no cycle guard, and a reparent does not recompute the
-//    subtree, so a parent picker here could orphan a branch from
-//    `/api/locations/roots`;
-//  * `fullPath` — customer-visible through `PlaceDto.LocationRef`;
+//  * `fullPath` — customer-visible through `PlaceDto.LocationRef`, and derived
+//    by the server from the parent and name on every write, so the form
+//    previews it and never edits it;
 //  * `level` — derived from nothing, validated against nothing;
 //  * `latitude`/`longitude` — no range or pairing validation.
+//
+// The type and parent pickers mirror the backend hierarchy (D13), so a
+// combination the backend would refuse is not offered and cannot be submitted.
+// The backend stays the authority and re-validates every write.
 
 class _LocationsTab extends StatelessWidget {
   final AdminLocationsState state;
@@ -1523,13 +1526,14 @@ Future<void> _openLocationForm(
 ) async {
   final result = await showDialog<_LocationFormResult>(
     context: context,
-    builder: (ctx) => _LocationFormDialog(existing: existing),
+    builder: (ctx) => _LocationFormDialog(existing: existing, state: state),
   );
   if (result == null) return;
   if (existing == null) {
     await state.create(
       name: result.name,
       type: result.type,
+      parentId: result.parentId,
       slug: result.slug,
       code: result.code,
       oldName: result.oldName,
@@ -1541,6 +1545,7 @@ Future<void> _openLocationForm(
       existing,
       name: result.name,
       type: result.type,
+      parentId: result.parentId,
       code: result.code,
       oldName: result.oldName,
       sortOrder: result.sortOrder,
@@ -1551,6 +1556,7 @@ Future<void> _openLocationForm(
 class _LocationFormResult {
   final String name;
   final String type;
+  final int? parentId;
   final String? slug;
   final String? code;
   final String? oldName;
@@ -1560,6 +1566,7 @@ class _LocationFormResult {
   const _LocationFormResult({
     required this.name,
     required this.type,
+    required this.parentId,
     required this.slug,
     required this.code,
     required this.oldName,
@@ -1570,13 +1577,20 @@ class _LocationFormResult {
 
 /// One form for create and update.
 ///
-/// Create makes a **top-level** location: D11 offers no parent control at all,
-/// because the backend neither guards cycles nor recomputes a subtree after a
-/// reparent. The form says so rather than leaving it to be discovered.
+/// The type picker decides which parents are offered, and the parent picker
+/// offers exactly those: "top level" for a COUNTRY and nothing else, compatible
+/// well-formed locations for every other type. A type change the chosen parent
+/// cannot hold clears the parent and says so, rather than leaving a combination
+/// the backend would refuse. WARD and COMMUNE are listed, disabled, because the
+/// enum declares them; they have no place in the hierarchy.
+///
+/// Every hierarchy question is answered by [AdminLocationsState] from the rows
+/// already loaded — the form issues no request of its own.
 class _LocationFormDialog extends StatefulWidget {
   final AdminLocation? existing;
+  final AdminLocationsState state;
 
-  const _LocationFormDialog({required this.existing});
+  const _LocationFormDialog({required this.existing, required this.state});
 
   @override
   State<_LocationFormDialog> createState() => _LocationFormDialogState();
@@ -1595,21 +1609,40 @@ class _LocationFormDialogState extends State<_LocationFormDialog> {
   late final TextEditingController _sortOrder =
       TextEditingController(text: widget.existing?.sortOrder?.toString() ?? '');
 
-  late String _type = widget.existing?.type ?? AdminLocationType.values.first;
+  late String _type;
+  int? _parentId;
+
+  /// True once the form has had to drop a parent — on open, because the stored
+  /// one is not an offerable choice, or after a type change it cannot hold.
+  bool _parentCleared = false;
+
+  /// Bumped whenever the form itself replaces the parent, so the picker is
+  /// rebuilt from the new value instead of keeping the one it was built with.
+  int _parentPickerGeneration = 0;
 
   @override
   void initState() {
     super.initState();
-    // The create form previews the exact `fullPath` it will send, and that
-    // preview is the name, so it has to follow the name as it is typed.
-    if (widget.existing == null) _name.addListener(_onNameChanged);
+    final existing = widget.existing;
+    _type = existing?.type ?? AdminLocationType.values.first;
+    // The stored parent is kept only while it is still an offerable choice. A
+    // legacy placement the hierarchy forbids starts empty — visibly — so the
+    // operator chooses rather than the form guessing.
+    final stored = existing?.parentId;
+    if (stored != null && _offers(_type, stored)) {
+      _parentId = stored;
+    } else {
+      _parentCleared = stored != null;
+    }
+    // The path preview follows the name as it is typed.
+    _name.addListener(_onNameChanged);
   }
 
   void _onNameChanged() => setState(() {});
 
   @override
   void dispose() {
-    if (widget.existing == null) _name.removeListener(_onNameChanged);
+    _name.removeListener(_onNameChanged);
     _name.dispose();
     _slug.dispose();
     _code.dispose();
@@ -1618,13 +1651,66 @@ class _LocationFormDialogState extends State<_LocationFormDialog> {
     super.dispose();
   }
 
-  /// What a new root location's path will be.
+  List<AdminLocation> _optionsFor(String? type) =>
+      widget.state.parentOptions(type: type, editing: widget.existing);
+
+  bool _offers(String? type, int parentId) =>
+      _optionsFor(type).any((l) => l.id == parentId);
+
+  /// A new type keeps the chosen parent when that parent can hold it, and
+  /// otherwise clears it and says so. Nothing is ever re-pointed silently.
+  void _onTypeChanged(String? next) {
+    if (next == null || next == _type) return;
+    setState(() {
+      _type = next;
+      final current = _parentId;
+      if (current != null && !_offers(next, current)) {
+        _parentId = null;
+        _parentCleared = true;
+        _parentPickerGeneration++;
+      }
+    });
+  }
+
+  /// The path the server will derive: `parent.fullPath + " > " + name`, or the
+  /// name alone at top level — the rule `LocationService` applies since D12.
   ///
-  /// `DataInitializer` builds a path as
-  /// `parent != null ? parent.fullPath + " > " + name : name`. D11 only creates
-  /// roots, so the second branch is the whole rule and there is nothing to
-  /// infer. It is shown read-only so the operator sees exactly what is stored.
-  String get _fullPathPreview => _name.text.trim();
+  /// A guide only. The server computes the stored value itself on every write,
+  /// so this string is never relied on; it is empty whenever the form cannot
+  /// know the answer yet.
+  String get _fullPathPreview {
+    final name = _name.text.trim();
+    if (name.isEmpty) return '';
+    final parentId = _parentId;
+    if (parentId == null) {
+      return AdminLocationType.allowsRoot(_type) ? name : '';
+    }
+    final parentPath = widget.state.byId(parentId)?.fullPath?.trim();
+    if (parentPath == null || parentPath.isEmpty) return '';
+    return '$parentPath > $name';
+  }
+
+  String? _validateType(String? v) {
+    final l10n = AppLocalizations.of(context)!;
+    if (!AdminLocationType.isAssignable(v)) {
+      return l10n.adminLocationTypeUnavailable;
+    }
+    final existing = widget.existing;
+    if (existing != null &&
+        widget.state.typeChangeStrandsChildren(existing, v)) {
+      return l10n.adminLocationTypeBlockedByChildren;
+    }
+    return null;
+  }
+
+  /// Only a COUNTRY may be saved without a parent. A reserved type is refused
+  /// by [_validateType], so it is not reported twice here.
+  String? _validateParent(int? v) {
+    if (v != null) return null;
+    if (!AdminLocationType.isAssignable(_type)) return null;
+    if (AdminLocationType.allowsRoot(_type)) return null;
+    return AppLocalizations.of(context)!.adminLocationParentRequired;
+  }
 
   String? _validateCode(String? v) {
     final existing = widget.existing;
@@ -1647,6 +1733,7 @@ class _LocationFormDialogState extends State<_LocationFormDialog> {
     Navigator.of(context).pop(_LocationFormResult(
       name: _name.text.trim(),
       type: _type,
+      parentId: _parentId,
       slug: creating ? trimmed(_slug) : widget.existing!.slug,
       code: trimmed(_code),
       oldName: trimmed(_oldName),
@@ -1706,11 +1793,96 @@ class _LocationFormDialogState extends State<_LocationFormDialog> {
                   items: [
                     for (final t
                         in AdminLocationType.optionsWith(existing?.type))
-                      DropdownMenuItem(value: t, child: Text(t)),
+                      DropdownMenuItem(
+                        key: Key('admin-reference-location-type-option-$t'),
+                        value: t,
+                        // WARD and COMMUNE are declared by the enum, so they
+                        // are listed — disabled, and labelled as reserved.
+                        enabled: AdminLocationType.isAssignable(t),
+                        child: AdminLocationType.isReserved(t)
+                            ? Row(
+                                children: [
+                                  Text(t),
+                                  const SizedBox(width: AppSpacing.xs),
+                                  Flexible(
+                                    child: Text(
+                                      l10n.adminLocationTypeReservedMarker,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelSmall,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Text(t),
+                      ),
                   ],
-                  onChanged: (v) => setState(() => _type = v ?? _type),
+                  onChanged: _onTypeChanged,
+                  validator: _validateType,
                 ),
               ),
+              const SizedBox(height: AppSpacing.xs),
+              Semantics(
+                container: true,
+                explicitChildNodes: true,
+                label: l10n.adminLocationFieldParent,
+                // Rebuilt from scratch when the form replaces the parent, so
+                // the field never holds a value its new items do not contain.
+                child: KeyedSubtree(
+                  key: ValueKey('location-parent-$_parentPickerGeneration'),
+                  child: DropdownButtonFormField<int?>(
+                    key: const Key('admin-reference-location-parent-picker'),
+                    initialValue: _parentId,
+                    isExpanded: true,
+                    decoration: InputDecoration(
+                      labelText: l10n.adminLocationFieldParent,
+                      helperText: l10n.adminLocationHierarchyRule,
+                      helperMaxLines: 3,
+                    ),
+                    hint: Text(l10n.adminLocationParentHint),
+                    disabledHint: Text(l10n.adminLocationParentNoCandidates),
+                    items: [
+                      // Top level is a position only a COUNTRY may take.
+                      if (AdminLocationType.allowsRoot(_type))
+                        DropdownMenuItem<int?>(
+                          key:
+                              const Key('admin-reference-location-parent-root'),
+                          value: null,
+                          child: Text(l10n.adminReferenceParentNone),
+                        ),
+                      for (final p in _optionsFor(_type))
+                        DropdownMenuItem<int?>(
+                          key: Key(
+                              'admin-reference-location-parent-option-${p.id}'),
+                          value: p.id,
+                          child: _ParentOptionLabel(location: p),
+                        ),
+                    ],
+                    onChanged: (v) => setState(() {
+                      _parentId = v;
+                      _parentCleared = false;
+                    }),
+                    validator: _validateParent,
+                  ),
+                ),
+              ),
+              if (_parentCleared) ...[
+                const SizedBox(height: AppSpacing.xxs),
+                Text(
+                  l10n.adminLocationParentCleared,
+                  key: const Key('admin-reference-location-parent-cleared'),
+                  style: Theme.of(context)
+                      .textTheme
+                      .labelSmall
+                      ?.copyWith(color: Theme.of(context).colorScheme.error),
+                ),
+              ],
+              if (editing) ...[
+                const SizedBox(height: AppSpacing.xxs),
+                Text(l10n.adminLocationParentGuardNotice,
+                    style: Theme.of(context).textTheme.labelSmall),
+              ],
               const SizedBox(height: AppSpacing.xs),
               _PlainField(
                 controller: _oldName,
@@ -1726,24 +1898,11 @@ class _LocationFormDialogState extends State<_LocationFormDialog> {
                   style: Theme.of(context).textTheme.labelSmall),
               const SizedBox(height: AppSpacing.xs),
               _ReadOnlyValue(
-                label: l10n.adminReferenceFieldParent,
-                value: editing
-                    ? (existing.isRoot
-                        ? l10n.adminReferenceParentNone
-                        : '#${existing.parentId}')
-                    : l10n.adminReferenceParentNone,
-                note: editing ? null : l10n.adminLocationCreateRootNotice,
-              ),
-              _ReadOnlyValue(
                 label: l10n.adminLocationFieldFullPath,
-                value: editing
-                    ? (existing.fullPath ?? l10n.adminValueUnknown)
-                    : (_fullPathPreview.isEmpty
-                        ? l10n.adminValueUnknown
-                        : _fullPathPreview),
-                note: editing
-                    ? l10n.adminLocationFullPathPreservedNotice
-                    : l10n.adminLocationFullPathPreviewNotice,
+                value: _fullPathPreview.isEmpty
+                    ? l10n.adminValueUnknown
+                    : _fullPathPreview,
+                note: l10n.adminLocationFullPathGeneratedNotice,
               ),
               _ReadOnlyValue(
                 label: l10n.adminLocationFieldLevel,
@@ -1775,6 +1934,37 @@ class _LocationFormDialogState extends State<_LocationFormDialog> {
           child: Text(
               editing ? l10n.adminReferenceSave : l10n.adminReferenceCreate),
         ),
+      ],
+    );
+  }
+}
+
+/// One parent choice: the parent's path, so two places with the same name are
+/// told apart, its type, and — only when it applies — the CMS-inactive marker.
+/// Inactive parents stay offered: CMS status has no bearing on the hierarchy.
+class _ParentOptionLabel extends StatelessWidget {
+  final AdminLocation location;
+
+  const _ParentOptionLabel({required this.location});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final small = Theme.of(context).textTheme.labelSmall;
+    return Row(
+      children: [
+        Flexible(
+          child: Text(
+            location.fullPath ?? location.name ?? '#${location.id}',
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        const SizedBox(width: AppSpacing.xs),
+        Text(location.type ?? l10n.adminValueUnknown, style: small),
+        if (!location.active) ...[
+          const SizedBox(width: AppSpacing.xs),
+          Text(l10n.adminReferenceStatusInactive, style: small),
+        ],
       ],
     );
   }
