@@ -7,6 +7,7 @@ import com.example.planyourtrip.model.AdministrativeUnit;
 import com.example.planyourtrip.model.UnitType;
 import com.example.planyourtrip.repository.AdministrativeUnitRepository;
 import com.example.planyourtrip.util.SlugUtils;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +44,12 @@ public class LocationService {
      * malformed legacy data can never turn a request into an unbounded loop.
      */
     private static final int MAX_TREE_DEPTH = 64;
+
+    /** D14 — the longest public search keyword accepted, measured after trimming. */
+    public static final int SEARCH_KEYWORD_MAX_LENGTH = 100;
+
+    /** D14 — the most rows a single public search returns. */
+    public static final int SEARCH_RESULT_LIMIT = 50;
 
     /**
      * D13 — the canonical location hierarchy, and the only place it is written down.
@@ -101,13 +108,57 @@ public class LocationService {
      * keeps the endpoint's shape exactly as it was (a 200 with a JSON array) and introduces no
      * paging contract, which is out of D12's scope.
      *
-     * <p>Search with an actual keyword is unchanged, down to the query.
+     * <p>D14 closes the ways a non-blank keyword could still do the same thing:
+     *
+     * <ul>
+     *   <li><b>Wildcards are literal.</b> {@code %}, {@code _} and SQL Server's {@code [} reached
+     *       {@code LIKE} as pattern operators, so {@code keyword=%} matched every row. They are now
+     *       escaped — see {@link #escapeLike}.</li>
+     *   <li><b>An empty normalised keyword matches nothing.</b> {@link SlugUtils#normalize} drops
+     *       every non-ASCII character, so a keyword such as {@code 北京} normalised to {@code ""} and
+     *       the accent-free predicate became {@code LIKE '%%'}. The repository skips that one
+     *       predicate when the normalised keyword is empty; the other three still match the keyword
+     *       as typed.</li>
+     *   <li><b>At most {@value #SEARCH_RESULT_LIMIT} rows,</b> ordered {@code name, id} so the cap
+     *       always keeps the same rows. The response is still a bare JSON array.</li>
+     *   <li><b>A keyword longer than {@value #SEARCH_KEYWORD_MAX_LENGTH} characters is a 400.</b> It
+     *       is measured after trimming and checked after the blank rule, so a blank keyword of any
+     *       length still answers {@code []} exactly as D12 defined.</li>
+     * </ul>
+     *
+     * <p>The four fields searched and the substring semantics are unchanged.
      */
     public List<LocationResponse> search(String keyword) {
         if (keyword == null || keyword.isBlank()) return List.of();
-        String kw = keyword.trim().toLowerCase();
-        String nkw = SlugUtils.normalize(keyword);
-        return repo.search(kw, nkw).stream().map(this::toResponse).toList();
+        String trimmed = keyword.trim();
+        if (trimmed.length() > SEARCH_KEYWORD_MAX_LENGTH) {
+            throw new ApiException(HttpStatus.BAD_REQUEST,
+                "keyword: must be at most " + SEARCH_KEYWORD_MAX_LENGTH + " characters");
+        }
+        String kw = escapeLike(trimmed.toLowerCase());
+        String nkw = escapeLike(SlugUtils.normalize(trimmed));
+        return repo.search(kw, nkw, PageRequest.of(0, SEARCH_RESULT_LIMIT)).stream()
+            .map(this::toResponse).toList();
+    }
+
+    /**
+     * D14 — makes a keyword literal inside a {@code LIKE} pattern.
+     *
+     * <p>Prefixes the escape character itself and every character a {@code LIKE} pattern treats
+     * specially: {@code %} and {@code _} everywhere, and {@code [} because SQL Server — the production
+     * database — reads {@code [...]} as a character class. Every predicate in
+     * {@link AdministrativeUnitRepository#search} declares the same escape character, so an escaped
+     * keyword matches exactly the text that was typed.
+     */
+    public static String escapeLike(String raw) {
+        char escape = AdministrativeUnitRepository.LIKE_ESCAPE;
+        StringBuilder out = new StringBuilder(raw.length() + 8);
+        for (int i = 0; i < raw.length(); i++) {
+            char c = raw.charAt(i);
+            if (c == escape || c == '%' || c == '_' || c == '[') out.append(escape);
+            out.append(c);
+        }
+        return out.toString();
     }
 
     public List<LocationResponse> getAll() {
@@ -122,25 +173,27 @@ public class LocationService {
     // LocationController is read-only and DataInitializer seeds through the repository directly -
     // so the audit is inline with the actor first.
     //
-    // Operator text goes through AdminActivityLogService.safeText: these request DTOs put no @Size
-    // bound on name or slug, and "who renamed this, and to what" is the whole question a reference
-    // data audit row exists to answer, so the text is bounded and guard-checked rather than
-    // dropped. Long free text (description, icon, colour, cover image URL, fullPath) is excluded.
+    // Operator text goes through AdminActivityLogService.safeText: "who renamed this, and to what" is
+    // the whole question a reference data audit row exists to answer, so the text is bounded and
+    // guard-checked rather than dropped. (Since D14 LocationRequest bounds name, code, slug and
+    // oldName itself; the audit bound stays regardless.) Long free text (description, icon, colour,
+    // cover image URL, fullPath) is excluded.
 
     @Transactional
     public LocationResponse create(Long adminUserId, LocationRequest req) {
-        String slug = resolveSlug(req.slug(), req.name());
+        String slug = requireSlug(resolveSlug(req.slug(), req.name()));
+        String code = normalizeCode(req.code());
         if (repo.existsBySlug(slug))
             throw new ApiException(HttpStatus.CONFLICT, "Slug already exists: " + slug);
-        if (req.code() != null && repo.existsByCode(req.code()))
-            throw new ApiException(HttpStatus.CONFLICT, "Code already exists: " + req.code());
+        if (code != null && repo.existsByCode(code))
+            throw new ApiException(HttpStatus.CONFLICT, "Code already exists: " + code);
         AdministrativeUnit unit = new AdministrativeUnit();
         // A row that does not exist yet has no descendants, so no cycle is reachable here. The
         // guard is still called so the two write paths share one rule and a later change cannot
         // quietly skip it on create.
         AdministrativeUnit parent = resolveParent(null, req.parentId());
         validatePlacement(req.type(), parent, null);
-        fill(unit, req, slug, parent);
+        fill(unit, req, slug, code, parent);
         LocationResponse saved = toResponse(repo.save(unit));
         adminAudit.record(adminUserId, "LOCATION_CREATE", "LOCATION", saved.id(),
             "Admin created location " + saved.id(), null, summarise(saved));
@@ -152,16 +205,17 @@ public class LocationService {
         AdministrativeUnit unit = getOrThrow(id);
         // Snapshot to an immutable record before fill() mutates the managed entity.
         String before = summarise(toResponse(unit));
-        String slug = resolveSlug(req.slug(), req.name());
+        String slug = requireSlug(resolveSlug(req.slug(), req.name()));
+        String code = normalizeCode(req.code());
         if (!slug.equals(unit.getSlug()) && repo.existsBySlug(slug))
             throw new ApiException(HttpStatus.CONFLICT, "Slug already exists: " + slug);
-        if (req.code() != null && !req.code().equals(unit.getCode()) && repo.existsByCode(req.code()))
-            throw new ApiException(HttpStatus.CONFLICT, "Code already exists: " + req.code());
+        if (code != null && !code.equals(unit.getCode()) && repo.existsByCode(code))
+            throw new ApiException(HttpStatus.CONFLICT, "Code already exists: " + code);
         AdministrativeUnit parent = resolveParent(id, req.parentId());
         // Before fill(), so the node still carries its current type for the child check and a
         // refusal never touches the managed entity.
         validatePlacement(req.type(), parent, unit);
-        fill(unit, req, slug, parent);
+        fill(unit, req, slug, code, parent);
         AdministrativeUnit persisted = repo.save(unit);
         // The node's own path has just been rewritten from the live hierarchy; every descendant
         // hangs off it and must follow. Same transaction as the mutation and the audit row, so a
@@ -209,10 +263,10 @@ public class LocationService {
      * the request record for wire compatibility (the D11 console echoes it back on every PUT); it
      * is read by nothing.
      */
-    private void fill(AdministrativeUnit unit, LocationRequest req, String slug,
+    private void fill(AdministrativeUnit unit, LocationRequest req, String slug, String code,
                       AdministrativeUnit parent) {
         unit.setParent(parent);
-        unit.setCode(req.code());
+        unit.setCode(code);
         unit.setName(req.name());
         unit.setSlug(slug);
         unit.setNameNormalized(SlugUtils.normalize(req.name()));
@@ -422,6 +476,34 @@ public class LocationService {
 
     private String resolveSlug(String slug, String name) {
         return (slug != null && !slug.isBlank()) ? slug.trim() : SlugUtils.toSlug(name);
+    }
+
+    /**
+     * D14 — a resolved slug may not be empty.
+     *
+     * <p>{@link SlugUtils#toSlug} keeps only ASCII letters, digits, spaces and hyphens, so a name with
+     * none of them ({@code 北京}, {@code !!!}) derives {@code ""}. That empty string would be stored
+     * as a real value of a unique column, and the next such name would get a 409 naming an empty
+     * slug. It is refused as a 400 before any lookup or write. No slug format rule is imposed beyond
+     * this.
+     */
+    private static String requireSlug(String slug) {
+        if (slug == null || slug.isEmpty()) {
+            throw new ApiException(HttpStatus.BAD_REQUEST,
+                "slug: cannot be derived from this name; provide a slug");
+        }
+        return slug;
+    }
+
+    /**
+     * D14 — a blank or whitespace-only code is no code.
+     *
+     * <p>{@code code} is optional, and uniqueness only applies to present codes (the production index
+     * is filtered on {@code code is not null}). A blank value used to be stored as a real code, so a
+     * second one answered 409. A non-blank code is stored exactly as sent.
+     */
+    private static String normalizeCode(String code) {
+        return (code == null || code.isBlank()) ? null : code;
     }
 
     private AdministrativeUnit getOrThrow(Long id) {

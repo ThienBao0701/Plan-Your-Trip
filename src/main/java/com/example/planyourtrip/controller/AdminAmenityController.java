@@ -49,7 +49,7 @@ public class AdminAmenityController {
     @PatchMapping("/{id}/status")
     @Operation(summary = "Activate or deactivate an amenity")
     public AmenityResponse updateStatus(@AuthUser Long uid, @PathVariable Long id,
-                                        @RequestBody StatusRequest req) {
+                                        @Valid @RequestBody StatusRequest req) {
         return service.updateStatus(uid, id, req.active());
     }
 }

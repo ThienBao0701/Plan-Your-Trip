@@ -49,7 +49,7 @@ public class AdminCategoryController {
     @PatchMapping("/{id}/status")
     @Operation(summary = "Activate or deactivate a category")
     public CategoryResponse updateStatus(@AuthUser Long uid, @PathVariable Long id,
-                                         @RequestBody StatusRequest req) {
+                                         @Valid @RequestBody StatusRequest req) {
         return service.updateStatus(uid, id, req.active());
     }
 }
