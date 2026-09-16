@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../app/app_surface.dart';
+import '../../app/surface_gate.dart';
+import '../../app/surface_scope.dart';
 import '../../core/app_state.dart';
 import '../../core/mock/mock_data.dart';
 import '../../design/app_breakpoints.dart';
@@ -12,10 +15,23 @@ import '../../shared/widgets/glass_widgets.dart';
 import 'email_verification_screen.dart';
 import 'forgot_password_screen.dart';
 import 'register_screen.dart';
-import 'role_home.dart';
 
+/// Sign-in, shared by all three application surfaces.
+///
+/// The running surface ([SurfaceScope]) decides the copy and which secondary
+/// actions exist: only the traveller app offers Demo Mode and self sign-up. On
+/// every surface a successful sign-in returns to that surface's root, whose gate
+/// admits or refuses the account — sign-in never picks a destination by role and
+/// never leaves the surface.
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  /// True when this screen is the signed-out face of a `SurfaceGate` rather
+  /// than a route pushed on top of other screens. A successful sign-in then only
+  /// changes the session: the gate rebuilds into the shell, or the access-denied
+  /// screen, at the location that was requested, so this screen must not
+  /// navigate.
+  final bool embeddedInSurfaceGate;
+
+  const LoginScreen({super.key, this.embeddedInSurfaceGate = false});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -39,15 +55,27 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => showPassword = !showPassword);
   }
 
-  Widget _buildLoginPanel() => _LoginPanel(
+  Widget _buildLoginPanel(AppSurface surface, AppLocalizations l10n) =>
+      _LoginPanel(
         formKey: _formKey,
         email: email,
         pass: pass,
         loading: loading,
         showPassword: showPassword,
+        title: switch (surface) {
+          AppSurface.user => l10n.authLoginTitle,
+          AppSurface.partner => l10n.authPartnerLoginTitle,
+          AppSurface.admin => l10n.authAdminLoginTitle,
+        },
+        subtitle: switch (surface) {
+          AppSurface.user => l10n.authLoginSubtitle,
+          AppSurface.partner => l10n.authPartnerLoginSubtitle,
+          AppSurface.admin => l10n.authAdminLoginSubtitle,
+        },
+        showRegistration: surface.offersSelfRegistration,
         onTogglePassword: _togglePasswordVisibility,
         onLogin: () => _login(demo: false),
-        onDemo: () => _login(demo: true),
+        onDemo: surface.offersDemoMode ? () => _login(demo: true) : null,
         validateEmail: _validateEmail,
         validatePassword: _validatePassword,
       );
@@ -55,6 +83,15 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    // Presentation only: a LoginScreen mounted outside any surface app (an
+    // isolated widget test) keeps the traveller copy it always had. Where a
+    // sign-in leads is decided in [_login], and that fails closed.
+    final surface = SurfaceScope.maybeOf(context) ?? AppSurface.user;
+    final heroTitle = switch (surface) {
+      AppSurface.user => l10n.authLoginHero,
+      AppSurface.partner => l10n.authPartnerLoginHero,
+      AppSurface.admin => l10n.authAdminLoginHero,
+    };
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: BubbleBackground(
@@ -75,18 +112,17 @@ class _LoginScreenState extends State<LoginScreen> {
                       ? Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Expanded(
-                                child: _HeroPanel(title: l10n.authLoginHero)),
+                            Expanded(child: _HeroPanel(title: heroTitle)),
                             const SizedBox(width: AppSpacing.xl),
-                            Expanded(child: _buildLoginPanel()),
+                            Expanded(child: _buildLoginPanel(surface, l10n)),
                           ],
                         )
                       : Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            _HeroPanel(title: l10n.authLoginHero),
+                            _HeroPanel(title: heroTitle),
                             const SizedBox(height: AppSpacing.lg),
-                            _buildLoginPanel(),
+                            _buildLoginPanel(surface, l10n),
                           ],
                         ),
                 ),
@@ -107,6 +143,7 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => loading = true);
     final nav = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
+    final home = SurfaceNavigation.home(context);
     final result = demo
         ? await app.login(MockData.demoEmail, MockData.demoPassword)
         : await app.login(email.text.trim(), pass.text);
@@ -114,7 +151,8 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => loading = false);
 
     if (result['success'] == true) {
-      nav.pushReplacement(MaterialPageRoute(builder: (_) => const RoleHome()));
+      if (widget.embeddedInSurfaceGate) return;
+      nav.pushReplacement(home);
       return;
     }
 
@@ -183,9 +221,14 @@ class _LoginPanel extends StatelessWidget {
   final TextEditingController pass;
   final bool loading;
   final bool showPassword;
+  final String title;
+  final String subtitle;
+  final bool showRegistration;
   final VoidCallback onTogglePassword;
   final VoidCallback onLogin;
-  final VoidCallback onDemo;
+
+  /// Null on a surface without Demo Mode, which removes the demo action.
+  final VoidCallback? onDemo;
   final FormFieldValidator<String> validateEmail;
   final FormFieldValidator<String> validatePassword;
 
@@ -195,6 +238,9 @@ class _LoginPanel extends StatelessWidget {
     required this.pass,
     required this.loading,
     required this.showPassword,
+    required this.title,
+    required this.subtitle,
+    required this.showRegistration,
     required this.onTogglePassword,
     required this.onLogin,
     required this.onDemo,
@@ -213,11 +259,9 @@ class _LoginPanel extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(l10n.authLoginTitle,
-                style: Theme.of(context).textTheme.headlineMedium),
+            Text(title, style: Theme.of(context).textTheme.headlineMedium),
             const SizedBox(height: AppSpacing.xs),
-            Text(l10n.authLoginSubtitle,
-                style: Theme.of(context).textTheme.bodyMedium),
+            Text(subtitle, style: Theme.of(context).textTheme.bodyMedium),
             const SizedBox(height: AppSpacing.lg),
             TextFormField(
               key: const Key('login-email-field'),
@@ -290,53 +334,63 @@ class _LoginPanel extends StatelessWidget {
                     onPressed: onLogin,
                   ),
             const SizedBox(height: AppSpacing.sm),
-            OceanSecondaryButton(
-              key: const Key('login-demo'),
-              label: l10n.authDemoAction,
-              icon: Icons.science_rounded,
-              onPressed: loading ? null : onDemo,
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(l10n.authDemoHint,
+            if (onDemo != null) ...[
+              OceanSecondaryButton(
+                key: const Key('login-demo'),
+                label: l10n.authDemoAction,
+                icon: Icons.science_rounded,
+                onPressed: loading ? null : onDemo,
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(l10n.authDemoHint,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium),
+            ] else
+              Text(
+                l10n.authStaffAccountRequired,
+                key: const Key('login-account-required'),
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium),
-            const SizedBox(height: AppSpacing.md),
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    l10n.authNeedAccount,
-                    style: Theme.of(context).textTheme.bodyMedium,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            if (showRegistration) ...[
+              const SizedBox(height: AppSpacing.md),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      l10n.authNeedAccount,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
                   ),
-                ),
-                TextButton(
-                  onPressed: loading
-                      ? null
-                      : () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const RegisterScreen()),
-                          ),
-                  child: Text(l10n.authCreateAccountAction),
-                ),
-              ],
-            ),
-            TextButton.icon(
-              onPressed: loading
-                  ? null
-                  : () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => EmailVerificationScreen(
-                            email: email.text.trim().isEmpty
-                                ? l10n.authEmailLabel
-                                : email.text.trim(),
+                  TextButton(
+                    onPressed: loading
+                        ? null
+                        : () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const RegisterScreen()),
+                            ),
+                    child: Text(l10n.authCreateAccountAction),
+                  ),
+                ],
+              ),
+              TextButton.icon(
+                onPressed: loading
+                    ? null
+                    : () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => EmailVerificationScreen(
+                              email: email.text.trim().isEmpty
+                                  ? l10n.authEmailLabel
+                                  : email.text.trim(),
+                            ),
                           ),
                         ),
-                      ),
-              icon: const Icon(Icons.mark_email_read_outlined),
-              label: Text(l10n.authVerifyEmailAction),
-            ),
+                icon: const Icon(Icons.mark_email_read_outlined),
+                label: Text(l10n.authVerifyEmailAction),
+              ),
+            ],
             const SizedBox(height: AppSpacing.xs),
             Text(
               l10n.authBackendHint,

@@ -4377,7 +4377,6 @@
   "partnerActionRetry": "Thử lại",
   "partnerActionRefresh": "Làm mới",
   "partnerActionBack": "Quay lại",
-  "partnerActionExitToTravellerApp": "Thoát về ứng dụng du khách",
   "partnerShellMobileHint": "Hãy dùng màn hình lớn hơn để có đầy đủ bảng vận hành.",
   "partnerStatusLoadingTitle": "Đang tải không gian làm việc",
   "partnerStatusLoadingMessage": "Đang lấy hồ sơ đối tác và hoạt động hôm nay của bạn.",
@@ -6783,5 +6782,29 @@
   "adminLocationFilterHelper": "Lọc trong các địa danh đã tải, theo tên, slug, mã hoặc tên cũ.",
   "adminLocationFilterClear": "Xoá tìm kiếm",
   "adminLocationDuplicateCodeOrSlug": "Mã hoặc slug này đã được dùng. Hãy chọn giá trị khác.",
+  "surfaceTitlePartner": "Plan Your Trip Đối tác",
+  "surfaceTitleAdmin": "Plan Your Trip Quản trị",
+  "authPartnerLoginHero": "Quản lý cơ sở lưu trú, đặt phòng và thanh toán trong một không gian làm việc.",
+  "authPartnerLoginTitle": "Đăng nhập đối tác",
+  "authPartnerLoginSubtitle": "Đăng nhập bằng tài khoản đối tác để mở không gian làm việc.",
+  "authAdminLoginHero": "Vận hành nền tảng Plan Your Trip.",
+  "authAdminLoginTitle": "Đăng nhập quản trị",
+  "authAdminLoginSubtitle": "Đăng nhập bằng tài khoản quản trị viên để mở bảng điều khiển.",
+  "authStaffAccountRequired": "Chế độ demo và tự đăng ký chỉ có trong ứng dụng du khách. Không gian này cần một tài khoản có sẵn.",
+  "surfaceAccessDeniedTitle": "Bạn không có quyền truy cập ứng dụng này",
+  "surfaceAccessDeniedUser": "Tài khoản này không dùng được ứng dụng du khách. Hãy đăng xuất rồi đăng nhập bằng tài khoản du khách.",
+  "surfaceAccessDeniedPartner": "Tài khoản này không dùng được không gian đối tác. Hãy đăng xuất rồi đăng nhập bằng tài khoản đối tác.",
+  "surfaceAccessDeniedAdmin": "Tài khoản này không dùng được bảng điều khiển quản trị. Hãy đăng xuất rồi đăng nhập bằng tài khoản quản trị viên.",
+  "surfaceSignedInAs": "Đã đăng nhập: {email}",
+  "@surfaceSignedInAs": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "surfaceSignOut": "Đăng xuất",
+  "surfaceConfigErrorTitle": "Ứng dụng chưa được cấu hình",
+  "surfaceConfigErrorBody": "Không xác định được ứng dụng cần mở. Hãy khởi động bằng một trong các entrypoint đã được ghi trong tài liệu.",
   "adminReviewModerationUncertain": "Không rõ kết quả của thao tác vừa rồi. Trang đã được tải lại — hãy kiểm tra trạng thái đánh giá trước khi thử lại."
 }

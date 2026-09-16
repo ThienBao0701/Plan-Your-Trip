@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../app/surface_session.dart';
 import '../../core/app_state.dart';
 import '../../core/partner/partner_models.dart';
 import '../../core/partner/partner_state.dart';
@@ -39,7 +40,16 @@ import 'widgets/partner_state_views.dart';
 class PartnerAppShell extends StatefulWidget {
   final String initialRoute;
 
-  const PartnerAppShell({super.key, required this.initialRoute});
+  /// Called with the destination's route whenever the operator moves to
+  /// another destination, so the Partner surface can keep the browser location
+  /// in step. Null when the shell is mounted on its own.
+  final ValueChanged<String>? onRouteChanged;
+
+  const PartnerAppShell({
+    super.key,
+    required this.initialRoute,
+    this.onRouteChanged,
+  });
 
   @override
   State<PartnerAppShell> createState() => _PartnerAppShellState();
@@ -75,6 +85,7 @@ class _PartnerAppShellState extends State<PartnerAppShell> {
   void _select(String route) {
     if (_route == route) return;
     setState(() => _route = route);
+    widget.onRouteChanged?.call(route);
   }
 
   @override
@@ -94,7 +105,9 @@ class _PartnerAppShellState extends State<PartnerAppShell> {
         if (!isDesktop) Navigator.of(context).maybePop();
         _select(route);
       },
-      onExit: () => Navigator.of(context).maybePop(),
+      // The workspace is its own application: leaving it means signing out,
+      // which returns to the Partner sign-in rather than to another app.
+      onSignOut: () => signOutToSurfaceRoot(context),
     );
 
     final body = _PartnerWorkArea(
@@ -159,14 +172,14 @@ class _PartnerSidebar extends StatelessWidget {
   final PartnerWorkspaceOverview? overview;
   final PartnerTeamRole teamRole;
   final ValueChanged<String> onSelect;
-  final VoidCallback onExit;
+  final VoidCallback onSignOut;
 
   const _PartnerSidebar({
     required this.selectedRoute,
     required this.overview,
     required this.teamRole,
     required this.onSelect,
-    required this.onExit,
+    required this.onSignOut,
   });
 
   @override
@@ -275,9 +288,10 @@ class _PartnerSidebar extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(AppSpacing.sm),
             child: OceanSecondaryButton(
-              label: l10n.partnerActionExitToTravellerApp,
+              key: const Key('partner-sign-out'),
+              label: l10n.surfaceSignOut,
               icon: Icons.logout_rounded,
-              onPressed: onExit,
+              onPressed: onSignOut,
             ),
           ),
         ],

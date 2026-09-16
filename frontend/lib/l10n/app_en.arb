@@ -4377,7 +4377,6 @@
   "partnerActionRetry": "Try again",
   "partnerActionRefresh": "Refresh",
   "partnerActionBack": "Go back",
-  "partnerActionExitToTravellerApp": "Exit to traveller app",
   "partnerShellMobileHint": "Use a larger screen for the full operations console.",
   "partnerStatusLoadingTitle": "Loading your workspace",
   "partnerStatusLoadingMessage": "Fetching your partner profile and today's activity.",
@@ -6783,5 +6782,29 @@
   "adminLocationFilterHelper": "Filters the locations already loaded, by name, slug, code or former name.",
   "adminLocationFilterClear": "Clear search",
   "adminLocationDuplicateCodeOrSlug": "That code or slug is already in use. Choose a different one.",
+  "surfaceTitlePartner": "Plan Your Trip Partner",
+  "surfaceTitleAdmin": "Plan Your Trip Admin",
+  "authPartnerLoginHero": "Run your properties, bookings and payouts from one workspace.",
+  "authPartnerLoginTitle": "Partner sign in",
+  "authPartnerLoginSubtitle": "Sign in with your partner account to open the workspace.",
+  "authAdminLoginHero": "Operate the Plan Your Trip platform.",
+  "authAdminLoginTitle": "Admin sign in",
+  "authAdminLoginSubtitle": "Sign in with an administrator account to open the console.",
+  "authStaffAccountRequired": "Demo Mode and self sign-up are only available in the traveller app. This workspace needs an existing account.",
+  "surfaceAccessDeniedTitle": "You don't have access to this application",
+  "surfaceAccessDeniedUser": "This account can't use the traveller app. Sign out, then sign in with a traveller account.",
+  "surfaceAccessDeniedPartner": "This account can't use the Partner workspace. Sign out, then sign in with a partner account.",
+  "surfaceAccessDeniedAdmin": "This account can't use the Admin console. Sign out, then sign in with an administrator account.",
+  "surfaceSignedInAs": "Signed in as {email}",
+  "@surfaceSignedInAs": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "surfaceSignOut": "Sign out",
+  "surfaceConfigErrorTitle": "This application isn't configured",
+  "surfaceConfigErrorBody": "It couldn't tell which application to open. Start it with one of the documented entrypoints.",
   "adminReviewModerationUncertain": "The result of the last action is unknown. This page has been reloaded — check the review's status before trying again."
 }

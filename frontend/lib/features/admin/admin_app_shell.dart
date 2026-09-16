@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../app/surface_session.dart';
 import '../../core/admin/admin_models.dart';
 import '../../core/admin/admin_state.dart';
 import '../../core/app_state.dart';
@@ -42,7 +43,16 @@ import 'screens/admin_reviews_screen.dart';
 class AdminAppShell extends StatefulWidget {
   final String initialRoute;
 
-  const AdminAppShell({super.key, this.initialRoute = AdminRoutes.dashboard});
+  /// Called with the destination's route whenever the operator moves to
+  /// another destination, so the Admin surface can keep the browser location in
+  /// step. Null when the shell is mounted on its own.
+  final ValueChanged<String>? onRouteChanged;
+
+  const AdminAppShell({
+    super.key,
+    this.initialRoute = AdminRoutes.dashboard,
+    this.onRouteChanged,
+  });
 
   @override
   State<AdminAppShell> createState() => _AdminAppShellState();
@@ -301,7 +311,10 @@ class _AdminAppShellState extends State<AdminAppShell> {
     if (_mediaOpenedFromPlaceDetail) {
       setState(() => _mediaOpenedFromPlaceDetail = false);
     }
-    if (_route != route) setState(() => _route = route);
+    if (_route != route) {
+      setState(() => _route = route);
+      widget.onRouteChanged?.call(route);
+    }
     _loadFor(route);
     AdminScope.maybeOf(context)?.setActiveRoute(route);
   }
@@ -381,6 +394,7 @@ class _AdminAppShellState extends State<AdminAppShell> {
                 child: _AdminMenu(
                   activeRoute: _route,
                   onSelect: (r) => _select(r, closeDrawer: true),
+                  onSignOut: () => signOutToSurfaceRoot(context),
                 ),
               ),
             ),
@@ -394,6 +408,7 @@ class _AdminAppShellState extends State<AdminAppShell> {
                     child: _AdminMenu(
                       activeRoute: _route,
                       onSelect: _select,
+                      onSignOut: () => signOutToSurfaceRoot(context),
                     ),
                   ),
                   const VerticalDivider(width: 1),
@@ -414,7 +429,15 @@ class _AdminMenu extends StatelessWidget {
   final String activeRoute;
   final ValueChanged<String> onSelect;
 
-  const _AdminMenu({required this.activeRoute, required this.onSelect});
+  /// The console is its own application: leaving it means signing out, which
+  /// returns to the Admin sign-in rather than to another app.
+  final VoidCallback onSignOut;
+
+  const _AdminMenu({
+    required this.activeRoute,
+    required this.onSelect,
+    required this.onSignOut,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -466,6 +489,14 @@ class _AdminMenu extends StatelessWidget {
               onTap: () => onSelect(d.route),
             ),
         ],
+        const Divider(height: 1),
+        ListTile(
+          key: const Key('admin-sign-out'),
+          leading: const Icon(Icons.logout_rounded),
+          title: Text(l10n.surfaceSignOut),
+          minVerticalPadding: 12,
+          onTap: onSignOut,
+        ),
       ],
     );
   }

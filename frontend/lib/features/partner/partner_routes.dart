@@ -7,14 +7,14 @@ import 'partner_app_shell.dart';
 import 'partner_navigation.dart';
 import 'widgets/partner_state_views.dart';
 
-/// The `/partner/...` route namespace.
+/// The in-app partner route strings (`/partner/...`).
 ///
-/// The app navigates imperatively with `MaterialPageRoute` (there is no named
-/// router and none is introduced here), so a "route" is a stable path string
-/// that identifies a partner destination. Keeping the strings identical to the
-/// ones `PartnerExtranetService.getMenu` returns means a future deep link, a
-/// backend quick-action URL (`/partner/bookings?arrivalToday=true`) and this
-/// client all agree on one vocabulary.
+/// A "route" is a stable path string that identifies a partner destination,
+/// kept identical to the ones `PartnerExtranetService.getMenu` returns so the
+/// backend's menu, a backend quick-action URL and this client agree on one
+/// vocabulary. They are not browser locations: the Partner workspace is its own
+/// application surface, whose router maps `/bookings` in the address bar to
+/// `/partner/bookings` here (see `app/routing/partner_router.dart`).
 class PartnerRoutes {
   const PartnerRoutes._();
 
@@ -54,15 +54,23 @@ class PartnerRoutes {
 class PartnerRouteGuard extends StatelessWidget {
   final String initialRoute;
 
-  const PartnerRouteGuard(
-      {super.key, this.initialRoute = PartnerRoutes.dashboard});
+  /// Passed through to [PartnerAppShell.onRouteChanged].
+  final ValueChanged<String>? onRouteChanged;
+
+  const PartnerRouteGuard({
+    super.key,
+    this.initialRoute = PartnerRoutes.dashboard,
+    this.onRouteChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
     final app = AppScope.of(context);
 
-    // Signed out: the traveller app's own session handling owns this case, so
-    // just refuse rather than duplicating a login flow here.
+    // On the Partner surface the SurfaceGate shows sign-in, and refuses every
+    // other role, before this guard is built. Reaching it signed out or with the
+    // wrong role means it was mounted directly — refuse, rather than duplicate a
+    // sign-in flow here.
     if (app.email == null || !app.role.canEnterPartnerExtranet) {
       return PartnerAccessDeniedScreen(role: app.role);
     }
@@ -70,6 +78,7 @@ class PartnerRouteGuard extends StatelessWidget {
     final destination = PartnerNavigation.byRoute(initialRoute);
     return PartnerAppShell(
       initialRoute: destination?.route ?? PartnerRoutes.dashboard,
+      onRouteChanged: onRouteChanged,
     );
   }
 }

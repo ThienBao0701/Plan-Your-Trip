@@ -38,6 +38,9 @@ more than speed of feature count.
 ```sh
 flutter pub get                                   # install deps
 flutter run -d chrome --dart-define=API_BASE_URL=http://localhost:8081/api
+flutter run -d chrome -t lib/main_user.dart --web-port 64117      # User surface (traveller app)
+flutter run -d chrome -t lib/main_partner.dart --web-port 64118   # Partner workspace
+flutter run -d chrome -t lib/main_admin.dart --web-port 64119     # Admin console
 flutter run -d android --dart-define=API_BASE_URL=http://10.0.2.2:8081/api   # Android emulator
 flutter run --dart-define=API_BASE_URL=http://192.168.1.10:8081/api          # physical device (LAN IP)
 
@@ -51,6 +54,10 @@ dart format .                                     # format before reporting a ph
 ```
 
 `API_BASE_URL` defaults to `http://localhost:8081/api` (`lib/core/config/app_config.dart`) when not passed via `--dart-define`.
+
+User, Partner and Admin are three separate application surfaces built from this one codebase, each on its
+own origin (ports 64117 / 64118 / 64119 locally). See `docs/APP_SURFACES.md` before changing entrypoints,
+routing, sign-in or anything that decides which shell an origin shows.
 
 Local development uses port **8081**, not 8080: port 8080 is occupied by Windows AgentService on the
 development machine, so local Spring Boot is started with `SERVER_PORT=8081` by the launcher. This is

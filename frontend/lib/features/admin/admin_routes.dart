@@ -6,12 +6,14 @@ import '../../l10n/app_localizations.dart';
 import 'admin_app_shell.dart';
 import 'admin_navigation.dart';
 
-/// The `/admin/...` route namespace.
+/// The in-app admin route strings (`/admin/...`).
 ///
-/// The app navigates imperatively with `MaterialPageRoute` — there is no named
-/// router, and `go_router` is deliberately not introduced. A "route" here is a
-/// stable path string identifying an admin destination, matching the convention
-/// `PartnerRoutes` already established so both consoles speak one vocabulary.
+/// A "route" here is a stable path string identifying an admin destination,
+/// matching the convention `PartnerRoutes` established so both consoles speak
+/// one vocabulary. They are not browser locations: the Admin console is its own
+/// application surface, whose router maps `/reference-data` in the address bar
+/// to `/admin/reference-data` here (see `app/routing/admin_router.dart`).
+/// `go_router` is still deliberately not introduced.
 class AdminRoutes {
   const AdminRoutes._();
 
@@ -63,14 +65,23 @@ class AdminRoutes {
 class AdminRouteGuard extends StatelessWidget {
   final String initialRoute;
 
-  const AdminRouteGuard({super.key, this.initialRoute = AdminRoutes.dashboard});
+  /// Passed through to [AdminAppShell.onRouteChanged].
+  final ValueChanged<String>? onRouteChanged;
+
+  const AdminRouteGuard({
+    super.key,
+    this.initialRoute = AdminRoutes.dashboard,
+    this.onRouteChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
     final app = AppScope.of(context);
 
-    // Signed out, or any role other than ADMIN. The traveller app owns the
-    // signed-out case, so this refuses rather than duplicating a login flow.
+    // On the Admin surface the SurfaceGate shows sign-in, and refuses every
+    // other role, before this guard is built. Reaching it signed out or with any
+    // role other than ADMIN means it was mounted directly — refuse, rather than
+    // duplicate a sign-in flow here.
     if (app.email == null || !app.role.canEnterAdminConsole) {
       return AdminAccessDeniedScreen(role: app.role);
     }
@@ -78,6 +89,7 @@ class AdminRouteGuard extends StatelessWidget {
     final destination = AdminNavigation.byRoute(initialRoute);
     return AdminAppShell(
       initialRoute: destination?.route ?? AdminRoutes.dashboard,
+      onRouteChanged: onRouteChanged,
     );
   }
 }

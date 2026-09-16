@@ -9,14 +9,24 @@ import '../trips/trips_screen.dart';
 import 'home_screen.dart';
 
 class AppShell extends StatefulWidget {
-  const AppShell({super.key});
+  /// The tab shown first: 0 Explore, 1 Trips, 2 Planner, 3 Profile. Anything
+  /// out of range opens Explore.
+  final int initialTab;
+
+  /// Called when the visible tab changes, so the User surface can keep the
+  /// browser location in step. Null when the shell is mounted on its own.
+  final ValueChanged<int>? onTabChanged;
+
+  const AppShell({super.key, this.initialTab = 0, this.onTabChanged});
 
   @override
   State<AppShell> createState() => _AppShellState();
 }
 
 class _AppShellState extends State<AppShell> {
-  int index = 0;
+  late int index = widget.initialTab >= 0 && widget.initialTab < _pages.length
+      ? widget.initialTab
+      : 0;
 
   late final List<Widget> _pages = const [
     HomeScreen(),
@@ -30,6 +40,7 @@ class _AppShellState extends State<AppShell> {
   void _selectTab(int nextIndex) {
     if (nextIndex == index) return;
     setState(() => index = nextIndex);
+    widget.onTabChanged?.call(nextIndex);
   }
 
   @override

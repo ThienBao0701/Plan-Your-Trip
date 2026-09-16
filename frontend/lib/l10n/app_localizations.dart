@@ -14488,12 +14488,6 @@ abstract class AppLocalizations {
   /// **'Go back'**
   String get partnerActionBack;
 
-  /// No description provided for @partnerActionExitToTravellerApp.
-  ///
-  /// In en, this message translates to:
-  /// **'Exit to traveller app'**
-  String get partnerActionExitToTravellerApp;
-
   /// No description provided for @partnerShellMobileHint.
   ///
   /// In en, this message translates to:
@@ -23355,6 +23349,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'That code or slug is already in use. Choose a different one.'**
   String get adminLocationDuplicateCodeOrSlug;
+
+  /// No description provided for @surfaceTitlePartner.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan Your Trip Partner'**
+  String get surfaceTitlePartner;
+
+  /// No description provided for @surfaceTitleAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan Your Trip Admin'**
+  String get surfaceTitleAdmin;
+
+  /// No description provided for @authPartnerLoginHero.
+  ///
+  /// In en, this message translates to:
+  /// **'Run your properties, bookings and payouts from one workspace.'**
+  String get authPartnerLoginHero;
+
+  /// No description provided for @authPartnerLoginTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Partner sign in'**
+  String get authPartnerLoginTitle;
+
+  /// No description provided for @authPartnerLoginSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with your partner account to open the workspace.'**
+  String get authPartnerLoginSubtitle;
+
+  /// No description provided for @authAdminLoginHero.
+  ///
+  /// In en, this message translates to:
+  /// **'Operate the Plan Your Trip platform.'**
+  String get authAdminLoginHero;
+
+  /// No description provided for @authAdminLoginTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Admin sign in'**
+  String get authAdminLoginTitle;
+
+  /// No description provided for @authAdminLoginSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with an administrator account to open the console.'**
+  String get authAdminLoginSubtitle;
+
+  /// No description provided for @authStaffAccountRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo Mode and self sign-up are only available in the traveller app. This workspace needs an existing account.'**
+  String get authStaffAccountRequired;
+
+  /// No description provided for @surfaceAccessDeniedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have access to this application'**
+  String get surfaceAccessDeniedTitle;
+
+  /// No description provided for @surfaceAccessDeniedUser.
+  ///
+  /// In en, this message translates to:
+  /// **'This account can\'t use the traveller app. Sign out, then sign in with a traveller account.'**
+  String get surfaceAccessDeniedUser;
+
+  /// No description provided for @surfaceAccessDeniedPartner.
+  ///
+  /// In en, this message translates to:
+  /// **'This account can\'t use the Partner workspace. Sign out, then sign in with a partner account.'**
+  String get surfaceAccessDeniedPartner;
+
+  /// No description provided for @surfaceAccessDeniedAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'This account can\'t use the Admin console. Sign out, then sign in with an administrator account.'**
+  String get surfaceAccessDeniedAdmin;
+
+  /// No description provided for @surfaceSignedInAs.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed in as {email}'**
+  String surfaceSignedInAs(String email);
+
+  /// No description provided for @surfaceSignOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out'**
+  String get surfaceSignOut;
+
+  /// No description provided for @surfaceConfigErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This application isn\'t configured'**
+  String get surfaceConfigErrorTitle;
+
+  /// No description provided for @surfaceConfigErrorBody.
+  ///
+  /// In en, this message translates to:
+  /// **'It couldn\'t tell which application to open. Start it with one of the documented entrypoints.'**
+  String get surfaceConfigErrorBody;
 
   /// No description provided for @adminReviewModerationUncertain.
   ///

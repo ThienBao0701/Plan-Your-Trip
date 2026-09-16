@@ -8505,9 +8505,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get partnerActionBack => 'Go back';
 
   @override
-  String get partnerActionExitToTravellerApp => 'Exit to traveller app';
-
-  @override
   String get partnerShellMobileHint =>
       'Use a larger screen for the full operations console.';
 
@@ -13584,6 +13581,68 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get adminLocationDuplicateCodeOrSlug =>
       'That code or slug is already in use. Choose a different one.';
+
+  @override
+  String get surfaceTitlePartner => 'Plan Your Trip Partner';
+
+  @override
+  String get surfaceTitleAdmin => 'Plan Your Trip Admin';
+
+  @override
+  String get authPartnerLoginHero =>
+      'Run your properties, bookings and payouts from one workspace.';
+
+  @override
+  String get authPartnerLoginTitle => 'Partner sign in';
+
+  @override
+  String get authPartnerLoginSubtitle =>
+      'Sign in with your partner account to open the workspace.';
+
+  @override
+  String get authAdminLoginHero => 'Operate the Plan Your Trip platform.';
+
+  @override
+  String get authAdminLoginTitle => 'Admin sign in';
+
+  @override
+  String get authAdminLoginSubtitle =>
+      'Sign in with an administrator account to open the console.';
+
+  @override
+  String get authStaffAccountRequired =>
+      'Demo Mode and self sign-up are only available in the traveller app. This workspace needs an existing account.';
+
+  @override
+  String get surfaceAccessDeniedTitle =>
+      'You don\'t have access to this application';
+
+  @override
+  String get surfaceAccessDeniedUser =>
+      'This account can\'t use the traveller app. Sign out, then sign in with a traveller account.';
+
+  @override
+  String get surfaceAccessDeniedPartner =>
+      'This account can\'t use the Partner workspace. Sign out, then sign in with a partner account.';
+
+  @override
+  String get surfaceAccessDeniedAdmin =>
+      'This account can\'t use the Admin console. Sign out, then sign in with an administrator account.';
+
+  @override
+  String surfaceSignedInAs(String email) {
+    return 'Signed in as $email';
+  }
+
+  @override
+  String get surfaceSignOut => 'Sign out';
+
+  @override
+  String get surfaceConfigErrorTitle => 'This application isn\'t configured';
+
+  @override
+  String get surfaceConfigErrorBody =>
+      'It couldn\'t tell which application to open. Start it with one of the documented entrypoints.';
 
   @override
   String get adminReviewModerationUncertain =>

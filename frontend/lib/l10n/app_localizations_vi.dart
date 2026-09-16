@@ -8339,9 +8339,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get partnerActionBack => 'Quay lại';
 
   @override
-  String get partnerActionExitToTravellerApp => 'Thoát về ứng dụng du khách';
-
-  @override
   String get partnerShellMobileHint =>
       'Hãy dùng màn hình lớn hơn để có đầy đủ bảng vận hành.';
 
@@ -13425,6 +13422,68 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get adminLocationDuplicateCodeOrSlug =>
       'Mã hoặc slug này đã được dùng. Hãy chọn giá trị khác.';
+
+  @override
+  String get surfaceTitlePartner => 'Plan Your Trip Đối tác';
+
+  @override
+  String get surfaceTitleAdmin => 'Plan Your Trip Quản trị';
+
+  @override
+  String get authPartnerLoginHero =>
+      'Quản lý cơ sở lưu trú, đặt phòng và thanh toán trong một không gian làm việc.';
+
+  @override
+  String get authPartnerLoginTitle => 'Đăng nhập đối tác';
+
+  @override
+  String get authPartnerLoginSubtitle =>
+      'Đăng nhập bằng tài khoản đối tác để mở không gian làm việc.';
+
+  @override
+  String get authAdminLoginHero => 'Vận hành nền tảng Plan Your Trip.';
+
+  @override
+  String get authAdminLoginTitle => 'Đăng nhập quản trị';
+
+  @override
+  String get authAdminLoginSubtitle =>
+      'Đăng nhập bằng tài khoản quản trị viên để mở bảng điều khiển.';
+
+  @override
+  String get authStaffAccountRequired =>
+      'Chế độ demo và tự đăng ký chỉ có trong ứng dụng du khách. Không gian này cần một tài khoản có sẵn.';
+
+  @override
+  String get surfaceAccessDeniedTitle =>
+      'Bạn không có quyền truy cập ứng dụng này';
+
+  @override
+  String get surfaceAccessDeniedUser =>
+      'Tài khoản này không dùng được ứng dụng du khách. Hãy đăng xuất rồi đăng nhập bằng tài khoản du khách.';
+
+  @override
+  String get surfaceAccessDeniedPartner =>
+      'Tài khoản này không dùng được không gian đối tác. Hãy đăng xuất rồi đăng nhập bằng tài khoản đối tác.';
+
+  @override
+  String get surfaceAccessDeniedAdmin =>
+      'Tài khoản này không dùng được bảng điều khiển quản trị. Hãy đăng xuất rồi đăng nhập bằng tài khoản quản trị viên.';
+
+  @override
+  String surfaceSignedInAs(String email) {
+    return 'Đã đăng nhập: $email';
+  }
+
+  @override
+  String get surfaceSignOut => 'Đăng xuất';
+
+  @override
+  String get surfaceConfigErrorTitle => 'Ứng dụng chưa được cấu hình';
+
+  @override
+  String get surfaceConfigErrorBody =>
+      'Không xác định được ứng dụng cần mở. Hãy khởi động bằng một trong các entrypoint đã được ghi trong tài liệu.';
 
   @override
   String get adminReviewModerationUncertain =>
