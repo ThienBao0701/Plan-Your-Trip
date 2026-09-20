@@ -4,6 +4,7 @@ import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/partner/partner_property_form_models.dart';
 import '../../../core/partner/partner_property_models.dart';
+import '../../../core/partner/property_catalogue.dart';
 
 /// Where the editor stands before anything can be typed.
 enum PropertyEditorStatus {
@@ -62,14 +63,8 @@ class PropertyFormText {
   });
 
   /// `"Vietnamese, English"` → `["Vietnamese", "English"]`; blanks dropped.
-  static List<String> splitList(String? raw) {
-    if (raw == null) return const [];
-    return raw
-        .split(',')
-        .map((entry) => entry.trim())
-        .where((entry) => entry.isNotEmpty)
-        .toList();
-  }
+  /// One implementation, shared with the onboarding wizard.
+  static List<String> splitList(String? raw) => splitPropertyList(raw);
 }
 
 /// The Partner property editor: the catalogue it chooses from, the choices
@@ -95,23 +90,17 @@ class PartnerPropertyEditorState extends ChangeNotifier {
 
   bool get isCreating => original == null;
 
+  /// The admin-managed reference data and the location cascade, shared with the
+  /// Phase D onboarding wizard rather than implemented twice.
+  late final PropertyCatalogue catalogue = PropertyCatalogue(api: api)
+    ..addListener(notifyListeners);
+
   PropertyEditorStatus _status = PropertyEditorStatus.loading;
   PropertyEditorStatus get status => _status;
   bool get isReady => _status == PropertyEditorStatus.ready;
 
-  List<PropertyCategoryOption> _categories = const [];
-  List<PropertyAmenityOption> _amenities = const [];
-  List<PropertyLocationOption> _countries = const [];
-  List<PropertyLocationOption> _provinces = const [];
-  List<PropertyLocationOption> _areas = const [];
-
   int? _categoryId;
   int? _subcategoryId;
-  int? _countryId;
-  int? _provinceId;
-  int? _areaId;
-  bool _locationTouched = false;
-  bool _loadingChildren = false;
 
   final Set<int> _amenityIds = <int>{};
 
@@ -125,45 +114,25 @@ class PartnerPropertyEditorState extends ChangeNotifier {
   bool _saving = false;
   ApiFailure? _failure;
 
-  /// The accommodation categories a property may be classified under, roots
-  /// first. Anything the backend does not type as ACCOMMODATION is not offered,
-  /// because it would be refused.
-  List<PropertyCategoryOption> get categoryOptions => _categories
-      .where((c) => c.isAccommodation && c.active && c.isRoot)
-      .toList(growable: false);
+  List<PropertyCategoryOption> get categoryOptions => catalogue.categoryOptions;
 
   /// The direct children of the chosen category — the specific property type.
-  List<PropertyCategoryOption> get subcategoryOptions {
-    final categoryId = _categoryId;
-    if (categoryId == null) return const [];
-    return _categories
-        .where((c) => c.active && c.isAccommodation && c.parentId == categoryId)
-        .toList(growable: false);
-  }
+  List<PropertyCategoryOption> get subcategoryOptions =>
+      catalogue.subcategoryOptions(_categoryId);
 
-  List<PropertyLocationOption> get countryOptions =>
-      _countries.where((unit) => unit.active).toList(growable: false);
-  List<PropertyLocationOption> get provinceOptions =>
-      _provinces.where((unit) => unit.active).toList(growable: false);
-  List<PropertyLocationOption> get areaOptions =>
-      _areas.where((unit) => unit.canHoldProperty).toList(growable: false);
+  List<PropertyLocationOption> get countryOptions => catalogue.countryOptions;
+  List<PropertyLocationOption> get provinceOptions => catalogue.provinceOptions;
+  List<PropertyLocationOption> get areaOptions => catalogue.areaOptions;
 
-  /// The amenities that describe a property, in catalogue order, grouped by the
-  /// backend's own `groupName`.
-  Map<String, List<PropertyAmenityOption>> get amenityGroups {
-    final groups = <String, List<PropertyAmenityOption>>{};
-    for (final amenity in _amenities.where((a) => a.describesProperty)) {
-      groups.putIfAbsent(amenity.groupName ?? '', () => []).add(amenity);
-    }
-    return groups;
-  }
+  Map<String, List<PropertyAmenityOption>> get amenityGroups =>
+      catalogue.amenityGroups;
 
   int? get categoryId => _categoryId;
   int? get subcategoryId => _subcategoryId;
-  int? get countryId => _countryId;
-  int? get provinceId => _provinceId;
-  int? get areaId => _areaId;
-  bool get isLoadingLocationChildren => _loadingChildren;
+  int? get countryId => catalogue.countryId;
+  int? get provinceId => catalogue.provinceId;
+  int? get areaId => catalogue.areaId;
+  bool get isLoadingLocationChildren => catalogue.isLoadingChildren;
   Set<int> get selectedAmenityIds => Set.unmodifiable(_amenityIds);
   int get starRating => _starRating;
   bool get freeCancellation => _freeCancellation;
@@ -179,17 +148,17 @@ class PartnerPropertyEditorState extends ChangeNotifier {
   /// an existing property whose location has not been touched, the one it
   /// already has.
   int? get selectedLocationId {
-    if (!_locationTouched) {
+    if (!catalogue.hasPickedLocation) {
       final current = original?.administrativeUnit?.id;
       if (current != null) return current;
     }
-    return _areaId ?? _provinceId;
+    return catalogue.pickedUnitId;
   }
 
   /// What the location row should show when nothing has been re-picked.
   String? get currentLocationLabel => original?.administrativeUnit?.label;
 
-  bool get hasPickedLocation => _locationTouched;
+  bool get hasPickedLocation => catalogue.hasPickedLocation;
 
   /// Loads the catalogue the editor chooses from, then pre-selects whatever the
   /// property being edited already uses.
@@ -197,34 +166,23 @@ class PartnerPropertyEditorState extends ChangeNotifier {
     _status = PropertyEditorStatus.loading;
     notifyListeners();
 
-    final categories = await api.getPropertyCategories();
-    final amenities = await api.getPropertyAmenities();
-    final countries = await api.getLocationRoots();
-
-    if (!categories.success || !amenities.success || !countries.success) {
+    await catalogue.load();
+    if (!catalogue.isReady) {
       _status = PropertyEditorStatus.referenceError;
       notifyListeners();
       return;
     }
 
-    _categories = categories.data ?? const [];
-    _amenities = amenities.data ?? const [];
-    _countries = countries.data ?? const [];
-
     _applyOriginal();
-
-    // One country in the catalogue is the common case; selecting it saves a
-    // pointless choice and gets the partner straight to the province list.
-    final onlyCountry =
-        countryOptions.length == 1 ? countryOptions.first.id : null;
     _status = PropertyEditorStatus.ready;
     notifyListeners();
-    if (onlyCountry != null && _countryId == null) {
-      // Pre-selecting the only country is not the partner choosing a location:
-      // an existing property keeps the unit it already has until a province or
-      // area is actually picked.
-      await _selectCountry(onlyCountry, touched: false);
-    }
+  }
+
+  @override
+  void dispose() {
+    catalogue.removeListener(notifyListeners);
+    catalogue.dispose();
+    super.dispose();
   }
 
   void _applyOriginal() {
@@ -234,6 +192,7 @@ class PartnerPropertyEditorState extends ChangeNotifier {
       if (categoryOptions.length == 1) _categoryId = categoryOptions.first.id;
       return;
     }
+    // Everything below mirrors the stored record into the form's own choices.
     _categoryId = property.category?.id;
     _subcategoryId = property.subcategory?.id;
     _starRating = property.starRating ?? _starRating;
@@ -263,55 +222,19 @@ class PartnerPropertyEditorState extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> selectCountry(int? id) => _selectCountry(id, touched: true);
-
-  Future<void> _selectCountry(int? id, {required bool touched}) async {
-    _countryId = id;
-    _provinceId = null;
-    _areaId = null;
-    _provinces = const [];
-    _areas = const [];
-    if (touched) _locationTouched = true;
+  Future<void> selectCountry(int? id) async {
     _clearFailure();
-    if (id == null) {
-      notifyListeners();
-      return;
-    }
-    await _loadChildren(id, into: (units) => _provinces = units);
+    await catalogue.selectCountry(id);
   }
 
   Future<void> selectProvince(int? id) async {
-    _provinceId = id;
-    _areaId = null;
-    _areas = const [];
-    _locationTouched = true;
     _clearFailure();
-    if (id == null) {
-      notifyListeners();
-      return;
-    }
-    await _loadChildren(id, into: (units) => _areas = units);
+    await catalogue.selectProvince(id);
   }
 
   void selectArea(int? id) {
-    _areaId = id;
-    _locationTouched = true;
     _clearFailure();
-    notifyListeners();
-  }
-
-  Future<void> _loadChildren(
-    int parentId, {
-    required void Function(List<PropertyLocationOption>) into,
-  }) async {
-    _loadingChildren = true;
-    notifyListeners();
-    final result = await api.getLocationChildren(parentId);
-    _loadingChildren = false;
-    // A failed level leaves an empty list: the form then has nothing to offer
-    // rather than an option that does not exist.
-    into(result.success ? (result.data ?? const []) : const []);
-    notifyListeners();
+    catalogue.selectArea(id);
   }
 
   void toggleAmenity(int id) {

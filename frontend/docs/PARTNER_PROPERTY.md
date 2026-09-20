@@ -2,7 +2,9 @@
 
 How a Partner creates and edits a property in the workspace, and what the client deliberately cannot
 do. The backend side is `PARTNER_PROPERTY.md` in the backend repository; this covers the Flutter
-client only. The account lifecycle that leads here is `PARTNER_ACCOUNT.md`.
+client only. The account lifecycle that leads here is `PARTNER_ACCOUNT.md`, and the step-by-step
+setup built on top of these endpoints is `PARTNER_PROPERTY_ONBOARDING.md` — **Add property** opens
+that wizard; the single-form editor described here is reached from a property's detail panel.
 
 ## 1. The flow
 

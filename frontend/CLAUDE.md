@@ -61,7 +61,8 @@ routing, sign-in or anything that decides which shell an origin shows, and `docs
 account lifecycle (Partner registration, email verification, password reset/change, business profile) and
 the shared auth error mapping in `lib/core/auth/`. `docs/PARTNER_PROPERTY.md` covers Partner property
 CRUD (the draft property editor, the admin-managed catalogue it chooses from, and why nothing there
-publishes).
+publishes), and `docs/PARTNER_PROPERTY_ONBOARDING.md` the step-by-step wizard built on top of it
+(when the draft is actually created, how Save draft and Continue setup behave).
 
 Local development uses port **8081**, not 8080: port 8080 is occupied by Windows AgentService on the
 development machine, so local Spring Boot is started with `SERVER_PORT=8081` by the launcher. This is

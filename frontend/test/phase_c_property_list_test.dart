@@ -300,21 +300,27 @@ void main() {
 
   // ── 2. Create affordance ─────────────────────────────────────────────────
 
+  // Phase D moved "Add property" from the single-form editor to the onboarding
+  // wizard. These assertions are updated deliberately rather than deleted: the
+  // claim is still "this affordance starts a new property", only the screen it
+  // opens changed. Editing an existing property still opens the Phase C editor,
+  // which the edit group below covers.
   group('add property', () {
-    testWidgets('the header action opens the editor', (tester) async {
+    testWidgets('the header action opens the onboarding wizard',
+        (tester) async {
       await pumpProperties(tester);
 
       await tester.tap(find.byKey(const Key('property-add-action')));
       await tester.pumpAndSettle();
 
-      expect(find.text(en.partnerPropertyEditorCreateTitle), findsWidgets);
-      expect(find.byKey(const Key('property-editor-name')), findsOneWidget);
-      // The editor reads the catalogue, not another partner's data.
+      expect(find.text(en.partnerWizardTitle), findsWidgets);
+      expect(find.byKey(const Key('wizard-draft-banner')), findsOneWidget);
+      // The wizard reads the catalogue, not another partner's data.
       expect(countOf('/api/categories'), 1);
       expect(countOf('/api/locations/roots'), 1);
     });
 
-    testWidgets('the empty state action opens the same editor', (tester) async {
+    testWidgets('the empty state action opens the same wizard', (tester) async {
       await pumpProperties(
         tester,
         client: propertiesClient(hotels: const []),
@@ -323,53 +329,17 @@ void main() {
       await tester.tap(find.text(en.partnerPropertyAddAction).last);
       await tester.pumpAndSettle();
 
-      expect(find.byKey(const Key('property-editor-name')), findsOneWidget);
+      expect(find.text(en.partnerWizardTitle), findsWidgets);
     });
 
-    testWidgets(
-        'a saved property comes back from the server, not from the form',
-        (tester) async {
-      await pumpProperties(
-        tester,
-        client: propertiesClient(hotels: const []),
-      );
-      expect(find.text(en.partnerPropertiesEmptyTitle), findsOneWidget);
-      final before = countOf('/api/partner/hotels');
-
-      await tester.tap(find.byKey(const Key('property-add-action')));
-      await tester.pumpAndSettle();
-      await tester.enterText(
-          find.byKey(const Key('property-editor-name')), 'Bay View Danang');
-      await tester.enterText(find.byKey(const Key('property-editor-address')),
-          '12 Vo Nguyen Giap, Da Nang');
-      await tester.tap(find.byKey(const Key('property-editor-province')));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Da Nang').last);
-      await tester.pumpAndSettle();
-
-      final save = find.byKey(const Key('property-editor-save'));
-      await tester.ensureVisible(save);
-      await tester.pumpAndSettle();
-      await tester.tap(save);
-      await tester.pumpAndSettle();
-
-      // The editor closed, and the list was re-read from the backend rather
-      // than patched locally with what was typed.
-      expect(find.byKey(const Key('property-editor-name')), findsNothing);
-      expect(countOf('/api/partner/hotels'), greaterThan(before));
-    });
-
-    testWidgets('leaving the editor without saving reloads nothing',
+    testWidgets('leaving the wizard without saving reloads nothing',
         (tester) async {
       await pumpProperties(tester);
       final listLoads = countOf('/api/partner/hotels');
 
       await tester.tap(find.byKey(const Key('property-add-action')));
       await tester.pumpAndSettle();
-      final cancel = find.byKey(const Key('property-editor-cancel'));
-      await tester.ensureVisible(cancel);
-      await tester.pumpAndSettle();
-      await tester.tap(cancel);
+      await tester.tap(find.byKey(const Key('wizard-close')));
       await tester.pumpAndSettle();
 
       expect(countOf('/api/partner/hotels'), listLoads);

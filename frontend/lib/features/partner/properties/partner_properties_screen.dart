@@ -14,6 +14,8 @@ import '../widgets/partner_state_views.dart';
 import 'partner_property_editor_screen.dart';
 import 'partner_property_editor_state.dart';
 import 'partner_properties_state.dart';
+import 'wizard/property_wizard_screen.dart';
+import 'wizard/property_wizard_state.dart';
 import 'widgets/partner_property_widgets.dart';
 
 /// The Partner Properties module — the workspace's inventory context.
@@ -59,8 +61,40 @@ class _PartnerPropertiesScreenState extends State<PartnerPropertiesScreen> {
   PartnerPropertiesState? _properties;
   PartnerState? _partner;
 
-  /// Opens the Phase C editor: a new draft when [existing] is null, otherwise
-  /// that property.
+  /// Opens the Phase D onboarding wizard — a new property, or a draft being
+  /// continued.
+  ///
+  /// The list reloads from the backend once the wizard reports a save, so what
+  /// the screen shows is the server's own record rather than a locally patched
+  /// copy. A draft is never duplicated: continuing one passes its id.
+  Future<void> _openWizard({int? propertyId}) async {
+    final partner = _partner;
+    final properties = _properties;
+    if (partner == null || properties == null) return;
+
+    final wizard = PropertyWizardState(
+      api: partner.api,
+      profile: partner.profile,
+      resumePropertyId: propertyId,
+    );
+    var saved = false;
+    await Navigator.of(context).push(MaterialPageRoute<void>(
+      builder: (_) => PartnerPropertyWizardScreen(
+        state: wizard,
+        onSaved: (_) => saved = true,
+      ),
+    ));
+    final savedId = wizard.saved?.id ?? propertyId;
+    wizard.dispose();
+    if (!mounted || !saved) return;
+    await properties.load(partner);
+    if (savedId != null && mounted) {
+      await properties.openProperty(partner, savedId);
+    }
+  }
+
+  /// Opens the Phase C editor for a property that already exists — the single
+  /// form for a quick correction, next to the step-by-step setup.
   ///
   /// The list is reloaded from the backend once the editor reports a save, so
   /// what the screen shows is always the server's own record rather than a
@@ -134,8 +168,9 @@ class _PartnerPropertiesScreenState extends State<PartnerPropertiesScreen> {
         partner: partner,
         properties: properties,
         onReload: _reload,
-        onCreate: () => _openEditor(),
+        onCreate: () => _openWizard(),
         onEdit: (detail) => _openEditor(existing: detail),
+        onContinueSetup: (propertyId) => _openWizard(propertyId: propertyId),
       ),
     );
   }
@@ -147,6 +182,7 @@ class _PropertiesBody extends StatelessWidget {
   final Future<void> Function() onReload;
   final VoidCallback onCreate;
   final ValueChanged<PartnerPropertyDetail> onEdit;
+  final ValueChanged<int> onContinueSetup;
 
   const _PropertiesBody({
     required this.partner,
@@ -154,6 +190,7 @@ class _PropertiesBody extends StatelessWidget {
     required this.onReload,
     required this.onCreate,
     required this.onEdit,
+    required this.onContinueSetup,
   });
 
   /// Creating and editing mirror the backend rule exactly: `PartnerProperty
@@ -193,6 +230,7 @@ class _PropertiesBody extends StatelessWidget {
       // On a narrow screen the detail replaces the list rather than stacking
       // below it, so the two never compete for the same short viewport.
       compact: isWide && detailOpen,
+      onContinueSetup: _canManage ? onContinueSetup : null,
     );
 
     return Column(
@@ -388,10 +426,15 @@ class _PropertyList extends StatelessWidget {
   final PartnerPropertiesState properties;
   final bool compact;
 
+  /// Null when this account may not manage properties; a draft then shows no
+  /// setup action rather than one that would be refused.
+  final ValueChanged<int>? onContinueSetup;
+
   const _PropertyList({
     required this.partner,
     required this.properties,
     required this.compact,
+    this.onContinueSetup,
   });
 
   /// Listing actions mirror the backend rule and nothing looser.
@@ -441,6 +484,12 @@ class _PropertyList extends StatelessWidget {
                           properties.openProperty(partner, property.id),
                       onToggleActive:
                           _canAct ? () => _toggle(context, property) : null,
+                      // Only a draft is still being set up; a published
+                      // property is past onboarding.
+                      onContinueSetup: onContinueSetup == null ||
+                              property.placeStatus != PartnerPlaceStatus.draft
+                          ? null
+                          : () => onContinueSetup!(property.id),
                     ),
                   ),
               ],

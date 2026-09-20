@@ -9418,6 +9418,183 @@ class AppLocalizationsEn extends AppLocalizations {
   String get partnerPropertyGateAction => 'Open my account';
 
   @override
+  String get partnerWizardTitle => 'Property onboarding';
+
+  @override
+  String get partnerWizardSubtitle =>
+      'Set your property up step by step. Everything is kept as a draft until our team publishes it.';
+
+  @override
+  String partnerWizardStepOf(int current, int total) {
+    return 'Step $current of $total';
+  }
+
+  @override
+  String partnerWizardStepSemantic(int current, int total, String step) {
+    return 'Step $current of $total: $step';
+  }
+
+  @override
+  String get partnerWizardStepBusinessProfile => 'Business profile';
+
+  @override
+  String get partnerWizardStepBasics => 'Property basics';
+
+  @override
+  String get partnerWizardStepLocation => 'Location';
+
+  @override
+  String get partnerWizardStepContact => 'Contact';
+
+  @override
+  String get partnerWizardStepAmenities => 'Amenities';
+
+  @override
+  String get partnerWizardStepPolicies => 'Details and policies';
+
+  @override
+  String get partnerWizardStepReview => 'Review';
+
+  @override
+  String get partnerWizardProgressLabel => 'Onboarding progress';
+
+  @override
+  String get partnerWizardActionContinue => 'Continue';
+
+  @override
+  String get partnerWizardActionBack => 'Back';
+
+  @override
+  String get partnerWizardActionSaveDraft => 'Save draft';
+
+  @override
+  String get partnerWizardStepIncomplete =>
+      'Complete this step before continuing.';
+
+  @override
+  String get partnerWizardSaveBlockedCreate =>
+      'Your draft is stored once the basics, the location and the check-in times are complete — the server keeps a property only with all of them.';
+
+  @override
+  String get partnerWizardSaveBlockedClean =>
+      'Everything here is already saved.';
+
+  @override
+  String get partnerWizardSavedJustNow => 'Saved just now';
+
+  @override
+  String partnerWizardSavedAt(String time) {
+    return 'Saved at $time';
+  }
+
+  @override
+  String get partnerWizardSaving => 'Saving…';
+
+  @override
+  String get partnerWizardLoading => 'Loading your property options…';
+
+  @override
+  String get partnerWizardPropertyError =>
+      'This draft could not be opened. It may no longer be available to your account.';
+
+  @override
+  String get partnerWizardDraftNotice => 'Draft — not visible to travellers';
+
+  @override
+  String get partnerWizardProfileHeading => 'Business profile readiness';
+
+  @override
+  String get partnerWizardProfileIntro =>
+      'Property management opens once an administrator approves your business profile. This step only checks it; your business details are edited in your account.';
+
+  @override
+  String get partnerWizardProfileApproved =>
+      'Your business profile is approved, so you can set up a property.';
+
+  @override
+  String get partnerWizardProfileBlocked =>
+      'Your business profile must be approved before you can set up a property.';
+
+  @override
+  String get partnerWizardProfileEditAction => 'Open business profile';
+
+  @override
+  String get partnerWizardBasicsIntro =>
+      'What the property is called, and what kind of place it is.';
+
+  @override
+  String get partnerWizardLocationIntro =>
+      'Where the property is. Travellers search by these places, so pick the smallest one that fits.';
+
+  @override
+  String get partnerWizardLocationSelected => 'Selected location';
+
+  @override
+  String get partnerWizardContactIntro =>
+      'How guests and our team reach this property. Every field here is optional.';
+
+  @override
+  String get partnerWizardAmenitiesIntro =>
+      'What the property itself offers. Room amenities belong to each room and are set later.';
+
+  @override
+  String get partnerWizardAmenitiesSearch => 'Search amenities';
+
+  @override
+  String get partnerWizardAmenitiesEmpty =>
+      'No property amenities match your search.';
+
+  @override
+  String get partnerWizardPoliciesIntro =>
+      'Check-in times and the rules that apply to the whole property.';
+
+  @override
+  String get partnerWizardReviewIntro =>
+      'Check everything, then save your draft.';
+
+  @override
+  String get partnerWizardReviewComplete => 'Complete';
+
+  @override
+  String get partnerWizardReviewIncomplete => 'Needs attention';
+
+  @override
+  String get partnerWizardReviewFix => 'Fix';
+
+  @override
+  String get partnerWizardReviewSavedTitle => 'Draft saved';
+
+  @override
+  String partnerWizardReviewSavedBody(String name) {
+    return '$name is saved as a draft. It stays invisible to travellers until our team publishes it.';
+  }
+
+  @override
+  String get partnerWizardReviewDone => 'Back to my properties';
+
+  @override
+  String get partnerWizardLeaveTitle => 'Save changes before leaving?';
+
+  @override
+  String get partnerWizardLeaveBody =>
+      'This step has changes the draft does not have yet.';
+
+  @override
+  String get partnerWizardLeaveSave => 'Save draft';
+
+  @override
+  String get partnerWizardLeaveDiscard => 'Discard changes';
+
+  @override
+  String get partnerWizardLeaveCancel => 'Keep editing';
+
+  @override
+  String get partnerPropertyContinueSetupAction => 'Continue setup';
+
+  @override
+  String get partnerPropertyDraftNotVisible => 'Not visible to travellers';
+
+  @override
   String partnerRoomsCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

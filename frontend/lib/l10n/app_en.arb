@@ -4794,6 +4794,94 @@
   "partnerPropertyGateTitle": "Business profile approval required",
   "partnerPropertyGateMessage": "You can add and edit properties once an administrator approves your business profile.",
   "partnerPropertyGateAction": "Open my account",
+  "partnerWizardTitle": "Property onboarding",
+  "partnerWizardSubtitle": "Set your property up step by step. Everything is kept as a draft until our team publishes it.",
+  "partnerWizardStepOf": "Step {current} of {total}",
+  "@partnerWizardStepOf": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "partnerWizardStepSemantic": "Step {current} of {total}: {step}",
+  "@partnerWizardStepSemantic": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "step": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerWizardStepBusinessProfile": "Business profile",
+  "partnerWizardStepBasics": "Property basics",
+  "partnerWizardStepLocation": "Location",
+  "partnerWizardStepContact": "Contact",
+  "partnerWizardStepAmenities": "Amenities",
+  "partnerWizardStepPolicies": "Details and policies",
+  "partnerWizardStepReview": "Review",
+  "partnerWizardProgressLabel": "Onboarding progress",
+  "partnerWizardActionContinue": "Continue",
+  "partnerWizardActionBack": "Back",
+  "partnerWizardActionSaveDraft": "Save draft",
+  "partnerWizardStepIncomplete": "Complete this step before continuing.",
+  "partnerWizardSaveBlockedCreate": "Your draft is stored once the basics, the location and the check-in times are complete \u2014 the server keeps a property only with all of them.",
+  "partnerWizardSaveBlockedClean": "Everything here is already saved.",
+  "partnerWizardSavedJustNow": "Saved just now",
+  "partnerWizardSavedAt": "Saved at {time}",
+  "@partnerWizardSavedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerWizardSaving": "Saving\u2026",
+  "partnerWizardLoading": "Loading your property options\u2026",
+  "partnerWizardPropertyError": "This draft could not be opened. It may no longer be available to your account.",
+  "partnerWizardDraftNotice": "Draft \u2014 not visible to travellers",
+  "partnerWizardProfileHeading": "Business profile readiness",
+  "partnerWizardProfileIntro": "Property management opens once an administrator approves your business profile. This step only checks it; your business details are edited in your account.",
+  "partnerWizardProfileApproved": "Your business profile is approved, so you can set up a property.",
+  "partnerWizardProfileBlocked": "Your business profile must be approved before you can set up a property.",
+  "partnerWizardProfileEditAction": "Open business profile",
+  "partnerWizardBasicsIntro": "What the property is called, and what kind of place it is.",
+  "partnerWizardLocationIntro": "Where the property is. Travellers search by these places, so pick the smallest one that fits.",
+  "partnerWizardLocationSelected": "Selected location",
+  "partnerWizardContactIntro": "How guests and our team reach this property. Every field here is optional.",
+  "partnerWizardAmenitiesIntro": "What the property itself offers. Room amenities belong to each room and are set later.",
+  "partnerWizardAmenitiesSearch": "Search amenities",
+  "partnerWizardAmenitiesEmpty": "No property amenities match your search.",
+  "partnerWizardPoliciesIntro": "Check-in times and the rules that apply to the whole property.",
+  "partnerWizardReviewIntro": "Check everything, then save your draft.",
+  "partnerWizardReviewComplete": "Complete",
+  "partnerWizardReviewIncomplete": "Needs attention",
+  "partnerWizardReviewFix": "Fix",
+  "partnerWizardReviewSavedTitle": "Draft saved",
+  "partnerWizardReviewSavedBody": "{name} is saved as a draft. It stays invisible to travellers until our team publishes it.",
+  "@partnerWizardReviewSavedBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerWizardReviewDone": "Back to my properties",
+  "partnerWizardLeaveTitle": "Save changes before leaving?",
+  "partnerWizardLeaveBody": "This step has changes the draft does not have yet.",
+  "partnerWizardLeaveSave": "Save draft",
+  "partnerWizardLeaveDiscard": "Discard changes",
+  "partnerWizardLeaveCancel": "Keep editing",
+  "partnerPropertyContinueSetupAction": "Continue setup",
+  "partnerPropertyDraftNotVisible": "Not visible to travellers",
   "partnerRoomsCount": "{count, plural, =1{1 room type} other{{count} room types}}",
   "@partnerRoomsCount": {
     "placeholders": {

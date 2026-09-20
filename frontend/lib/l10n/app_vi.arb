@@ -4794,6 +4794,94 @@
   "partnerPropertyGateTitle": "Cần duyệt hồ sơ doanh nghiệp",
   "partnerPropertyGateMessage": "Bạn có thể thêm và sửa chỗ nghỉ sau khi quản trị viên duyệt hồ sơ doanh nghiệp.",
   "partnerPropertyGateAction": "Mở tài khoản của tôi",
+  "partnerWizardTitle": "Thi\u1ebft l\u1eadp ch\u1ed7 ngh\u1ec9",
+  "partnerWizardSubtitle": "Thi\u1ebft l\u1eadp ch\u1ed7 ngh\u1ec9 theo t\u1eebng b\u01b0\u1edbc. M\u1ecdi th\u00f4ng tin \u0111\u01b0\u1ee3c gi\u1eef d\u01b0\u1edbi d\u1ea1ng b\u1ea3n nh\u00e1p cho \u0111\u1ebfn khi \u0111\u1ed9i ng\u0169 c\u1ee7a ch\u00fang t\u00f4i \u0111\u0103ng t\u1ea3i.",
+  "partnerWizardStepOf": "B\u01b0\u1edbc {current} tr\u00ean {total}",
+  "@partnerWizardStepOf": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "partnerWizardStepSemantic": "B\u01b0\u1edbc {current} tr\u00ean {total}: {step}",
+  "@partnerWizardStepSemantic": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "step": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerWizardStepBusinessProfile": "H\u1ed3 s\u01a1 doanh nghi\u1ec7p",
+  "partnerWizardStepBasics": "Th\u00f4ng tin c\u01a1 b\u1ea3n",
+  "partnerWizardStepLocation": "V\u1ecb tr\u00ed",
+  "partnerWizardStepContact": "Li\u00ean h\u1ec7",
+  "partnerWizardStepAmenities": "Ti\u1ec7n \u00edch",
+  "partnerWizardStepPolicies": "Chi ti\u1ebft v\u00e0 ch\u00ednh s\u00e1ch",
+  "partnerWizardStepReview": "Xem l\u1ea1i",
+  "partnerWizardProgressLabel": "Ti\u1ebfn \u0111\u1ed9 thi\u1ebft l\u1eadp",
+  "partnerWizardActionContinue": "Ti\u1ebfp t\u1ee5c",
+  "partnerWizardActionBack": "Quay l\u1ea1i",
+  "partnerWizardActionSaveDraft": "L\u01b0u b\u1ea3n nh\u00e1p",
+  "partnerWizardStepIncomplete": "H\u00e3y ho\u00e0n t\u1ea5t b\u01b0\u1edbc n\u00e0y tr\u01b0\u1edbc khi ti\u1ebfp t\u1ee5c.",
+  "partnerWizardSaveBlockedCreate": "B\u1ea3n nh\u00e1p ch\u1ec9 \u0111\u01b0\u1ee3c l\u01b0u khi th\u00f4ng tin c\u01a1 b\u1ea3n, v\u1ecb tr\u00ed v\u00e0 gi\u1edd nh\u1eadn ph\u00f2ng \u0111\u00e3 \u0111\u1ea7y \u0111\u1ee7 \u2014 m\u00e1y ch\u1ee7 c\u1ea7n t\u1ea5t c\u1ea3 tr\u01b0\u1edbc khi gi\u1eef ch\u1ed7 ngh\u1ec9.",
+  "partnerWizardSaveBlockedClean": "M\u1ecdi th\u00f4ng tin \u1edf \u0111\u00e2y \u0111\u00e3 \u0111\u01b0\u1ee3c l\u01b0u.",
+  "partnerWizardSavedJustNow": "V\u1eeba l\u01b0u xong",
+  "partnerWizardSavedAt": "\u0110\u00e3 l\u01b0u l\u00fac {time}",
+  "@partnerWizardSavedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerWizardSaving": "\u0110ang l\u01b0u\u2026",
+  "partnerWizardLoading": "\u0110ang t\u1ea3i c\u00e1c l\u1ef1a ch\u1ecdn\u2026",
+  "partnerWizardPropertyError": "Kh\u00f4ng m\u1edf \u0111\u01b0\u1ee3c b\u1ea3n nh\u00e1p n\u00e0y. C\u00f3 th\u1ec3 n\u00f3 kh\u00f4ng c\u00f2n thu\u1ed9c t\u00e0i kho\u1ea3n c\u1ee7a b\u1ea1n.",
+  "partnerWizardDraftNotice": "B\u1ea3n nh\u00e1p \u2014 du kh\u00e1ch ch\u01b0a th\u1ea5y",
+  "partnerWizardProfileHeading": "\u0110i\u1ec1u ki\u1ec7n h\u1ed3 s\u01a1 doanh nghi\u1ec7p",
+  "partnerWizardProfileIntro": "Vi\u1ec7c qu\u1ea3n l\u00fd ch\u1ed7 ngh\u1ec9 m\u1edf ra sau khi qu\u1ea3n tr\u1ecb vi\u00ean duy\u1ec7t h\u1ed3 s\u01a1 doanh nghi\u1ec7p. B\u01b0\u1edbc n\u00e0y ch\u1ec9 ki\u1ec3m tra \u0111i\u1ec1u \u0111\u00f3; th\u00f4ng tin doanh nghi\u1ec7p \u0111\u01b0\u1ee3c s\u1eeda trong t\u00e0i kho\u1ea3n c\u1ee7a b\u1ea1n.",
+  "partnerWizardProfileApproved": "H\u1ed3 s\u01a1 doanh nghi\u1ec7p \u0111\u00e3 \u0111\u01b0\u1ee3c duy\u1ec7t, b\u1ea1n c\u00f3 th\u1ec3 thi\u1ebft l\u1eadp ch\u1ed7 ngh\u1ec9.",
+  "partnerWizardProfileBlocked": "H\u1ed3 s\u01a1 doanh nghi\u1ec7p c\u1ea7n \u0111\u01b0\u1ee3c duy\u1ec7t tr\u01b0\u1edbc khi b\u1ea1n thi\u1ebft l\u1eadp ch\u1ed7 ngh\u1ec9.",
+  "partnerWizardProfileEditAction": "M\u1edf h\u1ed3 s\u01a1 doanh nghi\u1ec7p",
+  "partnerWizardBasicsIntro": "T\u00ean ch\u1ed7 ngh\u1ec9 v\u00e0 lo\u1ea1i h\u00ecnh c\u1ee7a n\u00f3.",
+  "partnerWizardLocationIntro": "N\u01a1i ch\u1ed7 ngh\u1ec9 t\u1ecda l\u1ea1c. Du kh\u00e1ch t\u00ecm theo c\u00e1c \u0111\u1ecba danh n\u00e0y, h\u00e3y ch\u1ecdn \u0111\u01a1n v\u1ecb nh\u1ecf nh\u1ea5t ph\u00f9 h\u1ee3p.",
+  "partnerWizardLocationSelected": "V\u1ecb tr\u00ed \u0111\u00e3 ch\u1ecdn",
+  "partnerWizardContactIntro": "C\u00e1ch kh\u00e1ch v\u00e0 \u0111\u1ed9i ng\u0169 c\u1ee7a ch\u00fang t\u00f4i li\u00ean h\u1ec7 ch\u1ed7 ngh\u1ec9. C\u00e1c m\u1ee5c \u1edf \u0111\u00e2y kh\u00f4ng b\u1eaft bu\u1ed9c.",
+  "partnerWizardAmenitiesIntro": "Nh\u1eefng g\u00ec ch\u1ed7 ngh\u1ec9 cung c\u1ea5p. Ti\u1ec7n \u00edch trong ph\u00f2ng thu\u1ed9c v\u1ec1 t\u1eebng ph\u00f2ng v\u00e0 s\u1ebd khai b\u00e1o sau.",
+  "partnerWizardAmenitiesSearch": "T\u00ecm ti\u1ec7n \u00edch",
+  "partnerWizardAmenitiesEmpty": "Kh\u00f4ng c\u00f3 ti\u1ec7n \u00edch n\u00e0o kh\u1edbp v\u1edbi t\u1eeb kh\u00f3a.",
+  "partnerWizardPoliciesIntro": "Gi\u1edd nh\u1eadn ph\u00f2ng v\u00e0 c\u00e1c quy \u0111\u1ecbnh \u00e1p d\u1ee5ng cho to\u00e0n b\u1ed9 ch\u1ed7 ngh\u1ec9.",
+  "partnerWizardReviewIntro": "Ki\u1ec3m tra l\u1ea1i m\u1ecdi th\u00f4ng tin, sau \u0111\u00f3 l\u01b0u b\u1ea3n nh\u00e1p.",
+  "partnerWizardReviewComplete": "\u0110\u1ea7y \u0111\u1ee7",
+  "partnerWizardReviewIncomplete": "C\u1ea7n b\u1ed5 sung",
+  "partnerWizardReviewFix": "S\u1eeda",
+  "partnerWizardReviewSavedTitle": "\u0110\u00e3 l\u01b0u b\u1ea3n nh\u00e1p",
+  "partnerWizardReviewSavedBody": "\u0110\u00e3 l\u01b0u {name} d\u01b0\u1edbi d\u1ea1ng b\u1ea3n nh\u00e1p. Du kh\u00e1ch ch\u01b0a th\u1ea5y cho \u0111\u1ebfn khi \u0111\u1ed9i ng\u0169 c\u1ee7a ch\u00fang t\u00f4i \u0111\u0103ng t\u1ea3i.",
+  "@partnerWizardReviewSavedBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerWizardReviewDone": "V\u1ec1 danh s\u00e1ch ch\u1ed7 ngh\u1ec9",
+  "partnerWizardLeaveTitle": "L\u01b0u thay \u0111\u1ed5i tr\u01b0\u1edbc khi r\u1eddi \u0111i?",
+  "partnerWizardLeaveBody": "B\u01b0\u1edbc n\u00e0y c\u00f3 thay \u0111\u1ed5i ch\u01b0a \u0111\u01b0\u1ee3c l\u01b0u v\u00e0o b\u1ea3n nh\u00e1p.",
+  "partnerWizardLeaveSave": "L\u01b0u b\u1ea3n nh\u00e1p",
+  "partnerWizardLeaveDiscard": "B\u1ecf thay \u0111\u1ed5i",
+  "partnerWizardLeaveCancel": "Ti\u1ebfp t\u1ee5c s\u1eeda",
+  "partnerPropertyContinueSetupAction": "Ti\u1ebfp t\u1ee5c thi\u1ebft l\u1eadp",
+  "partnerPropertyDraftNotVisible": "Du kh\u00e1ch ch\u01b0a th\u1ea5y",
   "partnerRoomsCount": "{count, plural, =1{1 loại phòng} other{{count} loại phòng}}",
   "@partnerRoomsCount": {
     "placeholders": {

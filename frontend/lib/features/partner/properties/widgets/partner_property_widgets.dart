@@ -98,6 +98,10 @@ class PartnerPropertyCard extends StatelessWidget {
   final VoidCallback? onToggleActive;
   final VoidCallback onOpen;
 
+  /// Phase D — opens the onboarding wizard on this draft. Null when the row is
+  /// not a draft, or when this account may not manage properties.
+  final VoidCallback? onContinueSetup;
+
   const PartnerPropertyCard({
     super.key,
     required this.property,
@@ -106,6 +110,7 @@ class PartnerPropertyCard extends StatelessWidget {
     required this.actionPending,
     required this.onOpen,
     this.onToggleActive,
+    this.onContinueSetup,
   });
 
   @override
@@ -120,6 +125,10 @@ class PartnerPropertyCard extends StatelessWidget {
       label: [
         property.name,
         statusSpec.label,
+        // What a status means for guests, in words: a draft is not a listing
+        // that is merely switched off.
+        if (!property.placeStatus.isPubliclyVisible)
+          l10n.partnerPropertyDraftNotVisible,
         property.active
             ? l10n.partnerPropertyActive
             : l10n.partnerPropertyInactive,
@@ -238,6 +247,28 @@ class PartnerPropertyCard extends StatelessWidget {
                           ),
                       ],
                     ),
+                    if (!property.placeStatus.isPubliclyVisible) ...[
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(
+                        l10n.partnerPropertyDraftNotVisible,
+                        key: Key('property-not-visible-${property.id}'),
+                        style: theme.textTheme.bodySmall
+                            ?.copyWith(color: AppColors.textSecondary),
+                      ),
+                    ],
+                    if (onContinueSetup != null) ...[
+                      const SizedBox(height: AppSpacing.sm),
+                      Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        child: OceanSecondaryButton(
+                          key: Key('property-continue-setup-${property.id}'),
+                          label: l10n.partnerPropertyContinueSetupAction,
+                          icon: Icons.playlist_add_check_rounded,
+                          fullWidth: false,
+                          onPressed: onContinueSetup,
+                        ),
+                      ),
+                    ],
                     if (onToggleActive != null) ...[
                       const SizedBox(height: AppSpacing.sm),
                       Align(

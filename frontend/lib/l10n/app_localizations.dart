@@ -15988,6 +15988,312 @@ abstract class AppLocalizations {
   /// **'Open my account'**
   String get partnerPropertyGateAction;
 
+  /// No description provided for @partnerWizardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Property onboarding'**
+  String get partnerWizardTitle;
+
+  /// No description provided for @partnerWizardSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set your property up step by step. Everything is kept as a draft until our team publishes it.'**
+  String get partnerWizardSubtitle;
+
+  /// No description provided for @partnerWizardStepOf.
+  ///
+  /// In en, this message translates to:
+  /// **'Step {current} of {total}'**
+  String partnerWizardStepOf(int current, int total);
+
+  /// No description provided for @partnerWizardStepSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Step {current} of {total}: {step}'**
+  String partnerWizardStepSemantic(int current, int total, String step);
+
+  /// No description provided for @partnerWizardStepBusinessProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Business profile'**
+  String get partnerWizardStepBusinessProfile;
+
+  /// No description provided for @partnerWizardStepBasics.
+  ///
+  /// In en, this message translates to:
+  /// **'Property basics'**
+  String get partnerWizardStepBasics;
+
+  /// No description provided for @partnerWizardStepLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get partnerWizardStepLocation;
+
+  /// No description provided for @partnerWizardStepContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact'**
+  String get partnerWizardStepContact;
+
+  /// No description provided for @partnerWizardStepAmenities.
+  ///
+  /// In en, this message translates to:
+  /// **'Amenities'**
+  String get partnerWizardStepAmenities;
+
+  /// No description provided for @partnerWizardStepPolicies.
+  ///
+  /// In en, this message translates to:
+  /// **'Details and policies'**
+  String get partnerWizardStepPolicies;
+
+  /// No description provided for @partnerWizardStepReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Review'**
+  String get partnerWizardStepReview;
+
+  /// No description provided for @partnerWizardProgressLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Onboarding progress'**
+  String get partnerWizardProgressLabel;
+
+  /// No description provided for @partnerWizardActionContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get partnerWizardActionContinue;
+
+  /// No description provided for @partnerWizardActionBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get partnerWizardActionBack;
+
+  /// No description provided for @partnerWizardActionSaveDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Save draft'**
+  String get partnerWizardActionSaveDraft;
+
+  /// No description provided for @partnerWizardStepIncomplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete this step before continuing.'**
+  String get partnerWizardStepIncomplete;
+
+  /// No description provided for @partnerWizardSaveBlockedCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Your draft is stored once the basics, the location and the check-in times are complete — the server keeps a property only with all of them.'**
+  String get partnerWizardSaveBlockedCreate;
+
+  /// No description provided for @partnerWizardSaveBlockedClean.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything here is already saved.'**
+  String get partnerWizardSaveBlockedClean;
+
+  /// No description provided for @partnerWizardSavedJustNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved just now'**
+  String get partnerWizardSavedJustNow;
+
+  /// No description provided for @partnerWizardSavedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved at {time}'**
+  String partnerWizardSavedAt(String time);
+
+  /// No description provided for @partnerWizardSaving.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving…'**
+  String get partnerWizardSaving;
+
+  /// No description provided for @partnerWizardLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading your property options…'**
+  String get partnerWizardLoading;
+
+  /// No description provided for @partnerWizardPropertyError.
+  ///
+  /// In en, this message translates to:
+  /// **'This draft could not be opened. It may no longer be available to your account.'**
+  String get partnerWizardPropertyError;
+
+  /// No description provided for @partnerWizardDraftNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft — not visible to travellers'**
+  String get partnerWizardDraftNotice;
+
+  /// No description provided for @partnerWizardProfileHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Business profile readiness'**
+  String get partnerWizardProfileHeading;
+
+  /// No description provided for @partnerWizardProfileIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Property management opens once an administrator approves your business profile. This step only checks it; your business details are edited in your account.'**
+  String get partnerWizardProfileIntro;
+
+  /// No description provided for @partnerWizardProfileApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Your business profile is approved, so you can set up a property.'**
+  String get partnerWizardProfileApproved;
+
+  /// No description provided for @partnerWizardProfileBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Your business profile must be approved before you can set up a property.'**
+  String get partnerWizardProfileBlocked;
+
+  /// No description provided for @partnerWizardProfileEditAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Open business profile'**
+  String get partnerWizardProfileEditAction;
+
+  /// No description provided for @partnerWizardBasicsIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'What the property is called, and what kind of place it is.'**
+  String get partnerWizardBasicsIntro;
+
+  /// No description provided for @partnerWizardLocationIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Where the property is. Travellers search by these places, so pick the smallest one that fits.'**
+  String get partnerWizardLocationIntro;
+
+  /// No description provided for @partnerWizardLocationSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected location'**
+  String get partnerWizardLocationSelected;
+
+  /// No description provided for @partnerWizardContactIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'How guests and our team reach this property. Every field here is optional.'**
+  String get partnerWizardContactIntro;
+
+  /// No description provided for @partnerWizardAmenitiesIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'What the property itself offers. Room amenities belong to each room and are set later.'**
+  String get partnerWizardAmenitiesIntro;
+
+  /// No description provided for @partnerWizardAmenitiesSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Search amenities'**
+  String get partnerWizardAmenitiesSearch;
+
+  /// No description provided for @partnerWizardAmenitiesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No property amenities match your search.'**
+  String get partnerWizardAmenitiesEmpty;
+
+  /// No description provided for @partnerWizardPoliciesIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in times and the rules that apply to the whole property.'**
+  String get partnerWizardPoliciesIntro;
+
+  /// No description provided for @partnerWizardReviewIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Check everything, then save your draft.'**
+  String get partnerWizardReviewIntro;
+
+  /// No description provided for @partnerWizardReviewComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete'**
+  String get partnerWizardReviewComplete;
+
+  /// No description provided for @partnerWizardReviewIncomplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs attention'**
+  String get partnerWizardReviewIncomplete;
+
+  /// No description provided for @partnerWizardReviewFix.
+  ///
+  /// In en, this message translates to:
+  /// **'Fix'**
+  String get partnerWizardReviewFix;
+
+  /// No description provided for @partnerWizardReviewSavedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft saved'**
+  String get partnerWizardReviewSavedTitle;
+
+  /// No description provided for @partnerWizardReviewSavedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is saved as a draft. It stays invisible to travellers until our team publishes it.'**
+  String partnerWizardReviewSavedBody(String name);
+
+  /// No description provided for @partnerWizardReviewDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to my properties'**
+  String get partnerWizardReviewDone;
+
+  /// No description provided for @partnerWizardLeaveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes before leaving?'**
+  String get partnerWizardLeaveTitle;
+
+  /// No description provided for @partnerWizardLeaveBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This step has changes the draft does not have yet.'**
+  String get partnerWizardLeaveBody;
+
+  /// No description provided for @partnerWizardLeaveSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save draft'**
+  String get partnerWizardLeaveSave;
+
+  /// No description provided for @partnerWizardLeaveDiscard.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard changes'**
+  String get partnerWizardLeaveDiscard;
+
+  /// No description provided for @partnerWizardLeaveCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep editing'**
+  String get partnerWizardLeaveCancel;
+
+  /// No description provided for @partnerPropertyContinueSetupAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue setup'**
+  String get partnerPropertyContinueSetupAction;
+
+  /// No description provided for @partnerPropertyDraftNotVisible.
+  ///
+  /// In en, this message translates to:
+  /// **'Not visible to travellers'**
+  String get partnerPropertyDraftNotVisible;
+
   /// No description provided for @partnerRoomsCount.
   ///
   /// In en, this message translates to:

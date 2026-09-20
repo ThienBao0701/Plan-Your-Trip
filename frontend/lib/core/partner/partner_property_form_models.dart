@@ -420,6 +420,19 @@ class PartnerPropertyDetails {
       };
 }
 
+/// `"Vietnamese, English"` → `["Vietnamese", "English"]`; blanks dropped.
+///
+/// The one reading of a comma-separated field, shared by the Phase C editor and
+/// the Phase D wizard so both send the backend the same list.
+List<String> splitPropertyList(String? raw) {
+  if (raw == null) return const [];
+  return raw
+      .split(',')
+      .map((entry) => entry.trim())
+      .where((entry) => entry.isNotEmpty)
+      .toList();
+}
+
 /// `"HH:mm"` → `"HH:mm:00"`; anything already carrying seconds is left alone.
 String _time(String value) {
   final parts = value.split(':');

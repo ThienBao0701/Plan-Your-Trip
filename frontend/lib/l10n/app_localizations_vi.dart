@@ -9250,6 +9250,182 @@ class AppLocalizationsVi extends AppLocalizations {
   String get partnerPropertyGateAction => 'Mở tài khoản của tôi';
 
   @override
+  String get partnerWizardTitle => 'Thiết lập chỗ nghỉ';
+
+  @override
+  String get partnerWizardSubtitle =>
+      'Thiết lập chỗ nghỉ theo từng bước. Mọi thông tin được giữ dưới dạng bản nháp cho đến khi đội ngũ của chúng tôi đăng tải.';
+
+  @override
+  String partnerWizardStepOf(int current, int total) {
+    return 'Bước $current trên $total';
+  }
+
+  @override
+  String partnerWizardStepSemantic(int current, int total, String step) {
+    return 'Bước $current trên $total: $step';
+  }
+
+  @override
+  String get partnerWizardStepBusinessProfile => 'Hồ sơ doanh nghiệp';
+
+  @override
+  String get partnerWizardStepBasics => 'Thông tin cơ bản';
+
+  @override
+  String get partnerWizardStepLocation => 'Vị trí';
+
+  @override
+  String get partnerWizardStepContact => 'Liên hệ';
+
+  @override
+  String get partnerWizardStepAmenities => 'Tiện ích';
+
+  @override
+  String get partnerWizardStepPolicies => 'Chi tiết và chính sách';
+
+  @override
+  String get partnerWizardStepReview => 'Xem lại';
+
+  @override
+  String get partnerWizardProgressLabel => 'Tiến độ thiết lập';
+
+  @override
+  String get partnerWizardActionContinue => 'Tiếp tục';
+
+  @override
+  String get partnerWizardActionBack => 'Quay lại';
+
+  @override
+  String get partnerWizardActionSaveDraft => 'Lưu bản nháp';
+
+  @override
+  String get partnerWizardStepIncomplete =>
+      'Hãy hoàn tất bước này trước khi tiếp tục.';
+
+  @override
+  String get partnerWizardSaveBlockedCreate =>
+      'Bản nháp chỉ được lưu khi thông tin cơ bản, vị trí và giờ nhận phòng đã đầy đủ — máy chủ cần tất cả trước khi giữ chỗ nghỉ.';
+
+  @override
+  String get partnerWizardSaveBlockedClean =>
+      'Mọi thông tin ở đây đã được lưu.';
+
+  @override
+  String get partnerWizardSavedJustNow => 'Vừa lưu xong';
+
+  @override
+  String partnerWizardSavedAt(String time) {
+    return 'Đã lưu lúc $time';
+  }
+
+  @override
+  String get partnerWizardSaving => 'Đang lưu…';
+
+  @override
+  String get partnerWizardLoading => 'Đang tải các lựa chọn…';
+
+  @override
+  String get partnerWizardPropertyError =>
+      'Không mở được bản nháp này. Có thể nó không còn thuộc tài khoản của bạn.';
+
+  @override
+  String get partnerWizardDraftNotice => 'Bản nháp — du khách chưa thấy';
+
+  @override
+  String get partnerWizardProfileHeading => 'Điều kiện hồ sơ doanh nghiệp';
+
+  @override
+  String get partnerWizardProfileIntro =>
+      'Việc quản lý chỗ nghỉ mở ra sau khi quản trị viên duyệt hồ sơ doanh nghiệp. Bước này chỉ kiểm tra điều đó; thông tin doanh nghiệp được sửa trong tài khoản của bạn.';
+
+  @override
+  String get partnerWizardProfileApproved =>
+      'Hồ sơ doanh nghiệp đã được duyệt, bạn có thể thiết lập chỗ nghỉ.';
+
+  @override
+  String get partnerWizardProfileBlocked =>
+      'Hồ sơ doanh nghiệp cần được duyệt trước khi bạn thiết lập chỗ nghỉ.';
+
+  @override
+  String get partnerWizardProfileEditAction => 'Mở hồ sơ doanh nghiệp';
+
+  @override
+  String get partnerWizardBasicsIntro => 'Tên chỗ nghỉ và loại hình của nó.';
+
+  @override
+  String get partnerWizardLocationIntro =>
+      'Nơi chỗ nghỉ tọa lạc. Du khách tìm theo các địa danh này, hãy chọn đơn vị nhỏ nhất phù hợp.';
+
+  @override
+  String get partnerWizardLocationSelected => 'Vị trí đã chọn';
+
+  @override
+  String get partnerWizardContactIntro =>
+      'Cách khách và đội ngũ của chúng tôi liên hệ chỗ nghỉ. Các mục ở đây không bắt buộc.';
+
+  @override
+  String get partnerWizardAmenitiesIntro =>
+      'Những gì chỗ nghỉ cung cấp. Tiện ích trong phòng thuộc về từng phòng và sẽ khai báo sau.';
+
+  @override
+  String get partnerWizardAmenitiesSearch => 'Tìm tiện ích';
+
+  @override
+  String get partnerWizardAmenitiesEmpty =>
+      'Không có tiện ích nào khớp với từ khóa.';
+
+  @override
+  String get partnerWizardPoliciesIntro =>
+      'Giờ nhận phòng và các quy định áp dụng cho toàn bộ chỗ nghỉ.';
+
+  @override
+  String get partnerWizardReviewIntro =>
+      'Kiểm tra lại mọi thông tin, sau đó lưu bản nháp.';
+
+  @override
+  String get partnerWizardReviewComplete => 'Đầy đủ';
+
+  @override
+  String get partnerWizardReviewIncomplete => 'Cần bổ sung';
+
+  @override
+  String get partnerWizardReviewFix => 'Sửa';
+
+  @override
+  String get partnerWizardReviewSavedTitle => 'Đã lưu bản nháp';
+
+  @override
+  String partnerWizardReviewSavedBody(String name) {
+    return 'Đã lưu $name dưới dạng bản nháp. Du khách chưa thấy cho đến khi đội ngũ của chúng tôi đăng tải.';
+  }
+
+  @override
+  String get partnerWizardReviewDone => 'Về danh sách chỗ nghỉ';
+
+  @override
+  String get partnerWizardLeaveTitle => 'Lưu thay đổi trước khi rời đi?';
+
+  @override
+  String get partnerWizardLeaveBody =>
+      'Bước này có thay đổi chưa được lưu vào bản nháp.';
+
+  @override
+  String get partnerWizardLeaveSave => 'Lưu bản nháp';
+
+  @override
+  String get partnerWizardLeaveDiscard => 'Bỏ thay đổi';
+
+  @override
+  String get partnerWizardLeaveCancel => 'Tiếp tục sửa';
+
+  @override
+  String get partnerPropertyContinueSetupAction => 'Tiếp tục thiết lập';
+
+  @override
+  String get partnerPropertyDraftNotVisible => 'Du khách chưa thấy';
+
+  @override
   String partnerRoomsCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
