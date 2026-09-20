@@ -45,8 +45,15 @@ public interface PlaceRepository extends JpaRepository<Place, Long>, JpaSpecific
 
     List<Place> findByAdministrativeUnitId(Long administrativeUnitId);
 
+    /**
+     * One partner's properties. Phase C fetches the catalogue references with them: the partner
+     * list and detail responses name the category and administrative unit of every row, which
+     * would otherwise be one lazy select each.
+     */
+    @EntityGraph(attributePaths = {"category", "subcategory", "administrativeUnit"})
     List<Place> findAllByOwnerId(Long ownerId);
 
+    @EntityGraph(attributePaths = {"category", "subcategory", "administrativeUnit"})
     Optional<Place> findByIdAndOwnerId(Long id, Long ownerId);
 
     long countByOwnerId(Long ownerId);

@@ -57,6 +57,7 @@ public class PlaceService {
     private final AmenityRepository amenities;
     private final UserRepository users;
     private final AdminActivityLogService adminAudit;
+    private final PlaceSlugService slugs;
 
     public PlaceService(PlaceRepository places, PlaceTagRepository tags,
                         PlaceOpeningHourRepository hours, PlaceAmenityRepository placeAmenities,
@@ -65,7 +66,8 @@ public class PlaceService {
                         HotelDetailService hotelDetailService,
                         CategoryRepository categories, AdministrativeUnitRepository locations,
                         AmenityRepository amenities, UserRepository users,
-                        AdminActivityLogService adminAudit) {
+                        AdminActivityLogService adminAudit,
+                        PlaceSlugService slugs) {
         this.places = places;
         this.tags = tags;
         this.hours = hours;
@@ -78,6 +80,7 @@ public class PlaceService {
         this.amenities = amenities;
         this.users = users;
         this.adminAudit = adminAudit;
+        this.slugs = slugs;
     }
 
     // ─── Public ───────────────────────────────────────────────────────────────
@@ -466,19 +469,15 @@ public class PlaceService {
 
     // ─── Slug helpers ─────────────────────────────────────────────────────────
 
-    /** Returns base if available; otherwise tries base-2, base-3, … until unique. */
+    /**
+     * Returns base if available; otherwise tries base-2, base-3, … until unique.
+     *
+     * <p>Phase C moved the algorithm itself into {@link PlaceSlugService} so the partner property
+     * endpoints share it rather than copying it. This delegation exists to keep every call site and
+     * the behaviour here exactly as they were.
+     */
     private String findUniqueSlug(String base, Long excludeId) {
-        String candidate = base;
-        int suffix = 2;
-        while (isSlugTaken(candidate, excludeId)) {
-            candidate = base + "-" + suffix++;
-        }
-        return candidate;
-    }
-
-    private boolean isSlugTaken(String slug, Long excludeId) {
-        if (excludeId == null) return places.existsBySlug(slug);
-        return places.existsBySlugAndIdNot(slug, excludeId);
+        return slugs.uniqueSlug(base, excludeId);
     }
 
     // ─── Helpers ──────────────────────────────────────────────────────────────

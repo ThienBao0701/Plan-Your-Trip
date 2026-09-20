@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +26,21 @@ public class PartnerHotelController {
     @Operation(summary = "List my hotels")
     public List<PartnerHotelSummaryResponse> getMyHotels(@AuthUser Long uid) {
         return service.getMyHotels(uid);
+    }
+
+    /**
+     * Phase C — creates one draft property for the caller's own approved profile.
+     *
+     * <p>The body carries no owner, author or status: the owner and author come from the
+     * authenticated principal and the status is always {@code DRAFT}. Publication is not part of
+     * this API.
+     */
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Create a draft property")
+    public PartnerHotelResponse createProperty(@AuthUser Long uid,
+                                                @Valid @RequestBody PartnerHotelCreateRequest req) {
+        return service.createProperty(uid, req);
     }
 
     @GetMapping("/{id}")
@@ -59,6 +75,13 @@ public class PartnerHotelController {
     public PartnerHotelResponse updateLocation(@AuthUser Long uid, @PathVariable Long id,
                                                 @Valid @RequestBody PartnerLocationRequest req) {
         return service.updateCoordinates(uid, id, req);
+    }
+
+    @PutMapping("/{id}/amenities")
+    @Operation(summary = "Replace the amenities of my property")
+    public PartnerHotelResponse updateAmenities(@AuthUser Long uid, @PathVariable Long id,
+                                                 @Valid @RequestBody PartnerAmenitiesRequest req) {
+        return service.updateAmenities(uid, id, req);
     }
 
     @PatchMapping("/{id}/activate")
