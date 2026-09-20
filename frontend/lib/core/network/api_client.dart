@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:http/http.dart' as http;
 import '../config/app_config.dart';
 import '../admin/admin_models.dart';
+import '../auth/auth_error.dart';
+import '../auth/auth_models.dart';
 import '../mock/app_models.dart';
 import '../mock/mock_data.dart';
 import '../partner/partner_account_models.dart';
@@ -161,6 +163,173 @@ class ApiClient {
     }
   }
 
+
+  // ── Account lifecycle (Phase A contracts) ────────────────────────────────
+  //
+  // Registration of a Partner, email verification, password reset and password
+  // change. Each returns an [AuthResult] carrying an [AuthFailure] whose `code`
+  // is the backend's own stable identifier, so screens branch on a code rather
+  // than on prose. Nothing here logs a password or a token.
+
+  static const Duration _accountTimeout = Duration(seconds: 8);
+
+  /// `POST /api/auth/partner/register`. Creates a PARTNER account server-side and
+  /// returns **no session**: the account cannot sign in until it is verified.
+  Future<AuthResult<PartnerRegistrationRecord>> registerPartner({
+    required String fullName,
+    required String email,
+    required String password,
+    required bool acceptTerms,
+  }) =>
+      _accountCall(
+        () => _client.post(
+          Uri.parse('$baseUrl/auth/partner/register'),
+          headers: _jsonHeaders,
+          body: jsonEncode({
+            'fullName': fullName.trim(),
+            'email': email.trim(),
+            'password': password,
+            'acceptTerms': acceptTerms,
+          }),
+        ),
+        expected: const {201, 200},
+        parse: PartnerRegistrationRecord.fromJson,
+      );
+
+  /// `POST /api/auth/verify-email`. The token comes from the emailed link's
+  /// fragment and is sent in the body — never as a query parameter.
+  Future<AuthResult<EmailVerificationRecord>> verifyEmail(String token) =>
+      _accountCall(
+        () => _client.post(
+          Uri.parse('$baseUrl/auth/verify-email'),
+          headers: _jsonHeaders,
+          body: jsonEncode({'token': token.trim()}),
+        ),
+        expected: const {200},
+        parse: EmailVerificationRecord.fromJson,
+      );
+
+  /// `POST /api/auth/resend-verification`. The backend answers the same 202 for
+  /// every address and issues at most one token per cooldown, so a success here
+  /// says nothing about whether the address has an account.
+  Future<AuthResult<String>> resendVerification(String email) => _accountCall(
+        () => _client.post(
+          Uri.parse('$baseUrl/auth/resend-verification'),
+          headers: _jsonHeaders,
+          body: jsonEncode({'email': email.trim()}),
+        ),
+        expected: const {202, 200},
+        parse: _messageOf,
+      );
+
+  /// `POST /api/auth/forgot-password`. Generic by design — see
+  /// [resendVerification].
+  Future<AuthResult<String>> requestPasswordReset(String email) =>
+      _accountCall(
+        () => _client.post(
+          Uri.parse('$baseUrl/auth/forgot-password'),
+          headers: _jsonHeaders,
+          body: jsonEncode({'email': email.trim()}),
+        ),
+        expected: const {202, 200},
+        parse: _messageOf,
+      );
+
+  /// `POST /api/auth/reset-password`. One-time token from the reset link.
+  Future<AuthResult<String>> resetPassword({
+    required String token,
+    required String newPassword,
+  }) =>
+      _accountCall(
+        () => _client.post(
+          Uri.parse('$baseUrl/auth/reset-password'),
+          headers: _jsonHeaders,
+          body: jsonEncode({'token': token.trim(), 'newPassword': newPassword}),
+        ),
+        expected: const {200},
+        parse: _messageOf,
+      );
+
+  /// `PUT /api/me/password`. The account is the session's — the body carries no
+  /// id. The response is a fresh session, because the change ends every older
+  /// one; the caller must store the returned token.
+  Future<AuthResult<AuthSessionRecord>> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) =>
+      _accountCall(
+        () => _client.put(
+          Uri.parse('$baseUrl/me/password'),
+          headers: _jsonHeaders,
+          body: jsonEncode({
+            'currentPassword': currentPassword,
+            'newPassword': newPassword,
+          }),
+        ),
+        expected: const {200},
+        parse: AuthSessionRecord.fromJson,
+      );
+
+  /// `POST /api/partner/profile` — creates or updates the caller's own business
+  /// profile. The backend refuses an edit unless the profile is DRAFT or
+  /// REJECTED (422), and resolves the owner from the session.
+  Future<AuthResult<PartnerProfile>> savePartnerProfile(
+    PartnerProfileDraft draft,
+  ) =>
+      _accountCall(
+        () => _client.post(
+          Uri.parse('$baseUrl/partner/profile'),
+          headers: _jsonHeaders,
+          body: jsonEncode(draft.toJson()),
+        ),
+        expected: const {200, 201},
+        parse: PartnerProfile.fromJson,
+      );
+
+  /// `POST /api/partner/profile/submit` — hands the profile to Admin review.
+  /// Only a DRAFT or REJECTED profile may be submitted (422 otherwise).
+  Future<AuthResult<PartnerProfileSubmission>> submitPartnerProfile() =>
+      _accountCall(
+        () => _client.post(
+          Uri.parse('$baseUrl/partner/profile/submit'),
+          headers: _jsonHeaders,
+        ),
+        expected: const {200, 201},
+        parse: PartnerProfileSubmission.fromJson,
+      );
+
+  /// The backend's acknowledgement text, or empty when it sent none. Never null,
+  /// so a generic 202 with no body still counts as success.
+  static String _messageOf(Map<String, dynamic> body) =>
+      body['message'] is String ? body['message'] as String : '';
+
+  /// One request/response shape for every account call: a JSON body on success,
+  /// an [AuthFailure] carrying the backend's `code` and `fieldErrors` otherwise,
+  /// and no exception ever escaping to a screen.
+  Future<AuthResult<T>> _accountCall<T>(
+    Future<http.Response> Function() send, {
+    required Set<int> expected,
+    required T? Function(Map<String, dynamic> body) parse,
+  }) async {
+    try {
+      final res = await send().timeout(_accountTimeout);
+      final body = _decodeJsonMap(res).data;
+      if (expected.contains(res.statusCode)) {
+        final parsed = parse(body ?? const <String, dynamic>{});
+        if (parsed == null) return const AuthResult.failed(AuthFailure.malformed());
+        return AuthResult.success(parsed);
+      }
+      return AuthResult.failed(AuthFailure.fromResponse(res.statusCode, body));
+    } on TimeoutException {
+      return const AuthResult.failed(AuthFailure.timeout());
+    } on http.ClientException {
+      return const AuthResult.failed(AuthFailure.network());
+    } on FormatException {
+      return const AuthResult.failed(AuthFailure.malformed());
+    } catch (_) {
+      return const AuthResult.failed(AuthFailure.network());
+    }
+  }
   // ── Saved Collections (/api/me/collections) ─────────────────────────────
 
   static const Duration _collectionsTimeout = Duration(seconds: 8);
@@ -5902,20 +6071,25 @@ class ApiClient {
       body = null;
     }
     final serverMessage = _safeServerMessage(body);
+    // Phase A gives every account failure a stable `code`; it is passed through
+    // so a caller can branch on it (EMAIL_NOT_VERIFIED, ACCOUNT_DISABLED, ...)
+    // instead of reading prose. The legacy `kind`/`message` keys are unchanged.
+    final failure = AuthFailure.fromResponse(res.statusCode, body);
     if (res.statusCode == 400) {
       return _failure('validation',
-          serverMessage ?? 'Please check the submitted information.');
+          serverMessage ?? 'Please check the submitted information.', failure);
     }
     if (res.statusCode == 401 || res.statusCode == 403) {
-      return _failure(
-          'invalid_credentials', serverMessage ?? 'Invalid email or password.');
+      return _failure('invalid_credentials',
+          serverMessage ?? 'Invalid email or password.', failure);
     }
     if (res.statusCode >= 500) {
       return _failure('server',
-          'The backend is temporarily unavailable. Please try again later.');
+          'The backend is temporarily unavailable. Please try again later.',
+          failure);
     }
     return _failure(
-        'unexpected', serverMessage ?? 'Unexpected backend response.');
+        'unexpected', serverMessage ?? 'Unexpected backend response.', failure);
   }
 
   ({Map<String, dynamic>? data}) _decodeJsonMap(http.Response res) {
@@ -5934,10 +6108,19 @@ class ApiClient {
     return cleaned;
   }
 
-  Map<String, dynamic> _failure(String code, String message) => {
+  /// A failed call, in the shape `login`/`register` have always returned.
+  ///
+  /// `code` stays the client-side kind ('validation', 'invalid_credentials',
+  /// 'network', ...) that existing callers branch on. Phase B adds `failure`:
+  /// the parsed [AuthFailure] carrying the backend's own stable code, for the
+  /// screens that map it to copy.
+  Map<String, dynamic> _failure(String code, String message,
+          [AuthFailure? failure]) =>
+      {
         'success': false,
         'code': code,
         'message': message,
+        if (failure != null) 'failure': failure,
       };
 
   // ---------------------------------------------------------------------------

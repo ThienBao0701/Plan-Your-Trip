@@ -475,22 +475,11 @@ class AppLocalizationsVi extends AppLocalizations {
   String get authRegistrationFailed => 'Đăng ký thất bại.';
 
   @override
-  String get authUnsupportedForgotPassword =>
-      'Đặt lại mật khẩu chưa được kết nối với backend.';
-
-  @override
-  String get authUnsupportedVerification =>
-      'Xác minh email chưa được kết nối với backend.';
-
-  @override
-  String get authUnsupportedResend => 'Gửi lại mã xác minh chưa được kết nối.';
-
-  @override
   String get forgotPasswordTitle => 'Quên mật khẩu?';
 
   @override
   String get forgotPasswordSubtitle =>
-      'Nhập email tài khoản của bạn. Màn hình này đã sẵn sàng cho endpoint đặt lại mật khẩu sau này.';
+      'Nhập email của tài khoản. Nếu tài khoản tồn tại, liên kết đặt lại mật khẩu sẽ được gửi.';
 
   @override
   String get forgotPasswordSendAction => 'Gửi liên kết đặt lại';
@@ -500,7 +489,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get forgotPasswordInfo =>
-      'Chưa thể gửi liên kết đặt lại cho đến khi backend được kết nối.';
+      'Vì lý do bảo mật, phản hồi là như nhau dù địa chỉ có tài khoản hay không.';
 
   @override
   String get emailVerificationTitle => 'Xác minh email';
@@ -13488,4 +13477,346 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get adminReviewModerationUncertain =>
       'Không rõ kết quả của thao tác vừa rồi. Trang đã được tải lại — hãy kiểm tra trạng thái đánh giá trước khi thử lại.';
+
+  @override
+  String get authErrorGeneric => 'Đã xảy ra lỗi. Vui lòng thử lại.';
+
+  @override
+  String get authErrorNetwork =>
+      'Không kết nối được máy chủ. Kiểm tra kết nối rồi thử lại.';
+
+  @override
+  String get authErrorTimeout => 'Máy chủ phản hồi quá lâu. Vui lòng thử lại.';
+
+  @override
+  String get authErrorServer =>
+      'Dịch vụ tạm thời không khả dụng. Vui lòng thử lại sau.';
+
+  @override
+  String get authErrorValidation =>
+      'Vui lòng kiểm tra các trường được đánh dấu.';
+
+  @override
+  String get authErrorEmailTaken => 'Email này đã có tài khoản.';
+
+  @override
+  String get authErrorInvalidCredentials => 'Email hoặc mật khẩu không đúng.';
+
+  @override
+  String get authErrorAccountDisabled =>
+      'Tài khoản này đã bị vô hiệu hoá. Liên hệ hỗ trợ để khôi phục.';
+
+  @override
+  String get authErrorAccountUnavailable =>
+      'Tài khoản này không thể đăng nhập. Liên hệ hỗ trợ.';
+
+  @override
+  String get authErrorEmailNotVerified =>
+      'Hãy xác minh email trước khi đăng nhập.';
+
+  @override
+  String get authErrorTokenInvalid =>
+      'Liên kết không hợp lệ hoặc đã được sử dụng.';
+
+  @override
+  String get authErrorTokenExpired =>
+      'Liên kết đã hết hạn. Hãy yêu cầu liên kết mới.';
+
+  @override
+  String get authErrorCurrentPassword => 'Mật khẩu hiện tại không đúng.';
+
+  @override
+  String get authErrorPasswordUnchanged =>
+      'Hãy chọn mật khẩu khác với mật khẩu hiện tại.';
+
+  @override
+  String get authErrorEmailDelivery =>
+      'Hiện chưa gửi được email. Vui lòng thử lại sau.';
+
+  @override
+  String get authErrorSessionExpired =>
+      'Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại.';
+
+  @override
+  String get authValidationPasswordMax => 'Mật khẩu tối đa 72 byte.';
+
+  @override
+  String get authValidationTermsRequired =>
+      'Hãy đồng ý điều khoản Đối tác để tiếp tục.';
+
+  @override
+  String get authValidationTokenRequired => 'Hãy dán mã từ liên kết của bạn.';
+
+  @override
+  String get authPartnerBecomeQuestion => 'Bạn mới biết Plan Your Trip?';
+
+  @override
+  String get authPartnerBecomeAction => 'Trở thành Đối tác';
+
+  @override
+  String get partnerRegisterTitle => 'Tạo tài khoản Đối tác';
+
+  @override
+  String get partnerRegisterSubtitle =>
+      'Đăng chỗ nghỉ và quản lý đặt phòng, giá, thanh toán trong một nơi làm việc.';
+
+  @override
+  String get partnerRegisterAction => 'Tạo tài khoản Đối tác';
+
+  @override
+  String get partnerRegisterTerms =>
+      'Tôi đồng ý với điều khoản dành cho Đối tác';
+
+  @override
+  String get partnerRegisterTermsHint =>
+      'Phiên bản điều khoản bạn đồng ý sẽ được lưu cùng tài khoản.';
+
+  @override
+  String get partnerRegisterHaveAccount => 'Đã có tài khoản Đối tác?';
+
+  @override
+  String get partnerRegisterSignInAction => 'Đăng nhập';
+
+  @override
+  String get verifyEmailTitle => 'Xác minh email';
+
+  @override
+  String verifyEmailSubtitle(String email) {
+    return 'Tài khoản Đối tác cho $email đã được tạo. Hãy xác minh địa chỉ này để đăng nhập.';
+  }
+
+  @override
+  String get verifyEmailNoDeliveryNotice =>
+      'Ở môi trường phát triển nội bộ, không có email nào được gửi. Backend ghi liên kết xác minh kèm nhãn [DEV ONLY — NO EMAIL SENT]; hãy sao chép phần sau #token= và dán vào ô bên dưới.';
+
+  @override
+  String get verifyEmailTokenLabel => 'Mã xác minh';
+
+  @override
+  String get verifyEmailAction => 'Xác minh email';
+
+  @override
+  String get verifyEmailSuccessTitle => 'Đã xác minh email';
+
+  @override
+  String get verifyEmailSuccessBody =>
+      'Địa chỉ của bạn đã được xác minh. Bạn có thể đăng nhập vào nơi làm việc Đối tác.';
+
+  @override
+  String get verifyEmailAlreadyTitle => 'Đã xác minh trước đó';
+
+  @override
+  String get verifyEmailAlreadyBody =>
+      'Email này đã được xác minh. Bạn có thể đăng nhập.';
+
+  @override
+  String get verifyEmailContinueAction => 'Tiếp tục đến đăng nhập Đối tác';
+
+  @override
+  String get verifyEmailResendAction => 'Gửi lại xác minh';
+
+  @override
+  String verifyEmailResendCooldown(int seconds) {
+    return 'Bạn có thể yêu cầu liên kết xác minh khác sau $seconds giây.';
+  }
+
+  @override
+  String get verifyEmailResendAck =>
+      'Nếu địa chỉ đó đang chờ xác minh, liên kết mới sẽ được gửi.';
+
+  @override
+  String get verifyEmailBackAction => 'Quay lại đăng nhập Đối tác';
+
+  @override
+  String get forgotPasswordAck =>
+      'Nếu địa chỉ đó có tài khoản, liên kết đặt lại mật khẩu sẽ được gửi.';
+
+  @override
+  String get forgotPasswordNoDeliveryNotice =>
+      'Ở môi trường phát triển nội bộ, không có email nào được gửi. Backend ghi liên kết đặt lại kèm nhãn [DEV ONLY — NO EMAIL SENT].';
+
+  @override
+  String get resetPasswordTitle => 'Đặt mật khẩu mới';
+
+  @override
+  String get resetPasswordSubtitle =>
+      'Dán mã từ liên kết đặt lại và chọn mật khẩu mới.';
+
+  @override
+  String get resetPasswordTokenLabel => 'Mã đặt lại';
+
+  @override
+  String get resetPasswordNewLabel => 'Mật khẩu mới';
+
+  @override
+  String get resetPasswordAction => 'Đặt lại mật khẩu';
+
+  @override
+  String get resetPasswordSuccessTitle => 'Đã đặt lại mật khẩu';
+
+  @override
+  String get resetPasswordSuccessBody =>
+      'Mật khẩu đã được đổi và mọi phiên đăng nhập khác đã bị đăng xuất.';
+
+  @override
+  String get resetPasswordBackAction => 'Quay lại đăng nhập';
+
+  @override
+  String get changePasswordTitle => 'Đổi mật khẩu';
+
+  @override
+  String get changePasswordSubtitle =>
+      'Đổi mật khẩu sẽ đăng xuất mọi thiết bị khác.';
+
+  @override
+  String get changePasswordCurrentLabel => 'Mật khẩu hiện tại';
+
+  @override
+  String get changePasswordAction => 'Cập nhật mật khẩu';
+
+  @override
+  String get changePasswordSuccess => 'Đã đổi mật khẩu thành công.';
+
+  @override
+  String get accountTitle => 'Tài khoản';
+
+  @override
+  String get accountDetailsHeading => 'Thông tin tài khoản';
+
+  @override
+  String get accountRoleLabel => 'Vai trò';
+
+  @override
+  String get accountRolePartner => 'Đối tác';
+
+  @override
+  String get accountRoleAdmin => 'Quản trị viên';
+
+  @override
+  String get accountRoleUser => 'Khách du lịch';
+
+  @override
+  String get accountSecurityHeading => 'Bảo mật';
+
+  @override
+  String get accountSecurityBody => 'Cập nhật mật khẩu bạn dùng để đăng nhập.';
+
+  @override
+  String get accountBackToWorkspace => 'Quay lại nơi làm việc';
+
+  @override
+  String get accountBackToConsole => 'Quay lại bảng điều khiển';
+
+  @override
+  String get accountOpenAction => 'Tài khoản';
+
+  @override
+  String get partnerBusinessHeading => 'Hồ sơ doanh nghiệp';
+
+  @override
+  String get partnerBusinessNoneTitle => 'Chưa có hồ sơ doanh nghiệp';
+
+  @override
+  String get partnerBusinessNoneBody =>
+      'Hãy nhập thông tin doanh nghiệp và gửi duyệt để mở nơi làm việc Đối tác.';
+
+  @override
+  String get partnerBusinessAddAction => 'Thêm thông tin doanh nghiệp';
+
+  @override
+  String get partnerBusinessEditAction => 'Sửa thông tin doanh nghiệp';
+
+  @override
+  String get partnerBusinessSaveAction => 'Lưu';
+
+  @override
+  String get partnerBusinessSubmitAction => 'Lưu và gửi duyệt';
+
+  @override
+  String get partnerBusinessSavedMessage => 'Đã lưu thông tin doanh nghiệp.';
+
+  @override
+  String get partnerBusinessSubmittedMessage => 'Đã gửi duyệt.';
+
+  @override
+  String get partnerBusinessStatusDraftBody =>
+      'Hoàn tất thông tin doanh nghiệp và gửi duyệt.';
+
+  @override
+  String get partnerBusinessStatusSubmittedBody =>
+      'Hồ sơ Đối tác của bạn đang chờ quản trị viên duyệt.';
+
+  @override
+  String get partnerBusinessStatusApprovedBody =>
+      'Tài khoản Đối tác đã được duyệt. Nơi làm việc đã mở.';
+
+  @override
+  String get partnerBusinessStatusRejectedBody =>
+      'Hồ sơ bị từ chối. Hãy cập nhật thông tin doanh nghiệp và gửi lại.';
+
+  @override
+  String get partnerBusinessStatusSuspendedBody =>
+      'Quyền Đối tác của bạn đang bị tạm ngưng. Liên hệ hỗ trợ.';
+
+  @override
+  String get partnerBusinessStatusUnknownBody =>
+      'Hồ sơ có trạng thái mà ứng dụng chưa nhận diện được.';
+
+  @override
+  String partnerBusinessRejectReason(String reason) {
+    return 'Lý do: $reason';
+  }
+
+  @override
+  String get partnerBusinessFieldName => 'Tên doanh nghiệp';
+
+  @override
+  String get partnerBusinessFieldType => 'Loại hình';
+
+  @override
+  String get partnerBusinessFieldRepresentative => 'Người đại diện';
+
+  @override
+  String get partnerBusinessFieldPhone => 'Điện thoại doanh nghiệp';
+
+  @override
+  String get partnerBusinessFieldEmail => 'Email doanh nghiệp';
+
+  @override
+  String get partnerBusinessFieldAddress => 'Địa chỉ doanh nghiệp';
+
+  @override
+  String get partnerBusinessFieldTaxCode => 'Mã số thuế';
+
+  @override
+  String get partnerBusinessFieldWebsite => 'Website';
+
+  @override
+  String partnerBusinessOptionalSuffix(String label) {
+    return '$label (không bắt buộc)';
+  }
+
+  @override
+  String get partnerBusinessTypeHotel => 'Khách sạn';
+
+  @override
+  String get partnerBusinessTypeRestaurant => 'Nhà hàng';
+
+  @override
+  String get partnerBusinessTypeCafe => 'Quán cà phê';
+
+  @override
+  String get partnerBusinessTypeTourOperator => 'Đơn vị lữ hành';
+
+  @override
+  String get partnerBusinessTypeTransport => 'Vận chuyển';
+
+  @override
+  String get partnerBusinessTypeOther => 'Khác';
+
+  @override
+  String get partnerBusinessTypeUnknown => 'Loại hình chưa nhận diện';
+
+  @override
+  String get partnerBusinessValidationRequired => 'Trường này là bắt buộc.';
 }

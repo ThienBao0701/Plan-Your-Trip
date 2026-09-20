@@ -89,9 +89,11 @@ enum PartnerTeamRole {
   bool get canManageTeam => this == PartnerTeamRole.owner;
 }
 
-/// `dto/PartnerProfileDto.PartnerProfileResponse`. Only the fields C0 needs are
-/// mapped; the write-side fields (address, tax code, ...) belong to the partner
-/// onboarding phase, not to the shell foundation.
+/// `dto/PartnerProfileDto.PartnerProfileResponse`.
+///
+/// Phase B adds the write-side fields the response already carried — address,
+/// tax code and website — because the Partner now edits this profile through
+/// [PartnerProfileDraft] rather than only reading it.
 class PartnerProfile {
   final int id;
   final int userId;
@@ -100,6 +102,9 @@ class PartnerProfile {
   final String representativeName;
   final String? email;
   final String? phone;
+  final String? address;
+  final String? taxCode;
+  final String? website;
   final PartnerVerificationStatus verificationStatus;
   final String? rejectReason;
   final DateTime? submittedAt;
@@ -114,6 +119,9 @@ class PartnerProfile {
     this.businessType,
     this.email,
     this.phone,
+    this.address,
+    this.taxCode,
+    this.website,
     this.rejectReason,
     this.submittedAt,
     this.approvedAt,
@@ -121,6 +129,18 @@ class PartnerProfile {
 
   bool get isApproved =>
       verificationStatus == PartnerVerificationStatus.approved;
+
+  /// The typed business kind; [PartnerBusinessType.unknown] when the server sent
+  /// a value this build does not know.
+  PartnerBusinessType get businessTypeValue =>
+      PartnerBusinessType.parse(businessType);
+
+  /// Whether the profile is in a state the backend allows editing and
+  /// submitting: `createOrUpdateMyProfile` and `submitMyProfile` both accept
+  /// only DRAFT or REJECTED.
+  bool get isEditable =>
+      verificationStatus == PartnerVerificationStatus.draft ||
+      verificationStatus == PartnerVerificationStatus.rejected;
 
   static PartnerProfile? fromJson(Map<String, dynamic> json) {
     final id = _asInt(json['id']);
@@ -133,11 +153,124 @@ class PartnerProfile {
       representativeName: _asString(json['representativeName']) ?? '',
       email: _asString(json['email']),
       phone: _asString(json['phone']),
+      address: _asString(json['address']),
+      taxCode: _asString(json['taxCode']),
+      website: _asString(json['website']),
       verificationStatus:
           PartnerVerificationStatus.parse(json['verificationStatus']),
       rejectReason: _asString(json['rejectReason']),
       submittedAt: _asDate(json['submittedAt']),
       approvedAt: _asDate(json['approvedAt']),
+    );
+  }
+}
+
+/// `model/BusinessType.java` — the business kinds the profile API accepts.
+///
+/// The wire value is what the backend stores; anything unrecognised parses to
+/// [unknown] rather than being coerced into a real type.
+enum PartnerBusinessType {
+  hotel('HOTEL'),
+  restaurant('RESTAURANT'),
+  cafe('CAFE'),
+  tourOperator('TOUR_OPERATOR'),
+  transport('TRANSPORT'),
+  other('OTHER'),
+  unknown(null);
+
+  const PartnerBusinessType(this.wireValue);
+
+  final String? wireValue;
+
+  /// The types a Partner may choose — [unknown] is a read-side fallback only.
+  static List<PartnerBusinessType> get selectable =>
+      values.where((t) => t.wireValue != null).toList();
+
+  static PartnerBusinessType parse(Object? raw) {
+    if (raw is! String) return PartnerBusinessType.unknown;
+    for (final type in values) {
+      if (type.wireValue == raw) return type;
+    }
+    return PartnerBusinessType.unknown;
+  }
+}
+
+/// `dto/PartnerProfileDto.PartnerProfileRequest` — the write side of the
+/// business profile, exactly the fields the backend accepts. `businessType` is
+/// sent as its wire value; `taxCode` and `website` are the only optional ones.
+class PartnerProfileDraft {
+  final String businessName;
+  final PartnerBusinessType businessType;
+  final String representativeName;
+  final String phone;
+  final String email;
+  final String address;
+  final String? taxCode;
+  final String? website;
+
+  const PartnerProfileDraft({
+    required this.businessName,
+    required this.businessType,
+    required this.representativeName,
+    required this.phone,
+    required this.email,
+    required this.address,
+    this.taxCode,
+    this.website,
+  });
+
+  /// Builds the editable draft of an existing profile, so an edit starts from
+  /// what the server holds rather than from an empty form.
+  static PartnerProfileDraft fromProfile(PartnerProfile profile) =>
+      PartnerProfileDraft(
+        businessName: profile.businessName,
+        businessType: profile.businessTypeValue,
+        representativeName: profile.representativeName,
+        phone: profile.phone ?? '',
+        email: profile.email ?? '',
+        address: profile.address ?? '',
+        taxCode: profile.taxCode,
+        website: profile.website,
+      );
+
+  Map<String, dynamic> toJson() => {
+        'businessName': businessName.trim(),
+        'businessType': businessType.wireValue,
+        'representativeName': representativeName.trim(),
+        'phone': phone.trim(),
+        'email': email.trim(),
+        'address': address.trim(),
+        if (taxCode != null && taxCode!.trim().isNotEmpty)
+          'taxCode': taxCode!.trim(),
+        if (website != null && website!.trim().isNotEmpty)
+          'website': website!.trim(),
+      };
+}
+
+/// `dto/PartnerProfileDto.PartnerSubmitResponse` — the acknowledgement of a
+/// submission for Admin review.
+class PartnerProfileSubmission {
+  final int id;
+  final PartnerVerificationStatus verificationStatus;
+  final DateTime? submittedAt;
+  final String? message;
+
+  const PartnerProfileSubmission({
+    required this.id,
+    required this.verificationStatus,
+    this.submittedAt,
+    this.message,
+  });
+
+  static PartnerProfileSubmission? fromJson(Map<String, dynamic> json) {
+    final id = _asInt(json['id']);
+    if (id == null) return null;
+    return PartnerProfileSubmission(
+      id: id,
+      verificationStatus:
+          PartnerVerificationStatus.parse(json['verificationStatus']),
+      submittedAt: _asDate(json['submittedAt']),
+      message: _asString(json['message']),
     );
   }
 }

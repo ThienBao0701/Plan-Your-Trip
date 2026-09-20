@@ -238,14 +238,11 @@
   "authValidationPasswordMismatch": "Passwords do not match.",
   "authLoginFailed": "Login failed.",
   "authRegistrationFailed": "Registration failed.",
-  "authUnsupportedForgotPassword": "Password reset is not connected to the backend yet.",
-  "authUnsupportedVerification": "Email verification is not connected to the backend yet.",
-  "authUnsupportedResend": "Resending a verification code is not connected yet.",
   "forgotPasswordTitle": "Forgot password?",
-  "forgotPasswordSubtitle": "Enter the email for your account. This presentation is ready for a future reset endpoint.",
+  "forgotPasswordSubtitle": "Enter the email for your account. If it exists, we send a password reset link.",
   "forgotPasswordSendAction": "Send reset link",
   "forgotPasswordReturnAction": "Back to login",
-  "forgotPasswordInfo": "Reset links cannot be sent until the backend endpoint is connected.",
+  "forgotPasswordInfo": "For your security, the same answer is shown whether or not the address has an account.",
   "emailVerificationTitle": "Verify email",
   "emailVerificationSubtitle": "Enter the 6-digit code for {email}.",
   "@emailVerificationSubtitle": {
@@ -6806,5 +6803,134 @@
   "surfaceSignOut": "Sign out",
   "surfaceConfigErrorTitle": "This application isn't configured",
   "surfaceConfigErrorBody": "It couldn't tell which application to open. Start it with one of the documented entrypoints.",
-  "adminReviewModerationUncertain": "The result of the last action is unknown. This page has been reloaded — check the review's status before trying again."
+  "adminReviewModerationUncertain": "The result of the last action is unknown. This page has been reloaded — check the review's status before trying again.",
+  "authErrorGeneric": "Something went wrong. Please try again.",
+  "authErrorNetwork": "Cannot reach the server. Check your connection and try again.",
+  "authErrorTimeout": "The server did not respond in time. Please try again.",
+  "authErrorServer": "The service is temporarily unavailable. Please try again later.",
+  "authErrorValidation": "Please check the highlighted fields.",
+  "authErrorEmailTaken": "That email address already has an account.",
+  "authErrorInvalidCredentials": "Email or password is incorrect.",
+  "authErrorAccountDisabled": "This account is disabled. Contact support to restore access.",
+  "authErrorAccountUnavailable": "This account cannot sign in. Contact support.",
+  "authErrorEmailNotVerified": "Verify your email address before signing in.",
+  "authErrorTokenInvalid": "This link is invalid or has already been used.",
+  "authErrorTokenExpired": "This link has expired. Request a new one.",
+  "authErrorCurrentPassword": "Your current password is incorrect.",
+  "authErrorPasswordUnchanged": "Choose a password different from your current one.",
+  "authErrorEmailDelivery": "Email delivery is unavailable right now. Please try again later.",
+  "authErrorSessionExpired": "Your session has expired. Sign in again.",
+  "authValidationPasswordMax": "Password must be at most 72 bytes.",
+  "authValidationTermsRequired": "Accept the Partner terms to continue.",
+  "authValidationTokenRequired": "Paste the token from your link.",
+  "authPartnerBecomeQuestion": "New to Plan Your Trip?",
+  "authPartnerBecomeAction": "Become a Partner",
+  "partnerRegisterTitle": "Create your Partner account",
+  "partnerRegisterSubtitle": "List your property and manage bookings, rates and payouts in one workspace.",
+  "partnerRegisterAction": "Create Partner account",
+  "partnerRegisterTerms": "I agree to the Partner terms",
+  "partnerRegisterTermsHint": "The terms version you accept is recorded with your account.",
+  "partnerRegisterHaveAccount": "Already have a Partner account?",
+  "partnerRegisterSignInAction": "Sign in",
+  "verifyEmailTitle": "Verify your email",
+  "verifyEmailSubtitle": "Your Partner account for {email} is created. Verify the address to sign in.",
+  "@verifyEmailSubtitle": {
+      "placeholders": {
+          "email": {
+              "type": "String"
+          }
+      }
+  },
+  "verifyEmailNoDeliveryNotice": "In local development no email is delivered. The backend logs a verification link marked [DEV ONLY — NO EMAIL SENT]; copy the token after #token= and paste it below.",
+  "verifyEmailTokenLabel": "Verification token",
+  "verifyEmailAction": "Verify email",
+  "verifyEmailSuccessTitle": "Email verified successfully",
+  "verifyEmailSuccessBody": "Your address is verified. You can sign in to the Partner workspace now.",
+  "verifyEmailAlreadyTitle": "Already verified",
+  "verifyEmailAlreadyBody": "This email address is already verified. You can sign in.",
+  "verifyEmailContinueAction": "Continue to Partner sign in",
+  "verifyEmailResendAction": "Resend verification",
+  "verifyEmailResendCooldown": "You can request another verification link in {seconds} seconds.",
+  "@verifyEmailResendCooldown": {
+      "placeholders": {
+          "seconds": {
+              "type": "int"
+          }
+      }
+  },
+  "verifyEmailResendAck": "If that address is waiting for verification, a new link is on its way.",
+  "verifyEmailBackAction": "Back to Partner sign in",
+  "forgotPasswordAck": "If that address has an account, a password reset link is on its way.",
+  "forgotPasswordNoDeliveryNotice": "In local development no email is delivered. The backend logs the reset link marked [DEV ONLY — NO EMAIL SENT].",
+  "resetPasswordTitle": "Set a new password",
+  "resetPasswordSubtitle": "Paste the token from your reset link and choose a new password.",
+  "resetPasswordTokenLabel": "Reset token",
+  "resetPasswordNewLabel": "New password",
+  "resetPasswordAction": "Reset password",
+  "resetPasswordSuccessTitle": "Password reset",
+  "resetPasswordSuccessBody": "Your password has been changed and every other session was signed out.",
+  "resetPasswordBackAction": "Back to sign in",
+  "changePasswordTitle": "Change password",
+  "changePasswordSubtitle": "Changing your password signs out every other device.",
+  "changePasswordCurrentLabel": "Current password",
+  "changePasswordAction": "Update password",
+  "changePasswordSuccess": "Password changed successfully.",
+  "accountTitle": "Account",
+  "accountDetailsHeading": "Account details",
+  "accountRoleLabel": "Role",
+  "accountRolePartner": "Partner",
+  "accountRoleAdmin": "Administrator",
+  "accountRoleUser": "Traveller",
+  "accountSecurityHeading": "Security",
+  "accountSecurityBody": "Update the password you use to sign in.",
+  "accountBackToWorkspace": "Back to workspace",
+  "accountBackToConsole": "Back to console",
+  "accountOpenAction": "Account",
+  "partnerBusinessHeading": "Business profile",
+  "partnerBusinessNoneTitle": "No business profile yet",
+  "partnerBusinessNoneBody": "Add your business information and submit it for review to open the Partner workspace.",
+  "partnerBusinessAddAction": "Add business information",
+  "partnerBusinessEditAction": "Edit business information",
+  "partnerBusinessSaveAction": "Save",
+  "partnerBusinessSubmitAction": "Save and submit for review",
+  "partnerBusinessSavedMessage": "Business information saved.",
+  "partnerBusinessSubmittedMessage": "Submitted for review.",
+  "partnerBusinessStatusDraftBody": "Complete your business information and submit it for review.",
+  "partnerBusinessStatusSubmittedBody": "Your Partner application is awaiting review by an administrator.",
+  "partnerBusinessStatusApprovedBody": "Your Partner account is approved. The workspace is open.",
+  "partnerBusinessStatusRejectedBody": "Your application was rejected. Update your business information and submit it again.",
+  "partnerBusinessStatusSuspendedBody": "Your Partner access is currently suspended. Contact support.",
+  "partnerBusinessStatusUnknownBody": "This profile has a status this app does not recognise.",
+  "partnerBusinessRejectReason": "Reason: {reason}",
+  "@partnerBusinessRejectReason": {
+      "placeholders": {
+          "reason": {
+              "type": "String"
+          }
+      }
+  },
+  "partnerBusinessFieldName": "Business name",
+  "partnerBusinessFieldType": "Business type",
+  "partnerBusinessFieldRepresentative": "Representative name",
+  "partnerBusinessFieldPhone": "Business phone",
+  "partnerBusinessFieldEmail": "Business email",
+  "partnerBusinessFieldAddress": "Business address",
+  "partnerBusinessFieldTaxCode": "Tax code",
+  "partnerBusinessFieldWebsite": "Website",
+  "partnerBusinessOptionalSuffix": "{label} (optional)",
+  "@partnerBusinessOptionalSuffix": {
+      "placeholders": {
+          "label": {
+              "type": "String"
+          }
+      }
+  },
+  "partnerBusinessTypeHotel": "Hotel",
+  "partnerBusinessTypeRestaurant": "Restaurant",
+  "partnerBusinessTypeCafe": "Cafe",
+  "partnerBusinessTypeTourOperator": "Tour operator",
+  "partnerBusinessTypeTransport": "Transport",
+  "partnerBusinessTypeOther": "Other",
+  "partnerBusinessTypeUnknown": "Unrecognised type",
+  "partnerBusinessValidationRequired": "This field is required."
 }

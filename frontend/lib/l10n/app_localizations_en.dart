@@ -485,23 +485,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authRegistrationFailed => 'Registration failed.';
 
   @override
-  String get authUnsupportedForgotPassword =>
-      'Password reset is not connected to the backend yet.';
-
-  @override
-  String get authUnsupportedVerification =>
-      'Email verification is not connected to the backend yet.';
-
-  @override
-  String get authUnsupportedResend =>
-      'Resending a verification code is not connected yet.';
-
-  @override
   String get forgotPasswordTitle => 'Forgot password?';
 
   @override
   String get forgotPasswordSubtitle =>
-      'Enter the email for your account. This presentation is ready for a future reset endpoint.';
+      'Enter the email for your account. If it exists, we send a password reset link.';
 
   @override
   String get forgotPasswordSendAction => 'Send reset link';
@@ -511,7 +499,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get forgotPasswordInfo =>
-      'Reset links cannot be sent until the backend endpoint is connected.';
+      'For your security, the same answer is shown whether or not the address has an account.';
 
   @override
   String get emailVerificationTitle => 'Verify email';
@@ -13647,4 +13635,346 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get adminReviewModerationUncertain =>
       'The result of the last action is unknown. This page has been reloaded — check the review\'s status before trying again.';
+
+  @override
+  String get authErrorGeneric => 'Something went wrong. Please try again.';
+
+  @override
+  String get authErrorNetwork =>
+      'Cannot reach the server. Check your connection and try again.';
+
+  @override
+  String get authErrorTimeout =>
+      'The server did not respond in time. Please try again.';
+
+  @override
+  String get authErrorServer =>
+      'The service is temporarily unavailable. Please try again later.';
+
+  @override
+  String get authErrorValidation => 'Please check the highlighted fields.';
+
+  @override
+  String get authErrorEmailTaken =>
+      'That email address already has an account.';
+
+  @override
+  String get authErrorInvalidCredentials => 'Email or password is incorrect.';
+
+  @override
+  String get authErrorAccountDisabled =>
+      'This account is disabled. Contact support to restore access.';
+
+  @override
+  String get authErrorAccountUnavailable =>
+      'This account cannot sign in. Contact support.';
+
+  @override
+  String get authErrorEmailNotVerified =>
+      'Verify your email address before signing in.';
+
+  @override
+  String get authErrorTokenInvalid =>
+      'This link is invalid or has already been used.';
+
+  @override
+  String get authErrorTokenExpired =>
+      'This link has expired. Request a new one.';
+
+  @override
+  String get authErrorCurrentPassword => 'Your current password is incorrect.';
+
+  @override
+  String get authErrorPasswordUnchanged =>
+      'Choose a password different from your current one.';
+
+  @override
+  String get authErrorEmailDelivery =>
+      'Email delivery is unavailable right now. Please try again later.';
+
+  @override
+  String get authErrorSessionExpired =>
+      'Your session has expired. Sign in again.';
+
+  @override
+  String get authValidationPasswordMax => 'Password must be at most 72 bytes.';
+
+  @override
+  String get authValidationTermsRequired =>
+      'Accept the Partner terms to continue.';
+
+  @override
+  String get authValidationTokenRequired => 'Paste the token from your link.';
+
+  @override
+  String get authPartnerBecomeQuestion => 'New to Plan Your Trip?';
+
+  @override
+  String get authPartnerBecomeAction => 'Become a Partner';
+
+  @override
+  String get partnerRegisterTitle => 'Create your Partner account';
+
+  @override
+  String get partnerRegisterSubtitle =>
+      'List your property and manage bookings, rates and payouts in one workspace.';
+
+  @override
+  String get partnerRegisterAction => 'Create Partner account';
+
+  @override
+  String get partnerRegisterTerms => 'I agree to the Partner terms';
+
+  @override
+  String get partnerRegisterTermsHint =>
+      'The terms version you accept is recorded with your account.';
+
+  @override
+  String get partnerRegisterHaveAccount => 'Already have a Partner account?';
+
+  @override
+  String get partnerRegisterSignInAction => 'Sign in';
+
+  @override
+  String get verifyEmailTitle => 'Verify your email';
+
+  @override
+  String verifyEmailSubtitle(String email) {
+    return 'Your Partner account for $email is created. Verify the address to sign in.';
+  }
+
+  @override
+  String get verifyEmailNoDeliveryNotice =>
+      'In local development no email is delivered. The backend logs a verification link marked [DEV ONLY — NO EMAIL SENT]; copy the token after #token= and paste it below.';
+
+  @override
+  String get verifyEmailTokenLabel => 'Verification token';
+
+  @override
+  String get verifyEmailAction => 'Verify email';
+
+  @override
+  String get verifyEmailSuccessTitle => 'Email verified successfully';
+
+  @override
+  String get verifyEmailSuccessBody =>
+      'Your address is verified. You can sign in to the Partner workspace now.';
+
+  @override
+  String get verifyEmailAlreadyTitle => 'Already verified';
+
+  @override
+  String get verifyEmailAlreadyBody =>
+      'This email address is already verified. You can sign in.';
+
+  @override
+  String get verifyEmailContinueAction => 'Continue to Partner sign in';
+
+  @override
+  String get verifyEmailResendAction => 'Resend verification';
+
+  @override
+  String verifyEmailResendCooldown(int seconds) {
+    return 'You can request another verification link in $seconds seconds.';
+  }
+
+  @override
+  String get verifyEmailResendAck =>
+      'If that address is waiting for verification, a new link is on its way.';
+
+  @override
+  String get verifyEmailBackAction => 'Back to Partner sign in';
+
+  @override
+  String get forgotPasswordAck =>
+      'If that address has an account, a password reset link is on its way.';
+
+  @override
+  String get forgotPasswordNoDeliveryNotice =>
+      'In local development no email is delivered. The backend logs the reset link marked [DEV ONLY — NO EMAIL SENT].';
+
+  @override
+  String get resetPasswordTitle => 'Set a new password';
+
+  @override
+  String get resetPasswordSubtitle =>
+      'Paste the token from your reset link and choose a new password.';
+
+  @override
+  String get resetPasswordTokenLabel => 'Reset token';
+
+  @override
+  String get resetPasswordNewLabel => 'New password';
+
+  @override
+  String get resetPasswordAction => 'Reset password';
+
+  @override
+  String get resetPasswordSuccessTitle => 'Password reset';
+
+  @override
+  String get resetPasswordSuccessBody =>
+      'Your password has been changed and every other session was signed out.';
+
+  @override
+  String get resetPasswordBackAction => 'Back to sign in';
+
+  @override
+  String get changePasswordTitle => 'Change password';
+
+  @override
+  String get changePasswordSubtitle =>
+      'Changing your password signs out every other device.';
+
+  @override
+  String get changePasswordCurrentLabel => 'Current password';
+
+  @override
+  String get changePasswordAction => 'Update password';
+
+  @override
+  String get changePasswordSuccess => 'Password changed successfully.';
+
+  @override
+  String get accountTitle => 'Account';
+
+  @override
+  String get accountDetailsHeading => 'Account details';
+
+  @override
+  String get accountRoleLabel => 'Role';
+
+  @override
+  String get accountRolePartner => 'Partner';
+
+  @override
+  String get accountRoleAdmin => 'Administrator';
+
+  @override
+  String get accountRoleUser => 'Traveller';
+
+  @override
+  String get accountSecurityHeading => 'Security';
+
+  @override
+  String get accountSecurityBody => 'Update the password you use to sign in.';
+
+  @override
+  String get accountBackToWorkspace => 'Back to workspace';
+
+  @override
+  String get accountBackToConsole => 'Back to console';
+
+  @override
+  String get accountOpenAction => 'Account';
+
+  @override
+  String get partnerBusinessHeading => 'Business profile';
+
+  @override
+  String get partnerBusinessNoneTitle => 'No business profile yet';
+
+  @override
+  String get partnerBusinessNoneBody =>
+      'Add your business information and submit it for review to open the Partner workspace.';
+
+  @override
+  String get partnerBusinessAddAction => 'Add business information';
+
+  @override
+  String get partnerBusinessEditAction => 'Edit business information';
+
+  @override
+  String get partnerBusinessSaveAction => 'Save';
+
+  @override
+  String get partnerBusinessSubmitAction => 'Save and submit for review';
+
+  @override
+  String get partnerBusinessSavedMessage => 'Business information saved.';
+
+  @override
+  String get partnerBusinessSubmittedMessage => 'Submitted for review.';
+
+  @override
+  String get partnerBusinessStatusDraftBody =>
+      'Complete your business information and submit it for review.';
+
+  @override
+  String get partnerBusinessStatusSubmittedBody =>
+      'Your Partner application is awaiting review by an administrator.';
+
+  @override
+  String get partnerBusinessStatusApprovedBody =>
+      'Your Partner account is approved. The workspace is open.';
+
+  @override
+  String get partnerBusinessStatusRejectedBody =>
+      'Your application was rejected. Update your business information and submit it again.';
+
+  @override
+  String get partnerBusinessStatusSuspendedBody =>
+      'Your Partner access is currently suspended. Contact support.';
+
+  @override
+  String get partnerBusinessStatusUnknownBody =>
+      'This profile has a status this app does not recognise.';
+
+  @override
+  String partnerBusinessRejectReason(String reason) {
+    return 'Reason: $reason';
+  }
+
+  @override
+  String get partnerBusinessFieldName => 'Business name';
+
+  @override
+  String get partnerBusinessFieldType => 'Business type';
+
+  @override
+  String get partnerBusinessFieldRepresentative => 'Representative name';
+
+  @override
+  String get partnerBusinessFieldPhone => 'Business phone';
+
+  @override
+  String get partnerBusinessFieldEmail => 'Business email';
+
+  @override
+  String get partnerBusinessFieldAddress => 'Business address';
+
+  @override
+  String get partnerBusinessFieldTaxCode => 'Tax code';
+
+  @override
+  String get partnerBusinessFieldWebsite => 'Website';
+
+  @override
+  String partnerBusinessOptionalSuffix(String label) {
+    return '$label (optional)';
+  }
+
+  @override
+  String get partnerBusinessTypeHotel => 'Hotel';
+
+  @override
+  String get partnerBusinessTypeRestaurant => 'Restaurant';
+
+  @override
+  String get partnerBusinessTypeCafe => 'Cafe';
+
+  @override
+  String get partnerBusinessTypeTourOperator => 'Tour operator';
+
+  @override
+  String get partnerBusinessTypeTransport => 'Transport';
+
+  @override
+  String get partnerBusinessTypeOther => 'Other';
+
+  @override
+  String get partnerBusinessTypeUnknown => 'Unrecognised type';
+
+  @override
+  String get partnerBusinessValidationRequired => 'This field is required.';
 }

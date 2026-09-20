@@ -37,7 +37,12 @@ class SurfaceGate extends StatelessWidget {
 
     final app = AppScope.of(context);
     final router = SurfaceRouter.of(surface);
-    if (app.email == null) return router.signedOutEntry();
+    if (app.email == null) {
+      // Account locations a visitor with no session may open — registration and
+      // the link-driven verification and reset flows. Everything else that is not
+      // the sign-in screen has already been resolved away by the router.
+      return router.publicScreenAt(location) ?? router.signedOutEntry();
+    }
     if (!surface.admits(app.role)) {
       return SurfaceAccessDeniedScreen(surface: surface);
     }
@@ -48,6 +53,39 @@ class SurfaceGate extends StatelessWidget {
 /// Navigation that must stay inside the running surface.
 class SurfaceNavigation {
   const SurfaceNavigation._();
+
+  /// Opens [location] on the running surface, keeping the address bar in step.
+  ///
+  /// Used for the account locations, which are ordinary pushes rather than shell
+  /// destinations. Outside a surface app it does nothing: there is no surface to
+  /// navigate within.
+  static Future<void> open(BuildContext context, String location) async {
+    final surface = SurfaceScope.maybeOf(context);
+    if (surface == null) return;
+    final router = SurfaceRouter.of(surface);
+    final navigator = Navigator.of(context);
+    SurfaceRouter.reportLocation(location);
+    await navigator.push(router.routeTo(location));
+    SurfaceRouter.reportLocation(SurfaceRouter.root);
+  }
+
+  /// Returns to the surface's root — the way back from any account screen.
+  ///
+  /// A screen reached by link has nothing behind it, so there the root replaces
+  /// it instead of popping to a stack that does not exist.
+  static void goHome(BuildContext context) {
+    final navigator = Navigator.of(context);
+    SurfaceRouter.reportLocation(SurfaceRouter.root);
+    if (navigator.canPop()) {
+      navigator.popUntil((route) => route.isFirst);
+      return;
+    }
+    final surface = SurfaceScope.maybeOf(context);
+    if (surface == null) return;
+    navigator.pushReplacement(
+      SurfaceRouter.of(surface).routeTo(SurfaceRouter.root),
+    );
+  }
 
   /// The running surface's root route — where a sign-in pushed on top of other
   /// screens hands over once it succeeds. Outside a surface app there is no

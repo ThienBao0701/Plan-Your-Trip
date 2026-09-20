@@ -25,6 +25,14 @@ abstract class SurfaceRouter {
   /// Every surface's application root.
   static const String root = '/';
 
+  /// Account locations, shared by the surfaces that offer them (Phase B). They
+  /// are root-relative like every other location: the origin is the surface.
+  static const String register = '/register';
+  static const String verifyEmail = '/verify-email';
+  static const String forgotPassword = '/forgot-password';
+  static const String resetPassword = '/reset-password';
+  static const String account = '/account';
+
   static SurfaceRouter of(AppSurface surface) => switch (surface) {
         AppSurface.user => const UserSurfaceRouter(),
         AppSurface.partner => const PartnerSurfaceRouter(),
@@ -42,6 +50,16 @@ abstract class SurfaceRouter {
 
   /// What a signed-out visitor sees.
   Widget signedOutEntry();
+
+  /// Locations this surface serves to a visitor with no session — registration,
+  /// verification and password recovery. They are reachable by link, because the
+  /// emails that carry their tokens are opened by someone who is signed out.
+  Set<String> get publicLocations => const {};
+
+  /// The screen for a public location, or null when this surface does not serve
+  /// one there. [SurfaceGate] shows it only while signed out; a signed-in visitor
+  /// gets the shell instead, so these can never hide an authenticated session.
+  Widget? publicScreenAt(String location) => null;
 
   /// The authenticated shell opened at [location], which [resolve] produced.
   Widget shellAt(String location);

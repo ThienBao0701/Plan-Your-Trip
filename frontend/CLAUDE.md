@@ -57,7 +57,9 @@ dart format .                                     # format before reporting a ph
 
 User, Partner and Admin are three separate application surfaces built from this one codebase, each on its
 own origin (ports 64117 / 64118 / 64119 locally). See `docs/APP_SURFACES.md` before changing entrypoints,
-routing, sign-in or anything that decides which shell an origin shows.
+routing, sign-in or anything that decides which shell an origin shows, and `docs/PARTNER_ACCOUNT.md` for the
+account lifecycle (Partner registration, email verification, password reset/change, business profile) and
+the shared auth error mapping in `lib/core/auth/`.
 
 Local development uses port **8081**, not 8080: port 8080 is occupied by Windows AgentService on the
 development machine, so local Spring Boot is started with `SERVER_PORT=8081` by the launcher. This is

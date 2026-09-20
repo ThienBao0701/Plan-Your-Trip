@@ -956,24 +956,6 @@ abstract class AppLocalizations {
   /// **'Registration failed.'**
   String get authRegistrationFailed;
 
-  /// No description provided for @authUnsupportedForgotPassword.
-  ///
-  /// In en, this message translates to:
-  /// **'Password reset is not connected to the backend yet.'**
-  String get authUnsupportedForgotPassword;
-
-  /// No description provided for @authUnsupportedVerification.
-  ///
-  /// In en, this message translates to:
-  /// **'Email verification is not connected to the backend yet.'**
-  String get authUnsupportedVerification;
-
-  /// No description provided for @authUnsupportedResend.
-  ///
-  /// In en, this message translates to:
-  /// **'Resending a verification code is not connected yet.'**
-  String get authUnsupportedResend;
-
   /// No description provided for @forgotPasswordTitle.
   ///
   /// In en, this message translates to:
@@ -983,7 +965,7 @@ abstract class AppLocalizations {
   /// No description provided for @forgotPasswordSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Enter the email for your account. This presentation is ready for a future reset endpoint.'**
+  /// **'Enter the email for your account. If it exists, we send a password reset link.'**
   String get forgotPasswordSubtitle;
 
   /// No description provided for @forgotPasswordSendAction.
@@ -1001,7 +983,7 @@ abstract class AppLocalizations {
   /// No description provided for @forgotPasswordInfo.
   ///
   /// In en, this message translates to:
-  /// **'Reset links cannot be sent until the backend endpoint is connected.'**
+  /// **'For your security, the same answer is shown whether or not the address has an account.'**
   String get forgotPasswordInfo;
 
   /// No description provided for @emailVerificationTitle.
@@ -23457,6 +23439,612 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The result of the last action is unknown. This page has been reloaded — check the review\'s status before trying again.'**
   String get adminReviewModerationUncertain;
+
+  /// No description provided for @authErrorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get authErrorGeneric;
+
+  /// No description provided for @authErrorNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot reach the server. Check your connection and try again.'**
+  String get authErrorNetwork;
+
+  /// No description provided for @authErrorTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'The server did not respond in time. Please try again.'**
+  String get authErrorTimeout;
+
+  /// No description provided for @authErrorServer.
+  ///
+  /// In en, this message translates to:
+  /// **'The service is temporarily unavailable. Please try again later.'**
+  String get authErrorServer;
+
+  /// No description provided for @authErrorValidation.
+  ///
+  /// In en, this message translates to:
+  /// **'Please check the highlighted fields.'**
+  String get authErrorValidation;
+
+  /// No description provided for @authErrorEmailTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'That email address already has an account.'**
+  String get authErrorEmailTaken;
+
+  /// No description provided for @authErrorInvalidCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'Email or password is incorrect.'**
+  String get authErrorInvalidCredentials;
+
+  /// No description provided for @authErrorAccountDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'This account is disabled. Contact support to restore access.'**
+  String get authErrorAccountDisabled;
+
+  /// No description provided for @authErrorAccountUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This account cannot sign in. Contact support.'**
+  String get authErrorAccountUnavailable;
+
+  /// No description provided for @authErrorEmailNotVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify your email address before signing in.'**
+  String get authErrorEmailNotVerified;
+
+  /// No description provided for @authErrorTokenInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'This link is invalid or has already been used.'**
+  String get authErrorTokenInvalid;
+
+  /// No description provided for @authErrorTokenExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'This link has expired. Request a new one.'**
+  String get authErrorTokenExpired;
+
+  /// No description provided for @authErrorCurrentPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Your current password is incorrect.'**
+  String get authErrorCurrentPassword;
+
+  /// No description provided for @authErrorPasswordUnchanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a password different from your current one.'**
+  String get authErrorPasswordUnchanged;
+
+  /// No description provided for @authErrorEmailDelivery.
+  ///
+  /// In en, this message translates to:
+  /// **'Email delivery is unavailable right now. Please try again later.'**
+  String get authErrorEmailDelivery;
+
+  /// No description provided for @authErrorSessionExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Your session has expired. Sign in again.'**
+  String get authErrorSessionExpired;
+
+  /// No description provided for @authValidationPasswordMax.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at most 72 bytes.'**
+  String get authValidationPasswordMax;
+
+  /// No description provided for @authValidationTermsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept the Partner terms to continue.'**
+  String get authValidationTermsRequired;
+
+  /// No description provided for @authValidationTokenRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste the token from your link.'**
+  String get authValidationTokenRequired;
+
+  /// No description provided for @authPartnerBecomeQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'New to Plan Your Trip?'**
+  String get authPartnerBecomeQuestion;
+
+  /// No description provided for @authPartnerBecomeAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Become a Partner'**
+  String get authPartnerBecomeAction;
+
+  /// No description provided for @partnerRegisterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your Partner account'**
+  String get partnerRegisterTitle;
+
+  /// No description provided for @partnerRegisterSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'List your property and manage bookings, rates and payouts in one workspace.'**
+  String get partnerRegisterSubtitle;
+
+  /// No description provided for @partnerRegisterAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Partner account'**
+  String get partnerRegisterAction;
+
+  /// No description provided for @partnerRegisterTerms.
+  ///
+  /// In en, this message translates to:
+  /// **'I agree to the Partner terms'**
+  String get partnerRegisterTerms;
+
+  /// No description provided for @partnerRegisterTermsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The terms version you accept is recorded with your account.'**
+  String get partnerRegisterTermsHint;
+
+  /// No description provided for @partnerRegisterHaveAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have a Partner account?'**
+  String get partnerRegisterHaveAccount;
+
+  /// No description provided for @partnerRegisterSignInAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get partnerRegisterSignInAction;
+
+  /// No description provided for @verifyEmailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify your email'**
+  String get verifyEmailTitle;
+
+  /// No description provided for @verifyEmailSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Partner account for {email} is created. Verify the address to sign in.'**
+  String verifyEmailSubtitle(String email);
+
+  /// No description provided for @verifyEmailNoDeliveryNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'In local development no email is delivered. The backend logs a verification link marked [DEV ONLY — NO EMAIL SENT]; copy the token after #token= and paste it below.'**
+  String get verifyEmailNoDeliveryNotice;
+
+  /// No description provided for @verifyEmailTokenLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification token'**
+  String get verifyEmailTokenLabel;
+
+  /// No description provided for @verifyEmailAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify email'**
+  String get verifyEmailAction;
+
+  /// No description provided for @verifyEmailSuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Email verified successfully'**
+  String get verifyEmailSuccessTitle;
+
+  /// No description provided for @verifyEmailSuccessBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your address is verified. You can sign in to the Partner workspace now.'**
+  String get verifyEmailSuccessBody;
+
+  /// No description provided for @verifyEmailAlreadyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Already verified'**
+  String get verifyEmailAlreadyTitle;
+
+  /// No description provided for @verifyEmailAlreadyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This email address is already verified. You can sign in.'**
+  String get verifyEmailAlreadyBody;
+
+  /// No description provided for @verifyEmailContinueAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to Partner sign in'**
+  String get verifyEmailContinueAction;
+
+  /// No description provided for @verifyEmailResendAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend verification'**
+  String get verifyEmailResendAction;
+
+  /// No description provided for @verifyEmailResendCooldown.
+  ///
+  /// In en, this message translates to:
+  /// **'You can request another verification link in {seconds} seconds.'**
+  String verifyEmailResendCooldown(int seconds);
+
+  /// No description provided for @verifyEmailResendAck.
+  ///
+  /// In en, this message translates to:
+  /// **'If that address is waiting for verification, a new link is on its way.'**
+  String get verifyEmailResendAck;
+
+  /// No description provided for @verifyEmailBackAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to Partner sign in'**
+  String get verifyEmailBackAction;
+
+  /// No description provided for @forgotPasswordAck.
+  ///
+  /// In en, this message translates to:
+  /// **'If that address has an account, a password reset link is on its way.'**
+  String get forgotPasswordAck;
+
+  /// No description provided for @forgotPasswordNoDeliveryNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'In local development no email is delivered. The backend logs the reset link marked [DEV ONLY — NO EMAIL SENT].'**
+  String get forgotPasswordNoDeliveryNotice;
+
+  /// No description provided for @resetPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a new password'**
+  String get resetPasswordTitle;
+
+  /// No description provided for @resetPasswordSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste the token from your reset link and choose a new password.'**
+  String get resetPasswordSubtitle;
+
+  /// No description provided for @resetPasswordTokenLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset token'**
+  String get resetPasswordTokenLabel;
+
+  /// No description provided for @resetPasswordNewLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'New password'**
+  String get resetPasswordNewLabel;
+
+  /// No description provided for @resetPasswordAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset password'**
+  String get resetPasswordAction;
+
+  /// No description provided for @resetPasswordSuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Password reset'**
+  String get resetPasswordSuccessTitle;
+
+  /// No description provided for @resetPasswordSuccessBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your password has been changed and every other session was signed out.'**
+  String get resetPasswordSuccessBody;
+
+  /// No description provided for @resetPasswordBackAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to sign in'**
+  String get resetPasswordBackAction;
+
+  /// No description provided for @changePasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Change password'**
+  String get changePasswordTitle;
+
+  /// No description provided for @changePasswordSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Changing your password signs out every other device.'**
+  String get changePasswordSubtitle;
+
+  /// No description provided for @changePasswordCurrentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Current password'**
+  String get changePasswordCurrentLabel;
+
+  /// No description provided for @changePasswordAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Update password'**
+  String get changePasswordAction;
+
+  /// No description provided for @changePasswordSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Password changed successfully.'**
+  String get changePasswordSuccess;
+
+  /// No description provided for @accountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get accountTitle;
+
+  /// No description provided for @accountDetailsHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Account details'**
+  String get accountDetailsHeading;
+
+  /// No description provided for @accountRoleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Role'**
+  String get accountRoleLabel;
+
+  /// No description provided for @accountRolePartner.
+  ///
+  /// In en, this message translates to:
+  /// **'Partner'**
+  String get accountRolePartner;
+
+  /// No description provided for @accountRoleAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'Administrator'**
+  String get accountRoleAdmin;
+
+  /// No description provided for @accountRoleUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Traveller'**
+  String get accountRoleUser;
+
+  /// No description provided for @accountSecurityHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Security'**
+  String get accountSecurityHeading;
+
+  /// No description provided for @accountSecurityBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Update the password you use to sign in.'**
+  String get accountSecurityBody;
+
+  /// No description provided for @accountBackToWorkspace.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to workspace'**
+  String get accountBackToWorkspace;
+
+  /// No description provided for @accountBackToConsole.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to console'**
+  String get accountBackToConsole;
+
+  /// No description provided for @accountOpenAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get accountOpenAction;
+
+  /// No description provided for @partnerBusinessHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Business profile'**
+  String get partnerBusinessHeading;
+
+  /// No description provided for @partnerBusinessNoneTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No business profile yet'**
+  String get partnerBusinessNoneTitle;
+
+  /// No description provided for @partnerBusinessNoneBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your business information and submit it for review to open the Partner workspace.'**
+  String get partnerBusinessNoneBody;
+
+  /// No description provided for @partnerBusinessAddAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add business information'**
+  String get partnerBusinessAddAction;
+
+  /// No description provided for @partnerBusinessEditAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit business information'**
+  String get partnerBusinessEditAction;
+
+  /// No description provided for @partnerBusinessSaveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get partnerBusinessSaveAction;
+
+  /// No description provided for @partnerBusinessSubmitAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Save and submit for review'**
+  String get partnerBusinessSubmitAction;
+
+  /// No description provided for @partnerBusinessSavedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Business information saved.'**
+  String get partnerBusinessSavedMessage;
+
+  /// No description provided for @partnerBusinessSubmittedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitted for review.'**
+  String get partnerBusinessSubmittedMessage;
+
+  /// No description provided for @partnerBusinessStatusDraftBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete your business information and submit it for review.'**
+  String get partnerBusinessStatusDraftBody;
+
+  /// No description provided for @partnerBusinessStatusSubmittedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Partner application is awaiting review by an administrator.'**
+  String get partnerBusinessStatusSubmittedBody;
+
+  /// No description provided for @partnerBusinessStatusApprovedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Partner account is approved. The workspace is open.'**
+  String get partnerBusinessStatusApprovedBody;
+
+  /// No description provided for @partnerBusinessStatusRejectedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your application was rejected. Update your business information and submit it again.'**
+  String get partnerBusinessStatusRejectedBody;
+
+  /// No description provided for @partnerBusinessStatusSuspendedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Partner access is currently suspended. Contact support.'**
+  String get partnerBusinessStatusSuspendedBody;
+
+  /// No description provided for @partnerBusinessStatusUnknownBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This profile has a status this app does not recognise.'**
+  String get partnerBusinessStatusUnknownBody;
+
+  /// No description provided for @partnerBusinessRejectReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason: {reason}'**
+  String partnerBusinessRejectReason(String reason);
+
+  /// No description provided for @partnerBusinessFieldName.
+  ///
+  /// In en, this message translates to:
+  /// **'Business name'**
+  String get partnerBusinessFieldName;
+
+  /// No description provided for @partnerBusinessFieldType.
+  ///
+  /// In en, this message translates to:
+  /// **'Business type'**
+  String get partnerBusinessFieldType;
+
+  /// No description provided for @partnerBusinessFieldRepresentative.
+  ///
+  /// In en, this message translates to:
+  /// **'Representative name'**
+  String get partnerBusinessFieldRepresentative;
+
+  /// No description provided for @partnerBusinessFieldPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Business phone'**
+  String get partnerBusinessFieldPhone;
+
+  /// No description provided for @partnerBusinessFieldEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Business email'**
+  String get partnerBusinessFieldEmail;
+
+  /// No description provided for @partnerBusinessFieldAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Business address'**
+  String get partnerBusinessFieldAddress;
+
+  /// No description provided for @partnerBusinessFieldTaxCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Tax code'**
+  String get partnerBusinessFieldTaxCode;
+
+  /// No description provided for @partnerBusinessFieldWebsite.
+  ///
+  /// In en, this message translates to:
+  /// **'Website'**
+  String get partnerBusinessFieldWebsite;
+
+  /// No description provided for @partnerBusinessOptionalSuffix.
+  ///
+  /// In en, this message translates to:
+  /// **'{label} (optional)'**
+  String partnerBusinessOptionalSuffix(String label);
+
+  /// No description provided for @partnerBusinessTypeHotel.
+  ///
+  /// In en, this message translates to:
+  /// **'Hotel'**
+  String get partnerBusinessTypeHotel;
+
+  /// No description provided for @partnerBusinessTypeRestaurant.
+  ///
+  /// In en, this message translates to:
+  /// **'Restaurant'**
+  String get partnerBusinessTypeRestaurant;
+
+  /// No description provided for @partnerBusinessTypeCafe.
+  ///
+  /// In en, this message translates to:
+  /// **'Cafe'**
+  String get partnerBusinessTypeCafe;
+
+  /// No description provided for @partnerBusinessTypeTourOperator.
+  ///
+  /// In en, this message translates to:
+  /// **'Tour operator'**
+  String get partnerBusinessTypeTourOperator;
+
+  /// No description provided for @partnerBusinessTypeTransport.
+  ///
+  /// In en, this message translates to:
+  /// **'Transport'**
+  String get partnerBusinessTypeTransport;
+
+  /// No description provided for @partnerBusinessTypeOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get partnerBusinessTypeOther;
+
+  /// No description provided for @partnerBusinessTypeUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unrecognised type'**
+  String get partnerBusinessTypeUnknown;
+
+  /// No description provided for @partnerBusinessValidationRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'This field is required.'**
+  String get partnerBusinessValidationRequired;
 }
 
 class _AppLocalizationsDelegate

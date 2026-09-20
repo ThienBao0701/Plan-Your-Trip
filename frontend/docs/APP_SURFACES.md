@@ -126,7 +126,12 @@ frame — exactly one of:
 2. **A role the surface does not admit, including an unrecognised role (403)** → *You don't have access to this
    application*, with a single **Sign out** action. No shell is built, so nothing protected is rendered and
    then hidden, and no partner or admin endpoint is called.
-3. **An admitted session** → the surface's shell at the requested location.
+3. **An admitted session** → the surface's shell at the requested location, or the account area at
+   `/account`.
+
+Before (1), a location in the surface's `publicLocations` shows its account screen instead of sign-in —
+registration and the two link-driven flows. Nothing there is authenticated, and none of it can reveal a
+session.
 
 Sign-in is one shared `LoginScreen`; the running surface sets its copy and actions. A successful sign-in never
 chooses a destination by role — it returns to the surface's root, whose gate admits or refuses the account.
@@ -155,9 +160,15 @@ on (`/bookings`, not `/#/bookings`).
 
 | Surface | Locations |
 |---|---|
-| User | `/` Explore · `/trips` · `/planner` · `/profile` |
-| Partner | `/` or `/dashboard` · `/hotels` · `/rooms` · `/calendar` · `/pricing` · `/bookings` · `/messages` · `/promotions` · `/reviews` · `/finance` · `/analytics` · `/notifications` · `/settings` |
-| Admin | `/` or `/dashboard` · `/bookings` · `/partners` · `/catalog` · `/media` · `/reference-data` · `/payments` · `/invoices` · `/reviews` · `/activity-log` |
+| User | `/` Explore · `/trips` · `/planner` · `/profile` · `/forgot-password` · `/reset-password` |
+| Partner | `/` or `/dashboard` · `/hotels` · `/rooms` · `/calendar` · `/pricing` · `/bookings` · `/messages` · `/promotions` · `/reviews` · `/finance` · `/analytics` · `/notifications` · `/settings` · `/account` · `/register` · `/verify-email` · `/forgot-password` · `/reset-password` |
+| Admin | `/` or `/dashboard` · `/bookings` · `/partners` · `/catalog` · `/media` · `/reference-data` · `/payments` · `/invoices` · `/reviews` · `/activity-log` · `/account` · `/forgot-password` · `/reset-password` |
+
+**Account locations (Phase B).** `/register`, `/verify-email`, `/forgot-password` and `/reset-password` are
+served to a visitor with **no session** — the emails that carry their one-time tokens are opened signed out.
+`/account` needs a session that the surface admits. Only the Partner surface offers `/register`: Admin
+accounts are provisioned, and traveller sign-up stays inside the traveller sign-in flow. See
+`docs/PARTNER_ACCOUNT.md`.
 
 - Opening or refreshing a location opens that destination (after sign-in, if needed).
 - A path the surface does not serve — including a role-prefixed one such as `/partner/bookings` — opens the

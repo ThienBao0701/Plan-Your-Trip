@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import '../../app/app_surface.dart';
 import '../../app/surface_gate.dart';
 import '../../app/surface_scope.dart';
+import '../../app/routing/surface_router.dart';
 import '../../core/app_state.dart';
+import '../../core/auth/auth_error.dart';
+import '../../core/auth/auth_messages.dart';
 import '../../core/mock/mock_data.dart';
 import '../../design/app_breakpoints.dart';
 import '../../design/app_colors.dart';
@@ -12,9 +15,9 @@ import '../../design/app_radii.dart';
 import '../../design/app_spacing.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/glass_widgets.dart';
-import 'email_verification_screen.dart';
 import 'forgot_password_screen.dart';
 import 'register_screen.dart';
+import 'verify_email_screen.dart';
 
 /// Sign-in, shared by all three application surfaces.
 ///
@@ -43,6 +46,10 @@ class _LoginScreenState extends State<LoginScreen> {
   final pass = TextEditingController();
   bool loading = false;
   bool showPassword = false;
+
+  /// Set when sign-in was refused with EMAIL_NOT_VERIFIED, so the screen can
+  /// offer the one action that helps: verifying that address.
+  String? pendingVerificationEmail;
 
   @override
   void dispose() {
@@ -76,9 +83,48 @@ class _LoginScreenState extends State<LoginScreen> {
         onTogglePassword: _togglePasswordVisibility,
         onLogin: () => _login(demo: false),
         onDemo: surface.offersDemoMode ? () => _login(demo: true) : null,
+        onForgotPassword: _openForgotPassword,
+        onVerifyEmail: () => _openVerification(email.text.trim()),
+        // Partner is the only surface that offers self-registration of a staff
+        // account, and it creates a PARTNER account server-side.
+        onBecomePartner: surface == AppSurface.partner
+            ? () => SurfaceNavigation.open(context, SurfaceRouter.register)
+            : null,
+        pendingVerificationEmail: pendingVerificationEmail,
         validateEmail: _validateEmail,
         validatePassword: _validatePassword,
       );
+
+  /// Opens password recovery at the surface's own `/forgot-password` when it has
+  /// one, and as a plain push otherwise (the traveller settings entry point).
+  void _openForgotPassword() {
+    final surface = SurfaceScope.maybeOf(context);
+    final router =
+        surface == null ? null : SurfaceRouter.of(surface);
+    if (router != null &&
+        router.publicLocations.contains(SurfaceRouter.forgotPassword)) {
+      SurfaceNavigation.open(context, SurfaceRouter.forgotPassword);
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (_) => ForgotPasswordScreen(initialEmail: email.text.trim()),
+      ),
+    );
+  }
+
+  void _openVerification(String address) {
+    Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        settings: const RouteSettings(name: SurfaceRouter.verifyEmail),
+        builder: (_) => VerifyEmailScreen(
+          email: address.isEmpty ? null : address,
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -140,13 +186,17 @@ class _LoginScreenState extends State<LoginScreen> {
     final app = AppScope.of(context);
     if (!demo && !(_formKey.currentState?.validate() ?? false)) return;
 
-    setState(() => loading = true);
+    setState(() {
+      loading = true;
+      pendingVerificationEmail = null;
+    });
     final nav = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
     final home = SurfaceNavigation.home(context);
+    final address = email.text.trim();
     final result = demo
         ? await app.login(MockData.demoEmail, MockData.demoPassword)
-        : await app.login(email.text.trim(), pass.text);
+        : await app.login(address, pass.text);
     if (!mounted) return;
     setState(() => loading = false);
 
@@ -156,11 +206,18 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text(result['message'] as String? ?? l10n.authLoginFailed),
-      ),
-    );
+    // Phase A answers a refused sign-in with a stable code; it is mapped to
+    // localized copy centrally, and only falls back to the server's own text.
+    final failure = result['failure'];
+    final message = failure is AuthFailure
+        ? authSignInFailureMessage(l10n, failure)
+        : result['message'] as String? ?? l10n.authLoginFailed;
+    if (failure is AuthFailure &&
+        failure.code == AuthErrorCode.emailNotVerified &&
+        !demo) {
+      setState(() => pendingVerificationEmail = address);
+    }
+    messenger.showSnackBar(SnackBar(content: Text(message)));
   }
 
   String? _validateEmail(String? value) {
@@ -229,6 +286,17 @@ class _LoginPanel extends StatelessWidget {
 
   /// Null on a surface without Demo Mode, which removes the demo action.
   final VoidCallback? onDemo;
+
+  final VoidCallback onForgotPassword;
+  final VoidCallback onVerifyEmail;
+
+  /// Null on every surface but Partner, which is the only one whose sign-in
+  /// offers creating a staff account.
+  final VoidCallback? onBecomePartner;
+
+  /// Set after a sign-in refused with EMAIL_NOT_VERIFIED: the address to verify.
+  final String? pendingVerificationEmail;
+
   final FormFieldValidator<String> validateEmail;
   final FormFieldValidator<String> validatePassword;
 
@@ -244,6 +312,10 @@ class _LoginPanel extends StatelessWidget {
     required this.onTogglePassword,
     required this.onLogin,
     required this.onDemo,
+    required this.onForgotPassword,
+    required this.onVerifyEmail,
+    required this.onBecomePartner,
+    required this.pendingVerificationEmail,
     required this.validateEmail,
     required this.validatePassword,
   });
@@ -309,16 +381,8 @@ class _LoginPanel extends StatelessWidget {
             Align(
               alignment: Alignment.centerRight,
               child: TextButton(
-                onPressed: loading
-                    ? null
-                    : () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => ForgotPasswordScreen(
-                              initialEmail: email.text.trim(),
-                            ),
-                          ),
-                        ),
+                key: const Key('login-forgot-password'),
+                onPressed: loading ? null : onForgotPassword,
                 child: Text(l10n.authForgotPasswordAction),
               ),
             ),
@@ -352,6 +416,15 @@ class _LoginPanel extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
+            if (pendingVerificationEmail != null) ...[
+              const SizedBox(height: AppSpacing.sm),
+              OceanSecondaryButton(
+                key: const Key('login-verify-email'),
+                label: l10n.authVerifyEmailAction,
+                icon: Icons.mark_email_read_outlined,
+                onPressed: loading ? null : onVerifyEmail,
+              ),
+            ],
             if (showRegistration) ...[
               const SizedBox(height: AppSpacing.md),
               Row(
@@ -375,20 +448,28 @@ class _LoginPanel extends StatelessWidget {
                 ],
               ),
               TextButton.icon(
-                onPressed: loading
-                    ? null
-                    : () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => EmailVerificationScreen(
-                              email: email.text.trim().isEmpty
-                                  ? l10n.authEmailLabel
-                                  : email.text.trim(),
-                            ),
-                          ),
-                        ),
+                key: const Key('login-verify-email-entry'),
+                onPressed: loading ? null : onVerifyEmail,
                 icon: const Icon(Icons.mark_email_read_outlined),
                 label: Text(l10n.authVerifyEmailAction),
+              ),
+            ],
+            if (onBecomePartner != null) ...[
+              const SizedBox(height: AppSpacing.md),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      l10n.authPartnerBecomeQuestion,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ),
+                  TextButton(
+                    key: const Key('login-become-partner'),
+                    onPressed: loading ? null : onBecomePartner,
+                    child: Text(l10n.authPartnerBecomeAction),
+                  ),
+                ],
               ),
             ],
             const SizedBox(height: AppSpacing.xs),

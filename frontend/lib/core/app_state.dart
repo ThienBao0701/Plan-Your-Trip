@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'app_role.dart';
+import 'auth/auth_error.dart';
+import 'auth/auth_models.dart';
 import 'mock/app_models.dart';
 import 'mock/mock_data.dart';
 import 'network/api_client.dart';
@@ -731,6 +733,39 @@ class AppState extends ChangeNotifier {
 
   Future<Map<String, dynamic>> register(String name, String e, String p) =>
       api.register(name, e, p);
+
+  /// Changes the signed-in account's own password (`PUT /api/me/password`).
+  ///
+  /// The backend ends every other session of the account and returns a fresh
+  /// token for this one, so the new token replaces the stored one here — without
+  /// it the caller would sign itself out. Identity comes from the session; no id
+  /// is ever sent. Nothing about the password is stored or logged.
+  Future<AuthResult<AuthSessionRecord>> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    final result = await api.changePassword(
+      currentPassword: currentPassword,
+      newPassword: newPassword,
+    );
+    final session = result.data;
+    if (!result.success || session == null) return result;
+
+    api.token = session.token;
+    email = session.email ?? email;
+    if (session.role != AppRole.unknown) role = session.role;
+    final address = email;
+    if (address != null) {
+      await storage.save(
+        email: address,
+        token: session.token,
+        demo: demoMode,
+        role: role.wireValue,
+      );
+    }
+    notifyListeners();
+    return result;
+  }
 
   Future<void> logout() async {
     await storage.clear();

@@ -238,14 +238,11 @@
   "authValidationPasswordMismatch": "Mật khẩu không khớp.",
   "authLoginFailed": "Đăng nhập thất bại.",
   "authRegistrationFailed": "Đăng ký thất bại.",
-  "authUnsupportedForgotPassword": "Đặt lại mật khẩu chưa được kết nối với backend.",
-  "authUnsupportedVerification": "Xác minh email chưa được kết nối với backend.",
-  "authUnsupportedResend": "Gửi lại mã xác minh chưa được kết nối.",
   "forgotPasswordTitle": "Quên mật khẩu?",
-  "forgotPasswordSubtitle": "Nhập email tài khoản của bạn. Màn hình này đã sẵn sàng cho endpoint đặt lại mật khẩu sau này.",
+  "forgotPasswordSubtitle": "Nhập email của tài khoản. Nếu tài khoản tồn tại, liên kết đặt lại mật khẩu sẽ được gửi.",
   "forgotPasswordSendAction": "Gửi liên kết đặt lại",
   "forgotPasswordReturnAction": "Quay lại đăng nhập",
-  "forgotPasswordInfo": "Chưa thể gửi liên kết đặt lại cho đến khi backend được kết nối.",
+  "forgotPasswordInfo": "Vì lý do bảo mật, phản hồi là như nhau dù địa chỉ có tài khoản hay không.",
   "emailVerificationTitle": "Xác minh email",
   "emailVerificationSubtitle": "Nhập mã gồm 6 chữ số cho {email}.",
   "@emailVerificationSubtitle": {
@@ -6806,5 +6803,134 @@
   "surfaceSignOut": "Đăng xuất",
   "surfaceConfigErrorTitle": "Ứng dụng chưa được cấu hình",
   "surfaceConfigErrorBody": "Không xác định được ứng dụng cần mở. Hãy khởi động bằng một trong các entrypoint đã được ghi trong tài liệu.",
-  "adminReviewModerationUncertain": "Không rõ kết quả của thao tác vừa rồi. Trang đã được tải lại — hãy kiểm tra trạng thái đánh giá trước khi thử lại."
+  "adminReviewModerationUncertain": "Không rõ kết quả của thao tác vừa rồi. Trang đã được tải lại — hãy kiểm tra trạng thái đánh giá trước khi thử lại.",
+  "authErrorGeneric": "Đã xảy ra lỗi. Vui lòng thử lại.",
+  "authErrorNetwork": "Không kết nối được máy chủ. Kiểm tra kết nối rồi thử lại.",
+  "authErrorTimeout": "Máy chủ phản hồi quá lâu. Vui lòng thử lại.",
+  "authErrorServer": "Dịch vụ tạm thời không khả dụng. Vui lòng thử lại sau.",
+  "authErrorValidation": "Vui lòng kiểm tra các trường được đánh dấu.",
+  "authErrorEmailTaken": "Email này đã có tài khoản.",
+  "authErrorInvalidCredentials": "Email hoặc mật khẩu không đúng.",
+  "authErrorAccountDisabled": "Tài khoản này đã bị vô hiệu hoá. Liên hệ hỗ trợ để khôi phục.",
+  "authErrorAccountUnavailable": "Tài khoản này không thể đăng nhập. Liên hệ hỗ trợ.",
+  "authErrorEmailNotVerified": "Hãy xác minh email trước khi đăng nhập.",
+  "authErrorTokenInvalid": "Liên kết không hợp lệ hoặc đã được sử dụng.",
+  "authErrorTokenExpired": "Liên kết đã hết hạn. Hãy yêu cầu liên kết mới.",
+  "authErrorCurrentPassword": "Mật khẩu hiện tại không đúng.",
+  "authErrorPasswordUnchanged": "Hãy chọn mật khẩu khác với mật khẩu hiện tại.",
+  "authErrorEmailDelivery": "Hiện chưa gửi được email. Vui lòng thử lại sau.",
+  "authErrorSessionExpired": "Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại.",
+  "authValidationPasswordMax": "Mật khẩu tối đa 72 byte.",
+  "authValidationTermsRequired": "Hãy đồng ý điều khoản Đối tác để tiếp tục.",
+  "authValidationTokenRequired": "Hãy dán mã từ liên kết của bạn.",
+  "authPartnerBecomeQuestion": "Bạn mới biết Plan Your Trip?",
+  "authPartnerBecomeAction": "Trở thành Đối tác",
+  "partnerRegisterTitle": "Tạo tài khoản Đối tác",
+  "partnerRegisterSubtitle": "Đăng chỗ nghỉ và quản lý đặt phòng, giá, thanh toán trong một nơi làm việc.",
+  "partnerRegisterAction": "Tạo tài khoản Đối tác",
+  "partnerRegisterTerms": "Tôi đồng ý với điều khoản dành cho Đối tác",
+  "partnerRegisterTermsHint": "Phiên bản điều khoản bạn đồng ý sẽ được lưu cùng tài khoản.",
+  "partnerRegisterHaveAccount": "Đã có tài khoản Đối tác?",
+  "partnerRegisterSignInAction": "Đăng nhập",
+  "verifyEmailTitle": "Xác minh email",
+  "verifyEmailSubtitle": "Tài khoản Đối tác cho {email} đã được tạo. Hãy xác minh địa chỉ này để đăng nhập.",
+  "@verifyEmailSubtitle": {
+      "placeholders": {
+          "email": {
+              "type": "String"
+          }
+      }
+  },
+  "verifyEmailNoDeliveryNotice": "Ở môi trường phát triển nội bộ, không có email nào được gửi. Backend ghi liên kết xác minh kèm nhãn [DEV ONLY — NO EMAIL SENT]; hãy sao chép phần sau #token= và dán vào ô bên dưới.",
+  "verifyEmailTokenLabel": "Mã xác minh",
+  "verifyEmailAction": "Xác minh email",
+  "verifyEmailSuccessTitle": "Đã xác minh email",
+  "verifyEmailSuccessBody": "Địa chỉ của bạn đã được xác minh. Bạn có thể đăng nhập vào nơi làm việc Đối tác.",
+  "verifyEmailAlreadyTitle": "Đã xác minh trước đó",
+  "verifyEmailAlreadyBody": "Email này đã được xác minh. Bạn có thể đăng nhập.",
+  "verifyEmailContinueAction": "Tiếp tục đến đăng nhập Đối tác",
+  "verifyEmailResendAction": "Gửi lại xác minh",
+  "verifyEmailResendCooldown": "Bạn có thể yêu cầu liên kết xác minh khác sau {seconds} giây.",
+  "@verifyEmailResendCooldown": {
+      "placeholders": {
+          "seconds": {
+              "type": "int"
+          }
+      }
+  },
+  "verifyEmailResendAck": "Nếu địa chỉ đó đang chờ xác minh, liên kết mới sẽ được gửi.",
+  "verifyEmailBackAction": "Quay lại đăng nhập Đối tác",
+  "forgotPasswordAck": "Nếu địa chỉ đó có tài khoản, liên kết đặt lại mật khẩu sẽ được gửi.",
+  "forgotPasswordNoDeliveryNotice": "Ở môi trường phát triển nội bộ, không có email nào được gửi. Backend ghi liên kết đặt lại kèm nhãn [DEV ONLY — NO EMAIL SENT].",
+  "resetPasswordTitle": "Đặt mật khẩu mới",
+  "resetPasswordSubtitle": "Dán mã từ liên kết đặt lại và chọn mật khẩu mới.",
+  "resetPasswordTokenLabel": "Mã đặt lại",
+  "resetPasswordNewLabel": "Mật khẩu mới",
+  "resetPasswordAction": "Đặt lại mật khẩu",
+  "resetPasswordSuccessTitle": "Đã đặt lại mật khẩu",
+  "resetPasswordSuccessBody": "Mật khẩu đã được đổi và mọi phiên đăng nhập khác đã bị đăng xuất.",
+  "resetPasswordBackAction": "Quay lại đăng nhập",
+  "changePasswordTitle": "Đổi mật khẩu",
+  "changePasswordSubtitle": "Đổi mật khẩu sẽ đăng xuất mọi thiết bị khác.",
+  "changePasswordCurrentLabel": "Mật khẩu hiện tại",
+  "changePasswordAction": "Cập nhật mật khẩu",
+  "changePasswordSuccess": "Đã đổi mật khẩu thành công.",
+  "accountTitle": "Tài khoản",
+  "accountDetailsHeading": "Thông tin tài khoản",
+  "accountRoleLabel": "Vai trò",
+  "accountRolePartner": "Đối tác",
+  "accountRoleAdmin": "Quản trị viên",
+  "accountRoleUser": "Khách du lịch",
+  "accountSecurityHeading": "Bảo mật",
+  "accountSecurityBody": "Cập nhật mật khẩu bạn dùng để đăng nhập.",
+  "accountBackToWorkspace": "Quay lại nơi làm việc",
+  "accountBackToConsole": "Quay lại bảng điều khiển",
+  "accountOpenAction": "Tài khoản",
+  "partnerBusinessHeading": "Hồ sơ doanh nghiệp",
+  "partnerBusinessNoneTitle": "Chưa có hồ sơ doanh nghiệp",
+  "partnerBusinessNoneBody": "Hãy nhập thông tin doanh nghiệp và gửi duyệt để mở nơi làm việc Đối tác.",
+  "partnerBusinessAddAction": "Thêm thông tin doanh nghiệp",
+  "partnerBusinessEditAction": "Sửa thông tin doanh nghiệp",
+  "partnerBusinessSaveAction": "Lưu",
+  "partnerBusinessSubmitAction": "Lưu và gửi duyệt",
+  "partnerBusinessSavedMessage": "Đã lưu thông tin doanh nghiệp.",
+  "partnerBusinessSubmittedMessage": "Đã gửi duyệt.",
+  "partnerBusinessStatusDraftBody": "Hoàn tất thông tin doanh nghiệp và gửi duyệt.",
+  "partnerBusinessStatusSubmittedBody": "Hồ sơ Đối tác của bạn đang chờ quản trị viên duyệt.",
+  "partnerBusinessStatusApprovedBody": "Tài khoản Đối tác đã được duyệt. Nơi làm việc đã mở.",
+  "partnerBusinessStatusRejectedBody": "Hồ sơ bị từ chối. Hãy cập nhật thông tin doanh nghiệp và gửi lại.",
+  "partnerBusinessStatusSuspendedBody": "Quyền Đối tác của bạn đang bị tạm ngưng. Liên hệ hỗ trợ.",
+  "partnerBusinessStatusUnknownBody": "Hồ sơ có trạng thái mà ứng dụng chưa nhận diện được.",
+  "partnerBusinessRejectReason": "Lý do: {reason}",
+  "@partnerBusinessRejectReason": {
+      "placeholders": {
+          "reason": {
+              "type": "String"
+          }
+      }
+  },
+  "partnerBusinessFieldName": "Tên doanh nghiệp",
+  "partnerBusinessFieldType": "Loại hình",
+  "partnerBusinessFieldRepresentative": "Người đại diện",
+  "partnerBusinessFieldPhone": "Điện thoại doanh nghiệp",
+  "partnerBusinessFieldEmail": "Email doanh nghiệp",
+  "partnerBusinessFieldAddress": "Địa chỉ doanh nghiệp",
+  "partnerBusinessFieldTaxCode": "Mã số thuế",
+  "partnerBusinessFieldWebsite": "Website",
+  "partnerBusinessOptionalSuffix": "{label} (không bắt buộc)",
+  "@partnerBusinessOptionalSuffix": {
+      "placeholders": {
+          "label": {
+              "type": "String"
+          }
+      }
+  },
+  "partnerBusinessTypeHotel": "Khách sạn",
+  "partnerBusinessTypeRestaurant": "Nhà hàng",
+  "partnerBusinessTypeCafe": "Quán cà phê",
+  "partnerBusinessTypeTourOperator": "Đơn vị lữ hành",
+  "partnerBusinessTypeTransport": "Vận chuyển",
+  "partnerBusinessTypeOther": "Khác",
+  "partnerBusinessTypeUnknown": "Loại hình chưa nhận diện",
+  "partnerBusinessValidationRequired": "Trường này là bắt buộc."
 }

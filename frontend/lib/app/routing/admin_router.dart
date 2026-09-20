@@ -2,7 +2,11 @@ import 'package:flutter/widgets.dart';
 
 import '../../features/admin/admin_navigation.dart';
 import '../../features/admin/admin_routes.dart';
+import '../../features/account/account_screen.dart';
+import '../../features/auth/forgot_password_screen.dart';
 import '../../features/auth/login_screen.dart';
+import '../../features/auth/reset_password_screen.dart';
+import '../surface_gate.dart';
 import '../../l10n/app_localizations.dart';
 import '../app_surface.dart';
 import 'surface_router.dart';
@@ -41,9 +45,30 @@ class AdminSurfaceRouter extends SurfaceRouter {
   }
 
   @override
-  String resolve(String? location) => routeOf(location) == null
-      ? SurfaceRouter.root
-      : SurfaceRouter.normalize(location);
+  /// Phase B — the Admin console has **no public registration**: only the two
+  /// link-driven password flows are reachable without a session. Admin accounts
+  /// are provisioned, never self-created.
+  @override
+  Set<String> get publicLocations => const {
+        SurfaceRouter.forgotPassword,
+        SurfaceRouter.resetPassword,
+      };
+
+  @override
+  Widget? publicScreenAt(String location) => switch (location) {
+        SurfaceRouter.forgotPassword => const ForgotPasswordScreen(),
+        SurfaceRouter.resetPassword => const ResetPasswordScreen(),
+        _ => null,
+      };
+
+  @override
+  String resolve(String? location) {
+    final path = SurfaceRouter.normalize(location);
+    if (publicLocations.contains(path) || path == SurfaceRouter.account) {
+      return path;
+    }
+    return routeOf(path) == null ? SurfaceRouter.root : path;
+  }
 
   @override
   String title(AppLocalizations l10n) => l10n.surfaceTitleAdmin;
@@ -52,9 +77,20 @@ class AdminSurfaceRouter extends SurfaceRouter {
   Widget signedOutEntry() => const LoginScreen(embeddedInSurfaceGate: true);
 
   @override
-  Widget shellAt(String location) => AdminRouteGuard(
-        initialRoute: routeOf(location) ?? AdminRoutes.dashboard,
-        onRouteChanged: (route) =>
-            SurfaceRouter.reportLocation(locationOf(route)),
+  Widget shellAt(String location) {
+    if (location == SurfaceRouter.account) {
+      return Builder(
+        builder: (context) => AccountScreen(
+          title: AppLocalizations.of(context)!.accountTitle,
+          backLabel: AppLocalizations.of(context)!.accountBackToConsole,
+          onBack: () => SurfaceNavigation.goHome(context),
+        ),
       );
+    }
+    return AdminRouteGuard(
+      initialRoute: routeOf(location) ?? AdminRoutes.dashboard,
+      onRouteChanged: (route) =>
+          SurfaceRouter.reportLocation(locationOf(route)),
+    );
+  }
 }

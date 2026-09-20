@@ -1,6 +1,12 @@
 import 'package:flutter/widgets.dart';
 
+import '../../features/auth/forgot_password_screen.dart';
 import '../../features/auth/login_screen.dart';
+import '../../features/auth/partner_register_screen.dart';
+import '../../features/auth/reset_password_screen.dart';
+import '../../features/auth/verify_email_screen.dart';
+import '../../features/partner/account/partner_account_screen.dart';
+import '../surface_gate.dart';
 import '../../features/partner/partner_navigation.dart';
 import '../../features/partner/partner_routes.dart';
 import '../../l10n/app_localizations.dart';
@@ -39,10 +45,33 @@ class PartnerSurfaceRouter extends SurfaceRouter {
     return null;
   }
 
+  /// Phase B — the account locations a signed-out Partner may open: registration,
+  /// and the two link-driven flows whose emails are opened without a session.
   @override
-  String resolve(String? location) => routeOf(location) == null
-      ? SurfaceRouter.root
-      : SurfaceRouter.normalize(location);
+  Set<String> get publicLocations => const {
+        SurfaceRouter.register,
+        SurfaceRouter.verifyEmail,
+        SurfaceRouter.forgotPassword,
+        SurfaceRouter.resetPassword,
+      };
+
+  @override
+  Widget? publicScreenAt(String location) => switch (location) {
+        SurfaceRouter.register => const PartnerRegisterScreen(),
+        SurfaceRouter.verifyEmail => const VerifyEmailScreen(),
+        SurfaceRouter.forgotPassword => const ForgotPasswordScreen(),
+        SurfaceRouter.resetPassword => const ResetPasswordScreen(),
+        _ => null,
+      };
+
+  @override
+  String resolve(String? location) {
+    final path = SurfaceRouter.normalize(location);
+    if (publicLocations.contains(path) || path == SurfaceRouter.account) {
+      return path;
+    }
+    return routeOf(path) == null ? SurfaceRouter.root : path;
+  }
 
   @override
   String title(AppLocalizations l10n) => l10n.surfaceTitlePartner;
@@ -51,9 +80,21 @@ class PartnerSurfaceRouter extends SurfaceRouter {
   Widget signedOutEntry() => const LoginScreen(embeddedInSurfaceGate: true);
 
   @override
-  Widget shellAt(String location) => PartnerRouteGuard(
-        initialRoute: routeOf(location) ?? PartnerRoutes.dashboard,
-        onRouteChanged: (route) =>
-            SurfaceRouter.reportLocation(locationOf(route)),
+  Widget shellAt(String location) {
+    // The account area is a screen of its own rather than a workspace
+    // destination: a Partner whose business profile is missing, in review,
+    // rejected or suspended has no workspace, and still needs to reach it.
+    if (location == SurfaceRouter.account) {
+      return Builder(
+        builder: (context) => PartnerAccountScreen(
+          onBack: () => SurfaceNavigation.goHome(context),
+        ),
       );
+    }
+    return PartnerRouteGuard(
+      initialRoute: routeOf(location) ?? PartnerRoutes.dashboard,
+      onRouteChanged: (route) =>
+          SurfaceRouter.reportLocation(locationOf(route)),
+    );
+  }
 }

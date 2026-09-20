@@ -8,7 +8,6 @@ import 'package:http/testing.dart';
 import 'package:planyourtrip_frontend/core/app_state.dart';
 import 'package:planyourtrip_frontend/core/network/api_client.dart';
 import 'package:planyourtrip_frontend/design/app_theme.dart';
-import 'package:planyourtrip_frontend/features/auth/email_verification_screen.dart';
 import 'package:planyourtrip_frontend/features/auth/forgot_password_screen.dart';
 import 'package:planyourtrip_frontend/features/auth/login_screen.dart';
 import 'package:planyourtrip_frontend/features/auth/register_screen.dart';
@@ -239,11 +238,29 @@ void main() {
     await tester.pumpAndSettle();
   });
 
-  testWidgets('forgot-password validates email and does not fake success',
+  // Phase B connected this screen to POST /api/auth/forgot-password. The
+  // acknowledgement is deliberately the same whether or not the address has an
+  // account, so the screen still never reveals one.
+  testWidgets('forgot-password validates the address and answers generically',
       (tester) async {
+    var requests = 0;
+    final app = AppState(
+      api: ApiClient(
+        client: MockClient((request) async {
+          requests++;
+          expect(request.url.path, endsWith('/auth/forgot-password'));
+          return http.Response(
+            jsonEncode({'message': 'ack'}),
+            202,
+            headers: {'content-type': 'application/json'},
+          );
+        }),
+      ),
+    );
+
     await pumpSize(
       tester,
-      testApp(child: const ForgotPasswordScreen()),
+      testApp(app: app, child: const ForgotPasswordScreen()),
       const Size(390, 780),
     );
 
@@ -251,6 +268,7 @@ void main() {
     await tester.tap(find.byKey(const Key('forgot-submit')));
     await tester.pump();
     expect(find.text('Enter a valid email address.'), findsOneWidget);
+    expect(requests, 0, reason: 'an invalid address is never submitted');
 
     await tester.enterText(
       find.byKey(const Key('forgot-email-field')),
@@ -259,74 +277,15 @@ void main() {
     await tester.ensureVisible(find.byKey(const Key('forgot-submit')));
     await tester.tap(find.byKey(const Key('forgot-submit')));
     await tester.pump();
+    await tester.pump();
 
+    expect(requests, 1);
+    expect(find.byKey(const Key('forgot-ack')), findsOneWidget);
     expect(
-      find.text('Password reset is not connected to the backend yet.'),
+      find.text(
+          'If that address has an account, a password reset link is on its way.'),
       findsOneWidget,
     );
-  });
-
-  testWidgets('six-digit verification input and unsupported verify behavior',
-      (tester) async {
-    await pumpSize(
-      tester,
-      testApp(
-        child: const EmailVerificationScreen(
-          email: 'bao@example.com',
-          initialCountdown: Duration.zero,
-        ),
-      ),
-      const Size(390, 780),
-    );
-
-    await tester.enterText(find.byKey(const Key('otp-0')), '123456');
-    await tester.pump();
-
-    for (var i = 0; i < 6; i++) {
-      final field = tester.widget<TextField>(find.byKey(Key('otp-$i')));
-      expect(field.controller?.text, '${i + 1}');
-    }
-
-    await tester.tap(find.byKey(const Key('verification-submit')));
-    await tester.pump();
-
-    expect(
-      find.text('Email verification is not connected to the backend yet.'),
-      findsOneWidget,
-    );
-  });
-
-  testWidgets('verification resend restarts countdown deterministically',
-      (tester) async {
-    var resendCalls = 0;
-    await pumpSize(
-      tester,
-      testApp(
-        child: EmailVerificationScreen(
-          email: 'bao@example.com',
-          initialCountdown: const Duration(seconds: 1),
-          onResend: () async {
-            resendCalls++;
-            return true;
-          },
-        ),
-      ),
-      const Size(390, 780),
-    );
-
-    await tester.pump(const Duration(seconds: 1));
-    await tester.pump();
-    expect(find.text('Resend code'), findsOneWidget);
-
-    await tester.tap(find.text('Resend code'));
-    await tester.pump();
-
-    expect(resendCalls, 1);
-    expect(find.text('Resend code in 00:1'), findsOneWidget);
-
-    await tester.pump(const Duration(seconds: 1));
-    await tester.pump();
-    expect(find.text('Resend code'), findsOneWidget);
   });
 
   testWidgets('profile separates real and demo account presentation',
@@ -527,18 +486,6 @@ void main() {
         const Size(390, 900),
       );
       expect(find.bySemanticsLabel('Show password'), findsOneWidget);
-
-      await pumpSize(
-        tester,
-        testApp(
-          child: const EmailVerificationScreen(
-            email: 'bao@example.com',
-            initialCountdown: Duration.zero,
-          ),
-        ),
-        const Size(390, 780),
-      );
-      expect(find.bySemanticsLabel('Verification digit 1'), findsOneWidget);
 
       final app = AppState()
         ..demoMode = true

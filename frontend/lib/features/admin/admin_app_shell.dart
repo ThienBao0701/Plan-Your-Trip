@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../app/routing/surface_router.dart';
+import '../../app/surface_gate.dart';
 import '../../app/surface_session.dart';
 import '../../core/admin/admin_models.dart';
 import '../../core/admin/admin_state.dart';
@@ -490,6 +492,13 @@ class _AdminMenu extends StatelessWidget {
             ),
         ],
         const Divider(height: 1),
+        ListTile(
+          key: const Key('admin-open-account'),
+          leading: const Icon(Icons.manage_accounts_outlined),
+          title: Text(l10n.accountOpenAction),
+          minVerticalPadding: 12,
+          onTap: () => SurfaceNavigation.open(context, SurfaceRouter.account),
+        ),
         ListTile(
           key: const Key('admin-sign-out'),
           leading: const Icon(Icons.logout_rounded),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../app/routing/surface_router.dart';
+import '../../app/surface_gate.dart';
 import '../../app/surface_session.dart';
 import '../../core/app_state.dart';
 import '../../core/partner/partner_models.dart';
@@ -287,11 +289,25 @@ class _PartnerSidebar extends StatelessWidget {
           const Divider(height: 1, thickness: 1, color: AppColors.divider),
           Padding(
             padding: const EdgeInsets.all(AppSpacing.sm),
-            child: OceanSecondaryButton(
-              key: const Key('partner-sign-out'),
-              label: l10n.surfaceSignOut,
-              icon: Icons.logout_rounded,
-              onPressed: onSignOut,
+            child: Column(
+              children: [
+                OceanSecondaryButton(
+                  key: const Key('partner-open-account'),
+                  label: l10n.accountOpenAction,
+                  icon: Icons.manage_accounts_outlined,
+                  onPressed: () => SurfaceNavigation.open(
+                    context,
+                    SurfaceRouter.account,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                OceanSecondaryButton(
+                  key: const Key('partner-sign-out'),
+                  label: l10n.surfaceSignOut,
+                  icon: Icons.logout_rounded,
+                  onPressed: onSignOut,
+                ),
+              ],
             ),
           ),
         ],
@@ -447,12 +463,28 @@ class _PartnerWorkArea extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.all(AppSpacing.md),
               children: [
-                if (!partner.isReady)
+                if (!partner.isReady) ...[
                   PartnerWorkspaceStatusView(
                     status: partner.status,
                     detail: partner.errorMessage,
                     onPrimaryAction: partner.isRetryable ? onReload : null,
-                  )
+                  ),
+                  // The workspace is closed until the business profile is
+                  // approved, so the account area — where that profile is
+                  // completed and submitted — has to be reachable from here.
+                  const SizedBox(height: AppSpacing.md),
+                  Center(
+                    child: OceanSecondaryButton(
+                      key: const Key('partner-open-account-status'),
+                      label: l10n.accountOpenAction,
+                      icon: Icons.manage_accounts_outlined,
+                      onPressed: () => SurfaceNavigation.open(
+                        context,
+                        SurfaceRouter.account,
+                      ),
+                    ),
+                  ),
+                ]
                 else
                   // Dispatch by the backend's own menu key. Anything not yet
                   // built falls through to the honest "planned" view rather

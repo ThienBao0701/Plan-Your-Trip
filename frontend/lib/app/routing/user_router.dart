@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart';
 
+import '../../features/auth/forgot_password_screen.dart';
 import '../../features/auth/onboarding_screen.dart';
+import '../../features/auth/reset_password_screen.dart';
 import '../../features/home/app_shell.dart';
 import '../../l10n/app_localizations.dart';
 import '../app_surface.dart';
@@ -25,9 +27,27 @@ class UserSurfaceRouter extends SurfaceRouter {
   @override
   AppSurface get surface => AppSurface.user;
 
+  /// Phase B — the traveller app serves the same two link-driven password flows,
+  /// because a reset link for a `USER` account points at this surface. Traveller
+  /// registration is unchanged and stays inside the sign-in flow, so there is no
+  /// public `/register` location here.
+  @override
+  Set<String> get publicLocations => const {
+        SurfaceRouter.forgotPassword,
+        SurfaceRouter.resetPassword,
+      };
+
+  @override
+  Widget? publicScreenAt(String location) => switch (location) {
+        SurfaceRouter.forgotPassword => const ForgotPasswordScreen(),
+        SurfaceRouter.resetPassword => const ResetPasswordScreen(),
+        _ => null,
+      };
+
   @override
   String resolve(String? location) {
     final path = SurfaceRouter.normalize(location);
+    if (publicLocations.contains(path)) return path;
     return tabLocations.contains(path) ? path : SurfaceRouter.root;
   }
 
