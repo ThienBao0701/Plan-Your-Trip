@@ -6,6 +6,9 @@ import com.example.planyourtrip.model.User;
 import com.example.planyourtrip.repository.LoyaltyRedemptionPolicyRepository;
 import com.example.planyourtrip.repository.ReferralCampaignRepository;
 import com.example.planyourtrip.repository.UserRepository;
+import com.example.planyourtrip.util.AccountEmails;
+import com.example.planyourtrip.validation.AccountPassword;
+import com.example.planyourtrip.validation.AccountPasswordValidator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,23 +139,35 @@ public class ProductionBootstrap implements ApplicationRunner {
      * credentials are absent (no default password) and when the email already exists (never
      * overwrites an existing user or its password). The password is hashed with the application's
      * {@link PasswordEncoder} and is NEVER logged.
+     *
+     * <p>Phase A (S7) — the email is normalized exactly as sign-in normalizes it (trimmed, lowercased),
+     * so a mixed-case {@code ADMIN_BOOTSTRAP_EMAIL} produces an admin who can actually sign in. The
+     * existence check ignores case, so an account stored earlier under a differently-cased address is
+     * still recognised and left untouched rather than duplicated. The bootstrap admin is created with a
+     * verified email (the operator supplied the address). A password BCrypt cannot hash (over 72 bytes)
+     * stops start-up with a message that does not contain it.
      */
     public void ensureBootstrapAdmin(String email, String password, String fullName) {
-        String trimmedEmail = email == null ? "" : email.trim();
-        if (trimmedEmail.isEmpty() || password == null || password.isEmpty()) {
+        String normalizedEmail = email == null ? "" : AccountEmails.normalize(email);
+        if (normalizedEmail.isEmpty() || password == null || password.isEmpty()) {
             log.info("DB-04: admin bootstrap skipped — no admin credentials configured.");
             return;
         }
-        if (users.existsByEmail(trimmedEmail)) {
+        if (users.existsByEmailIgnoreCase(normalizedEmail)) {
             log.info("DB-04: admin bootstrap skipped — a user already exists for the configured email.");
             return;
         }
+        if (AccountPasswordValidator.exceedsMaxBytes(password)) {
+            throw new IllegalStateException("ADMIN_BOOTSTRAP_PASSWORD must be at most "
+                + AccountPassword.MAX_BYTES + " bytes");
+        }
         User u = new User();
         u.setFullName(fullName == null || fullName.isBlank() ? "Administrator" : fullName.trim());
-        u.setEmail(trimmedEmail);
+        u.setEmail(normalizedEmail);
         u.setPasswordHash(encoder.encode(password));
         u.setRole("ADMIN");
         u.setEnabled(true);
+        u.setEmailVerifiedAt(Instant.now());
         users.save(u);
         log.info("DB-04: created bootstrap admin user for the configured email (role ADMIN).");
     }

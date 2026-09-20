@@ -546,6 +546,8 @@ public class DataInitializer implements ApplicationRunner {
         User u = new User();
         u.setFullName(fullName); u.setEmail(email);
         u.setPasswordHash(encoder.encode(password)); u.setRole(role);
+        // Phase A — seeded development accounts are verified, like every account that predates V3.
+        u.setEmailVerifiedAt(java.time.Instant.now());
         users.save(u);
     }
 

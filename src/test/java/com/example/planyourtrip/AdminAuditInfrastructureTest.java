@@ -255,8 +255,10 @@ class AdminAuditInfrastructureTest {
             .filter(a -> !a.matches("[A-Z][A-Z0-9_]{2,79}")).toList();
         assertTrue(malformed.isEmpty(), "malformed action names: " + malformed);
 
-        assertEquals(110, sites.size(),
-            "D3J adds no actions: the trail emits exactly 110 distinct administrative actions. "
+        // Phase A deliberately adds four: ADMIN_LOGIN_SUCCESS, ADMIN_LOGIN_FAILED, ADMIN_PASSWORD_CHANGE and
+        // ADMIN_PASSWORD_RESET (AuthService, AccountService), each from one call site.
+        assertEquals(114, sites.size(),
+            "Phase A: the trail emits exactly 114 distinct administrative actions (110 after D3J + 4 admin auth). "
                 + "If a later phase legitimately adds one, update this number deliberately. Found: "
                 + sites.size());
     }

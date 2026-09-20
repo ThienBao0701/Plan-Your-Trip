@@ -64,11 +64,21 @@ which creates **only** the `APP_DB_NAME` database (no tables). It is idempotent 
 Under the `prod` profile, Flyway runs **before** Hibernate and applies `db/migration/V1__initial_schema.sql`
 (90 tables) into the database, recording `flyway_schema_history`. Migrations are **forward-only**
 (Community edition — no undo). Never edit an applied migration; add `V2+` for changes.
+Current chain: `V1__initial_schema`, `V2__admin_activity_log`, `V3__account_lifecycle` (Phase A — additive
+account columns on `users`, the `auth_tokens` table, and existing accounts marked email-verified; see
+`ACCOUNT_LIFECYCLE.md` §11).
 
 ## 9. Bootstrap behavior
 `ProductionBootstrap` (`@Profile("prod")`) idempotently seeds the default referral campaign and loyalty
 redemption policy, and — **only if** `ADMIN_BOOTSTRAP_EMAIL` + `ADMIN_BOOTSTRAP_PASSWORD` are set — an
-initial admin (BCrypt-hashed, never logged, never overwrites an existing user).
+initial admin (BCrypt-hashed, never logged, never overwrites an existing user). Since Phase A the configured
+email is trimmed and lowercased like sign-in, an existing account is matched ignoring case, and a password
+over 72 bytes stops start-up.
+
+**Account emails (Phase A).** No email provider exists. Under `prod`, Partner registration, verification
+resend and forgot-password answer `503 EMAIL_DELIVERY_UNAVAILABLE` rather than pretend to send. When a
+provider is added, set `USER_APP_URL`, `PARTNER_APP_URL` and `ADMIN_APP_URL` to the public origins (they build
+the links) and `PARTNER_TERMS_VERSION` to the published terms version. See `ACCOUNT_LIFECYCLE.md`.
 
 ## 10. Health checks
 - Liveness: `GET /api/health` → `{"status":"UP", ...}`.
@@ -162,3 +172,5 @@ NOT RUN in this environment (no Docker).**
       (the `true` in `.env.example` is a LOCAL-ONLY allowance for the container's self-signed cert).
 - [ ] TLS terminates in front of `web` in production (§14).
 - [ ] Same-origin preserved (`API_BASE_URL=/api`) → no CORS surface.
+- [ ] Known gap (Phase A): sign-in has **no** brute-force rate limit or lockout — only one-time token issuance
+      is throttled. Put a rate limit in front of `POST /api/auth/login` at the edge until the app has one.

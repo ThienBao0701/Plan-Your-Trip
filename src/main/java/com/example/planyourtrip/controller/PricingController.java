@@ -38,7 +38,7 @@ public class PricingController {
             @PathVariable Long roomId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkIn,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOut) {
-        return service.calculate(roomId, checkIn, checkOut);
+        return service.calculateForPublicRoom(roomId, checkIn, checkOut);
     }
 
     /**

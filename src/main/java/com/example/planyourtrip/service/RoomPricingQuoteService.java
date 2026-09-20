@@ -7,10 +7,8 @@ import com.example.planyourtrip.dto.RoomPricingQuoteDto.RoomPricingQuoteResponse
 import com.example.planyourtrip.exception.ApiException;
 import com.example.planyourtrip.model.HotelRoom;
 import com.example.planyourtrip.model.Place;
-import com.example.planyourtrip.model.PlaceStatus;
 import com.example.planyourtrip.model.RatePlan;
 import com.example.planyourtrip.model.RoomInventory;
-import com.example.planyourtrip.repository.HotelRoomRepository;
 import com.example.planyourtrip.repository.RoomInventoryRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -57,16 +55,16 @@ public class RoomPricingQuoteService {
     private static final String BENEFITS_NOTE =
         "Coupon, loyalty, travel-credit and gift-card discounts are not included and apply only at checkout.";
 
-    private final HotelRoomRepository roomRepo;
+    private final PublicListingVisibility visibility;
     private final RoomInventoryRepository inventoryRepo;
     private final RatePlanPricingService ratePlanPricingService;
     private final PricingEngineService pricingEngineService;
 
-    public RoomPricingQuoteService(HotelRoomRepository roomRepo,
+    public RoomPricingQuoteService(PublicListingVisibility visibility,
                                    RoomInventoryRepository inventoryRepo,
                                    RatePlanPricingService ratePlanPricingService,
                                    PricingEngineService pricingEngineService) {
-        this.roomRepo               = roomRepo;
+        this.visibility             = visibility;
         this.inventoryRepo          = inventoryRepo;
         this.ratePlanPricingService = ratePlanPricingService;
         this.pricingEngineService   = pricingEngineService;
@@ -91,13 +89,11 @@ public class RoomPricingQuoteService {
         if (extraBeds < 0)throw new ApiException(HttpStatus.BAD_REQUEST, "extraBeds cannot be negative");
 
         // ── 2. Room must exist and be publicly sellable ───────────────────────
-        // Reuse the exact visibility rule enforced elsewhere: an ACTIVE room whose hotel Place
-        // is PUBLISHED. Unpublished/hidden listings return 404 (never leak their existence).
-        HotelRoom room = roomRepo.findById(roomId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Room not found: " + roomId));
+        // An ACTIVE room whose hotel Place is PUBLISHED. Unpublished/hidden listings return 404
+        // (never leak their existence). Phase A — the rule now lives in PublicListingVisibility, shared
+        // with the public availability, legacy pricing and rate-plan endpoints.
+        HotelRoom room = visibility.requireSellableRoom(roomId);
         Place hotel = room.getHotelDetail().getPlace();
-        if (!room.isActive() || hotel.getStatus() != PlaceStatus.PUBLISHED)
-            throw new ApiException(HttpStatus.NOT_FOUND, "Room not found: " + roomId);
 
         long nights = ChronoUnit.DAYS.between(checkIn, checkOut);
         Long placeId = hotel.getId();

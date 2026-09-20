@@ -134,3 +134,29 @@ K. full regression → L. production deployment (STEP 2+). Do not reach L until 
 Docker production stack, main-compose SQL Server edition, Flyway-owned schema, DB-06 production secret
 validators and exposed-surface hardening, unpublished DB port and app:8080, and the completed user-app
 real integration and passing test suites (backend 1408 pass / 1 gated-skip; frontend 1132 pass).
+
+---
+
+## Amendment A — Partner account lifecycle (Phase A, 2026-09-17)
+
+**Status:** APPROVED product decision, recorded here as an explicit and narrow amendment. Only the points
+below change; every other section of this document stands as written.
+
+1. **Partner self-registration.** `POST /api/auth/partner/register` creates an account whose system role is
+   `PARTNER`, assigned server-side. No request can choose or influence a role. The account must verify its
+   email address before it can sign in. (`USER` self-registration is unchanged; `ADMIN` accounts are still
+   only provisioned — `ProductionBootstrap` / `DataInitializer` — and never self-registered.)
+2. **Business approval is unchanged and still required.** The Partner business profile lifecycle
+   (`DRAFT → SUBMITTED → APPROVED / REJECTED`, `SUSPENDED`) and the Admin approve/reject/suspend operations
+   are unchanged. Every Partner property, room, rate, calendar and booking operation still requires an
+   `APPROVED` profile.
+3. **Property publication (future phase — not implemented by Phase A).** Once the Property Commerce phase
+   ships, an approved Partner publishes its own property without per-property Admin approval. Admin keeps the
+   moderation states `HIDDEN`, `REJECTED` and `ARCHIVED`. For Partner-owned properties this will supersede
+   the §B sentence "Approve/reject/publish are ADMIN operations"; until that phase ships, `PlaceStatus` is
+   still changed only through the Admin place endpoints.
+4. **Role model and URL authorization map: unchanged.** Still exactly `USER`, `PARTNER`, `ADMIN`. The backend
+   now fails closed on any other stored role value (it authenticates nothing). The new public endpoints fall
+   under the existing `/api/auth/**` permitAll rule; `PUT /api/me/password` falls under `authenticated`.
+
+See `ACCOUNT_LIFECYCLE.md` for the implemented behaviour.

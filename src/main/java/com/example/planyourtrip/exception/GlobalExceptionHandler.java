@@ -1,5 +1,6 @@
 package com.example.planyourtrip.exception;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 
 @RestControllerAdvice
@@ -23,22 +25,47 @@ public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    record ErrorBody(String timestamp, int status, String error, String message, String path) {}
+    /**
+     * The uniform error body. {@code code} and {@code fieldErrors} were added in Phase A and are
+     * omitted from the JSON when absent, so every existing error response keeps its exact shape and
+     * {@code message} keeps its existing meaning.
+     */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    record ErrorBody(String timestamp, int status, String error, String message, String path,
+                     String code, List<FieldErrorItem> fieldErrors) {
+        ErrorBody(String timestamp, int status, String error, String message, String path) {
+            this(timestamp, status, error, message, path, null, null);
+        }
+    }
+
+    /** One invalid request field: its name and why it was refused. */
+    record FieldErrorItem(String field, String message) {}
 
     @ExceptionHandler(ApiException.class)
     ResponseEntity<ErrorBody> api(ApiException ex, HttpServletRequest req) {
+        List<FieldErrorItem> fields = ex.field() == null ? null
+            : List.of(new FieldErrorItem(ex.field(), ex.getMessage()));
         return ResponseEntity.status(ex.status()).body(new ErrorBody(
             Instant.now().toString(), ex.status().value(), ex.status().getReasonPhrase(),
-            ex.getMessage(), req.getRequestURI()));
+            ex.getMessage(), req.getRequestURI(), ex.code(), fields));
     }
 
+    /**
+     * {@code message} is still the first field error as {@code "field: reason"}, exactly as before.
+     * Phase A adds {@code code = VALIDATION_FAILED} and every field error in {@code fieldErrors}, so a
+     * form can mark each invalid field instead of parsing one string.
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     ResponseEntity<ErrorBody> validation(MethodArgumentNotValidException ex, HttpServletRequest req) {
         String msg = ex.getBindingResult().getFieldErrors().stream().findFirst()
             .map(e -> e.getField() + ": " + e.getDefaultMessage())
             .orElse("Validation failed");
+        List<FieldErrorItem> fields = ex.getBindingResult().getFieldErrors().stream()
+            .map(e -> new FieldErrorItem(e.getField(), e.getDefaultMessage()))
+            .toList();
         return ResponseEntity.badRequest().body(new ErrorBody(
-            Instant.now().toString(), 400, "Bad Request", msg, req.getRequestURI()));
+            Instant.now().toString(), 400, "Bad Request", msg, req.getRequestURI(),
+            "VALIDATION_FAILED", fields.isEmpty() ? null : fields));
     }
 
     @ExceptionHandler(ConstraintViolationException.class)

@@ -20,7 +20,7 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class AvailabilityService {
 
-    private final PlaceRepository placeRepo;
+    private final PublicListingVisibility visibility;
     private final HotelDetailRepository hotelDetailRepo;
     private final HotelRoomRepository roomRepo;
     private final RoomInventoryRepository inventoryRepo;
@@ -28,14 +28,14 @@ public class AvailabilityService {
     private final RoomAmenityRepository roomAmenityRepo;
     private final MediaAssetRepository mediaAssetRepo;
 
-    public AvailabilityService(PlaceRepository placeRepo,
+    public AvailabilityService(PublicListingVisibility visibility,
                                 HotelDetailRepository hotelDetailRepo,
                                 HotelRoomRepository roomRepo,
                                 RoomInventoryRepository inventoryRepo,
                                 RatePlanPricingService ratePlanPricingService,
                                 RoomAmenityRepository roomAmenityRepo,
                                 MediaAssetRepository mediaAssetRepo) {
-        this.placeRepo       = placeRepo;
+        this.visibility      = visibility;
         this.hotelDetailRepo = hotelDetailRepo;
         this.roomRepo        = roomRepo;
         this.inventoryRepo   = inventoryRepo;
@@ -59,8 +59,9 @@ public class AvailabilityService {
             throw new ApiException(HttpStatus.BAD_REQUEST, "adults must be at least 1");
         }
 
-        Place place = placeRepo.findById(placeId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Place not found: " + placeId));
+        // Phase A (S2) — this endpoint is public: a place that is not PUBLISHED is reported as not found,
+        // so its rooms, images, amenities and prices are never returned.
+        Place place = visibility.requireVisiblePlace(placeId);
 
         HotelDetail detail = hotelDetailRepo.findByPlaceId(placeId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND,

@@ -3,7 +3,6 @@ package com.example.planyourtrip.service;
 import com.example.planyourtrip.dto.RatePlanDto.*;
 import com.example.planyourtrip.exception.ApiException;
 import com.example.planyourtrip.model.*;
-import com.example.planyourtrip.repository.HotelRoomRepository;
 import com.example.planyourtrip.repository.RatePlanOccupancyPriceRepository;
 import com.example.planyourtrip.repository.RatePlanRepository;
 import org.springframework.http.HttpStatus;
@@ -40,25 +39,30 @@ public class RatePlanPricingService {
 
     private final RatePlanRepository ratePlanRepo;
     private final RatePlanOccupancyPriceRepository occupancyRepo;
-    private final HotelRoomRepository roomRepo;
+    private final PublicListingVisibility visibility;
     private final RatePlanEligibilityService eligibilityService;
 
     public RatePlanPricingService(RatePlanRepository ratePlanRepo,
                                   RatePlanOccupancyPriceRepository occupancyRepo,
-                                  HotelRoomRepository roomRepo,
+                                  PublicListingVisibility visibility,
                                   RatePlanEligibilityService eligibilityService) {
         this.ratePlanRepo       = ratePlanRepo;
         this.occupancyRepo      = occupancyRepo;
-        this.roomRepo           = roomRepo;
+        this.visibility         = visibility;
         this.eligibilityService = eligibilityService;
     }
 
     // ── Public preview APIs ───────────────────────────────────────────────────
+    // Phase A (S2) — previewRoom, preview and cancellationPreview back the public
+    // /api/rooms/{roomId}/rate-plans endpoints, so each resolves its room through
+    // PublicListingVisibility first: a room that is inactive or belongs to a property that is not
+    // PUBLISHED is a 404, and its plans are never priced. A plan id belonging to a different room is
+    // a 404 as before (planForRoomOrThrow).
 
     /** List every plan for a room as a pricing/eligibility breakdown for the given stay. */
     public List<RatePlanPricingBreakdownResponse> previewRoom(Long roomId, LocalDate checkIn, LocalDate checkOut,
                                                               int adults, int children, int extraBeds) {
-        roomOrThrow(roomId);
+        visibility.requireSellableRoom(roomId);
         return ratePlanRepo.findByHotelRoomIdOrderByStartDateAsc(roomId).stream()
             .map(p -> buildBreakdown(p, checkIn, checkOut, adults, children, extraBeds, true))
             .toList();
@@ -66,6 +70,7 @@ public class RatePlanPricingService {
 
     public RatePlanPricingBreakdownResponse preview(Long roomId, Long ratePlanId, LocalDate checkIn,
                                                     LocalDate checkOut, int adults, int children, int extraBeds) {
+        visibility.requireSellableRoom(roomId);
         RatePlan plan = planForRoomOrThrow(roomId, ratePlanId);
         return buildBreakdown(plan, checkIn, checkOut, adults, children, extraBeds, true);
     }
@@ -102,6 +107,7 @@ public class RatePlanPricingService {
 
     public RatePlanCancellationPreviewResponse cancellationPreview(Long roomId, Long ratePlanId, LocalDate checkIn,
                                                                    LocalDate checkOut, int adults, int children, int extraBeds) {
+        visibility.requireSellableRoom(roomId);
         RatePlan plan = planForRoomOrThrow(roomId, ratePlanId);
         RatePlanPricingBreakdownResponse b = buildBreakdown(plan, checkIn, checkOut, adults, children, extraBeds, false);
         Instant deadline = b.cancellationDeadline();
@@ -316,11 +322,6 @@ public class RatePlanPricingService {
     }
 
     // ── Lookups ───────────────────────────────────────────────────────────────
-
-    private HotelRoom roomOrThrow(Long roomId) {
-        return roomRepo.findById(roomId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Room not found: " + roomId));
-    }
 
     private RatePlan planOrThrow(Long id) {
         return ratePlanRepo.findById(id)

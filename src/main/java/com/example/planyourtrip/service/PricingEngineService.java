@@ -24,13 +24,27 @@ public class PricingEngineService {
     private final HotelRoomRepository roomRepo;
     private final RatePlanRepository ratePlanRepo;
     private final PromotionRepository promotionRepo;
+    private final PublicListingVisibility visibility;
 
     public PricingEngineService(HotelRoomRepository roomRepo,
                                  RatePlanRepository ratePlanRepo,
-                                 PromotionRepository promotionRepo) {
+                                 PromotionRepository promotionRepo,
+                                 PublicListingVisibility visibility) {
         this.roomRepo      = roomRepo;
         this.ratePlanRepo  = ratePlanRepo;
         this.promotionRepo = promotionRepo;
+        this.visibility    = visibility;
+    }
+
+    /**
+     * Phase A (S2) — the public legacy {@code GET /api/rooms/{roomId}/pricing}. Same breakdown as
+     * {@link #calculate(Long, LocalDate, LocalDate)}, but only for a publicly sellable room: an inactive
+     * room, or a room of a property that is not PUBLISHED, is a 404. The internal {@code calculate}
+     * overloads (booking, partner preview, coupons) are unchanged.
+     */
+    public PricingBreakdownResponse calculateForPublicRoom(Long roomId, LocalDate checkIn, LocalDate checkOut) {
+        visibility.requireSellableRoom(roomId);
+        return calculate(roomId, checkIn, checkOut);
     }
 
     /**

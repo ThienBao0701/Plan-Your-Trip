@@ -1,6 +1,8 @@
 package com.example.planyourtrip;
 
 import com.example.planyourtrip.config.ProductionBootstrap;
+import com.example.planyourtrip.dto.AuthDtos.AuthResponse;
+import com.example.planyourtrip.dto.AuthDtos.LoginRequest;
 import com.example.planyourtrip.model.LoyaltyRedemptionPolicy;
 import com.example.planyourtrip.model.ReferralCampaign;
 import com.example.planyourtrip.model.User;
@@ -9,6 +11,7 @@ import com.example.planyourtrip.repository.LoyaltyRedemptionPolicyRepository;
 import com.example.planyourtrip.repository.ReferralCampaignRepository;
 import com.example.planyourtrip.repository.ReferralRewardRepository;
 import com.example.planyourtrip.repository.UserRepository;
+import com.example.planyourtrip.service.AuthService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.DefaultApplicationArguments;
@@ -37,6 +40,7 @@ class ProductionBootstrapTest {
     @Autowired LoyaltyRedemptionPolicyRepository redemptionPolicies;
     @Autowired ReferralRewardRepository referralRewards;
     @Autowired LoyaltyPointsRedemptionRepository loyaltyRedemptions;
+    @Autowired AuthService authService;
 
     private ProductionBootstrap bootstrap(String email, String password, String fullName) {
         return new ProductionBootstrap(users, encoder, referralCampaigns, redemptionPolicies,
@@ -133,6 +137,58 @@ class ProductionBootstrapTest {
         User after = users.findByEmail(email).orElseThrow();
         assertEquals(hashAfterCreate, after.getPasswordHash(), "existing password must be preserved");
         assertEquals("ADMIN", after.getRole());
+    }
+
+    /**
+     * Phase A (S7) — ADMIN_BOOTSTRAP_EMAIL is normalized the way sign-in normalizes it. Before, a
+     * mixed-case or padded value was stored as typed while sign-in lowercased its lookup, so the
+     * bootstrap admin could never sign in.
+     */
+    @Test
+    void adminEmailIsNormalizedAndTheAdminCanActuallySignIn() {
+        String local = "Ops.Admin-" + System.nanoTime();
+        String configured = "  " + local + "@Example.COM ";
+        String password = "Bootstrap-Sign-In-Pw";
+
+        bootstrap(configured, password, "Ops Admin").ensureBootstrapAdmin(configured, password, "Ops Admin");
+
+        String canonical = (local + "@example.com").toLowerCase();
+        User u = users.findByEmail(canonical).orElseThrow();
+        assertEquals("ADMIN", u.getRole());
+        assertNotNull(u.getEmailVerifiedAt(), "the operator-supplied address is treated as verified");
+        assertFalse(u.isEmailVerificationRequired());
+
+        AuthResponse session = authService.login(new LoginRequest(local.toUpperCase() + "@example.com", password));
+        assertEquals("ADMIN", session.user().role());
+        assertFalse(session.token().isBlank());
+    }
+
+    @Test
+    void anExistingAccountDifferingOnlyInCaseIsNeitherDuplicatedNorOverwritten() {
+        String stored = "Case-Existing-" + System.nanoTime() + "@Example.com";
+        User existing = new User();
+        existing.setFullName("Existing");
+        existing.setEmail(stored);
+        existing.setPasswordHash(encoder.encode("Existing-Pw-123"));
+        existing.setRole("ADMIN");
+        users.saveAndFlush(existing);
+        String hash = existing.getPasswordHash();
+
+        bootstrap(stored.toLowerCase(), "Different-Pw-456", "Other").ensureBootstrapAdmin(
+            "  " + stored.toUpperCase() + " ", "Different-Pw-456", "Other");
+
+        assertEquals(1, users.findAll().stream().filter(u -> stored.equalsIgnoreCase(u.getEmail())).count());
+        assertEquals(hash, users.findByEmail(stored).orElseThrow().getPasswordHash());
+    }
+
+    @Test
+    void aPasswordBcryptCannotHashStopsStartUpWithoutRevealingIt() {
+        String email = "db04-long-" + System.nanoTime() + "@example.com";
+        String password = "p".repeat(73);
+        IllegalStateException e = assertThrows(IllegalStateException.class,
+            () -> bootstrap(email, password, "Ops").ensureBootstrapAdmin(email, password, "Ops"));
+        assertFalse(e.getMessage().contains(password));
+        assertTrue(users.findByEmail(email).isEmpty());
     }
 
     @Test
