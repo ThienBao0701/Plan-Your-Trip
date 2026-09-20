@@ -15241,7 +15241,7 @@ abstract class AppLocalizations {
   /// No description provided for @partnerPropertiesEmptyMessage.
   ///
   /// In en, this message translates to:
-  /// **'Your partner profile is approved, but no property has been assigned to it yet. Properties are assigned by the Plan Your Trip team.'**
+  /// **'Create your first property to start preparing your listing. It is saved as a draft that only you and the Plan Your Trip team can see.'**
   String get partnerPropertiesEmptyMessage;
 
   /// No description provided for @partnerPropertiesSelectedSemantic.
@@ -15603,6 +15603,390 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Last updated'**
   String get partnerPropertyFieldUpdated;
+
+  /// No description provided for @partnerPropertyAddAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add property'**
+  String get partnerPropertyAddAction;
+
+  /// No description provided for @partnerPropertyEditAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit property'**
+  String get partnerPropertyEditAction;
+
+  /// No description provided for @partnerPropertyEditorCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New property'**
+  String get partnerPropertyEditorCreateTitle;
+
+  /// No description provided for @partnerPropertyEditorEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit property'**
+  String get partnerPropertyEditorEditTitle;
+
+  /// No description provided for @partnerPropertyEditorIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything here is saved as a draft. Travellers cannot see a draft, and only the Plan Your Trip team can publish one.'**
+  String get partnerPropertyEditorIntro;
+
+  /// No description provided for @partnerPropertyEditorSectionBasics.
+  ///
+  /// In en, this message translates to:
+  /// **'Property basics'**
+  String get partnerPropertyEditorSectionBasics;
+
+  /// No description provided for @partnerPropertyEditorSectionLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get partnerPropertyEditorSectionLocation;
+
+  /// No description provided for @partnerPropertyEditorSectionContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact'**
+  String get partnerPropertyEditorSectionContact;
+
+  /// No description provided for @partnerPropertyEditorSectionDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Details and policies'**
+  String get partnerPropertyEditorSectionDetails;
+
+  /// No description provided for @partnerPropertyEditorSectionAmenities.
+  ///
+  /// In en, this message translates to:
+  /// **'Amenities'**
+  String get partnerPropertyEditorSectionAmenities;
+
+  /// No description provided for @partnerPropertyEditorSaveDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Save draft'**
+  String get partnerPropertyEditorSaveDraft;
+
+  /// No description provided for @partnerPropertyEditorSaveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get partnerPropertyEditorSaveChanges;
+
+  /// No description provided for @partnerPropertyEditorCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get partnerPropertyEditorCancel;
+
+  /// No description provided for @partnerPropertyFieldName.
+  ///
+  /// In en, this message translates to:
+  /// **'Property name'**
+  String get partnerPropertyFieldName;
+
+  /// No description provided for @partnerPropertyFieldCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Property type'**
+  String get partnerPropertyFieldCategory;
+
+  /// No description provided for @partnerPropertyFieldSubcategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Specific type'**
+  String get partnerPropertyFieldSubcategory;
+
+  /// No description provided for @partnerPropertyFieldLocationUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'Administrative area'**
+  String get partnerPropertyFieldLocationUnit;
+
+  /// No description provided for @partnerPropertyFieldLatitude.
+  ///
+  /// In en, this message translates to:
+  /// **'Latitude'**
+  String get partnerPropertyFieldLatitude;
+
+  /// No description provided for @partnerPropertyFieldLongitude.
+  ///
+  /// In en, this message translates to:
+  /// **'Longitude'**
+  String get partnerPropertyFieldLongitude;
+
+  /// No description provided for @partnerPropertyFieldStarRating.
+  ///
+  /// In en, this message translates to:
+  /// **'Property rating'**
+  String get partnerPropertyFieldStarRating;
+
+  /// No description provided for @partnerPropertyFieldCancellationPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancellation policy'**
+  String get partnerPropertyFieldCancellationPolicy;
+
+  /// No description provided for @partnerPropertyFieldParking.
+  ///
+  /// In en, this message translates to:
+  /// **'Parking'**
+  String get partnerPropertyFieldParking;
+
+  /// No description provided for @partnerPropertyFieldWifi.
+  ///
+  /// In en, this message translates to:
+  /// **'Wi-Fi'**
+  String get partnerPropertyFieldWifi;
+
+  /// No description provided for @partnerPropertyFieldLanguages.
+  ///
+  /// In en, this message translates to:
+  /// **'Languages spoken'**
+  String get partnerPropertyFieldLanguages;
+
+  /// No description provided for @partnerPropertyFieldPaymentMethods.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment methods'**
+  String get partnerPropertyFieldPaymentMethods;
+
+  /// No description provided for @partnerPropertyFieldAmenities.
+  ///
+  /// In en, this message translates to:
+  /// **'Property amenities'**
+  String get partnerPropertyFieldAmenities;
+
+  /// No description provided for @partnerPropertyStarRatingHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Your own classification from 1 to 5. It is not a verified star rating.'**
+  String get partnerPropertyStarRatingHelp;
+
+  /// No description provided for @partnerPropertySlugHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Set when the property is created, because it is part of its public address.'**
+  String get partnerPropertySlugHelp;
+
+  /// No description provided for @partnerPropertyListHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Separate entries with a comma.'**
+  String get partnerPropertyListHelp;
+
+  /// No description provided for @partnerPropertyCoordinatesHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional. Latitude between -90 and 90, longitude between -180 and 180.'**
+  String get partnerPropertyCoordinatesHelp;
+
+  /// No description provided for @partnerPropertyAmenitiesHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from the amenities the Plan Your Trip catalogue defines. Room amenities are set on each room later.'**
+  String get partnerPropertyAmenitiesHelp;
+
+  /// No description provided for @partnerPropertyAmenitiesSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{None selected} =1{1 selected} other{{count} selected}}'**
+  String partnerPropertyAmenitiesSelected(int count);
+
+  /// No description provided for @partnerPropertyDraftNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft — not visible to travellers'**
+  String get partnerPropertyDraftNotice;
+
+  /// No description provided for @partnerPropertyFreeCancellation.
+  ///
+  /// In en, this message translates to:
+  /// **'Free cancellation'**
+  String get partnerPropertyFreeCancellation;
+
+  /// No description provided for @partnerPropertyParkingAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Parking available'**
+  String get partnerPropertyParkingAvailable;
+
+  /// No description provided for @partnerPropertyParkingFree.
+  ///
+  /// In en, this message translates to:
+  /// **'Parking is free'**
+  String get partnerPropertyParkingFree;
+
+  /// No description provided for @partnerPropertyWifiAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Wi-Fi available'**
+  String get partnerPropertyWifiAvailable;
+
+  /// No description provided for @partnerPropertyWifiFree.
+  ///
+  /// In en, this message translates to:
+  /// **'Wi-Fi is free'**
+  String get partnerPropertyWifiFree;
+
+  /// No description provided for @partnerPropertyLocationCountry.
+  ///
+  /// In en, this message translates to:
+  /// **'Country'**
+  String get partnerPropertyLocationCountry;
+
+  /// No description provided for @partnerPropertyLocationProvince.
+  ///
+  /// In en, this message translates to:
+  /// **'Province or city'**
+  String get partnerPropertyLocationProvince;
+
+  /// No description provided for @partnerPropertyLocationArea.
+  ///
+  /// In en, this message translates to:
+  /// **'Area (optional)'**
+  String get partnerPropertyLocationArea;
+
+  /// No description provided for @partnerPropertySelectPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Select'**
+  String get partnerPropertySelectPrompt;
+
+  /// No description provided for @partnerPropertyReferenceLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading the property options…'**
+  String get partnerPropertyReferenceLoading;
+
+  /// No description provided for @partnerPropertyReferenceError.
+  ///
+  /// In en, this message translates to:
+  /// **'The property options could not be loaded, so nothing can be saved yet.'**
+  String get partnerPropertyReferenceError;
+
+  /// No description provided for @partnerPropertyValidationName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the property name.'**
+  String get partnerPropertyValidationName;
+
+  /// No description provided for @partnerPropertyValidationAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the street address.'**
+  String get partnerPropertyValidationAddress;
+
+  /// No description provided for @partnerPropertyValidationCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a property type.'**
+  String get partnerPropertyValidationCategory;
+
+  /// No description provided for @partnerPropertyValidationLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the province, city or area the property is in.'**
+  String get partnerPropertyValidationLocation;
+
+  /// No description provided for @partnerPropertyValidationTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a time as HH:MM.'**
+  String get partnerPropertyValidationTime;
+
+  /// No description provided for @partnerPropertyValidationLatitude.
+  ///
+  /// In en, this message translates to:
+  /// **'Latitude must be between -90 and 90.'**
+  String get partnerPropertyValidationLatitude;
+
+  /// No description provided for @partnerPropertyValidationLongitude.
+  ///
+  /// In en, this message translates to:
+  /// **'Longitude must be between -180 and 180.'**
+  String get partnerPropertyValidationLongitude;
+
+  /// No description provided for @partnerPropertyValidationEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email address.'**
+  String get partnerPropertyValidationEmail;
+
+  /// No description provided for @partnerPropertyValidationStarRating.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a rating from 1 to 5.'**
+  String get partnerPropertyValidationStarRating;
+
+  /// No description provided for @partnerPropertyCreatedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} was saved as a draft.'**
+  String partnerPropertyCreatedMessage(String name);
+
+  /// No description provided for @partnerPropertySavedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} was updated.'**
+  String partnerPropertySavedMessage(String name);
+
+  /// No description provided for @partnerPropertyErrorValidation.
+  ///
+  /// In en, this message translates to:
+  /// **'Please check the highlighted fields.'**
+  String get partnerPropertyErrorValidation;
+
+  /// No description provided for @partnerPropertyErrorCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'That property type is not available. Choose another one.'**
+  String get partnerPropertyErrorCategory;
+
+  /// No description provided for @partnerPropertyErrorLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'A property cannot sit in that location. Choose a province, city or area.'**
+  String get partnerPropertyErrorLocation;
+
+  /// No description provided for @partnerPropertyErrorAmenity.
+  ///
+  /// In en, this message translates to:
+  /// **'One of the selected amenities is not available any more. Reload the options and try again.'**
+  String get partnerPropertyErrorAmenity;
+
+  /// No description provided for @partnerPropertyErrorSlugConflict.
+  ///
+  /// In en, this message translates to:
+  /// **'Another property already uses that address.'**
+  String get partnerPropertyErrorSlugConflict;
+
+  /// No description provided for @partnerPropertyErrorApproval.
+  ///
+  /// In en, this message translates to:
+  /// **'Your business profile must be approved before you can manage properties.'**
+  String get partnerPropertyErrorApproval;
+
+  /// No description provided for @partnerPropertyGateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Business profile approval required'**
+  String get partnerPropertyGateTitle;
+
+  /// No description provided for @partnerPropertyGateMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You can add and edit properties once an administrator approves your business profile.'**
+  String get partnerPropertyGateMessage;
+
+  /// No description provided for @partnerPropertyGateAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Open my account'**
+  String get partnerPropertyGateAction;
 
   /// No description provided for @partnerRoomsCount.
   ///

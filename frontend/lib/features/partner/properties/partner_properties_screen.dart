@@ -11,6 +11,8 @@ import '../../../design/app_spacing.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/glass_widgets.dart';
 import '../widgets/partner_state_views.dart';
+import 'partner_property_editor_screen.dart';
+import 'partner_property_editor_state.dart';
 import 'partner_properties_state.dart';
 import 'widgets/partner_property_widgets.dart';
 
@@ -22,18 +24,21 @@ import 'widgets/partner_property_widgets.dart';
 /// |---|---|
 /// | List | `GET /api/partner/hotels` → `PartnerHotelSummaryResponse[]` |
 /// | Detail | `GET /api/partner/hotels/{id}` → `PartnerHotelResponse` |
-/// | Publish listing | `PATCH /api/partner/hotels/{id}/activate` |
-/// | Withdraw listing | `PATCH /api/partner/hotels/{id}/deactivate` |
+/// | Create draft | `POST /api/partner/hotels` (Phase C) |
+/// | Edit | the four `PUT` sections and `PUT /{id}/amenities` (Phase C) |
+/// | Turn listing on | `PATCH /api/partner/hotels/{id}/activate` |
+/// | Turn listing off | `PATCH /api/partner/hotels/{id}/deactivate` |
 ///
-/// There is **no create and no delete**: properties are assigned to a partner
-/// by an admin (`PartnerPropertyService.assignOwner`). No "Add property"
-/// affordance appears here, because the API behind it does not exist.
+/// **Turning a listing on is not publishing it.** `active` is a workspace
+/// switch; what travellers can see depends on the property's `PlaceStatus`
+/// being PUBLISHED, which no partner endpoint changes. This screen therefore
+/// offers no publish action, and says "listing on/off" rather than "published".
 ///
-/// The four `PUT` edit endpoints (basic info, contact, policies, location) are
-/// deliberately **not** wired in C2 — an editing surface needs its own form
-/// validation, slug-conflict (409) handling and time pickers, and shipping a
-/// half-built one would be worse than shipping none. Everything here is
-/// read-only apart from the two atomic listing toggles.
+/// Phase C added creating and editing a **draft** property
+/// (`PartnerPropertyEditorScreen`). There is still **no delete**: sixteen tables
+/// carry a foreign key to `places`, `ARCHIVED` is an administrative moderation
+/// state and `active=false` deliberately does not mean "not public", so no safe
+/// partner-owned deletion semantics exist in the domain yet.
 ///
 /// ## Isolation
 ///
@@ -53,6 +58,34 @@ class PartnerPropertiesScreen extends StatefulWidget {
 class _PartnerPropertiesScreenState extends State<PartnerPropertiesScreen> {
   PartnerPropertiesState? _properties;
   PartnerState? _partner;
+
+  /// Opens the Phase C editor: a new draft when [existing] is null, otherwise
+  /// that property.
+  ///
+  /// The list is reloaded from the backend once the editor reports a save, so
+  /// what the screen shows is always the server's own record rather than a
+  /// locally patched copy.
+  Future<void> _openEditor({PartnerPropertyDetail? existing}) async {
+    final partner = _partner;
+    final properties = _properties;
+    if (partner == null || properties == null) return;
+
+    final editor =
+        PartnerPropertyEditorState(api: partner.api, original: existing);
+    var saved = false;
+    await Navigator.of(context).push(MaterialPageRoute<void>(
+      builder: (_) => PartnerPropertyEditorScreen(
+        state: editor,
+        onSaved: (_) => saved = true,
+      ),
+    ));
+    editor.dispose();
+    if (!mounted || !saved) return;
+    await properties.load(partner);
+    if (existing != null && mounted) {
+      await properties.openProperty(partner, existing.id);
+    }
+  }
 
   @override
   void didChangeDependencies() {
@@ -101,6 +134,8 @@ class _PartnerPropertiesScreenState extends State<PartnerPropertiesScreen> {
         partner: partner,
         properties: properties,
         onReload: _reload,
+        onCreate: () => _openEditor(),
+        onEdit: (detail) => _openEditor(existing: detail),
       ),
     );
   }
@@ -110,12 +145,22 @@ class _PropertiesBody extends StatelessWidget {
   final PartnerState partner;
   final PartnerPropertiesState properties;
   final Future<void> Function() onReload;
+  final VoidCallback onCreate;
+  final ValueChanged<PartnerPropertyDetail> onEdit;
 
   const _PropertiesBody({
     required this.partner,
     required this.properties,
     required this.onReload,
+    required this.onCreate,
+    required this.onEdit,
   });
+
+  /// Creating and editing mirror the backend rule exactly: `PartnerProperty
+  /// Service` resolves the caller with `partnerProfileRepo.findByUserId`, so
+  /// only the profile owner can reach these endpoints. An unknown team role
+  /// fails closed. It is UX only — the backend re-checks every request.
+  bool get _canManage => partner.teamRole == PartnerTeamRole.owner;
 
   @override
   Widget build(BuildContext context) {
@@ -153,12 +198,19 @@ class _PropertiesBody extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _PropertiesHeader(properties: properties, onReload: onReload),
+        _PropertiesHeader(
+          properties: properties,
+          onReload: onReload,
+          onCreate: _canManage ? onCreate : null,
+        ),
         const SizedBox(height: AppSpacing.md),
         if (properties.isLoading)
           const _PropertiesLoading()
         else if (properties.isEmpty)
-          _PropertiesEmpty(l10n: l10n)
+          _PropertiesEmpty(
+            l10n: l10n,
+            onCreate: _canManage ? onCreate : null,
+          )
         else if (isWide && detailOpen)
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -171,6 +223,7 @@ class _PropertiesBody extends StatelessWidget {
                   partner: partner,
                   properties: properties,
                   onReload: onReload,
+                  onEdit: _canManage ? onEdit : null,
                 ),
               ),
             ],
@@ -180,6 +233,7 @@ class _PropertiesBody extends StatelessWidget {
             partner: partner,
             properties: properties,
             onReload: onReload,
+            onEdit: _canManage ? onEdit : null,
           )
         else
           list,
@@ -192,47 +246,85 @@ class _PropertiesHeader extends StatelessWidget {
   final PartnerPropertiesState properties;
   final Future<void> Function() onReload;
 
-  const _PropertiesHeader({required this.properties, required this.onReload});
+  /// Null when this account may not manage properties; the affordance is then
+  /// absent rather than present-and-refused.
+  final VoidCallback? onCreate;
+
+  const _PropertiesHeader({
+    required this.properties,
+    required this.onReload,
+    this.onCreate,
+  });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
+    final title = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.partnerNavHotels,
+          style: theme.textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.w800,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          properties.isLoading
+              ? l10n.partnerStatusLoadingTitle
+              : l10n.partnerPropertiesCount(properties.properties.length),
+          style: theme.textTheme.bodySmall
+              ?.copyWith(color: AppColors.textSecondary),
+        ),
+      ],
+    );
+    final refresh = IconButton(
+      onPressed: properties.isLoading ? null : onReload,
+      icon: const Icon(Icons.refresh_rounded),
+      tooltip: l10n.partnerActionRefresh,
+    );
+    // fullWidth is decided by the available width below: the design system's
+    // buttons stretch by default, which a Row cannot give them.
+    Widget addButton({required bool fullWidth}) => OceanPrimaryButton(
+          key: const Key('property-add-action'),
+          label: l10n.partnerPropertyAddAction,
+          icon: Icons.add_rounded,
+          fullWidth: fullWidth,
+          onPressed: properties.isLoading ? null : onCreate,
+        );
+
     return OceanGlassCard(
       padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.partnerNavHotels,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  properties.isLoading
-                      ? l10n.partnerStatusLoadingTitle
-                      : l10n
-                          .partnerPropertiesCount(properties.properties.length),
-                  style: theme.textTheme.bodySmall
-                      ?.copyWith(color: AppColors.textSecondary),
-                ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // On a phone the action moves under the title rather than competing
+          // with it for a line that cannot hold both.
+          final stacked =
+              onCreate != null && constraints.maxWidth < AppBreakpoints.tablet;
+          final header = Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: title),
+              refresh,
+              if (onCreate != null && !stacked) ...[
+                const SizedBox(width: AppSpacing.xs),
+                addButton(fullWidth: false),
               ],
-            ),
-          ),
-          IconButton(
-            onPressed: properties.isLoading ? null : onReload,
-            icon: const Icon(Icons.refresh_rounded),
-            tooltip: l10n.partnerActionRefresh,
-          ),
-        ],
+            ],
+          );
+          if (!stacked) return header;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              header,
+              const SizedBox(height: AppSpacing.sm),
+              addButton(fullWidth: true),
+            ],
+          );
+        },
       ),
     );
   }
@@ -275,15 +367,19 @@ class _PropertiesLoading extends StatelessWidget {
 /// different screen.
 class _PropertiesEmpty extends StatelessWidget {
   final AppLocalizations l10n;
+  final VoidCallback? onCreate;
 
-  const _PropertiesEmpty({required this.l10n});
+  const _PropertiesEmpty({required this.l10n, this.onCreate});
 
   @override
   Widget build(BuildContext context) => OceanStateView(
+        key: const Key('property-empty-state'),
         icon: Icons.apartment_outlined,
         title: l10n.partnerPropertiesEmptyTitle,
         message: l10n.partnerPropertiesEmptyMessage,
         semanticLabel: l10n.partnerPropertiesEmptyTitle,
+        actionLabel: onCreate == null ? null : l10n.partnerPropertyAddAction,
+        onAction: onCreate,
       );
 }
 
@@ -427,10 +523,14 @@ class _PropertyDetailPanel extends StatelessWidget {
   final PartnerPropertiesState properties;
   final Future<void> Function() onReload;
 
+  /// Null when this account may not edit; the button is then absent.
+  final ValueChanged<PartnerPropertyDetail>? onEdit;
+
   const _PropertyDetailPanel({
     required this.partner,
     required this.properties,
     required this.onReload,
+    this.onEdit,
   });
 
   @override
@@ -469,9 +569,22 @@ class _PropertyDetailPanel extends StatelessWidget {
             )
           else if (properties.hasDetailError)
             _DetailError(properties: properties, partner: partner)
-          else if (properties.detail != null)
-            _DetailContent(detail: properties.detail!)
-          else
+          else if (properties.detail != null) ...[
+            if (onEdit != null) ...[
+              Align(
+                alignment: Alignment.centerLeft,
+                child: OceanSecondaryButton(
+                  key: const Key('property-edit-action'),
+                  label: l10n.partnerPropertyEditAction,
+                  icon: Icons.edit_outlined,
+                  fullWidth: false,
+                  onPressed: () => onEdit!(properties.detail!),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+            ],
+            _DetailContent(detail: properties.detail!),
+          ] else
             const SizedBox.shrink(),
         ],
       ),

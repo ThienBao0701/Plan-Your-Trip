@@ -4624,7 +4624,7 @@
     }
   },
   "partnerPropertiesEmptyTitle": "Chưa có cơ sở nào",
-  "partnerPropertiesEmptyMessage": "Hồ sơ đối tác của bạn đã được duyệt nhưng chưa có cơ sở nào được gán. Cơ sở do đội ngũ Plan Your Trip gán.",
+  "partnerPropertiesEmptyMessage": "Hãy tạo chỗ nghỉ đầu tiên để bắt đầu chuẩn bị tin đăng. Nó được lưu dưới dạng bản nháp mà chỉ bạn và đội ngũ Plan Your Trip nhìn thấy.",
   "partnerPropertiesSelectedSemantic": "Cơ sở đang chọn",
   "partnerPropertyDetailHeading": "Chi tiết cơ sở",
   "partnerPropertyCloseDetail": "Đóng chi tiết",
@@ -4709,6 +4709,91 @@
   "partnerPropertyFieldOwner": "Thuộc sở hữu của",
   "partnerPropertyFieldCreated": "Ngày tạo",
   "partnerPropertyFieldUpdated": "Cập nhật lần cuối",
+  "partnerPropertyAddAction": "Thêm chỗ nghỉ",
+  "partnerPropertyEditAction": "Sửa chỗ nghỉ",
+  "partnerPropertyEditorCreateTitle": "Chỗ nghỉ mới",
+  "partnerPropertyEditorEditTitle": "Sửa chỗ nghỉ",
+  "partnerPropertyEditorIntro": "Mọi thông tin ở đây được lưu dưới dạng bản nháp. Du khách không thấy bản nháp, và chỉ đội ngũ Plan Your Trip mới có thể đăng.",
+  "partnerPropertyEditorSectionBasics": "Thông tin cơ bản",
+  "partnerPropertyEditorSectionLocation": "Vị trí",
+  "partnerPropertyEditorSectionContact": "Liên hệ",
+  "partnerPropertyEditorSectionDetails": "Chi tiết và chính sách",
+  "partnerPropertyEditorSectionAmenities": "Tiện ích",
+  "partnerPropertyEditorSaveDraft": "Lưu bản nháp",
+  "partnerPropertyEditorSaveChanges": "Lưu thay đổi",
+  "partnerPropertyEditorCancel": "Hủy",
+  "partnerPropertyFieldName": "Tên chỗ nghỉ",
+  "partnerPropertyFieldCategory": "Loại hình",
+  "partnerPropertyFieldSubcategory": "Loại hình cụ thể",
+  "partnerPropertyFieldLocationUnit": "Đơn vị hành chính",
+  "partnerPropertyFieldLatitude": "Vĩ độ",
+  "partnerPropertyFieldLongitude": "Kinh độ",
+  "partnerPropertyFieldStarRating": "Hạng chỗ nghỉ",
+  "partnerPropertyFieldCancellationPolicy": "Chính sách hủy",
+  "partnerPropertyFieldParking": "Đỗ xe",
+  "partnerPropertyFieldWifi": "Wi-Fi",
+  "partnerPropertyFieldLanguages": "Ngôn ngữ phục vụ",
+  "partnerPropertyFieldPaymentMethods": "Hình thức thanh toán",
+  "partnerPropertyFieldAmenities": "Tiện ích của chỗ nghỉ",
+  "partnerPropertyStarRatingHelp": "Hạng do chính bạn tự khai, từ 1 đến 5. Đây không phải hạng sao đã được thẩm định.",
+  "partnerPropertySlugHelp": "Được tạo khi thêm chỗ nghỉ, vì nó nằm trong địa chỉ công khai.",
+  "partnerPropertyListHelp": "Phân cách các mục bằng dấu phẩy.",
+  "partnerPropertyCoordinatesHelp": "Không bắt buộc. Vĩ độ từ -90 đến 90, kinh độ từ -180 đến 180.",
+  "partnerPropertyAmenitiesHelp": "Chọn từ danh mục tiện ích của Plan Your Trip. Tiện ích trong phòng sẽ được khai báo ở từng phòng sau.",
+  "partnerPropertyAmenitiesSelected": "{count, plural, =0{Chưa chọn mục nào} other{Đã chọn {count} mục}}",
+  "@partnerPropertyAmenitiesSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "partnerPropertyDraftNotice": "Bản nháp — du khách chưa thấy",
+  "partnerPropertyFreeCancellation": "Hủy miễn phí",
+  "partnerPropertyParkingAvailable": "Có chỗ đỗ xe",
+  "partnerPropertyParkingFree": "Đỗ xe miễn phí",
+  "partnerPropertyWifiAvailable": "Có Wi-Fi",
+  "partnerPropertyWifiFree": "Wi-Fi miễn phí",
+  "partnerPropertyLocationCountry": "Quốc gia",
+  "partnerPropertyLocationProvince": "Tỉnh hoặc thành phố",
+  "partnerPropertyLocationArea": "Khu vực (không bắt buộc)",
+  "partnerPropertySelectPrompt": "Chọn",
+  "partnerPropertyReferenceLoading": "Đang tải các lựa chọn…",
+  "partnerPropertyReferenceError": "Không tải được các lựa chọn, nên chưa thể lưu.",
+  "partnerPropertyValidationName": "Nhập tên chỗ nghỉ.",
+  "partnerPropertyValidationAddress": "Nhập địa chỉ cụ thể.",
+  "partnerPropertyValidationCategory": "Chọn loại hình chỗ nghỉ.",
+  "partnerPropertyValidationLocation": "Chọn tỉnh, thành phố hoặc khu vực của chỗ nghỉ.",
+  "partnerPropertyValidationTime": "Nhập giờ theo dạng HH:MM.",
+  "partnerPropertyValidationLatitude": "Vĩ độ phải nằm trong khoảng -90 đến 90.",
+  "partnerPropertyValidationLongitude": "Kinh độ phải nằm trong khoảng -180 đến 180.",
+  "partnerPropertyValidationEmail": "Nhập địa chỉ email hợp lệ.",
+  "partnerPropertyValidationStarRating": "Chọn hạng từ 1 đến 5.",
+  "partnerPropertyCreatedMessage": "Đã lưu {name} dưới dạng bản nháp.",
+  "@partnerPropertyCreatedMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerPropertySavedMessage": "Đã cập nhật {name}.",
+  "@partnerPropertySavedMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerPropertyErrorValidation": "Vui lòng kiểm tra các trường được đánh dấu.",
+  "partnerPropertyErrorCategory": "Loại hình này hiện không dùng được. Hãy chọn loại khác.",
+  "partnerPropertyErrorLocation": "Chỗ nghỉ không thể đặt tại vị trí đó. Hãy chọn tỉnh, thành phố hoặc khu vực.",
+  "partnerPropertyErrorAmenity": "Một tiện ích đã chọn không còn khả dụng. Hãy tải lại danh sách và thử lại.",
+  "partnerPropertyErrorSlugConflict": "Một chỗ nghỉ khác đang dùng địa chỉ đó.",
+  "partnerPropertyErrorApproval": "Hồ sơ doanh nghiệp cần được duyệt trước khi bạn quản lý chỗ nghỉ.",
+  "partnerPropertyGateTitle": "Cần duyệt hồ sơ doanh nghiệp",
+  "partnerPropertyGateMessage": "Bạn có thể thêm và sửa chỗ nghỉ sau khi quản trị viên duyệt hồ sơ doanh nghiệp.",
+  "partnerPropertyGateAction": "Mở tài khoản của tôi",
   "partnerRoomsCount": "{count, plural, =1{1 loại phòng} other{{count} loại phòng}}",
   "@partnerRoomsCount": {
     "placeholders": {

@@ -4624,7 +4624,7 @@
     }
   },
   "partnerPropertiesEmptyTitle": "No properties yet",
-  "partnerPropertiesEmptyMessage": "Your partner profile is approved, but no property has been assigned to it yet. Properties are assigned by the Plan Your Trip team.",
+  "partnerPropertiesEmptyMessage": "Create your first property to start preparing your listing. It is saved as a draft that only you and the Plan Your Trip team can see.",
   "partnerPropertiesSelectedSemantic": "Selected property",
   "partnerPropertyDetailHeading": "Property details",
   "partnerPropertyCloseDetail": "Close details",
@@ -4709,6 +4709,91 @@
   "partnerPropertyFieldOwner": "Owned by",
   "partnerPropertyFieldCreated": "Created",
   "partnerPropertyFieldUpdated": "Last updated",
+  "partnerPropertyAddAction": "Add property",
+  "partnerPropertyEditAction": "Edit property",
+  "partnerPropertyEditorCreateTitle": "New property",
+  "partnerPropertyEditorEditTitle": "Edit property",
+  "partnerPropertyEditorIntro": "Everything here is saved as a draft. Travellers cannot see a draft, and only the Plan Your Trip team can publish one.",
+  "partnerPropertyEditorSectionBasics": "Property basics",
+  "partnerPropertyEditorSectionLocation": "Location",
+  "partnerPropertyEditorSectionContact": "Contact",
+  "partnerPropertyEditorSectionDetails": "Details and policies",
+  "partnerPropertyEditorSectionAmenities": "Amenities",
+  "partnerPropertyEditorSaveDraft": "Save draft",
+  "partnerPropertyEditorSaveChanges": "Save changes",
+  "partnerPropertyEditorCancel": "Cancel",
+  "partnerPropertyFieldName": "Property name",
+  "partnerPropertyFieldCategory": "Property type",
+  "partnerPropertyFieldSubcategory": "Specific type",
+  "partnerPropertyFieldLocationUnit": "Administrative area",
+  "partnerPropertyFieldLatitude": "Latitude",
+  "partnerPropertyFieldLongitude": "Longitude",
+  "partnerPropertyFieldStarRating": "Property rating",
+  "partnerPropertyFieldCancellationPolicy": "Cancellation policy",
+  "partnerPropertyFieldParking": "Parking",
+  "partnerPropertyFieldWifi": "Wi-Fi",
+  "partnerPropertyFieldLanguages": "Languages spoken",
+  "partnerPropertyFieldPaymentMethods": "Payment methods",
+  "partnerPropertyFieldAmenities": "Property amenities",
+  "partnerPropertyStarRatingHelp": "Your own classification from 1 to 5. It is not a verified star rating.",
+  "partnerPropertySlugHelp": "Set when the property is created, because it is part of its public address.",
+  "partnerPropertyListHelp": "Separate entries with a comma.",
+  "partnerPropertyCoordinatesHelp": "Optional. Latitude between -90 and 90, longitude between -180 and 180.",
+  "partnerPropertyAmenitiesHelp": "Choose from the amenities the Plan Your Trip catalogue defines. Room amenities are set on each room later.",
+  "partnerPropertyAmenitiesSelected": "{count, plural, =0{None selected} =1{1 selected} other{{count} selected}}",
+  "@partnerPropertyAmenitiesSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "partnerPropertyDraftNotice": "Draft — not visible to travellers",
+  "partnerPropertyFreeCancellation": "Free cancellation",
+  "partnerPropertyParkingAvailable": "Parking available",
+  "partnerPropertyParkingFree": "Parking is free",
+  "partnerPropertyWifiAvailable": "Wi-Fi available",
+  "partnerPropertyWifiFree": "Wi-Fi is free",
+  "partnerPropertyLocationCountry": "Country",
+  "partnerPropertyLocationProvince": "Province or city",
+  "partnerPropertyLocationArea": "Area (optional)",
+  "partnerPropertySelectPrompt": "Select",
+  "partnerPropertyReferenceLoading": "Loading the property options…",
+  "partnerPropertyReferenceError": "The property options could not be loaded, so nothing can be saved yet.",
+  "partnerPropertyValidationName": "Enter the property name.",
+  "partnerPropertyValidationAddress": "Enter the street address.",
+  "partnerPropertyValidationCategory": "Choose a property type.",
+  "partnerPropertyValidationLocation": "Choose the province, city or area the property is in.",
+  "partnerPropertyValidationTime": "Enter a time as HH:MM.",
+  "partnerPropertyValidationLatitude": "Latitude must be between -90 and 90.",
+  "partnerPropertyValidationLongitude": "Longitude must be between -180 and 180.",
+  "partnerPropertyValidationEmail": "Enter a valid email address.",
+  "partnerPropertyValidationStarRating": "Choose a rating from 1 to 5.",
+  "partnerPropertyCreatedMessage": "{name} was saved as a draft.",
+  "@partnerPropertyCreatedMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerPropertySavedMessage": "{name} was updated.",
+  "@partnerPropertySavedMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerPropertyErrorValidation": "Please check the highlighted fields.",
+  "partnerPropertyErrorCategory": "That property type is not available. Choose another one.",
+  "partnerPropertyErrorLocation": "A property cannot sit in that location. Choose a province, city or area.",
+  "partnerPropertyErrorAmenity": "One of the selected amenities is not available any more. Reload the options and try again.",
+  "partnerPropertyErrorSlugConflict": "Another property already uses that address.",
+  "partnerPropertyErrorApproval": "Your business profile must be approved before you can manage properties.",
+  "partnerPropertyGateTitle": "Business profile approval required",
+  "partnerPropertyGateMessage": "You can add and edit properties once an administrator approves your business profile.",
+  "partnerPropertyGateAction": "Open my account",
   "partnerRoomsCount": "{count, plural, =1{1 room type} other{{count} room types}}",
   "@partnerRoomsCount": {
     "placeholders": {

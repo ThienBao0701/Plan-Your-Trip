@@ -273,8 +273,11 @@ void main() {
       expect(find.text(en.partnerKpiOccupancy), findsNothing);
       expect(find.text(en.partnerKpiTotalRevenue), findsNothing);
       expect(find.text(en.partnerOccupancyInventory), findsNothing);
-      // ...and there is no create affordance, because no create endpoint exists.
-      expect(find.byIcon(Icons.add), findsNothing);
+      // Phase C added the create endpoint, so the affordance exists now. This
+      // assertion was "no create affordance" while none did; it is updated
+      // deliberately rather than deleted, because it is the same claim about
+      // the same screen — only the backend's answer changed.
+      expect(find.byKey(const Key('property-add-action')), findsOneWidget);
     });
 
     testWidgets('renders multiple properties', (tester) async {

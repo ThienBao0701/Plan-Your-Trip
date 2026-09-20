@@ -8993,7 +8993,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get partnerPropertiesEmptyMessage =>
-      'Your partner profile is approved, but no property has been assigned to it yet. Properties are assigned by the Plan Your Trip team.';
+      'Create your first property to start preparing your listing. It is saved as a draft that only you and the Plan Your Trip team can see.';
 
   @override
   String get partnerPropertiesSelectedSemantic => 'Selected property';
@@ -9194,6 +9194,228 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get partnerPropertyFieldUpdated => 'Last updated';
+
+  @override
+  String get partnerPropertyAddAction => 'Add property';
+
+  @override
+  String get partnerPropertyEditAction => 'Edit property';
+
+  @override
+  String get partnerPropertyEditorCreateTitle => 'New property';
+
+  @override
+  String get partnerPropertyEditorEditTitle => 'Edit property';
+
+  @override
+  String get partnerPropertyEditorIntro =>
+      'Everything here is saved as a draft. Travellers cannot see a draft, and only the Plan Your Trip team can publish one.';
+
+  @override
+  String get partnerPropertyEditorSectionBasics => 'Property basics';
+
+  @override
+  String get partnerPropertyEditorSectionLocation => 'Location';
+
+  @override
+  String get partnerPropertyEditorSectionContact => 'Contact';
+
+  @override
+  String get partnerPropertyEditorSectionDetails => 'Details and policies';
+
+  @override
+  String get partnerPropertyEditorSectionAmenities => 'Amenities';
+
+  @override
+  String get partnerPropertyEditorSaveDraft => 'Save draft';
+
+  @override
+  String get partnerPropertyEditorSaveChanges => 'Save changes';
+
+  @override
+  String get partnerPropertyEditorCancel => 'Cancel';
+
+  @override
+  String get partnerPropertyFieldName => 'Property name';
+
+  @override
+  String get partnerPropertyFieldCategory => 'Property type';
+
+  @override
+  String get partnerPropertyFieldSubcategory => 'Specific type';
+
+  @override
+  String get partnerPropertyFieldLocationUnit => 'Administrative area';
+
+  @override
+  String get partnerPropertyFieldLatitude => 'Latitude';
+
+  @override
+  String get partnerPropertyFieldLongitude => 'Longitude';
+
+  @override
+  String get partnerPropertyFieldStarRating => 'Property rating';
+
+  @override
+  String get partnerPropertyFieldCancellationPolicy => 'Cancellation policy';
+
+  @override
+  String get partnerPropertyFieldParking => 'Parking';
+
+  @override
+  String get partnerPropertyFieldWifi => 'Wi-Fi';
+
+  @override
+  String get partnerPropertyFieldLanguages => 'Languages spoken';
+
+  @override
+  String get partnerPropertyFieldPaymentMethods => 'Payment methods';
+
+  @override
+  String get partnerPropertyFieldAmenities => 'Property amenities';
+
+  @override
+  String get partnerPropertyStarRatingHelp =>
+      'Your own classification from 1 to 5. It is not a verified star rating.';
+
+  @override
+  String get partnerPropertySlugHelp =>
+      'Set when the property is created, because it is part of its public address.';
+
+  @override
+  String get partnerPropertyListHelp => 'Separate entries with a comma.';
+
+  @override
+  String get partnerPropertyCoordinatesHelp =>
+      'Optional. Latitude between -90 and 90, longitude between -180 and 180.';
+
+  @override
+  String get partnerPropertyAmenitiesHelp =>
+      'Choose from the amenities the Plan Your Trip catalogue defines. Room amenities are set on each room later.';
+
+  @override
+  String partnerPropertyAmenitiesSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count selected',
+      one: '1 selected',
+      zero: 'None selected',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get partnerPropertyDraftNotice => 'Draft — not visible to travellers';
+
+  @override
+  String get partnerPropertyFreeCancellation => 'Free cancellation';
+
+  @override
+  String get partnerPropertyParkingAvailable => 'Parking available';
+
+  @override
+  String get partnerPropertyParkingFree => 'Parking is free';
+
+  @override
+  String get partnerPropertyWifiAvailable => 'Wi-Fi available';
+
+  @override
+  String get partnerPropertyWifiFree => 'Wi-Fi is free';
+
+  @override
+  String get partnerPropertyLocationCountry => 'Country';
+
+  @override
+  String get partnerPropertyLocationProvince => 'Province or city';
+
+  @override
+  String get partnerPropertyLocationArea => 'Area (optional)';
+
+  @override
+  String get partnerPropertySelectPrompt => 'Select';
+
+  @override
+  String get partnerPropertyReferenceLoading => 'Loading the property options…';
+
+  @override
+  String get partnerPropertyReferenceError =>
+      'The property options could not be loaded, so nothing can be saved yet.';
+
+  @override
+  String get partnerPropertyValidationName => 'Enter the property name.';
+
+  @override
+  String get partnerPropertyValidationAddress => 'Enter the street address.';
+
+  @override
+  String get partnerPropertyValidationCategory => 'Choose a property type.';
+
+  @override
+  String get partnerPropertyValidationLocation =>
+      'Choose the province, city or area the property is in.';
+
+  @override
+  String get partnerPropertyValidationTime => 'Enter a time as HH:MM.';
+
+  @override
+  String get partnerPropertyValidationLatitude =>
+      'Latitude must be between -90 and 90.';
+
+  @override
+  String get partnerPropertyValidationLongitude =>
+      'Longitude must be between -180 and 180.';
+
+  @override
+  String get partnerPropertyValidationEmail => 'Enter a valid email address.';
+
+  @override
+  String get partnerPropertyValidationStarRating =>
+      'Choose a rating from 1 to 5.';
+
+  @override
+  String partnerPropertyCreatedMessage(String name) {
+    return '$name was saved as a draft.';
+  }
+
+  @override
+  String partnerPropertySavedMessage(String name) {
+    return '$name was updated.';
+  }
+
+  @override
+  String get partnerPropertyErrorValidation =>
+      'Please check the highlighted fields.';
+
+  @override
+  String get partnerPropertyErrorCategory =>
+      'That property type is not available. Choose another one.';
+
+  @override
+  String get partnerPropertyErrorLocation =>
+      'A property cannot sit in that location. Choose a province, city or area.';
+
+  @override
+  String get partnerPropertyErrorAmenity =>
+      'One of the selected amenities is not available any more. Reload the options and try again.';
+
+  @override
+  String get partnerPropertyErrorSlugConflict =>
+      'Another property already uses that address.';
+
+  @override
+  String get partnerPropertyErrorApproval =>
+      'Your business profile must be approved before you can manage properties.';
+
+  @override
+  String get partnerPropertyGateTitle => 'Business profile approval required';
+
+  @override
+  String get partnerPropertyGateMessage =>
+      'You can add and edit properties once an administrator approves your business profile.';
+
+  @override
+  String get partnerPropertyGateAction => 'Open my account';
 
   @override
   String partnerRoomsCount(int count) {

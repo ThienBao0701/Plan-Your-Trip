@@ -118,6 +118,37 @@ class PartnerPropertyDetail {
 
   final int? ownerProfileId;
   final String? ownerBusinessName;
+
+  // ── Phase C ────────────────────────────────────────────────────────────
+  //
+  // The catalogue references the partner chose, resolved by the backend rather
+  // than echoed: a property is classified by an admin-managed category and sits
+  // in an admin-managed administrative unit.
+  final PropertyCategoryRef? category;
+  final PropertyCategoryRef? subcategory;
+  final PropertyLocationRef? administrativeUnit;
+
+  /// What the partner declared about their own property, 1–5. Null only for a
+  /// property with no `HotelDetail` row yet. It is **not** an audited
+  /// classification and must never be presented as one.
+  final int? starRating;
+
+  final String? cancellationPolicy;
+  final bool? freeCancellation;
+  final String? paymentPolicy;
+  final bool? prepaymentRequired;
+  final bool? parkingAvailable;
+  final bool? parkingFree;
+  final String? parkingDescription;
+  final bool? wifiAvailable;
+  final bool? wifiFree;
+  final String? internetDescription;
+
+  /// Empty when the property has none, never null — the backend sends a list.
+  final List<String> languages;
+  final List<String> paymentMethods;
+  final List<PropertyAmenityRef> amenities;
+
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -148,6 +179,23 @@ class PartnerPropertyDetail {
     this.smokingPolicy,
     this.ownerProfileId,
     this.ownerBusinessName,
+    this.category,
+    this.subcategory,
+    this.administrativeUnit,
+    this.starRating,
+    this.cancellationPolicy,
+    this.freeCancellation,
+    this.paymentPolicy,
+    this.prepaymentRequired,
+    this.parkingAvailable,
+    this.parkingFree,
+    this.parkingDescription,
+    this.wifiAvailable,
+    this.wifiFree,
+    this.internetDescription,
+    this.languages = const [],
+    this.paymentMethods = const [],
+    this.amenities = const [],
     this.createdAt,
     this.updatedAt,
   });
@@ -200,10 +248,146 @@ class PartnerPropertyDetail {
       status: PartnerPlaceStatus.parse(json['status']),
       ownerProfileId: _asInt(json['ownerProfileId']),
       ownerBusinessName: _asString(json['ownerBusinessName']),
+      category: PropertyCategoryRef.fromJson(json['category']),
+      subcategory: PropertyCategoryRef.fromJson(json['subcategory']),
+      administrativeUnit:
+          PropertyLocationRef.fromJson(json['administrativeUnit']),
+      starRating: _asInt(json['starRating']),
+      cancellationPolicy: _asString(json['cancellationPolicy']),
+      freeCancellation: _asBool(json['freeCancellation']),
+      paymentPolicy: _asString(json['paymentPolicy']),
+      prepaymentRequired: _asBool(json['prepaymentRequired']),
+      parkingAvailable: _asBool(json['parkingAvailable']),
+      parkingFree: _asBool(json['parkingFree']),
+      parkingDescription: _asString(json['parkingDescription']),
+      wifiAvailable: _asBool(json['wifiAvailable']),
+      wifiFree: _asBool(json['wifiFree']),
+      internetDescription: _asString(json['internetDescription']),
+      languages: _asStringList(json['languages']),
+      paymentMethods: _asStringList(json['paymentMethods']),
+      amenities: PropertyAmenityRef.listFrom(json['amenities']),
       createdAt: _asDate(json['createdAt']),
       updatedAt: _asDate(json['updatedAt']),
     );
   }
+}
+
+/// `dto/PlaceDto.CategoryRef` — an admin-managed category, as the backend
+/// resolved it. Never constructed from user input.
+class PropertyCategoryRef {
+  final int id;
+  final String name;
+  final String? slug;
+  final String? type;
+  final String? icon;
+
+  const PropertyCategoryRef({
+    required this.id,
+    required this.name,
+    this.slug,
+    this.type,
+    this.icon,
+  });
+
+  static PropertyCategoryRef? fromJson(Object? json) {
+    if (json is! Map<String, dynamic>) return null;
+    final id = _asInt(json['id']);
+    if (id == null) return null;
+    return PropertyCategoryRef(
+      id: id,
+      name: _asString(json['name']) ?? '',
+      slug: _asString(json['slug']),
+      type: _asString(json['type']),
+      icon: _asString(json['icon']),
+    );
+  }
+}
+
+/// `dto/PlaceDto.LocationRef` — one administrative unit. `fullPath` is the
+/// backend's own rendering of the hierarchy ("Vietnam > Da Nang > ..."), so the
+/// client never assembles one itself.
+class PropertyLocationRef {
+  final int id;
+  final String name;
+  final String? slug;
+  final String? fullPath;
+
+  const PropertyLocationRef({
+    required this.id,
+    required this.name,
+    this.slug,
+    this.fullPath,
+  });
+
+  /// The most complete label the backend supplied.
+  String get label => fullPath ?? name;
+
+  static PropertyLocationRef? fromJson(Object? json) {
+    if (json is! Map<String, dynamic>) return null;
+    final id = _asInt(json['id']);
+    if (id == null) return null;
+    return PropertyLocationRef(
+      id: id,
+      name: _asString(json['name']) ?? '',
+      slug: _asString(json['slug']),
+      fullPath: _asString(json['fullPath']),
+    );
+  }
+}
+
+/// `dto/PlaceDto.AmenityRef` — one linked amenity from the admin catalogue.
+class PropertyAmenityRef {
+  final int id;
+  final String name;
+  final String? slug;
+  final String? icon;
+  final String? groupName;
+
+  const PropertyAmenityRef({
+    required this.id,
+    required this.name,
+    this.slug,
+    this.icon,
+    this.groupName,
+  });
+
+  static PropertyAmenityRef? fromJson(Object? json) {
+    if (json is! Map<String, dynamic>) return null;
+    final id = _asInt(json['id']);
+    if (id == null) return null;
+    return PropertyAmenityRef(
+      id: id,
+      name: _asString(json['name']) ?? '',
+      slug: _asString(json['slug']),
+      icon: _asString(json['icon']),
+      groupName: _asString(json['groupName']),
+    );
+  }
+
+  static List<PropertyAmenityRef> listFrom(Object? json) {
+    if (json is! List) return const [];
+    final refs = <PropertyAmenityRef>[];
+    for (final entry in json) {
+      final ref = PropertyAmenityRef.fromJson(entry);
+      if (ref != null) refs.add(ref);
+    }
+    return refs;
+  }
+}
+
+/// Booleans the backend sends as real nulls when there is no `HotelDetail` row:
+/// "not recorded" is not "false", and the editor must not turn one into the
+/// other behind the partner's back.
+bool? _asBool(Object? value) => value is bool ? value : null;
+
+List<String> _asStringList(Object? value) {
+  if (value is! List) return const [];
+  final items = <String>[];
+  for (final entry in value) {
+    final text = _asString(entry);
+    if (text != null) items.add(text);
+  }
+  return items;
 }
 
 /// `LocalTime` arrives as `"HH:mm:ss"` (or `"HH:mm"`). Trim the seconds for

@@ -5,6 +5,7 @@ import '../config/app_config.dart';
 import '../admin/admin_models.dart';
 import '../auth/auth_error.dart';
 import '../auth/auth_models.dart';
+import 'api_failure.dart';
 import '../mock/app_models.dart';
 import '../mock/mock_data.dart';
 import '../partner/partner_account_models.dart';
@@ -16,6 +17,7 @@ import '../partner/partner_models.dart';
 import '../partner/partner_inventory_models.dart';
 import '../partner/partner_policy_models.dart';
 import '../partner/partner_promotion_models.dart';
+import '../partner/partner_property_form_models.dart';
 import '../partner/partner_property_models.dart';
 import '../partner/partner_rate_models.dart';
 import '../partner/partner_room_models.dart';
@@ -4664,9 +4666,10 @@ class ApiClient {
   // ── Partner Properties (C2) ─────────────────────────────────────────────
   //
   // `PartnerHotelController` exposes GET list, GET detail, four PUT edit
-  // endpoints and PATCH activate/deactivate. There is **no create and no
-  // delete** — a partner's properties are assigned to them by an admin
-  // (`PartnerPropertyService.assignOwner`), so no client-side create exists.
+  // endpoints and PATCH activate/deactivate. Phase C added `POST` (create) and
+  // `PUT /{id}/amenities`; see the Phase C section below. There is still **no
+  // delete** — sixteen tables carry a foreign key to `places`, so no safe
+  // partner-owned deletion semantics exist yet.
   //
   // Ownership: every method resolves through
   // `ownedPlaceOrThrow` → `places.findByIdAndOwnerId`, which returns a uniform
@@ -4687,7 +4690,11 @@ class ApiClient {
         (body) => PartnerPropertyDetail.fromJson(body),
       ).then(_requireDetail);
 
-  /// `PATCH /api/partner/hotels/{id}/activate` — publish the listing to guests.
+  /// `PATCH /api/partner/hotels/{id}/activate` — turns the listing on inside
+  /// the workspace.
+  ///
+  /// This is **not** publication: what guests can see depends on the property's
+  /// `PlaceStatus` being PUBLISHED, which no partner endpoint changes.
   ///
   /// Returns the full updated `PartnerHotelResponse`, so state is refreshed
   /// from the server's own answer rather than optimistically guessed.
@@ -4741,6 +4748,148 @@ class ApiClient {
               : CollectionApiResult.success(
                   result.data as PartnerPropertyDetail))
           : CollectionApiResult.failure(result.errorKind, result.message);
+
+  // ── Partner property CRUD (Phase C) ─────────────────────────────────────
+  //
+  // `PartnerHotelController` gained `POST /api/partner/hotels` and
+  // `PUT /api/partner/hotels/{id}/amenities`, and the four existing PUTs gained
+  // optional classification/location/detail fields. The rules these calls rely
+  // on are the backend's, not this client's:
+  //
+  //   * the owner and the author come from the authenticated principal — no
+  //     request here carries an owner, a partner id or a status;
+  //   * a created property is DRAFT, and nothing in this API publishes;
+  //   * category, administrative unit and amenity ids are validated against the
+  //     admin-managed catalogue, and a refused one comes back as 422 with a
+  //     `code` and the field that caused it.
+  //
+  // These return [ApiWriteResult] rather than [CollectionApiResult] because a
+  // form needs the `fieldErrors` the Phase A error body carries.
+
+  /// `POST /api/partner/hotels` — creates one draft property. 201 with the full
+  /// record.
+  Future<ApiWriteResult<PartnerPropertyDetail>> createPartnerProperty(
+          PartnerPropertyDraft draft) =>
+      _partnerPropertyWrite(
+        '/partner/hotels',
+        draft.toRequestJson(),
+        created: true,
+      );
+
+  /// `PUT /api/partner/hotels/{id}` — name, descriptions and classification.
+  Future<ApiWriteResult<PartnerPropertyDetail>> updatePartnerPropertyBasics({
+    required int propertyId,
+    required PartnerPropertyBasics basics,
+  }) =>
+      _partnerPropertyWrite(
+          '/partner/hotels/$propertyId', basics.toRequestJson());
+
+  /// `PUT /api/partner/hotels/{id}/contact`.
+  Future<ApiWriteResult<PartnerPropertyDetail>> updatePartnerPropertyContact({
+    required int propertyId,
+    required PartnerPropertyContact contact,
+  }) =>
+      _partnerPropertyWrite(
+          '/partner/hotels/$propertyId/contact', contact.toRequestJson());
+
+  /// `PUT /api/partner/hotels/{id}/location` — address, coordinates and unit.
+  Future<ApiWriteResult<PartnerPropertyDetail>> updatePartnerPropertyPlacement({
+    required int propertyId,
+    required PartnerPropertyPlacement placement,
+  }) =>
+      _partnerPropertyWrite(
+          '/partner/hotels/$propertyId/location', placement.toRequestJson());
+
+  /// `PUT /api/partner/hotels/{id}/policies` — check-in/out, house rules and
+  /// the Phase C property details.
+  Future<ApiWriteResult<PartnerPropertyDetail>> updatePartnerPropertyDetails({
+    required int propertyId,
+    required PartnerPropertyDetails details,
+  }) =>
+      _partnerPropertyWrite(
+          '/partner/hotels/$propertyId/policies', details.toRequestJson());
+
+  /// `PUT /api/partner/hotels/{id}/amenities` — replaces the whole set.
+  Future<ApiWriteResult<PartnerPropertyDetail>> updatePartnerPropertyAmenities({
+    required int propertyId,
+    required List<int> amenityIds,
+  }) =>
+      _partnerPropertyWrite(
+          '/partner/hotels/$propertyId/amenities', {'amenityIds': amenityIds});
+
+  /// One request/decode path for every property write.
+  ///
+  /// A timeout is [ApiErrorKind.uncertain], never a failure: the mutation may
+  /// have been committed before the connection dropped, and a screen must not
+  /// claim either outcome.
+  Future<ApiWriteResult<PartnerPropertyDetail>> _partnerPropertyWrite(
+    String path,
+    Map<String, dynamic> body, {
+    bool created = false,
+  }) async {
+    final uri = _partnerUri(path);
+    try {
+      final res = created
+          ? await _client
+              .post(uri, headers: _jsonHeaders, body: jsonEncode(body))
+              .timeout(_collectionsTimeout)
+          : await _client
+              .put(uri, headers: _jsonHeaders, body: jsonEncode(body))
+              .timeout(_collectionsTimeout);
+      final decoded = _decodeJsonMap(res).data;
+      if (res.statusCode == (created ? 201 : 200)) {
+        final detail =
+            decoded == null ? null : PartnerPropertyDetail.fromJson(decoded);
+        if (detail == null) {
+          return ApiWriteResult.of(ApiErrorKind.malformed);
+        }
+        return ApiWriteResult.success(detail);
+      }
+      return ApiWriteResult.failed(ApiFailure.fromResponse(
+        res.statusCode,
+        decoded,
+        _errorKindForStatus(res.statusCode),
+      ));
+    } on TimeoutException {
+      return ApiWriteResult.of(ApiErrorKind.uncertain);
+    } on http.ClientException {
+      return ApiWriteResult.of(ApiErrorKind.network);
+    } on FormatException {
+      return ApiWriteResult.of(ApiErrorKind.malformed);
+    } catch (_) {
+      return ApiWriteResult.of(ApiErrorKind.network);
+    }
+  }
+
+  // ── Property reference data (Phase C) ───────────────────────────────────
+  //
+  // Admin-managed catalogue, readable without a session
+  // (`SecurityConfig`: GET /api/categories/**, /api/locations/**,
+  // /api/amenities/** are permitAll). The editor offers only what these return,
+  // and the backend re-validates every id it is sent.
+
+  /// `GET /api/categories` — the whole flat list; the caller keeps the
+  /// accommodation ones.
+  Future<CollectionApiResult<List<PropertyCategoryOption>>>
+      getPropertyCategories() => _partnerGetList(
+          _partnerUri('/categories'), PropertyCategoryOption.fromJson);
+
+  /// `GET /api/locations/roots` — the top of the D13 hierarchy.
+  Future<CollectionApiResult<List<PropertyLocationOption>>>
+      getLocationRoots() => _partnerGetList(
+          _partnerUri('/locations/roots'), PropertyLocationOption.fromJson);
+
+  /// `GET /api/locations/{id}/children` — one level down.
+  Future<CollectionApiResult<List<PropertyLocationOption>>> getLocationChildren(
+          int parentId) =>
+      _partnerGetList(_partnerUri('/locations/$parentId/children'),
+          PropertyLocationOption.fromJson);
+
+  /// `GET /api/amenities` — the whole catalogue; the caller keeps the groups
+  /// that describe a property.
+  Future<CollectionApiResult<List<PropertyAmenityOption>>>
+      getPropertyAmenities() => _partnerGetList(
+          _partnerUri('/amenities'), PropertyAmenityOption.fromJson);
 
   // ── Partner Rooms (C3) ──────────────────────────────────────────────────
   //

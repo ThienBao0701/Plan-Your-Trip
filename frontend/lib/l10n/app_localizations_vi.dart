@@ -8827,7 +8827,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get partnerPropertiesEmptyMessage =>
-      'Hồ sơ đối tác của bạn đã được duyệt nhưng chưa có cơ sở nào được gán. Cơ sở do đội ngũ Plan Your Trip gán.';
+      'Hãy tạo chỗ nghỉ đầu tiên để bắt đầu chuẩn bị tin đăng. Nó được lưu dưới dạng bản nháp mà chỉ bạn và đội ngũ Plan Your Trip nhìn thấy.';
 
   @override
   String get partnerPropertiesSelectedSemantic => 'Cơ sở đang chọn';
@@ -9028,6 +9028,226 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get partnerPropertyFieldUpdated => 'Cập nhật lần cuối';
+
+  @override
+  String get partnerPropertyAddAction => 'Thêm chỗ nghỉ';
+
+  @override
+  String get partnerPropertyEditAction => 'Sửa chỗ nghỉ';
+
+  @override
+  String get partnerPropertyEditorCreateTitle => 'Chỗ nghỉ mới';
+
+  @override
+  String get partnerPropertyEditorEditTitle => 'Sửa chỗ nghỉ';
+
+  @override
+  String get partnerPropertyEditorIntro =>
+      'Mọi thông tin ở đây được lưu dưới dạng bản nháp. Du khách không thấy bản nháp, và chỉ đội ngũ Plan Your Trip mới có thể đăng.';
+
+  @override
+  String get partnerPropertyEditorSectionBasics => 'Thông tin cơ bản';
+
+  @override
+  String get partnerPropertyEditorSectionLocation => 'Vị trí';
+
+  @override
+  String get partnerPropertyEditorSectionContact => 'Liên hệ';
+
+  @override
+  String get partnerPropertyEditorSectionDetails => 'Chi tiết và chính sách';
+
+  @override
+  String get partnerPropertyEditorSectionAmenities => 'Tiện ích';
+
+  @override
+  String get partnerPropertyEditorSaveDraft => 'Lưu bản nháp';
+
+  @override
+  String get partnerPropertyEditorSaveChanges => 'Lưu thay đổi';
+
+  @override
+  String get partnerPropertyEditorCancel => 'Hủy';
+
+  @override
+  String get partnerPropertyFieldName => 'Tên chỗ nghỉ';
+
+  @override
+  String get partnerPropertyFieldCategory => 'Loại hình';
+
+  @override
+  String get partnerPropertyFieldSubcategory => 'Loại hình cụ thể';
+
+  @override
+  String get partnerPropertyFieldLocationUnit => 'Đơn vị hành chính';
+
+  @override
+  String get partnerPropertyFieldLatitude => 'Vĩ độ';
+
+  @override
+  String get partnerPropertyFieldLongitude => 'Kinh độ';
+
+  @override
+  String get partnerPropertyFieldStarRating => 'Hạng chỗ nghỉ';
+
+  @override
+  String get partnerPropertyFieldCancellationPolicy => 'Chính sách hủy';
+
+  @override
+  String get partnerPropertyFieldParking => 'Đỗ xe';
+
+  @override
+  String get partnerPropertyFieldWifi => 'Wi-Fi';
+
+  @override
+  String get partnerPropertyFieldLanguages => 'Ngôn ngữ phục vụ';
+
+  @override
+  String get partnerPropertyFieldPaymentMethods => 'Hình thức thanh toán';
+
+  @override
+  String get partnerPropertyFieldAmenities => 'Tiện ích của chỗ nghỉ';
+
+  @override
+  String get partnerPropertyStarRatingHelp =>
+      'Hạng do chính bạn tự khai, từ 1 đến 5. Đây không phải hạng sao đã được thẩm định.';
+
+  @override
+  String get partnerPropertySlugHelp =>
+      'Được tạo khi thêm chỗ nghỉ, vì nó nằm trong địa chỉ công khai.';
+
+  @override
+  String get partnerPropertyListHelp => 'Phân cách các mục bằng dấu phẩy.';
+
+  @override
+  String get partnerPropertyCoordinatesHelp =>
+      'Không bắt buộc. Vĩ độ từ -90 đến 90, kinh độ từ -180 đến 180.';
+
+  @override
+  String get partnerPropertyAmenitiesHelp =>
+      'Chọn từ danh mục tiện ích của Plan Your Trip. Tiện ích trong phòng sẽ được khai báo ở từng phòng sau.';
+
+  @override
+  String partnerPropertyAmenitiesSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Đã chọn $count mục',
+      zero: 'Chưa chọn mục nào',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get partnerPropertyDraftNotice => 'Bản nháp — du khách chưa thấy';
+
+  @override
+  String get partnerPropertyFreeCancellation => 'Hủy miễn phí';
+
+  @override
+  String get partnerPropertyParkingAvailable => 'Có chỗ đỗ xe';
+
+  @override
+  String get partnerPropertyParkingFree => 'Đỗ xe miễn phí';
+
+  @override
+  String get partnerPropertyWifiAvailable => 'Có Wi-Fi';
+
+  @override
+  String get partnerPropertyWifiFree => 'Wi-Fi miễn phí';
+
+  @override
+  String get partnerPropertyLocationCountry => 'Quốc gia';
+
+  @override
+  String get partnerPropertyLocationProvince => 'Tỉnh hoặc thành phố';
+
+  @override
+  String get partnerPropertyLocationArea => 'Khu vực (không bắt buộc)';
+
+  @override
+  String get partnerPropertySelectPrompt => 'Chọn';
+
+  @override
+  String get partnerPropertyReferenceLoading => 'Đang tải các lựa chọn…';
+
+  @override
+  String get partnerPropertyReferenceError =>
+      'Không tải được các lựa chọn, nên chưa thể lưu.';
+
+  @override
+  String get partnerPropertyValidationName => 'Nhập tên chỗ nghỉ.';
+
+  @override
+  String get partnerPropertyValidationAddress => 'Nhập địa chỉ cụ thể.';
+
+  @override
+  String get partnerPropertyValidationCategory => 'Chọn loại hình chỗ nghỉ.';
+
+  @override
+  String get partnerPropertyValidationLocation =>
+      'Chọn tỉnh, thành phố hoặc khu vực của chỗ nghỉ.';
+
+  @override
+  String get partnerPropertyValidationTime => 'Nhập giờ theo dạng HH:MM.';
+
+  @override
+  String get partnerPropertyValidationLatitude =>
+      'Vĩ độ phải nằm trong khoảng -90 đến 90.';
+
+  @override
+  String get partnerPropertyValidationLongitude =>
+      'Kinh độ phải nằm trong khoảng -180 đến 180.';
+
+  @override
+  String get partnerPropertyValidationEmail => 'Nhập địa chỉ email hợp lệ.';
+
+  @override
+  String get partnerPropertyValidationStarRating => 'Chọn hạng từ 1 đến 5.';
+
+  @override
+  String partnerPropertyCreatedMessage(String name) {
+    return 'Đã lưu $name dưới dạng bản nháp.';
+  }
+
+  @override
+  String partnerPropertySavedMessage(String name) {
+    return 'Đã cập nhật $name.';
+  }
+
+  @override
+  String get partnerPropertyErrorValidation =>
+      'Vui lòng kiểm tra các trường được đánh dấu.';
+
+  @override
+  String get partnerPropertyErrorCategory =>
+      'Loại hình này hiện không dùng được. Hãy chọn loại khác.';
+
+  @override
+  String get partnerPropertyErrorLocation =>
+      'Chỗ nghỉ không thể đặt tại vị trí đó. Hãy chọn tỉnh, thành phố hoặc khu vực.';
+
+  @override
+  String get partnerPropertyErrorAmenity =>
+      'Một tiện ích đã chọn không còn khả dụng. Hãy tải lại danh sách và thử lại.';
+
+  @override
+  String get partnerPropertyErrorSlugConflict =>
+      'Một chỗ nghỉ khác đang dùng địa chỉ đó.';
+
+  @override
+  String get partnerPropertyErrorApproval =>
+      'Hồ sơ doanh nghiệp cần được duyệt trước khi bạn quản lý chỗ nghỉ.';
+
+  @override
+  String get partnerPropertyGateTitle => 'Cần duyệt hồ sơ doanh nghiệp';
+
+  @override
+  String get partnerPropertyGateMessage =>
+      'Bạn có thể thêm và sửa chỗ nghỉ sau khi quản trị viên duyệt hồ sơ doanh nghiệp.';
+
+  @override
+  String get partnerPropertyGateAction => 'Mở tài khoản của tôi';
 
   @override
   String partnerRoomsCount(int count) {
