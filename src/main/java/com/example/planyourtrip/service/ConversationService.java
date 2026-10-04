@@ -7,7 +7,6 @@ import com.example.planyourtrip.model.*;
 import com.example.planyourtrip.repository.BookingRepository;
 import com.example.planyourtrip.repository.ConversationRepository;
 import com.example.planyourtrip.repository.MessageRepository;
-import com.example.planyourtrip.repository.PartnerProfileRepository;
 import com.example.planyourtrip.repository.UserRepository;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.Page;
@@ -31,24 +30,24 @@ public class ConversationService {
     private final MessageRepository messageRepo;
     private final BookingRepository bookingRepo;
     private final UserRepository userRepo;
-    private final PartnerProfileRepository partnerProfileRepo;
     private final NotificationService notificationService;
     private final AdminActivityLogService adminAudit;
+    private final PartnerAccessService partnerAccess;
 
     public ConversationService(ConversationRepository conversationRepo,
                                 MessageRepository messageRepo,
                                 BookingRepository bookingRepo,
                                 UserRepository userRepo,
-                                PartnerProfileRepository partnerProfileRepo,
                                 NotificationService notificationService,
-                                AdminActivityLogService adminAudit) {
+                                AdminActivityLogService adminAudit,
+                                PartnerAccessService partnerAccess) {
         this.conversationRepo = conversationRepo;
         this.messageRepo = messageRepo;
         this.bookingRepo = bookingRepo;
         this.userRepo = userRepo;
-        this.partnerProfileRepo = partnerProfileRepo;
         this.notificationService = notificationService;
         this.adminAudit = adminAudit;
+        this.partnerAccess = partnerAccess;
     }
 
     // ── Create ───────────────────────────────────────────────────────────────
@@ -96,14 +95,14 @@ public class ConversationService {
 
     @Transactional(readOnly = true)
     public List<ConversationSummaryResponse> getPartnerConversations(Long userId) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         return conversationRepo.findByPartnerProfileIdOrderByLastMessageAtDesc(profile.getId())
             .stream().map(this::toSummaryForPartner).toList();
     }
 
     @Transactional(readOnly = true)
     public ConversationResponse getConversationForPartner(Long userId, Long id) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         return toResponse(ownedByPartnerOrThrow(id, profile.getId()));
     }
 
@@ -173,7 +172,7 @@ public class ConversationService {
 
     @Transactional
     public MessageResponse sendPartnerMessage(Long userId, Long conversationId, MessageRequest req) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         Conversation conv = ownedByPartnerOrThrow(conversationId, profile.getId());
         return sendMessage(conv, userId, MessageSenderRole.PARTNER, req.body());
     }
@@ -201,7 +200,7 @@ public class ConversationService {
 
     @Transactional
     public ConversationResponse markReadByPartner(Long userId, Long conversationId) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         Conversation conv = ownedByPartnerOrThrow(conversationId, profile.getId());
         messageRepo.markReadByPartner(conv.getId());
         return toResponse(conv);
@@ -218,7 +217,7 @@ public class ConversationService {
 
     @Transactional
     public ConversationResponse closeByPartner(Long userId, Long conversationId) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         Conversation conv = ownedByPartnerOrThrow(conversationId, profile.getId());
         conv.setStatus(ConversationStatus.CLOSED);
         return toResponse(conversationRepo.save(conv));
@@ -292,14 +291,6 @@ public class ConversationService {
         notificationService.create(conv.getUser().getId(),
             NotificationType.MESSAGE, Priority.NORMAL, title, message,
             RelatedEntityType.MESSAGE, conv.getId());
-    }
-
-    private PartnerProfile myApprovedProfileOrThrow(Long userId) {
-        PartnerProfile profile = partnerProfileRepo.findByUserId(userId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Partner profile not found"));
-        if (profile.getVerificationStatus() != PartnerVerificationStatus.APPROVED)
-            throw new ApiException(HttpStatus.FORBIDDEN, "Partner profile is not approved");
-        return profile;
     }
 
     private Conversation conversationOrThrow(Long id) {

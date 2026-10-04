@@ -33,7 +33,7 @@ import java.util.Set;
  *
  * <ul>
  *   <li><b>The caller is the tenant.</b> Every method starts at
- *       {@link #myApprovedProfileOrThrow}, which resolves the {@code PartnerProfile} from the
+ *       {@link PartnerAccessService#requireRegistrantWorkspace}, which resolves the {@code PartnerProfile} from the
  *       authenticated user id and refuses anything but {@code APPROVED}. No request body carries an
  *       owner, a partner id or an author, so none can be spoofed.</li>
  *   <li><b>One property is reachable only through its owner.</b> {@link #ownedPlaceOrThrow} goes
@@ -96,6 +96,7 @@ public class PartnerPropertyService {
     private final PlaceAmenityRepository placeAmenities;
     private final UserRepository users;
     private final PlaceSlugService slugs;
+    private final PartnerAccessService partnerAccess;
 
     public PartnerPropertyService(PlaceRepository places,
                                    PartnerProfileRepository partnerProfiles,
@@ -108,7 +109,8 @@ public class PartnerPropertyService {
                                    AmenityRepository amenities,
                                    PlaceAmenityRepository placeAmenities,
                                    UserRepository users,
-                                   PlaceSlugService slugs) {
+                                   PlaceSlugService slugs,
+                                   PartnerAccessService partnerAccess) {
         this.places = places;
         this.partnerProfiles = partnerProfiles;
         this.hotelDetails = hotelDetails;
@@ -121,17 +123,18 @@ public class PartnerPropertyService {
         this.placeAmenities = placeAmenities;
         this.users = users;
         this.slugs = slugs;
+        this.partnerAccess = partnerAccess;
     }
 
     @Transactional(readOnly = true)
     public List<PartnerHotelSummaryResponse> getMyHotels(Long userId) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         return places.findAllByOwnerId(profile.getId()).stream().map(this::toSummary).toList();
     }
 
     @Transactional(readOnly = true)
     public PartnerHotelResponse getHotel(Long userId, Long hotelId) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         return toResponse(ownedPlaceOrThrow(hotelId, profile.getId()));
     }
 
@@ -146,7 +149,7 @@ public class PartnerPropertyService {
      */
     @Transactional
     public PartnerHotelResponse createProperty(Long userId, PartnerHotelCreateRequest req) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         User author = users.findById(userId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found: " + userId));
 
@@ -208,7 +211,7 @@ public class PartnerPropertyService {
 
     @Transactional
     public PartnerHotelResponse updateBasicInformation(Long userId, Long hotelId, PartnerHotelUpdateRequest req) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         Place place = ownedPlaceOrThrow(hotelId, profile.getId());
 
         if (!place.getSlug().equals(req.slug()) && places.existsBySlug(req.slug()))
@@ -238,7 +241,7 @@ public class PartnerPropertyService {
 
     @Transactional
     public PartnerHotelResponse updateContact(Long userId, Long hotelId, PartnerContactRequest req) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         Place place = ownedPlaceOrThrow(hotelId, profile.getId());
 
         place.setPhone(req.phone());
@@ -254,7 +257,7 @@ public class PartnerPropertyService {
 
     @Transactional
     public PartnerHotelResponse updatePolicies(Long userId, Long hotelId, PartnerPolicyRequest req) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         Place place = ownedPlaceOrThrow(hotelId, profile.getId());
 
         HotelDetail detail = hotelDetails.findByPlaceId(place.getId()).orElseGet(() -> {
@@ -292,7 +295,7 @@ public class PartnerPropertyService {
 
     @Transactional
     public PartnerHotelResponse updateCoordinates(Long userId, Long hotelId, PartnerLocationRequest req) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         Place place = ownedPlaceOrThrow(hotelId, profile.getId());
 
         place.setLatitude(req.latitude());
@@ -318,7 +321,7 @@ public class PartnerPropertyService {
      */
     @Transactional
     public PartnerHotelResponse updateAmenities(Long userId, Long hotelId, PartnerAmenitiesRequest req) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         Place place = ownedPlaceOrThrow(hotelId, profile.getId());
         List<Amenity> selected = propertyAmenitiesOrThrow(req.amenityIds());
 
@@ -375,20 +378,12 @@ public class PartnerPropertyService {
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     private PartnerHotelResponse setActive(Long userId, Long hotelId, boolean active) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         Place place = ownedPlaceOrThrow(hotelId, profile.getId());
         place.setActive(active);
         Place saved = places.save(place);
         notifyPropertyUpdated(saved);
         return toResponse(saved);
-    }
-
-    private PartnerProfile myApprovedProfileOrThrow(Long userId) {
-        PartnerProfile profile = partnerProfiles.findByUserId(userId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Partner profile not found"));
-        if (profile.getVerificationStatus() != PartnerVerificationStatus.APPROVED)
-            throw new ApiException(HttpStatus.FORBIDDEN, "Partner profile is not approved");
-        return profile;
     }
 
     private Place ownedPlaceOrThrow(Long hotelId, Long ownerId) {

@@ -54,31 +54,31 @@ public class PartnerFinanceService {
         EnumSet.of(BookingStatus.CONFIRMED, BookingStatus.CHECK_IN_READY, BookingStatus.CHECKED_IN,
                    BookingStatus.CHECKED_OUT, BookingStatus.COMPLETED, BookingStatus.ARCHIVED);
 
-    private final PartnerProfileRepository partnerProfiles;
     private final PlaceRepository places;
     private final BookingRepository bookingRepo;
     private final PaymentRepository paymentRepo;
     private final InvoiceRepository invoiceRepo;
     private final PartnerAnalyticsService analyticsService;
+    private final PartnerAccessService partnerAccess;
 
-    public PartnerFinanceService(PartnerProfileRepository partnerProfiles,
-                                  PlaceRepository places,
+    public PartnerFinanceService(PlaceRepository places,
                                   BookingRepository bookingRepo,
                                   PaymentRepository paymentRepo,
                                   InvoiceRepository invoiceRepo,
-                                  PartnerAnalyticsService analyticsService) {
-        this.partnerProfiles = partnerProfiles;
+                                  PartnerAnalyticsService analyticsService,
+                                  PartnerAccessService partnerAccess) {
         this.places = places;
         this.bookingRepo = bookingRepo;
         this.paymentRepo = paymentRepo;
         this.invoiceRepo = invoiceRepo;
         this.analyticsService = analyticsService;
+        this.partnerAccess = partnerAccess;
     }
 
     // ── Overview ─────────────────────────────────────────────────────────────
 
     public PartnerFinanceOverviewResponse getOverview(Long userId, Long hotelId, LocalDate from, LocalDate to) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         List<Long> hotelIds = resolveHotelScope(profile.getId(), hotelId);
         LocalDate[] range = resolveRange(from, to);
 
@@ -114,7 +114,7 @@ public class PartnerFinanceService {
     // ── Revenue ──────────────────────────────────────────────────────────────
 
     public PartnerRevenueResponse getRevenue(Long userId, Long hotelId, LocalDate from, LocalDate to) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         List<Long> hotelIds = resolveHotelScope(profile.getId(), hotelId);
         LocalDate[] range = resolveRange(from, to);
 
@@ -142,7 +142,7 @@ public class PartnerFinanceService {
     // ── Commission ───────────────────────────────────────────────────────────
 
     public PartnerCommissionResponse getCommission(Long userId, Long hotelId, LocalDate from, LocalDate to) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         resolveHotelScope(profile.getId(), hotelId);
         LocalDate[] range = resolveRange(from, to);
 
@@ -156,7 +156,7 @@ public class PartnerFinanceService {
     // ── Settlement ───────────────────────────────────────────────────────────
 
     public PartnerSettlementResponse getSettlement(Long userId, Long hotelId, LocalDate from, LocalDate to) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         List<Long> hotelIds = resolveHotelScope(profile.getId(), hotelId);
         LocalDate[] range = resolveRange(from, to);
         List<Booking> revenueBookings = bookingsInRange(hotelIds, range[0], range[1]).stream()
@@ -184,7 +184,7 @@ public class PartnerFinanceService {
     // ── Payout ───────────────────────────────────────────────────────────────
 
     public PartnerPayoutResponse getPayout(Long userId, Long hotelId, LocalDate from, LocalDate to) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         List<Long> hotelIds = resolveHotelScope(profile.getId(), hotelId);
         LocalDate[] range = resolveRange(from, to);
         List<Booking> revenueBookings = bookingsInRange(hotelIds, range[0], range[1]).stream()
@@ -200,7 +200,7 @@ public class PartnerFinanceService {
     // ── Invoice finance ──────────────────────────────────────────────────────
 
     public PartnerInvoiceFinanceResponse getInvoiceFinance(Long userId, Long hotelId, LocalDate from, LocalDate to) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         List<Long> hotelIds = resolveHotelScope(profile.getId(), hotelId);
         LocalDate[] range = resolveRange(from, to);
         List<Long> bookingIds = bookingsInRange(hotelIds, range[0], range[1]).stream().map(Booking::getId).toList();
@@ -219,7 +219,7 @@ public class PartnerFinanceService {
     // ── Refund ───────────────────────────────────────────────────────────────
 
     public PartnerRefundResponse getRefund(Long userId, Long hotelId, LocalDate from, LocalDate to) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         List<Long> hotelIds = resolveHotelScope(profile.getId(), hotelId);
         LocalDate[] range = resolveRange(from, to);
         List<Long> bookingIds = bookingsInRange(hotelIds, range[0], range[1]).stream().map(Booking::getId).toList();
@@ -240,14 +240,6 @@ public class PartnerFinanceService {
     }
 
     // ── Ownership / scope helpers ────────────────────────────────────────────
-
-    private PartnerProfile myApprovedProfileOrThrow(Long userId) {
-        PartnerProfile profile = partnerProfiles.findByUserId(userId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Partner profile not found"));
-        if (profile.getVerificationStatus() != PartnerVerificationStatus.APPROVED)
-            throw new ApiException(HttpStatus.FORBIDDEN, "Partner profile is not approved");
-        return profile;
-    }
 
     private List<Long> resolveHotelScope(Long ownerId, Long hotelId) {
         List<Long> owned = places.findAllByOwnerId(ownerId).stream().map(Place::getId).toList();

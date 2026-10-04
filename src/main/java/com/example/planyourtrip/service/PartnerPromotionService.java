@@ -6,7 +6,6 @@ import com.example.planyourtrip.exception.ApiException;
 import com.example.planyourtrip.model.*;
 import com.example.planyourtrip.repository.HotelDetailRepository;
 import com.example.planyourtrip.repository.HotelRoomRepository;
-import com.example.planyourtrip.repository.PartnerProfileRepository;
 import com.example.planyourtrip.repository.PlaceRepository;
 import com.example.planyourtrip.repository.PromotionRepository;
 import org.springframework.http.HttpStatus;
@@ -19,7 +18,6 @@ import java.util.Objects;
 @Service
 public class PartnerPromotionService {
 
-    private final PartnerProfileRepository partnerProfiles;
     private final PlaceRepository places;
     private final HotelDetailRepository hotelDetails;
     private final HotelRoomRepository rooms;
@@ -27,16 +25,16 @@ public class PartnerPromotionService {
     private final PromotionService promotionService;
     private final NotificationService notificationService;
     private final PartnerActivityLogService activityLogService;
+    private final PartnerAccessService partnerAccess;
 
-    public PartnerPromotionService(PartnerProfileRepository partnerProfiles,
-                                    PlaceRepository places,
+    public PartnerPromotionService(PlaceRepository places,
                                     HotelDetailRepository hotelDetails,
                                     HotelRoomRepository rooms,
                                     PromotionRepository promotionRepo,
                                     PromotionService promotionService,
                                     NotificationService notificationService,
-                                    PartnerActivityLogService activityLogService) {
-        this.partnerProfiles = partnerProfiles;
+                                    PartnerActivityLogService activityLogService,
+                                    PartnerAccessService partnerAccess) {
         this.places = places;
         this.hotelDetails = hotelDetails;
         this.rooms = rooms;
@@ -44,11 +42,12 @@ public class PartnerPromotionService {
         this.promotionService = promotionService;
         this.notificationService = notificationService;
         this.activityLogService = activityLogService;
+        this.partnerAccess = partnerAccess;
     }
 
     @Transactional(readOnly = true)
     public List<PromotionResponse> getMyPromotions(Long userId) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         List<Long> hotelDetailIds = ownedHotelDetailIds(profile.getId());
         List<Long> roomIds = ownedRoomIds(hotelDetailIds);
         if (hotelDetailIds.isEmpty() && roomIds.isEmpty()) return List.of();
@@ -61,14 +60,14 @@ public class PartnerPromotionService {
 
     @Transactional(readOnly = true)
     public PromotionResponse getPromotion(Long userId, Long id) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         Promotion promo = ownedPromotionOrThrow(id, profile.getId());
         return promotionService.toResponse(promo);
     }
 
     @Transactional
     public PromotionResponse createPromotion(Long userId, PromotionRequest req) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         validateTargetOwnership(req.targetType(), req.targetId(), profile.getId());
         PromotionResponse res = promotionService.create(req);
         notifyPromotionUpdated(profile, res.id(), res.name());
@@ -77,7 +76,7 @@ public class PartnerPromotionService {
 
     @Transactional
     public PromotionResponse updatePromotion(Long userId, Long id, PromotionRequest req) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         ownedPromotionOrThrow(id, profile.getId());
         validateTargetOwnership(req.targetType(), req.targetId(), profile.getId());
         PromotionResponse res = promotionService.update(id, req);
@@ -89,7 +88,7 @@ public class PartnerPromotionService {
 
     @Transactional
     public void deletePromotion(Long userId, Long id) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         Promotion promo = ownedPromotionOrThrow(id, profile.getId());
         String name = promo.getName();
         promotionService.delete(id);
@@ -97,14 +96,6 @@ public class PartnerPromotionService {
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
-
-    private PartnerProfile myApprovedProfileOrThrow(Long userId) {
-        PartnerProfile profile = partnerProfiles.findByUserId(userId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Partner profile not found"));
-        if (profile.getVerificationStatus() != PartnerVerificationStatus.APPROVED)
-            throw new ApiException(HttpStatus.FORBIDDEN, "Partner profile is not approved");
-        return profile;
-    }
 
     private Promotion ownedPromotionOrThrow(Long id, Long ownerId) {
         Promotion promo = promotionRepo.findById(id)

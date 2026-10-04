@@ -2,17 +2,14 @@ package com.example.planyourtrip.service;
 
 import com.example.planyourtrip.dto.PageResponse;
 import com.example.planyourtrip.dto.PartnerExtranetDto.PartnerActivityLogResponse;
-import com.example.planyourtrip.exception.ApiException;
 import com.example.planyourtrip.model.PartnerActivityLog;
 import com.example.planyourtrip.model.PartnerProfile;
-import com.example.planyourtrip.model.PartnerVerificationStatus;
 import com.example.planyourtrip.model.User;
 import com.example.planyourtrip.repository.PartnerActivityLogRepository;
 import com.example.planyourtrip.repository.PartnerProfileRepository;
 import com.example.planyourtrip.repository.UserRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,13 +26,16 @@ public class PartnerActivityLogService {
     private final PartnerActivityLogRepository logRepo;
     private final PartnerProfileRepository partnerProfileRepo;
     private final UserRepository userRepo;
+    private final PartnerAccessService partnerAccess;
 
     public PartnerActivityLogService(PartnerActivityLogRepository logRepo,
                                       PartnerProfileRepository partnerProfileRepo,
-                                      UserRepository userRepo) {
+                                      UserRepository userRepo,
+                                      PartnerAccessService partnerAccess) {
         this.logRepo = logRepo;
         this.partnerProfileRepo = partnerProfileRepo;
         this.userRepo = userRepo;
+        this.partnerAccess = partnerAccess;
     }
 
     @Transactional
@@ -59,7 +59,7 @@ public class PartnerActivityLogService {
 
     @Transactional(readOnly = true)
     public List<PartnerActivityLogResponse> listMine(Long userId) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         return logRepo.findByPartnerProfileIdOrderByCreatedAtDesc(profile.getId())
             .stream().map(this::toResponse).toList();
     }
@@ -83,14 +83,6 @@ public class PartnerActivityLogService {
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
-
-    private PartnerProfile myApprovedProfileOrThrow(Long userId) {
-        PartnerProfile profile = partnerProfileRepo.findByUserId(userId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Partner profile not found"));
-        if (profile.getVerificationStatus() != PartnerVerificationStatus.APPROVED)
-            throw new ApiException(HttpStatus.FORBIDDEN, "Partner profile is not approved");
-        return profile;
-    }
 
     private PartnerActivityLogResponse toResponse(PartnerActivityLog l) {
         return new PartnerActivityLogResponse(

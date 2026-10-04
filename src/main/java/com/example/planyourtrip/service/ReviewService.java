@@ -23,31 +23,31 @@ public class ReviewService {
     private final BookingRepository bookingRepo;
     private final PlaceRepository placeRepo;
     private final UserRepository userRepo;
-    private final PartnerProfileRepository partnerProfileRepo;
     private final NotificationService notificationService;
     private final MediaAssetService mediaAssetService;
     private final MediaAssetRepository mediaAssetRepo;
     /** D1a — review moderation is an administrative act and must leave a trail. */
     private final AdminActivityLogService adminAudit;
+    private final PartnerAccessService partnerAccess;
 
     public ReviewService(ReviewRepository reviewRepo,
                           BookingRepository bookingRepo,
                           PlaceRepository placeRepo,
                           UserRepository userRepo,
-                          PartnerProfileRepository partnerProfileRepo,
                           NotificationService notificationService,
                           MediaAssetService mediaAssetService,
                           MediaAssetRepository mediaAssetRepo,
-                          AdminActivityLogService adminAudit) {
+                          AdminActivityLogService adminAudit,
+                          PartnerAccessService partnerAccess) {
         this.reviewRepo = reviewRepo;
         this.bookingRepo = bookingRepo;
         this.placeRepo = placeRepo;
         this.userRepo = userRepo;
-        this.partnerProfileRepo = partnerProfileRepo;
         this.notificationService = notificationService;
         this.mediaAssetService = mediaAssetService;
         this.mediaAssetRepo = mediaAssetRepo;
         this.adminAudit = adminAudit;
+        this.partnerAccess = partnerAccess;
     }
 
     /** Body-based create route: {@code POST /api/reviews} (bookingId in the payload). */
@@ -269,7 +269,7 @@ public class ReviewService {
      *
      * <ul>
      *   <li>Caller must have an APPROVED {@link PartnerProfile} (same
-     *       {@code myApprovedProfileOrThrow} convention as the other partner services);
+     *       {@code PartnerAccessService.requireRegistrantWorkspace} convention as the other partner services);
      *       an admin/anyone without an approved profile → 404 (no cross-partner leak).</li>
      *   <li>The review's place must be owned by that profile; otherwise a uniform 404
      *       (same status as an unknown review — no existence leak across partners).</li>
@@ -284,7 +284,7 @@ public class ReviewService {
      */
     @Transactional
     public ReviewResponse partnerReply(Long userId, Long reviewId, PartnerReplyRequest req) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         Review review = reviewOrThrow(reviewId);
 
         PartnerProfile owner = review.getPlace().getOwner();
@@ -313,15 +313,6 @@ public class ReviewService {
         }
 
         return toResponse(review);
-    }
-
-    // Same APPROVED-profile ownership convention as PartnerBookingService / PartnerPricingService.
-    private PartnerProfile myApprovedProfileOrThrow(Long userId) {
-        PartnerProfile profile = partnerProfileRepo.findByUserId(userId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Partner profile not found"));
-        if (profile.getVerificationStatus() != PartnerVerificationStatus.APPROVED)
-            throw new ApiException(HttpStatus.FORBIDDEN, "Partner profile is not approved");
-        return profile;
     }
 
     @Transactional

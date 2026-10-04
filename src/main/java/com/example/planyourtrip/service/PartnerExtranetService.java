@@ -50,6 +50,7 @@ public class PartnerExtranetService {
     private final PartnerSettingsService settingsService;
     private final PartnerActivityLogService activityLogService;
     private final NotificationService notificationService;
+    private final PartnerAccessService partnerAccess;
 
     public PartnerExtranetService(PartnerProfileRepository partnerProfileRepo,
                                    PlaceRepository places,
@@ -62,7 +63,8 @@ public class PartnerExtranetService {
                                    PartnerFinanceService financeService,
                                    PartnerSettingsService settingsService,
                                    PartnerActivityLogService activityLogService,
-                                   NotificationService notificationService) {
+                                   NotificationService notificationService,
+                                   PartnerAccessService partnerAccess) {
         this.partnerProfileRepo = partnerProfileRepo;
         this.places = places;
         this.hotelDetails = hotelDetails;
@@ -75,13 +77,14 @@ public class PartnerExtranetService {
         this.settingsService = settingsService;
         this.activityLogService = activityLogService;
         this.notificationService = notificationService;
+        this.partnerAccess = partnerAccess;
     }
 
     // ── Partner: home / menu / account summary / activity ──────────────────────
 
     @Transactional(readOnly = true)
     public PartnerExtranetHomeResponse getHome(Long userId) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         List<Long> hotelIds = places.findAllByOwnerId(profile.getId()).stream().map(Place::getId).toList();
 
         long ownedHotelCount = hotelIds.size();
@@ -107,7 +110,7 @@ public class PartnerExtranetService {
 
     @Transactional(readOnly = true)
     public PartnerMenuResponse getMenu(Long userId) {
-        myApprovedProfileOrThrow(userId);
+        partnerAccess.requireRegistrantWorkspace(userId);
 
         long unreadMessages = analyticsService.getMessageAnalytics(userId, null, null, null).unreadPartnerMessages();
         long unreadNotifications = notificationService.countUnread(userId);
@@ -134,7 +137,7 @@ public class PartnerExtranetService {
 
     @Transactional(readOnly = true)
     public PartnerAccountSummaryResponse getAccountSummary(Long userId) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
 
         PartnerSettingsResponse settings = settingsService.getSettings(userId);
         PartnerPayoutAccountResponse payout = settingsService.getPayoutAccountOrNull(userId);
@@ -167,14 +170,6 @@ public class PartnerExtranetService {
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
-
-    private PartnerProfile myApprovedProfileOrThrow(Long userId) {
-        PartnerProfile profile = partnerProfileRepo.findByUserId(userId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Partner profile not found"));
-        if (profile.getVerificationStatus() != PartnerVerificationStatus.APPROVED)
-            throw new ApiException(HttpStatus.FORBIDDEN, "Partner profile is not approved");
-        return profile;
-    }
 
     private long countActiveRooms(List<Long> hotelIds) {
         return hotelIds.stream()

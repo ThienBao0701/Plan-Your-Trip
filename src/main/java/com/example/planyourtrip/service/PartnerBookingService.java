@@ -33,7 +33,6 @@ import java.util.Set;
 @Service
 public class PartnerBookingService {
 
-    private final PartnerProfileRepository partnerProfiles;
     private final PlaceRepository places;
     private final HotelDetailRepository hotelDetails;
     private final HotelRoomRepository rooms;
@@ -50,6 +49,7 @@ public class PartnerBookingService {
     private final BookingStatusEngineService statusEngine;
     private final NotificationService notificationService;
     private final PartnerActivityLogService activityLogService;
+    private final PartnerAccessService partnerAccess;
 
     private static final Set<BookingStatus> UPCOMING_STATUSES =
         EnumSet.of(BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.CHECK_IN_READY);
@@ -58,8 +58,7 @@ public class PartnerBookingService {
         EnumSet.of(BookingStatus.CONFIRMED, BookingStatus.CHECK_IN_READY, BookingStatus.CHECKED_IN,
                    BookingStatus.CHECKED_OUT, BookingStatus.COMPLETED, BookingStatus.ARCHIVED);
 
-    public PartnerBookingService(PartnerProfileRepository partnerProfiles,
-                                  PlaceRepository places,
+    public PartnerBookingService(PlaceRepository places,
                                   HotelDetailRepository hotelDetails,
                                   HotelRoomRepository rooms,
                                   BookingRepository bookingRepo,
@@ -74,8 +73,8 @@ public class PartnerBookingService {
                                   InvoiceService invoiceService,
                                   BookingStatusEngineService statusEngine,
                                   NotificationService notificationService,
-                                  PartnerActivityLogService activityLogService) {
-        this.partnerProfiles = partnerProfiles;
+                                  PartnerActivityLogService activityLogService,
+                                  PartnerAccessService partnerAccess) {
         this.places = places;
         this.hotelDetails = hotelDetails;
         this.rooms = rooms;
@@ -92,6 +91,7 @@ public class PartnerBookingService {
         this.statusEngine = statusEngine;
         this.notificationService = notificationService;
         this.activityLogService = activityLogService;
+        this.partnerAccess = partnerAccess;
     }
 
     // ── List / search ────────────────────────────────────────────────────────
@@ -103,7 +103,7 @@ public class PartnerBookingService {
             Boolean arrivalToday, Boolean departureToday, Boolean upcoming,
             Boolean inHouse, Boolean cancelled, Boolean completed,
             int page, int size) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         List<Long> hotelIds = ownedHotelIds(profile.getId());
         LocalDate today = LocalDate.now();
 
@@ -138,7 +138,7 @@ public class PartnerBookingService {
 
     @Transactional(readOnly = true)
     public PartnerBookingDetailResponse getBookingDetail(Long userId, Long bookingId) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         Booking booking = ownedBookingOrThrow(bookingId, profile.getId());
 
         BookingResponse bookingResponse = bookingService.toResponse(booking);
@@ -155,7 +155,7 @@ public class PartnerBookingService {
 
     /**
      * Phase 7.42 — one consolidated, ownership-scoped, strictly READ-ONLY guest-stay projection for a
-     * single booking. Reuses the SAME ownership resolution ({@link #myApprovedProfileOrThrow} +
+     * single booking. Reuses the SAME ownership resolution ({@link PartnerAccessService#requireRegistrantWorkspace} +
      * {@link #ownedBookingOrThrow}, which already returns a uniform 404 for both an unknown booking and
      * a booking outside the caller's properties — so another partner's booking never leaks), the SAME
      * lifecycle timeline ({@link BookingService#adminGetTimeline}) and the SAME voucher-status derivation
@@ -165,7 +165,7 @@ public class PartnerBookingService {
      */
     @Transactional(readOnly = true)
     public PartnerGuestStayResponse getGuestStay(Long userId, Long bookingId) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         Booking booking = ownedBookingOrThrow(bookingId, profile.getId());
 
         BookingTimelineResponse timeline = bookingService.adminGetTimeline(bookingId);
@@ -336,7 +336,7 @@ public class PartnerBookingService {
 
     @Transactional
     public BookingResponse checkIn(Long userId, Long bookingId) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         Booking booking = ownedBookingOrThrow(bookingId, profile.getId());
         statusEngine.transition(booking, BookingStatus.CHECKED_IN);
         Booking saved = bookingRepo.save(booking);
@@ -346,7 +346,7 @@ public class PartnerBookingService {
 
     @Transactional
     public BookingResponse checkOut(Long userId, Long bookingId) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         Booking booking = ownedBookingOrThrow(bookingId, profile.getId());
         statusEngine.transition(booking, BookingStatus.CHECKED_OUT);
         Booking saved = bookingRepo.save(booking);
@@ -356,7 +356,7 @@ public class PartnerBookingService {
 
     @Transactional
     public BookingResponse markNoShow(Long userId, Long bookingId) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         Booking booking = ownedBookingOrThrow(bookingId, profile.getId());
         statusEngine.transition(booking, BookingStatus.NO_SHOW);
         Booking saved = bookingRepo.save(booking);
@@ -367,7 +367,7 @@ public class PartnerBookingService {
 
     @Transactional
     public BookingResponse complete(Long userId, Long bookingId) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         Booking booking = ownedBookingOrThrow(bookingId, profile.getId());
         statusEngine.transition(booking, BookingStatus.COMPLETED);
         Booking saved = bookingRepo.save(booking);
@@ -384,7 +384,7 @@ public class PartnerBookingService {
 
     @Transactional(readOnly = true)
     public PartnerDashboardResponse getDashboard(Long userId) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         List<Long> hotelIds = ownedHotelIds(profile.getId());
         if (hotelIds.isEmpty()) {
             return new PartnerDashboardResponse(0, 0, 0, 0, 0, 0, 0.0,
@@ -442,14 +442,6 @@ public class PartnerBookingService {
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
-
-    private PartnerProfile myApprovedProfileOrThrow(Long userId) {
-        PartnerProfile profile = partnerProfiles.findByUserId(userId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Partner profile not found"));
-        if (profile.getVerificationStatus() != PartnerVerificationStatus.APPROVED)
-            throw new ApiException(HttpStatus.FORBIDDEN, "Partner profile is not approved");
-        return profile;
-    }
 
     private List<Long> ownedHotelIds(Long ownerId) {
         return places.findAllByOwnerId(ownerId).stream().map(Place::getId).toList();

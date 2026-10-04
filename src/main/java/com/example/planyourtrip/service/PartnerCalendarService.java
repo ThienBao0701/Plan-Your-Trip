@@ -6,10 +6,8 @@ import com.example.planyourtrip.dto.RoomInventoryDto.*;
 import com.example.planyourtrip.exception.ApiException;
 import com.example.planyourtrip.model.HotelRoom;
 import com.example.planyourtrip.model.PartnerProfile;
-import com.example.planyourtrip.model.PartnerVerificationStatus;
 import com.example.planyourtrip.model.RoomInventory;
 import com.example.planyourtrip.repository.HotelRoomRepository;
-import com.example.planyourtrip.repository.PartnerProfileRepository;
 import com.example.planyourtrip.repository.RoomInventoryRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -21,34 +19,34 @@ import java.util.List;
 @Service
 public class PartnerCalendarService {
 
-    private final PartnerProfileRepository partnerProfiles;
     private final HotelRoomRepository rooms;
     private final RoomInventoryRepository inventoryRepo;
     private final RoomInventoryService roomInventoryService;
     private final RatePlanService ratePlanService;
+    private final PartnerAccessService partnerAccess;
 
-    public PartnerCalendarService(PartnerProfileRepository partnerProfiles,
-                                   HotelRoomRepository rooms,
+    public PartnerCalendarService(HotelRoomRepository rooms,
                                    RoomInventoryRepository inventoryRepo,
                                    RoomInventoryService roomInventoryService,
-                                   RatePlanService ratePlanService) {
-        this.partnerProfiles = partnerProfiles;
+                                   RatePlanService ratePlanService,
+                                   PartnerAccessService partnerAccess) {
         this.rooms = rooms;
         this.inventoryRepo = inventoryRepo;
         this.roomInventoryService = roomInventoryService;
         this.ratePlanService = ratePlanService;
+        this.partnerAccess = partnerAccess;
     }
 
     @Transactional(readOnly = true)
     public InventoryCalendarResponse getCalendar(Long userId, Long roomId, LocalDate from, LocalDate to) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         ownedRoomOrThrow(roomId, profile.getId());
         return roomInventoryService.getCalendar(roomId, from, to);
     }
 
     @Transactional
     public RoomInventoryResponse updateDay(Long userId, Long roomId, LocalDate date, RoomInventoryRequest req) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         ownedRoomOrThrow(roomId, profile.getId());
         // PARTNER authority: soldInventory is booking-derived and not editable here (H-FIX 1B).
         return roomInventoryService.update(roomId, date, req, RoomInventoryService.Authority.PARTNER);
@@ -56,14 +54,14 @@ public class PartnerCalendarService {
 
     @Transactional
     public List<RoomInventoryResponse> bulkUpdate(Long userId, Long roomId, BulkInventoryRequest req) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         ownedRoomOrThrow(roomId, profile.getId());
         return roomInventoryService.bulkUpsert(roomId, req, RoomInventoryService.Authority.PARTNER);
     }
 
     @Transactional
     public RoomInventoryResponse updateStopSell(Long userId, Long roomId, LocalDate date, boolean value) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         ownedRoomOrThrow(roomId, profile.getId());
         RoomInventory inv = inventoryOrThrow(roomId, date);
         inv.setStopSell(value);
@@ -72,7 +70,7 @@ public class PartnerCalendarService {
 
     @Transactional
     public RoomInventoryResponse updateClosedArrival(Long userId, Long roomId, LocalDate date, boolean value) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         ownedRoomOrThrow(roomId, profile.getId());
         RoomInventory inv = inventoryOrThrow(roomId, date);
         inv.setClosedArrival(value);
@@ -81,7 +79,7 @@ public class PartnerCalendarService {
 
     @Transactional
     public RoomInventoryResponse updateClosedDeparture(Long userId, Long roomId, LocalDate date, boolean value) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         ownedRoomOrThrow(roomId, profile.getId());
         RoomInventory inv = inventoryOrThrow(roomId, date);
         inv.setClosedDeparture(value);
@@ -90,27 +88,19 @@ public class PartnerCalendarService {
 
     @Transactional
     public RatePlanResponse updateDailyPrice(Long userId, Long roomId, RatePlanRequest req) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         ownedRoomOrThrow(roomId, profile.getId());
         return ratePlanService.create(roomId, req);
     }
 
     @Transactional(readOnly = true)
     public List<RatePlanResponse> getPrices(Long userId, Long roomId) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         ownedRoomOrThrow(roomId, profile.getId());
         return ratePlanService.getByRoom(roomId);
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
-
-    private PartnerProfile myApprovedProfileOrThrow(Long userId) {
-        PartnerProfile profile = partnerProfiles.findByUserId(userId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Partner profile not found"));
-        if (profile.getVerificationStatus() != PartnerVerificationStatus.APPROVED)
-            throw new ApiException(HttpStatus.FORBIDDEN, "Partner profile is not approved");
-        return profile;
-    }
 
     private HotelRoom ownedRoomOrThrow(Long roomId, Long ownerId) {
         HotelRoom room = rooms.findById(roomId)

@@ -4,23 +4,34 @@ import com.example.planyourtrip.dto.PartnerSettingsDto.*;
 import com.example.planyourtrip.exception.ApiException;
 import com.example.planyourtrip.model.*;
 import com.example.planyourtrip.repository.*;
+import com.example.planyourtrip.security.rbac.PartnerAccessContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
+
+import static com.example.planyourtrip.security.rbac.PartnerPermission.PAYOUT_ACCOUNT_MANAGE;
+import static com.example.planyourtrip.security.rbac.PartnerPermission.PAYOUT_ACCOUNT_VIEW;
+import static com.example.planyourtrip.security.rbac.PartnerPermission.SETTINGS_EDIT;
+import static com.example.planyourtrip.security.rbac.PartnerPermission.TEAM_INVITE;
+import static com.example.planyourtrip.security.rbac.PartnerPermission.TEAM_OWNER_MANAGE;
+import static com.example.planyourtrip.security.rbac.PartnerPermission.TEAM_REMOVE;
+import static com.example.planyourtrip.security.rbac.PartnerPermission.TEAM_ROLE_ASSIGN;
+import static com.example.planyourtrip.security.rbac.PartnerPermission.TEAM_SUSPEND;
+import static com.example.planyourtrip.security.rbac.PartnerPermission.TEAM_VIEW;
+import static com.example.planyourtrip.security.rbac.PartnerPermission.WORKSPACE_ACCESS;
 
 /**
  * Partner-side business settings, payout metadata, and team management.
  *
- * <p>Unlike earlier partner services (which only ever resolve "the caller IS the
- * profile-owning user"), this service introduces delegated team access: a caller is
- * either the profile's own user (always treated as {@link PartnerTeamRole#OWNER}) or
- * an active {@link PartnerTeamMember} of some partner profile, in which case their
- * granted role governs what they may do. See {@link #resolveAccess(Long)}.
+ * <p>Unlike the operational partner services (which only ever resolve "the caller IS the
+ * profile-owning user"), this service allows delegated team access: a caller is either the
+ * profile's own user (who holds every partner permission) or an active {@link PartnerTeamMember}
+ * of some partner profile, whose role's legacy bundle governs what they may do. Both are resolved
+ * by {@link PartnerAccessService#requireTeamWorkspace} and checked through the RBAC kernel; the
+ * bundles reproduce the pre-RBAC rules exactly ({@code LegacyPartnerBundles}).
  *
  * <p>No payout is ever executed and no real bank account number is ever persisted —
  * {@link PartnerPayoutAccount#getBankAccountLast4()} is derived once from the request
@@ -29,10 +40,9 @@ import java.util.Set;
 @Service
 public class PartnerSettingsService {
 
-    private static final Set<PartnerTeamRole> SETTINGS_WRITE_ROLES =
-        EnumSet.of(PartnerTeamRole.OWNER, PartnerTeamRole.MANAGER);
-    private static final Set<PartnerTeamRole> PAYOUT_WRITE_ROLES =
-        EnumSet.of(PartnerTeamRole.OWNER, PartnerTeamRole.FINANCE);
+    private static final String SETTINGS_DENIED = "Your role does not allow you to manage business/notification settings";
+    private static final String PAYOUT_DENIED = "Your role does not allow you to manage payout metadata";
+    private static final String TEAM_DENIED = "Only the partner owner can manage team members";
 
     private final PartnerProfileRepository partnerProfileRepo;
     private final PartnerSettingsRepository settingsRepo;
@@ -41,6 +51,7 @@ public class PartnerSettingsService {
     private final UserRepository userRepo;
     private final NotificationService notificationService;
     private final PartnerActivityLogService activityLogService;
+    private final PartnerAccessService partnerAccess;
 
     public PartnerSettingsService(PartnerProfileRepository partnerProfileRepo,
                                    PartnerSettingsRepository settingsRepo,
@@ -48,7 +59,8 @@ public class PartnerSettingsService {
                                    PartnerTeamMemberRepository teamMemberRepo,
                                    UserRepository userRepo,
                                    NotificationService notificationService,
-                                   PartnerActivityLogService activityLogService) {
+                                   PartnerActivityLogService activityLogService,
+                                   PartnerAccessService partnerAccess) {
         this.partnerProfileRepo = partnerProfileRepo;
         this.settingsRepo = settingsRepo;
         this.payoutAccountRepo = payoutAccountRepo;
@@ -56,20 +68,22 @@ public class PartnerSettingsService {
         this.userRepo = userRepo;
         this.notificationService = notificationService;
         this.activityLogService = activityLogService;
+        this.partnerAccess = partnerAccess;
     }
 
     // ── Settings ─────────────────────────────────────────────────────────────
 
     @Transactional
     public PartnerSettingsResponse getSettings(Long userId) {
-        PartnerAccess access = resolveAccess(userId);
+        PartnerAccessContext access = partnerAccess.requireTeamWorkspace(userId);
+        partnerAccess.requireCompanyPermission(access, WORKSPACE_ACCESS, null);
         return toSettingsResponse(getOrCreateSettings(access.profile()));
     }
 
     @Transactional
     public PartnerSettingsResponse updateSettings(Long userId, PartnerSettingsRequest req) {
-        PartnerAccess access = resolveAccess(userId);
-        requireRole(access.role(), SETTINGS_WRITE_ROLES, "manage business/notification settings");
+        PartnerAccessContext access = partnerAccess.requireTeamWorkspace(userId);
+        partnerAccess.requireCompanyPermission(access, SETTINGS_EDIT, SETTINGS_DENIED);
 
         PartnerSettings settings = getOrCreateSettings(access.profile());
         if (req.defaultLanguage() != null) settings.setDefaultLanguage(req.defaultLanguage());
@@ -89,7 +103,8 @@ public class PartnerSettingsService {
 
     @Transactional(readOnly = true)
     public PartnerPayoutAccountResponse getPayoutAccount(Long userId) {
-        PartnerAccess access = resolveAccess(userId);
+        PartnerAccessContext access = partnerAccess.requireTeamWorkspace(userId);
+        partnerAccess.requireCompanyPermission(access, PAYOUT_ACCOUNT_VIEW, null);
         PartnerPayoutAccount account = payoutAccountRepo.findByPartnerProfileId(access.profile().getId())
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Payout account not configured yet"));
         return toPayoutResponse(account);
@@ -106,15 +121,16 @@ public class PartnerSettingsService {
      */
     @Transactional(readOnly = true)
     public PartnerPayoutAccountResponse getPayoutAccountOrNull(Long userId) {
-        PartnerAccess access = resolveAccess(userId);
+        PartnerAccessContext access = partnerAccess.requireTeamWorkspace(userId);
+        partnerAccess.requireCompanyPermission(access, PAYOUT_ACCOUNT_VIEW, null);
         return payoutAccountRepo.findByPartnerProfileId(access.profile().getId())
             .map(this::toPayoutResponse).orElse(null);
     }
 
     @Transactional
     public PartnerPayoutAccountResponse updatePayoutAccount(Long userId, PartnerPayoutAccountRequest req) {
-        PartnerAccess access = resolveAccess(userId);
-        requireRole(access.role(), PAYOUT_WRITE_ROLES, "manage payout metadata");
+        PartnerAccessContext access = partnerAccess.requireTeamWorkspace(userId);
+        partnerAccess.requireCompanyPermission(access, PAYOUT_ACCOUNT_MANAGE, PAYOUT_DENIED);
 
         PartnerPayoutAccount account = payoutAccountRepo.findByPartnerProfileId(access.profile().getId())
             .orElseGet(() -> {
@@ -140,20 +156,23 @@ public class PartnerSettingsService {
 
     @Transactional(readOnly = true)
     public List<PartnerTeamMemberResponse> getTeamMembers(Long userId) {
-        PartnerAccess access = resolveAccess(userId);
+        PartnerAccessContext access = partnerAccess.requireTeamWorkspace(userId);
+        partnerAccess.requireCompanyPermission(access, TEAM_VIEW, null);
         return teamMemberRepo.findByPartnerProfileIdOrderByCreatedAtAsc(access.profile().getId())
             .stream().map(this::toTeamResponse).toList();
     }
 
     @Transactional
     public PartnerTeamMemberResponse addTeamMember(Long userId, PartnerTeamMemberRequest req) {
-        PartnerAccess access = resolveAccess(userId);
-        requireOwner(access.role());
+        PartnerAccessContext access = partnerAccess.requireTeamWorkspace(userId);
+        partnerAccess.requireCompanyPermission(access, TEAM_INVITE, TEAM_DENIED);
 
         if (req.email() == null || req.email().isBlank())
             throw new ApiException(HttpStatus.BAD_REQUEST, "email is required");
         if (req.role() == null)
             throw new ApiException(HttpStatus.BAD_REQUEST, "role is required");
+        if (req.role() == PartnerTeamRole.OWNER)
+            partnerAccess.requireCompanyPermission(access, TEAM_OWNER_MANAGE, TEAM_DENIED);
 
         User target = userRepo.findByEmail(req.email())
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found: " + req.email()));
@@ -193,10 +212,17 @@ public class PartnerSettingsService {
 
     @Transactional
     public PartnerTeamMemberResponse updateTeamMember(Long userId, Long teamMemberId, PartnerTeamMemberRequest req) {
-        PartnerAccess access = resolveAccess(userId);
-        requireOwner(access.role());
+        PartnerAccessContext access = partnerAccess.requireTeamWorkspace(userId);
+        // A role change needs P09, an active change P10; a request carrying neither is still a team
+        // mutation and is judged as a role change, exactly like the single owner gate before RBAC.
+        partnerAccess.requireCompanyPermission(access,
+            req.role() == null && req.active() != null ? TEAM_SUSPEND : TEAM_ROLE_ASSIGN, TEAM_DENIED);
+        if (req.role() != null && req.active() != null)
+            partnerAccess.requireCompanyPermission(access, TEAM_SUSPEND, TEAM_DENIED);
 
         PartnerTeamMember member = ownedTeamMemberOrThrow(teamMemberId, access.profile().getId());
+        if (req.role() == PartnerTeamRole.OWNER || member.getRole() == PartnerTeamRole.OWNER)
+            partnerAccess.requireCompanyPermission(access, TEAM_OWNER_MANAGE, TEAM_DENIED);
         if (req.role() != null) member.setRole(req.role());
         if (req.active() != null) member.setActive(req.active());
 
@@ -205,10 +231,12 @@ public class PartnerSettingsService {
 
     @Transactional
     public void removeTeamMember(Long userId, Long teamMemberId) {
-        PartnerAccess access = resolveAccess(userId);
-        requireOwner(access.role());
+        PartnerAccessContext access = partnerAccess.requireTeamWorkspace(userId);
+        partnerAccess.requireCompanyPermission(access, TEAM_REMOVE, TEAM_DENIED);
 
         PartnerTeamMember member = ownedTeamMemberOrThrow(teamMemberId, access.profile().getId());
+        if (member.getRole() == PartnerTeamRole.OWNER)
+            partnerAccess.requireCompanyPermission(access, TEAM_OWNER_MANAGE, TEAM_DENIED);
         teamMemberRepo.delete(member);
     }
 
@@ -225,39 +253,6 @@ public class PartnerSettingsService {
     public List<PartnerTeamMemberResponse> adminGetTeamMembers(Long partnerProfileId) {
         return teamMemberRepo.findByPartnerProfileIdOrderByCreatedAtAsc(partnerProfileId)
             .stream().map(this::toTeamResponse).toList();
-    }
-
-    // ── Access resolution ────────────────────────────────────────────────────
-
-    private record PartnerAccess(PartnerProfile profile, PartnerTeamRole role) {}
-
-    private PartnerAccess resolveAccess(Long userId) {
-        PartnerProfile ownProfile = partnerProfileRepo.findByUserId(userId).orElse(null);
-        if (ownProfile != null) {
-            requireApproved(ownProfile);
-            return new PartnerAccess(ownProfile, PartnerTeamRole.OWNER);
-        }
-
-        PartnerTeamMember membership = teamMemberRepo.findByUserIdAndActiveTrue(userId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Partner profile not found"));
-        PartnerProfile profile = membership.getPartnerProfile();
-        requireApproved(profile);
-        return new PartnerAccess(profile, membership.getRole());
-    }
-
-    private void requireApproved(PartnerProfile profile) {
-        if (profile.getVerificationStatus() != PartnerVerificationStatus.APPROVED)
-            throw new ApiException(HttpStatus.FORBIDDEN, "Partner profile is not approved");
-    }
-
-    private void requireRole(PartnerTeamRole actual, Set<PartnerTeamRole> allowed, String action) {
-        if (!allowed.contains(actual))
-            throw new ApiException(HttpStatus.FORBIDDEN, "Your role does not allow you to " + action);
-    }
-
-    private void requireOwner(PartnerTeamRole actual) {
-        if (actual != PartnerTeamRole.OWNER)
-            throw new ApiException(HttpStatus.FORBIDDEN, "Only the partner owner can manage team members");
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

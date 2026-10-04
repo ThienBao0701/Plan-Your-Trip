@@ -6,13 +6,11 @@ import com.example.planyourtrip.exception.ApiException;
 import com.example.planyourtrip.model.HotelRoom;
 import com.example.planyourtrip.model.NotificationType;
 import com.example.planyourtrip.model.PartnerProfile;
-import com.example.planyourtrip.model.PartnerVerificationStatus;
 import com.example.planyourtrip.model.Priority;
 import com.example.planyourtrip.model.RatePlan;
 import com.example.planyourtrip.model.RatePlanOccupancyPrice;
 import com.example.planyourtrip.model.RelatedEntityType;
 import com.example.planyourtrip.repository.HotelRoomRepository;
-import com.example.planyourtrip.repository.PartnerProfileRepository;
 import com.example.planyourtrip.repository.RatePlanRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -24,7 +22,6 @@ import java.util.List;
 @Service
 public class PartnerPricingService {
 
-    private final PartnerProfileRepository partnerProfiles;
     private final HotelRoomRepository rooms;
     private final RatePlanRepository ratePlanRepo;
     private final RatePlanService ratePlanService;
@@ -32,16 +29,16 @@ public class PartnerPricingService {
     private final PricingEngineService pricingEngineService;
     private final NotificationService notificationService;
     private final PartnerActivityLogService activityLogService;
+    private final PartnerAccessService partnerAccess;
 
-    public PartnerPricingService(PartnerProfileRepository partnerProfiles,
-                                  HotelRoomRepository rooms,
+    public PartnerPricingService(HotelRoomRepository rooms,
                                   RatePlanRepository ratePlanRepo,
                                   RatePlanService ratePlanService,
                                   RatePlanPricingService ratePlanPricingService,
                                   PricingEngineService pricingEngineService,
                                   NotificationService notificationService,
-                                  PartnerActivityLogService activityLogService) {
-        this.partnerProfiles = partnerProfiles;
+                                  PartnerActivityLogService activityLogService,
+                                  PartnerAccessService partnerAccess) {
         this.rooms = rooms;
         this.ratePlanRepo = ratePlanRepo;
         this.ratePlanService = ratePlanService;
@@ -49,18 +46,19 @@ public class PartnerPricingService {
         this.pricingEngineService = pricingEngineService;
         this.notificationService = notificationService;
         this.activityLogService = activityLogService;
+        this.partnerAccess = partnerAccess;
     }
 
     @Transactional(readOnly = true)
     public List<RatePlanResponse> getRatePlans(Long userId, Long roomId) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         ownedRoomOrThrow(roomId, profile.getId());
         return ratePlanService.getByRoom(roomId);
     }
 
     @Transactional
     public RatePlanResponse createRatePlan(Long userId, Long roomId, RatePlanRequest req) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         HotelRoom room = ownedRoomOrThrow(roomId, profile.getId());
         RatePlanResponse res = ratePlanService.create(roomId, req);
         notifyRatePlanUpdated(room);
@@ -69,7 +67,7 @@ public class PartnerPricingService {
 
     @Transactional
     public RatePlanResponse updateRatePlan(Long userId, Long ratePlanId, RatePlanRequest req) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         RatePlan plan = ownedRatePlanOrThrow(ratePlanId, profile.getId());
         RatePlanResponse res = ratePlanService.update(ratePlanId, req);
         notifyRatePlanUpdated(plan.getHotelRoom());
@@ -80,7 +78,7 @@ public class PartnerPricingService {
 
     @Transactional
     public void deleteRatePlan(Long userId, Long ratePlanId) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         RatePlan plan = ownedRatePlanOrThrow(ratePlanId, profile.getId());
         HotelRoom room = plan.getHotelRoom();
         ratePlanService.delete(ratePlanId);
@@ -89,7 +87,7 @@ public class PartnerPricingService {
 
     @Transactional(readOnly = true)
     public PricingBreakdownResponse getPricingPreview(Long userId, Long roomId, LocalDate checkIn, LocalDate checkOut) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         HotelRoom room = ownedRoomOrThrow(roomId, profile.getId());
         // Phase 7.31 — resolve the best eligible plan with the SAME priority-based selection used by
         // checkout (RatePlanPricingService), then feed its resolved stay subtotal into the unchanged
@@ -107,7 +105,7 @@ public class PartnerPricingService {
 
     @Transactional
     public RatePlanResponse activateRatePlan(Long userId, Long ratePlanId, boolean active) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         RatePlan plan = ownedRatePlanOrThrow(ratePlanId, profile.getId());
         RatePlanResponse res = ratePlanService.setActive(ratePlanId, active);
         notifyRatePlanUpdated(plan.getHotelRoom());
@@ -116,7 +114,7 @@ public class PartnerPricingService {
 
     @Transactional
     public RatePlanResponse duplicateRatePlan(Long userId, Long ratePlanId, RatePlanDuplicateRequest req) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         RatePlan plan = ownedRatePlanOrThrow(ratePlanId, profile.getId());
         RatePlanResponse res = ratePlanService.duplicate(ratePlanId, req);
         notifyRatePlanUpdated(plan.getHotelRoom());
@@ -125,28 +123,28 @@ public class PartnerPricingService {
 
     @Transactional(readOnly = true)
     public List<RatePlanOccupancyPriceResponse> getOccupancyPrices(Long userId, Long ratePlanId) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         ownedRatePlanOrThrow(ratePlanId, profile.getId());
         return ratePlanService.getOccupancyPrices(ratePlanId);
     }
 
     @Transactional
     public RatePlanOccupancyPriceResponse addOccupancyPrice(Long userId, Long ratePlanId, RatePlanOccupancyPriceRequest req) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         ownedRatePlanOrThrow(ratePlanId, profile.getId());
         return ratePlanService.addOccupancyPrice(ratePlanId, req);
     }
 
     @Transactional
     public RatePlanOccupancyPriceResponse updateOccupancyPrice(Long userId, Long occupancyPriceId, RatePlanOccupancyPriceRequest req) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         ownedOccupancyPriceOrThrow(occupancyPriceId, profile.getId());
         return ratePlanService.updateOccupancyPrice(occupancyPriceId, req);
     }
 
     @Transactional
     public void deleteOccupancyPrice(Long userId, Long occupancyPriceId) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         ownedOccupancyPriceOrThrow(occupancyPriceId, profile.getId());
         ratePlanService.deleteOccupancyPrice(occupancyPriceId);
     }
@@ -154,14 +152,14 @@ public class PartnerPricingService {
     @Transactional(readOnly = true)
     public RatePlanPricingBreakdownResponse previewRatePlan(Long userId, Long ratePlanId, LocalDate checkIn,
                                                             LocalDate checkOut, int adults, int children, int extraBeds) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         ownedRatePlanOrThrow(ratePlanId, profile.getId());
         return ratePlanPricingService.previewByPlan(ratePlanId, checkIn, checkOut, adults, children, extraBeds);
     }
 
     @Transactional(readOnly = true)
     public RatePlanEligibilityResponse validateRatePlan(Long userId, Long ratePlanId, RatePlanEligibilityRequest req) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         ownedRatePlanOrThrow(ratePlanId, profile.getId());
         return ratePlanPricingService.validate(ratePlanId, req);
     }
@@ -172,14 +170,6 @@ public class PartnerPricingService {
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
-
-    private PartnerProfile myApprovedProfileOrThrow(Long userId) {
-        PartnerProfile profile = partnerProfiles.findByUserId(userId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Partner profile not found"));
-        if (profile.getVerificationStatus() != PartnerVerificationStatus.APPROVED)
-            throw new ApiException(HttpStatus.FORBIDDEN, "Partner profile is not approved");
-        return profile;
-    }
 
     private HotelRoom ownedRoomOrThrow(Long roomId, Long ownerId) {
         HotelRoom room = rooms.findById(roomId)

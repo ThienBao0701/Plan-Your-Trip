@@ -7,9 +7,7 @@ import com.example.planyourtrip.exception.ApiException;
 import com.example.planyourtrip.model.Booking;
 import com.example.planyourtrip.model.BookingStatus;
 import com.example.planyourtrip.model.PartnerProfile;
-import com.example.planyourtrip.model.PartnerVerificationStatus;
 import com.example.planyourtrip.repository.BookingRepository;
-import com.example.planyourtrip.repository.PartnerProfileRepository;
 import com.example.planyourtrip.security.VoucherSignatureService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -57,14 +55,14 @@ public class PartnerVoucherVerificationService {
 
     private final VoucherSignatureService voucherSignatureService;
     private final BookingRepository bookingRepo;
-    private final PartnerProfileRepository partnerProfiles;
+    private final PartnerAccessService partnerAccess;
 
     public PartnerVoucherVerificationService(VoucherSignatureService voucherSignatureService,
                                              BookingRepository bookingRepo,
-                                             PartnerProfileRepository partnerProfiles) {
+                                             PartnerAccessService partnerAccess) {
         this.voucherSignatureService = voucherSignatureService;
         this.bookingRepo = bookingRepo;
-        this.partnerProfiles = partnerProfiles;
+        this.partnerAccess = partnerAccess;
     }
 
     public VoucherVerificationResponse verify(Long userId, VoucherVerifyRequest req) {
@@ -109,7 +107,7 @@ public class PartnerVoucherVerificationService {
      * apply their own status/window logic; this method itself mutates NOTHING.
      */
     public Booking resolveOwnedBookingByPayload(Long userId, String voucherPayload) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         String bookingCode = voucherSignatureService.verifyAndExtractBookingCode(voucherPayload)
             .orElseThrow(this::notFound);
         return ownedBookingByCodeOrThrow(bookingCode, profile);
@@ -122,7 +120,7 @@ public class PartnerVoucherVerificationService {
      * was typed, not signed), but the ownership guarantee is identical.
      */
     public Booking resolveOwnedBookingByCode(Long userId, String bookingCode) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         return ownedBookingByCodeOrThrow(bookingCode, profile);
     }
 
@@ -136,15 +134,6 @@ public class PartnerVoucherVerificationService {
         if (owner == null || !owner.getId().equals(profile.getId()))
             throw notFound();
         return booking;
-    }
-
-    /** Same approved-profile gate as PartnerBookingService / PartnerAnalyticsService. */
-    private PartnerProfile myApprovedProfileOrThrow(Long userId) {
-        PartnerProfile profile = partnerProfiles.findByUserId(userId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Partner profile not found"));
-        if (profile.getVerificationStatus() != PartnerVerificationStatus.APPROVED)
-            throw new ApiException(HttpStatus.FORBIDDEN, "Partner profile is not approved");
-        return profile;
     }
 
     /** Uniform, non-enumerating 404 for every invalid/unknown/not-owned case. */

@@ -36,7 +36,6 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class PartnerAnalyticsService {
 
-    private final PartnerProfileRepository partnerProfiles;
     private final PlaceRepository places;
     private final HotelDetailRepository hotelDetails;
     private final HotelRoomRepository rooms;
@@ -46,6 +45,7 @@ public class PartnerAnalyticsService {
     private final PromotionRepository promotionRepo;
     private final ConversationRepository conversationRepo;
     private final MessageRepository messageRepo;
+    private final PartnerAccessService partnerAccess;
 
     private static final Set<BookingStatus> REVENUE_STATUSES =
         EnumSet.of(BookingStatus.CONFIRMED, BookingStatus.CHECK_IN_READY, BookingStatus.CHECKED_IN,
@@ -54,8 +54,7 @@ public class PartnerAnalyticsService {
     private static final Set<BookingStatus> STAYED_STATUSES =
         EnumSet.of(BookingStatus.CHECKED_OUT, BookingStatus.COMPLETED);
 
-    public PartnerAnalyticsService(PartnerProfileRepository partnerProfiles,
-                                    PlaceRepository places,
+    public PartnerAnalyticsService(PlaceRepository places,
                                     HotelDetailRepository hotelDetails,
                                     HotelRoomRepository rooms,
                                     BookingRepository bookingRepo,
@@ -63,8 +62,8 @@ public class PartnerAnalyticsService {
                                     ReviewRepository reviewRepo,
                                     PromotionRepository promotionRepo,
                                     ConversationRepository conversationRepo,
-                                    MessageRepository messageRepo) {
-        this.partnerProfiles = partnerProfiles;
+                                    MessageRepository messageRepo,
+                                    PartnerAccessService partnerAccess) {
         this.places = places;
         this.hotelDetails = hotelDetails;
         this.rooms = rooms;
@@ -74,12 +73,13 @@ public class PartnerAnalyticsService {
         this.promotionRepo = promotionRepo;
         this.conversationRepo = conversationRepo;
         this.messageRepo = messageRepo;
+        this.partnerAccess = partnerAccess;
     }
 
     // ── Overview ─────────────────────────────────────────────────────────────
 
     public PartnerAnalyticsOverviewResponse getOverview(Long userId, Long hotelId, LocalDate from, LocalDate to) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         List<Long> hotelIds = resolveHotelScope(profile.getId(), hotelId);
         LocalDate[] range = resolveRange(from, to);
         List<Booking> bookings = bookingsInRange(hotelIds, range[0], range[1]);
@@ -116,7 +116,7 @@ public class PartnerAnalyticsService {
     // ── Revenue ──────────────────────────────────────────────────────────────
 
     public RevenueAnalyticsResponse getRevenue(Long userId, Long hotelId, LocalDate from, LocalDate to) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         List<Long> hotelIds = resolveHotelScope(profile.getId(), hotelId);
         LocalDate[] range = resolveRange(from, to);
         List<Booking> revenueBookings = bookingsInRange(hotelIds, range[0], range[1]).stream()
@@ -137,7 +137,7 @@ public class PartnerAnalyticsService {
     // ── Occupancy ────────────────────────────────────────────────────────────
 
     public OccupancyAnalyticsResponse getOccupancy(Long userId, Long hotelId, LocalDate from, LocalDate to) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         List<Long> hotelIds = resolveHotelScope(profile.getId(), hotelId);
         LocalDate[] range = resolveRange(from, to);
         List<Long> roomIds = ownedRoomIds(hotelIds);
@@ -166,7 +166,7 @@ public class PartnerAnalyticsService {
     // ── Bookings ─────────────────────────────────────────────────────────────
 
     public BookingAnalyticsResponse getBookingAnalytics(Long userId, Long hotelId, LocalDate from, LocalDate to) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         List<Long> hotelIds = resolveHotelScope(profile.getId(), hotelId);
         LocalDate[] range = resolveRange(from, to);
         List<Booking> bookings = bookingsInRange(hotelIds, range[0], range[1]);
@@ -195,7 +195,7 @@ public class PartnerAnalyticsService {
     // ── Rooms ────────────────────────────────────────────────────────────────
 
     public RoomAnalyticsResponse getRoomAnalytics(Long userId, Long hotelId, LocalDate from, LocalDate to) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         List<Long> hotelIds = resolveHotelScope(profile.getId(), hotelId);
         LocalDate[] range = resolveRange(from, to);
         List<Booking> revenueBookings = bookingsInRange(hotelIds, range[0], range[1]).stream()
@@ -215,7 +215,7 @@ public class PartnerAnalyticsService {
     // ── Promotions ───────────────────────────────────────────────────────────
 
     public PromotionAnalyticsResponse getPromotionAnalytics(Long userId, Long hotelId, LocalDate from, LocalDate to) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         List<Long> hotelIds = resolveHotelScope(profile.getId(), hotelId);
         resolveRange(from, to); // validated for API consistency; promotion state is current, not date-windowed (documented)
 
@@ -258,7 +258,7 @@ public class PartnerAnalyticsService {
     // ── Reviews ──────────────────────────────────────────────────────────────
 
     public ReviewAnalyticsResponse getReviewAnalytics(Long userId, Long hotelId, LocalDate from, LocalDate to) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         List<Long> hotelIds = resolveHotelScope(profile.getId(), hotelId);
         resolveRange(from, to); // validated for API consistency; reviews are all-time reputation data (documented)
 
@@ -292,7 +292,7 @@ public class PartnerAnalyticsService {
      */
     public PlaceReviewAnalyticsResponse getPlaceReviewAnalytics(Long userId, Long placeId,
                                                                 LocalDate from, LocalDate to) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         resolveHotelScope(profile.getId(), placeId); // 404 if unknown or not owned (uniform, no leak)
         LocalDate[] range = resolveRange(from, to);
 
@@ -369,7 +369,7 @@ public class PartnerAnalyticsService {
     // ── Messages ─────────────────────────────────────────────────────────────
 
     public MessageAnalyticsResponse getMessageAnalytics(Long userId, Long hotelId, LocalDate from, LocalDate to) {
-        PartnerProfile profile = myApprovedProfileOrThrow(userId);
+        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
         resolveHotelScope(profile.getId(), hotelId); // validates hotelId ownership, if provided
         resolveRange(from, to); // validated for API consistency; conversation state is current inbox, not date-windowed (documented)
 
@@ -386,14 +386,6 @@ public class PartnerAnalyticsService {
     }
 
     // ── Ownership / scope helpers ────────────────────────────────────────────
-
-    private PartnerProfile myApprovedProfileOrThrow(Long userId) {
-        PartnerProfile profile = partnerProfiles.findByUserId(userId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Partner profile not found"));
-        if (profile.getVerificationStatus() != PartnerVerificationStatus.APPROVED)
-            throw new ApiException(HttpStatus.FORBIDDEN, "Partner profile is not approved");
-        return profile;
-    }
 
     private List<Long> resolveHotelScope(Long ownerId, Long hotelId) {
         List<Long> owned = places.findAllByOwnerId(ownerId).stream().map(Place::getId).toList();
