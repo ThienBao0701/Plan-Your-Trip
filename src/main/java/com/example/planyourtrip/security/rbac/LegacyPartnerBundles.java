@@ -43,17 +43,29 @@ public final class LegacyPartnerBundles {
         return Set.copyOf(EnumSet.allOf(PartnerPermission.class));
     }
 
-    /** What a team member with {@code role} could do before R1. */
+    /**
+     * What a team member with {@code role} could do before R1. The roles added in R2 ({@code REVENUE},
+     * {@code RESERVATIONS}, {@code CONTENT}, {@code HOUSEKEEPING}) had no legacy rights and receive none:
+     * their V1.1 bundles take effect only when R3b enforces the matrix.
+     */
     public static Set<PartnerPermission> member(PartnerTeamRole role) {
-        if (role == null) return Set.of();
+        if (!assignable(role)) return Set.of();
         EnumSet<PartnerPermission> bundle = EnumSet.copyOf(MEMBER_READS);
         switch (role) {
             case OWNER -> bundle.addAll(EnumSet.of(SETTINGS_EDIT, PAYOUT_ACCOUNT_MANAGE, TEAM_INVITE,
                 TEAM_ROLE_ASSIGN, TEAM_SUSPEND, TEAM_REMOVE, TEAM_OWNER_MANAGE));
             case MANAGER -> bundle.add(SETTINGS_EDIT);
             case FINANCE -> bundle.add(PAYOUT_ACCOUNT_MANAGE);
-            case FRONT_DESK, VIEWER -> { }
+            default -> { }
         }
         return Set.copyOf(bundle);
+    }
+
+    /** The five roles the legacy team endpoints may assign — the roles that existed before R2. */
+    public static boolean assignable(PartnerTeamRole role) {
+        return role != null && switch (role) {
+            case OWNER, MANAGER, FRONT_DESK, FINANCE, VIEWER -> true;
+            case REVENUE, RESERVATIONS, CONTENT, HOUSEKEEPING -> false;
+        };
     }
 }

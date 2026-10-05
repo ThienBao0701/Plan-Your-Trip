@@ -4,6 +4,7 @@ import com.example.planyourtrip.dto.PartnerSettingsDto.*;
 import com.example.planyourtrip.exception.ApiException;
 import com.example.planyourtrip.model.*;
 import com.example.planyourtrip.repository.*;
+import com.example.planyourtrip.security.rbac.LegacyPartnerBundles;
 import com.example.planyourtrip.security.rbac.PartnerAccessContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -52,6 +53,7 @@ public class PartnerSettingsService {
     private final NotificationService notificationService;
     private final PartnerActivityLogService activityLogService;
     private final PartnerAccessService partnerAccess;
+    private final PartnerMembershipService membershipService;
 
     public PartnerSettingsService(PartnerProfileRepository partnerProfileRepo,
                                    PartnerSettingsRepository settingsRepo,
@@ -60,7 +62,8 @@ public class PartnerSettingsService {
                                    UserRepository userRepo,
                                    NotificationService notificationService,
                                    PartnerActivityLogService activityLogService,
-                                   PartnerAccessService partnerAccess) {
+                                   PartnerAccessService partnerAccess,
+                                   PartnerMembershipService membershipService) {
         this.partnerProfileRepo = partnerProfileRepo;
         this.settingsRepo = settingsRepo;
         this.payoutAccountRepo = payoutAccountRepo;
@@ -69,6 +72,7 @@ public class PartnerSettingsService {
         this.notificationService = notificationService;
         this.activityLogService = activityLogService;
         this.partnerAccess = partnerAccess;
+        this.membershipService = membershipService;
     }
 
     // ── Settings ─────────────────────────────────────────────────────────────
@@ -171,6 +175,7 @@ public class PartnerSettingsService {
             throw new ApiException(HttpStatus.BAD_REQUEST, "email is required");
         if (req.role() == null)
             throw new ApiException(HttpStatus.BAD_REQUEST, "role is required");
+        requireLegacyAssignable(req.role());
         if (req.role() == PartnerTeamRole.OWNER)
             partnerAccess.requireCompanyPermission(access, TEAM_OWNER_MANAGE, TEAM_DENIED);
 
@@ -179,6 +184,8 @@ public class PartnerSettingsService {
 
         if (teamMemberRepo.existsByPartnerProfileIdAndUserId(access.profile().getId(), target.getId()))
             throw new ApiException(HttpStatus.CONFLICT, "This user is already a team member");
+        membershipService.requireCanJoin(target.getId(), access.profile().getId(),
+            req.active() == null || req.active());
 
         // /api/partner/** is gated by role at the security-filter level (hasAnyRole("PARTNER","ADMIN")),
         // same as PartnerProfileService.adminApprove() — a team member needs this to reach the
@@ -198,6 +205,7 @@ public class PartnerSettingsService {
         member.setJoinedAt(now);
 
         PartnerTeamMember saved = teamMemberRepo.save(member);
+        membershipService.syncLegacyCompanyGrant(saved, userId);
 
         notificationService.create(target.getId(), NotificationType.PARTNER, Priority.NORMAL,
             "You were added to a partner team",
@@ -223,10 +231,15 @@ public class PartnerSettingsService {
         PartnerTeamMember member = ownedTeamMemberOrThrow(teamMemberId, access.profile().getId());
         if (req.role() == PartnerTeamRole.OWNER || member.getRole() == PartnerTeamRole.OWNER)
             partnerAccess.requireCompanyPermission(access, TEAM_OWNER_MANAGE, TEAM_DENIED);
+        if (req.role() != null) requireLegacyAssignable(req.role());
+        if (Boolean.TRUE.equals(req.active()) && !member.isActive())
+            membershipService.requireCanReactivate(member);
         if (req.role() != null) member.setRole(req.role());
-        if (req.active() != null) member.setActive(req.active());
+        if (req.active() != null) member.setActive(req.active(), userId);
 
-        return toTeamResponse(teamMemberRepo.save(member));
+        PartnerTeamMember saved = teamMemberRepo.save(member);
+        membershipService.syncLegacyCompanyGrant(saved, userId);
+        return toTeamResponse(saved);
     }
 
     @Transactional
@@ -237,6 +250,7 @@ public class PartnerSettingsService {
         PartnerTeamMember member = ownedTeamMemberOrThrow(teamMemberId, access.profile().getId());
         if (member.getRole() == PartnerTeamRole.OWNER)
             partnerAccess.requireCompanyPermission(access, TEAM_OWNER_MANAGE, TEAM_DENIED);
+        membershipService.deleteGrants(member);
         teamMemberRepo.delete(member);
     }
 
@@ -256,6 +270,18 @@ public class PartnerSettingsService {
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
+
+    /**
+     * RBAC R2 — the legacy team endpoints assign only the five roles that existed before R2. The roles
+     * added in R2 can be stored but carry no capability until the V1.1 matrix is enforced (R3b), so they
+     * are refused here exactly like any other invalid field.
+     */
+    private static void requireLegacyAssignable(PartnerTeamRole role) {
+        if (!LegacyPartnerBundles.assignable(role)) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "VALIDATION_FAILED", "role",
+                "role " + role.name() + " cannot be assigned yet");
+        }
+    }
 
     private PartnerSettings getOrCreateSettings(PartnerProfile profile) {
         return settingsRepo.findByPartnerProfileId(profile.getId()).orElseGet(() -> {

@@ -54,6 +54,7 @@ public class DataInitializer implements ApplicationRunner {
     private final PartnerSettingsRepository partnerSettingsRepo;
     private final PartnerPayoutAccountRepository partnerPayoutAccountRepo;
     private final PartnerTeamMemberRepository partnerTeamMemberRepo;
+    private final PartnerMemberGrantRepository partnerMemberGrantRepo;
     private final CouponDefinitionRepository couponDefinitionRepo;
     private final com.example.planyourtrip.service.TravelCreditService travelCreditService;
     private final com.example.planyourtrip.service.LoyaltyService loyaltyService;
@@ -94,6 +95,7 @@ public class DataInitializer implements ApplicationRunner {
                            PartnerSettingsRepository partnerSettingsRepo,
                            PartnerPayoutAccountRepository partnerPayoutAccountRepo,
                            PartnerTeamMemberRepository partnerTeamMemberRepo,
+                           PartnerMemberGrantRepository partnerMemberGrantRepo,
                            CouponDefinitionRepository couponDefinitionRepo,
                            com.example.planyourtrip.service.TravelCreditService travelCreditService,
                            com.example.planyourtrip.service.LoyaltyService loyaltyService,
@@ -134,6 +136,7 @@ public class DataInitializer implements ApplicationRunner {
         this.partnerSettingsRepo       = partnerSettingsRepo;
         this.partnerPayoutAccountRepo  = partnerPayoutAccountRepo;
         this.partnerTeamMemberRepo     = partnerTeamMemberRepo;
+        this.partnerMemberGrantRepo    = partnerMemberGrantRepo;
         this.couponDefinitionRepo      = couponDefinitionRepo;
         this.travelCreditService       = travelCreditService;
         this.loyaltyService            = loyaltyService;
@@ -1925,7 +1928,9 @@ public class DataInitializer implements ApplicationRunner {
             java.time.Instant now = java.time.Instant.now();
             owner.setInvitedAt(now);
             owner.setJoinedAt(now);
-            partnerTeamMemberRepo.save(owner);
+            PartnerTeamMember saved = partnerTeamMemberRepo.save(owner);
+            // RBAC R2 — every membership carries the company-wide grant mirroring its role.
+            partnerMemberGrantRepo.save(PartnerMemberGrant.company(saved, PartnerTeamRole.OWNER, null));
         }
 
         if (!partnerPayoutAccountRepo.existsByPartnerProfileId(profile.getId())) {

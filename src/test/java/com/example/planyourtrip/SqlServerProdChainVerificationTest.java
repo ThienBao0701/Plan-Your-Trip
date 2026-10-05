@@ -9,6 +9,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -56,5 +59,39 @@ class SqlServerProdChainVerificationTest {
                 "DEFAULT_REFERRAL campaign must exist after prod bootstrap");
         assertTrue(redemptionPolicies.findByPolicyCodeIgnoreCase("DEFAULT_LOYALTY_REDEMPTION").isPresent(),
                 "DEFAULT_LOYALTY_REDEMPTION policy must exist after prod bootstrap");
+    }
+
+    /**
+     * RBAC R2 — V4–V6 applied on SQL Server: every named constraint exists (CHECK constraints are invisible
+     * to {@code ddl-auto=validate}), V1's generated role check is gone, and the backfills hold.
+     */
+    @Test
+    void rbacR2MembershipMigrationsAppliedWithTheirConstraints() {
+        for (String version : List.of("4", "5", "6")) {
+            Integer applied = jdbc.queryForObject(
+                    "SELECT COUNT(*) FROM flyway_schema_history WHERE success = 1 AND version = ?", Integer.class, version);
+            assertEquals(1, applied, "Flyway V" + version + " must be recorded as applied");
+        }
+        for (String check : List.of("ck_partner_team_members_role", "ck_partner_team_members_status",
+                "ck_partner_team_members_active_status", "ck_partner_member_grants_role",
+                "ck_partner_member_grants_scope_type", "ck_partner_member_grants_scope_id",
+                "ck_partner_member_grants_scope_shape", "ck_partner_member_grants_role_scope")) {
+            assertEquals(1, jdbc.queryForObject("SELECT COUNT(*) FROM sys.check_constraints WHERE name = ?",
+                    Integer.class, check), check);
+        }
+        assertEquals(1, jdbc.queryForObject("SELECT COUNT(*) FROM sys.check_constraints cc "
+                + "JOIN sys.columns c ON c.object_id = cc.parent_object_id AND c.column_id = cc.parent_column_id "
+                + "WHERE cc.parent_object_id = OBJECT_ID('partner_team_members') AND c.name = 'role'", Integer.class),
+                "only the named role check remains");
+        assertEquals(2, jdbc.queryForObject("SELECT COUNT(*) FROM sys.foreign_key_columns fkc "
+                + "JOIN sys.foreign_keys fk ON fk.object_id = fkc.constraint_object_id "
+                + "WHERE fk.name = 'fk_partner_member_grants_member'", Integer.class),
+                "the composite membership/company foreign key");
+        assertEquals(0, jdbc.queryForObject("SELECT COUNT(*) FROM partner_team_members m WHERE m.status <> 'REVOKED' "
+                + "AND NOT EXISTS (SELECT 1 FROM partner_member_grants g WHERE g.team_member_id = m.id "
+                + "AND g.scope_type = 'COMPANY' AND g.role = m.role)", Integer.class),
+                "every membership that is not revoked holds a company grant mirroring its role");
+        assertEquals(0, jdbc.queryForObject("SELECT COUNT(*) FROM partner_activity_logs WHERE actor_email IS NULL",
+                Integer.class));
     }
 }

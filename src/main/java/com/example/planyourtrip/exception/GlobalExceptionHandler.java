@@ -26,15 +26,21 @@ public class GlobalExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     /**
-     * The uniform error body. {@code code} and {@code fieldErrors} were added in Phase A and are
-     * omitted from the JSON when absent, so every existing error response keeps its exact shape and
-     * {@code message} keeps its existing meaning.
+     * The uniform error body. {@code code} and {@code fieldErrors} were added in Phase A, {@code reason}
+     * in RBAC R2 (only {@code WORKSPACE_CONFLICT} carries one); all three are omitted from the JSON when
+     * absent, so every existing error response keeps its exact shape and {@code message} keeps its
+     * existing meaning.
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     record ErrorBody(String timestamp, int status, String error, String message, String path,
-                     String code, List<FieldErrorItem> fieldErrors) {
+                     String code, List<FieldErrorItem> fieldErrors, String reason) {
         ErrorBody(String timestamp, int status, String error, String message, String path) {
-            this(timestamp, status, error, message, path, null, null);
+            this(timestamp, status, error, message, path, null, null, null);
+        }
+
+        ErrorBody(String timestamp, int status, String error, String message, String path,
+                  String code, List<FieldErrorItem> fieldErrors) {
+            this(timestamp, status, error, message, path, code, fieldErrors, null);
         }
     }
 
@@ -47,7 +53,7 @@ public class GlobalExceptionHandler {
             : List.of(new FieldErrorItem(ex.field(), ex.getMessage()));
         return ResponseEntity.status(ex.status()).body(new ErrorBody(
             Instant.now().toString(), ex.status().value(), ex.status().getReasonPhrase(),
-            ex.getMessage(), req.getRequestURI(), ex.code(), fields));
+            ex.getMessage(), req.getRequestURI(), ex.code(), fields, ex.reason()));
     }
 
     /**

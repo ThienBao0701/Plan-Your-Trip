@@ -50,6 +50,8 @@ public class PartnerActivityLogService {
         PartnerActivityLog entry = new PartnerActivityLog();
         entry.setPartnerProfile(profile);
         entry.setActorUser(actor);
+        // RBAC V1.1 §22.1 AU-2 — the actor's email as it is now, kept even if the account changes later.
+        entry.setActorEmail(actor.getEmail());
         entry.setAction(action);
         entry.setEntityType(entityType);
         entry.setEntityId(entityId);

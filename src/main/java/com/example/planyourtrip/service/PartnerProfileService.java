@@ -29,17 +29,20 @@ public class PartnerProfileService {
 
     /** D1a — partner lifecycle decisions are administrative acts and must leave a trail. */
     private final AdminActivityLogService adminAudit;
+    private final PartnerMembershipService membershipService;
 
     public PartnerProfileService(PartnerProfileRepository partnerProfileRepo,
                                   UserRepository userRepo,
                                   NotificationService notificationService,
                                   PartnerTeamMemberRepository partnerTeamMemberRepo,
-                                  AdminActivityLogService adminAudit) {
+                                  AdminActivityLogService adminAudit,
+                                  PartnerMembershipService membershipService) {
         this.partnerProfileRepo = partnerProfileRepo;
         this.userRepo = userRepo;
         this.notificationService = notificationService;
         this.partnerTeamMemberRepo = partnerTeamMemberRepo;
         this.adminAudit = adminAudit;
+        this.membershipService = membershipService;
     }
 
     @Transactional
@@ -47,6 +50,9 @@ public class PartnerProfileService {
         PartnerProfile profile = partnerProfileRepo.findByUserId(userId).orElse(null);
 
         if (profile == null) {
+            // RBAC V1.1 §11.6 WS-2 — one workspace per account: a member of another partner company
+            // must leave it before registering a company of their own.
+            membershipService.requireCanCreateCompany(userId);
             User user = userRepo.findById(userId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
             profile = new PartnerProfile();
@@ -164,7 +170,7 @@ public class PartnerProfileService {
             userRepo.save(owner);
         }
 
-        ensureOwnerTeamMember(profile, owner);
+        ensureOwnerTeamMember(profile, owner, adminUserId);
 
         notificationService.create(owner.getId(), NotificationType.PARTNER, Priority.NORMAL,
             "Your partner profile has been approved", "Your partner profile has been approved.",
@@ -184,18 +190,22 @@ public class PartnerProfileService {
      * its own user (Phase 6.9 introduced the team model after some profiles had
      * already been approved, so this is created lazily here rather than assumed).
      */
-    private void ensureOwnerTeamMember(PartnerProfile profile, User owner) {
-        if (partnerTeamMemberRepo.existsByPartnerProfileIdAndUserId(profile.getId(), owner.getId())) return;
-
-        PartnerTeamMember member = new PartnerTeamMember();
-        member.setPartnerProfile(profile);
-        member.setUser(owner);
-        member.setRole(PartnerTeamRole.OWNER);
-        member.setActive(true);
-        Instant now = Instant.now();
-        member.setInvitedAt(now);
-        member.setJoinedAt(now);
-        partnerTeamMemberRepo.save(member);
+    private void ensureOwnerTeamMember(PartnerProfile profile, User owner, Long adminUserId) {
+        PartnerTeamMember member = partnerTeamMemberRepo
+            .findByPartnerProfileIdAndUserId(profile.getId(), owner.getId())
+            .orElseGet(() -> {
+                PartnerTeamMember created = new PartnerTeamMember();
+                created.setPartnerProfile(profile);
+                created.setUser(owner);
+                created.setRole(PartnerTeamRole.OWNER);
+                created.setActive(true);
+                Instant now = Instant.now();
+                created.setInvitedAt(now);
+                created.setJoinedAt(now);
+                return partnerTeamMemberRepo.save(created);
+            });
+        // RBAC R2 — the membership's company-wide grant mirrors its role (§28 M-2).
+        membershipService.syncLegacyCompanyGrant(member, adminUserId);
     }
 
     @Transactional

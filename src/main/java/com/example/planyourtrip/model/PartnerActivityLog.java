@@ -36,6 +36,25 @@ public class PartnerActivityLog {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    /**
+     * RBAC V1.1 §22.1 AU-2 / §28 M-4 — the actor's email as it was when the row was written. A snapshot,
+     * never re-resolved on read, so the trail stays truthful if the account's email changes later.
+     */
+    @Column(name = "actor_email", nullable = false, length = 255)
+    private String actorEmail;
+
+    /** Safe scalar summary of the relevant state before the change, e.g. {@code MANAGER@COMPANY:456}. */
+    @Column(name = "before_state", length = 500)
+    private String beforeState;
+
+    /** Safe scalar summary of the relevant state after the change. */
+    @Column(name = "after_state", length = 500)
+    private String afterState;
+
+    /** Why the change was made, when the actor gave a reason; V6 marks backfilled actor emails here. */
+    @Column(length = 500)
+    private String reason;
+
     @Column(updatable = false)
     private Instant createdAt;
 
