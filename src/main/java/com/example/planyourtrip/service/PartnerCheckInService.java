@@ -11,6 +11,7 @@ import com.example.planyourtrip.repository.BookingCheckInAuditRepository;
 import com.example.planyourtrip.repository.BookingRepository;
 import com.example.planyourtrip.repository.PartnerProfileRepository;
 import org.springframework.beans.factory.annotation.Value;
+import com.example.planyourtrip.security.rbac.PartnerPermission;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +55,7 @@ public class PartnerCheckInService {
         EnumSet.of(BookingStatus.CONFIRMED, BookingStatus.CHECK_IN_READY);
 
     private final PartnerVoucherVerificationService verificationService;
+    private final PartnerBookingRedactor redactor;
     private final BookingStatusEngineService statusEngine;
     private final BookingRepository bookingRepo;
     private final BookingCheckInAuditRepository auditRepo;
@@ -70,6 +72,7 @@ public class PartnerCheckInService {
     private final long earlyWindowDays;
 
     public PartnerCheckInService(PartnerVoucherVerificationService verificationService,
+                                 PartnerBookingRedactor redactor,
                                  BookingStatusEngineService statusEngine,
                                  BookingRepository bookingRepo,
                                  BookingCheckInAuditRepository auditRepo,
@@ -77,6 +80,7 @@ public class PartnerCheckInService {
                                  PartnerBusinessZoneService businessZone,
                                  @Value("${booking.checkin.early-window-days:1}") long earlyWindowDays) {
         this.verificationService = verificationService;
+        this.redactor = redactor;
         this.statusEngine = statusEngine;
         this.bookingRepo = bookingRepo;
         this.auditRepo = auditRepo;
@@ -97,15 +101,18 @@ public class PartnerCheckInService {
         }
 
         // Reuse Phase 7.39's verify+resolve+ownership (uniform 404 for invalid/unknown/not-owned).
-        Booking booking = payload != null
-            ? verificationService.resolveOwnedBookingByPayload(userId, payload)
-            : verificationService.resolveOwnedBookingByCode(userId, code);
+        // RBAC R3b — the booking must lie where the caller holds BOOKING_ARRIVAL_OPERATE (404 / 403 per §4.5 RESOURCE)
+        PartnerVoucherVerificationService.AuthorizedBooking authorized = payload != null
+            ? verificationService.resolveOwnedBookingByPayload(userId, payload, PartnerPermission.BOOKING_ARRIVAL_OPERATE)
+            : verificationService.resolveOwnedBookingByCode(userId, code, PartnerPermission.BOOKING_ARRIVAL_OPERATE);
+        Booking booking = authorized.booking();
+        com.example.planyourtrip.security.rbac.PartnerAccessContext access = authorized.access();
 
         // IDEMPOTENCY: already checked in and owned by the caller → deterministic 200, NO re-transition,
         // NO re-notify, NO second audit row, checkedInAt unchanged. Checked FIRST, before the engine
         // (which would otherwise throw on CHECKED_IN → CHECKED_IN).
         if (booking.getStatus() == BookingStatus.CHECKED_IN) {
-            return toResponse(booking, "Guest is already checked in");
+            return toResponse(access, booking, "Guest is already checked in");
         }
 
         // Eligibility — only CONFIRMED / CHECK_IN_READY may be admitted; everything else → 422.
@@ -128,7 +135,7 @@ public class PartnerCheckInService {
         // Exactly one immutable audit row on the real transition.
         writeAudit(userId, saved);
 
-        return toResponse(saved, "Check-in completed");
+        return toResponse(access, saved, "Check-in completed");
     }
 
     /**
@@ -169,7 +176,8 @@ public class PartnerCheckInService {
         return partnerProfiles.findByUserId(userId).map(PartnerProfile::getId).orElse(null);
     }
 
-    private CheckInResponse toResponse(Booking b, String message) {
+    private CheckInResponse toResponse(com.example.planyourtrip.security.rbac.PartnerAccessContext access, Booking b, String message) {
+        java.util.List<com.example.planyourtrip.dto.RedactedField> redacted = new java.util.ArrayList<>();
         return new CheckInResponse(
             true,
             b.getBookingCode(),
@@ -177,8 +185,9 @@ public class PartnerCheckInService {
             b.getActualCheckInAt(),
             b.getHotel().getName(),
             b.getRoom().getRoomName(),
-            b.getUser().getFullName(),
-            message
+            redactor.guestName(access, b, b.getUser().getFullName(), redacted, "guestName"),
+            message,
+            java.util.List.copyOf(redacted)
         );
     }
 

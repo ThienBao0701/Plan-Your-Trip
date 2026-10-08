@@ -19,12 +19,14 @@ public class PartnerAnalyticsDto {
         long cancelledBookings,
         long completedBookings,
         double occupancyRate,
-        double averageDailyRate,
+        Double averageDailyRate,
         double averageStayNights,
         double reviewAverage,
         long reviewCount,
         long unreadMessages,
-        Double responseRate
+        Double responseRate,
+        // RBAC R3b — totalRevenue and averageDailyRate are null without finance.revenue.view (P49) over the scope
+        List<RedactedField> redacted
     ) {}
 
     public record RevenueAnalyticsResponse(
@@ -56,7 +58,9 @@ public class PartnerAnalyticsDto {
         List<MetricBreakdown> topRoomsByRevenue,
         List<MetricBreakdown> topRoomsByBookings,
         List<MetricBreakdown> roomAvailabilitySummary,
-        double roomOccupancyEstimate
+        double roomOccupancyEstimate,
+        // RBAC R3b — topRoomsByRevenue is null without finance.revenue.view (P49) over the scope
+        List<RedactedField> redacted
     ) {}
 
     public record PromotionAnalyticsResponse(
@@ -81,7 +85,9 @@ public class PartnerAnalyticsDto {
         long pendingReviews,
         long approvedReviews,
         long rejectedReviews,
-        List<ReviewPreview> latestReviews
+        List<ReviewPreview> latestReviews,
+        // RBAC R3b — latestReviews (individual reviews) is null without review.view (P44) over the scope
+        List<RedactedField> redacted
     ) {}
 
     public record MessageAnalyticsResponse(

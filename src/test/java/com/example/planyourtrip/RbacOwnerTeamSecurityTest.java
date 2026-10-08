@@ -585,7 +585,7 @@ class RbacOwnerTeamSecurityTest {
     // ═══════════════════════════════════════════════════════════════════════
 
     @Test
-    void scopedAndNewRoleGrantsActivateNothing() throws Exception {
+    void scopedAndNewRoleGrantsActivateExactlyTheirScopedBundles() throws Exception {
         Partner p = approvedPartner();
         Long property = createProperty(p);
         Member m = member(p, "VIEWER");
@@ -596,16 +596,18 @@ class RbacOwnerTeamSecurityTest {
                 """.formatted(property, p.companyId(), property, version(m.rowId()))), p.token())
             .andExpect(status().isOk()).andExpect(jsonPath("$.role").value("MANAGER"));
 
-        // a MANAGER@PROPERTY grant is not company-wide MANAGER, and REVENUE/HOUSEKEEPING carry nothing before R3b
+        // R3b: a MANAGER@PROPERTY grant is never company-wide MANAGER (floor C stays out of reach)…
         send(json(put("/api/partner/settings"), SETTINGS_ALL_OFF), m.token()).andExpect(status().isForbidden());
-        send(get("/api/partner/settings"), m.token()).andExpect(status().isForbidden());
+        send(get("/api/partner/finance/settlements"), m.token()).andExpect(status().isForbidden());
+        // …while REVENUE@COMPANY and MANAGER@PROPERTY give exactly their bundles
+        send(get("/api/partner/settings"), m.token()).andExpect(status().isOk());
         for (String path : List.of("/api/partner/hotels", "/api/partner/hotels/" + property, "/api/partner/bookings",
                 "/api/partner/finance/overview")) {
-            send(get(path), m.token()).andExpect(status().isNotFound());
+            send(get(path), m.token()).andExpect(status().isOk());
         }
-        // a confirmed co-owner still has no operational access before R3b
+        // a confirmed co-owner operates company-wide
         Member coOwner = member(p, "OWNER");
-        send(get("/api/partner/hotels"), coOwner.token()).andExpect(status().isNotFound());
+        send(get("/api/partner/hotels"), coOwner.token()).andExpect(status().isOk());
         send(get("/api/partner/team"), coOwner.token()).andExpect(status().isOk());
     }
 

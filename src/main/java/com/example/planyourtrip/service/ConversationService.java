@@ -12,6 +12,11 @@ import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import com.example.planyourtrip.dto.RedactedField;
+import com.example.planyourtrip.security.rbac.PartnerAccessContext;
+import com.example.planyourtrip.security.rbac.PartnerPermission;
+import com.example.planyourtrip.security.rbac.ResourceType;
+import com.example.planyourtrip.security.rbac.ScopePath;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +27,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static com.example.planyourtrip.security.rbac.PartnerPermission.CONVERSATION_RESPOND;
+import static com.example.planyourtrip.security.rbac.PartnerPermission.CONVERSATION_VIEW;
 
 @Service
 public class ConversationService {
@@ -95,15 +103,18 @@ public class ConversationService {
 
     @Transactional(readOnly = true)
     public List<ConversationSummaryResponse> getPartnerConversations(Long userId) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        return conversationRepo.findByPartnerProfileIdOrderByLastMessageAtDesc(profile.getId())
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        // §25.1: COLLECTION (conversation) filtered by booking.hotel ∈ S — never by the denormalized company column
+        List<Long> hotelIds = partnerAccess.propertyIds(access, partnerAccess.requireCollection(access, CONVERSATION_VIEW));
+        if (hotelIds.isEmpty()) return List.of();
+        return conversationRepo.findByBookingHotelIdInOrderByLastMessageAtDesc(hotelIds)
             .stream().map(this::toSummaryForPartner).toList();
     }
 
     @Transactional(readOnly = true)
-    public ConversationResponse getConversationForPartner(Long userId, Long id) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        return toResponse(ownedByPartnerOrThrow(id, profile.getId()));
+    public PartnerConversationView getConversationForPartner(Long userId, Long id) {
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        return toPartnerView(access, authorizedForPartner(access, CONVERSATION_VIEW, id));
     }
 
     // ── Read: admin ──────────────────────────────────────────────────────────
@@ -171,10 +182,12 @@ public class ConversationService {
     }
 
     @Transactional
-    public MessageResponse sendPartnerMessage(Long userId, Long conversationId, MessageRequest req) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        Conversation conv = ownedByPartnerOrThrow(conversationId, profile.getId());
-        return sendMessage(conv, userId, MessageSenderRole.PARTNER, req.body());
+    public PartnerMessageView sendPartnerMessage(Long userId, Long conversationId, MessageRequest req) {
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        Conversation conv = authorizedForPartner(access, CONVERSATION_RESPOND, conversationId);
+        MessageResponse sent = sendMessage(conv, userId, MessageSenderRole.PARTNER, req.body());
+        return new PartnerMessageView(sent.id(), sent.conversationId(), sent.senderName(), sent.senderRole(),
+            sent.body(), sent.readByUser(), sent.readByPartner(), sent.createdAt());
     }
 
     @Transactional
@@ -199,11 +212,11 @@ public class ConversationService {
     }
 
     @Transactional
-    public ConversationResponse markReadByPartner(Long userId, Long conversationId) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        Conversation conv = ownedByPartnerOrThrow(conversationId, profile.getId());
+    public PartnerConversationView markReadByPartner(Long userId, Long conversationId) {
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        Conversation conv = authorizedForPartner(access, CONVERSATION_RESPOND, conversationId);
         messageRepo.markReadByPartner(conv.getId());
-        return toResponse(conv);
+        return toPartnerView(access, conv);
     }
 
     // ── Close / archive ──────────────────────────────────────────────────────
@@ -216,11 +229,11 @@ public class ConversationService {
     }
 
     @Transactional
-    public ConversationResponse closeByPartner(Long userId, Long conversationId) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        Conversation conv = ownedByPartnerOrThrow(conversationId, profile.getId());
+    public PartnerConversationView closeByPartner(Long userId, Long conversationId) {
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        Conversation conv = authorizedForPartner(access, CONVERSATION_RESPOND, conversationId);
         conv.setStatus(ConversationStatus.CLOSED);
-        return toResponse(conversationRepo.save(conv));
+        return toPartnerView(access, conversationRepo.save(conv));
     }
 
     @Transactional
@@ -305,11 +318,32 @@ public class ConversationService {
         return conv;
     }
 
-    private Conversation ownedByPartnerOrThrow(Long id, Long partnerProfileId) {
-        Conversation conv = conversationOrThrow(id);
-        if (!conv.getPartnerProfile().getId().equals(partnerProfileId))
-            throw new ApiException(HttpStatus.NOT_FOUND, "Conversation not found: " + id);
-        return conv;
+    /**
+     * RBAC R3b — §4.5 RESOURCE (conversation): it lives at the PROPERTY of its booking's hotel and the hotel's
+     * <em>current</em> owner (§11.2); the denormalized {@code partner_profile_id} is never consulted (§16 PA-4).
+     */
+    private Conversation authorizedForPartner(PartnerAccessContext access, PartnerPermission permission, Long id) {
+        partnerAccess.requireResource(access, permission, ResourceType.CONVERSATION, id, "Conversation not found: " + id);
+        return conversationOrThrow(id);
+    }
+
+    private PartnerConversationView toPartnerView(PartnerAccessContext access, Conversation c) {
+        boolean identity = partnerAccess.holds(access, PartnerPermission.BOOKING_GUEST_IDENTITY_VIEW,
+            ScopePath.property(access.companyId(), c.getBooking().getHotel().getId()));
+        List<RedactedField> redacted = identity ? List.of() : List.of(
+            RedactedField.masked("userName"), RedactedField.masked("messages[].senderName"));
+        List<PartnerMessageView> messages = messageRepo.findByConversationIdOrderByCreatedAtAsc(c.getId()).stream()
+            .map(m -> new PartnerMessageView(m.getId(), c.getId(),
+                identity || m.getSenderRole() != MessageSenderRole.USER
+                    ? m.getSenderUser().getFullName() : RedactedField.maskName(m.getSenderUser().getFullName()),
+                m.getSenderRole().name(), m.getBody(), m.isReadByUser(), m.isReadByPartner(), m.getCreatedAt()))
+            .toList();
+        return new PartnerConversationView(
+            c.getId(), c.getBooking().getId(), c.getBooking().getBookingCode(),
+            identity ? c.getUser().getFullName() : RedactedField.maskName(c.getUser().getFullName()),
+            c.getPartnerProfile().getId(), c.getPartnerProfile().getBusinessName(),
+            c.getStatus().name(), c.getSubject(), c.getLastMessageAt(),
+            c.getCreatedAt(), c.getUpdatedAt(), messages, redacted);
     }
 
     private ConversationResponse toResponse(Conversation c) {

@@ -25,6 +25,7 @@ import com.example.planyourtrip.security.rbac.PartnerAccessContext;
 import com.example.planyourtrip.security.rbac.PartnerAuthorization;
 import com.example.planyourtrip.security.rbac.PartnerPermission;
 import com.example.planyourtrip.security.rbac.ScopeRef;
+import com.example.planyourtrip.security.rbac.ScopeSet;
 import com.example.planyourtrip.security.rbac.ScopeType;
 import com.example.planyourtrip.util.AccountEmails;
 import jakarta.persistence.EntityManager;
@@ -137,14 +138,26 @@ public class PartnerTeamService {
 
     // ── Reads ────────────────────────────────────────────────────────────────
 
-    /** The company's members (not revoked) with their status and grants (§25.3, additive). */
+    /**
+     * The company's members (not revoked) with their status and grants (§25.3, additive). RBAC R3b — a COLLECTION
+     * over team view's scope set (P07): a company holder sees every member; a property holder sees only members all
+     * of whose grants lie inside their properties (§11.4), never the owners.
+     */
     @Transactional(readOnly = true)
     public List<PartnerTeamMemberResponse> list(Long userId) {
         PartnerAccessContext ctx = access.requireTeamWorkspace(userId);
-        access.requireCompanyPermission(ctx, TEAM_VIEW, null);
+        ScopeSet scope = access.requireCollection(ctx, TEAM_VIEW);
         return members.findByPartnerProfileIdOrderByCreatedAtAsc(ctx.companyId()).stream()
             .filter(m -> m.getStatus() != PartnerMembershipStatus.REVOKED)
+            .filter(m -> scope.companyWide() || within(scope, m))
             .map(m -> toResponse(m, userId)).toList();
+    }
+
+    /** Every grant of the membership, as resolved today, lies inside the scope set; a membership with none does not. */
+    private boolean within(ScopeSet scope, PartnerTeamMember member) {
+        if (memberships.isPrimaryOwner(member)) return false;
+        List<PartnerMembershipService.ResolvedGrant> grants = memberships.resolveGrants(member);
+        return !grants.isEmpty() && grants.stream().allMatch(g -> scope.permits(g.scope()));
     }
 
     /** Administrative read: every membership of the company, revoked ones included. */

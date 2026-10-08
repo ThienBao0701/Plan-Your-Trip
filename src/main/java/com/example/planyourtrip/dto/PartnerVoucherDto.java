@@ -53,6 +53,8 @@ public class PartnerVoucherDto {
         LocalDate checkInDate,
         LocalDate checkOutDate,
         Occupancy occupancy,
-        int nights
+        int nights,
+        // RBAC R3b — guestName is masked without booking.guest_identity.view (§21.2)
+        java.util.List<com.example.planyourtrip.dto.RedactedField> redacted
     ) {}
 }

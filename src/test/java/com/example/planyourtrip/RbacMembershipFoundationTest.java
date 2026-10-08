@@ -20,6 +20,7 @@ import com.example.planyourtrip.security.rbac.PartnerAccessContext;
 import com.example.planyourtrip.security.rbac.PartnerAuthorization;
 import com.example.planyourtrip.security.rbac.PartnerGrant;
 import com.example.planyourtrip.security.rbac.PartnerPermission;
+import com.example.planyourtrip.security.rbac.PartnerRoleBundles;
 import com.example.planyourtrip.security.rbac.PartnerRoleScopes;
 import com.example.planyourtrip.security.rbac.ResourceType;
 import com.example.planyourtrip.security.rbac.ScopePath;
@@ -579,29 +580,30 @@ class RbacMembershipFoundationTest {
     }
 
     @Test
-    void storedGrantsGiveATeamMemberNothingInR2() throws Exception {
+    void storedGrantsDecideEveryRequestFromR3b() throws Exception {
         Partner partner = approvedPartner();
         Long propertyId = createProperty(partner);
         Account viewer = memberAccount(partner, "VIEWER");
         PartnerTeamMember row = membership(partner.profileId(), viewer.userId());
-        // grants that R3b will honour — stored now, read by no request path yet
         memberships.grant(row, PartnerTeamRole.MANAGER, new ScopeRef(ScopeType.PROPERTY, propertyId), partner.userId());
         memberships.grant(row, PartnerTeamRole.CONTENT, new ScopeRef(ScopeType.COMPANY, partner.profileId()), partner.userId());
 
+        // R3b: the stored grants decide — VIEWER@COMPANY reads, MANAGER@PROPERTY operates its property
         for (String path : new String[] {"/api/partner/hotels", "/api/partner/hotels/" + propertyId,
-                "/api/partner/bookings", "/api/partner/extranet/home"}) {
-            mvc.perform(auth(get(path), viewer.token()))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("Partner profile not found"));
+                "/api/partner/bookings", "/api/partner/extranet/home", "/api/partner/settings"}) {
+            mvc.perform(auth(get(path), viewer.token())).andExpect(status().isOk());
         }
+        // settings.edit has floor COMPANY: the MANAGER@PROPERTY grant never satisfies it
         mvc.perform(auth(json(put("/api/partner/settings"), SETTINGS_BODY), viewer.token()))
             .andExpect(status().isForbidden())
             .andExpect(jsonPath("$.code").value("PERMISSION_DENIED"));
-        mvc.perform(auth(get("/api/partner/settings"), viewer.token())).andExpect(status().isOk());
 
-        PartnerAccessContext legacy = partnerAccess.requireTeamWorkspace(viewer.userId());
-        assertEquals(List.of(new PartnerGrant(LegacyPartnerBundles.member(PartnerTeamRole.VIEWER),
-            ScopePath.company(partner.profileId()))), legacy.grants(), "the workspace still carries the legacy bundle only");
+        PartnerAccessContext ctx = partnerAccess.requireTeamWorkspace(viewer.userId());
+        assertTrue(ctx.grants().contains(new PartnerGrant(PartnerRoleBundles.effective(PartnerTeamRole.MANAGER),
+            ScopePath.property(partner.profileId(), propertyId))));
+        assertTrue(PartnerAuthorization.isGranted(ctx, "partner.property.policy.edit",
+            ScopePath.property(partner.profileId(), propertyId)));
+        assertEquals(AuthorizationDecision.FORBIDDEN, PartnerAuthorization.company(ctx, PartnerPermission.SETTINGS_EDIT));
     }
 
     @Test

@@ -6,6 +6,9 @@ import com.example.planyourtrip.model.*;
 import com.example.planyourtrip.repository.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
+import com.example.planyourtrip.dto.RedactedField;
+import com.example.planyourtrip.security.rbac.PartnerAccessContext;
+import com.example.planyourtrip.security.rbac.ResourceType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +35,10 @@ import java.util.stream.Collectors;
  * Every method aggregates over data already produced by existing write flows
  * (Booking/Payment/Review/RoomInventory/Promotion/Conversation) — nothing here mutates state.
  */
+import static com.example.planyourtrip.security.rbac.PartnerPermission.ANALYTICS_VIEW;
+import static com.example.planyourtrip.security.rbac.PartnerPermission.FINANCE_REVENUE_VIEW;
+import static com.example.planyourtrip.security.rbac.PartnerPermission.REVIEW_VIEW;
+
 @Service
 @Transactional(readOnly = true)
 public class PartnerAnalyticsService {
@@ -79,8 +86,18 @@ public class PartnerAnalyticsService {
     // ── Overview ─────────────────────────────────────────────────────────────
 
     public PartnerAnalyticsOverviewResponse getOverview(Long userId, Long hotelId, LocalDate from, LocalDate to) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        List<Long> hotelIds = resolveHotelScope(profile.getId(), hotelId);
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        // §25.1: COLLECTION over S of analytics.view; revenue fields need finance.revenue.view over all of it
+        List<Long> hotelIds = partnerAccess.propertyIds(access, partnerAccess.requireCollection(access, ANALYTICS_VIEW), hotelId);
+        return overviewOver(hotelIds, from, to, partnerAccess.holdsOver(access, FINANCE_REVENUE_VIEW, hotelIds));
+    }
+
+    /**
+     * The overview over {@code hotelIds}, which the caller has already authorized; revenue figures only when
+     * {@code revenueVisible}. Also the source of finance overview and commission (computed over P49's set).
+     */
+    PartnerAnalyticsOverviewResponse overviewOver(List<Long> hotelIds, LocalDate from, LocalDate to,
+                                                  boolean revenueVisible) {
         LocalDate[] range = resolveRange(from, to);
         List<Booking> bookings = bookingsInRange(hotelIds, range[0], range[1]);
 
@@ -100,24 +117,32 @@ public class PartnerAnalyticsService {
         double reviewAverage = approvedReviews.isEmpty() ? 0.0 :
             approvedReviews.stream().mapToInt(Review::getRatingOverall).average().orElse(0.0);
 
-        List<Conversation> convs = partnerConversationsInScope(profile.getId(), hotelId);
+        List<Conversation> convs = conversationsIn(hotelIds);
         long unreadMessages = convs.stream()
             .mapToLong(c -> messageRepo.countByConversationIdAndReadByPartnerFalse(c.getId())).sum();
         Double responseRate = computeResponseRate(convs);
 
         return new PartnerAnalyticsOverviewResponse(
-            totalRevenue.setScale(2, RoundingMode.HALF_UP), totalBookings, confirmedBookings,
-            cancelledBookings, completedBookings, round2(occupancyRate), round2(adr), round2(avgStay),
-            round2(reviewAverage), approvedReviews.size(), unreadMessages,
-            responseRate != null ? round2(responseRate) : null
+            revenueVisible ? totalRevenue.setScale(2, RoundingMode.HALF_UP) : null, totalBookings, confirmedBookings,
+            cancelledBookings, completedBookings, round2(occupancyRate), revenueVisible ? round2(adr) : null,
+            round2(avgStay), round2(reviewAverage), approvedReviews.size(), unreadMessages,
+            responseRate != null ? round2(responseRate) : null,
+            revenueVisible ? List.of()
+                : List.of(RedactedField.omitted("totalRevenue"), RedactedField.omitted("averageDailyRate"))
         );
     }
 
     // ── Revenue ──────────────────────────────────────────────────────────────
 
     public RevenueAnalyticsResponse getRevenue(Long userId, Long hotelId, LocalDate from, LocalDate to) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        List<Long> hotelIds = resolveHotelScope(profile.getId(), hotelId);
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        // §25.1: COLLECTION over S of finance.revenue.view (P49)
+        List<Long> hotelIds = partnerAccess.propertyIds(access, partnerAccess.requireCollection(access, FINANCE_REVENUE_VIEW), hotelId);
+        return revenueOver(hotelIds, from, to);
+    }
+
+    /** The revenue breakdowns over {@code hotelIds}, which the caller has authorized for P49. */
+    RevenueAnalyticsResponse revenueOver(List<Long> hotelIds, LocalDate from, LocalDate to) {
         LocalDate[] range = resolveRange(from, to);
         List<Booking> revenueBookings = bookingsInRange(hotelIds, range[0], range[1]).stream()
             .filter(b -> REVENUE_STATUSES.contains(b.getStatus())).toList();
@@ -137,8 +162,8 @@ public class PartnerAnalyticsService {
     // ── Occupancy ────────────────────────────────────────────────────────────
 
     public OccupancyAnalyticsResponse getOccupancy(Long userId, Long hotelId, LocalDate from, LocalDate to) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        List<Long> hotelIds = resolveHotelScope(profile.getId(), hotelId);
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        List<Long> hotelIds = partnerAccess.propertyIds(access, partnerAccess.requireCollection(access, ANALYTICS_VIEW), hotelId);
         LocalDate[] range = resolveRange(from, to);
         List<Long> roomIds = ownedRoomIds(hotelIds);
         List<RoomInventory> inv = inventoryInRange(roomIds, range[0], range[1]);
@@ -166,8 +191,8 @@ public class PartnerAnalyticsService {
     // ── Bookings ─────────────────────────────────────────────────────────────
 
     public BookingAnalyticsResponse getBookingAnalytics(Long userId, Long hotelId, LocalDate from, LocalDate to) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        List<Long> hotelIds = resolveHotelScope(profile.getId(), hotelId);
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        List<Long> hotelIds = partnerAccess.propertyIds(access, partnerAccess.requireCollection(access, ANALYTICS_VIEW), hotelId);
         LocalDate[] range = resolveRange(from, to);
         List<Booking> bookings = bookingsInRange(hotelIds, range[0], range[1]);
 
@@ -195,8 +220,8 @@ public class PartnerAnalyticsService {
     // ── Rooms ────────────────────────────────────────────────────────────────
 
     public RoomAnalyticsResponse getRoomAnalytics(Long userId, Long hotelId, LocalDate from, LocalDate to) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        List<Long> hotelIds = resolveHotelScope(profile.getId(), hotelId);
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        List<Long> hotelIds = partnerAccess.propertyIds(access, partnerAccess.requireCollection(access, ANALYTICS_VIEW), hotelId);
         LocalDate[] range = resolveRange(from, to);
         List<Booking> revenueBookings = bookingsInRange(hotelIds, range[0], range[1]).stream()
             .filter(b -> REVENUE_STATUSES.contains(b.getStatus())).toList();
@@ -209,14 +234,17 @@ public class PartnerAnalyticsService {
         List<MetricBreakdown> availabilitySummary = roomAvailabilitySummary(inv);
         double occupancyEstimate = computeOccupancyRate(roomIds, range[0], range[1]);
 
-        return new RoomAnalyticsResponse(byRevenue, byBookingCount, availabilitySummary, round2(occupancyEstimate));
+        boolean revenueVisible = partnerAccess.holdsOver(access, FINANCE_REVENUE_VIEW, hotelIds);
+        return new RoomAnalyticsResponse(revenueVisible ? byRevenue : null, byBookingCount, availabilitySummary,
+            round2(occupancyEstimate),
+            revenueVisible ? List.of() : List.of(RedactedField.omitted("topRoomsByRevenue")));
     }
 
     // ── Promotions ───────────────────────────────────────────────────────────
 
     public PromotionAnalyticsResponse getPromotionAnalytics(Long userId, Long hotelId, LocalDate from, LocalDate to) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        List<Long> hotelIds = resolveHotelScope(profile.getId(), hotelId);
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        List<Long> hotelIds = partnerAccess.propertyIds(access, partnerAccess.requireCollection(access, ANALYTICS_VIEW), hotelId);
         resolveRange(from, to); // validated for API consistency; promotion state is current, not date-windowed (documented)
 
         List<Long> hotelDetailIds = hotelIds.stream()
@@ -258,8 +286,8 @@ public class PartnerAnalyticsService {
     // ── Reviews ──────────────────────────────────────────────────────────────
 
     public ReviewAnalyticsResponse getReviewAnalytics(Long userId, Long hotelId, LocalDate from, LocalDate to) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        List<Long> hotelIds = resolveHotelScope(profile.getId(), hotelId);
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        List<Long> hotelIds = partnerAccess.propertyIds(access, partnerAccess.requireCollection(access, ANALYTICS_VIEW), hotelId);
         resolveRange(from, to); // validated for API consistency; reviews are all-time reputation data (documented)
 
         List<Review> reviews = hotelIds.isEmpty() ? List.of() : reviewRepo.findByPlaceIdIn(hotelIds);
@@ -276,8 +304,11 @@ public class PartnerAnalyticsService {
                 r.getTitle(), r.getStatus().name(), r.getCreatedAt()))
             .toList();
 
+        // Aggregates are analytics; the individual reviews behind them need review.view (P44) over the scope
+        boolean individual = partnerAccess.holdsOver(access, REVIEW_VIEW, hotelIds);
         return new ReviewAnalyticsResponse(round2(avgRating), reviews.size(), pending, approved.size(),
-            rejected, latest);
+            rejected, individual ? latest : null,
+            individual ? List.of() : List.of(RedactedField.omitted("latestReviews")));
     }
 
     /**
@@ -292,8 +323,10 @@ public class PartnerAnalyticsService {
      */
     public PlaceReviewAnalyticsResponse getPlaceReviewAnalytics(Long userId, Long placeId,
                                                                 LocalDate from, LocalDate to) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        resolveHotelScope(profile.getId(), placeId); // 404 if unknown or not owned (uniform, no leak)
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        // §25.1: RESOURCE (review, one property) — review.view (P44) at the place's property; 404 otherwise
+        partnerAccess.requireResourceVia(access, REVIEW_VIEW, ResourceType.REVIEW, ResourceType.PROPERTY, placeId,
+            "Hotel not found: " + placeId);
         LocalDate[] range = resolveRange(from, to);
 
         Place place = places.findById(placeId)
@@ -369,11 +402,11 @@ public class PartnerAnalyticsService {
     // ── Messages ─────────────────────────────────────────────────────────────
 
     public MessageAnalyticsResponse getMessageAnalytics(Long userId, Long hotelId, LocalDate from, LocalDate to) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        resolveHotelScope(profile.getId(), hotelId); // validates hotelId ownership, if provided
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        List<Long> hotelIds = partnerAccess.propertyIds(access, partnerAccess.requireCollection(access, ANALYTICS_VIEW), hotelId);
         resolveRange(from, to); // validated for API consistency; conversation state is current inbox, not date-windowed (documented)
 
-        List<Conversation> convs = partnerConversationsInScope(profile.getId(), hotelId);
+        List<Conversation> convs = conversationsIn(hotelIds);
 
         long open = convs.stream().filter(c -> c.getStatus() == ConversationStatus.OPEN).count();
         long closed = convs.stream().filter(c -> c.getStatus() == ConversationStatus.CLOSED).count();
@@ -386,14 +419,6 @@ public class PartnerAnalyticsService {
     }
 
     // ── Ownership / scope helpers ────────────────────────────────────────────
-
-    private List<Long> resolveHotelScope(Long ownerId, Long hotelId) {
-        List<Long> owned = places.findAllByOwnerId(ownerId).stream().map(Place::getId).toList();
-        if (hotelId == null) return owned;
-        if (!owned.contains(hotelId))
-            throw new ApiException(HttpStatus.NOT_FOUND, "Hotel not found: " + hotelId);
-        return List.of(hotelId);
-    }
 
     private List<Long> ownedRoomIds(List<Long> hotelIds) {
         return hotelIds.stream()
@@ -424,10 +449,9 @@ public class PartnerAnalyticsService {
         return roomIds.isEmpty() ? List.of() : inventoryRepo.findByHotelRoomIdInAndInventoryDateBetween(roomIds, from, to);
     }
 
-    private List<Conversation> partnerConversationsInScope(Long partnerProfileId, Long hotelId) {
-        List<Conversation> all = conversationRepo.findByPartnerProfileIdOrderByLastMessageAtDesc(partnerProfileId);
-        if (hotelId == null) return all;
-        return all.stream().filter(c -> c.getBooking().getHotel().getId().equals(hotelId)).toList();
+    /** RBAC R3b — conversations of bookings at {@code hotelIds}, through booking.hotel (§11.2), never the company column. */
+    private List<Conversation> conversationsIn(List<Long> hotelIds) {
+        return hotelIds.isEmpty() ? List.of() : conversationRepo.findByBookingHotelIdInOrderByLastMessageAtDesc(hotelIds);
     }
 
     // ── Metric helpers ───────────────────────────────────────────────────────

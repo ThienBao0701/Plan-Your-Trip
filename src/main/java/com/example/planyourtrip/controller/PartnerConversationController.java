@@ -30,27 +30,27 @@ public class PartnerConversationController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get one of my conversations")
-    public ConversationResponse getById(@AuthUser Long uid, @PathVariable Long id) {
+    public PartnerConversationView getById(@AuthUser Long uid, @PathVariable Long id) {
         return service.getConversationForPartner(uid, id);
     }
 
     @PostMapping("/{id}/messages")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Send a message as the host")
-    public MessageResponse sendMessage(@AuthUser Long uid, @PathVariable Long id,
+    public PartnerMessageView sendMessage(@AuthUser Long uid, @PathVariable Long id,
                                         @Valid @RequestBody MessageRequest req) {
         return service.sendPartnerMessage(uid, id, req);
     }
 
     @PatchMapping("/{id}/read")
     @Operation(summary = "Mark my messages as read")
-    public ConversationResponse markRead(@AuthUser Long uid, @PathVariable Long id) {
+    public PartnerConversationView markRead(@AuthUser Long uid, @PathVariable Long id) {
         return service.markReadByPartner(uid, id);
     }
 
     @PatchMapping("/{id}/close")
     @Operation(summary = "Close this conversation")
-    public ConversationResponse close(@AuthUser Long uid, @PathVariable Long id) {
+    public PartnerConversationView close(@AuthUser Long uid, @PathVariable Long id) {
         return service.closeByPartner(uid, id);
     }
 }

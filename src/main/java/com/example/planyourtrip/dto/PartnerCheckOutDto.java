@@ -34,6 +34,8 @@ public class PartnerCheckOutDto {
         String hotelName,
         String roomName,
         String guestName,
-        String message
+        String message,
+        // RBAC R3b — guestName is masked without booking.guest_identity.view (§21.2)
+        java.util.List<com.example.planyourtrip.dto.RedactedField> redacted
     ) {}
 }

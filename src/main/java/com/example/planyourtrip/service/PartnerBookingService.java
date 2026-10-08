@@ -15,6 +15,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import com.example.planyourtrip.dto.PartnerBookingDto.PartnerBookingView;
+import com.example.planyourtrip.dto.PartnerBookingDto.PartnerPaymentView;
+import com.example.planyourtrip.dto.RedactedField;
+import com.example.planyourtrip.security.rbac.PartnerAccessContext;
+import com.example.planyourtrip.security.rbac.PartnerPermission;
+import com.example.planyourtrip.security.rbac.ResourceType;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +35,8 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+
+import static com.example.planyourtrip.security.rbac.PartnerPermission.*;
 
 @Service
 public class PartnerBookingService {
@@ -50,6 +58,7 @@ public class PartnerBookingService {
     private final NotificationService notificationService;
     private final PartnerActivityLogService activityLogService;
     private final PartnerAccessService partnerAccess;
+    private final PartnerBookingRedactor redactor;
 
     private static final Set<BookingStatus> UPCOMING_STATUSES =
         EnumSet.of(BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.CHECK_IN_READY);
@@ -74,7 +83,8 @@ public class PartnerBookingService {
                                   BookingStatusEngineService statusEngine,
                                   NotificationService notificationService,
                                   PartnerActivityLogService activityLogService,
-                                  PartnerAccessService partnerAccess) {
+                                  PartnerAccessService partnerAccess,
+                                  PartnerBookingRedactor redactor) {
         this.places = places;
         this.hotelDetails = hotelDetails;
         this.rooms = rooms;
@@ -92,6 +102,7 @@ public class PartnerBookingService {
         this.notificationService = notificationService;
         this.activityLogService = activityLogService;
         this.partnerAccess = partnerAccess;
+        this.redactor = redactor;
     }
 
     // ── List / search ────────────────────────────────────────────────────────
@@ -103,8 +114,9 @@ public class PartnerBookingService {
             Boolean arrivalToday, Boolean departureToday, Boolean upcoming,
             Boolean inHouse, Boolean cancelled, Boolean completed,
             int page, int size) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        List<Long> hotelIds = ownedHotelIds(profile.getId());
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        // §4.5 COLLECTION (booking): bookings of the properties the caller may view, filtered in the query (B5)
+        List<Long> hotelIds = partnerAccess.propertyIds(access, partnerAccess.requireCollection(access, BOOKING_VIEW));
         LocalDate today = LocalDate.now();
 
         Specification<Booking> spec = Specification
@@ -131,31 +143,39 @@ public class PartnerBookingService {
             spec = spec.and(BookingSpecification.withStatusIn(EnumSet.of(BookingStatus.COMPLETED)));
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        return PageResponse.of(bookingRepo.findAll(spec, pageable).map(this::toPartnerSummary));
+        return PageResponse.of(bookingRepo.findAll(spec, pageable).map(b -> toPartnerSummary(access, b)));
     }
 
     // ── Detail ───────────────────────────────────────────────────────────────
 
     @Transactional(readOnly = true)
     public PartnerBookingDetailResponse getBookingDetail(Long userId, Long bookingId) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        Booking booking = ownedBookingOrThrow(bookingId, profile.getId());
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        Booking booking = authorizedBooking(access, BOOKING_VIEW, bookingId);
 
-        BookingResponse bookingResponse = bookingService.toResponse(booking);
-        List<PaymentResponse> payments = paymentRepo.findByBookingIdOrderByCreatedAtDesc(bookingId)
-            .stream().map(paymentService::toResponse).toList();
-        InvoiceSummaryResponse invoice = invoiceRepo.findByBookingId(bookingId)
-            .map(invoiceService::toSummary).orElse(null);
+        PartnerBookingView view = redactor.view(access, booking);
+        List<RedactedField> redacted = new ArrayList<>();
+        view.redacted().forEach(r -> redacted.add(new RedactedField("booking." + r.field(), r.mode())));
+        List<PartnerPaymentView> payments = null;
+        InvoiceSummaryResponse invoice = null;
+        if (redactor.may(access, BOOKING_PAYMENT_VIEW, booking)) {
+            payments = paymentRepo.findByBookingIdOrderByCreatedAtDesc(bookingId).stream()
+                .map(paymentService::toResponse).map(PartnerBookingRedactor::payment).toList();
+            invoice = invoiceRepo.findByBookingId(bookingId).map(invoiceService::toSummary).orElse(null);
+        } else {
+            redacted.add(RedactedField.omitted("payments"));
+            redacted.add(RedactedField.omitted("invoice"));
+        }
         BookingTimelineResponse timeline = bookingService.adminGetTimeline(bookingId);
 
-        return new PartnerBookingDetailResponse(bookingResponse, payments, invoice, timeline);
+        return new PartnerBookingDetailResponse(view, payments, invoice, timeline, List.copyOf(redacted));
     }
 
     // ── Phase 7.42 — Consolidated READ-ONLY guest stay detail ──────────────────
 
     /**
      * Phase 7.42 — one consolidated, ownership-scoped, strictly READ-ONLY guest-stay projection for a
-     * single booking. Reuses the SAME ownership resolution ({@link PartnerAccessService#requireRegistrantWorkspace} +
+     * single booking. RBAC R3b: authorized as a RESOURCE (booking) needing booking.stay.view ({@link #authorizedBooking} +
      * {@link #ownedBookingOrThrow}, which already returns a uniform 404 for both an unknown booking and
      * a booking outside the caller's properties — so another partner's booking never leaks), the SAME
      * lifecycle timeline ({@link BookingService#adminGetTimeline}) and the SAME voucher-status derivation
@@ -165,8 +185,10 @@ public class PartnerBookingService {
      */
     @Transactional(readOnly = true)
     public PartnerGuestStayResponse getGuestStay(Long userId, Long bookingId) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        Booking booking = ownedBookingOrThrow(bookingId, profile.getId());
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        // §25.1 Stay: RESOURCE (booking) needing booking.stay.view (P40); view(type) stays booking.view
+        Booking booking = authorizedBooking(access, BOOKING_STAY_VIEW, bookingId);
+        List<RedactedField> redacted = new ArrayList<>();
 
         BookingTimelineResponse timeline = bookingService.adminGetTimeline(bookingId);
         VoucherStatus vs = bookingService.partnerVoucherStatus(booking);
@@ -176,9 +198,9 @@ public class PartnerBookingService {
             .stream().map(this::toStayModification).toList();
 
         StayCheckAudit checkInAudit = checkInAuditRepo.findByBookingId(bookingId).stream()
-            .findFirst().map(this::toCheckInAudit).orElse(null);
+            .findFirst().map(a -> toCheckInAudit(access, a)).orElse(null);
         StayCheckAudit checkOutAudit = checkOutAuditRepo.findByBookingId(bookingId).stream()
-            .findFirst().map(this::toCheckOutAudit).orElse(null);
+            .findFirst().map(a -> toCheckOutAudit(access, a)).orElse(null);
 
         LocalDate today = LocalDate.now();
         long totalNights = Math.max(0,
@@ -194,7 +216,7 @@ public class PartnerBookingService {
         return new PartnerGuestStayResponse(
             booking.getId(), booking.getBookingCode(), booking.getStatus().name(),
             booking.getCreatedAt(), booking.getUpdatedAt(),
-            booking.getUser().getFullName(),
+            redactor.guestName(access, booking, booking.getUser().getFullName(), redacted, "guestName"),
             new OccupancyInfo(booking.getAdults(), booking.getChildren()),
             booking.getHotel().getId(), booking.getHotel().getName(),
             booking.getRoom().getId(), booking.getRoom().getRoomName(), booking.getRoom().getRoomCode(),
@@ -203,7 +225,8 @@ public class PartnerBookingService {
             timeline,
             modifications,
             checkInAudit, checkOutAudit,
-            deriveWarnings(booking, today));
+            deriveWarnings(booking, today),
+            List.copyOf(redacted));
     }
 
     /**
@@ -322,57 +345,63 @@ public class PartnerBookingService {
             m.getCreatedAt());
     }
 
-    private StayCheckAudit toCheckInAudit(BookingCheckInAudit a) {
-        return new StayCheckAudit(a.getPartnerProfileId(), a.getPartnerUserId(),
+    /**
+     * §16 PA-4 step 4 — a check audit written by another company (the property moved since) shows the operation
+     * and time, never that company's identity or staff.
+     */
+    private StayCheckAudit toCheckInAudit(PartnerAccessContext access, BookingCheckInAudit a) {
+        boolean own = access.companyId().equals(a.getPartnerProfileId());
+        return new StayCheckAudit(own ? a.getPartnerProfileId() : null, own ? a.getPartnerUserId() : null,
             a.getOperation(), null, a.getCreatedAt());
     }
 
-    private StayCheckAudit toCheckOutAudit(BookingCheckOutAudit a) {
-        return new StayCheckAudit(a.getPartnerProfileId(), a.getPartnerUserId(),
+    private StayCheckAudit toCheckOutAudit(PartnerAccessContext access, BookingCheckOutAudit a) {
+        boolean own = access.companyId().equals(a.getPartnerProfileId());
+        return new StayCheckAudit(own ? a.getPartnerProfileId() : null, own ? a.getPartnerUserId() : null,
             a.getOperation(), a.getMethod().name(), a.getCreatedAt());
     }
 
     // ── Status transitions ──────────────────────────────────────────────────
 
     @Transactional
-    public BookingResponse checkIn(Long userId, Long bookingId) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        Booking booking = ownedBookingOrThrow(bookingId, profile.getId());
+    public PartnerBookingView checkIn(Long userId, Long bookingId) {
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        Booking booking = authorizedBooking(access, BOOKING_ARRIVAL_OPERATE, bookingId);
         statusEngine.transition(booking, BookingStatus.CHECKED_IN);
         Booking saved = bookingRepo.save(booking);
-        logStatusChange(profile.getId(), userId, saved);
-        return bookingService.toResponse(saved);
+        logStatusChange(access.companyId(), userId, saved);
+        return redactor.view(access, saved);
     }
 
     @Transactional
-    public BookingResponse checkOut(Long userId, Long bookingId) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        Booking booking = ownedBookingOrThrow(bookingId, profile.getId());
+    public PartnerBookingView checkOut(Long userId, Long bookingId) {
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        Booking booking = authorizedBooking(access, BOOKING_DEPARTURE_OPERATE, bookingId);
         statusEngine.transition(booking, BookingStatus.CHECKED_OUT);
         Booking saved = bookingRepo.save(booking);
-        logStatusChange(profile.getId(), userId, saved);
-        return bookingService.toResponse(saved);
+        logStatusChange(access.companyId(), userId, saved);
+        return redactor.view(access, saved);
     }
 
     @Transactional
-    public BookingResponse markNoShow(Long userId, Long bookingId) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        Booking booking = ownedBookingOrThrow(bookingId, profile.getId());
+    public PartnerBookingView markNoShow(Long userId, Long bookingId) {
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        Booking booking = authorizedBooking(access, BOOKING_NO_SHOW_MARK, bookingId);
         statusEngine.transition(booking, BookingStatus.NO_SHOW);
         Booking saved = bookingRepo.save(booking);
         notifyAdminsNoShow(saved);
-        logStatusChange(profile.getId(), userId, saved);
-        return bookingService.toResponse(saved);
+        logStatusChange(access.companyId(), userId, saved);
+        return redactor.view(access, saved);
     }
 
     @Transactional
-    public BookingResponse complete(Long userId, Long bookingId) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        Booking booking = ownedBookingOrThrow(bookingId, profile.getId());
+    public PartnerBookingView complete(Long userId, Long bookingId) {
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        Booking booking = authorizedBooking(access, BOOKING_DEPARTURE_OPERATE, bookingId);
         statusEngine.transition(booking, BookingStatus.COMPLETED);
         Booking saved = bookingRepo.save(booking);
-        logStatusChange(profile.getId(), userId, saved);
-        return bookingService.toResponse(saved);
+        logStatusChange(access.companyId(), userId, saved);
+        return redactor.view(access, saved);
     }
 
     private void logStatusChange(Long partnerProfileId, Long userId, Booking booking) {
@@ -384,11 +413,16 @@ public class PartnerBookingService {
 
     @Transactional(readOnly = true)
     public PartnerDashboardResponse getDashboard(Long userId) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        List<Long> hotelIds = ownedHotelIds(profile.getId());
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        // §25.1 dashboard: COLLECTION (booking) over S, revenue fields need finance.revenue.view (P49) over all of it
+        List<Long> hotelIds = partnerAccess.propertyIds(access, partnerAccess.requireCollection(access, BOOKING_VIEW));
+        boolean revenue = partnerAccess.holdsOver(access, FINANCE_REVENUE_VIEW, hotelIds);
+        List<RedactedField> redacted = revenue ? List.of()
+            : List.of(RedactedField.omitted("revenueToday"), RedactedField.omitted("revenueMonth"));
         if (hotelIds.isEmpty()) {
             return new PartnerDashboardResponse(0, 0, 0, 0, 0, 0, 0.0,
-                BigDecimal.ZERO.setScale(2), BigDecimal.ZERO.setScale(2), 0.0);
+                revenue ? BigDecimal.ZERO.setScale(2) : null, revenue ? BigDecimal.ZERO.setScale(2) : null, 0.0,
+                redacted);
         }
 
         LocalDate today = LocalDate.now();
@@ -435,25 +469,23 @@ public class PartnerBookingService {
         return new PartnerDashboardResponse(
             arrivalsToday, departuresToday, currentGuests, upcomingCount, cancelledCount, completedCount,
             round2(occupancyRate),
-            revenueToday.setScale(2, RoundingMode.HALF_UP),
-            revenueMonth.setScale(2, RoundingMode.HALF_UP),
-            round2(averageStay)
+            revenue ? revenueToday.setScale(2, RoundingMode.HALF_UP) : null,
+            revenue ? revenueMonth.setScale(2, RoundingMode.HALF_UP) : null,
+            round2(averageStay),
+            redacted
         );
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    private List<Long> ownedHotelIds(Long ownerId) {
-        return places.findAllByOwnerId(ownerId).stream().map(Place::getId).toList();
-    }
-
-    private Booking ownedBookingOrThrow(Long bookingId, Long ownerId) {
-        Booking booking = bookingRepo.findById(bookingId)
+    /**
+     * RBAC R3b — §4.5 RESOURCE (booking): the booking lives at {@code booking.hotel}'s property; the caller needs
+     * {@code permission} there (404 without booking view there, 403 with view but not this action).
+     */
+    private Booking authorizedBooking(PartnerAccessContext access, PartnerPermission permission, Long bookingId) {
+        partnerAccess.requireResource(access, permission, ResourceType.BOOKING, bookingId, "Booking not found: " + bookingId);
+        return bookingRepo.findById(bookingId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found: " + bookingId));
-        PartnerProfile owner = booking.getHotel().getOwner();
-        if (owner == null || !owner.getId().equals(ownerId))
-            throw new ApiException(HttpStatus.NOT_FOUND, "Booking not found: " + bookingId);
-        return booking;
     }
 
     private int totalRoomCapacity(List<Long> hotelIds) {
@@ -475,15 +507,18 @@ public class PartnerBookingService {
                 RelatedEntityType.BOOKING, booking.getId()));
     }
 
-    private PartnerBookingSummaryResponse toPartnerSummary(Booking b) {
+    private PartnerBookingSummaryResponse toPartnerSummary(PartnerAccessContext access, Booking b) {
         int nights = (int) ChronoUnit.DAYS.between(b.getCheckInDate(), b.getCheckOutDate());
+        List<RedactedField> redacted = new ArrayList<>();
+        String guestName = redactor.guestName(access, b, b.getUser().getFullName(), redacted, "guestName");
+        String guestEmail = redactor.guestEmail(access, b, b.getUser().getEmail(), redacted, "guestEmail");
         return new PartnerBookingSummaryResponse(
             b.getId(), b.getBookingCode(),
             b.getRoom().getId(), b.getRoom().getRoomName(), b.getRoom().getRoomCode(),
-            b.getUser().getFullName(), b.getUser().getEmail(),
+            guestName, guestEmail,
             b.getCheckInDate(), b.getCheckOutDate(), nights,
             b.getStatus().name(), b.getFinalPrice(), b.getCurrency(),
-            b.getCreatedAt()
+            b.getCreatedAt(), List.copyOf(redacted)
         );
     }
 

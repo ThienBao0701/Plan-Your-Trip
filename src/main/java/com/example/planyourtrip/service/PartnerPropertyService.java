@@ -9,12 +9,17 @@ import com.example.planyourtrip.model.*;
 import com.example.planyourtrip.repository.AdministrativeUnitRepository;
 import com.example.planyourtrip.repository.AmenityRepository;
 import com.example.planyourtrip.repository.CategoryRepository;
+import com.example.planyourtrip.repository.ConversationRepository;
+import com.example.planyourtrip.repository.PartnerMemberGrantRepository;
 import com.example.planyourtrip.repository.HotelDetailRepository;
 import com.example.planyourtrip.repository.PartnerProfileRepository;
 import com.example.planyourtrip.repository.PlaceAmenityRepository;
 import com.example.planyourtrip.repository.PlaceRepository;
 import com.example.planyourtrip.repository.UserRepository;
 import com.example.planyourtrip.util.SlugUtils;
+import com.example.planyourtrip.security.rbac.PartnerAccessContext;
+import com.example.planyourtrip.security.rbac.PartnerPermission;
+import com.example.planyourtrip.security.rbac.ResourceType;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +30,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.example.planyourtrip.security.rbac.PartnerPermission.PROPERTY_CONTENT_EDIT;
+import static com.example.planyourtrip.security.rbac.PartnerPermission.PROPERTY_CREATE;
+import static com.example.planyourtrip.security.rbac.PartnerPermission.PROPERTY_POLICY_EDIT;
+import static com.example.planyourtrip.security.rbac.PartnerPermission.PROPERTY_STATUS_TOGGLE;
+import static com.example.planyourtrip.security.rbac.PartnerPermission.PROPERTY_VIEW;
+
 /**
  * The partner's own properties: the canonical {@link Place} + {@link HotelDetail} pair, created and
  * edited by the approved partner that owns it.
@@ -33,10 +44,10 @@ import java.util.Set;
  *
  * <ul>
  *   <li><b>The caller is the tenant.</b> Every method starts at
- *       {@link PartnerAccessService#requireRegistrantWorkspace}, which resolves the {@code PartnerProfile} from the
+ *       {@link PartnerAccessService#requireWorkspace}, which resolves the {@code PartnerProfile} from the
  *       authenticated user id and refuses anything but {@code APPROVED}. No request body carries an
  *       owner, a partner id or an author, so none can be spoofed.</li>
- *   <li><b>One property is reachable only through its owner.</b> {@link #ownedPlaceOrThrow} goes
+ *   <li><b>One property is reachable only through its owner.</b> {@link #authorizedPlace} goes
  *       through {@code findByIdAndOwnerId}, so another partner's property answers exactly like an id
  *       that does not exist — 404, leaking neither its data nor its existence.</li>
  *   <li><b>A created property is a draft.</b> {@code status = DRAFT} is set here and there is no
@@ -97,6 +108,9 @@ public class PartnerPropertyService {
     private final UserRepository users;
     private final PlaceSlugService slugs;
     private final PartnerAccessService partnerAccess;
+    private final PartnerMemberGrantRepository grants;
+    private final ConversationRepository conversations;
+    private final PartnerSecurityNotifier securityNotifier;
 
     public PartnerPropertyService(PlaceRepository places,
                                    PartnerProfileRepository partnerProfiles,
@@ -110,7 +124,10 @@ public class PartnerPropertyService {
                                    PlaceAmenityRepository placeAmenities,
                                    UserRepository users,
                                    PlaceSlugService slugs,
-                                   PartnerAccessService partnerAccess) {
+                                   PartnerAccessService partnerAccess,
+                                   PartnerMemberGrantRepository grants,
+                                   ConversationRepository conversations,
+                                   PartnerSecurityNotifier securityNotifier) {
         this.places = places;
         this.partnerProfiles = partnerProfiles;
         this.hotelDetails = hotelDetails;
@@ -124,18 +141,25 @@ public class PartnerPropertyService {
         this.users = users;
         this.slugs = slugs;
         this.partnerAccess = partnerAccess;
+        this.grants = grants;
+        this.conversations = conversations;
+        this.securityNotifier = securityNotifier;
     }
 
     @Transactional(readOnly = true)
     public List<PartnerHotelSummaryResponse> getMyHotels(Long userId) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        return places.findAllByOwnerId(profile.getId()).stream().map(this::toSummary).toList();
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        // §4.5 COLLECTION: the properties the caller may view (company-wide or granted ones), in the query
+        List<Long> permitted = partnerAccess.propertyIds(access, partnerAccess.requireCollection(access, PROPERTY_VIEW));
+        return places.findAllByOwnerId(access.companyId()).stream()
+            .filter(place -> permitted.contains(place.getId()))
+            .map(this::toSummary).toList();
     }
 
     @Transactional(readOnly = true)
     public PartnerHotelResponse getHotel(Long userId, Long hotelId) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        return toResponse(ownedPlaceOrThrow(hotelId, profile.getId()));
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        return toResponse(authorizedPlace(access, PROPERTY_VIEW, hotelId));
     }
 
     /**
@@ -149,7 +173,10 @@ public class PartnerPropertyService {
      */
     @Transactional
     public PartnerHotelResponse createProperty(Long userId, PartnerHotelCreateRequest req) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        // §4.5 COMPANY, floor C: creating a property creates scope, so only a company grant may (PA-2)
+        partnerAccess.requireCompanyPermission(access, PROPERTY_CREATE, null);
+        PartnerProfile profile = access.profile();
         User author = users.findById(userId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found: " + userId));
 
@@ -211,8 +238,9 @@ public class PartnerPropertyService {
 
     @Transactional
     public PartnerHotelResponse updateBasicInformation(Long userId, Long hotelId, PartnerHotelUpdateRequest req) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        Place place = ownedPlaceOrThrow(hotelId, profile.getId());
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        PartnerProfile profile = access.profile();
+        Place place = authorizedPlace(access, PROPERTY_CONTENT_EDIT, hotelId);
 
         if (!place.getSlug().equals(req.slug()) && places.existsBySlug(req.slug()))
             throw new ApiException(HttpStatus.CONFLICT, "SLUG_CONFLICT", "slug",
@@ -241,8 +269,9 @@ public class PartnerPropertyService {
 
     @Transactional
     public PartnerHotelResponse updateContact(Long userId, Long hotelId, PartnerContactRequest req) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        Place place = ownedPlaceOrThrow(hotelId, profile.getId());
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        PartnerProfile profile = access.profile();
+        Place place = authorizedPlace(access, PROPERTY_CONTENT_EDIT, hotelId);
 
         place.setPhone(req.phone());
         place.setEmail(req.email());
@@ -257,8 +286,9 @@ public class PartnerPropertyService {
 
     @Transactional
     public PartnerHotelResponse updatePolicies(Long userId, Long hotelId, PartnerPolicyRequest req) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        Place place = ownedPlaceOrThrow(hotelId, profile.getId());
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        PartnerProfile profile = access.profile();
+        Place place = authorizedPlace(access, PROPERTY_POLICY_EDIT, hotelId);
 
         HotelDetail detail = hotelDetails.findByPlaceId(place.getId()).orElseGet(() -> {
             HotelDetail d = new HotelDetail();
@@ -295,8 +325,9 @@ public class PartnerPropertyService {
 
     @Transactional
     public PartnerHotelResponse updateCoordinates(Long userId, Long hotelId, PartnerLocationRequest req) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        Place place = ownedPlaceOrThrow(hotelId, profile.getId());
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        PartnerProfile profile = access.profile();
+        Place place = authorizedPlace(access, PROPERTY_CONTENT_EDIT, hotelId);
 
         place.setLatitude(req.latitude());
         place.setLongitude(req.longitude());
@@ -321,8 +352,9 @@ public class PartnerPropertyService {
      */
     @Transactional
     public PartnerHotelResponse updateAmenities(Long userId, Long hotelId, PartnerAmenitiesRequest req) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        Place place = ownedPlaceOrThrow(hotelId, profile.getId());
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        PartnerProfile profile = access.profile();
+        Place place = authorizedPlace(access, PROPERTY_CONTENT_EDIT, hotelId);
         List<Amenity> selected = propertyAmenitiesOrThrow(req.amenityIds());
 
         placeAmenities.deleteAllByPlaceId(place.getId());
@@ -358,6 +390,9 @@ public class PartnerPropertyService {
         PartnerProfile previousOwner = place.getOwner();
         place.setOwner(profile);
         Place saved = places.save(place);
+        if (previousOwner != null && !previousOwner.getId().equals(profile.getId())) {
+            moveTenant(adminUserId, saved, previousOwner, profile);
+        }
 
         // D1c - this is an authorization change, not a catalogue edit: it hands a partner account
         // the extranet, rates, inventory and booking data for a property. Recorded with both the
@@ -375,19 +410,56 @@ public class PartnerPropertyService {
         return toResponse(saved);
     }
 
+    /**
+     * RBAC R3b §16 PA-4 — a property moved to another company leaves nothing of the previous company behind
+     * (I16), in the same transaction as the move:
+     * <ol>
+     *   <li>every PROPERTY or UNIT grant of the previous company on the property (or its room types) is revoked,
+     *       audited {@code TEAM_MEMBER_SCOPE_REVOKED} in the previous company's trail and notified to its owners
+     *       and the member;</li>
+     *   <li>the conversations of the property's bookings are re-pointed to the new company, so the denormalized
+     *       column stays consistent — authorization never relies on it anyway (§11.2).</li>
+     * </ol>
+     * Historical rows (activity logs, check-in/out audits) keep their historical company.
+     */
+    private void moveTenant(Long adminUserId, Place place, PartnerProfile previous, PartnerProfile next) {
+        for (PartnerMemberGrant grant : grants.findByPropertyId(place.getId())) {
+            if (!previous.getId().equals(grant.getPartnerProfile().getId())) continue;
+            PartnerTeamMember member = grant.getTeamMember();
+            String before = grant.getRole().name() + "@" + grant.getScopeType().name() + ":" + grant.getScopeId();
+            grants.delete(grant);
+            activityLogService.audit(previous.getId(), adminUserId, "TEAM_MEMBER_SCOPE_REVOKED", "TEAM_MEMBER",
+                member.getId(), "Grant on property #" + place.getId() + " revoked: the property moved to another company",
+                before, null, "PROPERTY_MOVED");
+            securityNotifier.notifyOwners(previous, member.getUser().getId(), "Team member access removed",
+                "Access to property #" + place.getId() + " was removed (" + before + "): the property moved to another company.");
+        }
+        grants.flush();
+        for (Conversation conversation : conversations.findByBookingHotelId(place.getId())) {
+            conversation.setPartnerProfile(next);
+        }
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     private PartnerHotelResponse setActive(Long userId, Long hotelId, boolean active) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        Place place = ownedPlaceOrThrow(hotelId, profile.getId());
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        PartnerProfile profile = access.profile();
+        Place place = authorizedPlace(access, PROPERTY_STATUS_TOGGLE, hotelId);
         place.setActive(active);
         Place saved = places.save(place);
         notifyPropertyUpdated(saved);
         return toResponse(saved);
     }
 
-    private Place ownedPlaceOrThrow(Long hotelId, Long ownerId) {
-        return places.findByIdAndOwnerId(hotelId, ownerId)
+    /**
+     * RBAC R3b — §4.5 RESOURCE: the property's company and scope come from the database; the caller needs
+     * {@code permission} at a scope covering it (404 when they cannot see the property, 403 when they can view it
+     * but not do this).
+     */
+    private Place authorizedPlace(PartnerAccessContext access, PartnerPermission permission, Long hotelId) {
+        partnerAccess.requireResource(access, permission, ResourceType.PROPERTY, hotelId, "Hotel not found: " + hotelId);
+        return places.findById(hotelId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Hotel not found: " + hotelId));
     }
 

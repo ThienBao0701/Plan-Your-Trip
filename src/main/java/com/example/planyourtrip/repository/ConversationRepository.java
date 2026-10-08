@@ -22,6 +22,16 @@ public interface ConversationRepository
     List<Conversation> findByBookingIdAndStatusIn(Long bookingId, Collection<ConversationStatus> statuses);
 
     /**
+     * RBAC R3b — a partner's conversations are those of bookings at properties in the caller's scope set,
+     * resolved through {@code booking.hotel} (§11.2). The denormalized {@code partner_profile_id} is not used
+     * for authorization (§16 PA-4).
+     */
+    List<Conversation> findByBookingHotelIdInOrderByLastMessageAtDesc(Collection<Long> hotelIds);
+
+    /** RBAC R3b §16 PA-4 — the conversations of one property, re-pointed when the property changes company. */
+    List<Conversation> findByBookingHotelId(Long hotelId);
+
+    /**
      * D1c — the administrative grid renders each row's booking code, and {@code booking} is a lazy
      * {@code @ManyToOne}, so without a graph every page costs one extra select per row. The graph
      * is applied to the content query only; Spring Data runs the count query separately and

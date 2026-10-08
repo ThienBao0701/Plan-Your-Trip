@@ -10,6 +10,9 @@ import com.example.planyourtrip.model.*;
 import com.example.planyourtrip.repository.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
+import com.example.planyourtrip.security.rbac.PartnerAccessContext;
+import com.example.planyourtrip.security.rbac.PartnerPermission;
+import com.example.planyourtrip.security.rbac.ScopeSet;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +26,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static com.example.planyourtrip.security.rbac.PartnerPermission.FINANCE_PAYOUT_VIEW;
+import static com.example.planyourtrip.security.rbac.PartnerPermission.FINANCE_REVENUE_VIEW;
+import static com.example.planyourtrip.security.rbac.PartnerPermission.FINANCE_STATEMENT_VIEW;
 
 /**
  * Read-only finance and settlement analytics for approved partners, scoped to hotels
@@ -78,13 +85,14 @@ public class PartnerFinanceService {
     // ── Overview ─────────────────────────────────────────────────────────────
 
     public PartnerFinanceOverviewResponse getOverview(Long userId, Long hotelId, LocalDate from, LocalDate to) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        List<Long> hotelIds = resolveHotelScope(profile.getId(), hotelId);
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        // §25.1: COLLECTION over S of finance.revenue.view (P49) — FILTERABLE BY PROPERTY
+        List<Long> hotelIds = partnerAccess.propertyIds(access, partnerAccess.requireCollection(access, FINANCE_REVENUE_VIEW), hotelId);
         LocalDate[] range = resolveRange(from, to);
 
         // Reuse Phase 6.7's already-computed gross revenue / completed-booking count
         // rather than re-deriving them from raw bookings.
-        PartnerAnalyticsOverviewResponse analyticsOverview = analyticsService.getOverview(userId, hotelId, range[0], range[1]);
+        PartnerAnalyticsOverviewResponse analyticsOverview = analyticsService.overviewOver(hotelIds, range[0], range[1], true);
         BigDecimal grossRevenue = analyticsOverview.totalRevenue();
         long completedBookings = analyticsOverview.completedBookings();
 
@@ -114,12 +122,12 @@ public class PartnerFinanceService {
     // ── Revenue ──────────────────────────────────────────────────────────────
 
     public PartnerRevenueResponse getRevenue(Long userId, Long hotelId, LocalDate from, LocalDate to) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        List<Long> hotelIds = resolveHotelScope(profile.getId(), hotelId);
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        List<Long> hotelIds = partnerAccess.propertyIds(access, partnerAccess.requireCollection(access, FINANCE_REVENUE_VIEW), hotelId);
         LocalDate[] range = resolveRange(from, to);
 
         // Reuse Phase 6.7's day/room/hotel revenue breakdowns instead of re-grouping bookings here.
-        RevenueAnalyticsResponse analyticsRevenue = analyticsService.getRevenue(userId, hotelId, range[0], range[1]);
+        RevenueAnalyticsResponse analyticsRevenue = analyticsService.revenueOver(hotelIds, range[0], range[1]);
         List<TimeSeriesPoint> revenueByDay = analyticsRevenue.revenueByDay();
         List<MetricBreakdown> revenueByHotel = analyticsRevenue.revenueByHotel();
         List<MetricBreakdown> revenueByRoom = analyticsRevenue.revenueByRoom();
@@ -142,11 +150,11 @@ public class PartnerFinanceService {
     // ── Commission ───────────────────────────────────────────────────────────
 
     public PartnerCommissionResponse getCommission(Long userId, Long hotelId, LocalDate from, LocalDate to) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        resolveHotelScope(profile.getId(), hotelId);
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        List<Long> hotelIds = companyOnly(access, FINANCE_STATEMENT_VIEW, hotelId);
         LocalDate[] range = resolveRange(from, to);
 
-        BigDecimal gross = analyticsService.getOverview(userId, hotelId, range[0], range[1]).totalRevenue();
+        BigDecimal gross = analyticsService.overviewOver(hotelIds, range[0], range[1], true).totalRevenue();
         BigDecimal commission = commissionOf(gross);
         BigDecimal net = gross.subtract(commission).setScale(2, RoundingMode.HALF_UP);
 
@@ -156,8 +164,8 @@ public class PartnerFinanceService {
     // ── Settlement ───────────────────────────────────────────────────────────
 
     public PartnerSettlementResponse getSettlement(Long userId, Long hotelId, LocalDate from, LocalDate to) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        List<Long> hotelIds = resolveHotelScope(profile.getId(), hotelId);
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        List<Long> hotelIds = companyOnly(access, FINANCE_STATEMENT_VIEW, hotelId);
         LocalDate[] range = resolveRange(from, to);
         List<Booking> revenueBookings = bookingsInRange(hotelIds, range[0], range[1]).stream()
             .filter(b -> REVENUE_STATUSES.contains(b.getStatus())).toList();
@@ -184,8 +192,8 @@ public class PartnerFinanceService {
     // ── Payout ───────────────────────────────────────────────────────────────
 
     public PartnerPayoutResponse getPayout(Long userId, Long hotelId, LocalDate from, LocalDate to) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        List<Long> hotelIds = resolveHotelScope(profile.getId(), hotelId);
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        List<Long> hotelIds = companyOnly(access, FINANCE_PAYOUT_VIEW, hotelId);
         LocalDate[] range = resolveRange(from, to);
         List<Booking> revenueBookings = bookingsInRange(hotelIds, range[0], range[1]).stream()
             .filter(b -> REVENUE_STATUSES.contains(b.getStatus())).toList();
@@ -200,8 +208,8 @@ public class PartnerFinanceService {
     // ── Invoice finance ──────────────────────────────────────────────────────
 
     public PartnerInvoiceFinanceResponse getInvoiceFinance(Long userId, Long hotelId, LocalDate from, LocalDate to) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        List<Long> hotelIds = resolveHotelScope(profile.getId(), hotelId);
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        List<Long> hotelIds = companyOnly(access, FINANCE_STATEMENT_VIEW, hotelId);
         LocalDate[] range = resolveRange(from, to);
         List<Long> bookingIds = bookingsInRange(hotelIds, range[0], range[1]).stream().map(Booking::getId).toList();
 
@@ -219,8 +227,8 @@ public class PartnerFinanceService {
     // ── Refund ───────────────────────────────────────────────────────────────
 
     public PartnerRefundResponse getRefund(Long userId, Long hotelId, LocalDate from, LocalDate to) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        List<Long> hotelIds = resolveHotelScope(profile.getId(), hotelId);
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        List<Long> hotelIds = companyOnly(access, FINANCE_STATEMENT_VIEW, hotelId);
         LocalDate[] range = resolveRange(from, to);
         List<Long> bookingIds = bookingsInRange(hotelIds, range[0], range[1]).stream().map(Booking::getId).toList();
 
@@ -241,12 +249,13 @@ public class PartnerFinanceService {
 
     // ── Ownership / scope helpers ────────────────────────────────────────────
 
-    private List<Long> resolveHotelScope(Long ownerId, Long hotelId) {
-        List<Long> owned = places.findAllByOwnerId(ownerId).stream().map(Place::getId).toList();
-        if (hotelId == null) return owned;
-        if (!owned.contains(hotelId))
-            throw new ApiException(HttpStatus.NOT_FOUND, "Hotel not found: " + hotelId);
-        return List.of(hotelId);
+    /**
+     * RBAC R3b — §25.1 "COMPANY ONLY": statements and payouts need {@code permission} at company scope (a property
+     * grant is 403, floor C); {@code hotelId} stays a filter inside the company for company holders.
+     */
+    private List<Long> companyOnly(PartnerAccessContext access, PartnerPermission permission, Long hotelId) {
+        partnerAccess.requireCompanyPermission(access, permission, null);
+        return partnerAccess.propertyIds(access, new ScopeSet(access.companyId(), true, null, null), hotelId);
     }
 
     private LocalDate[] resolveRange(LocalDate from, LocalDate to) {

@@ -269,7 +269,7 @@ public class ReviewService {
      *
      * <ul>
      *   <li>Caller must have an APPROVED {@link PartnerProfile} (same
-     *       {@code PartnerAccessService.requireRegistrantWorkspace} convention as the other partner services);
+     *       workspace as every partner endpoint; RBAC R3b: review.reply (P45) at the review's property);
      *       an admin/anyone without an approved profile → 404 (no cross-partner leak).</li>
      *   <li>The review's place must be owned by that profile; otherwise a uniform 404
      *       (same status as an unknown review — no existence leak across partners).</li>
@@ -284,12 +284,11 @@ public class ReviewService {
      */
     @Transactional
     public ReviewResponse partnerReply(Long userId, Long reviewId, PartnerReplyRequest req) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
+        // RBAC R3b — §4.5 RESOURCE (review): the review lives at its place's property; review.reply (P45) there.
+        com.example.planyourtrip.security.rbac.PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        partnerAccess.requireResource(access, com.example.planyourtrip.security.rbac.PartnerPermission.REVIEW_REPLY,
+            com.example.planyourtrip.security.rbac.ResourceType.REVIEW, reviewId, "Review not found: " + reviewId);
         Review review = reviewOrThrow(reviewId);
-
-        PartnerProfile owner = review.getPlace().getOwner();
-        if (owner == null || !owner.getId().equals(profile.getId()))
-            throw new ApiException(HttpStatus.NOT_FOUND, "Review not found: " + reviewId);
 
         if (review.getStatus() != ReviewStatus.APPROVED)
             throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,
@@ -301,7 +300,7 @@ public class ReviewService {
         review.setPartnerReply(req.content().trim());
         if (firstReply) review.setPartnerRepliedAt(now);
         review.setPartnerReplyUpdatedAt(now);
-        review.setPartnerRepliedBy(profile);
+        review.setPartnerRepliedBy(access.profile());
         review = reviewRepo.save(review);
 
         // Notify the review author ONLY on the first reply (idempotent on edits).

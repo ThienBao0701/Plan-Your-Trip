@@ -9,6 +9,10 @@ import com.example.planyourtrip.model.BookingStatus;
 import com.example.planyourtrip.model.PartnerProfile;
 import com.example.planyourtrip.repository.BookingRepository;
 import com.example.planyourtrip.security.VoucherSignatureService;
+import com.example.planyourtrip.dto.RedactedField;
+import com.example.planyourtrip.security.rbac.PartnerAccessContext;
+import com.example.planyourtrip.security.rbac.PartnerPermission;
+import com.example.planyourtrip.security.rbac.ResourceType;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.temporal.ChronoUnit;
 import java.util.EnumSet;
 import java.util.Set;
+
+import static com.example.planyourtrip.security.rbac.PartnerPermission.BOOKING_ARRIVAL_OPERATE;
 
 /**
  * Phase 7.39 — Partner Voucher Verification (read-only; NO check-in).
@@ -56,19 +62,27 @@ public class PartnerVoucherVerificationService {
     private final VoucherSignatureService voucherSignatureService;
     private final BookingRepository bookingRepo;
     private final PartnerAccessService partnerAccess;
+    private final PartnerBookingRedactor redactor;
+
+    /** RBAC R3b — a booking the caller may act on, with the workspace the decision was made in. */
+    public record AuthorizedBooking(Booking booking, PartnerAccessContext access) {}
 
     public PartnerVoucherVerificationService(VoucherSignatureService voucherSignatureService,
                                              BookingRepository bookingRepo,
-                                             PartnerAccessService partnerAccess) {
+                                             PartnerAccessService partnerAccess,
+                                             PartnerBookingRedactor redactor) {
         this.voucherSignatureService = voucherSignatureService;
         this.bookingRepo = bookingRepo;
         this.partnerAccess = partnerAccess;
+        this.redactor = redactor;
     }
 
     public VoucherVerificationResponse verify(Long userId, VoucherVerifyRequest req) {
         // Reuse the shared verify+resolve+ownership step, then report eligibility WITHOUT mutating.
         String payload = req != null ? req.voucherPayload() : null;
-        Booking booking = resolveOwnedBookingByPayload(userId, payload);
+        AuthorizedBooking authorized = resolveOwnedBookingByPayload(userId, payload, BOOKING_ARRIVAL_OPERATE);
+        Booking booking = authorized.booking();
+        java.util.List<RedactedField> redacted = new java.util.ArrayList<>();
 
         // Eligibility — verification only, NEVER a mutation or status transition.
         BookingStatus status = booking.getStatus();
@@ -88,11 +102,12 @@ public class PartnerVoucherVerificationService {
             booking.getHotel().getName(),
             booking.getRoom().getId(),
             booking.getRoom().getRoomName(),
-            booking.getUser().getFullName(),
+            redactor.guestName(authorized.access(), booking, booking.getUser().getFullName(), redacted, "guestName"),
             booking.getCheckInDate(),
             booking.getCheckOutDate(),
             new Occupancy(booking.getAdults(), booking.getChildren()),
-            nights
+            nights,
+            java.util.List.copyOf(redacted)
         );
     }
 
@@ -106,11 +121,12 @@ public class PartnerVoucherVerificationService {
      * {@link #verify}. Callers (e.g. the Phase 7.40 check-in mutation) get back the managed Booking and
      * apply their own status/window logic; this method itself mutates NOTHING.
      */
-    public Booking resolveOwnedBookingByPayload(Long userId, String voucherPayload) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
+    public AuthorizedBooking resolveOwnedBookingByPayload(Long userId, String voucherPayload,
+                                                          PartnerPermission permission) {
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
         String bookingCode = voucherSignatureService.verifyAndExtractBookingCode(voucherPayload)
             .orElseThrow(this::notFound);
-        return ownedBookingByCodeOrThrow(bookingCode, profile);
+        return authorizedByCode(access, bookingCode, permission);
     }
 
     /**
@@ -119,21 +135,22 @@ public class PartnerVoucherVerificationService {
      * unknown code and another partner's booking are indistinguishable. No crypto is involved (the code
      * was typed, not signed), but the ownership guarantee is identical.
      */
-    public Booking resolveOwnedBookingByCode(Long userId, String bookingCode) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        return ownedBookingByCodeOrThrow(bookingCode, profile);
+    public AuthorizedBooking resolveOwnedBookingByCode(Long userId, String bookingCode, PartnerPermission permission) {
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        return authorizedByCode(access, bookingCode, permission);
     }
 
-    /** Resolve by immutable unique code + confirm the calling partner owns the booking's hotel. */
-    private Booking ownedBookingByCodeOrThrow(String bookingCode, PartnerProfile profile) {
-        Booking booking = bookingRepo.findByBookingCode(bookingCode)
-            .orElseThrow(this::notFound);
-        // Ownership: the booking's hotel (a Place) must be owned by THIS partner. Otherwise 404
-        // (never 403) — a partner must not learn that another hotel's booking exists.
-        PartnerProfile owner = booking.getHotel().getOwner();
-        if (owner == null || !owner.getId().equals(profile.getId()))
-            throw notFound();
-        return booking;
+    /**
+     * RBAC R3b — §4.5 RESOURCE (booking by code): the booking lives at {@code booking.hotel}'s property; the caller
+     * needs {@code permission} there. Another company's booking, a booking the caller has no booking view over and
+     * an unknown code are the same 404; a caller who can view the booking but not do this gets 403.
+     */
+    private AuthorizedBooking authorizedByCode(PartnerAccessContext access, String bookingCode,
+                                               PartnerPermission permission) {
+        partnerAccess.decide(access, permission, ResourceType.BOOKING, partnerAccess.bookingCodeTarget(bookingCode),
+            "Booking not found");
+        Booking booking = bookingRepo.findByBookingCode(bookingCode).orElseThrow(this::notFound);
+        return new AuthorizedBooking(booking, access);
     }
 
     /** Uniform, non-enumerating 404 for every invalid/unknown/not-owned case. */

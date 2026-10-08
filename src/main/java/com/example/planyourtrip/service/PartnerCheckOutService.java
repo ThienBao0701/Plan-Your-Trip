@@ -12,6 +12,7 @@ import com.example.planyourtrip.repository.BookingCheckOutAuditRepository;
 import com.example.planyourtrip.repository.BookingRepository;
 import com.example.planyourtrip.repository.PartnerProfileRepository;
 import org.springframework.beans.factory.annotation.Value;
+import com.example.planyourtrip.security.rbac.PartnerPermission;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,6 +53,7 @@ import java.time.LocalDate;
 public class PartnerCheckOutService {
 
     private final PartnerVoucherVerificationService verificationService;
+    private final PartnerBookingRedactor redactor;
     private final BookingStatusEngineService statusEngine;
     private final BookingRepository bookingRepo;
     private final BookingCheckOutAuditRepository auditRepo;
@@ -89,6 +91,7 @@ public class PartnerCheckOutService {
     private static final Duration CLOCK_SKEW_TOLERANCE = Duration.ofMinutes(1);
 
     public PartnerCheckOutService(PartnerVoucherVerificationService verificationService,
+                                 PartnerBookingRedactor redactor,
                                   BookingStatusEngineService statusEngine,
                                   BookingRepository bookingRepo,
                                   BookingCheckOutAuditRepository auditRepo,
@@ -96,6 +99,7 @@ public class PartnerCheckOutService {
                                   PartnerBusinessZoneService businessZone,
                                   @Value("${booking.checkout.late-window-days:1}") long lateWindowDays) {
         this.verificationService = verificationService;
+        this.redactor = redactor;
         this.statusEngine = statusEngine;
         this.bookingRepo = bookingRepo;
         this.auditRepo = auditRepo;
@@ -119,15 +123,18 @@ public class PartnerCheckOutService {
         CheckMethod method = payload != null ? CheckMethod.QR_SCAN : CheckMethod.MANUAL;
 
         // Reuse Phase 7.39/7.40 verify+resolve+ownership (uniform 404 for invalid/unknown/not-owned).
-        Booking booking = payload != null
-            ? verificationService.resolveOwnedBookingByPayload(userId, payload)
-            : verificationService.resolveOwnedBookingByCode(userId, code);
+        // RBAC R3b — the booking must lie where the caller holds BOOKING_DEPARTURE_OPERATE (404 / 403 per §4.5 RESOURCE)
+        PartnerVoucherVerificationService.AuthorizedBooking authorized = payload != null
+            ? verificationService.resolveOwnedBookingByPayload(userId, payload, PartnerPermission.BOOKING_DEPARTURE_OPERATE)
+            : verificationService.resolveOwnedBookingByCode(userId, code, PartnerPermission.BOOKING_DEPARTURE_OPERATE);
+        Booking booking = authorized.booking();
+        com.example.planyourtrip.security.rbac.PartnerAccessContext access = authorized.access();
 
         // IDEMPOTENCY: already checked out and owned by the caller → deterministic 200, NO re-transition,
         // NO re-notify, NO second audit row, checkedOutAt unchanged. Checked FIRST, before eligibility/
         // window/engine (the engine would otherwise throw on CHECKED_OUT → CHECKED_OUT).
         if (booking.getStatus() == BookingStatus.CHECKED_OUT) {
-            return toResponse(booking, "Guest is already checked out");
+            return toResponse(access, booking, "Guest is already checked out");
         }
 
         // Eligibility — ONLY a CHECKED_IN booking may be checked out; everything else → 422.
@@ -150,7 +157,7 @@ public class PartnerCheckOutService {
         // Exactly one immutable audit row on the real transition, recording the derived method.
         writeAudit(userId, saved, method);
 
-        return toResponse(saved, "Check-out completed");
+        return toResponse(access, saved, "Check-out completed");
     }
 
     /**
@@ -197,7 +204,8 @@ public class PartnerCheckOutService {
         return partnerProfiles.findByUserId(userId).map(PartnerProfile::getId).orElse(null);
     }
 
-    private CheckOutResponse toResponse(Booking b, String message) {
+    private CheckOutResponse toResponse(com.example.planyourtrip.security.rbac.PartnerAccessContext access, Booking b, String message) {
+        java.util.List<com.example.planyourtrip.dto.RedactedField> redacted = new java.util.ArrayList<>();
         return new CheckOutResponse(
             true,
             b.getBookingCode(),
@@ -205,8 +213,9 @@ public class PartnerCheckOutService {
             b.getActualCheckOutAt(),
             b.getHotel().getName(),
             b.getRoom().getRoomName(),
-            b.getUser().getFullName(),
-            message
+            redactor.guestName(access, b, b.getUser().getFullName(), redacted, "guestName"),
+            message,
+            java.util.List.copyOf(redacted)
         );
     }
 

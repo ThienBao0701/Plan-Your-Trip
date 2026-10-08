@@ -10,6 +10,8 @@ import com.example.planyourtrip.repository.PartnerProfileRepository;
 import com.example.planyourtrip.repository.UserRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import com.example.planyourtrip.security.rbac.PartnerAccessContext;
+import com.example.planyourtrip.security.rbac.PartnerPermission;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -103,8 +105,10 @@ public class PartnerActivityLogService {
 
     @Transactional(readOnly = true)
     public List<PartnerActivityLogResponse> listMine(Long userId) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        return logRepo.findByPartnerProfileIdOrderByCreatedAtDesc(profile.getId())
+        // RBAC R3b — COMPANY P05 (AU-4): owners and company-level managers; the company is the caller's workspace
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        partnerAccess.requireCompanyPermission(access, PartnerPermission.ACTIVITY_LOG_VIEW, null);
+        return logRepo.findByPartnerProfileIdOrderByCreatedAtDesc(access.companyId())
             .stream().map(this::toResponse).toList();
     }
 

@@ -8,12 +8,18 @@ import com.example.planyourtrip.repository.HotelDetailRepository;
 import com.example.planyourtrip.repository.HotelRoomRepository;
 import com.example.planyourtrip.repository.PlaceRepository;
 import com.example.planyourtrip.repository.PromotionRepository;
+import com.example.planyourtrip.security.rbac.PartnerAccessContext;
+import com.example.planyourtrip.security.rbac.PartnerPermission;
+import com.example.planyourtrip.security.rbac.ResourceType;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+
+import static com.example.planyourtrip.security.rbac.PartnerPermission.PROMOTION_MANAGE;
+import static com.example.planyourtrip.security.rbac.PartnerPermission.PROMOTION_VIEW;
 
 @Service
 public class PartnerPromotionService {
@@ -47,8 +53,10 @@ public class PartnerPromotionService {
 
     @Transactional(readOnly = true)
     public List<PromotionResponse> getMyPromotions(Long userId) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        List<Long> hotelDetailIds = ownedHotelDetailIds(profile.getId());
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        // §4.5 COLLECTION: promotions targeting the properties (or their rooms) the caller may view
+        List<Long> permitted = partnerAccess.propertyIds(access, partnerAccess.requireCollection(access, PROMOTION_VIEW));
+        List<Long> hotelDetailIds = hotelDetailIdsOf(permitted);
         List<Long> roomIds = ownedRoomIds(hotelDetailIds);
         if (hotelDetailIds.isEmpty() && roomIds.isEmpty()) return List.of();
 
@@ -60,15 +68,16 @@ public class PartnerPromotionService {
 
     @Transactional(readOnly = true)
     public PromotionResponse getPromotion(Long userId, Long id) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        Promotion promo = ownedPromotionOrThrow(id, profile.getId());
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        Promotion promo = authorizedPromotion(access, PROMOTION_VIEW, id);
         return promotionService.toResponse(promo);
     }
 
     @Transactional
     public PromotionResponse createPromotion(Long userId, PromotionRequest req) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        validateTargetOwnership(req.targetType(), req.targetId(), profile.getId());
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        PartnerProfile profile = access.profile();
+        authorizeTarget(access, req.targetType(), req.targetId());
         PromotionResponse res = promotionService.create(req);
         notifyPromotionUpdated(profile, res.id(), res.name());
         return res;
@@ -76,9 +85,10 @@ public class PartnerPromotionService {
 
     @Transactional
     public PromotionResponse updatePromotion(Long userId, Long id, PromotionRequest req) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        ownedPromotionOrThrow(id, profile.getId());
-        validateTargetOwnership(req.targetType(), req.targetId(), profile.getId());
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        PartnerProfile profile = access.profile();
+        authorizedPromotion(access, PROMOTION_MANAGE, id);
+        authorizeTarget(access, req.targetType(), req.targetId());
         PromotionResponse res = promotionService.update(id, req);
         notifyPromotionUpdated(profile, res.id(), res.name());
         activityLogService.log(profile.getId(), userId, "PROMOTION_UPDATED", "PROMOTION", res.id(),
@@ -88,8 +98,9 @@ public class PartnerPromotionService {
 
     @Transactional
     public void deletePromotion(Long userId, Long id) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        Promotion promo = ownedPromotionOrThrow(id, profile.getId());
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        PartnerProfile profile = access.profile();
+        Promotion promo = authorizedPromotion(access, PROMOTION_MANAGE, id);
         String name = promo.getName();
         promotionService.delete(id);
         notifyPromotionUpdated(profile, id, name);
@@ -97,44 +108,32 @@ public class PartnerPromotionService {
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    private Promotion ownedPromotionOrThrow(Long id, Long ownerId) {
-        Promotion promo = promotionRepo.findById(id)
+    /** RBAC R3b — §4.5 RESOURCE on a stored promotion, resolved through its target (§11.2). */
+    private Promotion authorizedPromotion(PartnerAccessContext access, PartnerPermission permission, Long id) {
+        partnerAccess.requireResource(access, permission, ResourceType.PROMOTION, id, "Promotion not found: " + id);
+        return promotionRepo.findById(id)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Promotion not found: " + id));
-        if (!isOwnedTarget(promo.getTargetType(), promo.getTargetId(), ownerId)) {
-            throw new ApiException(HttpStatus.NOT_FOUND, "Promotion not found: " + id);
-        }
-        return promo;
     }
 
-    private void validateTargetOwnership(PromotionTargetType targetType, Long targetId, Long ownerId) {
+    /**
+     * RBAC R3b — the target a promotion body names must lie inside the caller's {@code promotion.manage} scope:
+     * a HOTEL target is a {@code hotel_details} id resolved through its place, a ROOM target a room type; ALL is
+     * never a partner scope. Another company's target and a missing one get the same 404.
+     */
+    private void authorizeTarget(PartnerAccessContext access, PromotionTargetType targetType, Long targetId) {
         if (targetType == null || targetType == PromotionTargetType.ALL) {
             throw new ApiException(HttpStatus.FORBIDDEN, "Partners cannot create global ALL promotions");
         }
         if (targetId == null) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "targetId is required for HOTEL/ROOM promotions");
         }
-        if (!isOwnedTarget(targetType, targetId, ownerId)) {
-            throw new ApiException(HttpStatus.NOT_FOUND, "Target hotel/room not found: " + targetId);
-        }
+        partnerAccess.decide(access, PROMOTION_MANAGE, ResourceType.PROMOTION,
+            partnerAccess.promotionTarget(targetType, targetId), "Target hotel/room not found: " + targetId);
     }
 
-    private boolean isOwnedTarget(PromotionTargetType targetType, Long targetId, Long ownerId) {
-        if (targetId == null) return false;
-        return switch (targetType) {
-            case HOTEL -> hotelDetails.findById(targetId)
-                .map(hd -> hd.getPlace().getOwner() != null && hd.getPlace().getOwner().getId().equals(ownerId))
-                .orElse(false);
-            case ROOM -> rooms.findById(targetId)
-                .map(r -> r.getHotelDetail().getPlace().getOwner() != null
-                    && r.getHotelDetail().getPlace().getOwner().getId().equals(ownerId))
-                .orElse(false);
-            case ALL -> false;
-        };
-    }
-
-    private List<Long> ownedHotelDetailIds(Long ownerId) {
-        return places.findAllByOwnerId(ownerId).stream()
-            .map(place -> hotelDetails.findByPlaceId(place.getId()).map(HotelDetail::getId).orElse(null))
+    private List<Long> hotelDetailIdsOf(List<Long> placeIds) {
+        return placeIds.stream()
+            .map(placeId -> hotelDetails.findByPlaceId(placeId).map(HotelDetail::getId).orElse(null))
             .filter(Objects::nonNull)
             .toList();
     }

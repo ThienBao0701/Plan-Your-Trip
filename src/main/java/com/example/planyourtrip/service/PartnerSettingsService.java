@@ -22,12 +22,10 @@ import static com.example.planyourtrip.security.rbac.PartnerPermission.WORKSPACE
 /**
  * Partner-side business settings and payout metadata. Team management is {@link PartnerTeamService} (RBAC R3a).
  *
- * <p>Unlike the operational partner services (which only ever resolve "the caller IS the
- * profile-owning user"), this service allows delegated team access: a caller is either the
- * profile's own user (who holds every partner permission) or an active {@link PartnerTeamMember}
- * of some partner profile, whose role's legacy bundle governs what they may do. Both are resolved
- * by {@link PartnerAccessService#requireTeamWorkspace} and checked through the RBAC kernel; the
- * bundles reproduce the pre-RBAC rules exactly ({@code LegacyPartnerBundles}).
+ * <p>A caller is the profile's own user (who holds every partner permission) or an ACTIVE
+ * {@link PartnerTeamMember}, resolved by {@link PartnerAccessService#requireWorkspace} like every partner
+ * endpoint and checked through the RBAC kernel with the V1.1 role bundles at each grant's scope
+ * ({@code PartnerRoleBundles}, RBAC R3b): settings edit P04, payout view P52, payout change P53 (step-up).
  *
  * <p>No payout is ever executed and no real bank account number is ever persisted —
  * {@link PartnerPayoutAccount#getBankAccountLast4()} is derived once from the request

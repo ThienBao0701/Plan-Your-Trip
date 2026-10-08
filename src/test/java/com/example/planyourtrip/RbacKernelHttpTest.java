@@ -182,23 +182,25 @@ class RbacKernelHttpTest {
     }
 
     // ═══════════════════════════════════════════════════════════════════════
-    // Team members gain nothing in R1
+    // Team members hold their role's V1.1 bundle at their grant's scope (R3b)
     // ═══════════════════════════════════════════════════════════════════════
 
     @Test
-    void frontDeskMemberKeepsOnlyTodaysSettingsReads() throws Exception {
+    void aFrontDeskMemberHoldsExactlyTheFrontDeskBundle() throws Exception {
         Partner owner = approvedPartner();
         Long propertyId = createProperty(owner);
         String member = member(owner, "FRONT_DESK");
 
+        // R3b: property, room and booking reads and workspace entry (FRONT_DESK@COMPANY, §10.1)
         for (String path : new String[] {"/api/partner/hotels", "/api/partner/hotels/" + propertyId,
-                "/api/partner/bookings", "/api/partner/extranet/home", "/api/partner/finance/overview"}) {
-            mvc.perform(auth(get(path), member))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("Partner profile not found"));
+                "/api/partner/bookings", "/api/partner/extranet/home", "/api/partner/settings"}) {
+            expect(get(path), member, HttpStatus.OK);
         }
-        expect(get("/api/partner/settings"), member, HttpStatus.OK);
-        expect(get("/api/partner/team"), member, HttpStatus.OK);
+        // no revenue (P49) and — a deliberate R3b loss (§29) — no team list (P07)
+        mvc.perform(auth(get("/api/partner/finance/overview"), member))
+            .andExpect(status().isForbidden())
+            .andExpect(jsonPath("$.code").value("PERMISSION_DENIED"));
+        expect(get("/api/partner/team"), member, HttpStatus.FORBIDDEN);
         mvc.perform(auth(json(put("/api/partner/settings"), SETTINGS_BODY), member))
             .andExpect(status().isForbidden())
             .andExpect(jsonPath("$.code").value("PERMISSION_DENIED"))
@@ -213,7 +215,7 @@ class RbacKernelHttpTest {
     }
 
     @Test
-    void managerAndFinanceKeepExactlyTheirLegacyWrites() throws Exception {
+    void managerAndFinanceHoldTheirV11Bundles() throws Exception {
         Partner owner = approvedPartner();
         String manager = member(owner, "MANAGER");
         String finance = member(owner, "FINANCE");
@@ -222,12 +224,16 @@ class RbacKernelHttpTest {
         expect(json(put("/api/partner/payout-account"), PAYOUT_BODY), manager, HttpStatus.FORBIDDEN);
         expect(json(put("/api/partner/payout-account"), PAYOUT_BODY), finance, HttpStatus.OK);
         expect(json(put("/api/partner/settings"), SETTINGS_BODY), finance, HttpStatus.FORBIDDEN);
-        expect(get("/api/partner/hotels"), manager, HttpStatus.NOT_FOUND);
-        expect(get("/api/partner/finance/settlements"), finance, HttpStatus.NOT_FOUND);
+        // R3b: operational and statement access per §10.1; MANAGER never reads payout metadata, FINANCE never the team
+        expect(get("/api/partner/hotels"), manager, HttpStatus.OK);
+        expect(get("/api/partner/finance/settlements"), manager, HttpStatus.OK);
+        expect(get("/api/partner/finance/settlements"), finance, HttpStatus.OK);
+        expect(get("/api/partner/payout-account"), manager, HttpStatus.FORBIDDEN);
+        expect(get("/api/partner/team"), finance, HttpStatus.FORBIDDEN);
     }
 
     @Test
-    void aNonRegistrantOwnerManagesTheTeamButStillHasNoOperationalAccess() throws Exception {
+    void aConfirmedCoOwnerManagesTheTeamAndOperatesCompanyWide() throws Exception {
         Partner owner = approvedPartner();
         String coOwner = member(owner, "OWNER");
         String target = registerPlainUser();
@@ -236,8 +242,9 @@ class RbacKernelHttpTest {
         mvc.perform(auth(json(post("/api/partner/team"),
                 "{\"email\":\"" + target + "\",\"role\":\"VIEWER\"}"), coOwner))
             .andExpect(status().isCreated());
-        expect(get("/api/partner/hotels"), coOwner, HttpStatus.NOT_FOUND);
-        expect(get("/api/partner/extranet/home"), coOwner, HttpStatus.NOT_FOUND);
+        // R3b: OWNER@COMPANY carries every permission over the company
+        expect(get("/api/partner/hotels"), coOwner, HttpStatus.OK);
+        expect(get("/api/partner/extranet/home"), coOwner, HttpStatus.OK);
     }
 
     // ═══════════════════════════════════════════════════════════════════════

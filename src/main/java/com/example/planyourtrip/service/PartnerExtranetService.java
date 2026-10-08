@@ -14,6 +14,11 @@ import com.example.planyourtrip.repository.PartnerProfileRepository;
 import com.example.planyourtrip.repository.PartnerTeamMemberRepository;
 import com.example.planyourtrip.repository.PlaceRepository;
 import org.springframework.http.HttpStatus;
+import com.example.planyourtrip.dto.RedactedField;
+import com.example.planyourtrip.security.rbac.AuthorizationDecision;
+import com.example.planyourtrip.security.rbac.PartnerAccessContext;
+import com.example.planyourtrip.security.rbac.PartnerAuthorization;
+import com.example.planyourtrip.security.rbac.ScopeSet;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,19 +26,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static com.example.planyourtrip.security.rbac.PartnerPermission.*;
+
 /**
  * Aggregates the Partner Portal's "home", "menu" and "account summary" views purely
  * by composing already-existing partner services (Booking, Analytics, Finance,
  * Settings, Notification) — nothing here re-derives a metric another service already
  * computes, and nothing here mutates state.
  *
- * <p>Access is resolved the same owner-only way as every partner service prior to
- * Phase 6.9 ({@code PartnerProfileRepository.findByUserId}), not the newer team-aware
- * resolution introduced for settings/payout/team management. This is a deliberate
- * choice: every reused service below (Booking/Analytics/Finance) is itself
- * owner-only, so resolving Extranet access any other way would only produce
- * inconsistent 404s when those calls are made on the caller's behalf. Broadening the
- * whole partner surface to be team-aware is out of scope for this phase.
+ * <p>RBAC R3b — access is the shared workspace of every partner endpoint (registrant or ACTIVE member); each
+ * composed block is computed only with its own permission, over that permission's scope set.
  */
 @Service
 public class PartnerExtranetService {
@@ -82,70 +84,140 @@ public class PartnerExtranetService {
 
     // ── Partner: home / menu / account summary / activity ──────────────────────
 
+    /**
+     * RBAC R3b — workspace entry (P01, any grant). Every block is computed only when the caller holds its own
+     * permission, over that permission's scope set (§25.1 Extranet, FILTERABLE BY PROPERTY): hotels P14, rooms P21,
+     * arrivals/departures P34, messages/reviews/promotions badges P48, finance summary P49, profile detail P02.
+     * A withheld block is 0 or null and listed in {@code redacted}.
+     */
     @Transactional(readOnly = true)
     public PartnerExtranetHomeResponse getHome(Long userId) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
-        List<Long> hotelIds = places.findAllByOwnerId(profile.getId()).stream().map(Place::getId).toList();
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        partnerAccess.requireCompanyPermission(access, WORKSPACE_ACCESS, null);
+        PartnerProfile profile = access.profile();
+        List<RedactedField> redacted = new ArrayList<>();
 
-        long ownedHotelCount = hotelIds.size();
-        long activeRoomCount = countActiveRooms(hotelIds);
+        long ownedHotelCount = 0;
+        if (partnerAccess.holdsAnywhere(access, PROPERTY_VIEW)) {
+            ownedHotelCount = partnerAccess.propertyIds(access, partnerAccess.requireCollection(access, PROPERTY_VIEW)).size();
+        } else {
+            redacted.add(RedactedField.omitted("ownedHotelCount"));
+        }
+        long activeRoomCount = countActiveRooms(access);
 
-        var dashboard = bookingService.getDashboard(userId);
+        long arrivals = 0, departures = 0;
+        if (partnerAccess.holdsAnywhere(access, BOOKING_VIEW)) {
+            var dashboard = bookingService.getDashboard(userId);
+            arrivals = dashboard.todaysArrivals();
+            departures = dashboard.todaysDepartures();
+        } else {
+            redacted.add(RedactedField.omitted("todaysArrivals"));
+            redacted.add(RedactedField.omitted("todaysDepartures"));
+        }
+        long unreadMessages = 0, pendingReviews = 0, activePromotions = 0;
+        if (partnerAccess.holdsAnywhere(access, ANALYTICS_VIEW)) {
+            unreadMessages = analyticsService.getMessageAnalytics(userId, null, null, null).unreadPartnerMessages();
+            pendingReviews = analyticsService.getReviewAnalytics(userId, null, null, null).pendingReviews();
+            activePromotions = analyticsService.getPromotionAnalytics(userId, null, null, null).activePromotions();
+        } else {
+            for (String field : List.of("unreadMessages", "pendingReviews", "activePromotions"))
+                redacted.add(RedactedField.omitted(field));
+        }
         long unreadNotifications = notificationService.countUnread(userId);
-        long unreadMessages = analyticsService.getMessageAnalytics(userId, null, null, null).unreadPartnerMessages();
-        long pendingReviews = analyticsService.getReviewAnalytics(userId, null, null, null).pendingReviews();
-        long activePromotions = analyticsService.getPromotionAnalytics(userId, null, null, null).activePromotions();
-        PartnerFinanceOverviewResponse finance = financeService.getOverview(userId, null, null, null);
+        PartnerFinanceOverviewResponse finance = null;
+        if (partnerAccess.holdsAnywhere(access, FINANCE_REVENUE_VIEW)) {
+            finance = financeService.getOverview(userId, null, null, null);
+        } else {
+            redacted.add(RedactedField.omitted("financeSummary"));
+        }
 
-        List<QuickAction> quickActions = buildQuickActions(unreadMessages, pendingReviews, dashboard.todaysArrivals());
+        List<QuickAction> quickActions = buildQuickActions(access, unreadMessages, pendingReviews, arrivals);
 
         return new PartnerExtranetHomeResponse(
-            toProfileSummary(profile), profile.getVerificationStatus().name(),
+            toProfileSummary(access, profile, redacted, "profile."), profile.getVerificationStatus().name(),
             ownedHotelCount, activeRoomCount,
-            dashboard.todaysArrivals(), dashboard.todaysDepartures(),
+            arrivals, departures,
             unreadMessages, unreadNotifications, pendingReviews, activePromotions,
-            finance, quickActions
+            finance, quickActions, List.copyOf(redacted)
         );
     }
 
+    /**
+     * RBAC R3b — §23 F4: a destination is listed when the caller holds its permission at any scope; badges are
+     * computed only when their own permission allows.
+     */
     @Transactional(readOnly = true)
     public PartnerMenuResponse getMenu(Long userId) {
-        partnerAccess.requireRegistrantWorkspace(userId);
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        partnerAccess.requireCompanyPermission(access, WORKSPACE_ACCESS, null);
+        boolean analytics = partnerAccess.holdsAnywhere(access, ANALYTICS_VIEW);
 
-        long unreadMessages = analyticsService.getMessageAnalytics(userId, null, null, null).unreadPartnerMessages();
+        Long unreadMessages = analytics
+            ? analyticsService.getMessageAnalytics(userId, null, null, null).unreadPartnerMessages() : null;
         long unreadNotifications = notificationService.countUnread(userId);
-        long pendingReviews = analyticsService.getReviewAnalytics(userId, null, null, null).pendingReviews();
-        long activePromotions = analyticsService.getPromotionAnalytics(userId, null, null, null).activePromotions();
+        Long pendingReviews = analytics
+            ? analyticsService.getReviewAnalytics(userId, null, null, null).pendingReviews() : null;
+        Long activePromotions = analytics
+            ? analyticsService.getPromotionAnalytics(userId, null, null, null).activePromotions() : null;
 
-        List<MenuItem> sections = List.of(
-            new MenuItem("dashboard", "Dashboard", "/partner/dashboard", true, null),
-            new MenuItem("hotels", "Hotels", "/partner/hotels", true, null),
-            new MenuItem("rooms", "Rooms", "/partner/rooms", true, null),
-            new MenuItem("calendar", "Calendar", "/partner/calendar", true, null),
-            new MenuItem("pricing", "Pricing", "/partner/pricing", true, null),
-            new MenuItem("promotions", "Promotions", "/partner/promotions", true, activePromotions),
-            new MenuItem("bookings", "Bookings", "/partner/bookings", true, null),
-            new MenuItem("messages", "Messages", "/partner/messages", true, unreadMessages),
-            new MenuItem("analytics", "Analytics", "/partner/analytics", true, null),
-            new MenuItem("finance", "Finance", "/partner/finance", true, null),
-            new MenuItem("reviews", "Reviews", "/partner/reviews", true, pendingReviews),
-            new MenuItem("notifications", "Notifications", "/partner/notifications", true, unreadNotifications),
-            new MenuItem("settings", "Settings", "/partner/settings", true, null)
-        );
-        return new PartnerMenuResponse(sections);
+        List<MenuItem> sections = new ArrayList<>();
+        sections.add(new MenuItem("dashboard", "Dashboard", "/partner/dashboard", true, null));
+        // hotels: P14, or parent context (§11.7) for a member holding only room types
+        if (partnerAccess.holdsAnywhere(access, PROPERTY_VIEW) || partnerAccess.holdsAnywhere(access, ROOM_VIEW))
+            sections.add(new MenuItem("hotels", "Hotels", "/partner/hotels", true, null));
+        if (partnerAccess.holdsAnywhere(access, ROOM_VIEW))
+            sections.add(new MenuItem("rooms", "Rooms", "/partner/rooms", true, null));
+        if (partnerAccess.holdsAnywhere(access, INVENTORY_VIEW))
+            sections.add(new MenuItem("calendar", "Calendar", "/partner/calendar", true, null));
+        if (partnerAccess.holdsAnywhere(access, RATE_VIEW))
+            sections.add(new MenuItem("pricing", "Pricing", "/partner/pricing", true, null));
+        if (partnerAccess.holdsAnywhere(access, PROMOTION_VIEW))
+            sections.add(new MenuItem("promotions", "Promotions", "/partner/promotions", true, activePromotions));
+        if (partnerAccess.holdsAnywhere(access, BOOKING_VIEW))
+            sections.add(new MenuItem("bookings", "Bookings", "/partner/bookings", true, null));
+        if (partnerAccess.holdsAnywhere(access, CONVERSATION_VIEW))
+            sections.add(new MenuItem("messages", "Messages", "/partner/messages", true, unreadMessages));
+        if (analytics || partnerAccess.holdsAnywhere(access, FINANCE_REVENUE_VIEW))
+            sections.add(new MenuItem("analytics", "Analytics", "/partner/analytics", true, null));
+        if (partnerAccess.holdsAnywhere(access, FINANCE_REVENUE_VIEW)
+                || partnerAccess.holdsAnywhere(access, FINANCE_STATEMENT_VIEW)
+                || partnerAccess.holdsAnywhere(access, FINANCE_PAYOUT_VIEW))
+            sections.add(new MenuItem("finance", "Finance", "/partner/finance", true, null));
+        if (partnerAccess.holdsAnywhere(access, REVIEW_VIEW))
+            sections.add(new MenuItem("reviews", "Reviews", "/partner/reviews", true, pendingReviews));
+        sections.add(new MenuItem("notifications", "Notifications", "/partner/notifications", true, unreadNotifications));
+        sections.add(new MenuItem("settings", "Settings", "/partner/settings", true, null));
+        return new PartnerMenuResponse(List.copyOf(sections));
     }
 
+    /**
+     * RBAC R3b — workspace entry (P01) with company-level blocks (§25.1 COMPANY ONLY): workspace settings (P01),
+     * profile detail (P02), payout account (P52), team size (P07).
+     */
     @Transactional(readOnly = true)
     public PartnerAccountSummaryResponse getAccountSummary(Long userId) {
-        PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
+        PartnerAccessContext access = partnerAccess.requireWorkspace(userId);
+        partnerAccess.requireCompanyPermission(access, WORKSPACE_ACCESS, null);
+        List<RedactedField> redacted = new ArrayList<>();
 
         PartnerSettingsResponse settings = settingsService.getSettings(userId);
-        PartnerPayoutAccountResponse payout = settingsService.getPayoutAccountOrNull(userId);
-        List<PartnerTeamMemberResponse> team = settingsService.getTeamMembers(userId);
-
-        return new PartnerAccountSummaryResponse(toProfileSummary(profile), settings, payout, team.size());
+        PartnerPayoutAccountResponse payout = null;
+        if (PartnerAuthorization.company(access, PAYOUT_ACCOUNT_VIEW) == AuthorizationDecision.ALLOW) {
+            payout = settingsService.getPayoutAccountOrNull(userId);
+        } else {
+            redacted.add(RedactedField.omitted("payoutAccount"));
+        }
+        int teamSize = 0;
+        if (partnerAccess.holdsAnywhere(access, TEAM_VIEW)) {
+            teamSize = settingsService.getTeamMembers(userId).size();
+        } else {
+            redacted.add(RedactedField.omitted("teamMemberCount"));
+        }
+        return new PartnerAccountSummaryResponse(toProfileSummary(access, access.profile(), redacted, "profile."),
+            settings, payout, teamSize, List.copyOf(redacted));
     }
 
+    /** RBAC R3b — COMPANY P05 (AU-4): owners and company-level managers read the workspace trail. */
     @Transactional(readOnly = true)
     public List<PartnerActivityLogResponse> getActivityLogs(Long userId) {
         return activityLogService.listMine(userId);
@@ -171,24 +243,48 @@ public class PartnerExtranetService {
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    private long countActiveRooms(List<Long> hotelIds) {
-        return hotelIds.stream()
+    /** Active room types over room view's scope set (P21, floor U): whole properties, plus single granted units. */
+    private long countActiveRooms(PartnerAccessContext access) {
+        if (!partnerAccess.holdsAnywhere(access, ROOM_VIEW)) return 0;
+        ScopeSet scope = partnerAccess.requireCollection(access, ROOM_VIEW);
+        List<Long> hotelIds = partnerAccess.propertyIds(access, scope);
+        long whole = hotelIds.stream()
             .map(id -> hotelDetails.findByPlaceId(id).orElse(null))
             .filter(Objects::nonNull)
             .flatMap(hd -> rooms.findAllByHotelDetailIdAndActiveTrue(hd.getId()).stream())
             .count();
+        long units = scope.units().stream()
+            .filter(unit -> !hotelIds.contains(unit.propertyId()))
+            .filter(unit -> rooms.findById(unit.unitId()).map(r -> r.isActive()).orElse(false))
+            .count();
+        return whole + units;
     }
 
-    private List<QuickAction> buildQuickActions(long unreadMessages, long pendingReviews, long todaysArrivals) {
+    private List<QuickAction> buildQuickActions(PartnerAccessContext access, long unreadMessages, long pendingReviews,
+                                                long todaysArrivals) {
         List<QuickAction> actions = new ArrayList<>();
         if (todaysArrivals > 0) actions.add(new QuickAction("Review today's arrivals", "/partner/bookings?arrivalToday=true"));
-        if (unreadMessages > 0) actions.add(new QuickAction("Reply to guest messages", "/partner/messages"));
-        if (pendingReviews > 0) actions.add(new QuickAction("Respond to pending reviews", "/partner/reviews"));
-        actions.add(new QuickAction("Manage hotels", "/partner/hotels"));
-        actions.add(new QuickAction("View calendar", "/partner/calendar"));
+        if (unreadMessages > 0 && partnerAccess.holdsAnywhere(access, CONVERSATION_RESPOND))
+            actions.add(new QuickAction("Reply to guest messages", "/partner/messages"));
+        if (pendingReviews > 0 && partnerAccess.holdsAnywhere(access, REVIEW_REPLY))
+            actions.add(new QuickAction("Respond to pending reviews", "/partner/reviews"));
+        if (partnerAccess.holdsAnywhere(access, PROPERTY_VIEW)) actions.add(new QuickAction("Manage hotels", "/partner/hotels"));
+        if (partnerAccess.holdsAnywhere(access, INVENTORY_VIEW)) actions.add(new QuickAction("View calendar", "/partner/calendar"));
         return actions;
     }
 
+    /** §11.7 parent context for everyone (id, business name); the representative and contact need P02 (§21.1). */
+    private PartnerProfileSummary toProfileSummary(PartnerAccessContext access, PartnerProfile p,
+                                                   List<RedactedField> redacted, String prefix) {
+        if (PartnerAuthorization.company(access, BUSINESS_PROFILE_VIEW) == AuthorizationDecision.ALLOW) {
+            return new PartnerProfileSummary(p.getId(), p.getBusinessName(), p.getRepresentativeName(), p.getEmail());
+        }
+        redacted.add(RedactedField.omitted(prefix + "representativeName"));
+        redacted.add(RedactedField.omitted(prefix + "email"));
+        return new PartnerProfileSummary(p.getId(), p.getBusinessName(), null, null);
+    }
+
+    /** Admin views see the whole profile summary. */
     private PartnerProfileSummary toProfileSummary(PartnerProfile p) {
         return new PartnerProfileSummary(p.getId(), p.getBusinessName(), p.getRepresentativeName(), p.getEmail());
     }

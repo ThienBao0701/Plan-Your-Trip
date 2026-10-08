@@ -99,6 +99,8 @@ public class PartnerGuestStayDto {
         // 9. Check-out audit (nullable single)
         StayCheckAudit checkOutAudit,
         // 10. Derived operational warnings
-        List<String> operationalWarnings
+        List<String> operationalWarnings,
+        // 11. RBAC R3b — guestName is masked without booking.guest_identity.view (§21.2)
+        List<RedactedField> redacted
     ) {}
 }

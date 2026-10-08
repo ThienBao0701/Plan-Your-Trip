@@ -32,7 +32,9 @@ public class PartnerExtranetDto {
         long pendingReviews,
         long activePromotions,
         PartnerFinanceOverviewResponse financeSummary,
-        List<QuickAction> quickActions
+        List<QuickAction> quickActions,
+        // RBAC R3b — each block needs its own permission over the caller's scope; withheld blocks are 0/null here
+        List<RedactedField> redacted
     ) {}
 
     public record PartnerMenuResponse(List<MenuItem> sections) {}
@@ -41,7 +43,9 @@ public class PartnerExtranetDto {
         PartnerProfileSummary profile,
         PartnerSettingsResponse settings,
         PartnerPayoutAccountResponse payoutAccount,
-        int teamMemberCount
+        int teamMemberCount,
+        // RBAC R3b — profile detail needs P02, the payout block P52, the team count P07
+        List<RedactedField> redacted
     ) {}
 
     public record PartnerActivityLogResponse(

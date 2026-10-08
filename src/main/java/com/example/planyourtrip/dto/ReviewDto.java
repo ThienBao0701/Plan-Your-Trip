@@ -124,4 +124,43 @@ public class ReviewDto {
         @NotNull ReviewStatus status,
         String rejectReason
     ) {}
+
+    /**
+     * RBAC R3b — a review as the partner's reply endpoint returns it: the reviewer's account id is never sent to a
+     * partner (§21.3 NR-2); everything else is the public review.
+     */
+    public record PartnerReviewView(
+        Long id,
+        Long bookingId,
+        String bookingCode,
+        String userName,
+        Long placeId,
+        String placeName,
+        Integer ratingOverall,
+        Integer ratingCleanliness,
+        Integer ratingService,
+        Integer ratingLocation,
+        Integer ratingValue,
+        Integer ratingFacilities,
+        String title,
+        String content,
+        String status,
+        int helpfulCount,
+        int reportedCount,
+        Instant approvedAt,
+        Instant rejectedAt,
+        String rejectReason,
+        Instant createdAt,
+        Instant updatedAt,
+        PartnerReplyInfo partnerReply,
+        List<ReviewMediaItem> media
+    ) {
+        public static PartnerReviewView of(ReviewResponse r) {
+            return new PartnerReviewView(r.id(), r.bookingId(), r.bookingCode(), r.userName(), r.placeId(),
+                r.placeName(), r.ratingOverall(), r.ratingCleanliness(), r.ratingService(), r.ratingLocation(),
+                r.ratingValue(), r.ratingFacilities(), r.title(), r.content(), r.status(), r.helpfulCount(),
+                r.reportedCount(), r.approvedAt(), r.rejectedAt(), r.rejectReason(), r.createdAt(), r.updatedAt(),
+                r.partnerReply(), r.media());
+        }
+    }
 }

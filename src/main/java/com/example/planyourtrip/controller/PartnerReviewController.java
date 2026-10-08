@@ -1,5 +1,6 @@
 package com.example.planyourtrip.controller;
 
+import com.example.planyourtrip.dto.ReviewDto.PartnerReviewView;
 import com.example.planyourtrip.dto.ReviewDto.PartnerReplyRequest;
 import com.example.planyourtrip.dto.ReviewDto.ReviewResponse;
 import com.example.planyourtrip.security.AuthUser;
@@ -26,8 +27,8 @@ public class PartnerReviewController {
             + "partner profile that owns the review's place; an unknown review, or a review whose place the "
             + "caller does not own, both return a uniform 404. Reply is allowed only on a published (APPROVED) "
             + "review — any other status returns 422. The customer is notified only on the first reply.")
-    public ReviewResponse reply(@AuthUser Long uid, @PathVariable Long reviewId,
+    public PartnerReviewView reply(@AuthUser Long uid, @PathVariable Long reviewId,
                                 @RequestBody @Valid PartnerReplyRequest req) {
-        return service.partnerReply(uid, reviewId, req);
+        return PartnerReviewView.of(service.partnerReply(uid, reviewId, req));
     }
 }

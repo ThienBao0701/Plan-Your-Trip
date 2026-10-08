@@ -39,8 +39,9 @@ final class PartnerEndpointRules {
         aggregate(GET, "/api/partner/analytics/revenue", FINANCE_REVENUE_VIEW, FILTERABLE_BY_PROPERTY),
         aggregate(GET, "/api/partner/analytics/occupancy", ANALYTICS_VIEW, FILTERABLE_BY_PROPERTY),
         aggregate(GET, "/api/partner/analytics/bookings", ANALYTICS_VIEW, FILTERABLE_BY_PROPERTY),
-        aggregate(GET, "/api/partner/analytics/rooms", ANALYTICS_VIEW, FILTERABLE_BY_PROPERTY),
-        aggregate(GET, "/api/partner/analytics/reviews", ANALYTICS_VIEW, FILTERABLE_BY_PROPERTY),
+        // R3b: room revenue ranking is a revenue figure (P49); review previews are individual reviews (P44, §21)
+        aggregate(GET, "/api/partner/analytics/rooms", ANALYTICS_VIEW, FILTERABLE_BY_PROPERTY).withFields(FINANCE_REVENUE_VIEW),
+        aggregate(GET, "/api/partner/analytics/reviews", ANALYTICS_VIEW, FILTERABLE_BY_PROPERTY).withFields(REVIEW_VIEW),
         aggregate(GET, "/api/partner/analytics/messages", ANALYTICS_VIEW, FILTERABLE_BY_PROPERTY),
         aggregate(GET, "/api/partner/analytics/promotions", ANALYTICS_VIEW, FILTERABLE_BY_PROPERTY).withFields(FINANCE_REVENUE_VIEW),
 
@@ -84,8 +85,10 @@ final class PartnerEndpointRules {
         resource(PATCH, "/api/partner/conversations/{id}/close", ResourceType.CONVERSATION, CONVERSATION_RESPOND),
 
         // ── Extranet ────────────────────────────────────────────────────────
+        // R3b: "each block needs its permission" (§25.1) — the gates PartnerExtranetService applies
         company(GET, "/api/partner/extranet/home", WORKSPACE_ACCESS)
-            .withFields(FINANCE_REVENUE_VIEW).withAggregate(FILTERABLE_BY_PROPERTY),
+            .withFields(FINANCE_REVENUE_VIEW, PROPERTY_VIEW, ROOM_VIEW, BOOKING_VIEW, ANALYTICS_VIEW, BUSINESS_PROFILE_VIEW)
+            .withAggregate(FILTERABLE_BY_PROPERTY),
         company(GET, "/api/partner/extranet/menu", WORKSPACE_ACCESS),
         company(GET, "/api/partner/extranet/account-summary", WORKSPACE_ACCESS)
             .withFields(PAYOUT_ACCOUNT_VIEW, TEAM_VIEW, BUSINESS_PROFILE_VIEW).withAggregate(COMPANY_ONLY),
@@ -131,7 +134,10 @@ final class PartnerEndpointRules {
         resource(POST, "/api/partner/rate-plans/{id}/activate", ResourceType.RATE_PLAN, RATE_ACTIVATE),
         resource(POST, "/api/partner/rate-plans/{id}/deactivate", ResourceType.RATE_PLAN, RATE_ACTIVATE),
 
-        // ── Onboarding (outside the workspace evaluator) ────────────────────
+        // ── Onboarding and self (outside the workspace evaluator) ───────────
+        new PartnerEndpointRule(GET, "/api/partner/me/access", EndpointKind.SELF, null, List.of(WORKSPACE_ACCESS),
+            "SELF (§25.2): not gated by P01, approval or membership status; permissions listed only when they apply",
+            Set.of(), AggregateScope.NONE, false),
         self(POST, "/api/partner/profile", BUSINESS_PROFILE_EDIT),
         self(POST, "/api/partner/profile/submit", BUSINESS_PROFILE_EDIT),
         self(GET, "/api/partner/profile", BUSINESS_PROFILE_VIEW),

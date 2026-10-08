@@ -4,7 +4,10 @@ The protections that must be live before any partner member gains new power (RBA
 §22, §25.3, §25.6, §26, §28 M-6, §29, §32). Builds on R1 (`security/rbac`, `PartnerAccessService`) and R2
 (`RBAC_MEMBERSHIP_FOUNDATION.md`). Design: `frontend/docs/security/PLAN_YOUR_TRIP_RBAC_PERMISSION_MATRIX_V1.md`.
 
-**Still not activated:** the V1.1 permission matrix (R3b). Every operational endpoint is still decided with the
+> R3b (`RBAC_PARTNER_ENFORCEMENT.md`) activates the V1.1 matrix: operational endpoints are now decided by stored
+> grants and the §10.1 bundles; the legacy-bundle notes below describe R3a only.
+
+**Still not activated (in R3a):** the V1.1 permission matrix (R3b). Every operational endpoint is still decided with the
 R1 legacy bundles: the registrant holds everything; members keep today's settings/payout/team rights. Team
 mutations are owner-only until R4 (§31 Q3).
 

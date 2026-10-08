@@ -44,6 +44,16 @@ public class StepUpPolicy {
         return !session.issuedAt().isBefore(now.minus(FRESHNESS));
     }
 
+    /** Until when the current session counts as fresh, or null without a session (access document, §25.2). */
+    public Instant freshUntil() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getDetails() instanceof TokenSession session)
+                || session.issuedAt() == null) {
+            return null;
+        }
+        return session.issuedAt().plus(FRESHNESS);
+    }
+
     /** 403 {@code STEP_UP_REQUIRED} unless {@link #isFresh()}. */
     public void requireFresh() {
         if (!isFresh()) {

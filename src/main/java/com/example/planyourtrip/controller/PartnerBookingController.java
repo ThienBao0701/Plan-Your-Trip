@@ -2,6 +2,7 @@ package com.example.planyourtrip.controller;
 
 import com.example.planyourtrip.dto.BookingDto.BookingResponse;
 import com.example.planyourtrip.dto.PageResponse;
+import com.example.planyourtrip.dto.PartnerBookingDto.PartnerBookingView;
 import com.example.planyourtrip.dto.PartnerBookingDto.*;
 import com.example.planyourtrip.dto.PartnerCheckInDto.CheckInRequest;
 import com.example.planyourtrip.dto.PartnerCheckInDto.CheckInResponse;
@@ -73,25 +74,25 @@ public class PartnerBookingController {
 
     @PatchMapping("/api/partner/bookings/{id}/check-in")
     @Operation(summary = "Check in guest (reuses BookingStatusEngineService)")
-    public BookingResponse checkIn(@AuthUser Long uid, @PathVariable Long id) {
+    public PartnerBookingView checkIn(@AuthUser Long uid, @PathVariable Long id) {
         return service.checkIn(uid, id);
     }
 
     @PatchMapping("/api/partner/bookings/{id}/check-out")
     @Operation(summary = "Check out guest (reuses BookingStatusEngineService)")
-    public BookingResponse checkOut(@AuthUser Long uid, @PathVariable Long id) {
+    public PartnerBookingView checkOut(@AuthUser Long uid, @PathVariable Long id) {
         return service.checkOut(uid, id);
     }
 
     @PatchMapping("/api/partner/bookings/{id}/no-show")
     @Operation(summary = "Mark booking as no-show (reuses BookingStatusEngineService)")
-    public BookingResponse noShow(@AuthUser Long uid, @PathVariable Long id) {
+    public PartnerBookingView noShow(@AuthUser Long uid, @PathVariable Long id) {
         return service.markNoShow(uid, id);
     }
 
     @PatchMapping("/api/partner/bookings/{id}/complete")
     @Operation(summary = "Complete reservation (reuses BookingStatusEngineService)")
-    public BookingResponse complete(@AuthUser Long uid, @PathVariable Long id) {
+    public PartnerBookingView complete(@AuthUser Long uid, @PathVariable Long id) {
         return service.complete(uid, id);
     }
 
