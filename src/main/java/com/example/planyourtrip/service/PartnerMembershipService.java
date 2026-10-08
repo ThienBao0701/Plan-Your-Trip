@@ -26,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -277,6 +279,71 @@ public class PartnerMembershipService {
         return resolveGrants(membership).stream()
             .map(g -> new PartnerGrant(bundles.apply(g.role()), g.scope()))
             .toList();
+    }
+
+    /**
+     * RBAC R3a — validates one grant for a company without writing it: the role may sit at the scope type
+     * (§11.3) and the scope resolves inside the company from stored ownership; 422 {@code SCOPE_INVALID}
+     * otherwise, with the same answer for another company's id and a missing id.
+     */
+    @Transactional(readOnly = true)
+    public ScopePath validateGrant(Long companyId, PartnerTeamRole role, ScopeRef scope) {
+        if (scope == null || !PartnerRoleScopes.allows(role, scope.type()))
+            throw scopeInvalid("This role cannot be granted at this scope");
+        return targets.resolveGrantScope(companyId, scope)
+            .orElseThrow(() -> scopeInvalid("The scope does not belong to this company"));
+    }
+
+    /** RBAC R3a — replaces every grant of a membership (§15 step 8). The caller has validated them. */
+    @Transactional
+    public void replaceGrants(PartnerTeamMember membership, List<Map.Entry<PartnerTeamRole, ScopeRef>> newGrants,
+                              Long actorUserId) {
+        deleteGrants(membership);
+        for (Map.Entry<PartnerTeamRole, ScopeRef> g : newGrants) grant(membership, g.getKey(), g.getValue(), actorUserId);
+    }
+
+    // ── Owners (RBAC R3a, §18, §19) ──────────────────────────────────────────
+
+    /** The registrant's own row: the primary owner, immutable inside the workspace (§18 O-1). */
+    public boolean isPrimaryOwner(PartnerTeamMember membership) {
+        return isRegistrantRow(membership);
+    }
+
+    /** Holds a confirmed {@code OWNER@COMPANY} grant; a co-owner pending confirmation does not (§18 O-9). */
+    @Transactional(readOnly = true)
+    public boolean holdsConfirmedOwner(PartnerTeamMember membership) {
+        return !membership.isPendingOwnerConfirmation()
+            && grants.existsByTeamMemberIdAndRoleAndScopeType(membership.getId(), PartnerTeamRole.OWNER, ScopeType.COMPANY);
+    }
+
+    /**
+     * Every owner of the company who must receive security notifications (§18 O-8): the primary owner and the
+     * ACTIVE confirmed co-owners.
+     */
+    @Transactional(readOnly = true)
+    public Set<Long> activeOwnerUserIds(PartnerProfile company) {
+        Set<Long> owners = new LinkedHashSet<>();
+        owners.add(company.getUser().getId());
+        for (PartnerTeamMember m : grants.findMembersHolding(company.getId(), PartnerTeamRole.OWNER, ScopeType.COMPANY,
+                PartnerMembershipStatus.ACTIVE)) {
+            owners.add(m.getUser().getId());
+        }
+        return owners;
+    }
+
+    /**
+     * The owners that keep a company reachable (§19 LO-1): ACTIVE, confirmed, account enabled. The primary owner
+     * counts while their account is enabled — O-1 makes their ownership implicit and unremovable in the workspace.
+     */
+    @Transactional(readOnly = true)
+    public Set<Long> qualifyingOwnerUserIds(PartnerProfile company) {
+        Set<Long> owners = new LinkedHashSet<>();
+        if (company.getUser().isEnabled()) owners.add(company.getUser().getId());
+        for (PartnerTeamMember m : grants.findMembersHolding(company.getId(), PartnerTeamRole.OWNER, ScopeType.COMPANY,
+                PartnerMembershipStatus.ACTIVE)) {
+            if (m.getUser().isEnabled()) owners.add(m.getUser().getId());
+        }
+        return owners;
     }
 
     // ── Containment ──────────────────────────────────────────────────────────

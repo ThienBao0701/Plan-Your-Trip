@@ -230,9 +230,11 @@ class RbacKernelHttpTest {
     void aNonRegistrantOwnerManagesTheTeamButStillHasNoOperationalAccess() throws Exception {
         Partner owner = approvedPartner();
         String coOwner = member(owner, "OWNER");
+        String target = registerPlainUser();
+        makePartnerAccount(target); // RBAC R3a: only an existing PARTNER account can be attached
 
         mvc.perform(auth(json(post("/api/partner/team"),
-                "{\"email\":\"" + registerPlainUser() + "\",\"role\":\"VIEWER\"}"), coOwner))
+                "{\"email\":\"" + target + "\",\"role\":\"VIEWER\"}"), coOwner))
             .andExpect(status().isCreated());
         expect(get("/api/partner/hotels"), coOwner, HttpStatus.NOT_FOUND);
         expect(get("/api/partner/extranet/home"), coOwner, HttpStatus.NOT_FOUND);
@@ -385,6 +387,7 @@ class RbacKernelHttpTest {
     }
 
     private void addMember(Partner owner, String email, String role) throws Exception {
+        makePartnerAccount(email);
         mvc.perform(auth(json(post("/api/partner/team"),
                 "{\"email\":\"" + email + "\",\"role\":\"" + role + "\"}"), owner.token()))
             .andExpect(status().isCreated());
@@ -421,5 +424,15 @@ class RbacKernelHttpTest {
         JsonNode room = mapper.readTree(mvc.perform(auth(json(post("/api/admin/rooms"), body), adminToken()))
             .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString());
         return room.get("id").asLong();
+    }
+
+    /**
+     * RBAC R3a (§29) — the legacy team endpoint attaches only an existing PARTNER account; it no longer promotes a
+     * traveller. Test members are therefore Partner accounts, as a self-registered Partner would be.
+     */
+    private void makePartnerAccount(String email) {
+        com.example.planyourtrip.model.User u = userRepo.findByEmail(email).orElseThrow();
+        u.setRole("PARTNER");
+        userRepo.save(u);
     }
 }

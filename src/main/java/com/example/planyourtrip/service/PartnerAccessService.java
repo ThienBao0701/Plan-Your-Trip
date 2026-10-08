@@ -1,9 +1,12 @@
 package com.example.planyourtrip.service;
 
 import com.example.planyourtrip.exception.ApiException;
+import com.example.planyourtrip.model.PartnerMemberGrant;
+import com.example.planyourtrip.model.PartnerMembershipStatus;
 import com.example.planyourtrip.model.PartnerProfile;
 import com.example.planyourtrip.model.PartnerTeamMember;
 import com.example.planyourtrip.model.PartnerVerificationStatus;
+import com.example.planyourtrip.repository.PartnerMemberGrantRepository;
 import com.example.planyourtrip.repository.PartnerProfileRepository;
 import com.example.planyourtrip.repository.PartnerTeamMemberRepository;
 import com.example.planyourtrip.security.rbac.AuthorizationDecision;
@@ -12,16 +15,22 @@ import com.example.planyourtrip.security.rbac.PartnerAccessContext;
 import com.example.planyourtrip.security.rbac.PartnerAuthorization;
 import com.example.planyourtrip.security.rbac.PartnerGrant;
 import com.example.planyourtrip.security.rbac.PartnerPermission;
+import com.example.planyourtrip.security.rbac.PartnerRoleScopes;
 import com.example.planyourtrip.security.rbac.ResourceType;
 import com.example.planyourtrip.security.rbac.ScopePath;
 import com.example.planyourtrip.security.rbac.ScopeSet;
+import com.example.planyourtrip.security.rbac.ScopeType;
 import org.hibernate.Hibernate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * The partner authorization kernel's entry point (RBAC V1.1 §24 B1): resolves the caller's workspace from
@@ -49,19 +58,24 @@ public class PartnerAccessService {
     public static final String PARTNER_NOT_APPROVED = "PARTNER_NOT_APPROVED";
     public static final String PERMISSION_DENIED = "PERMISSION_DENIED";
 
+    private static final Logger log = LoggerFactory.getLogger(PartnerAccessService.class);
+
     static final String PROFILE_NOT_FOUND_MESSAGE = "Partner profile not found";
     static final String NOT_APPROVED_MESSAGE = "Partner profile is not approved";
     static final String ACCESS_DENIED_MESSAGE = "Access denied";
 
     private final PartnerProfileRepository partnerProfiles;
     private final PartnerTeamMemberRepository teamMembers;
+    private final PartnerMemberGrantRepository grants;
     private final PartnerResourceTargetResolver targets;
 
     public PartnerAccessService(PartnerProfileRepository partnerProfiles,
                                 PartnerTeamMemberRepository teamMembers,
+                                PartnerMemberGrantRepository grants,
                                 PartnerResourceTargetResolver targets) {
         this.partnerProfiles = partnerProfiles;
         this.teamMembers = teamMembers;
+        this.grants = grants;
         this.targets = targets;
     }
 
@@ -94,13 +108,35 @@ public class PartnerAccessService {
             requireApproved(own.get());
             return registrantContext(own.get(), userId);
         }
-        PartnerTeamMember membership = teamMembers.findByUserIdAndActiveTrue(userId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, PROFILE_NOT_FOUND_MESSAGE));
+        // One ACTIVE membership or none (§11.6 WS-1). Two — legacy data until M-6 — is refused rather than
+        // guessed (previously the lookup itself failed with a 500).
+        List<PartnerTeamMember> active = teamMembers.findByUserIdAndStatusIn(userId, List.of(PartnerMembershipStatus.ACTIVE));
+        if (active.size() != 1) {
+            if (active.size() > 1) log.warn("User {} holds {} active partner memberships; refusing the workspace", userId, active.size());
+            throw new ApiException(HttpStatus.NOT_FOUND, PROFILE_NOT_FOUND_MESSAGE);
+        }
+        PartnerTeamMember membership = active.get(0);
         PartnerProfile company = Hibernate.unproxy(membership.getPartnerProfile(), PartnerProfile.class);
         requireApproved(company);
-        PartnerGrant grant = new PartnerGrant(LegacyPartnerBundles.member(membership.getRole()),
+        PartnerGrant grant = new PartnerGrant(legacyCompanyBundle(membership, company.getId()),
             ScopePath.company(company.getId()));
         return new PartnerAccessContext(company, userId, false, List.of(grant));
+    }
+
+    /**
+     * RBAC R3a — a member's legacy rights come from the roles they hold at <em>company</em> scope (their stored
+     * grants), not from the {@code role} column. The column is the highest of all grants, so reading it would
+     * turn a {@code MANAGER@PROPERTY} grant into company-wide legacy MANAGER rights. Property and unit grants
+     * carry nothing until R3b enforces the V1.1 matrix; a pending co-owner holds {@code MANAGER@COMPANY} (§18 O-9).
+     */
+    private Set<PartnerPermission> legacyCompanyBundle(PartnerTeamMember membership, Long companyId) {
+        EnumSet<PartnerPermission> bundle = EnumSet.noneOf(PartnerPermission.class);
+        for (PartnerMemberGrant grant : grants.findByTeamMemberIdAndScopeType(membership.getId(), ScopeType.COMPANY)) {
+            if (!companyId.equals(grant.getPartnerProfile().getId()) || !companyId.equals(grant.getScopeId())) continue;
+            if (!PartnerRoleScopes.allows(grant.getRole(), ScopeType.COMPANY)) continue;
+            bundle.addAll(LegacyPartnerBundles.member(grant.getRole()));
+        }
+        return Set.copyOf(bundle);
     }
 
     // ── Decisions ────────────────────────────────────────────────────────────

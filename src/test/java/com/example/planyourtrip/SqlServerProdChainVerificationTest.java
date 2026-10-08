@@ -62,12 +62,12 @@ class SqlServerProdChainVerificationTest {
     }
 
     /**
-     * RBAC R2 — V4–V6 applied on SQL Server: every named constraint exists (CHECK constraints are invisible
+     * RBAC R2/R3a — V4–V7 applied on SQL Server: every named constraint exists (CHECK constraints are invisible
      * to {@code ddl-auto=validate}), V1's generated role check is gone, and the backfills hold.
      */
     @Test
     void rbacR2MembershipMigrationsAppliedWithTheirConstraints() {
-        for (String version : List.of("4", "5", "6")) {
+        for (String version : List.of("4", "5", "6", "7")) {
             Integer applied = jdbc.queryForObject(
                     "SELECT COUNT(*) FROM flyway_schema_history WHERE success = 1 AND version = ?", Integer.class, version);
             assertEquals(1, applied, "Flyway V" + version + " must be recorded as applied");
@@ -93,5 +93,12 @@ class SqlServerProdChainVerificationTest {
                 "every membership that is not revoked holds a company grant mirroring its role");
         assertEquals(0, jdbc.queryForObject("SELECT COUNT(*) FROM partner_activity_logs WHERE actor_email IS NULL",
                 Integer.class));
+        // RBAC R3a / V7 (M-6): no administrator remains a member, no legacy co-owner keeps OWNER unconfirmed
+        assertEquals(0, jdbc.queryForObject("SELECT COUNT(*) FROM partner_team_members m JOIN users u ON u.id = m.user_id "
+                + "JOIN partner_profiles p ON p.id = m.partner_profile_id "
+                + "WHERE u.role = 'ADMIN' AND m.status <> 'REVOKED' AND p.user_id <> m.user_id", Integer.class));
+        assertEquals(0, jdbc.queryForObject("SELECT COUNT(*) FROM partner_member_grants g "
+                + "JOIN partner_team_members m ON m.id = g.team_member_id "
+                + "WHERE g.role = 'OWNER' AND m.pending_owner_confirmation = 1", Integer.class));
     }
 }

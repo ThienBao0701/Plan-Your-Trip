@@ -59,6 +59,48 @@ public class PartnerActivityLogService {
         logRepo.save(entry);
     }
 
+    /**
+     * RBAC R3a — the strict writer for security-sensitive partner events: team, grants, owners and the
+     * payout account (RBAC V1.1 §22.1 AU-1…AU-3).
+     *
+     * <p>Unlike {@link #log}, nothing is swallowed. It joins the mutating transaction ({@code REQUIRED}): the
+     * mutation rolls back → the row rolls back; the row cannot be written → the exception propagates and the
+     * mutation rolls back. Each row carries the actor's id <em>and</em> email as they are now (a snapshot,
+     * never re-resolved), before/after as short safe scalars such as {@code MANAGER@COMPANY:456}, and the
+     * reason when one was given. Text that looks like a credential is refused, with the admin trail's guard.
+     *
+     * <p>Deliberately not named {@code record}: that name is the administrative trail's, whose inventory
+     * test reads every {@code .record(} call site in the source.
+     *
+     * @param actorUserId the acting user; never null here — system rows are written only by migration M-6
+     */
+    @Transactional
+    public void audit(Long partnerProfileId, Long actorUserId, String action, String entityType, Long entityId,
+                      String description, String beforeState, String afterState, String reason) {
+        if (partnerProfileId == null || actorUserId == null || action == null || action.isBlank()) {
+            throw new IllegalArgumentException("A partner security audit row needs a company, an actor and an action");
+        }
+        guard(description); guard(beforeState); guard(afterState); guard(reason);
+        PartnerProfile profile = partnerProfileRepo.findById(partnerProfileId)
+            .orElseThrow(() -> new IllegalStateException("Audited company not found: " + partnerProfileId));
+        User actor = userRepo.findById(actorUserId)
+            .orElseThrow(() -> new IllegalStateException("Audited actor not found: " + actorUserId));
+
+        PartnerActivityLog entry = new PartnerActivityLog();
+        entry.setPartnerProfile(profile);
+        entry.setActorUser(actor);
+        entry.setActorEmail(actor.getEmail() == null || actor.getEmail().isBlank()
+            ? "user:" + actorUserId : actor.getEmail());
+        entry.setAction(action);
+        entry.setEntityType(entityType);
+        entry.setEntityId(entityId);
+        entry.setDescription(truncate(description, 4000));
+        entry.setBeforeState(truncate(beforeState, 500));
+        entry.setAfterState(truncate(afterState, 500));
+        entry.setReason(truncate(reason, 500));
+        logRepo.save(entry);
+    }
+
     @Transactional(readOnly = true)
     public List<PartnerActivityLogResponse> listMine(Long userId) {
         PartnerProfile profile = partnerAccess.requireRegistrantWorkspace(userId).profile();
@@ -86,10 +128,21 @@ public class PartnerActivityLogService {
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
+    private static void guard(String value) {
+        if (value != null && AdminActivityLogService.FORBIDDEN.matcher(value).find()) {
+            throw new IllegalArgumentException("Partner audit text must not contain credential-like content");
+        }
+    }
+
+    private static String truncate(String value, int max) {
+        return value == null || value.length() <= max ? value : value.substring(0, max);
+    }
+
     private PartnerActivityLogResponse toResponse(PartnerActivityLog l) {
+        User actor = l.getActorUser();
         return new PartnerActivityLogResponse(
             l.getId(), l.getPartnerProfile().getId(),
-            l.getActorUser().getId(), l.getActorUser().getFullName(),
+            actor == null ? null : actor.getId(), actor == null ? l.getActorEmail() : actor.getFullName(),
             l.getAction(), l.getEntityType(), l.getEntityId(), l.getDescription(),
             l.getCreatedAt()
         );

@@ -5,6 +5,9 @@ the one-company-per-account rule. The design is
 `frontend/docs/security/PLAN_YOUR_TRIP_RBAC_PERMISSION_MATRIX_V1.md` (rev 1.1, §11, §12.3, §28, §32); the
 authorization kernel it feeds is R1 (`security/rbac`, `PartnerAccessService`).
 
+> R3a (`RBAC_OWNER_TEAM_SECURITY.md`) supersedes the legacy team endpoint notes below: no USER→PARTNER
+> promotion, soft revoke instead of delete, owner protection, step-up and member rights read from company grants.
+
 **R2 changes nobody's rights.** Every request is still decided by the R1 kernel with the legacy bundles
 (`LegacyPartnerBundles`): the registrant holds every partner permission over their own company, and a team
 member keeps exactly today's settings, payout and team rights. The grants written in R2 mirror the legacy

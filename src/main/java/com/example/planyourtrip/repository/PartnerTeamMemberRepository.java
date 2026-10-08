@@ -12,8 +12,6 @@ public interface PartnerTeamMemberRepository extends JpaRepository<PartnerTeamMe
 
     List<PartnerTeamMember> findByPartnerProfileIdOrderByCreatedAtAsc(Long partnerProfileId);
 
-    Optional<PartnerTeamMember> findByUserIdAndActiveTrue(Long userId);
-
     boolean existsByPartnerProfileIdAndUserId(Long partnerProfileId, Long userId);
 
     Optional<PartnerTeamMember> findByPartnerProfileIdAndUserId(Long partnerProfileId, Long userId);

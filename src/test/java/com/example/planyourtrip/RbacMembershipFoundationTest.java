@@ -627,7 +627,8 @@ class RbacMembershipFoundationTest {
         assertEquals(PartnerTeamRole.MANAGER, membership(partner.profileId(), member.userId()).getRole());
 
         mvc.perform(auth(delete("/api/partner/team/" + row.getId()), partner.token())).andExpect(status().isNoContent());
-        assertTrue(teamMemberRepo.findById(row.getId()).isEmpty());
+        // RBAC R3a §17: removal is a soft revoke — the row is kept for history, its grants are gone
+        assertEquals(PartnerMembershipStatus.REVOKED, teamMemberRepo.findById(row.getId()).orElseThrow().getStatus());
         assertTrue(grantRepo.findByTeamMemberIdOrderByIdAsc(row.getId()).isEmpty(), "no orphaned grant remains");
     }
 
@@ -744,6 +745,7 @@ class RbacMembershipFoundationTest {
 
     private Account memberAccount(Partner owner, String role) throws Exception {
         Account account = registerPlainUser();
+        makePartnerAccount(account.email());
         mvc.perform(auth(json(post("/api/partner/team"),
                 "{\"email\":\"" + account.email() + "\",\"role\":\"" + role + "\"}"), owner.token()))
             .andExpect(status().isCreated());
@@ -775,5 +777,15 @@ class RbacMembershipFoundationTest {
         JsonNode room = mapper.readTree(mvc.perform(auth(json(post("/api/admin/rooms"), body), adminToken()))
             .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString());
         return room.get("id").asLong();
+    }
+
+    /**
+     * RBAC R3a (§29) — the legacy team endpoint attaches only an existing PARTNER account; it no longer promotes a
+     * traveller. Test members are therefore Partner accounts, as a self-registered Partner would be.
+     */
+    private void makePartnerAccount(String email) {
+        com.example.planyourtrip.model.User u = userRepo.findByEmail(email).orElseThrow();
+        u.setRole("PARTNER");
+        userRepo.save(u);
     }
 }

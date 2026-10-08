@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * R1 — the endpoint authorization registry covers every partner and admin handler (RBAC V1.1 §24 B11, I17):
- * 90 partner and 181 admin handlers, no handler missing, no rule without a handler, and a missing mapping
+ * 94 partner (90 + 4 in RBAC R3a) and 181 admin handlers, no handler missing, no rule without a handler, and a missing mapping
  * is refused rather than allowed.
  */
 @SpringBootTest
@@ -77,7 +77,8 @@ class RbacEndpointRegistryTest {
         assertEquals(Set.of(), difference(partnerRules, partnerHandlers), "partner rules without a handler");
         assertEquals(Set.of(), difference(adminHandlers, adminRules), "admin handlers without a rule");
         assertEquals(Set.of(), difference(adminRules, adminHandlers), "admin rules without a handler");
-        assertEquals(90, partnerHandlers.size());
+        // RBAC R3a adds PUT /team/{id}/grants, POST /team/{id}/suspend, /reactivate and POST /team/leave
+        assertEquals(94, partnerHandlers.size());
         assertEquals(181, adminHandlers.size());
     }
 
@@ -109,7 +110,7 @@ class RbacEndpointRegistryTest {
                 assertNotEquals(ScopeType.UNIT,
                     rule.permissions().get(0).floor(), rule.key());
         }
-        assertEquals(3, registry.partnerRules().stream().filter(r -> r.kind() == EndpointKind.SELF).count());
+        assertEquals(4, registry.partnerRules().stream().filter(r -> r.kind() == EndpointKind.SELF).count());
         // spot checks against RBAC V1.1 §25.1 and §9.2
         assertEquals(List.of(PartnerPermission.PROPERTY_CREATE),
             registry.partnerRule(RequestMethod.POST, "/api/partner/hotels").orElseThrow().permissions());

@@ -4,7 +4,7 @@ import com.example.planyourtrip.dto.PartnerSettingsDto.*;
 import com.example.planyourtrip.exception.ApiException;
 import com.example.planyourtrip.model.*;
 import com.example.planyourtrip.repository.*;
-import com.example.planyourtrip.security.rbac.LegacyPartnerBundles;
+import com.example.planyourtrip.security.StepUpPolicy;
 import com.example.planyourtrip.security.rbac.PartnerAccessContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -12,20 +12,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 import static com.example.planyourtrip.security.rbac.PartnerPermission.PAYOUT_ACCOUNT_MANAGE;
 import static com.example.planyourtrip.security.rbac.PartnerPermission.PAYOUT_ACCOUNT_VIEW;
 import static com.example.planyourtrip.security.rbac.PartnerPermission.SETTINGS_EDIT;
-import static com.example.planyourtrip.security.rbac.PartnerPermission.TEAM_INVITE;
-import static com.example.planyourtrip.security.rbac.PartnerPermission.TEAM_OWNER_MANAGE;
-import static com.example.planyourtrip.security.rbac.PartnerPermission.TEAM_REMOVE;
-import static com.example.planyourtrip.security.rbac.PartnerPermission.TEAM_ROLE_ASSIGN;
-import static com.example.planyourtrip.security.rbac.PartnerPermission.TEAM_SUSPEND;
-import static com.example.planyourtrip.security.rbac.PartnerPermission.TEAM_VIEW;
 import static com.example.planyourtrip.security.rbac.PartnerPermission.WORKSPACE_ACCESS;
 
 /**
- * Partner-side business settings, payout metadata, and team management.
+ * Partner-side business settings and payout metadata. Team management is {@link PartnerTeamService} (RBAC R3a).
  *
  * <p>Unlike the operational partner services (which only ever resolve "the caller IS the
  * profile-owning user"), this service allows delegated team access: a caller is either the
@@ -43,36 +38,32 @@ public class PartnerSettingsService {
 
     private static final String SETTINGS_DENIED = "Your role does not allow you to manage business/notification settings";
     private static final String PAYOUT_DENIED = "Your role does not allow you to manage payout metadata";
-    private static final String TEAM_DENIED = "Only the partner owner can manage team members";
 
     private final PartnerProfileRepository partnerProfileRepo;
     private final PartnerSettingsRepository settingsRepo;
     private final PartnerPayoutAccountRepository payoutAccountRepo;
-    private final PartnerTeamMemberRepository teamMemberRepo;
-    private final UserRepository userRepo;
-    private final NotificationService notificationService;
     private final PartnerActivityLogService activityLogService;
     private final PartnerAccessService partnerAccess;
-    private final PartnerMembershipService membershipService;
+    private final PartnerTeamService teamService;
+    private final PartnerSecurityNotifier securityNotifier;
+    private final StepUpPolicy stepUp;
 
     public PartnerSettingsService(PartnerProfileRepository partnerProfileRepo,
                                    PartnerSettingsRepository settingsRepo,
                                    PartnerPayoutAccountRepository payoutAccountRepo,
-                                   PartnerTeamMemberRepository teamMemberRepo,
-                                   UserRepository userRepo,
-                                   NotificationService notificationService,
                                    PartnerActivityLogService activityLogService,
                                    PartnerAccessService partnerAccess,
-                                   PartnerMembershipService membershipService) {
+                                   PartnerTeamService teamService,
+                                   PartnerSecurityNotifier securityNotifier,
+                                   StepUpPolicy stepUp) {
         this.partnerProfileRepo = partnerProfileRepo;
         this.settingsRepo = settingsRepo;
         this.payoutAccountRepo = payoutAccountRepo;
-        this.teamMemberRepo = teamMemberRepo;
-        this.userRepo = userRepo;
-        this.notificationService = notificationService;
         this.activityLogService = activityLogService;
         this.partnerAccess = partnerAccess;
-        this.membershipService = membershipService;
+        this.teamService = teamService;
+        this.securityNotifier = securityNotifier;
+        this.stepUp = stepUp;
     }
 
     // ── Settings ─────────────────────────────────────────────────────────────
@@ -135,8 +126,12 @@ public class PartnerSettingsService {
     public PartnerPayoutAccountResponse updatePayoutAccount(Long userId, PartnerPayoutAccountRequest req) {
         PartnerAccessContext access = partnerAccess.requireTeamWorkspace(userId);
         partnerAccess.requireCompanyPermission(access, PAYOUT_ACCOUNT_MANAGE, PAYOUT_DENIED);
+        // RBAC R3a §20 FI-4, §18 O-7 — changing where money goes needs a fresh session.
+        stepUp.requireFresh();
 
-        PartnerPayoutAccount account = payoutAccountRepo.findByPartnerProfileId(access.profile().getId())
+        Optional<PartnerPayoutAccount> existing = payoutAccountRepo.findByPartnerProfileId(access.profile().getId());
+        String before = existing.map(a -> masked(a.getBankAccountLast4())).orElse("none");
+        PartnerPayoutAccount account = existing
             .orElseGet(() -> {
                 PartnerPayoutAccount fresh = new PartnerPayoutAccount();
                 fresh.setPartnerProfile(access.profile());
@@ -150,108 +145,13 @@ public class PartnerSettingsService {
         account.setPayoutMethod(req.payoutMethod());
 
         PartnerPayoutAccount saved = payoutAccountRepo.save(account);
-        notifyPayoutUpdated(access.profile());
-        activityLogService.log(access.profile().getId(), userId, "PAYOUT_ACCOUNT_UPDATED",
-            "PAYOUT_ACCOUNT", saved.getId(), "Payout account updated");
+        String after = masked(saved.getBankAccountLast4());
+        // RBAC R3a — strict audit with masked before/after (AU-1, FI-4) and every owner notified (O-8, FI-6).
+        activityLogService.audit(access.profile().getId(), userId, "PAYOUT_ACCOUNT_UPDATED",
+            "PAYOUT_ACCOUNT", saved.getId(), "Payout account updated", before, after, null);
+        securityNotifier.notifyOwners(access.profile(), null, "Payout account updated",
+            "Your payout account details have been updated (" + before + " -> " + after + ").");
         return toPayoutResponse(saved);
-    }
-
-    // ── Team ─────────────────────────────────────────────────────────────────
-
-    @Transactional(readOnly = true)
-    public List<PartnerTeamMemberResponse> getTeamMembers(Long userId) {
-        PartnerAccessContext access = partnerAccess.requireTeamWorkspace(userId);
-        partnerAccess.requireCompanyPermission(access, TEAM_VIEW, null);
-        return teamMemberRepo.findByPartnerProfileIdOrderByCreatedAtAsc(access.profile().getId())
-            .stream().map(this::toTeamResponse).toList();
-    }
-
-    @Transactional
-    public PartnerTeamMemberResponse addTeamMember(Long userId, PartnerTeamMemberRequest req) {
-        PartnerAccessContext access = partnerAccess.requireTeamWorkspace(userId);
-        partnerAccess.requireCompanyPermission(access, TEAM_INVITE, TEAM_DENIED);
-
-        if (req.email() == null || req.email().isBlank())
-            throw new ApiException(HttpStatus.BAD_REQUEST, "email is required");
-        if (req.role() == null)
-            throw new ApiException(HttpStatus.BAD_REQUEST, "role is required");
-        requireLegacyAssignable(req.role());
-        if (req.role() == PartnerTeamRole.OWNER)
-            partnerAccess.requireCompanyPermission(access, TEAM_OWNER_MANAGE, TEAM_DENIED);
-
-        User target = userRepo.findByEmail(req.email())
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found: " + req.email()));
-
-        if (teamMemberRepo.existsByPartnerProfileIdAndUserId(access.profile().getId(), target.getId()))
-            throw new ApiException(HttpStatus.CONFLICT, "This user is already a team member");
-        membershipService.requireCanJoin(target.getId(), access.profile().getId(),
-            req.active() == null || req.active());
-
-        // /api/partner/** is gated by role at the security-filter level (hasAnyRole("PARTNER","ADMIN")),
-        // same as PartnerProfileService.adminApprove() — a team member needs this to reach the
-        // finer-grained PartnerTeamRole checks in this service at all.
-        if (!"ADMIN".equals(target.getRole()) && !"PARTNER".equals(target.getRole())) {
-            target.setRole("PARTNER");
-            userRepo.save(target);
-        }
-
-        PartnerTeamMember member = new PartnerTeamMember();
-        member.setPartnerProfile(access.profile());
-        member.setUser(target);
-        member.setRole(req.role());
-        member.setActive(req.active() == null || req.active());
-        Instant now = Instant.now();
-        member.setInvitedAt(now);
-        member.setJoinedAt(now);
-
-        PartnerTeamMember saved = teamMemberRepo.save(member);
-        membershipService.syncLegacyCompanyGrant(saved, userId);
-
-        notificationService.create(target.getId(), NotificationType.PARTNER, Priority.NORMAL,
-            "You were added to a partner team",
-            "You were added to " + access.profile().getBusinessName() + "'s team as " + req.role().name() + ".",
-            RelatedEntityType.PARTNER, access.profile().getId());
-
-        activityLogService.log(access.profile().getId(), userId, "TEAM_MEMBER_ADDED",
-            "TEAM_MEMBER", saved.getId(), "Added " + target.getEmail() + " as " + req.role().name());
-
-        return toTeamResponse(saved);
-    }
-
-    @Transactional
-    public PartnerTeamMemberResponse updateTeamMember(Long userId, Long teamMemberId, PartnerTeamMemberRequest req) {
-        PartnerAccessContext access = partnerAccess.requireTeamWorkspace(userId);
-        // A role change needs P09, an active change P10; a request carrying neither is still a team
-        // mutation and is judged as a role change, exactly like the single owner gate before RBAC.
-        partnerAccess.requireCompanyPermission(access,
-            req.role() == null && req.active() != null ? TEAM_SUSPEND : TEAM_ROLE_ASSIGN, TEAM_DENIED);
-        if (req.role() != null && req.active() != null)
-            partnerAccess.requireCompanyPermission(access, TEAM_SUSPEND, TEAM_DENIED);
-
-        PartnerTeamMember member = ownedTeamMemberOrThrow(teamMemberId, access.profile().getId());
-        if (req.role() == PartnerTeamRole.OWNER || member.getRole() == PartnerTeamRole.OWNER)
-            partnerAccess.requireCompanyPermission(access, TEAM_OWNER_MANAGE, TEAM_DENIED);
-        if (req.role() != null) requireLegacyAssignable(req.role());
-        if (Boolean.TRUE.equals(req.active()) && !member.isActive())
-            membershipService.requireCanReactivate(member);
-        if (req.role() != null) member.setRole(req.role());
-        if (req.active() != null) member.setActive(req.active(), userId);
-
-        PartnerTeamMember saved = teamMemberRepo.save(member);
-        membershipService.syncLegacyCompanyGrant(saved, userId);
-        return toTeamResponse(saved);
-    }
-
-    @Transactional
-    public void removeTeamMember(Long userId, Long teamMemberId) {
-        PartnerAccessContext access = partnerAccess.requireTeamWorkspace(userId);
-        partnerAccess.requireCompanyPermission(access, TEAM_REMOVE, TEAM_DENIED);
-
-        PartnerTeamMember member = ownedTeamMemberOrThrow(teamMemberId, access.profile().getId());
-        if (member.getRole() == PartnerTeamRole.OWNER)
-            partnerAccess.requireCompanyPermission(access, TEAM_OWNER_MANAGE, TEAM_DENIED);
-        membershipService.deleteGrants(member);
-        teamMemberRepo.delete(member);
     }
 
     // ── Admin (unrestricted, no role/ownership checks) ──────────────────────────
@@ -263,25 +163,19 @@ public class PartnerSettingsService {
         return toSettingsResponse(getOrCreateSettings(profile));
     }
 
+    /** The caller's team (members not revoked); kept for the account summary — {@link PartnerTeamService#list}. */
+    @Transactional(readOnly = true)
+    public List<PartnerTeamMemberResponse> getTeamMembers(Long userId) {
+        return teamService.list(userId);
+    }
+
     @Transactional(readOnly = true)
     public List<PartnerTeamMemberResponse> adminGetTeamMembers(Long partnerProfileId) {
-        return teamMemberRepo.findByPartnerProfileIdOrderByCreatedAtAsc(partnerProfileId)
-            .stream().map(this::toTeamResponse).toList();
+        return teamService.adminList(partnerProfileId);
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    /**
-     * RBAC R2 — the legacy team endpoints assign only the five roles that existed before R2. The roles
-     * added in R2 can be stored but carry no capability until the V1.1 matrix is enforced (R3b), so they
-     * are refused here exactly like any other invalid field.
-     */
-    private static void requireLegacyAssignable(PartnerTeamRole role) {
-        if (!LegacyPartnerBundles.assignable(role)) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "VALIDATION_FAILED", "role",
-                "role " + role.name() + " cannot be assigned yet");
-        }
-    }
 
     private PartnerSettings getOrCreateSettings(PartnerProfile profile) {
         return settingsRepo.findByPartnerProfileId(profile.getId()).orElseGet(() -> {
@@ -291,25 +185,16 @@ public class PartnerSettingsService {
         });
     }
 
+    private static String masked(String lastFour) {
+        return lastFour == null ? "none" : "****" + lastFour;
+    }
+
     private String lastFour(String accountNumber) {
         String trimmed = accountNumber.trim();
         return trimmed.length() <= 4 ? trimmed : trimmed.substring(trimmed.length() - 4);
     }
 
-    private void notifyPayoutUpdated(PartnerProfile profile) {
-        notificationService.create(profile.getUser().getId(), NotificationType.PARTNER, Priority.NORMAL,
-            "Payout account updated",
-            "Your payout account details have been updated.",
-            RelatedEntityType.PARTNER, profile.getId());
-    }
 
-    private PartnerTeamMember ownedTeamMemberOrThrow(Long teamMemberId, Long profileId) {
-        PartnerTeamMember member = teamMemberRepo.findById(teamMemberId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Team member not found: " + teamMemberId));
-        if (!member.getPartnerProfile().getId().equals(profileId))
-            throw new ApiException(HttpStatus.NOT_FOUND, "Team member not found: " + teamMemberId);
-        return member;
-    }
 
     private PartnerSettingsResponse toSettingsResponse(PartnerSettings s) {
         return new PartnerSettingsResponse(
@@ -331,12 +216,4 @@ public class PartnerSettingsService {
         );
     }
 
-    private PartnerTeamMemberResponse toTeamResponse(PartnerTeamMember m) {
-        return new PartnerTeamMemberResponse(
-            m.getId(), m.getPartnerProfile().getId(),
-            m.getUser().getId(), m.getUser().getFullName(), m.getUser().getEmail(),
-            m.getRole().name(), m.isActive(),
-            m.getInvitedAt(), m.getJoinedAt(), m.getCreatedAt(), m.getUpdatedAt()
-        );
-    }
 }

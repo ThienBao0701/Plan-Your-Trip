@@ -8,6 +8,8 @@ import com.example.planyourtrip.model.AuthTokenPurpose;
 import com.example.planyourtrip.model.User;
 import com.example.planyourtrip.repository.UserRepository;
 import com.example.planyourtrip.security.JwtService;
+import com.example.planyourtrip.security.StepUpPolicy;
+import com.example.planyourtrip.security.StepUpRateLimiter;
 import com.example.planyourtrip.util.AccountEmails;
 import com.example.planyourtrip.validation.AccountPasswordValidator;
 import org.hibernate.exception.ConstraintViolationException;
@@ -48,10 +50,12 @@ public class AuthService {
     private final AdminActivityLogService adminAudit;
     private final AuthProperties properties;
     private final Clock clock;
+    private final StepUpRateLimiter stepUpLimiter;
 
     public AuthService(UserRepository users, PasswordEncoder encoder, JwtService jwt,
                        AccountService accounts, AuthTokenService tokens,
-                       AdminActivityLogService adminAudit, AuthProperties properties, Clock clock) {
+                       AdminActivityLogService adminAudit, AuthProperties properties, Clock clock,
+                       StepUpRateLimiter stepUpLimiter) {
         this.users = users;
         this.encoder = encoder;
         this.jwt = jwt;
@@ -60,6 +64,7 @@ public class AuthService {
         this.adminAudit = adminAudit;
         this.properties = properties;
         this.clock = clock;
+        this.stepUpLimiter = stepUpLimiter;
     }
 
     /** Traveller self-registration: a USER account, signed in immediately (unchanged V1 behaviour). */
@@ -137,6 +142,35 @@ public class AuthService {
         if (isAdmin(u)) {
             adminAudit.record(u.getId(), "ADMIN_PASSWORD_CHANGE", "USER", u.getId(),
                 "Admin changed their own sign-in credentials; other sessions ended");
+        }
+        return toAuthResponse(u);
+    }
+
+    /**
+     * RBAC R3a — step-up (§18 O-7, §25.6): the signed-in account re-enters its password and receives a newly
+     * issued token, fresh for {@link StepUpPolicy#FRESHNESS}. Nothing else changes: the previous token stays
+     * valid until it expires and no session is ended. At most {@link StepUpRateLimiter#MAX_ATTEMPTS}
+     * attempts per account in {@link StepUpRateLimiter#WINDOW} (429 {@code STEP_UP_RATE_LIMITED}). For an
+     * ADMIN account both outcomes are audited; the method is deliberately not transactional so a refused
+     * attempt still leaves its row.
+     */
+    public AuthResponse stepUp(Long userId, StepUpRequest r) {
+        User u = users.findById(userId)
+            .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "Missing or invalid bearer token"));
+        if (!stepUpLimiter.tryAcquire(u.getId())) {
+            throw new ApiException(HttpStatus.TOO_MANY_REQUESTS, "STEP_UP_RATE_LIMITED",
+                "Too many attempts. Try again later");
+        }
+        if (!passwordMatches(r.currentPassword(), u.getPasswordHash())) {
+            if (isAdmin(u)) {
+                adminAudit.record(u.getId(), "ADMIN_STEP_UP_FAILED", "USER", u.getId(),
+                    "Admin step-up refused: credentials did not match");
+            }
+            throw new ApiException(HttpStatus.BAD_REQUEST, "CURRENT_PASSWORD_INCORRECT", "currentPassword",
+                "is incorrect");
+        }
+        if (isAdmin(u)) {
+            adminAudit.record(u.getId(), "ADMIN_STEP_UP", "USER", u.getId(), "Admin re-confirmed their sign-in credentials (step-up)");
         }
         return toAuthResponse(u);
     }

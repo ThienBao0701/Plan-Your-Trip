@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.time.Instant;
+import java.util.List;
 
 public class PartnerSettingsDto {
 
@@ -64,6 +65,13 @@ public class PartnerSettingsDto {
         Boolean active
     ) {}
 
+    /**
+     * One membership. {@code role} is the highest grant and {@code active} is {@code status == ACTIVE}, both
+     * kept for existing clients. RBAC R3a adds (§25.3): {@code status}, {@code grants} ({@code role} at
+     * {@code scope}, e.g. {@code MANAGER} at {@code COMPANY:456}), {@code primaryOwner},
+     * {@code pendingOwnerConfirmation}, {@code isSelf} and {@code version} (sent back to
+     * {@code PUT /team/{id}/grants}).
+     */
     public record PartnerTeamMemberResponse(
         Long id,
         Long partnerProfileId,
@@ -75,6 +83,27 @@ public class PartnerSettingsDto {
         Instant invitedAt,
         Instant joinedAt,
         Instant createdAt,
-        Instant updatedAt
+        Instant updatedAt,
+        String status,
+        List<PartnerTeamGrantView> grants,
+        boolean primaryOwner,
+        boolean pendingOwnerConfirmation,
+        boolean isSelf,
+        Long version
     ) {}
+
+    /** A grant as the API shows and accepts it: a role at a scope written {@code TYPE:id}. */
+    public record PartnerTeamGrantView(String role, String scope) {}
+
+    /** RBAC R3a — {@code PUT /api/partner/team/{memberId}/grants} (§15). */
+    public record PartnerTeamGrantsRequest(
+        List<PartnerTeamGrantItem> grants,
+        @Size(max = 500) String reason,
+        Long version
+    ) {}
+
+    public record PartnerTeamGrantItem(PartnerTeamRole role, String scope) {}
+
+    /** RBAC R3a — the optional reason of a suspend or remove (§17). */
+    public record PartnerTeamReasonRequest(@Size(max = 500) String reason) {}
 }

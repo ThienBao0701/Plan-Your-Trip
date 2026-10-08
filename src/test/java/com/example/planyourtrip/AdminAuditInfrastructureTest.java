@@ -257,8 +257,9 @@ class AdminAuditInfrastructureTest {
 
         // Phase A deliberately adds four: ADMIN_LOGIN_SUCCESS, ADMIN_LOGIN_FAILED, ADMIN_PASSWORD_CHANGE and
         // ADMIN_PASSWORD_RESET (AuthService, AccountService), each from one call site.
-        assertEquals(114, sites.size(),
-            "Phase A: the trail emits exactly 114 distinct administrative actions (110 after D3J + 4 admin auth). "
+        // RBAC R3a deliberately adds two: ADMIN_STEP_UP and ADMIN_STEP_UP_FAILED (AuthService.stepUp, §22.3).
+        assertEquals(116, sites.size(),
+            "RBAC R3a: the trail emits exactly 116 distinct administrative actions (114 after Phase A + 2 step-up). "
                 + "If a later phase legitimately adds one, update this number deliberately. Found: "
                 + sites.size());
     }

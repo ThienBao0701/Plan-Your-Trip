@@ -64,6 +64,7 @@ class PartnerBookingNotificationTest {
 
     @Autowired MockMvc mvc;
     @Autowired ObjectMapper mapper;
+    @Autowired com.example.planyourtrip.repository.UserRepository userRepo;
     @Autowired CategoryRepository categoryRepo;
     @Autowired AdministrativeUnitRepository locationRepo;
     @Autowired NotificationRepository notificationRepo;
@@ -251,6 +252,7 @@ class PartnerBookingNotificationTest {
         // Invite a second account onto the partner team.
         String memberEmail = "d9-member-" + counter.getAndIncrement() + "@test.com";
         registerAndLogin(memberEmail, "Team Member");
+        makePartnerAccount(memberEmail);
         mvc.perform(post("/api/partner/team")
                 .header("Authorization", "Bearer " + r.partner().token())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -663,5 +665,15 @@ class PartnerBookingNotificationTest {
 
     private String uniqSuffix() {
         return UUID.randomUUID().toString().substring(0, 8);
+    }
+
+    /**
+     * RBAC R3a (§29) — the legacy team endpoint attaches only an existing PARTNER account; it no longer promotes a
+     * traveller. Test members are therefore Partner accounts, as a self-registered Partner would be.
+     */
+    private void makePartnerAccount(String email) {
+        com.example.planyourtrip.model.User u = userRepo.findByEmail(email).orElseThrow();
+        u.setRole("PARTNER");
+        userRepo.save(u);
     }
 }

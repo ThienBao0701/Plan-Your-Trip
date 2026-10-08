@@ -48,6 +48,7 @@ class RbacMembershipMigrationTest {
     private static final String V4 = "/db/migration/V4__partner_membership_status.sql";
     private static final String V5 = "/db/migration/V5__partner_member_grants.sql";
     private static final String V6 = "/db/migration/V6__partner_activity_log_states.sql";
+    private static final String V7 = "/db/migration/V7__partner_membership_remediation.sql";
 
     /** SHA-256 of V1–V3 with line endings normalised — applied migrations are never edited. */
     private static final Map<String, String> APPLIED = Map.of(
@@ -66,10 +67,11 @@ class RbacMembershipMigrationTest {
             assertTrue(m.matches(), "unexpected migration file name " + r.getFilename());
             assertNull(versions.put(Integer.parseInt(m.group(1)), m.group(2)), "duplicate version " + m.group(1));
         }
-        assertEquals(List.of(1, 2, 3, 4, 5, 6), List.copyOf(versions.keySet()));
+        assertEquals(List.of(1, 2, 3, 4, 5, 6, 7), List.copyOf(versions.keySet()));
         assertEquals("partner_membership_status", versions.get(4));
         assertEquals("partner_member_grants", versions.get(5));
         assertEquals("partner_activity_log_states", versions.get(6));
+        assertEquals("partner_membership_remediation", versions.get(7));
     }
 
     @Test
@@ -87,7 +89,7 @@ class RbacMembershipMigrationTest {
     void flywayRunsEveryR2StatementAsItsOwnBatch() throws IOException {
         Pattern addsColumn = Pattern.compile("(?s).*\\balter\\s+table\\s+\\w+\\s+add\\s+(?!constraint\\b)\\w+.*");
         Pattern dml = Pattern.compile("(?s).*\\b(update|insert\\s+into|delete\\s+from)\\b.*");
-        for (String file : List.of(V4, V5, V6)) {
+        for (String file : List.of(V4, V5, V6, V7)) {
             String sql = read(file);
             List<String> batches = flywayBatches(sql);
             long goLines = sql.lines().filter(l -> l.trim().equalsIgnoreCase("go")).count();
@@ -225,6 +227,47 @@ class RbacMembershipMigrationTest {
             + "reason = 'actor_email backfilled from users.email by v6'"));
         assertTrue(ddl.contains("left join users u on u.id = l.actor_user_id where l.actor_email is null"));
         assertTrue(ddl.contains("alter table partner_activity_logs alter column actor_email nvarchar(255) not null"));
+    }
+
+    // ── V7 (M-6, RBAC R3a) ───────────────────────────────────────────────────
+
+    /**
+     * V7 applies exactly the M-6 mapping of §28 to memberships other than the registrant's own row, audits each
+     * change as SYSTEM and notifies, and only ever reduces power (I24): it grants nothing but the MANAGER grant
+     * that replaces a legacy co-owner's OWNER grant.
+     */
+    @Test
+    void v7RemediatesExactlyTheApprovedMappingAndOnlyReduces() throws IOException {
+        String ddl = ddl(V7);
+        assertTrue(ddl.contains("alter table partner_activity_logs alter column actor_user_id bigint null"));
+        // (a) ADMIN -> REVOKED, (f) not PARTNER -> SUSPENDED ACCOUNT_ROLE, (b)/(c) -> SUSPENDED WS1_CONFLICT
+        assertTrue(ddl.contains("set status = 'revoked', active = 0, status_reason = 'admin_account'"));
+        assertTrue(ddl.contains("set status = 'suspended', active = 0, status_reason = 'account_role'"));
+        assertEquals(2, count(ddl, "set status = 'suspended', active = 0, status_reason = 'ws1_conflict'"));
+        // (d) legacy co-owners -> MANAGER pending confirmation, never OWNER
+        assertTrue(ddl.contains("set role = 'manager', pending_owner_confirmation = 1"));
+        assertTrue(ddl.contains("where m.pending_owner_confirmation = 1 and g.role = 'owner'"));
+        // the registrant's own row is never touched: every step excludes it
+        String[] updates = ddl.split("update m set");
+        assertEquals(6, updates.length, "five member updates: (a) (f) (b) (c) (d)");
+        for (int i = 1; i < updates.length; i++) {
+            String statement = updates[i].substring(0, updates[i].indexOf(';'));
+            assertTrue(statement.contains("p.user_id <> m.user_id"), "update " + i + " must exclude the registrant");
+        }
+        // every remediated row is audited as SYSTEM and notified
+        assertEquals(5, count(ddl, "'membership_remediated'"));
+        assertEquals(5, count(ddl, "select null, 'system', sysdatetimeoffset()"));
+        assertEquals(5, count(ddl, "insert into notifications"));
+        // I24: the only grant V7 writes is MANAGER, and nothing sets status ACTIVE or role OWNER
+        assertEquals(1, count(ddl, "insert into partner_member_grants"));
+        assertTrue(ddl.contains("m.id, null, 'manager', 'company'"));
+        assertFalse(ddl.matches("(?s).*set\s+status\s*=\s*'active'.*"));
+        assertFalse(ddl.matches("(?s).*set\s+role\s*=\s*'owner'.*"));
+        assertFalse(ddl.matches("(?s).*pending_owner_confirmation\s*=\s*0.*"));
+        for (String forbidden : new String[] {"drop table", "drop column", "truncate ", "users set", "update users",
+                "partner_profiles set"}) {
+            assertFalse(ddl.contains(forbidden), "V7: " + forbidden);
+        }
     }
 
     // ── Additive and SQL Server shaped ───────────────────────────────────────

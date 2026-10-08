@@ -68,7 +68,9 @@ Current chain: `V1__initial_schema`, `V2__admin_activity_log`, `V3__account_life
 account columns on `users`, the `auth_tokens` table, and existing accounts marked email-verified; see
 `ACCOUNT_LIFECYCLE.md` §11), `V4__partner_membership_status`, `V5__partner_member_grants`,
 `V6__partner_activity_log_states` (RBAC R2 — membership states, scoped grants, activity-log snapshots; run the
-read-only M-0 audit `db/audit/R2_M0_partner_membership_audit.sql` first; see `RBAC_MEMBERSHIP_FOUNDATION.md`).
+read-only M-0 audit `db/audit/R2_M0_partner_membership_audit.sql` first; see `RBAC_MEMBERSHIP_FOUNDATION.md`),
+`V7__partner_membership_remediation` (RBAC R3a — M-6 membership remediation; run the M-0 audit again first; see
+`RBAC_OWNER_TEAM_SECURITY.md`).
 Known blocker: V3 as committed fails on SQL Server (one batch adds and updates a column —
 `RBAC_MEMBERSHIP_FOUNDATION.md` §7).
 

@@ -166,7 +166,18 @@ final class PartnerEndpointRules {
             .when("P09 for a role change, P10 for an active change, P12 and step-up when OWNER is involved",
                 TEAM_SUSPEND, TEAM_OWNER_MANAGE),
         resource(DELETE, "/api/partner/team/{id}", ResourceType.MEMBERSHIP, TEAM_REMOVE)
-            .when("P12 when the member holds OWNER", TEAM_OWNER_MANAGE),
+            .when("P12 and step-up when the member holds OWNER", TEAM_OWNER_MANAGE),
+        // RBAC R3a (§25.3): grants, suspend/reactivate, leave
+        resource(PUT, "/api/partner/team/{id}/grants", ResourceType.MEMBERSHIP, TEAM_ROLE_ASSIGN)
+            .when("P12 and step-up when an OWNER grant is added, confirmed or removed", TEAM_OWNER_MANAGE),
+        resource(POST, "/api/partner/team/{id}/suspend", ResourceType.MEMBERSHIP, TEAM_SUSPEND)
+            .when("P12 and step-up when the member holds OWNER", TEAM_OWNER_MANAGE),
+        resource(POST, "/api/partner/team/{id}/reactivate", ResourceType.MEMBERSHIP, TEAM_SUSPEND)
+            .when("P12 and step-up when the member holds OWNER", TEAM_OWNER_MANAGE),
+        new PartnerEndpointRule(POST, "/api/partner/team/leave", EndpointKind.SELF, null, List.of(WORKSPACE_ACCESS),
+            "SELF on the caller's own membership in any state but REVOKED; P01 is not required, so a suspended "
+                + "member can leave; refused for the primary owner and the last owner", Set.of(),
+            AggregateScope.NONE, false),
 
         // ── Stays ───────────────────────────────────────────────────────────
         resource(GET, "/api/partner/stays/{bookingId}", ResourceType.BOOKING, BOOKING_STAY_VIEW)

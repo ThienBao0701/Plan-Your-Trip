@@ -43,15 +43,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String header = req.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer ")) {
-            jwt.parse(header.substring(7))
-               .flatMap(claims -> users.findById(claims.userId())
-                   .filter(u -> u.isEnabled() && u.getTokenVersion() == claims.tokenVersion()))
+            jwt.parse(header.substring(7)).ifPresent(claims -> users.findById(claims.userId())
+               .filter(u -> u.isEnabled() && u.getTokenVersion() == claims.tokenVersion())
                .ifPresent(u -> AccountRole.parse(u.getRole()).ifPresent(role -> {
                    var authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
                    var principal = new UserPrincipal(u.getId(), u.getEmail(), u.getPasswordHash(), authorities);
-                   SecurityContextHolder.getContext().setAuthentication(
-                       new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities()));
-               }));
+                   var authentication = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
+                   // RBAC R3a §18 O-7 — when this session's token was issued, for the step-up freshness check.
+                   authentication.setDetails(new TokenSession(claims.issuedAt()));
+                   SecurityContextHolder.getContext().setAuthentication(authentication);
+               })));
         }
         chain.doFilter(req, res);
     }

@@ -2,6 +2,7 @@ package com.example.planyourtrip.controller;
 
 import com.example.planyourtrip.dto.AuthDtos.AuthResponse;
 import com.example.planyourtrip.dto.AuthDtos.ChangePasswordRequest;
+import com.example.planyourtrip.dto.AuthDtos.StepUpRequest;
 import com.example.planyourtrip.dto.AuthDtos.UserDto;
 import com.example.planyourtrip.security.AuthUser;
 import com.example.planyourtrip.service.AuthService;
@@ -31,5 +32,14 @@ public class UserController {
     @PutMapping("/api/me/password")
     public AuthResponse changePassword(@AuthUser Long userId, @Valid @RequestBody ChangePasswordRequest req) {
         return authService.changePassword(userId, req);
+    }
+
+    /**
+     * RBAC R3a — step-up (§25.6): re-enter the password to obtain a fresh token for owner-level actions. The
+     * previous token stays valid; no session ends.
+     */
+    @PostMapping("/api/me/step-up")
+    public AuthResponse stepUp(@AuthUser Long userId, @Valid @RequestBody StepUpRequest req) {
+        return authService.stepUp(userId, req);
     }
 }

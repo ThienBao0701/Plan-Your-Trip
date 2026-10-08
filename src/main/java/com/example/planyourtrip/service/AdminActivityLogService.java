@@ -53,9 +53,10 @@ public class AdminActivityLogService {
     /**
      * Defence-in-depth: text that looks like a credential is refused outright rather than stored.
      * This is not a substitute for callers passing safe values — it is a backstop that turns a
-     * mistake into a loud failure instead of a silent leak into permanent storage.
+     * mistake into a loud failure instead of a silent leak into permanent storage. RBAC R3a — the strict
+     * partner trail ({@link PartnerActivityLogService#audit}) applies the same guard (§22.1 AU-2).
      */
-    private static final Pattern FORBIDDEN = Pattern.compile(
+    static final Pattern FORBIDDEN = Pattern.compile(
         "(?i)(password|passwd|secret|bearer\\s|eyJ[A-Za-z0-9_-]{10,}|api[_-]?key|private[_-]?key"
             + "|cvv|iban|swift|\\b\\d{13,19}\\b)");
 

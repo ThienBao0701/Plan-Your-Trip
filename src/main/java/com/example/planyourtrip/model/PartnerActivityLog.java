@@ -22,8 +22,9 @@ public class PartnerActivityLog {
     @JoinColumn(name = "partner_profile_id", nullable = false)
     private PartnerProfile partnerProfile;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "actor_user_id", nullable = false)
+    /** The acting user, or null for a system action (RBAC R3a M-6 remediation; {@code actorEmail} = SYSTEM). */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "actor_user_id")
     private User actorUser;
 
     @Column(nullable = false)

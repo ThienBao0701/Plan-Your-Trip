@@ -84,6 +84,9 @@ public class AuthDtos {
 
     public record AuthResponse(String token, UserDto user) {}
 
+    /** RBAC R3a — {@code POST /api/me/step-up}: the account's current password, nothing else. */
+    public record StepUpRequest(@NotBlank String currentPassword) {}
+
     /** Partner registration never returns a session: the account cannot sign in until verified. */
     public record PartnerRegistrationResponse(String email, String status, boolean verificationRequired,
                                               String message) {}

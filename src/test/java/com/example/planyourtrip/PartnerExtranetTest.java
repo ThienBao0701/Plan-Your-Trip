@@ -425,6 +425,7 @@ class PartnerExtranetTest {
     }
 
     private String addTeamMember(String ownerToken, String email, String role) throws Exception {
+        makePartnerAccount(email);
         return mvc.perform(post("/api/partner/team")
                 .header("Authorization", "Bearer " + ownerToken)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -666,5 +667,15 @@ class PartnerExtranetTest {
 
     private String uniqSuffix() {
         return UUID.randomUUID().toString().substring(0, 8);
+    }
+
+    /**
+     * RBAC R3a (§29) — the legacy team endpoint attaches only an existing PARTNER account; it no longer promotes a
+     * traveller. Test members are therefore Partner accounts, as a self-registered Partner would be.
+     */
+    private void makePartnerAccount(String email) {
+        com.example.planyourtrip.model.User u = userRepo.findByEmail(email).orElseThrow();
+        u.setRole("PARTNER");
+        userRepo.save(u);
     }
 }

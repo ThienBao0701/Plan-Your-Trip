@@ -28,6 +28,7 @@ class PartnerSettingsTest {
 
     @Autowired MockMvc mvc;
     @Autowired ObjectMapper mapper;
+    @Autowired com.example.planyourtrip.repository.UserRepository userRepo;
 
     private String adminToken;
     private static final AtomicInteger counter = new AtomicInteger(1);
@@ -345,6 +346,7 @@ class PartnerSettingsTest {
     }
 
     private String addTeamMember(String ownerToken, String email, String role) throws Exception {
+        makePartnerAccount(email);
         return mvc.perform(post("/api/partner/team")
                 .header("Authorization", "Bearer " + ownerToken)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -434,5 +436,15 @@ class PartnerSettingsTest {
             if (title.equals(n.get("title").asText())) return true;
         }
         return false;
+    }
+
+    /**
+     * RBAC R3a (§29) — the legacy team endpoint attaches only an existing PARTNER account; it no longer promotes a
+     * traveller. Test members are therefore Partner accounts, as a self-registered Partner would be.
+     */
+    private void makePartnerAccount(String email) {
+        com.example.planyourtrip.model.User u = userRepo.findByEmail(email).orElseThrow();
+        u.setRole("PARTNER");
+        userRepo.save(u);
     }
 }
