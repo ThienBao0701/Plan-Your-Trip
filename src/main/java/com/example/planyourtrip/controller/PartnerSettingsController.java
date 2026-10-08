@@ -1,7 +1,9 @@
 package com.example.planyourtrip.controller;
 
+import com.example.planyourtrip.dto.PartnerInvitationDto.InvitationRequestResult;
 import com.example.planyourtrip.dto.PartnerSettingsDto.*;
 import com.example.planyourtrip.security.AuthUser;
+import com.example.planyourtrip.service.PartnerInvitationService;
 import com.example.planyourtrip.service.PartnerSettingsService;
 import com.example.planyourtrip.service.PartnerTeamService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,10 +23,13 @@ public class PartnerSettingsController {
 
     private final PartnerSettingsService service;
     private final PartnerTeamService teamService;
+    private final PartnerInvitationService invitationService;
 
-    public PartnerSettingsController(PartnerSettingsService service, PartnerTeamService teamService) {
+    public PartnerSettingsController(PartnerSettingsService service, PartnerTeamService teamService,
+                                     PartnerInvitationService invitationService) {
         this.service = service;
         this.teamService = teamService;
+        this.invitationService = invitationService;
     }
 
     @GetMapping("/settings")
@@ -58,43 +63,47 @@ public class PartnerSettingsController {
         return teamService.list(uid);
     }
 
+    /**
+     * RBAC R4 (§29): no longer attaches accounts directly — an alias of {@code POST /api/partner/team/invitations}
+     * with {@code role} at company scope. 202 with the uniform invitation body; {@code active} is ignored.
+     */
     @PostMapping("/team")
-    @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Add an existing Partner account to my team (OWNER only; OWNER role needs step-up)")
-    public PartnerTeamMemberResponse addTeamMember(@AuthUser Long uid, @Valid @RequestBody PartnerTeamMemberRequest req) {
-        return teamService.add(uid, req);
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @Operation(summary = "Invite an address to my team with a company-wide role (alias of POST /team/invitations)")
+    public InvitationRequestResult addTeamMember(@AuthUser Long uid, @Valid @RequestBody PartnerTeamMemberRequest req) {
+        return invitationService.inviteLegacy(uid, req);
     }
 
     @PatchMapping("/team/{id}")
-    @Operation(summary = "Update a team member's role or active flag (OWNER only; owner changes need step-up)")
+    @Operation(summary = "Update a team member's role or active flag (within delegated authority; owner changes need step-up)")
     public PartnerTeamMemberResponse updateTeamMember(@AuthUser Long uid, @PathVariable Long id,
                                                        @Valid @RequestBody PartnerTeamMemberRequest req) {
         return teamService.updateLegacy(uid, id, req);
     }
 
     @PutMapping("/team/{id}/grants")
-    @Operation(summary = "Replace a team member's grants (OWNER only; owner changes need step-up)")
+    @Operation(summary = "Replace a team member's grants (within delegated authority; owner changes need step-up)")
     public PartnerTeamMemberResponse replaceGrants(@AuthUser Long uid, @PathVariable Long id,
                                                    @Valid @RequestBody PartnerTeamGrantsRequest req) {
         return teamService.replaceGrants(uid, id, req);
     }
 
     @PostMapping("/team/{id}/suspend")
-    @Operation(summary = "Suspend a team member (OWNER only)")
+    @Operation(summary = "Suspend a team member (within delegated authority)")
     public PartnerTeamMemberResponse suspendTeamMember(@AuthUser Long uid, @PathVariable Long id,
                                                        @Valid @RequestBody(required = false) PartnerTeamReasonRequest req) {
         return teamService.suspend(uid, id, req == null ? null : req.reason());
     }
 
     @PostMapping("/team/{id}/reactivate")
-    @Operation(summary = "Reactivate a suspended team member (OWNER only)")
+    @Operation(summary = "Reactivate a suspended team member (within delegated authority)")
     public PartnerTeamMemberResponse reactivateTeamMember(@AuthUser Long uid, @PathVariable Long id) {
         return teamService.reactivate(uid, id);
     }
 
     @DeleteMapping("/team/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "Remove a team member: the membership is revoked and kept for history (OWNER only)")
+    @Operation(summary = "Remove a team member: the membership is revoked and kept for history (within delegated authority)")
     public void removeTeamMember(@AuthUser Long uid, @PathVariable Long id,
                                  @Valid @RequestBody(required = false) PartnerTeamReasonRequest req) {
         teamService.remove(uid, id, req == null ? null : req.reason());

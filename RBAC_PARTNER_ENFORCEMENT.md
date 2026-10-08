@@ -16,7 +16,7 @@ was activated.
 | SUSPENDED / REVOKED member, no membership, admin | No workspace. Operational endpoints return 404 "Partner profile not found". |
 | Member of a company that is not APPROVED | 403 `PARTNER_NOT_APPROVED` |
 
-- **MANAGER** holds its bundle minus P08–P11 (team invite, role assignment, suspend and remove). These are deferred to R4 (`PartnerRoleBundles.effective`), so team mutations stay owner-only.
+- **MANAGER** holds its bundle minus P08–P11 (team invite, role assignment, suspend and remove). These are deferred to R4 (`PartnerRoleBundles.effective`), so team mutations stay owner-only. *R4 (`RBAC_TEAM_ADMINISTRATION.md`) activates them, bounded by §10.3 delegation and authority.*
 - **Floors.** A permission whose floor is C (company) is never satisfied by a property or unit grant. A permission whose floor is P (property) is never satisfied by a unit grant.
 - **Legacy endpoints.** `LegacyPartnerBundles` is now used only by `assignable()`, which limits the legacy `POST/PATCH /team` endpoints to the five pre-R2 roles. Any role at any scope can be granted through `PUT /team/{id}/grants`.
 

@@ -6,28 +6,19 @@ import com.example.planyourtrip.dto.PartnerSettingsDto.PartnerTeamGrantsRequest;
 import com.example.planyourtrip.dto.PartnerSettingsDto.PartnerTeamMemberRequest;
 import com.example.planyourtrip.dto.PartnerSettingsDto.PartnerTeamMemberResponse;
 import com.example.planyourtrip.exception.ApiException;
-import com.example.planyourtrip.model.NotificationType;
 import com.example.planyourtrip.model.PartnerMemberGrant;
 import com.example.planyourtrip.model.PartnerMembershipStatus;
 import com.example.planyourtrip.model.PartnerProfile;
 import com.example.planyourtrip.model.PartnerTeamMember;
 import com.example.planyourtrip.model.PartnerTeamRole;
-import com.example.planyourtrip.model.Priority;
-import com.example.planyourtrip.model.RelatedEntityType;
-import com.example.planyourtrip.model.User;
 import com.example.planyourtrip.repository.PartnerProfileRepository;
 import com.example.planyourtrip.repository.PartnerTeamMemberRepository;
-import com.example.planyourtrip.repository.UserRepository;
-import com.example.planyourtrip.security.StepUpPolicy;
-import com.example.planyourtrip.security.rbac.AuthorizationDecision;
-import com.example.planyourtrip.security.rbac.LegacyPartnerBundles;
 import com.example.planyourtrip.security.rbac.PartnerAccessContext;
-import com.example.planyourtrip.security.rbac.PartnerAuthorization;
 import com.example.planyourtrip.security.rbac.PartnerPermission;
+import com.example.planyourtrip.security.rbac.ScopePath;
 import com.example.planyourtrip.security.rbac.ScopeRef;
 import com.example.planyourtrip.security.rbac.ScopeSet;
 import com.example.planyourtrip.security.rbac.ScopeType;
-import com.example.planyourtrip.util.AccountEmails;
 import jakarta.persistence.EntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,38 +28,38 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import static com.example.planyourtrip.security.rbac.PartnerPermission.TEAM_INVITE;
-import static com.example.planyourtrip.security.rbac.PartnerPermission.TEAM_OWNER_MANAGE;
 import static com.example.planyourtrip.security.rbac.PartnerPermission.TEAM_REMOVE;
 import static com.example.planyourtrip.security.rbac.PartnerPermission.TEAM_ROLE_ASSIGN;
 import static com.example.planyourtrip.security.rbac.PartnerPermission.TEAM_SUSPEND;
 import static com.example.planyourtrip.security.rbac.PartnerPermission.TEAM_VIEW;
 
 /**
- * RBAC R3a — owner and team safety (RBAC V1.1 §10.3, §15, §17, §18, §19, §22, §29).
+ * RBAC R3a/R4 — team administration (RBAC V1.1 §10.3, §15, §17, §18, §19, §22, §29).
  *
  * <p>Every team mutation, legacy or new, goes through {@link #apply} in this order:
  * <ol>
- *   <li>the endpoint permission (P08–P11) from the caller's workspace — in R3a only owners hold them
- *       (MANAGER's team permissions take effect in R4, §31 Q3);</li>
+ *   <li>the endpoint permission (P09–P11) held somewhere in the caller's workspace (403 {@code PERMISSION_DENIED});
+ *       since R4 MANAGER holds them too (§31 Q3), bounded by the rules below;</li>
  *   <li>the company row is locked ({@code SELECT … FOR UPDATE}, §19 LO-3) and the target membership is read
  *       under the lock — a target outside the company, or revoked, is 404;</li>
  *   <li>no one modifies their own membership (403 {@code SELF_MODIFICATION_FORBIDDEN}, I7) — leaving is the
  *       one self-service action;</li>
+ *   <li>the caller's team view (P07) must cover every grant of the target — otherwise 404, as if missing, so a
+ *       scoped manager learns nothing about members outside their scope (§11.2, §26 E5);</li>
  *   <li>the primary owner is immutable inside the workspace (403 {@code OWNER_PROTECTED}, O-1);</li>
- *   <li>authority over the target's current grants and over the new ones (§10.3): an owner-held membership
- *       or an {@code OWNER} grant needs an owner (403 {@code OWNER_PROTECTED}); MANAGER and FINANCE need an
- *       owner (403 {@code ROLE_NOT_DELEGABLE});</li>
- *   <li>every new grant is valid for its scope type and inside the company (422 {@code SCOPE_INVALID});</li>
+ *   <li>authority over the target's current grants and over the new ones (§10.3, {@link PartnerTeamAuthority}):
+ *       only owners touch OWNER (403 {@code OWNER_PROTECTED}), MANAGER and FINANCE (403
+ *       {@code ROLE_NOT_DELEGABLE}); the action permission must cover every current grant;</li>
+ *   <li>every new grant is valid for its scope type and inside the company (422 {@code SCOPE_INVALID}) and
+ *       delegable by the caller — never wider than the caller's own grant (403 {@code ROLE_NOT_DELEGABLE}, I6); a
+ *       reactivation re-checks the retained grants the same way;</li>
  *   <li>a change that involves an owner — adding, confirming, revoking, suspending, reactivating or removing
  *       one — needs {@code team.owner.manage} (P12) and a fresh session (403 {@code STEP_UP_REQUIRED}, O-7);</li>
  *   <li>the version the client read (409 {@code CONCURRENT_MODIFICATION});</li>
@@ -80,7 +71,10 @@ import static com.example.planyourtrip.security.rbac.PartnerPermission.TEAM_VIEW
  * </ol>
  *
  * <p>Removing a member is a soft revoke: {@code REVOKED}, grants removed, row kept (§17); a revoked membership
- * is never revived (RV-2). No team action writes {@code users.role} (RV-1, I1).
+ * is never revived (RV-2) — the person is re-invited and joins through a new membership
+ * ({@link PartnerInvitationService}). No team action writes {@code users.role} (RV-1, I1). Members are added only
+ * through invitations since R4: legacy {@code POST /api/partner/team} is an alias of
+ * {@code POST /api/partner/team/invitations} (§29).
  */
 @Service
 public class PartnerTeamService {
@@ -92,15 +86,7 @@ public class PartnerTeamService {
     public static final String CONCURRENT_MODIFICATION = "CONCURRENT_MODIFICATION";
     public static final String ALREADY_MEMBER = "ALREADY_MEMBER";
 
-    static final String TEAM_DENIED = "Only the partner owner can manage team members";
     private static final String ENTITY = "TEAM_MEMBER";
-
-    /** Highest authority first (§10.3); the legacy {@code role} column shows the highest grant. */
-    private static final List<PartnerTeamRole> AUTHORITY_ORDER = List.of(
-        PartnerTeamRole.OWNER, PartnerTeamRole.MANAGER, PartnerTeamRole.FINANCE, PartnerTeamRole.REVENUE,
-        PartnerTeamRole.RESERVATIONS, PartnerTeamRole.FRONT_DESK, PartnerTeamRole.CONTENT,
-        PartnerTeamRole.HOUSEKEEPING, PartnerTeamRole.VIEWER);
-
     private static final Logger log = LoggerFactory.getLogger(PartnerTeamService.class);
 
     /** One grant: a role at a scope written {@code TYPE:id}. */
@@ -110,29 +96,24 @@ public class PartnerTeamService {
 
     private final PartnerAccessService access;
     private final PartnerMembershipService memberships;
+    private final PartnerTeamAuthority authority;
     private final PartnerTeamMemberRepository members;
     private final PartnerProfileRepository profiles;
-    private final UserRepository users;
     private final PartnerActivityLogService audit;
     private final PartnerSecurityNotifier securityNotifier;
-    private final NotificationService notifications;
-    private final StepUpPolicy stepUp;
     private final EntityManager entityManager;
 
     public PartnerTeamService(PartnerAccessService access, PartnerMembershipService memberships,
-                              PartnerTeamMemberRepository members, PartnerProfileRepository profiles,
-                              UserRepository users, PartnerActivityLogService audit,
-                              PartnerSecurityNotifier securityNotifier, NotificationService notifications,
-                              StepUpPolicy stepUp, EntityManager entityManager) {
+                              PartnerTeamAuthority authority, PartnerTeamMemberRepository members,
+                              PartnerProfileRepository profiles, PartnerActivityLogService audit,
+                              PartnerSecurityNotifier securityNotifier, EntityManager entityManager) {
         this.access = access;
         this.memberships = memberships;
+        this.authority = authority;
         this.members = members;
         this.profiles = profiles;
-        this.users = users;
         this.audit = audit;
         this.securityNotifier = securityNotifier;
-        this.notifications = notifications;
-        this.stepUp = stepUp;
         this.entityManager = entityManager;
     }
 
@@ -156,74 +137,18 @@ public class PartnerTeamService {
     /** Every grant of the membership, as resolved today, lies inside the scope set; a membership with none does not. */
     private boolean within(ScopeSet scope, PartnerTeamMember member) {
         if (memberships.isPrimaryOwner(member)) return false;
-        List<PartnerMembershipService.ResolvedGrant> grants = memberships.resolveGrants(member);
-        return !grants.isEmpty() && grants.stream().allMatch(g -> scope.permits(g.scope()));
+        List<ScopePath> grants = memberships.scopesOf(member);
+        return !grants.isEmpty() && grants.stream().allMatch(scope::permits);
     }
 
-    /** Administrative read: every membership of the company, revoked ones included. */
+    /** Administrative read: every membership of the company, revoked history included. */
     @Transactional(readOnly = true)
     public List<PartnerTeamMemberResponse> adminList(Long companyId) {
         return members.findByPartnerProfileIdOrderByCreatedAtAsc(companyId).stream()
             .map(m -> toResponse(m, null)).toList();
     }
 
-    // ── Legacy endpoints (R3a semantics, §29) ────────────────────────────────
-
-    /**
-     * {@code POST /api/partner/team}: attaches an existing PARTNER account directly (until R4 invitations).
-     * No account is promoted any more: an unknown address, a traveller, an administrator, a disabled account, a
-     * removed member and an account in another workspace all get the same 422 {@code MEMBER_NOT_ADDABLE}.
-     */
-    @Transactional
-    public PartnerTeamMemberResponse add(Long userId, PartnerTeamMemberRequest req) {
-        PartnerAccessContext ctx = access.requireTeamWorkspace(userId);
-        access.requireCompanyPermission(ctx, TEAM_INVITE, TEAM_DENIED);
-        if (req.email() == null || req.email().isBlank())
-            throw new ApiException(HttpStatus.BAD_REQUEST, "email is required");
-        if (req.role() == null)
-            throw new ApiException(HttpStatus.BAD_REQUEST, "role is required");
-        requireLegacyAssignable(req.role());
-        boolean owner = req.role() == PartnerTeamRole.OWNER;
-        if (owner) requireOwnerManagement(ctx);
-
-        PartnerProfile company = lockCompany(ctx.companyId());
-        User target = users.findByEmail(AccountEmails.normalize(req.email())).orElseThrow(PartnerTeamService::notAddable);
-        Optional<PartnerTeamMember> existing = members.findByPartnerProfileIdAndUserId(company.getId(), target.getId());
-        if (existing.isPresent()) {
-            if (existing.get().getStatus() != PartnerMembershipStatus.REVOKED)
-                throw new ApiException(HttpStatus.CONFLICT, ALREADY_MEMBER, "This user is already a team member");
-            throw notAddable(); // RV-2: a removed member is re-invited (R4), never revived
-        }
-        if (!target.isEnabled() || !"PARTNER".equals(target.getRole())) throw notAddable();
-        boolean active = req.active() == null || req.active();
-        memberships.requireCanJoin(target.getId(), company.getId(), active);
-
-        PartnerTeamMember member = new PartnerTeamMember();
-        member.setPartnerProfile(company);
-        member.setUser(target);
-        member.setRole(req.role());
-        member.setActive(active, userId);
-        Instant now = Instant.now();
-        member.setInvitedAt(now);
-        member.setJoinedAt(now);
-        PartnerTeamMember saved = members.saveAndFlush(member);
-        memberships.syncLegacyCompanyGrant(saved, userId);
-
-        String after = describe(currentGrants(saved), saved);
-        audit.audit(company.getId(), userId, "TEAM_MEMBER_ADDED", ENTITY, saved.getId(),
-            "Team member #" + saved.getId() + " added", null, after, null);
-        if (owner) {
-            audit.audit(company.getId(), userId, "OWNER_GRANTED", ENTITY, saved.getId(),
-                "Owner granted to team member #" + saved.getId(), null, after, null);
-        }
-        notifications.create(target.getId(), NotificationType.PARTNER, Priority.NORMAL,
-            "You were added to a partner team",
-            "You were added to " + company.getBusinessName() + "'s team as " + req.role().name() + ".",
-            RelatedEntityType.PARTNER, company.getId());
-        securityNotifier.notifyOwners(company, null, owner ? "Owner added" : "Team member added",
-            target.getEmail() + " was added to the team: " + after);
-        return toResponse(saved, userId);
-    }
+    // ── Legacy endpoint (R3a semantics + R4 delegation, §29) ─────────────────
 
     /**
      * {@code PATCH /api/partner/team/{id}} with {@code role} and/or {@code active}: the same rules as the new
@@ -231,14 +156,13 @@ public class PartnerTeamService {
      */
     @Transactional
     public PartnerTeamMemberResponse updateLegacy(Long userId, Long memberId, PartnerTeamMemberRequest req) {
-        PartnerAccessContext ctx = access.requireTeamWorkspace(userId);
+        PartnerTeamAuthority.Actor actor = authority.actor(access.requireTeamWorkspace(userId));
         // A role change needs P09, an active change P10; a request carrying neither is judged as a role change.
-        access.requireCompanyPermission(ctx,
-            req.role() == null && req.active() != null ? TEAM_SUSPEND : TEAM_ROLE_ASSIGN, TEAM_DENIED);
-        if (req.role() != null && req.active() != null) access.requireCompanyPermission(ctx, TEAM_SUSPEND, TEAM_DENIED);
-        if (req.role() != null) requireLegacyAssignable(req.role());
+        PartnerPermission action = req.role() == null && req.active() != null ? TEAM_SUSPEND : TEAM_ROLE_ASSIGN;
+        authority.requireSomewhere(actor, action);
+        if (req.role() != null && req.active() != null) authority.requireSomewhere(actor, TEAM_SUSPEND);
 
-        PartnerProfile company = lockCompany(ctx.companyId());
+        PartnerProfile company = lockCompany(actor.companyId());
         PartnerTeamMember member = targetIn(company, memberId);
         List<GrantSpec> newGrants = null;
         if (req.role() != null) {
@@ -248,7 +172,7 @@ public class PartnerTeamService {
         }
         PartnerMembershipStatus newStatus = req.active() == null ? null
             : req.active() ? PartnerMembershipStatus.ACTIVE : PartnerMembershipStatus.SUSPENDED;
-        apply(ctx.userId(), isOwnerActor(ctx), ctx, company, member, newGrants, newStatus, null, null, false);
+        apply(actor, action, company, member, newGrants, newStatus, null, null);
         return toResponse(member, userId);
     }
 
@@ -257,23 +181,15 @@ public class PartnerTeamService {
     /** {@code PUT /api/partner/team/{memberId}/grants} (§15). */
     @Transactional
     public PartnerTeamMemberResponse replaceGrants(Long userId, Long memberId, PartnerTeamGrantsRequest req) {
-        PartnerAccessContext ctx = access.requireTeamWorkspace(userId);
-        access.requireCompanyPermission(ctx, TEAM_ROLE_ASSIGN, TEAM_DENIED);
+        PartnerTeamAuthority.Actor actor = authority.actor(access.requireTeamWorkspace(userId));
+        authority.requireSomewhere(actor, TEAM_ROLE_ASSIGN);
         if (req.grants() == null || req.grants().isEmpty())
             throw invalid("grants", "must contain at least one grant (suspend or remove the member instead)");
         if (req.version() == null) throw invalid("version", "is required");
-        List<GrantSpec> specs = new ArrayList<>();
-        Set<String> seen = new LinkedHashSet<>();
-        for (PartnerTeamGrantItem item : req.grants()) {
-            if (item == null || item.role() == null) throw invalid("grants", "every grant needs a role");
-            ScopeRef scope = ScopeRef.parse(item.scope()).orElseThrow(() -> new ApiException(
-                HttpStatus.UNPROCESSABLE_ENTITY, PartnerMembershipService.SCOPE_INVALID, "scope", "The scope is not valid"));
-            GrantSpec spec = new GrantSpec(item.role(), scope);
-            if (seen.add(spec.label())) specs.add(spec);
-        }
-        PartnerProfile company = lockCompany(ctx.companyId());
+        List<GrantSpec> specs = parseGrants(req.grants());
+        PartnerProfile company = lockCompany(actor.companyId());
         PartnerTeamMember member = targetIn(company, memberId);
-        apply(ctx.userId(), isOwnerActor(ctx), ctx, company, member, specs, null, req.reason(), req.version(), false);
+        apply(actor, TEAM_ROLE_ASSIGN, company, member, specs, null, req.reason(), req.version());
         return toResponse(member, userId);
     }
 
@@ -322,50 +238,66 @@ public class PartnerTeamService {
         PartnerProfile company = lockCompany(chosen.getPartnerProfile().getId());
         PartnerTeamMember member = refreshed(chosen);
         if (member.getStatus() == PartnerMembershipStatus.REVOKED) throw new ApiException(HttpStatus.NOT_FOUND, "Partner profile not found");
-        apply(userId, false, null, company, member, null, PartnerMembershipStatus.REVOKED, null, null, true);
+        apply(null, null, company, member, null, PartnerMembershipStatus.REVOKED, null, null);
     }
 
     // ── The single mutation path ─────────────────────────────────────────────
 
     private PartnerTeamMemberResponse changeStatus(Long userId, Long memberId, PartnerMembershipStatus status,
-                                                   PartnerPermission permission,
-                                                   String reason) {
-        PartnerAccessContext ctx = access.requireTeamWorkspace(userId);
-        access.requireCompanyPermission(ctx, permission, TEAM_DENIED);
-        PartnerProfile company = lockCompany(ctx.companyId());
+                                                   PartnerPermission permission, String reason) {
+        PartnerTeamAuthority.Actor actor = authority.actor(access.requireTeamWorkspace(userId));
+        authority.requireSomewhere(actor, permission);
+        PartnerProfile company = lockCompany(actor.companyId());
         PartnerTeamMember member = targetIn(company, memberId);
-        apply(ctx.userId(), isOwnerActor(ctx), ctx, company, member, null, status, reason, null, false);
+        apply(actor, permission, company, member, null, status, reason, null);
         return toResponse(member, userId);
     }
 
     /**
-     * Applies a change to one membership under the company lock, after every check of §15/§17/§18/§19. A change
-     * that changes nothing is accepted and writes nothing.
+     * Applies a change to one membership under the company lock, after every check of §10.3/§15/§17/§18/§19. A
+     * change that changes nothing is accepted and writes nothing.
      *
+     * @param actor     the acting team holder, or null when the member is leaving (the only self-service change)
+     * @param action    the team permission the endpoint requires (P09–P11); null when leaving
      * @param newGrants the full new grant list, or null to keep the grants
      * @param newStatus the new status, or null to keep it
      * @param expectedVersion the version the client read, or null (legacy endpoints carry none)
-     * @param leaving   the member is the caller, leaving (the only self-service change)
      */
-    private void apply(Long actorUserId, boolean actorOwner, PartnerAccessContext ctx, PartnerProfile company,
+    private void apply(PartnerTeamAuthority.Actor actor, PartnerPermission action, PartnerProfile company,
                        PartnerTeamMember member, List<GrantSpec> newGrants, PartnerMembershipStatus newStatus,
-                       String reason, Long expectedVersion, boolean leaving) {
-        if (!leaving && member.getUser().getId().equals(actorUserId)) {
-            throw denied(HttpStatus.FORBIDDEN, SELF_MODIFICATION_FORBIDDEN,
-                "You cannot change your own membership", actorUserId, member);
-        }
-        if (memberships.isPrimaryOwner(member)) {
-            throw denied(HttpStatus.FORBIDDEN, OWNER_PROTECTED,
-                "The primary owner cannot be changed from inside the workspace", actorUserId, member);
-        }
-
+                       String reason, Long expectedVersion) {
+        boolean leaving = actor == null;
+        Long actorUserId = leaving ? member.getUser().getId() : actor.userId();
         List<GrantSpec> current = currentGrants(member);
-        boolean ownerBefore = memberships.holdsConfirmedOwner(member);
+
         if (!leaving) {
-            requireAuthority(actorOwner, rolesOf(current), member.isPendingOwnerConfirmation(), actorUserId, member);
+            if (member.getUser().getId().equals(actorUserId)) {
+                throw denied(HttpStatus.FORBIDDEN, SELF_MODIFICATION_FORBIDDEN,
+                    "You cannot change your own membership", actorUserId, member);
+            }
+            List<ScopePath> currentScopes = memberships.scopesOf(member);
+            if (!authority.sees(actor, currentScopes)) throw notFound(member.getId());
+            if (memberships.isPrimaryOwner(member)) {
+                throw denied(HttpStatus.FORBIDDEN, OWNER_PROTECTED,
+                    "The primary owner cannot be changed from inside the workspace", actorUserId, member);
+            }
+            authority.requireAuthorityOver(actor, rolesOf(current), member.isPendingOwnerConfirmation());
+            if (!authority.covers(actor, action, currentScopes)) {
+                throw denied(HttpStatus.FORBIDDEN, ROLE_NOT_DELEGABLE,
+                    "Your role cannot manage this member", actorUserId, member);
+            }
             if (newGrants != null) {
-                requireAuthority(actorOwner, rolesOf(newGrants), false, actorUserId, member);
-                for (GrantSpec g : newGrants) memberships.validateGrant(company.getId(), g.role(), g.scope());
+                authority.requireAuthorityOver(actor, rolesOf(newGrants), false);
+                for (GrantSpec g : newGrants) {
+                    ScopePath path = memberships.validateGrant(company.getId(), g.role(), g.scope());
+                    authority.requireDelegable(actor, action, g.role(), path);
+                }
+            } else if (newStatus == PartnerMembershipStatus.ACTIVE
+                    && member.getStatus() == PartnerMembershipStatus.SUSPENDED) {
+                // reactivation hands the retained grants back: they must still be delegable by this actor
+                for (PartnerMembershipService.ResolvedGrant g : memberships.resolveGrants(member)) {
+                    authority.requireDelegable(actor, action, g.role(), g.scope());
+                }
             }
         }
 
@@ -376,10 +308,11 @@ public class PartnerTeamService {
         boolean statusChanged = statusAfter != statusBefore;
         if (!grantsChanged && !statusChanged) return;
 
+        boolean ownerBefore = memberships.holdsConfirmedOwner(member);
         boolean ownerAfter = statusAfter != PartnerMembershipStatus.REVOKED
             && (newGrants != null ? rolesOf(newGrants).contains(PartnerTeamRole.OWNER) : ownerBefore);
         boolean ownerInvolved = ownerBefore || ownerAfter || (grantsChanged && member.isPendingOwnerConfirmation());
-        if (!leaving && ownerInvolved) requireOwnerManagement(ctx);
+        if (!leaving && ownerInvolved) authority.requireOwnerManagement(actor);
 
         if (expectedVersion != null && !expectedVersion.equals(member.getVersion())) {
             throw new ApiException(HttpStatus.CONFLICT, CONCURRENT_MODIFICATION,
@@ -405,7 +338,7 @@ public class PartnerTeamService {
         if (grantsChanged) {
             memberships.replaceGrants(member, newGrants.stream()
                 .map(g -> Map.entry(g.role(), g.scope())).toList(), actorUserId);
-            member.setRole(highest(newGrants));
+            member.setRole(PartnerMembershipService.highestRole(rolesOf(newGrants)));
             member.setPendingOwnerConfirmation(false);
         }
         if (statusChanged) {
@@ -434,41 +367,24 @@ public class PartnerTeamService {
             audit.audit(company.getId(), actorUserId, event, ENTITY, member.getId(),
                 describeEvent(event, member.getId()), before, after, reason);
         }
-        securityNotifier.notifyOwners(company, member.getUser().getId(), titleOf(events.get(events.size() - 1)),
+        securityNotifier.notifyOwners(company, member.getUser().getId(), titleOf(events.get(0)),
             member.getUser().getEmail() + ": " + before + " -> " + after);
     }
 
-    // ── Checks ───────────────────────────────────────────────────────────────
+    // ── Helpers ──────────────────────────────────────────────────────────────
 
-    /**
-     * §10.3 authority. In R3a team permissions are held by owners only (MANAGER's take effect in R4), so a
-     * non-owner never reaches here through the legacy bundles; the table is enforced anyway.
-     */
-    private void requireAuthority(boolean actorOwner, Set<PartnerTeamRole> roles, boolean pendingOwner,
-                                  Long actorUserId, PartnerTeamMember member) {
-        if (actorOwner) return;
-        if (pendingOwner || roles.contains(PartnerTeamRole.OWNER)) {
-            throw denied(HttpStatus.FORBIDDEN, OWNER_PROTECTED, "Only an owner can manage an owner", actorUserId, member);
+    /** Parses and de-duplicates {@code role}/{@code TYPE:id} items; a malformed scope is 422 {@code SCOPE_INVALID}. */
+    static List<GrantSpec> parseGrants(List<PartnerTeamGrantItem> items) {
+        List<GrantSpec> specs = new ArrayList<>();
+        Set<String> seen = new LinkedHashSet<>();
+        for (PartnerTeamGrantItem item : items) {
+            if (item == null || item.role() == null) throw invalid("grants", "every grant needs a role");
+            ScopeRef scope = ScopeRef.parse(item.scope()).orElseThrow(() -> new ApiException(
+                HttpStatus.UNPROCESSABLE_ENTITY, PartnerMembershipService.SCOPE_INVALID, "scope", "The scope is not valid"));
+            GrantSpec spec = new GrantSpec(item.role(), scope);
+            if (seen.add(spec.label())) specs.add(spec);
         }
-        throw denied(HttpStatus.FORBIDDEN, ROLE_NOT_DELEGABLE, "Your role cannot manage this member", actorUserId, member);
-    }
-
-    /** O-2 and O-7: {@code team.owner.manage} (owners only, non-delegable) and a fresh session. */
-    private void requireOwnerManagement(PartnerAccessContext ctx) {
-        if (PartnerAuthorization.company(ctx, TEAM_OWNER_MANAGE) != AuthorizationDecision.ALLOW || !isOwnerActor(ctx)) {
-            log.warn("Owner management refused for user {} (P12 not held)", ctx.userId());
-            throw new ApiException(HttpStatus.FORBIDDEN, OWNER_PROTECTED, "Only an owner can manage owners");
-        }
-        if (!stepUp.isFresh()) log.warn("Owner management refused for user {}: step-up required", ctx.userId());
-        stepUp.requireFresh();
-    }
-
-    /** The registrant, or an active member holding a confirmed {@code OWNER@COMPANY} grant. */
-    private boolean isOwnerActor(PartnerAccessContext ctx) {
-        if (ctx.registrant()) return true;
-        return memberships.activeTeamMembership(ctx.userId())
-            .filter(m -> m.getPartnerProfile().getId().equals(ctx.companyId()))
-            .map(memberships::holdsConfirmedOwner).orElse(false);
+        return specs;
     }
 
     private PartnerProfile lockCompany(Long companyId) {
@@ -478,12 +394,11 @@ public class PartnerTeamService {
 
     /** The membership as the database holds it now, read after the company lock. */
     private PartnerTeamMember targetIn(PartnerProfile company, Long memberId) {
-        PartnerTeamMember member = members.findById(memberId)
+        return members.findById(memberId)
             .filter(m -> m.getPartnerProfile().getId().equals(company.getId()))
             .map(this::refreshed)
             .filter(m -> m.getStatus() != PartnerMembershipStatus.REVOKED)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Team member not found: " + memberId));
-        return member;
+            .orElseThrow(() -> notFound(memberId));
     }
 
     private PartnerTeamMember refreshed(PartnerTeamMember member) {
@@ -491,19 +406,11 @@ public class PartnerTeamService {
         return member;
     }
 
-    private static void requireLegacyAssignable(PartnerTeamRole role) {
-        if (!LegacyPartnerBundles.assignable(role)) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "VALIDATION_FAILED", "role",
-                "role " + role.name() + " cannot be assigned yet");
-        }
+    private static ApiException notFound(Long memberId) {
+        return new ApiException(HttpStatus.NOT_FOUND, "Team member not found: " + memberId);
     }
 
-    private static ApiException notAddable() {
-        return new ApiException(HttpStatus.UNPROCESSABLE_ENTITY, PartnerMembershipService.MEMBER_NOT_ADDABLE,
-            "This account cannot be added to the team");
-    }
-
-    private static ApiException invalid(String field, String message) {
+    static ApiException invalid(String field, String message) {
         return new ApiException(HttpStatus.BAD_REQUEST, "VALIDATION_FAILED", field, message);
     }
 
@@ -528,13 +435,8 @@ public class PartnerTeamService {
         return specs.stream().map(GrantSpec::role).collect(Collectors.toSet());
     }
 
-    private static Set<String> labels(List<GrantSpec> specs) {
+    static Set<String> labels(List<GrantSpec> specs) {
         return specs.stream().map(GrantSpec::label).collect(Collectors.toCollection(TreeSet::new));
-    }
-
-    private static PartnerTeamRole highest(List<GrantSpec> specs) {
-        return specs.stream().map(GrantSpec::role).min(Comparator.comparingInt(AUTHORITY_ORDER::indexOf))
-            .orElseThrow();
     }
 
     /** A safe scalar for the audit trail, e.g. {@code FRONT_DESK@PROPERTY:123,MANAGER@COMPANY:456|ACTIVE}. */

@@ -70,7 +70,9 @@ account columns on `users`, the `auth_tokens` table, and existing accounts marke
 `V6__partner_activity_log_states` (RBAC R2 — membership states, scoped grants, activity-log snapshots; run the
 read-only M-0 audit `db/audit/R2_M0_partner_membership_audit.sql` first; see `RBAC_MEMBERSHIP_FOUNDATION.md`),
 `V7__partner_membership_remediation` (RBAC R3a — M-6 membership remediation; run the M-0 audit again first; see
-`RBAC_OWNER_TEAM_SECURITY.md`).
+`RBAC_OWNER_TEAM_SECURITY.md`), `V8__partner_invitations` (RBAC R4 — M-3 invitation tables and the live-membership
+key that lets a removed member re-join through a new membership; see `RBAC_TEAM_ADMINISTRATION.md`). R4 invitations
+answer 503 in production until a real email provider replaces `UnconfiguredEmailSender`.
 Known blocker: V3 as committed fails on SQL Server (one batch adds and updates a column —
 `RBAC_MEMBERSHIP_FOUNDATION.md` §7).
 

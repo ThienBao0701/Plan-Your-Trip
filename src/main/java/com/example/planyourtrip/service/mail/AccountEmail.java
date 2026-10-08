@@ -9,6 +9,8 @@ public record AccountEmail(String to, Kind kind, String actionUrl) {
 
     public enum Kind {
         EMAIL_VERIFICATION,
-        PASSWORD_RESET
+        PASSWORD_RESET,
+        /** RBAC R4 — an invitation to join a partner team; the address may not have an account yet. */
+        PARTNER_INVITATION
     }
 }

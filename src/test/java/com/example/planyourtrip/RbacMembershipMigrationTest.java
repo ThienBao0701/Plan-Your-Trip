@@ -49,6 +49,7 @@ class RbacMembershipMigrationTest {
     private static final String V5 = "/db/migration/V5__partner_member_grants.sql";
     private static final String V6 = "/db/migration/V6__partner_activity_log_states.sql";
     private static final String V7 = "/db/migration/V7__partner_membership_remediation.sql";
+    private static final String V8 = "/db/migration/V8__partner_invitations.sql";
 
     /** SHA-256 of V1–V3 with line endings normalised — applied migrations are never edited. */
     private static final Map<String, String> APPLIED = Map.of(
@@ -67,11 +68,13 @@ class RbacMembershipMigrationTest {
             assertTrue(m.matches(), "unexpected migration file name " + r.getFilename());
             assertNull(versions.put(Integer.parseInt(m.group(1)), m.group(2)), "duplicate version " + m.group(1));
         }
-        assertEquals(List.of(1, 2, 3, 4, 5, 6, 7), List.copyOf(versions.keySet()));
+        // RBAC R4 adds V8 (M-3); its content is checked by RbacInvitationMigrationTest
+        assertEquals(List.of(1, 2, 3, 4, 5, 6, 7, 8), List.copyOf(versions.keySet()));
         assertEquals("partner_membership_status", versions.get(4));
         assertEquals("partner_member_grants", versions.get(5));
         assertEquals("partner_activity_log_states", versions.get(6));
         assertEquals("partner_membership_remediation", versions.get(7));
+        assertEquals("partner_invitations", versions.get(8));
     }
 
     @Test
@@ -188,9 +191,11 @@ class RbacMembershipMigrationTest {
 
     @Test
     void everyEntityCheckIsTheMigrationsConstraintVerbatim() throws IOException {
-        String migrations = normalise(withoutComments(read(V4) + "\n" + read(V5)));
+        String migrations = normalise(withoutComments(read(V4) + "\n" + read(V5) + "\n" + read(V8)));
         Map<Class<?>, List<String>> expected = Map.of(
-            PartnerTeamMember.class, List.of("ck_partner_team_members_status", "ck_partner_team_members_active_status"),
+            // RBAC R4 / V8: the revocation key that lets a removed member re-join through a new row
+            PartnerTeamMember.class, List.of("ck_partner_team_members_status", "ck_partner_team_members_active_status",
+                "ck_partner_team_members_revocation_key"),
             PartnerMemberGrant.class, List.of("ck_partner_member_grants_role", "ck_partner_member_grants_scope_type",
                 "ck_partner_member_grants_scope_id", "ck_partner_member_grants_scope_shape",
                 "ck_partner_member_grants_role_scope"));

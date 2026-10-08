@@ -101,4 +101,32 @@ class SqlServerProdChainVerificationTest {
                 + "JOIN partner_team_members m ON m.id = g.team_member_id "
                 + "WHERE g.role = 'OWNER' AND m.pending_owner_confirmation = 1", Integer.class));
     }
+
+    /**
+     * RBAC R4 — V8 applied on SQL Server: the invitation tables and their named constraints exist, V1's (company,
+     * account) unique key is replaced by the live-membership key, and every revoked row carries its own revocation key.
+     */
+    @Test
+    void rbacR4InvitationMigrationAppliedWithItsConstraints() {
+        assertEquals(1, jdbc.queryForObject(
+                "SELECT COUNT(*) FROM flyway_schema_history WHERE success = 1 AND version = '8'", Integer.class));
+        for (String check : List.of("ck_partner_team_members_revocation_key", "ck_partner_invitations_status",
+                "ck_partner_invitations_delivery_status", "ck_partner_invitations_resend_count",
+                "ck_partner_invitations_closed_key", "ck_partner_invitation_grants_role",
+                "ck_partner_invitation_grants_scope_type", "ck_partner_invitation_grants_scope_id",
+                "ck_partner_invitation_grants_role_scope")) {
+            assertEquals(1, jdbc.queryForObject("SELECT COUNT(*) FROM sys.check_constraints WHERE name = ?",
+                    Integer.class, check), check);
+        }
+        for (String key : List.of("uk_partner_team_members_live", "uk_partner_invitations_token_hash",
+                "uk_partner_invitations_pending", "uk_partner_invitation_grant")) {
+            assertEquals(1, jdbc.queryForObject("SELECT COUNT(*) FROM sys.key_constraints WHERE name = ?",
+                    Integer.class, key), key);
+        }
+        assertEquals(0, jdbc.queryForObject("SELECT COUNT(*) FROM sys.key_constraints WHERE name = "
+                + "'uk_partner_team_member_profile_user'", Integer.class), "V1's key is replaced");
+        assertEquals(0, jdbc.queryForObject("SELECT COUNT(*) FROM partner_team_members WHERE "
+                + "(status = 'REVOKED' AND revocation_key <> id) OR (status <> 'REVOKED' AND revocation_key <> 0)",
+                Integer.class));
+    }
 }

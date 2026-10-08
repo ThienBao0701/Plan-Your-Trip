@@ -6,6 +6,10 @@ The protections that must be live before any partner member gains new power (RBA
 
 > R3b (`RBAC_PARTNER_ENFORCEMENT.md`) activates the V1.1 matrix: operational endpoints are now decided by stored
 > grants and the §10.1 bundles; the legacy-bundle notes below describe R3a only.
+>
+> R4 (`RBAC_TEAM_ADMINISTRATION.md`) activates MANAGER's team permissions within §10.3, adds invitations, and turns
+> legacy `POST /api/partner/team` into an alias of `POST /api/partner/team/invitations` (202, no direct attachment,
+> no `MEMBER_NOT_ADDABLE`). A removed member re-joins through a new membership (V8).
 
 **Still not activated (in R3a):** the V1.1 permission matrix (R3b). Every operational endpoint is still decided with the
 R1 legacy bundles: the registrant holds everything; members keep today's settings/payout/team rights. Team

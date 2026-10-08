@@ -85,6 +85,7 @@ class RbacMembershipFoundationTest {
     @Autowired PartnerActivityLogRepository activityLogRepo;
     @Autowired PartnerMembershipService memberships;
     @Autowired PartnerAccessService partnerAccess;
+    @Autowired com.example.planyourtrip.support.TeamMemberSeeder seeder;
 
     private static final AtomicInteger counter = new AtomicInteger(1);
     private static final String SETTINGS_BODY = """
@@ -189,7 +190,11 @@ class RbacMembershipFoundationTest {
     @Test
     void aRevokedMembershipIsNeverRevived() {
         PartnerTeamMember row = new PartnerTeamMember();
+        // RBAC R4: a revoked row's revocation key is its own id, so only a stored membership can be revoked
+        assertThrows(IllegalStateException.class, () -> row.changeStatus(PartnerMembershipStatus.REVOKED, "test", 1L));
+        row.setId(41L);
         row.changeStatus(PartnerMembershipStatus.REVOKED, "test", 1L);
+        assertEquals(41L, row.getRevocationKey());
         assertFalse(row.isActive());
         assertThrows(IllegalStateException.class, () -> row.setActive(true));
         assertThrows(IllegalStateException.class, () -> row.changeStatus(PartnerMembershipStatus.ACTIVE, null, null));
@@ -372,13 +377,13 @@ class RbacMembershipFoundationTest {
         assertScopeInvalid(() -> memberships.grant(row, PartnerTeamRole.HOUSEKEEPING,
             new ScopeRef(ScopeType.COMPANY, partner.profileId()), partner.userId()));
 
-        // the role exists but carries no runtime capability yet, and the legacy endpoints cannot assign it
+        // the legacy bundle of the role is empty; RBAC R4: the legacy add (an alias of the invitation endpoint)
+        // puts the role at company scope, where HOUSEKEEPING may not sit (§11.3)
         assertTrue(LegacyPartnerBundles.member(PartnerTeamRole.HOUSEKEEPING).isEmpty());
         mvc.perform(auth(json(post("/api/partner/team"),
                 "{\"email\":\"" + registerPlainUser().email() + "\",\"role\":\"HOUSEKEEPING\"}"), partner.token()))
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"))
-            .andExpect(jsonPath("$.fieldErrors[0].field").value("role"));
+            .andExpect(status().isUnprocessableEntity())
+            .andExpect(jsonPath("$.code").value("SCOPE_INVALID"));
     }
 
     @Test
@@ -534,24 +539,21 @@ class RbacMembershipFoundationTest {
         Partner b = approvedPartner();
         Account memberOfA = memberAccount(a, "FRONT_DESK");
 
-        // the registrant of B cannot join A, and an active member of A cannot join B: one uniform answer
+        // RBAC R4: the legacy add is the invitation alias — the registrant of B and an active member of A get the
+        // same uniform 202 as anyone (IN-1); nobody is attached (acceptance would refuse them, WS-3)
         for (Object[] attempt : new Object[][] {{a, b.email()}, {b, memberOfA.email()}}) {
             Partner owner = (Partner) attempt[0];
             mvc.perform(auth(json(post("/api/partner/team"),
                     "{\"email\":\"" + attempt[1] + "\",\"role\":\"VIEWER\"}"), owner.token()))
-                .andExpect(status().isUnprocessableEntity())
-                .andExpect(jsonPath("$.code").value("MEMBER_NOT_ADDABLE"))
-                .andExpect(jsonPath("$.message").value("This account cannot be added to the team"))
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$.status").value("REQUESTED"))
                 .andExpect(jsonPath("$.reason").doesNotExist());
         }
         assertTrue(teamMemberRepo.findByPartnerProfileIdAndUserId(a.profileId(), b.userId()).isEmpty());
         assertTrue(teamMemberRepo.findByPartnerProfileIdAndUserId(b.profileId(), memberOfA.userId()).isEmpty());
 
         // an inactive membership elsewhere may exist, as before; reactivating it re-checks the invariant (WS-5)
-        String body = mvc.perform(auth(json(post("/api/partner/team"),
-                "{\"email\":\"" + memberOfA.email() + "\",\"role\":\"VIEWER\",\"active\":false}"), b.token()))
-            .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
-        long inactiveRow = mapper.readTree(body).get("id").asLong();
+        long inactiveRow = seeder.seed(b.profileId(), memberOfA.email(), PartnerTeamRole.VIEWER, false);
         mvc.perform(auth(json(patch("/api/partner/team/" + inactiveRow), "{\"active\":true}"), b.token()))
             .andExpect(status().isConflict())
             .andExpect(jsonPath("$.code").value("WORKSPACE_CONFLICT"))
@@ -619,13 +621,15 @@ class RbacMembershipFoundationTest {
         assertEquals(List.of("CONTENT@PROPERTY", "MANAGER@COMPANY"), describe(row.getId()).stream().sorted().toList(),
             "the company grant follows the role; scoped grants are left alone");
 
-        // the R2 roles cannot be assigned through the legacy endpoints
-        for (String role : new String[] {"REVENUE", "RESERVATIONS", "CONTENT", "HOUSEKEEPING"}) {
-            mvc.perform(auth(json(patch("/api/partner/team/" + row.getId()), "{\"role\":\"" + role + "\"}"), partner.token()))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"))
-                .andExpect(jsonPath("$.fieldErrors[0].field").value("role"));
+        // RBAC R4: every role may be assigned through the legacy endpoint where §11.3 lets it sit at company scope
+        for (String role : new String[] {"REVENUE", "RESERVATIONS", "CONTENT"}) {
+            patchMember(partner, row.getId(), "{\"role\":\"" + role + "\"}", HttpStatus.OK);
+            assertTrue(describe(row.getId()).contains(role + "@COMPANY"), role);
         }
+        mvc.perform(auth(json(patch("/api/partner/team/" + row.getId()), "{\"role\":\"HOUSEKEEPING\"}"), partner.token()))
+            .andExpect(status().isUnprocessableEntity())
+            .andExpect(jsonPath("$.code").value("SCOPE_INVALID"));
+        patchMember(partner, row.getId(), "{\"role\":\"MANAGER\"}", HttpStatus.OK);
         assertEquals(PartnerTeamRole.MANAGER, membership(partner.profileId(), member.userId()).getRole());
 
         mvc.perform(auth(delete("/api/partner/team/" + row.getId()), partner.token())).andExpect(status().isNoContent());
@@ -637,10 +641,13 @@ class RbacMembershipFoundationTest {
     @Test
     void partnerActivityRecordsTheActorsEmail() throws Exception {
         Partner partner = approvedPartner();
-        memberAccount(partner, "VIEWER");
+        // RBAC R4: adding is inviting (legacy POST /team is the alias); the trail records TEAM_MEMBER_INVITED
+        mvc.perform(auth(json(post("/api/partner/team"),
+                "{\"email\":\"" + registerPlainUser().email() + "\",\"role\":\"VIEWER\"}"), partner.token()))
+            .andExpect(status().isAccepted());
         List<PartnerActivityLog> entries = activityLogRepo.findByPartnerProfileIdOrderByCreatedAtDesc(partner.profileId());
         assertFalse(entries.isEmpty());
-        PartnerActivityLog added = entries.stream().filter(e -> "TEAM_MEMBER_ADDED".equals(e.getAction()))
+        PartnerActivityLog added = entries.stream().filter(e -> "TEAM_MEMBER_INVITED".equals(e.getAction()))
             .findFirst().orElseThrow();
         assertEquals(partner.email(), added.getActorEmail());
     }
@@ -745,12 +752,11 @@ class RbacMembershipFoundationTest {
         return new Partner(token, profileId, userRepo.findByEmail(email).orElseThrow().getId(), email);
     }
 
+    /** RBAC R4: members join through accepted invitations; the seeder creates exactly that membership. */
     private Account memberAccount(Partner owner, String role) throws Exception {
         Account account = registerPlainUser();
         makePartnerAccount(account.email());
-        mvc.perform(auth(json(post("/api/partner/team"),
-                "{\"email\":\"" + account.email() + "\",\"role\":\"" + role + "\"}"), owner.token()))
-            .andExpect(status().isCreated());
+        seeder.seed(owner.profileId(), account.email(), PartnerTeamRole.valueOf(role));
         return new Account(login(account.email(), "password123"), account.userId(), account.email());
     }
 

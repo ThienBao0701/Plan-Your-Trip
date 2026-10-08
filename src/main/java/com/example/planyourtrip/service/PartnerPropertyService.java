@@ -12,6 +12,7 @@ import com.example.planyourtrip.repository.CategoryRepository;
 import com.example.planyourtrip.repository.ConversationRepository;
 import com.example.planyourtrip.repository.PartnerMemberGrantRepository;
 import com.example.planyourtrip.repository.HotelDetailRepository;
+import com.example.planyourtrip.repository.HotelRoomRepository;
 import com.example.planyourtrip.repository.PartnerProfileRepository;
 import com.example.planyourtrip.repository.PlaceAmenityRepository;
 import com.example.planyourtrip.repository.PlaceRepository;
@@ -111,6 +112,8 @@ public class PartnerPropertyService {
     private final PartnerMemberGrantRepository grants;
     private final ConversationRepository conversations;
     private final PartnerSecurityNotifier securityNotifier;
+    private final HotelRoomRepository hotelRooms;
+    private final PartnerInvitationService invitations;
 
     public PartnerPropertyService(PlaceRepository places,
                                    PartnerProfileRepository partnerProfiles,
@@ -127,7 +130,9 @@ public class PartnerPropertyService {
                                    PartnerAccessService partnerAccess,
                                    PartnerMemberGrantRepository grants,
                                    ConversationRepository conversations,
-                                   PartnerSecurityNotifier securityNotifier) {
+                                   PartnerSecurityNotifier securityNotifier,
+                                   HotelRoomRepository hotelRooms,
+                                   PartnerInvitationService invitations) {
         this.places = places;
         this.partnerProfiles = partnerProfiles;
         this.hotelDetails = hotelDetails;
@@ -144,6 +149,8 @@ public class PartnerPropertyService {
         this.grants = grants;
         this.conversations = conversations;
         this.securityNotifier = securityNotifier;
+        this.hotelRooms = hotelRooms;
+        this.invitations = invitations;
     }
 
     @Transactional(readOnly = true)
@@ -435,6 +442,11 @@ public class PartnerPropertyService {
                 "Access to property #" + place.getId() + " was removed (" + before + "): the property moved to another company.");
         }
         grants.flush();
+        // RBAC R4: pending invitations of the previous company with a grant on the property or its room types
+        List<Long> unitIds = hotelDetails.findByPlaceId(place.getId())
+            .map(detail -> hotelRooms.findAllByHotelDetailId(detail.getId()).stream().map(r -> r.getId()).toList())
+            .orElse(List.of());
+        invitations.revokeForMovedProperty(adminUserId, previous, place.getId(), unitIds);
         for (Conversation conversation : conversations.findByBookingHotelId(place.getId())) {
             conversation.setPartnerProfile(next);
         }

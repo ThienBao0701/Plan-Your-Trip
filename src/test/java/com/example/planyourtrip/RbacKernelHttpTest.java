@@ -62,6 +62,7 @@ class RbacKernelHttpTest {
     @Autowired JwtService jwt;
     @Autowired PartnerAccessService partnerAccess;
     @Autowired PartnerResourceTargetResolver targets;
+    @Autowired com.example.planyourtrip.support.TeamMemberSeeder seeder;
 
     private static final AtomicInteger counter = new AtomicInteger(1);
     private static final String SETTINGS_BODY = """
@@ -211,7 +212,9 @@ class RbacKernelHttpTest {
         mvc.perform(auth(json(post("/api/partner/team"),
                 "{\"email\":\"" + registerPlainUser() + "\",\"role\":\"VIEWER\"}"), member))
             .andExpect(status().isForbidden())
-            .andExpect(jsonPath("$.message").value("Only the partner owner can manage team members"));
+            .andExpect(jsonPath("$.code").value("PERMISSION_DENIED"))
+            // RBAC R4: team permissions are no longer owner-only (MANAGER holds them); FRONT_DESK holds none
+            .andExpect(jsonPath("$.message").value("Your role cannot manage team members"));
     }
 
     @Test
@@ -237,11 +240,12 @@ class RbacKernelHttpTest {
         Partner owner = approvedPartner();
         String coOwner = member(owner, "OWNER");
         String target = registerPlainUser();
-        makePartnerAccount(target); // RBAC R3a: only an existing PARTNER account can be attached
+        makePartnerAccount(target);
 
+        // RBAC R4: a confirmed co-owner invites (legacy POST /team is the invitation alias, 202)
         mvc.perform(auth(json(post("/api/partner/team"),
                 "{\"email\":\"" + target + "\",\"role\":\"VIEWER\"}"), coOwner))
-            .andExpect(status().isCreated());
+            .andExpect(status().isAccepted());
         // R3b: OWNER@COMPANY carries every permission over the company
         expect(get("/api/partner/hotels"), coOwner, HttpStatus.OK);
         expect(get("/api/partner/extranet/home"), coOwner, HttpStatus.OK);
@@ -393,11 +397,10 @@ class RbacKernelHttpTest {
         return new Partner(token, profileId, userRepo.findByEmail(email).orElseThrow().getId(), email);
     }
 
+    /** RBAC R4: members join through accepted invitations; the seeder creates exactly that membership. */
     private void addMember(Partner owner, String email, String role) throws Exception {
         makePartnerAccount(email);
-        mvc.perform(auth(json(post("/api/partner/team"),
-                "{\"email\":\"" + email + "\",\"role\":\"" + role + "\"}"), owner.token()))
-            .andExpect(status().isCreated());
+        seeder.seed(owner.profileId(), email, com.example.planyourtrip.model.PartnerTeamRole.valueOf(role));
     }
 
     private String member(Partner owner, String role) throws Exception {

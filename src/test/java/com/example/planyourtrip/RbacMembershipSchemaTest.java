@@ -141,7 +141,12 @@ class RbacMembershipSchemaTest {
 
         jdbc.update("update partner_team_members set active = false, status = 'SUSPENDED', status_reason = 'LEGACY_INACTIVE' "
             + "where id = ?", member);
-        jdbc.update("update partner_team_members set status = 'REVOKED' where id = ?", member);
+        // RBAC R4 (V8): a revoked row carries its own id as revocation key, a live row 0 — never anything else
+        refusedSql("ck_partner_team_members_revocation_key",
+            "update partner_team_members set status = 'REVOKED' where id = ?", member);
+        refusedSql("ck_partner_team_members_revocation_key",
+            "update partner_team_members set revocation_key = id where id = ?", member);
+        jdbc.update("update partner_team_members set status = 'REVOKED', revocation_key = id where id = ?", member);
         jdbc.update("update partner_team_members set role = 'HOUSEKEEPING' where id = ?", member);
     }
 

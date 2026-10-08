@@ -65,6 +65,7 @@ class RbacOwnerTeamSecurityTest {
     @Autowired AdministrativeUnitRepository locationRepo;
     @Autowired PartnerTeamMemberRepository teamMemberRepo;
     @Autowired PartnerMemberGrantRepository grantRepo;
+    @Autowired com.example.planyourtrip.support.TeamMemberSeeder seeder;
 
     private static final AtomicInteger counter = new AtomicInteger(1);
     private static final String PASSWORD = "password123";
@@ -216,8 +217,12 @@ class RbacOwnerTeamSecurityTest {
         markPendingCoOwner(legacy.rowId()); // the state M-6 (V7) leaves a legacy co-owner in
 
         String other = partnerAccount();
+        // RBAC R4: a pending co-owner holds MANAGER's rights only - those now include inviting below-manager roles
+        // (§31 Q3), never an owner, and never the payout account
         send(json(post("/api/partner/team"), "{\"email\":\"" + other + "\",\"role\":\"VIEWER\"}"), legacy.token())
-            .andExpect(status().isForbidden()).andExpect(jsonPath("$.code").value("PERMISSION_DENIED"));
+            .andExpect(status().isAccepted());
+        send(json(post("/api/partner/team"), "{\"email\":\"" + partnerAccount() + "\",\"role\":\"OWNER\"}"), legacy.token())
+            .andExpect(status().isForbidden()).andExpect(jsonPath("$.code").value("OWNER_PROTECTED"));
         send(json(put("/api/partner/payout-account"), PAYOUT_BODY.formatted("1234567890")), legacy.token())
             .andExpect(status().isForbidden());
 
@@ -227,8 +232,10 @@ class RbacOwnerTeamSecurityTest {
             .andExpect(jsonPath("$.pendingOwnerConfirmation").value(false))
             .andExpect(jsonPath("$.role").value("OWNER"));
         assertTrue(actions(p.companyId()).contains("OWNER_GRANTED"));
-        send(json(post("/api/partner/team"), "{\"email\":\"" + other + "\",\"role\":\"VIEWER\"}"), legacy.token())
-            .andExpect(status().isCreated());
+        // confirmed: owner-level invitations become possible (with a fresh session)
+        send(json(post("/api/partner/team"), "{\"email\":\"" + partnerAccount() + "\",\"role\":\"OWNER\"}"),
+                login(legacy.email(), PASSWORD))
+            .andExpect(status().isAccepted());
     }
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -236,13 +243,15 @@ class RbacOwnerTeamSecurityTest {
     // ═══════════════════════════════════════════════════════════════════════
 
     @Test
-    void nonOwnersCannotChangeAnyMembership() throws Exception {
+    void rolesWithoutTeamPermissionsCannotChangeAnyMembership() throws Exception {
         Partner p = approvedPartner();
         Member manager = member(p, "MANAGER");
         Member finance = member(p, "FINANCE");
         Member viewer = member(p, "VIEWER");
 
-        for (Member actor : List.of(manager, finance, viewer)) {
+        // RBAC R4: MANAGER holds the team permissions (§31 Q3, see RbacTeamAdministrationTest); FINANCE and VIEWER
+        // hold none - FINANCE being company-wide gives it no team power (§10.4)
+        for (Member actor : List.of(finance, viewer)) {
             for (MockHttpServletRequestBuilder attempt : List.of(
                     json(patch("/api/partner/team/" + viewer.rowId()), "{\"role\":\"FRONT_DESK\"}"),
                     json(put("/api/partner/team/" + viewer.rowId() + "/grants"),
@@ -257,6 +266,11 @@ class RbacOwnerTeamSecurityTest {
         }
         assertEquals(List.of("VIEWER@COMPANY"), grants(viewer.rowId()));
         assertEquals(PartnerMembershipStatus.ACTIVE, teamMemberRepo.findById(viewer.rowId()).orElseThrow().getStatus());
+        // the manager may manage the viewer, but never the finance member (§10.3)
+        send(json(patch("/api/partner/team/" + viewer.rowId()), "{\"role\":\"FRONT_DESK\"}"), manager.token())
+            .andExpect(status().isOk());
+        send(post("/api/partner/team/" + finance.rowId() + "/suspend"), manager.token())
+            .andExpect(status().isForbidden()).andExpect(jsonPath("$.code").value("ROLE_NOT_DELEGABLE"));
     }
 
     @Test
@@ -390,8 +404,10 @@ class RbacOwnerTeamSecurityTest {
                 delete("/api/partner/team/" + m.rowId()))) {
             send(attempt, p.token()).andExpect(status().isNotFound());
         }
+        // RBAC R4 (RV-2): the person is re-invited - a new invitation, and on acceptance a NEW membership; the
+        // revoked row is never revived (RbacTeamAdministrationTest covers the acceptance)
         send(json(post("/api/partner/team"), "{\"email\":\"" + m.email() + "\",\"role\":\"VIEWER\"}"), p.token())
-            .andExpect(status().isUnprocessableEntity()).andExpect(jsonPath("$.code").value("MEMBER_NOT_ADDABLE"));
+            .andExpect(status().isAccepted());
         assertEquals(PartnerMembershipStatus.REVOKED, teamMemberRepo.findById(m.rowId()).orElseThrow().getStatus());
     }
 
@@ -402,10 +418,7 @@ class RbacOwnerTeamSecurityTest {
         Member m = member(a, "VIEWER");
 
         // suspended in B while active in A, then B tries to reactivate (WS-5)
-        String body = send(json(post("/api/partner/team"),
-                "{\"email\":\"" + m.email() + "\",\"role\":\"VIEWER\",\"active\":false}"), b.token())
-            .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
-        long rowInB = mapper.readTree(body).get("id").asLong();
+        long rowInB = seeder.seed(b.companyId(), m.email(), PartnerTeamRole.VIEWER, false);
         send(post("/api/partner/team/" + rowInB + "/reactivate"), b.token())
             .andExpect(status().isConflict())
             .andExpect(jsonPath("$.code").value("WORKSPACE_CONFLICT"))
@@ -440,6 +453,9 @@ class RbacOwnerTeamSecurityTest {
             .andExpect(jsonPath("$.grants.length()").value(2));
         send(post("/api/partner/team/" + m.rowId() + "/suspend"), p.token()).andExpect(status().isOk());
         send(post("/api/partner/team/" + m.rowId() + "/reactivate"), p.token()).andExpect(status().isOk());
+        send(json(put("/api/partner/team/" + m.rowId() + "/grants"),
+                grantsBody(version(m.rowId()), "OWNER", "COMPANY:" + p.companyId())), p.token())
+            .andExpect(status().isOk());
         Member owner2 = member(p, "OWNER");
         send(json(patch("/api/partner/team/" + owner2.rowId()), "{\"role\":\"MANAGER\"}"), p.token())
             .andExpect(status().isOk());
@@ -448,7 +464,9 @@ class RbacOwnerTeamSecurityTest {
         List<Map<String, Object>> rows = auditRows(p.companyId());
         Map<String, Map<String, Object>> byAction = new LinkedHashMap<>();
         rows.forEach(r -> byAction.putIfAbsent((String) r.get("action"), r));
-        for (String action : List.of("TEAM_MEMBER_ADDED", "TEAM_MEMBER_ROLE_CHANGED", "TEAM_MEMBER_SUSPENDED",
+        // RBAC R4: members join through invitations (TEAM_MEMBER_INVITED / TEAM_INVITATION_ACCEPTED, covered in
+        // RbacTeamInvitationTest); TEAM_MEMBER_ADDED is no longer written (§22.2)
+        for (String action : List.of("TEAM_MEMBER_ROLE_CHANGED", "TEAM_MEMBER_SUSPENDED",
                 "TEAM_MEMBER_REACTIVATED", "OWNER_GRANTED", "OWNER_REVOKED", "TEAM_MEMBER_REMOVED")) {
             Map<String, Object> row = byAction.get(action);
             assertNotNull(row, "missing audit " + action + " in " + byAction.keySet());
@@ -556,19 +574,24 @@ class RbacOwnerTeamSecurityTest {
     }
 
     @Test
-    void theLegacyAddAttachesOnlyAnExistingPartnerAccountAndPromotesNobody() throws Exception {
+    void theLegacyAddIsAnInvitationAliasAndPromotesNobody() throws Exception {
         Partner p = approvedPartner();
         Partner other = approvedPartner();
         String traveller = registerUser();
         Member existing = member(p, "VIEWER");
 
+        // RBAC R4 (§29): POST /team invites - one uniform 202 for an unknown address, a traveller, an administrator
+        // and another company's registrant (IN-1); nobody is attached or promoted (IN-2)
+        String uniform = null;
         for (String email : List.of("nobody-" + UUID.randomUUID() + "@test.com", traveller,
                 "admin@planyourtrip.com", other.email())) {
-            send(json(post("/api/partner/team"), "{\"email\":\"" + email + "\",\"role\":\"VIEWER\"}"), p.token())
-                .andExpect(status().isUnprocessableEntity())
-                .andExpect(jsonPath("$.code").value("MEMBER_NOT_ADDABLE"))
-                .andExpect(jsonPath("$.message").value("This account cannot be added to the team"));
+            String body = send(json(post("/api/partner/team"), "{\"email\":\"" + email + "\",\"role\":\"VIEWER\"}"), p.token())
+                .andExpect(status().isAccepted())
+                .andReturn().getResponse().getContentAsString();
+            if (uniform == null) uniform = body;
+            assertEquals(uniform, body, "the answer never depends on the address");
         }
+        assertEquals(2, teamIds(p).size(), "nobody joined: the owner and the existing viewer only");
         assertEquals("USER", userRepo.findByEmail(traveller).orElseThrow().getRole(), "no USER -> PARTNER promotion");
         send(json(post("/api/partner/team"), "{\"email\":\"" + existing.email() + "\",\"role\":\"VIEWER\"}"), p.token())
             .andExpect(status().isConflict()).andExpect(jsonPath("$.code").value("ALREADY_MEMBER"));
@@ -764,13 +787,13 @@ class RbacOwnerTeamSecurityTest {
         return new Partner(token, companyId, userId, email, ownerRow);
     }
 
-    /** Adds a Partner account with {@code role}; adding an OWNER uses the owner's fresh sign-in token. */
+    /**
+     * A Partner account in the team with {@code role} at company scope. RBAC R4: members join through accepted
+     * invitations; the seeder creates exactly that membership (the invitation flow is RbacTeamInvitationTest's).
+     */
     private Member member(Partner owner, String role) throws Exception {
         String email = partnerAccount();
-        String body = send(json(post("/api/partner/team"), "{\"email\":\"" + email + "\",\"role\":\"" + role + "\"}"),
-                owner.token())
-            .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
-        Long rowId = mapper.readTree(body).get("id").asLong();
+        Long rowId = seeder.seed(owner.companyId(), email, PartnerTeamRole.valueOf(role));
         return new Member(login(email, PASSWORD), userRepo.findByEmail(email).orElseThrow().getId(), email, rowId);
     }
 

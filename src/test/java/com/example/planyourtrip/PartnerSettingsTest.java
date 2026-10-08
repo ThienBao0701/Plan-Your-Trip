@@ -29,6 +29,7 @@ class PartnerSettingsTest {
     @Autowired MockMvc mvc;
     @Autowired ObjectMapper mapper;
     @Autowired com.example.planyourtrip.repository.UserRepository userRepo;
+    @Autowired com.example.planyourtrip.support.TeamMemberSeeder seeder;
 
     private String adminToken;
     private static final AtomicInteger counter = new AtomicInteger(1);
@@ -149,7 +150,7 @@ class PartnerSettingsTest {
     @Test
     void listTeamMembers() throws Exception {
         PartnerCtx partner = createAndApprovePartner();
-        addTeamMember(partner.token(), registerPlainUser("teammate"), "MANAGER");
+        addTeamMember(partner, registerPlainUser("teammate"), "MANAGER");
 
         String body = mvc.perform(get("/api/partner/team")
                 .header("Authorization", "Bearer " + partner.token()))
@@ -170,40 +171,63 @@ class PartnerSettingsTest {
         assertTrue(hasOwner);
     }
 
+    /**
+     * RBAC R4 (§29): the legacy add no longer attaches an account — it is an alias of the invitation endpoint, 202
+     * with the uniform body, and the address receives an invitation with the role at company scope.
+     */
     @Test
-    void addTeamMember_succeeds() throws Exception {
+    void addTeamMember_invitesThroughTheR4Alias() throws Exception {
         PartnerCtx partner = createAndApprovePartner();
         String email = registerPlainUser("newmember");
+        makePartnerAccount(email);
 
-        String body = addTeamMember(partner.token(), email, "FRONT_DESK");
-        JsonNode res = mapper.readTree(body);
+        mvc.perform(post("/api/partner/team")
+                .header("Authorization", "Bearer " + partner.token())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"email\":\"" + email + "\",\"role\":\"FRONT_DESK\"}"))
+            .andExpect(status().isAccepted())
+            .andExpect(jsonPath("$.status").value("REQUESTED"))
+            .andExpect(jsonPath("$.id").doesNotExist());
 
-        assertEquals(email, res.get("userEmail").asText());
-        assertEquals("FRONT_DESK", res.get("role").asText());
-        assertTrue(res.get("active").asBoolean());
+        JsonNode invitations = mapper.readTree(mvc.perform(get("/api/partner/team/invitations")
+                .header("Authorization", "Bearer " + partner.token()))
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
+        assertEquals(1, invitations.size());
+        assertEquals(email, invitations.get(0).get("email").asText());
+        assertEquals("PENDING", invitations.get(0).get("status").asText());
+        assertEquals("FRONT_DESK", invitations.get(0).get("grants").get(0).get("role").asText());
+        assertEquals("COMPANY:" + partner.profileId(), invitations.get(0).get("grants").get(0).get("scope").asText());
+        // nobody joined yet: the team is the owner alone
+        assertEquals(1, mapper.readTree(mvc.perform(get("/api/partner/team")
+                .header("Authorization", "Bearer " + partner.token()))
+            .andReturn().getResponse().getContentAsString()).size());
     }
 
+    /** RBAC R4: inviting is a security event — every owner is told, in-app, whatever the settings say (O-8). */
     @Test
-    void teamMember_receivesNotification() throws Exception {
+    void invitingNotifiesTheOwners() throws Exception {
         PartnerCtx partner = createAndApprovePartner();
         String email = registerPlainUser("notifyme");
-        String memberToken = login(email, "password123");
 
-        addTeamMember(partner.token(), email, "VIEWER");
+        mvc.perform(post("/api/partner/team")
+                .header("Authorization", "Bearer " + partner.token())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"email\":\"" + email + "\",\"role\":\"VIEWER\"}"))
+            .andExpect(status().isAccepted());
 
         String body = mvc.perform(get("/api/me/notifications")
-                .header("Authorization", "Bearer " + memberToken))
+                .header("Authorization", "Bearer " + partner.token()))
             .andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
 
-        assertTrue(containsTitle(mapper.readTree(body), "You were added to a partner team"));
+        assertTrue(containsTitle(mapper.readTree(body), "Team member invited"));
     }
 
     @Test
     void updateTeamMemberRole() throws Exception {
         PartnerCtx partner = createAndApprovePartner();
         String email = registerPlainUser("rolechange");
-        Long memberId = mapper.readTree(addTeamMember(partner.token(), email, "VIEWER")).get("id").asLong();
+        Long memberId = mapper.readTree(addTeamMember(partner, email, "VIEWER")).get("id").asLong();
 
         String body = mvc.perform(patch("/api/partner/team/" + memberId)
                 .header("Authorization", "Bearer " + partner.token())
@@ -219,7 +243,7 @@ class PartnerSettingsTest {
     void deactivateAndRemoveTeamMember() throws Exception {
         PartnerCtx partner = createAndApprovePartner();
         String email = registerPlainUser("removeme");
-        Long memberId = mapper.readTree(addTeamMember(partner.token(), email, "VIEWER")).get("id").asLong();
+        Long memberId = mapper.readTree(addTeamMember(partner, email, "VIEWER")).get("id").asLong();
 
         String deactivated = mvc.perform(patch("/api/partner/team/" + memberId)
                 .header("Authorization", "Bearer " + partner.token())
@@ -253,7 +277,7 @@ class PartnerSettingsTest {
         PartnerCtx partner = createAndApprovePartner();
         String email = registerPlainUser("vieweronly");
         String viewerToken = login(email, "password123");
-        addTeamMember(partner.token(), email, "VIEWER");
+        addTeamMember(partner, email, "VIEWER");
 
         mvc.perform(put("/api/partner/settings")
                 .header("Authorization", "Bearer " + viewerToken)
@@ -272,7 +296,7 @@ class PartnerSettingsTest {
         PartnerCtx partner = createAndApprovePartner();
         String email = registerPlainUser("financeperson");
         String financeToken = login(email, "password123");
-        addTeamMember(partner.token(), email, "FINANCE");
+        addTeamMember(partner, email, "FINANCE");
 
         putPayoutAccount(financeToken, "5555666677778888");
         mvc.perform(get("/api/partner/payout-account")
@@ -345,14 +369,19 @@ class PartnerSettingsTest {
             .andReturn().getResponse().getContentAsString();
     }
 
-    private String addTeamMember(String ownerToken, String email, String role) throws Exception {
+    /**
+     * Puts a Partner account in the team with {@code role} (RBAC R4: members join through accepted invitations, see
+     * {@code TeamMemberSeeder}) and returns the member as {@code GET /api/partner/team} shows it.
+     */
+    private String addTeamMember(PartnerCtx partner, String email, String role) throws Exception {
         makePartnerAccount(email);
-        return mvc.perform(post("/api/partner/team")
-                .header("Authorization", "Bearer " + ownerToken)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"email\":\"" + email + "\",\"role\":\"" + role + "\"}"))
-            .andExpect(status().isCreated())
-            .andReturn().getResponse().getContentAsString();
+        Long memberId = seeder.seed(partner.profileId(), email,
+            com.example.planyourtrip.model.PartnerTeamRole.valueOf(role));
+        JsonNode team = mapper.readTree(mvc.perform(get("/api/partner/team")
+                .header("Authorization", "Bearer " + partner.token()))
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
+        for (JsonNode m : team) if (m.get("id").asLong() == memberId) return m.toString();
+        throw new AssertionError("member " + memberId + " not listed");
     }
 
     private String registerPlainUser(String namePrefix) throws Exception {

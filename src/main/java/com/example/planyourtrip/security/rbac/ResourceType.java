@@ -17,7 +17,9 @@ public enum ResourceType {
     BOOKING(PartnerPermission.BOOKING_VIEW),
     CONVERSATION(PartnerPermission.CONVERSATION_VIEW),
     REVIEW(PartnerPermission.REVIEW_VIEW),
-    MEMBERSHIP(PartnerPermission.TEAM_VIEW);
+    MEMBERSHIP(PartnerPermission.TEAM_VIEW),
+    /** RBAC R4 — a team invitation; seen, like a membership, through team view covering all of its grants. */
+    INVITATION(PartnerPermission.TEAM_VIEW);
 
     private final PartnerPermission viewPermission;
 

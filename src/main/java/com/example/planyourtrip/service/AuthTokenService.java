@@ -126,7 +126,8 @@ public class AuthTokenService {
         return new ApiException(HttpStatus.BAD_REQUEST, "TOKEN_INVALID", "This link is invalid or has already been used");
     }
 
-    private static String newRawToken() {
+    /** 32 random bytes, base64url — also used for partner invitation tokens (RBAC R4, IN-7). */
+    static String newRawToken() {
         byte[] bytes = new byte[TOKEN_BYTES];
         RANDOM.nextBytes(bytes);
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);

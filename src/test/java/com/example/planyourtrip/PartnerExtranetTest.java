@@ -196,12 +196,13 @@ class PartnerExtranetTest {
     }
 
     @Test
-    void teamMemberAdd_createsActivityLog() throws Exception {
+    void teamMemberInvite_createsActivityLog() throws Exception {
+        // RBAC R4 (§22.2): members join through invitations; TEAM_MEMBER_ADDED is no longer written
         Scenario s = setupBookingScenario("TeamLog", 3, 5);
         String email = registerPlainUser("teammatelog");
         addTeamMember(s.partner().token(), email, "MANAGER");
 
-        assertTrue(containsAction(myActivityLogs(s.partner().token()), "TEAM_MEMBER_ADDED"));
+        assertTrue(containsAction(myActivityLogs(s.partner().token()), "TEAM_MEMBER_INVITED"));
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -430,7 +431,7 @@ class PartnerExtranetTest {
                 .header("Authorization", "Bearer " + ownerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"email\":\"" + email + "\",\"role\":\"" + role + "\"}"))
-            .andExpect(status().isCreated())
+            .andExpect(status().isAccepted())
             .andReturn().getResponse().getContentAsString();
     }
 

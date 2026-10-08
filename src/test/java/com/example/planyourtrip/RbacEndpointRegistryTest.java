@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * R1 — the endpoint authorization registry covers every partner and admin handler (RBAC V1.1 §24 B11, I17):
- * 95 partner (90 + 4 in RBAC R3a + 1 in R3b) and 181 admin handlers, no handler missing, no rule without a handler, and a missing mapping
+ * 99 partner (90 + 4 in RBAC R3a + 1 in R3b + 4 in R4) and 181 admin handlers, no handler missing, no rule without a handler, and a missing mapping
  * is refused rather than allowed.
  */
 @SpringBootTest
@@ -78,8 +78,9 @@ class RbacEndpointRegistryTest {
         assertEquals(Set.of(), difference(adminHandlers, adminRules), "admin handlers without a rule");
         assertEquals(Set.of(), difference(adminRules, adminHandlers), "admin rules without a handler");
         // RBAC R3a adds PUT /team/{id}/grants, POST /team/{id}/suspend, /reactivate and POST /team/leave;
-        // RBAC R3b adds GET /api/partner/me/access
-        assertEquals(95, partnerHandlers.size());
+        // RBAC R3b adds GET /api/partner/me/access; RBAC R4 adds GET/POST /team/invitations, POST
+        // /team/invitations/{id}/resend and DELETE /team/invitations/{id}
+        assertEquals(99, partnerHandlers.size());
         assertEquals(181, adminHandlers.size());
     }
 

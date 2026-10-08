@@ -75,6 +75,7 @@ class RbacPartnerEnforcementTest {
     @Autowired PartnerMemberGrantRepository grantRepo;
     @Autowired ConversationRepository conversationRepo;
     @Autowired PartnerAccessService partnerAccess;
+    @Autowired com.example.planyourtrip.support.TeamMemberSeeder seeder;
     @Autowired EndpointAuthorizationRegistry registry;
 
     private static final AtomicInteger counter = new AtomicInteger(1);
@@ -110,7 +111,7 @@ class RbacPartnerEnforcementTest {
     }
 
     @Test
-    void aCompanyManagerOperatesEverythingButPayoutAndTeamMutations() throws Exception {
+    void aCompanyManagerOperatesEverythingButPayoutAndOwnerLevelTeamChanges() throws Exception {
         Fixture f = fixture();
         String t = f.m("managerCompany").token();
         assertEquals(Set.of(f.p1(), f.p2()), ids(get("/api/partner/hotels"), t));
@@ -118,8 +119,12 @@ class RbacPartnerEnforcementTest {
         ok(get("/api/partner/extranet/activity-logs"), t);           // AU-4: MANAGER@COMPANY reads the trail
         ok(get("/api/partner/team"), t);
         denied(get("/api/partner/payout-account"), t);                 // P52 is OWNER/FINANCE only
-        denied(json(post("/api/partner/team"), "{\"email\":\"x@test.com\",\"role\":\"VIEWER\"}"), t); // R4
-        denied(post("/api/partner/team/" + f.m("viewerCompany").rowId() + "/suspend"), t);
+        // RBAC R4 (§31 Q3): MANAGER invites below-manager roles, never owners, and never touches FINANCE
+        ok(json(post("/api/partner/team"), "{\"email\":\"" + uniqueEmail("x") + "\",\"role\":\"VIEWER\"}"), t, 202);
+        send(json(post("/api/partner/team"), "{\"email\":\"" + uniqueEmail("x") + "\",\"role\":\"OWNER\"}"), t)
+            .andExpect(status().isForbidden()).andExpect(jsonPath("$.code").value("OWNER_PROTECTED"));
+        send(post("/api/partner/team/" + f.m("financeCompany").rowId() + "/suspend"), t)
+            .andExpect(status().isForbidden()).andExpect(jsonPath("$.code").value("ROLE_NOT_DELEGABLE"));
     }
 
     @Test
@@ -474,7 +479,8 @@ class RbacPartnerEnforcementTest {
         assertTrue(keys.containsAll(List.of("partner.property.view", "partner.booking.view", "partner.rate.edit")));
         assertFalse(keys.contains("partner.finance.statement.view"), "floor C never appears under a property");
         assertFalse(keys.contains("partner.property.create"));
-        assertFalse(keys.contains("partner.team.invite"), "MANAGER team mutations wait for R4");
+        assertTrue(keys.contains("partner.team.invite"), "RBAC R4: MANAGER's team permissions are active at its scope");
+        assertFalse(keys.contains("partner.team.owner.manage"), "owner management stays owner-only (floor C, O-2)");
         assertFalse(keys.contains("partner.housekeeping.view"), "reserved permissions are never listed");
         assertEquals(1, doc.get("context").get("properties").size());
         assertEquals(f.p1().longValue(), doc.get("context").get("properties").get(0).get("id").asLong());
@@ -493,7 +499,8 @@ class RbacPartnerEnforcementTest {
             PartnerTeamRole.FINANCE, 13, PartnerTeamRole.CONTENT, 8, PartnerTeamRole.HOUSEKEEPING, 5,
             PartnerTeamRole.VIEWER, 9);
         totals.forEach((role, n) -> assertEquals(n, PartnerRoleBundles.of(role).size(), role.name()));
-        assertEquals(43, PartnerRoleBundles.effective(PartnerTeamRole.MANAGER).size());
+        // RBAC R4: MANAGER's team permissions (P08-P11) are no longer withheld
+        assertEquals(47, PartnerRoleBundles.effective(PartnerTeamRole.MANAGER).size());
         for (PartnerTeamRole role : PartnerTeamRole.values()) {
             if (role == PartnerTeamRole.OWNER) continue;
             for (PartnerPermission p : List.of(PartnerPermission.BUSINESS_PROFILE_EDIT, PartnerPermission.SECURITY_SETTINGS_MANAGE,
@@ -507,7 +514,7 @@ class RbacPartnerEnforcementTest {
     void noRoleCanRaiseItsOwnOrAnotherMembersPrivileges() throws Exception {
         Fixture f = fixture();
         Member self = f.m("managerCompany");
-        // MANAGER holds no grant-assignment before R4 and never P12: not for itself, not for anyone
+        // MANAGER never modifies itself, never assigns MANAGER or above, and never holds P12 (RBAC R4, §10.3)
         denied(json(put("/api/partner/team/" + self.rowId() + "/grants"), grants(self.rowId(), "OWNER", "COMPANY:" + f.a().companyId())), self.token());
         denied(json(put("/api/partner/team/" + f.m("viewerCompany").rowId() + "/grants"),
             grants(f.m("viewerCompany").rowId(), "MANAGER", "COMPANY:" + f.a().companyId())), self.token());
@@ -522,7 +529,7 @@ class RbacPartnerEnforcementTest {
         PartnerAccessContext ctx = partnerAccess.requireWorkspace(self.userId());
         assertTrue(PartnerAuthorization.effectivePermissions(ctx).company().stream()
             .noneMatch(p -> p == PartnerPermission.TEAM_OWNER_MANAGE || p == PartnerPermission.OWNERSHIP_TRANSFER
-                || p == PartnerPermission.TEAM_ROLE_ASSIGN));
+));
     }
 
     @Test
@@ -664,8 +671,8 @@ class RbacPartnerEnforcementTest {
         User u = userRepo.findByEmail(email).orElseThrow();
         u.setRole("PARTNER");
         userRepo.save(u);
-        Long rowId = body(json(post("/api/partner/team"), "{\"email\":\"" + email + "\",\"role\":\"" + role + "\"}"),
-            company.ownerToken(), 201).get("id").asLong();
+        // RBAC R4: members join through accepted invitations; the seeder creates exactly that membership
+        Long rowId = seeder.seed(company.companyId(), email, PartnerTeamRole.valueOf(role));
         return new Member(login(email), u.getId(), email, rowId);
     }
 

@@ -14,18 +14,15 @@ import static com.example.planyourtrip.security.rbac.PartnerPermission.*;
  * RBAC R3b — the default permission bundle of every partner role, exactly the matrix of RBAC V1.1 §10.1.
  *
  * <p>{@link #of} is the matrix as designed (OWNER 54, MANAGER 47, REVENUE 17, RESERVATIONS 16, FRONT_DESK 16,
- * FINANCE 13, CONTENT 8, HOUSEKEEPING 5, VIEWER 9). {@link #effective} is what a grant carries today: MANAGER's
- * team mutations (P08–P11, footnote ¹) take effect only in R4, so until then they are withheld and team mutations
- * stay owner-only. Reserved permissions are part of the bundles but no endpoint uses them (§9.1).
+ * FINANCE 13, CONTENT 8, HOUSEKEEPING 5, VIEWER 9). {@link #effective} is what a grant carries today. RBAC R4
+ * activates MANAGER's team mutations (P08–P11, footnote ¹, §31 Q3), so {@code effective} now equals the matrix;
+ * what a manager may do with them is bounded by delegation and authority (§10.3, {@code PartnerTeamAuthority}).
+ * Reserved permissions are part of the bundles but no endpoint uses them (§9.1).
  *
  * <p>A bundle says what a role may do; where it may do it is the grant's scope, cut by each permission's floor
  * ({@link PartnerAuthorization#effectiveScopes}).
  */
 public final class PartnerRoleBundles {
-
-    /** MANAGER's team mutations, deferred to R4 (§10.1 footnote ¹, §31 Q3). */
-    public static final Set<PartnerPermission> DEFERRED_TO_R4 =
-        Set.copyOf(EnumSet.of(TEAM_INVITE, TEAM_ROLE_ASSIGN, TEAM_SUSPEND, TEAM_REMOVE));
 
     private static final Map<PartnerTeamRole, Set<PartnerPermission>> MATRIX = new EnumMap<>(PartnerTeamRole.class);
 
@@ -82,14 +79,11 @@ public final class PartnerRoleBundles {
     }
 
     /**
-     * What a grant of {@code role} carries in this release: the §10.1 bundle without MANAGER's R4 team
-     * mutations. OWNER keeps every permission (team mutations are owner-only, O-2).
+     * What a grant of {@code role} carries in this release. Since RBAC R4 this is the full §10.1 bundle: MANAGER
+     * holds its team permissions (P07–P11); owner management (P12) stays owner-only and non-delegable (O-2, O-5).
      */
     public static Set<PartnerPermission> effective(PartnerTeamRole role) {
-        if (role != PartnerTeamRole.MANAGER) return of(role);
-        EnumSet<PartnerPermission> bundle = EnumSet.copyOf(of(role));
-        bundle.removeAll(DEFERRED_TO_R4);
-        return Set.copyOf(bundle);
+        return of(role);
     }
 
     private static Set<PartnerPermission> set(PartnerPermission... permissions) {

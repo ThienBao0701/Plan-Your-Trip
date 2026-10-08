@@ -40,9 +40,8 @@ import java.util.function.Function;
  * which grants it holds and which company, property or room type each grant covers. It also writes grants
  * and enforces the one-workspace-per-account invariant (§11.6, I21).
  *
- * <p>R2 activates nothing. The R1 kernel keeps deciding with the legacy bundles
- * ({@code PartnerAccessService}); the grants written here mirror the legacy roles and are read only by
- * {@link #kernelGrants}, which the matrix enforcement phase (R3b) will use.
+ * <p>Since RBAC R3b the stored grants decide every request ({@link #kernelGrants}); since R4 memberships are also
+ * created here from accepted invitations ({@link #createMembership}).
  *
  * <p>Every read fails closed: a grant whose property or room no longer belongs to the membership's company,
  * or whose stored shape does not match the design, resolves to nothing.
@@ -62,6 +61,18 @@ public class PartnerMembershipService {
 
     /** A stored grant whose scope the server has resolved against current ownership. */
     public record ResolvedGrant(Long grantId, PartnerTeamRole role, ScopePath scope) {}
+
+    /** Highest authority first (§10.3); the legacy {@code role} column shows the highest grant. */
+    public static final List<PartnerTeamRole> AUTHORITY_ORDER = List.of(
+        PartnerTeamRole.OWNER, PartnerTeamRole.MANAGER, PartnerTeamRole.FINANCE, PartnerTeamRole.REVENUE,
+        PartnerTeamRole.RESERVATIONS, PartnerTeamRole.FRONT_DESK, PartnerTeamRole.CONTENT,
+        PartnerTeamRole.HOUSEKEEPING, PartnerTeamRole.VIEWER);
+
+    /** The highest-authority role among {@code roles} (§10.3: a membership is held at its highest role). */
+    public static PartnerTeamRole highestRole(java.util.Collection<PartnerTeamRole> roles) {
+        return roles.stream().min(java.util.Comparator.comparingInt(AUTHORITY_ORDER::indexOf))
+            .orElseThrow(() -> new IllegalArgumentException("A membership needs at least one grant"));
+    }
 
     private final PartnerTeamMemberRepository members;
     private final PartnerMemberGrantRepository grants;
@@ -172,6 +183,33 @@ public class PartnerMembershipService {
             });
     }
 
+    // ── Memberships: writing (RBAC R4) ───────────────────────────────────────
+
+    /**
+     * RBAC R4 — creates a NEW live membership with exactly {@code newGrants} (§14 step 7). Never revives a revoked
+     * row (RV-2): the account's revoked memberships of the company stay as history, and the database key
+     * {@code uk_partner_team_members_live} refuses a second live membership of the same company and account. The
+     * caller has validated the grants, the one-workspace rule and its authority, under the company lock.
+     */
+    @Transactional
+    public PartnerTeamMember createMembership(PartnerProfile company, com.example.planyourtrip.model.User user,
+                                              List<Map.Entry<PartnerTeamRole, ScopeRef>> newGrants,
+                                              Long actorUserId, java.time.Instant invitedAt) {
+        if (newGrants == null || newGrants.isEmpty()) throw new IllegalArgumentException("A membership needs a grant");
+        PartnerTeamMember member = new PartnerTeamMember();
+        member.setPartnerProfile(company);
+        member.setUser(user);
+        member.setRole(highestRole(newGrants.stream().map(Map.Entry::getKey).toList()));
+        member.setActive(true, actorUserId);
+        java.time.Instant now = java.time.Instant.now();
+        member.setInvitedAt(invitedAt == null ? now : invitedAt);
+        member.setJoinedAt(now);
+        PartnerTeamMember saved = members.saveAndFlush(member);
+        for (Map.Entry<PartnerTeamRole, ScopeRef> g : newGrants) grant(saved, g.getKey(), g.getValue(), actorUserId);
+        grants.flush();
+        return saved;
+    }
+
     // ── Grants: writing ──────────────────────────────────────────────────────
 
     /**
@@ -265,6 +303,12 @@ public class PartnerMembershipService {
                     grant.getId(), companyId));
         }
         return resolved;
+    }
+
+    /** RBAC R4 — the scopes of a membership's grants as they resolve today (its scope as a team resource, §11.2). */
+    @Transactional(readOnly = true)
+    public List<ScopePath> scopesOf(PartnerTeamMember membership) {
+        return resolveGrants(membership).stream().map(ResolvedGrant::scope).toList();
     }
 
     /**

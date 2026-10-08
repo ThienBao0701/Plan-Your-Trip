@@ -69,6 +69,7 @@ class PartnerBookingNotificationTest {
     @Autowired AdministrativeUnitRepository locationRepo;
     @Autowired NotificationRepository notificationRepo;
     @Autowired PartnerProfileRepository partnerProfileRepo;
+    @Autowired com.example.planyourtrip.support.TeamMemberSeeder seeder;
 
     /** Spied so a notification write can be made to fail deterministically. */
     @MockitoSpyBean NotificationService notificationService;
@@ -249,15 +250,11 @@ class PartnerBookingNotificationTest {
         OwnedHotelRoom r = setupOwnedHotelRoom("TeamMember");
         Long ownerUserId = ownerUserId(r);
 
-        // Invite a second account onto the partner team.
+        // A second account on the partner team (RBAC R4: members join through invitations — seeded here).
         String memberEmail = "d9-member-" + counter.getAndIncrement() + "@test.com";
         registerAndLogin(memberEmail, "Team Member");
         makePartnerAccount(memberEmail);
-        mvc.perform(post("/api/partner/team")
-                .header("Authorization", "Bearer " + r.partner().token())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"email\":\"" + memberEmail + "\",\"role\":\"MANAGER\"}"))
-            .andExpect(status().isCreated());
+        seeder.seed(r.partner().profileId(), memberEmail, com.example.planyourtrip.model.PartnerTeamRole.MANAGER);
 
         String guest = registerGuest();
         Long bookingId = createBooking(guest, r.roomId(), today.plusDays(10), today.plusDays(12));

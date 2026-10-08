@@ -9,6 +9,7 @@ import com.example.planyourtrip.repository.BookingRepository;
 import com.example.planyourtrip.repository.ConversationRepository;
 import com.example.planyourtrip.repository.HotelDetailRepository;
 import com.example.planyourtrip.repository.HotelRoomRepository;
+import com.example.planyourtrip.repository.PartnerInvitationRepository;
 import com.example.planyourtrip.repository.PartnerTeamMemberRepository;
 import com.example.planyourtrip.repository.PlaceRepository;
 import com.example.planyourtrip.repository.PromotionRepository;
@@ -49,6 +50,7 @@ public class PartnerResourceTargetResolver {
     private final ConversationRepository conversations;
     private final ReviewRepository reviews;
     private final PartnerTeamMemberRepository teamMembers;
+    private final PartnerInvitationRepository invitations;
 
     public PartnerResourceTargetResolver(PlaceRepository places,
                                          HotelDetailRepository hotelDetails,
@@ -59,7 +61,8 @@ public class PartnerResourceTargetResolver {
                                          PromotionRepository promotions,
                                          ConversationRepository conversations,
                                          ReviewRepository reviews,
-                                         PartnerTeamMemberRepository teamMembers) {
+                                         PartnerTeamMemberRepository teamMembers,
+                                         PartnerInvitationRepository invitations) {
         this.places = places;
         this.hotelDetails = hotelDetails;
         this.rooms = rooms;
@@ -70,6 +73,7 @@ public class PartnerResourceTargetResolver {
         this.conversations = conversations;
         this.reviews = reviews;
         this.teamMembers = teamMembers;
+        this.invitations = invitations;
     }
 
     /** The stored location of the resource of {@code type} with {@code id}, or empty. */
@@ -94,6 +98,9 @@ public class PartnerResourceTargetResolver {
             case REVIEW -> reviews.findById(id).flatMap(review -> propertyPathOf(review.getPlace()));
             case MEMBERSHIP -> teamMembers.findById(id)
                 .flatMap(member -> companyPathOf(member.getPartnerProfile()));
+            // RBAC R4: like a membership, an invitation lives in its company; its grants refine it (§11.2)
+            case INVITATION -> invitations.findById(id)
+                .flatMap(invitation -> companyPathOf(invitation.getPartnerProfile()));
         };
     }
 

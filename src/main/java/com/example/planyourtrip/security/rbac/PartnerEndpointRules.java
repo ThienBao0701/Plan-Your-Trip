@@ -166,8 +166,19 @@ final class PartnerEndpointRules {
         company(GET, "/api/partner/payout-account", PAYOUT_ACCOUNT_VIEW),
         company(PUT, "/api/partner/payout-account", PAYOUT_ACCOUNT_MANAGE).withStepUp(),
         collection(GET, "/api/partner/team", ResourceType.MEMBERSHIP, TEAM_VIEW),
+        // RBAC R4 (§29): an alias of POST /team/invitations with the role at company scope — 202, uniform body
         company(POST, "/api/partner/team", TEAM_INVITE)
             .when("P12 and step-up when the role is OWNER", TEAM_OWNER_MANAGE),
+        // RBAC R4 (§25.3, §13): invitations. Creation is authorized against the body's grants (P08 covering every
+        // grant scope, §13.1 step 1), like a promotion's body target — so a property-scoped manager may invite to
+        // their property (PA-3); the design table's COMPANY marking is read through that normative step.
+        collection(GET, "/api/partner/team/invitations", ResourceType.INVITATION, TEAM_VIEW),
+        resource(POST, "/api/partner/team/invitations", ResourceType.INVITATION, TEAM_INVITE)
+            .when("P08 at a scope covering every invited grant; P12 and step-up when OWNER is invited",
+                TEAM_OWNER_MANAGE),
+        resource(POST, "/api/partner/team/invitations/{id}/resend", ResourceType.INVITATION, TEAM_INVITE)
+            .when("P12 and step-up when the invitation carries OWNER", TEAM_OWNER_MANAGE),
+        resource(DELETE, "/api/partner/team/invitations/{id}", ResourceType.INVITATION, TEAM_INVITE),
         resource(PATCH, "/api/partner/team/{id}", ResourceType.MEMBERSHIP, TEAM_ROLE_ASSIGN)
             .when("P09 for a role change, P10 for an active change, P12 and step-up when OWNER is involved",
                 TEAM_SUSPEND, TEAM_OWNER_MANAGE),
