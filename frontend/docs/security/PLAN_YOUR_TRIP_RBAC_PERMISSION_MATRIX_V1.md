@@ -1675,7 +1675,7 @@ appears under `properties`, and a floor-`P` permission never appears under `unit
 | `DELETE /api/partner/team/{memberId}` | RESOURCE (membership) | P11 | R3a | soft revoke |
 | `POST /api/partner/team/leave` | SELF | membership | R3a | §17 |
 | `GET /api/partner/team/invitations` | COLLECTION (invitation) | P07 | R4 | within authority |
-| `POST /api/partner/team/invitations` | COMPANY | P08 (+P12, step-up for OWNER) | R4 | §13.1 — 202, uniform body |
+| `POST /api/partner/team/invitations` | RESOURCE (invitation; body target: every invited grant) | P08 (+P12, step-up for OWNER) | R4 | §13.1 — 202, uniform body; each invited grant is resolved per §11.2 and P08 must cover its scope (§11.4, PA-3), so no invitation widens the inviter's authority |
 | `POST /api/partner/team/invitations/{id}/resend` | RESOURCE (invitation) | P08 | R4 | §13.2 |
 | `DELETE /api/partner/team/invitations/{id}` | RESOURCE (invitation) | P08 | R4 | revoke |
 | `GET /api/me/partner-invitations` | SELF | authenticated PARTNER, verified email | R4 | §14 AC-5 |
