@@ -71,7 +71,10 @@ account columns on `users`, the `auth_tokens` table, and existing accounts marke
 read-only M-0 audit `db/audit/R2_M0_partner_membership_audit.sql` first; see `RBAC_MEMBERSHIP_FOUNDATION.md`),
 `V7__partner_membership_remediation` (RBAC R3a — M-6 membership remediation; run the M-0 audit again first; see
 `RBAC_OWNER_TEAM_SECURITY.md`), `V8__partner_invitations` (RBAC R4 — M-3 invitation tables and the live-membership
-key that lets a removed member re-join through a new membership; see `RBAC_TEAM_ADMINISTRATION.md`). R4 invitations
+key that lets a removed member re-join through a new membership; see `RBAC_TEAM_ADMINISTRATION.md`),
+`V9__admin_profile_assignments` (RBAC R6 — M-5 admin profile table; every existing `ADMIN` is backfilled as
+`PLATFORM_OWNER`, so nothing changes until profiles are narrowed; see `RBAC_ADMIN_PROFILES.md`),
+`V10__admin_dual_control_requests` (RBAC R6 — A16 dual-control request table; writes no row). R4 invitations
 answer 503 in production until a real email provider replaces `UnconfiguredEmailSender`.
 V3 SQL Server blocker: resolved in DB-07 (2026-10-09). V3 added a column and updated it in one batch (Msg 207);
 a single `GO` now separates them, under an approved exception (`RBAC_MEMBERSHIP_FOUNDATION.md` §7). The full
@@ -184,6 +187,33 @@ supplied through the environment only.
   `Msg 207 Invalid column name 'email_verified_at'` and left no column and no `auth_tokens` table.
 The container was removed afterwards. The Compose stack itself (`docker compose up`) was not exercised by DB-07.
 
+**RBAC R6 — V9: PASSED (2026-10-09)**, again on a disposable `mcr.microsoft.com/mssql/server:2022-latest` container
+published on `127.0.0.1` only, with a throwaway SA password, `JWT_SECRET` and bootstrap-admin password supplied
+through the environment only. The container was removed afterwards; the Compose stacks were not touched.
+- Run C (empty database `PYT_R6_VERIFY`): `SqlServerProdChainVerificationTest` 4/4, 0 skipped — "Successfully
+  applied 9 migrations … now at version v9"; `rbacR6AdminProfileMigrationAppliedWithItsConstraints` passed;
+  `flyway_schema_history` holds V1–V9, all `success = 1`; the bootstrap admin holds one active `PLATFORM_OWNER` row.
+- Run D (backfill, database `PYT_R6_BACKFILL`): migrated to V8 first (`spring.flyway.target=8`; that context start
+  failed `validate` on the missing V9 table, as expected), two `ADMIN` rows (one disabled) and one `USER` row were
+  inserted, then the gated test applied V9: 4/4. Both admins received `PLATFORM_OWNER` (`granted_by` null,
+  `revocation_key` 0); the `USER` received nothing.
+- Direct inserts on Run D's database were refused by the intended constraint: an unknown profile and both
+  inconsistent revocation states (CHECK), a second live row for the same profile (UNIQUE KEY), an unknown user
+  (FOREIGN KEY).
+
+**RBAC R6 — V10 (A16 dual control): PASSED (2026-10-10)**, on another disposable
+`mcr.microsoft.com/mssql/server:2022-latest` container published on `127.0.0.1` only, with throwaway secrets supplied
+through the environment only. The container was removed afterwards; the Compose stacks were not touched.
+- Run E (empty database `PYT_R6_V10`): `SqlServerProdChainVerificationTest` 5/5, 0 skipped — "Successfully applied 10
+  migrations … now at version v10"; `rbacR6DualControlMigrationAppliedWithItsConstraints` passed; V9 and V10 are in
+  `flyway_schema_history` with `success = 1`; V10 wrote no row.
+- Run F (upgrade, database `PYT_R6_V10_UPGRADE`): migrated to V9 first (`spring.flyway.target=9`; that context start
+  failed `validate` on the missing V10 table, as expected), then the gated test applied V10 alone ("Successfully
+  applied 1 migration … now at version v10"): 5/5.
+- Direct inserts on Run E's database were refused by the intended constraint: an unknown permission, target type and
+  status, a pending row with a closed live key, an approved row without an approver (CHECK), an unknown requester
+  (FOREIGN KEY), and a second open request for the same target (UNIQUE KEY) after a first was accepted.
+
 ## 21. Security checklist
 - [ ] `.env` is git-ignored and never committed; no real secrets in the repo.
 - [ ] SQL Server has **no** published host port (internal network only).
@@ -205,3 +235,20 @@ R4 (partner team administration and invitations, `RBAC_TEAM_ADMINISTRATION.md`) 
   are deployed. No provider or credential is configured by the R4 code.
 - [x] **V8 verified on SQL Server.** §20 passed on a disposable SQL Server 2022 database (DB-07, 2026-10-09),
   including `rbacR4InvitationMigrationAppliedWithItsConstraints`.
+
+## 23. RBAC R6 release notes
+R6 (admin profiles, `RBAC_ADMIN_PROFILES.md`):
+- [x] **V9 verified on SQL Server.** §20 Run C and Run D, on a disposable database only.
+- [x] **V10 verified on SQL Server.** §20 Run E and Run F, on disposable databases only.
+- [ ] **Privilege review after V9 (AP-4).** V9 makes every pre-existing `ADMIN` a `PLATFORM_OWNER`, **disabled accounts
+  included** (one that is re-enabled has full power again). Right after V9 is deployed, list the administrators
+  (`GET /api/admin/access/admins` or the console's Administrators screen) and have a platform owner assign the
+  intended profiles; AP-2 keeps at least one platform owner. V9 itself is not changed for this.
+- [ ] **A16 is dual-controlled (breaking API change).** `POST /api/admin/hotels/{id}/assign-owner` no longer moves the
+  property: it answers **202** with a pending request that a *different* platform owner approves at
+  `POST /api/admin/dual-control/requests/{id}/approve` within 24 hours. Submitting and approving both need a session
+  under 15 minutes old (`403 STEP_UP_REQUIRED`). Any script or runbook that called assign-owner and expected 200 must be
+  updated; the console has no assign-owner or approval screen (`RBAC_ADMIN_PROFILES.md` §6).
+- [ ] **Two enabled platform owners.** A16 cannot complete with only one: there is no break-glass path, and a request
+  nobody else approves expires after 24 hours. AP-2 guarantees only one, so assign a second before relying on A16.
+- A11 (owner recovery) stays reserved until R8, and the threshold actions A31/A39/A41/A42 stay single-actor until R7.

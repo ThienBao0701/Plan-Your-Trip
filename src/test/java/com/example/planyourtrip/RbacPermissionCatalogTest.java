@@ -55,7 +55,8 @@ class RbacPermissionCatalogTest {
     void reservedPermissionsAreExactlyTheFrozenTwelve() {
         assertEquals(Set.of("P06", "P13", "P19", "P20", "P22", "P41", "P46", "P47"),
             ids(Arrays.stream(PartnerPermission.values()).filter(Permission::reserved).toArray(Permission[]::new)));
-        assertEquals(Set.of("A02", "A07", "A11", "A12"),
+        // RBAC R6 activates A02 admin.access.manage with the admin access endpoints (§25.4).
+        assertEquals(Set.of("A07", "A11", "A12"),
             ids(Arrays.stream(AdminPermission.values()).filter(Permission::reserved).toArray(Permission[]::new)));
     }
 

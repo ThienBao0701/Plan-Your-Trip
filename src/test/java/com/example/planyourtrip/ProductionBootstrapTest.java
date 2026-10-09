@@ -6,6 +6,7 @@ import com.example.planyourtrip.dto.AuthDtos.LoginRequest;
 import com.example.planyourtrip.model.LoyaltyRedemptionPolicy;
 import com.example.planyourtrip.model.ReferralCampaign;
 import com.example.planyourtrip.model.User;
+import com.example.planyourtrip.repository.AdminProfileAssignmentRepository;
 import com.example.planyourtrip.repository.LoyaltyPointsRedemptionRepository;
 import com.example.planyourtrip.repository.LoyaltyRedemptionPolicyRepository;
 import com.example.planyourtrip.repository.ReferralCampaignRepository;
@@ -38,12 +39,13 @@ class ProductionBootstrapTest {
     @Autowired PasswordEncoder encoder;
     @Autowired ReferralCampaignRepository referralCampaigns;
     @Autowired LoyaltyRedemptionPolicyRepository redemptionPolicies;
+    @Autowired AdminProfileAssignmentRepository adminProfiles;
     @Autowired ReferralRewardRepository referralRewards;
     @Autowired LoyaltyPointsRedemptionRepository loyaltyRedemptions;
     @Autowired AuthService authService;
 
     private ProductionBootstrap bootstrap(String email, String password, String fullName) {
-        return new ProductionBootstrap(users, encoder, referralCampaigns, redemptionPolicies,
+        return new ProductionBootstrap(users, encoder, referralCampaigns, redemptionPolicies, adminProfiles,
                 email, password, fullName);
     }
 
@@ -120,6 +122,9 @@ class ProductionBootstrapTest {
         assertTrue(u.isEnabled());
         assertNotEquals(password, u.getPasswordHash(), "password must be hashed, not stored in plaintext");
         assertTrue(encoder.matches(password, u.getPasswordHash()));
+        // RBAC R6 (AP-2, AP-4): the bootstrap administrator is the platform owner, a system grant.
+        assertEquals(java.util.List.of(com.example.planyourtrip.security.rbac.AdminProfile.PLATFORM_OWNER),
+            adminProfiles.findActiveProfiles(u.getId()));
     }
 
     @Test

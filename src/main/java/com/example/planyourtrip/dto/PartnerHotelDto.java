@@ -224,7 +224,12 @@ public class PartnerHotelDto {
         @NotNull @Size(max = AMENITIES_MAX) List<Long> amenityIds
     ) {}
 
+    /**
+     * {@code POST /api/admin/hotels/{id}/assign-owner}. Since RBAC R6 this submits an A16 dual-control request
+     * (202) instead of moving the property; {@code reason} is optional, credential-free, at most 500 characters.
+     */
     public record AssignOwnerRequest(
-        @NotNull Long partnerProfileId
+        @NotNull Long partnerProfileId,
+        @jakarta.validation.constraints.Size(max = 500) String reason
     ) {}
 }

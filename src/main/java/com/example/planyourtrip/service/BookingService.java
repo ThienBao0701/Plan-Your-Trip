@@ -1183,7 +1183,8 @@ public class BookingService {
             b.getMealPlanType() != null ? b.getMealPlanType().name() : null,
             b.getCancellationPolicyType() != null ? b.getCancellationPolicyType().name() : null,
             b.getCancellationDeadlineAt(), b.getRefundable(),
-            b.getNightlyRateSnapshot(), b.getRatePlanAdjustmentSnapshot()
+            b.getNightlyRateSnapshot(), b.getRatePlanAdjustmentSnapshot(),
+            null
         );
     }
 

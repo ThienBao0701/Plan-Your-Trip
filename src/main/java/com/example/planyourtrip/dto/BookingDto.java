@@ -88,8 +88,30 @@ public class BookingDto {
         Instant cancellationDeadlineAt,
         Boolean refundable,
         BigDecimal nightlyRateSnapshot,
-        BigDecimal ratePlanAdjustmentSnapshot
-    ) {}
+        BigDecimal ratePlanAdjustmentSnapshot,
+        // RBAC R6 — null except in an admin response masked for a caller without A05 admin.customer.view
+        // (§21.4, AP-6): then it lists the withheld guest fields, as partner responses do (§31 Q15).
+        List<RedactedField> redacted
+    ) {
+        /**
+         * RBAC R6 — this booking as an administrator without A05 {@code admin.customer.view} may see it (§21.4,
+         * AP-6): the guest's name masked, the guest's email omitted, both listed in {@code redacted}.
+         */
+        public BookingResponse withGuestIdentityMasked() {
+            return new BookingResponse(
+            id, bookingCode, userId, RedactedField.maskName(userFullName), null,
+            hotelId, hotelName, roomId, roomName, roomCode,
+            checkIn, checkOut, nights, adults, children,
+            numberOfRooms, status, currency, basePrice, ratePlanPrice,
+            discountAmount, finalPrice, specialRequest, partnerNote, createdAt,
+            updatedAt, confirmedAt, cancelledAt, actualCheckInAt, actualCheckOutAt,
+            completedAt, archivedAt, lastStatusChangedAt, cancelReason, couponCode,
+            couponDiscountAmount, creditAmountUsed, loyaltyDiscountAmount, loyaltyPointsRedeemed, giftCardAmountUsed,
+            giftCardReference, selectedRatePlanId, selectedRatePlanCode, selectedRatePlanName, mealPlanType,
+            cancellationPolicyType, cancellationDeadlineAt, refundable, nightlyRateSnapshot, ratePlanAdjustmentSnapshot,
+            List.of(RedactedField.masked("userFullName"), RedactedField.omitted("userEmail")));
+        }
+    }
 
     /**
      * Phase 7.34 — customer modification of a PENDING (not-yet-paid) booking. Every field is

@@ -5,10 +5,10 @@ import com.example.planyourtrip.dto.HotelDetailDto.HotelDetailResponse;
 import com.example.planyourtrip.dto.HotelExperienceDto.ExperienceRequest;
 import com.example.planyourtrip.dto.HotelExperienceDto.ExperienceResponse;
 import com.example.planyourtrip.dto.PartnerHotelDto.AssignOwnerRequest;
-import com.example.planyourtrip.dto.PartnerHotelDto.PartnerHotelResponse;
+import com.example.planyourtrip.dto.AdminDualControlDto.DualControlRequestResponse;
+import com.example.planyourtrip.service.AdminDualControlService;
 import com.example.planyourtrip.service.HotelDetailService;
 import com.example.planyourtrip.service.HotelExperienceService;
-import com.example.planyourtrip.service.PartnerPropertyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,14 +25,14 @@ public class AdminHotelController {
 
     private final HotelDetailService service;
     private final HotelExperienceService experienceService;
-    private final PartnerPropertyService partnerPropertyService;
+    private final AdminDualControlService dualControl;
 
     public AdminHotelController(HotelDetailService service,
                                  HotelExperienceService experienceService,
-                                 PartnerPropertyService partnerPropertyService) {
-        this.service                = service;
-        this.experienceService      = experienceService;
-        this.partnerPropertyService = partnerPropertyService;
+                                 AdminDualControlService dualControl) {
+        this.service           = service;
+        this.experienceService = experienceService;
+        this.dualControl       = dualControl;
     }
 
     @GetMapping("/{placeId}")
@@ -73,12 +73,17 @@ public class AdminHotelController {
         return experienceService.updateExperience(placeId, req, adminId);
     }
 
+    /**
+     * RBAC R6 — A16 is dual-controlled (§22.6): this submits a request (202) that a second platform owner approves
+     * at {@code POST /api/admin/dual-control/requests/{id}/approve}; nothing moves until then.
+     */
     @PostMapping("/{hotelId}/assign-owner")
-    @Operation(summary = "Assign a hotel to a partner profile")
-    public PartnerHotelResponse assignOwner(
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @Operation(summary = "Request moving a hotel to a partner profile (dual control: a second admin approves)")
+    public DualControlRequestResponse assignOwner(
             @AuthUser Long uid,
             @PathVariable Long hotelId,
             @Valid @RequestBody AssignOwnerRequest req) {
-        return partnerPropertyService.assignOwner(uid, hotelId, req);
+        return dualControl.submit(uid, hotelId, req);
     }
 }

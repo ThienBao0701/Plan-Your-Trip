@@ -46,6 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class PartnerVoucherVerifyTest {
 
     @Autowired MockMvc mvc;
+    @Autowired com.example.planyourtrip.support.DualControlTestSupport dualControl;
     @Autowired ObjectMapper mapper;
     @Autowired CategoryRepository categoryRepo;
     @Autowired AdministrativeUnitRepository locationRepo;
@@ -187,10 +188,17 @@ class PartnerVoucherVerifyTest {
         Long bookingId = createAndConfirmBooking(guestToken, r.roomId(), today.plusDays(3), today.plusDays(5));
         String payload = fetchVoucherPayload(guestToken, bookingId);
 
-        // Flip the last character of the signature segment.
-        char last = payload.charAt(payload.length() - 1);
-        char replacement = last == 'A' ? 'B' : 'A';
-        String tampered = payload.substring(0, payload.length() - 1) + replacement;
+        // Tamper with the signature BYTES, not its text: a 32-byte HMAC is 43 unpadded Base64URL characters, and the
+        // last character's two low bits are padding that the decoder ignores, so swapping that character (e.g. A<->B)
+        // can leave the decoded signature unchanged. Flip a real bit and re-encode instead.
+        int dot = payload.lastIndexOf('.');
+        byte[] genuine = java.util.Base64.getUrlDecoder().decode(payload.substring(dot + 1));
+        byte[] forged = genuine.clone();
+        forged[0] ^= 0x01;
+        assertFalse(java.util.Arrays.equals(genuine, forged), "the tampered signature must differ in its bytes");
+        String tampered = payload.substring(0, dot + 1)
+            + java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(forged);
+        assertNotEquals(payload, tampered);
 
         verify(r.partner().token(), tampered).andExpect(status().isNotFound());
     }
@@ -563,11 +571,7 @@ class PartnerVoucherVerifyTest {
     }
 
     private void assignOwner(Long hotelId, Long partnerProfileId) throws Exception {
-        mvc.perform(post("/api/admin/hotels/" + hotelId + "/assign-owner")
-                .header("Authorization", "Bearer " + adminToken())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"partnerProfileId\":" + partnerProfileId + "}"))
-            .andExpect(status().isOk());
+        dualControl.assignOwner(mvc, adminToken(), hotelId, partnerProfileId);
     }
 
     private void bulkCreateInventory(Long roomId, LocalDate start, int days) throws Exception {

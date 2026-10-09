@@ -129,4 +129,51 @@ class SqlServerProdChainVerificationTest {
                 + "(status = 'REVOKED' AND revocation_key <> id) OR (status <> 'REVOKED' AND revocation_key <> 0)",
                 Integer.class));
     }
+
+    /**
+     * RBAC R6 — V9 (M-5) applied on SQL Server: the admin profile table and its named constraints exist, and every
+     * ADMIN account holds an active PLATFORM_OWNER grant (the AP-4 backfill, or the bootstrap's system grant).
+     */
+    @Test
+    void rbacR6AdminProfileMigrationAppliedWithItsConstraints() {
+        assertEquals(1, jdbc.queryForObject(
+                "SELECT COUNT(*) FROM flyway_schema_history WHERE success = 1 AND version = '9'", Integer.class));
+        for (String check : List.of("ck_admin_profile_assignments_profile", "ck_admin_profile_assignments_revocation")) {
+            assertEquals(1, jdbc.queryForObject("SELECT COUNT(*) FROM sys.check_constraints WHERE name = ?",
+                    Integer.class, check), check);
+        }
+        assertEquals(1, jdbc.queryForObject("SELECT COUNT(*) FROM sys.key_constraints WHERE name = "
+                + "'uk_admin_profile_assignments_live'", Integer.class));
+        assertEquals(3, jdbc.queryForObject("SELECT COUNT(*) FROM sys.foreign_keys WHERE name IN "
+                + "('fk_admin_profile_assignments_user', 'fk_admin_profile_assignments_granted_by', "
+                + "'fk_admin_profile_assignments_revoked_by')", Integer.class));
+        assertEquals(0, jdbc.queryForObject("SELECT COUNT(*) FROM users u WHERE u.role = 'ADMIN' AND NOT EXISTS ("
+                + "SELECT 1 FROM admin_profile_assignments a WHERE a.user_id = u.id "
+                + "AND a.profile = 'PLATFORM_OWNER' AND a.revoked_at IS NULL)", Integer.class),
+                "every ADMIN is a PLATFORM_OWNER until profiles are narrowed (AP-4)");
+    }
+
+    /**
+     * RBAC R6 — V10 (A16 dual control) applied on SQL Server: the request table with every named CHECK (invisible to
+     * {@code ddl-auto=validate}), the live unique key that allows one open request per action and target, the three
+     * foreign keys and the queue index. V10 writes no row.
+     */
+    @Test
+    void rbacR6DualControlMigrationAppliedWithItsConstraints() {
+        assertEquals(1, jdbc.queryForObject(
+                "SELECT COUNT(*) FROM flyway_schema_history WHERE success = 1 AND version = '10'", Integer.class));
+        for (String check : List.of("ck_admin_dual_control_requests_permission",
+                "ck_admin_dual_control_requests_target_type", "ck_admin_dual_control_requests_status",
+                "ck_admin_dual_control_requests_live", "ck_admin_dual_control_requests_decision")) {
+            assertEquals(1, jdbc.queryForObject("SELECT COUNT(*) FROM sys.check_constraints WHERE name = ?",
+                    Integer.class, check), check);
+        }
+        assertEquals(1, jdbc.queryForObject("SELECT COUNT(*) FROM sys.key_constraints WHERE name = "
+                + "'uk_admin_dual_control_requests_live'", Integer.class));
+        assertEquals(3, jdbc.queryForObject("SELECT COUNT(*) FROM sys.foreign_keys WHERE name IN "
+                + "('fk_admin_dual_control_requests_requested_by', 'fk_admin_dual_control_requests_approved_by', "
+                + "'fk_admin_dual_control_requests_rejected_by')", Integer.class));
+        assertEquals(1, jdbc.queryForObject("SELECT COUNT(*) FROM sys.indexes WHERE name = "
+                + "'idx_admin_dual_control_requests_status'", Integer.class));
+    }
 }

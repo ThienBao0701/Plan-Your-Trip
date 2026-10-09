@@ -73,13 +73,16 @@ class RbacMembershipMigrationTest {
             assertTrue(m.matches(), "unexpected migration file name " + r.getFilename());
             assertNull(versions.put(Integer.parseInt(m.group(1)), m.group(2)), "duplicate version " + m.group(1));
         }
-        // RBAC R4 adds V8 (M-3); its content is checked by RbacInvitationMigrationTest
-        assertEquals(List.of(1, 2, 3, 4, 5, 6, 7, 8), List.copyOf(versions.keySet()));
+        // RBAC R4 adds V8 (M-3), checked by RbacInvitationMigrationTest; RBAC R6 adds V9 (M-5), checked by
+        // RbacAdminProfileMigrationTest, and V10 (A16 dual control), checked by RbacDualControlMigrationTest
+        assertEquals(List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), List.copyOf(versions.keySet()));
         assertEquals("partner_membership_status", versions.get(4));
         assertEquals("partner_member_grants", versions.get(5));
         assertEquals("partner_activity_log_states", versions.get(6));
         assertEquals("partner_membership_remediation", versions.get(7));
         assertEquals("partner_invitations", versions.get(8));
+        assertEquals("admin_profile_assignments", versions.get(9));
+        assertEquals("admin_dual_control_requests", versions.get(10));
     }
 
     @Test

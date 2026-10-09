@@ -2,12 +2,14 @@ package com.example.planyourtrip.repository;
 
 import com.example.planyourtrip.model.Place;
 import com.example.planyourtrip.model.PlaceStatus;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -15,6 +17,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PlaceRepository extends JpaRepository<Place, Long>, JpaSpecificationExecutor<Place> {
+
+    /**
+     * RBAC R6 — the place, row-locked while an approved dual-control request moves it to another company (A16), so
+     * its current owner cannot change between the stale check and the move. Taken after the request row's lock.
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT p FROM Place p WHERE p.id = :id")
+    Optional<Place> lockById(@Param("id") Long id);
 
     @EntityGraph(attributePaths = {"category", "subcategory", "administrativeUnit"})
     @Query("SELECT p FROM Place p WHERE p.status = :status")

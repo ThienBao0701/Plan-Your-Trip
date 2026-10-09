@@ -6,7 +6,11 @@ import com.example.planyourtrip.dto.PlaceDto.*;
 import com.example.planyourtrip.dto.PlaceMetadataDto.PlaceMetadataRequest;
 import com.example.planyourtrip.dto.PlaceMetadataDto.PlaceMetadataResponse;
 import com.example.planyourtrip.model.PlaceStatus;
+import com.example.planyourtrip.exception.ApiException;
 import com.example.planyourtrip.security.AuthUser;
+import com.example.planyourtrip.security.rbac.AdminPermission;
+import com.example.planyourtrip.service.AdminAccessService;
+import com.example.planyourtrip.service.PartnerAccessService;
 import com.example.planyourtrip.service.PlaceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -14,6 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,9 +30,11 @@ import org.springframework.web.bind.annotation.*;
 public class AdminPlaceController {
 
     private final PlaceService service;
+    private final AdminAccessService adminAccess;
 
-    public AdminPlaceController(PlaceService service) {
+    public AdminPlaceController(PlaceService service, AdminAccessService adminAccess) {
         this.service = service;
+        this.adminAccess = adminAccess;
     }
 
     @GetMapping
@@ -70,7 +77,16 @@ public class AdminPlaceController {
     public PlaceResponse updateStatus(
             @PathVariable Long id,
             @Valid @RequestBody PlaceStatusRequest req,
-            @AuthUser Long adminId) {
+            @AuthUser Long adminId,
+            Authentication authentication) {
+        // RBAC R6 — the value-dependent mapping of §9.2/§25.5: making a listing public needs A46
+        // admin.place.publish; every other status (a take-down or workflow step) needs A15 admin.place.moderate.
+        // The registry let the request through on either; the requested value decides which one is required.
+        AdminPermission required = req.status() == PlaceStatus.PUBLISHED
+            ? AdminPermission.PLACE_PUBLISH : AdminPermission.PLACE_MODERATE;
+        if (!adminAccess.holds(authentication, required)) {
+            throw new ApiException(HttpStatus.FORBIDDEN, PartnerAccessService.PERMISSION_DENIED, "Access denied");
+        }
         return service.updateStatus(id, req.status(), adminId);
     }
 

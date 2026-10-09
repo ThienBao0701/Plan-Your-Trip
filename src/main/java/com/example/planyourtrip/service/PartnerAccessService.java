@@ -135,6 +135,17 @@ public class PartnerAccessService {
     }
 
     /**
+     * The properties over which {@code permission} is held, read like {@link #propertyIds}; empty when it is held
+     * nowhere. For field-level filters, e.g. a guest search that may only match where the guest's name or contact
+     * would be shown. Unit grants contribute no property, exactly as a unit grant never covers a property target.
+     */
+    @Transactional(readOnly = true)
+    public List<Long> propertyIdsHolding(PartnerAccessContext ctx, PartnerPermission permission) {
+        ScopeSet scope = PartnerAuthorization.collection(ctx, permission);
+        return scope.isEmpty() ? List.of() : propertyIds(ctx, scope);
+    }
+
+    /**
      * The property list a filtered collection or report runs over: all of {@link #propertyIds} without a filter,
      * otherwise just the filtered property — which must lie inside the scope set, else 404 like a missing id
      * (§4.5 COLLECTION step 4).

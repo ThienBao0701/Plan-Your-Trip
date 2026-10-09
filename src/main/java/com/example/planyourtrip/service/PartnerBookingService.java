@@ -122,7 +122,7 @@ public class PartnerBookingService {
         Specification<Booking> spec = Specification
             .where(BookingSpecification.withHotelIdIn(hotelIds))
             .and(BookingSpecification.withStatus(status))
-            .and(BookingSpecification.withGuest(guest))
+            .and(guestFilter(access, hotelIds, guest))
             .and(BookingSpecification.withBookingCode(bookingCode))
             .and(BookingSpecification.withRoomId(roomId))
             .and(BookingSpecification.withCheckInDateRange(checkInFrom, checkInTo))
@@ -144,6 +144,25 @@ public class PartnerBookingService {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         return PageResponse.of(bookingRepo.findAll(spec, pageable).map(b -> toPartnerSummary(access, b)));
+    }
+
+    /**
+     * RBAC (§21, I12) — {@code guest} is a substring match on the guest's name and email, so its rows and
+     * {@code totalElements} would answer "does this guest's name or email contain X?". It therefore matches the
+     * name only where the caller holds P54 and the email only where they hold P35, within the P34 properties.
+     * Held nowhere (REVENUE, VIEWER): 403 {@code PERMISSION_DENIED}, decided before any query, the same for every
+     * value and never echoing it. FINANCE (P54 without P35) searches names only.
+     */
+    private Specification<Booking> guestFilter(PartnerAccessContext access, List<Long> hotelIds, String guest) {
+        if (guest == null || guest.isBlank()) return Specification.where(null);
+        List<Long> names = partnerAccess.propertyIdsHolding(access, BOOKING_GUEST_IDENTITY_VIEW).stream()
+            .filter(hotelIds::contains).toList();
+        List<Long> emails = partnerAccess.propertyIdsHolding(access, BOOKING_GUEST_CONTACT_VIEW).stream()
+            .filter(hotelIds::contains).toList();
+        if (names.isEmpty() && emails.isEmpty()) {
+            throw new ApiException(HttpStatus.FORBIDDEN, PartnerAccessService.PERMISSION_DENIED, "Access denied");
+        }
+        return BookingSpecification.withGuestVisibleIn(guest, names, emails);
     }
 
     // ── Detail ───────────────────────────────────────────────────────────────

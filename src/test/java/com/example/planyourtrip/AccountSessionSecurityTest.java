@@ -55,6 +55,7 @@ class AccountSessionSecurityTest {
     @Autowired UserRepository users;
     @Autowired PasswordEncoder encoder;
     @Autowired JwtService jwt;
+    @Autowired com.example.planyourtrip.repository.AdminProfileAssignmentRepository adminProfiles;
     @Value("${app.jwt.secret}") String jwtSecret;
 
     // ══════════════════════════════════════════════════════════════════════════
@@ -201,7 +202,13 @@ class AccountSessionSecurityTest {
         u.setPasswordHash(encoder.encode(PASSWORD));
         u.setRole(role);
         u.setEmailVerifiedAt(Instant.now());
-        return users.saveAndFlush(u);
+        User saved = users.saveAndFlush(u);
+        // RBAC R6: an administrator acts through admin profiles; M-5 makes every ADMIN a PLATFORM_OWNER.
+        if ("ADMIN".equals(role)) {
+            adminProfiles.saveAndFlush(com.example.planyourtrip.model.AdminProfileAssignment.systemGrant(saved,
+                com.example.planyourtrip.security.rbac.AdminProfile.PLATFORM_OWNER, Instant.now()));
+        }
+        return saved;
     }
 
     private MvcResult login(String email, String password, int expectedStatus) throws Exception {

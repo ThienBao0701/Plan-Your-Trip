@@ -46,6 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class PartnerGuestStayTest {
 
     @Autowired MockMvc mvc;
+    @Autowired com.example.planyourtrip.support.DualControlTestSupport dualControl;
     @Autowired ObjectMapper mapper;
     @Autowired CategoryRepository categoryRepo;
     @Autowired AdministrativeUnitRepository locationRepo;
@@ -636,11 +637,7 @@ class PartnerGuestStayTest {
     }
 
     private void assignOwner(Long hotelId, Long partnerProfileId) throws Exception {
-        mvc.perform(post("/api/admin/hotels/" + hotelId + "/assign-owner")
-                .header("Authorization", "Bearer " + adminToken())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"partnerProfileId\":" + partnerProfileId + "}"))
-            .andExpect(status().isOk());
+        dualControl.assignOwner(mvc, adminToken(), hotelId, partnerProfileId);
     }
 
     private void bulkCreateInventory(Long roomId, LocalDate start, int days) throws Exception {

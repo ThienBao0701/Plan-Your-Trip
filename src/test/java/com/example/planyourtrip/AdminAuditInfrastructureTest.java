@@ -258,8 +258,14 @@ class AdminAuditInfrastructureTest {
         // Phase A deliberately adds four: ADMIN_LOGIN_SUCCESS, ADMIN_LOGIN_FAILED, ADMIN_PASSWORD_CHANGE and
         // ADMIN_PASSWORD_RESET (AuthService, AccountService), each from one call site.
         // RBAC R3a deliberately adds two: ADMIN_STEP_UP and ADMIN_STEP_UP_FAILED (AuthService.stepUp, §22.3).
-        assertEquals(116, sites.size(),
-            "RBAC R3a: the trail emits exactly 116 distinct administrative actions (114 after Phase A + 2 step-up). "
+        // RBAC R6 deliberately adds four (§22.3, §22.5): ADMIN_PROFILE_GRANT and ADMIN_PROFILE_REVOKE
+        // (AdminProfileService), TRAVEL_WALLET_VIEW and CONVERSATION_VIEW (AdminReadAuditService).
+        // RBAC R6 dual control deliberately adds six (§22.3, §22.6), each from one call site in AdminDualControlService:
+        // DUAL_CONTROL_REQUEST, DUAL_CONTROL_APPROVE, DUAL_CONTROL_REJECT, DUAL_CONTROL_CANCEL, DUAL_CONTROL_EXPIRE and
+        // DUAL_CONTROL_STALE. HOTEL_ASSIGN_OWNER keeps its single call site and now runs only on approval.
+        assertEquals(126, sites.size(),
+            "RBAC R6: the trail emits exactly 126 distinct administrative actions (116 after R3a + 2 profile + 2 read audit"
+                + " + 6 dual control). "
                 + "If a later phase legitimately adds one, update this number deliberately. Found: "
                 + sites.size());
     }
@@ -299,8 +305,9 @@ class AdminAuditInfrastructureTest {
         Set<String> targetTypes = targetTypesFromSource();
         Assumptions.assumeFalse(targetTypes.isEmpty(), "source tree not reachable");
 
-        assertEquals(35, targetTypes.size(),
-            "D3J adds no target types: the trail uses exactly 35. Found: " + targetTypes.size());
+        // RBAC R6 dual control deliberately adds one: DUAL_CONTROL_REQUEST.
+        assertEquals(36, targetTypes.size(),
+            "The trail uses exactly 36 target types (35 + DUAL_CONTROL_REQUEST). Found: " + targetTypes.size());
 
         for (String targetType : targetTypes) {
             assertTrue(targetType.matches("[A-Z][A-Z0-9_]{2,59}"), "malformed target type: " + targetType);

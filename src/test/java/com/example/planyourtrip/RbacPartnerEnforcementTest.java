@@ -64,6 +64,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class RbacPartnerEnforcementTest {
 
     @Autowired MockMvc mvc;
+    @Autowired com.example.planyourtrip.support.DualControlTestSupport dualControl;
     @Autowired ObjectMapper mapper;
     @Autowired JdbcTemplate jdbc;
     @Autowired JwtService jwt;
@@ -263,6 +264,121 @@ class RbacPartnerEnforcementTest {
         denied(patch("/api/partner/bookings/" + f.b1() + "/check-in"), t);
         denied(json(put("/api/partner/settings"), settingsBody()), t);
         denied(get("/api/partner/team"), t);
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // Guest search is no identity oracle (§21, I12; P54 name, P35 contact)
+    // ═══════════════════════════════════════════════════════════════════════
+
+    @Test
+    void revenueAndViewerCannotProbeGuestIdentityThroughTheGuestFilter() throws Exception {
+        Fixture f = fixture();
+        String email = guestEmail(f);
+        String emailProbe = email.substring(0, email.indexOf('@'));   // the guest's real local part
+        String nameProbe = f.guestName().split(" ")[0];               // a real part of the guest's name
+        String missing = "zz-nobody-" + UUID.randomUUID();
+        for (String role : List.of("revenueCompany", "viewerCompany")) {
+            String t = f.m(role).token();
+            List<String> refusals = new ArrayList<>();
+            for (MockHttpServletRequestBuilder probe : List.of(
+                    get("/api/partner/bookings").param("guest", emailProbe),
+                    get("/api/partner/bookings").param("guest", nameProbe),
+                    get("/api/partner/bookings").param("guest", missing),
+                    get("/api/partner/bookings").param("guest", emailProbe).param("bookingCode", "NOPE")
+                        .param("page", "3").param("size", "1"))) {
+                String raw = send(probe, t).andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.code").value("PERMISSION_DENIED"))
+                    .andExpect(jsonPath("$.message").value("Access denied"))
+                    .andExpect(jsonPath("$.path").value("/api/partner/bookings"))
+                    .andReturn().getResponse().getContentAsString();
+                assertFalse(raw.contains(emailProbe) || raw.contains(nameProbe) || raw.contains(missing),
+                    "the probe is never echoed: " + raw);
+                assertFalse(raw.contains("totalElements") || raw.contains("content"), raw);
+                refusals.add(raw.replaceAll("\"timestamp\":\"[^\"]*\"", ""));
+            }
+            assertEquals(1, Set.copyOf(refusals).size(), role + ": a hit and a miss are refused identically");
+
+            // the list itself is unchanged: both properties, masked names, no contact anywhere
+            String list = send(get("/api/partner/bookings").param("size", "100"), t).andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+            assertTrue(bookingIds(t).containsAll(List.of(f.b1(), f.b2())), role);
+            assertFalse(list.contains(email) || list.contains(emailProbe), role + " list carries no guest email");
+            assertFalse(list.contains(f.guestName()), role + " list carries no guest name");
+            // a blank filter is no filter
+            assertEquals(Set.copyOf(bookingIds(t)), ids(body(get("/api/partner/bookings").param("guest", "   ")
+                .param("size", "100"), t).get("content")), role);
+        }
+    }
+
+    @Test
+    void financeSearchesGuestNamesButNeverTheEmailItCannotSee() throws Exception {
+        Fixture f = fixture();
+        String t = f.m("financeCompany").token();
+        String emailProbe = guestEmail(f).substring(0, guestEmail(f).indexOf('@'));
+        // P54 company-wide: the name search works across the company
+        Set<Long> byName = ids(body(get("/api/partner/bookings").param("guest", f.guestName())
+            .param("size", "100"), t).get("content"));
+        assertTrue(byName.containsAll(List.of(f.b1(), f.b2())), byName.toString());
+        // no P35: an email that matches and one that matches nobody return the same empty page
+        JsonNode hit = body(get("/api/partner/bookings").param("guest", emailProbe), t);
+        JsonNode miss = body(get("/api/partner/bookings").param("guest", "zz-nobody-" + UUID.randomUUID()), t);
+        assertEquals(0, hit.get("totalElements").asInt());
+        assertEquals(miss.get("totalElements"), hit.get("totalElements"));
+        assertEquals(miss.get("totalPages"), hit.get("totalPages"));
+        assertEquals(0, hit.get("content").size());
+    }
+
+    @Test
+    void authorizedRolesSearchGuestsInsideTheirOwnScopeOnly() throws Exception {
+        Fixture f = fixture();
+        String emailProbe = guestEmail(f).substring(0, guestEmail(f).indexOf('@'));
+        // company-wide P54 + P35: both properties, never the other company's booking of the same guest
+        for (String t : List.of(f.a().ownerToken(), f.m("managerCompany").token())) {
+            Set<Long> found = ids(body(get("/api/partner/bookings").param("guest", emailProbe)
+                .param("size", "100"), t).get("content"));
+            assertEquals(Set.of(f.b1(), f.b2()), found);
+            assertFalse(found.contains(f.bq()));
+            assertEquals(0, body(get("/api/partner/bookings").param("guest", "zz-nobody-" + UUID.randomUUID()), t)
+                .get("totalElements").asInt());
+        }
+        // property-scoped: RESERVATIONS@P1 finds the guest at P1 only
+        String reservations = f.m("reservationsP1").token();
+        assertEquals(Set.of(f.b1()), ids(body(get("/api/partner/bookings").param("guest", emailProbe)
+            .param("size", "100"), reservations).get("content")));
+        assertEquals(Set.of(f.b1()), ids(body(get("/api/partner/bookings").param("guest", f.guestName())
+            .param("size", "100"), reservations).get("content")));
+    }
+
+    @Test
+    void aMixedMemberSearchesOnlyWhereTheyMaySeeTheGuest() throws Exception {
+        Fixture f = fixture();
+        // RESERVATIONS@P1 (P54 + P35) and REVENUE@P2 (P34 only)
+        Member mixed = newMember(f.a(), "VIEWER");
+        long version = teamMemberRepo.findById(mixed.rowId()).orElseThrow().getVersion();
+        send(json(put("/api/partner/team/" + mixed.rowId() + "/grants"), "{\"grants\":["
+                + "{\"role\":\"RESERVATIONS\",\"scope\":\"PROPERTY:" + f.p1() + "\"},"
+                + "{\"role\":\"REVENUE\",\"scope\":\"PROPERTY:" + f.p2() + "\"}],\"version\":" + version + "}"),
+            f.a().ownerToken()).andExpect(status().isOk());
+        String t = login(mixed.email());
+        assertEquals(Set.of(f.b1(), f.b2()), Set.copyOf(bookingIds(t)), "the unfiltered list covers both");
+        JsonNode p2Row = find(body(get("/api/partner/bookings").param("size", "100"), t).get("content"), f.b2());
+        assertEquals(mask(f.guestName()), p2Row.get("guestName").asText(), "masked at P2");
+        String emailProbe = guestEmail(f).substring(0, guestEmail(f).indexOf('@'));
+        for (String probe : List.of(emailProbe, f.guestName())) {
+            assertEquals(Set.of(f.b1()), ids(body(get("/api/partner/bookings").param("guest", probe)
+                .param("size", "100"), t).get("content")), "P2's booking never matches a guest search");
+        }
+    }
+
+    private String guestEmail(Fixture f) {
+        return jdbc.queryForObject("SELECT u.email FROM bookings b JOIN users u ON u.id = b.user_id WHERE b.id = ?",
+            String.class, f.b1());
+    }
+
+    private static Set<Long> ids(JsonNode list) {
+        Set<Long> ids = new TreeSet<>();
+        list.forEach(n -> ids.add(n.get("id").asLong()));
+        return ids;
     }
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -600,8 +716,7 @@ class RbacPartnerEnforcementTest {
         ok(get("/api/partner/bookings/" + booking), scoped.token());
         ok(get("/api/partner/conversations/" + conversation), scoped.token());
 
-        send(json(post("/api/admin/hotels/" + property + "/assign-owner"), "{\"partnerProfileId\":" + b.companyId() + "}"),
-            adminToken()).andExpect(status().isOk());
+        dualControl.assignOwner(mvc, adminToken(), property, b.companyId());   // RBAC R6: approved by a second owner
 
         // the previous company loses the property, its bookings and its conversations on the next request
         notFound(get("/api/partner/bookings/" + booking), scoped.token());
@@ -709,8 +824,7 @@ class RbacPartnerEnforcementTest {
             {"placeId":%d,"starRating":4,"checkInTime":"14:00:00","checkOutTime":"12:00:00","totalRooms":10,
              "availableRooms":10,"freeCancellation":false,"prepaymentRequired":false,"breakfastIncluded":false,
              "airportShuttle":false}""".formatted(id)), adminToken()).andExpect(status().isCreated());
-        send(json(post("/api/admin/hotels/" + id + "/assign-owner"), "{\"partnerProfileId\":" + owner.companyId() + "}"),
-            adminToken()).andExpect(status().isOk());
+        dualControl.assignOwner(mvc, adminToken(), id, owner.companyId());
         return id;
     }
 

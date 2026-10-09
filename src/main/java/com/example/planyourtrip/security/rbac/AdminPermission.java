@@ -13,7 +13,8 @@ import java.util.stream.Collectors;
 public enum AdminPermission implements Permission {
 
     CONSOLE_ACCESS("A01", "admin.console.access", false),
-    ACCESS_MANAGE("A02", "admin.access.manage", true),
+    /** RBAC R6: active — backs {@code GET/PUT /api/admin/access/admins…} (§25.4). */
+    ACCESS_MANAGE("A02", "admin.access.manage", false),
     AUDIT_LOG_VIEW("A03", "admin.audit_log.view", false),
     ANALYTICS_VIEW("A04", "admin.analytics.view", false),
     CUSTOMER_VIEW("A05", "admin.customer.view", false),

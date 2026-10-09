@@ -2,10 +2,13 @@ package com.example.planyourtrip.config;
 
 import com.example.planyourtrip.model.LoyaltyRedemptionPolicy;
 import com.example.planyourtrip.model.ReferralCampaign;
+import com.example.planyourtrip.model.AdminProfileAssignment;
 import com.example.planyourtrip.model.User;
 import com.example.planyourtrip.repository.LoyaltyRedemptionPolicyRepository;
 import com.example.planyourtrip.repository.ReferralCampaignRepository;
+import com.example.planyourtrip.repository.AdminProfileAssignmentRepository;
 import com.example.planyourtrip.repository.UserRepository;
+import com.example.planyourtrip.security.rbac.AdminProfile;
 import com.example.planyourtrip.util.AccountEmails;
 import com.example.planyourtrip.validation.AccountPassword;
 import com.example.planyourtrip.validation.AccountPasswordValidator;
@@ -57,6 +60,7 @@ public class ProductionBootstrap implements ApplicationRunner {
     private final PasswordEncoder encoder;
     private final ReferralCampaignRepository referralCampaigns;
     private final LoyaltyRedemptionPolicyRepository redemptionPolicies;
+    private final AdminProfileAssignmentRepository adminProfiles;
 
     private final String adminEmail;
     private final String adminPassword;
@@ -66,6 +70,7 @@ public class ProductionBootstrap implements ApplicationRunner {
                                PasswordEncoder encoder,
                                ReferralCampaignRepository referralCampaigns,
                                LoyaltyRedemptionPolicyRepository redemptionPolicies,
+                               AdminProfileAssignmentRepository adminProfiles,
                                @Value("${app.bootstrap.admin.email:}") String adminEmail,
                                @Value("${app.bootstrap.admin.password:}") String adminPassword,
                                @Value("${app.bootstrap.admin.full-name:Administrator}") String adminFullName) {
@@ -73,6 +78,7 @@ public class ProductionBootstrap implements ApplicationRunner {
         this.encoder = encoder;
         this.referralCampaigns = referralCampaigns;
         this.redemptionPolicies = redemptionPolicies;
+        this.adminProfiles = adminProfiles;
         this.adminEmail = adminEmail;
         this.adminPassword = adminPassword;
         this.adminFullName = adminFullName;
@@ -169,6 +175,9 @@ public class ProductionBootstrap implements ApplicationRunner {
         u.setEnabled(true);
         u.setEmailVerifiedAt(Instant.now());
         users.save(u);
-        log.info("DB-04: created bootstrap admin user for the configured email (role ADMIN).");
+        // RBAC R6 (AP-2, AP-4): the bootstrap administrator is the platform owner — a system grant, like M-5's
+        // backfill. Without it no administrator could hold any admin permission.
+        adminProfiles.save(AdminProfileAssignment.systemGrant(u, AdminProfile.PLATFORM_OWNER, Instant.now()));
+        log.info("DB-04: created bootstrap admin user for the configured email (role ADMIN, PLATFORM_OWNER).");
     }
 }

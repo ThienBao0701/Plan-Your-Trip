@@ -30,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class PartnerPropertyTest {
 
     @Autowired MockMvc mvc;
+    @Autowired com.example.planyourtrip.support.DualControlTestSupport dualControl;
     @Autowired ObjectMapper mapper;
     @Autowired CategoryRepository categoryRepo;
     @Autowired AdministrativeUnitRepository locationRepo;
@@ -446,13 +447,8 @@ class PartnerPropertyTest {
     }
 
     private JsonNode assignOwner(Long hotelId, Long partnerProfileId) throws Exception {
-        String body = mvc.perform(post("/api/admin/hotels/" + hotelId + "/assign-owner")
-                .header("Authorization", "Bearer " + adminToken())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"partnerProfileId\":" + partnerProfileId + "}"))
-            .andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString();
-        return mapper.readTree(body);
+        // RBAC R6: submitted by the seeded admin, approved by a second platform owner (dual control)
+        return dualControl.assignOwner(mvc, adminToken(), hotelId, partnerProfileId);
     }
 
     private String basicInfoJson(String name, String slug) {

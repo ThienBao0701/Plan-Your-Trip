@@ -1,5 +1,6 @@
 package com.example.planyourtrip;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import com.example.planyourtrip.model.PartnerInvitation;
 import com.example.planyourtrip.model.PartnerMembershipStatus;
 import com.example.planyourtrip.model.PartnerTeamMember;
@@ -35,6 +36,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @ExtendWith(OutputCaptureExtension.class)
 class RbacTeamInvitationTest extends RbacTeamTestSupport {
+
+    @Autowired com.example.planyourtrip.support.DualControlTestSupport dualControl;
 
     // ═══════════════════════════════════════════════════════════════════════
     // Create, accept, decline (§13.1, §14)
@@ -535,8 +538,7 @@ class RbacTeamInvitationTest extends RbacTeamTestSupport {
         invite(a.token(), scoped, "FRONT_DESK", "PROPERTY:" + property).andExpect(status().isAccepted());
         invite(a.token(), companyWide, "VIEWER", "COMPANY:" + a.id()).andExpect(status().isAccepted());
 
-        send(json(post("/api/admin/hotels/" + property + "/assign-owner"), "{\"partnerProfileId\":" + b.id() + "}"),
-            adminToken()).andExpect(status().isOk());
+        dualControl.assignOwner(mvc, adminToken(), property, b.id());   // RBAC R6: approved by a second owner
 
         PartnerInvitation moved = invitationRepo.findById(invitationOf(a, scoped).get("id").asLong()).orElseThrow();
         assertEquals("REVOKED", moved.getStatus().name());

@@ -77,6 +77,12 @@ Further rules:
 
 The per-booking `finalPrice` is booking data under P34 (FI-1).
 
+- **Guest search (`GET /api/partner/bookings?guest=`).** The filter is a substring match. It matches the guest's name only for bookings of properties where the caller holds P54, and the email only where the caller holds P35, always inside the P34 properties. Otherwise the result set and `totalElements` would reveal a name or email that the rows mask or omit.
+  - FINANCE (P54 without P35) searches names only.
+  - Callers holding neither permission anywhere (REVENUE, VIEWER) get 403 `PERMISSION_DENIED` before any query. The refusal is the same for every value, and the value is never echoed.
+  - A blank filter is no filter. The list without it is unchanged.
+  - The partner console offers the field only when P54 or P35 is held somewhere, and labels it with what it can match: "Guest name or email" with both, "Guest name" with P54 only (FINANCE), "Guest email" with P35 only.
+
 - **SD-3 / NR: never-to-partner fields.** These fields are removed by partner-specific DTOs: they are absent from the response and not listed in `redacted`.
   - `PartnerBookingView`: no `userId`, no `loyaltyPointsRedeemed`.
   - `PartnerPaymentView`: no `checkoutUrl`, no raw `failureReason`.

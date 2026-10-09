@@ -12,12 +12,12 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
 /**
- * The 181 admin handlers and their admin permission, transcribed from the "Backing endpoints" column of
+ * The 189 admin handlers (181 + 3 access endpoints + 5 dual-control endpoints in RBAC R6) and their admin permission, transcribed from the "Backing endpoints" column of
  * RBAC V1.1 §9.2 (the source of truth), grouped by controller.
  *
- * <p>In R1 every {@code ADMIN} holds every admin permission ({@code AdminAccessService}), so enforcing this
- * map changes nothing for today's administrators; it makes the per-handler requirement explicit and refuses
- * any admin handler that is not listed. Narrower admin profiles arrive in R6.
+ * <p>RBAC R6: an administrator holds the union of their admin profiles' bundles ({@code AdminAccessService}); the
+ * M-5 backfill made every existing {@code ADMIN} a {@code PLATFORM_OWNER}, so enforcing this map changed nothing
+ * for them until profiles are narrowed. Any admin handler that is not listed is refused.
  */
 final class AdminEndpointRules {
 
@@ -27,6 +27,18 @@ final class AdminEndpointRules {
         "A46 when the requested status is PUBLISHED, A15 for every other status";
 
     static final List<AdminEndpointRule> RULES = List.of(
+        // RBAC R6 — admin access (§25.4): the caller's own access document, and access management (AP-1)
+        rule(GET, "/api/admin/me/access", CONSOLE_ACCESS),
+        rule(GET, "/api/admin/access/admins", ACCESS_MANAGE),
+        new AdminEndpointRule(PUT, "/api/admin/access/admins/{userId}/profiles", List.of(ACCESS_MANAGE),
+            null, true, false),
+        // RBAC R6 — dual control for A16 (§22.6): the queue and its decisions; approving needs a fresh session
+        rule(GET, "/api/admin/dual-control/requests", PLACE_OWNER_ASSIGN),
+        rule(GET, "/api/admin/dual-control/requests/{id}", PLACE_OWNER_ASSIGN),
+        new AdminEndpointRule(POST, "/api/admin/dual-control/requests/{id}/approve", List.of(PLACE_OWNER_ASSIGN),
+            null, true, false),
+        rule(POST, "/api/admin/dual-control/requests/{id}/reject", PLACE_OWNER_ASSIGN),
+        rule(POST, "/api/admin/dual-control/requests/{id}/cancel", PLACE_OWNER_ASSIGN),
         // Activity log
         rule(GET, "/api/admin/activity-logs", AUDIT_LOG_VIEW),
         // Amenities

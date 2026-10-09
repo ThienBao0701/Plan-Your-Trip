@@ -23,6 +23,7 @@ import com.example.planyourtrip.security.rbac.PartnerPermission;
 import com.example.planyourtrip.security.rbac.ResourceType;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -382,18 +383,40 @@ public class PartnerPropertyService {
         return setActive(userId, hotelId, false);
     }
 
-    @Transactional
-    public PartnerHotelResponse assignOwner(Long adminUserId, Long hotelId, AssignOwnerRequest req) {
-        Place place = places.findById(hotelId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Hotel not found: " + hotelId));
-        PartnerProfile profile = partnerProfiles.findById(req.partnerProfileId())
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND,
-                "Partner profile not found: " + req.partnerProfileId()));
+    // ── A16 owner assignment — executed only by an approved dual-control request (RBAC R6, §22.6) ──
 
-        if (profile.getVerificationStatus() != PartnerVerificationStatus.APPROVED)
+    /** The hotel an A16 request targets, or 404 — the check {@code POST /hotels/{id}/assign-owner} has always made. */
+    @Transactional(readOnly = true)
+    public Place requireHotel(Long hotelId) {
+        return places.findById(hotelId)
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Hotel not found: " + hotelId));
+    }
+
+    /** The company an A16 request proposes as owner: 404 when unknown, 422 unless it is approved. */
+    @Transactional(readOnly = true)
+    public PartnerProfile requireAssignableOwner(Long partnerProfileId) {
+        PartnerProfile profile = partnerProfiles.findById(partnerProfileId)
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND,
+                "Partner profile not found: " + partnerProfileId));
+        if (!canOwnProperties(profile))
             throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,
                 "Only an approved partner profile can own a hotel");
+        return profile;
+    }
 
+    /** Whether {@code profile} may own a property now — rechecked when an approval is about to execute. */
+    public static boolean canOwnProperties(PartnerProfile profile) {
+        return profile != null && profile.getVerificationStatus() == PartnerVerificationStatus.APPROVED;
+    }
+
+    /**
+     * Moves {@code place} to {@code profile}: §16 PA-4 for the previous company, the {@code HOTEL_ASSIGN_OWNER}
+     * audit and the new owner's notification. Runs only inside the dual-control approval's transaction
+     * ({@link Propagation#MANDATORY}), with {@code place} row-locked and every precondition rechecked by the caller,
+     * so the move, the approval and their audits commit or roll back together.
+     */
+    @Transactional(propagation = Propagation.MANDATORY)
+    public PartnerHotelResponse executeOwnerAssignment(Long adminUserId, Place place, PartnerProfile profile) {
         PartnerProfile previousOwner = place.getOwner();
         place.setOwner(profile);
         Place saved = places.save(place);

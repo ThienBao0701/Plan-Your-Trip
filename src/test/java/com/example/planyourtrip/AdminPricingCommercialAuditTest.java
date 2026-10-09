@@ -45,6 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AdminPricingCommercialAuditTest {
 
     @Autowired MockMvc mvc;
+    @Autowired com.example.planyourtrip.support.DualControlTestSupport dualControl;
     @Autowired ObjectMapper mapper;
     @Autowired AdminActivityLogRepository auditRepo;
     @Autowired UserRepository userRepo;
@@ -917,11 +918,7 @@ class AdminPricingCommercialAuditTest {
         Long hotelId = createHotelPlace("D3H-P-" + suffix());
         createHotelDetail(hotelId);
         Long roomId = createRoom(hotelId, "D3HP-" + suffix());
-        mvc.perform(post("/api/admin/hotels/" + hotelId + "/assign-owner")
-                .header("Authorization", "Bearer " + adminToken)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"partnerProfileId\":" + profileId + "}"))
-            .andExpect(status().isOk());
+        dualControl.assignOwner(mvc, adminToken, hotelId, profileId);
 
         return new OwnedRoom(token, hotelId, roomId);
     }

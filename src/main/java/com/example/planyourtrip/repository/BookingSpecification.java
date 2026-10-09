@@ -43,6 +43,29 @@ public final class BookingSpecification {
         );
     }
 
+    /**
+     * RBAC — {@link #withGuest} limited to what the caller may see: the guest's name is matched only for bookings
+     * of {@code nameHotelIds} (P54 there) and the email only for bookings of {@code emailHotelIds} (P35 there), so
+     * the filter never answers a question about an identity the response would mask or omit.
+     */
+    public static Specification<Booking> withGuestVisibleIn(String guest, Collection<Long> nameHotelIds,
+                                                          Collection<Long> emailHotelIds) {
+        if (guest == null || guest.isBlank()) return Specification.where(null);
+        String like = "%" + guest.toLowerCase() + "%";
+        return (root, query, cb) -> {
+            List<jakarta.persistence.criteria.Predicate> matches = new java.util.ArrayList<>();
+            if (!nameHotelIds.isEmpty()) {
+                matches.add(cb.and(root.get("hotel").get("id").in(nameHotelIds),
+                    cb.like(cb.lower(root.get("user").get("fullName")), like)));
+            }
+            if (!emailHotelIds.isEmpty()) {
+                matches.add(cb.and(root.get("hotel").get("id").in(emailHotelIds),
+                    cb.like(cb.lower(root.get("user").get("email")), like)));
+            }
+            return matches.isEmpty() ? cb.disjunction() : cb.or(matches.toArray(jakarta.persistence.criteria.Predicate[]::new));
+        };
+    }
+
     public static Specification<Booking> withBookingCode(String code) {
         if (code == null || code.isBlank()) return Specification.where(null);
         return (root, query, cb) ->

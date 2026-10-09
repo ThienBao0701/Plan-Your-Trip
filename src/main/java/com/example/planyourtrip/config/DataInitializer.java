@@ -2,6 +2,7 @@ package com.example.planyourtrip.config;
 
 import com.example.planyourtrip.model.*;
 import com.example.planyourtrip.repository.*;
+import com.example.planyourtrip.security.rbac.AdminProfile;
 
 import java.math.RoundingMode;
 import java.time.format.DateTimeFormatter;
@@ -55,6 +56,7 @@ public class DataInitializer implements ApplicationRunner {
     private final PartnerPayoutAccountRepository partnerPayoutAccountRepo;
     private final PartnerTeamMemberRepository partnerTeamMemberRepo;
     private final PartnerMemberGrantRepository partnerMemberGrantRepo;
+    private final AdminProfileAssignmentRepository adminProfileRepo;
     private final CouponDefinitionRepository couponDefinitionRepo;
     private final com.example.planyourtrip.service.TravelCreditService travelCreditService;
     private final com.example.planyourtrip.service.LoyaltyService loyaltyService;
@@ -96,6 +98,7 @@ public class DataInitializer implements ApplicationRunner {
                            PartnerPayoutAccountRepository partnerPayoutAccountRepo,
                            PartnerTeamMemberRepository partnerTeamMemberRepo,
                            PartnerMemberGrantRepository partnerMemberGrantRepo,
+                           AdminProfileAssignmentRepository adminProfileRepo,
                            CouponDefinitionRepository couponDefinitionRepo,
                            com.example.planyourtrip.service.TravelCreditService travelCreditService,
                            com.example.planyourtrip.service.LoyaltyService loyaltyService,
@@ -137,6 +140,7 @@ public class DataInitializer implements ApplicationRunner {
         this.partnerPayoutAccountRepo  = partnerPayoutAccountRepo;
         this.partnerTeamMemberRepo     = partnerTeamMemberRepo;
         this.partnerMemberGrantRepo    = partnerMemberGrantRepo;
+        this.adminProfileRepo          = adminProfileRepo;
         this.couponDefinitionRepo      = couponDefinitionRepo;
         this.travelCreditService       = travelCreditService;
         this.loyaltyService            = loyaltyService;
@@ -552,6 +556,11 @@ public class DataInitializer implements ApplicationRunner {
         // Phase A — seeded development accounts are verified, like every account that predates V3.
         u.setEmailVerifiedAt(java.time.Instant.now());
         users.save(u);
+        // RBAC R6 (AP-4): the seeded administrator is a PLATFORM_OWNER, exactly as M-5 backfills every ADMIN.
+        if ("ADMIN".equals(role)) {
+            adminProfileRepo.save(AdminProfileAssignment.systemGrant(u, AdminProfile.PLATFORM_OWNER,
+                java.time.Instant.now()));
+        }
     }
 
     // ─────────────────────────────────────────────────────────────

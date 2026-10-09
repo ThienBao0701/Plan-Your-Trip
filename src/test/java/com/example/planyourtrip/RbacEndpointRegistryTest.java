@@ -81,7 +81,8 @@ class RbacEndpointRegistryTest {
         // RBAC R3b adds GET /api/partner/me/access; RBAC R4 adds GET/POST /team/invitations, POST
         // /team/invitations/{id}/resend and DELETE /team/invitations/{id}
         assertEquals(99, partnerHandlers.size());
-        assertEquals(181, adminHandlers.size());
+        // RBAC R6 adds the 3 admin access endpoints (§25.4) and the 5 dual-control endpoints (§22.6)
+        assertEquals(189, adminHandlers.size());
     }
 
     @Test
@@ -132,7 +133,8 @@ class RbacEndpointRegistryTest {
     @Test
     void anUnregisteredHandlerIsRefused() throws Exception {
         EndpointAuthorizationInterceptor guard = new EndpointAuthorizationInterceptor(
-            new EndpointAuthorizationRegistry(List.of(), List.of()), new AdminAccessService());
+            // an unregistered handler is refused before the admin access, step-up or read-audit collaborators run
+            new EndpointAuthorizationRegistry(List.of(), List.of()), new AdminAccessService(null), null, null);
         HandlerMethod handler = new HandlerMethod(this, getClass().getDeclaredMethod("anUnregisteredHandlerIsRefused"));
 
         for (String pattern : List.of("/api/partner/hotels", "/api/admin/partners")) {
@@ -172,7 +174,7 @@ class RbacEndpointRegistryTest {
         assertThrows(IllegalStateException.class,
             () -> new EndpointAuthorizationRegistry(List.of(ok, ok), List.of()), "duplicate");
         assertThrows(IllegalStateException.class, () -> new EndpointAuthorizationRegistry(List.of(), List.of(
-            new AdminEndpointRule(RequestMethod.GET, "/api/admin/x", List.of(AdminPermission.ACCESS_MANAGE), null, false, false))));
+            new AdminEndpointRule(RequestMethod.GET, "/api/admin/x", List.of(AdminPermission.CUSTOMER_ACCOUNT_MANAGE), null, false, false))));
     }
 
     private static Set<String> difference(Set<String> a, Set<String> b) {
