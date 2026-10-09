@@ -26,6 +26,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 class RbacTeamAdministrationTest extends RbacTeamTestSupport {
 
+    @org.springframework.beans.factory.annotation.Autowired
+    com.example.planyourtrip.security.rbac.EndpointAuthorizationRegistry registry;
+
     /** A company with two properties, a room type at each, and managers at company and property scope. */
     private record Team(Company c, Long p1, Long p2, Long r1, Long r2, Member managerCompany, Member managerP1) {}
 
@@ -186,6 +189,81 @@ class RbacTeamAdministrationTest extends RbacTeamTestSupport {
         // a company-wide manager sees them; another company's member stays 404 for everyone
         send(post("/api/partner/team/" + atP2.rowId() + "/suspend"), t.managerCompany().token()).andExpect(status().isOk());
         send(post("/api/partner/team/" + foreign.rowId() + "/suspend"), t.c().token()).andExpect(status().isNotFound());
+    }
+
+    /**
+     * R4 hardening — the invitation endpoint's contract (§13.1 step 1, §11.2, §11.4, PA-3): authorization is over the
+     * invited grants (RESOURCE, body target), so a property-scoped manager invites inside their property while a
+     * company-scoped one may invite company-wide; no invited grant is ever wider than the inviter's own; another
+     * company's scopes and invitations do not exist for the caller. The legacy alias stays COMPANY-shaped (role at
+     * company scope), so only a company-wide team holder can use it.
+     */
+    @Test
+    void invitationsAreAuthorizedOverTheInvitedGrantsNeverWiderThanTheInviter() throws Exception {
+        Team t = team();
+        Company other = approvedCompany();
+        Long foreignProperty = createProperty(other);
+        String company = "COMPANY:" + t.c().id();
+
+        // company scope: owner and company-wide manager
+        invite(t.c().token(), partnerAccount(), "VIEWER", company).andExpect(status().isAccepted());
+        invite(t.managerCompany().token(), partnerAccount(), "REVENUE", company).andExpect(status().isAccepted());
+        invite(t.managerCompany().token(), partnerAccount(), "CONTENT", "PROPERTY:" + t.p2()).andExpect(status().isAccepted());
+        // property scope: the P1 manager, inside P1 and its room types only
+        String mgr = t.managerP1().token();
+        invite(mgr, partnerAccount(), "RESERVATIONS", "PROPERTY:" + t.p1()).andExpect(status().isAccepted());
+        invite(mgr, partnerAccount(), "HOUSEKEEPING", "UNIT:" + t.r1()).andExpect(status().isAccepted());
+        // widening: property -> company, -> another property, -> another property's room type, mixed grants
+        for (String body : List.of(
+                invitationBody(partnerAccount(), "VIEWER", company),
+                invitationBody(partnerAccount(), "VIEWER", "PROPERTY:" + t.p2()),
+                invitationBody(partnerAccount(), "HOUSEKEEPING", "UNIT:" + t.r2()),
+                "{\"email\":\"" + partnerAccount() + "\",\"grants\":[{\"role\":\"VIEWER\",\"scope\":\"PROPERTY:" + t.p1()
+                    + "\"},{\"role\":\"VIEWER\",\"scope\":\"PROPERTY:" + t.p2() + "\"}]}")) {
+            send(json(post("/api/partner/team/invitations"), body), mgr)
+                .andExpect(status().isForbidden()).andExpect(jsonPath("$.code").value("ROLE_NOT_DELEGABLE"));
+        }
+        send(json(post("/api/partner/team"), "{\"email\":\"" + partnerAccount() + "\",\"role\":\"VIEWER\"}"), mgr)
+            .andExpect(status().isForbidden()).andExpect(jsonPath("$.code").value("ROLE_NOT_DELEGABLE"));
+        // cross-company targets: another company's scopes are invalid, its invitations missing
+        for (String scope : List.of("COMPANY:" + other.id(), "PROPERTY:" + foreignProperty)) {
+            invite(t.c().token(), partnerAccount(), "VIEWER", scope)
+                .andExpect(status().isUnprocessableEntity()).andExpect(jsonPath("$.code").value("SCOPE_INVALID"));
+        }
+        String foreignEmail = partnerAccount();
+        invite(other.token(), foreignEmail, "VIEWER", "COMPANY:" + other.id()).andExpect(status().isAccepted());
+        Long foreignInvitation = invitationOf(other, foreignEmail).get("id").asLong();
+        send(delete("/api/partner/team/invitations/" + foreignInvitation), t.c().token()).andExpect(status().isNotFound());
+        send(delete("/api/partner/team/invitations/" + foreignInvitation), mgr).andExpect(status().isNotFound());
+        // the P1 manager sees exactly the invitations inside P1
+        JsonNode seen = body(get("/api/partner/team/invitations"), mgr, 200);
+        assertEquals(2, seen.size(), seen.toString());
+        seen.forEach(i -> i.get("grants").forEach(g -> assertTrue(
+            g.get("scope").asText().equals("PROPERTY:" + t.p1()) || g.get("scope").asText().equals("UNIT:" + t.r1()), i.toString())));
+    }
+
+    /** The registry records the contract the services enforce (design erratum E-R4-1 in RBAC_TEAM_ADMINISTRATION.md). */
+    @Test
+    void theRegistryRecordsInvitationsAsResourcesOverTheirGrants() {
+        var post = org.springframework.web.bind.annotation.RequestMethod.POST;
+        var create = registry.partnerRule(post, "/api/partner/team/invitations").orElseThrow();
+        assertEquals(com.example.planyourtrip.security.rbac.EndpointKind.RESOURCE, create.kind());
+        assertEquals(com.example.planyourtrip.security.rbac.ResourceType.INVITATION, create.resourceType());
+        assertEquals(List.of(com.example.planyourtrip.security.rbac.PartnerPermission.TEAM_INVITE,
+            com.example.planyourtrip.security.rbac.PartnerPermission.TEAM_OWNER_MANAGE), create.permissions());
+        for (String path : List.of("/api/partner/team/invitations/{id}/resend")) {
+            assertEquals(com.example.planyourtrip.security.rbac.EndpointKind.RESOURCE, registry.partnerRule(post, path).orElseThrow().kind());
+        }
+        assertEquals(com.example.planyourtrip.security.rbac.EndpointKind.RESOURCE, registry.partnerRule(
+            org.springframework.web.bind.annotation.RequestMethod.DELETE, "/api/partner/team/invitations/{id}").orElseThrow().kind());
+        assertEquals(com.example.planyourtrip.security.rbac.EndpointKind.COLLECTION, registry.partnerRule(
+            org.springframework.web.bind.annotation.RequestMethod.GET, "/api/partner/team/invitations").orElseThrow().kind());
+        // the legacy alias always invites at company scope: it stays COMPANY
+        assertEquals(com.example.planyourtrip.security.rbac.EndpointKind.COMPANY,
+            registry.partnerRule(post, "/api/partner/team").orElseThrow().kind());
+        // an invitation is seen, like a membership, through team view (P07) covering all of its grants (§11.2)
+        assertEquals(com.example.planyourtrip.security.rbac.PartnerPermission.TEAM_VIEW,
+            com.example.planyourtrip.security.rbac.ResourceType.INVITATION.viewPermission());
     }
 
     @Test

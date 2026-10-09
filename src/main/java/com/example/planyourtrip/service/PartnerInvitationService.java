@@ -321,6 +321,7 @@ public class PartnerInvitationService {
     /** {@code DELETE /api/partner/team/invitations/{id}}: the invitation can never be accepted afterwards. */
     @Transactional
     public void revoke(Long userId, Long invitationId, String reason) {
+        PartnerTeamService.requireAuditableReason(reason);
         PartnerTeamAuthority.Actor actor = authority.actor(access.requireTeamWorkspace(userId));
         authority.requireSomewhere(actor, TEAM_INVITE);
         PartnerProfile company = lockCompany(actor.companyId());

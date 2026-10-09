@@ -2,6 +2,7 @@ package com.example.planyourtrip.dto;
 
 import com.example.planyourtrip.model.PartnerTeamRole;
 import com.example.planyourtrip.model.PayoutMethod;
+import com.example.planyourtrip.validation.NoCredentialText;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -98,12 +99,12 @@ public class PartnerSettingsDto {
     /** RBAC R3a — {@code PUT /api/partner/team/{memberId}/grants} (§15). */
     public record PartnerTeamGrantsRequest(
         List<PartnerTeamGrantItem> grants,
-        @Size(max = 500) String reason,
+        @Size(max = 500) @NoCredentialText String reason,
         Long version
     ) {}
 
     public record PartnerTeamGrantItem(PartnerTeamRole role, String scope) {}
 
     /** RBAC R3a — the optional reason of a suspend or remove (§17). */
-    public record PartnerTeamReasonRequest(@Size(max = 500) String reason) {}
+    public record PartnerTeamReasonRequest(@Size(max = 500) @NoCredentialText String reason) {}
 }

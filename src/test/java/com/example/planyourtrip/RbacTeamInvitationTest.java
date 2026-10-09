@@ -609,27 +609,125 @@ class RbacTeamInvitationTest extends RbacTeamTestSupport {
     // Audit (§22.1 AU-1): written in the transaction and failing closed
     // ═══════════════════════════════════════════════════════════════════════
 
+    /**
+     * R4 hardening: a reason the audit guard would refuse is a structured 400 before anything starts — not a failed
+     * audit write and a 500 — and is never echoed or logged. Ordinary reasons keep working.
+     */
     @Test
-    void anAuditRowThatCannotBeWrittenAbortsTheChange() throws Exception {
+    void aCredentialLikeReasonIsAValidationErrorAndChangesNothing(CapturedOutput output) throws Exception {
         Company c = approvedCompany();
         String email = partnerAccount();
         invite(c.token(), email, "VIEWER", "COMPANY:" + c.id()).andExpect(status().isAccepted());
         Long id = invitationOf(c, email).get("id").asLong();
         Member m = member(c, "VIEWER");
         List<String> before = actions(c.id());
+        long versionBefore = version(m.rowId());
 
-        // the strict writer refuses credential-looking text (AU-2); the refusal must take the mutation down with it
-        int revoked = send(json(delete("/api/partner/team/invitations/" + id), "{\"reason\":\"my password is hunter2\"}"),
-            c.token()).andReturn().getResponse().getStatus();
-        int suspended = send(json(post("/api/partner/team/" + m.rowId() + "/suspend"), "{\"reason\":\"shared secret\"}"),
-            c.token()).andReturn().getResponse().getStatus();
-        assertTrue(revoked >= 400 && suspended >= 400, revoked + " / " + suspended);
-        assertEquals("PENDING", invitationOf(c, email).get("status").asText(), "no revocation without its audit row");
+        for (var attempt : List.of(
+                json(delete("/api/partner/team/invitations/" + id), "{\"reason\":\"my password is hunter2\"}"),
+                json(post("/api/partner/team/" + m.rowId() + "/suspend"), "{\"reason\":\"shared secret hunter2\"}"),
+                json(delete("/api/partner/team/" + m.rowId()), "{\"reason\":\"api_key hunter2\"}"),
+                json(put("/api/partner/team/" + m.rowId() + "/grants"), "{\"grants\":[{\"role\":\"FRONT_DESK\",\"scope\":\"COMPANY:"
+                    + c.id() + "\"}],\"reason\":\"bearer hunter2\",\"version\":" + versionBefore + "}"))) {
+            String body = send(attempt, c.token())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"))
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("reason"))
+                .andReturn().getResponse().getContentAsString();
+            assertFalse(body.contains("hunter2"), "the rejected value is not echoed");
+        }
+        assertEquals("PENDING", invitationOf(c, email).get("status").asText());
         assertEquals(PartnerMembershipStatus.ACTIVE, teamMemberRepo.findById(m.rowId()).orElseThrow().getStatus());
-        assertEquals(before, actions(c.id()));
+        assertEquals(versionBefore, version(m.rowId()));
+        assertEquals(List.of("VIEWER@COMPANY:" + c.id()), grants(m.rowId()));
+        assertEquals(before, actions(c.id()), "nothing audited");
+        assertFalse(output.getAll().contains("hunter2"), "the rejected value is not logged");
 
-        // an address that merely contains such a word is invited normally: addresses never enter the audit text
+        // every other caller of the services gets the same 400, before any lock or change
+        com.example.planyourtrip.exception.ApiException refused = assertThrows(com.example.planyourtrip.exception.ApiException.class,
+            () -> teamService.suspend(c.userId(), m.rowId(), "the password is hunter2"));
+        assertEquals("VALIDATION_FAILED", refused.code());
+        assertEquals("reason", refused.field());
+        assertThrows(com.example.planyourtrip.exception.ApiException.class,
+            () -> invitationService.revoke(c.userId(), id, "secret hunter2"));
+        assertEquals(PartnerMembershipStatus.ACTIVE, teamMemberRepo.findById(m.rowId()).orElseThrow().getStatus());
+
+        // ordinary reasons are recorded as given; an address merely containing such a word is invited normally
+        send(json(post("/api/partner/team/" + m.rowId() + "/suspend"), "{\"reason\":\"on leave until March\"}"), c.token())
+            .andExpect(status().isOk());
+        send(json(delete("/api/partner/team/invitations/" + id), "{\"reason\":\"sent to the wrong address\"}"), c.token())
+            .andExpect(status().isNoContent());
+        assertEquals("on leave until March", auditRows(c.id(), "TEAM_MEMBER_SUSPENDED").get(0).get("reason"));
+        assertEquals("sent to the wrong address", auditRows(c.id(), "TEAM_INVITATION_REVOKED").get(0).get("reason"));
         invite(c.token(), "secretary-" + uniqueEmail("x"), "VIEWER", "COMPANY:" + c.id()).andExpect(status().isAccepted());
+    }
+
+    /** AU-1: when the strict audit write itself fails, the mutation it records never commits — and nothing is sent. */
+    @Test
+    void anAuditWriteFailureRollsTheMutationBack() throws Exception {
+        Company c = approvedCompany();
+        String pendingEmail = partnerAccount();
+        invite(c.token(), pendingEmail, "VIEWER", "COMPANY:" + c.id()).andExpect(status().isAccepted());
+        Long pending = invitationOf(c, pendingEmail).get("id").asLong();
+        Member m = member(c, "VIEWER");
+        String newcomer = partnerAccount();
+        List<String> before = actions(c.id());
+        long invitationsBefore = invitationRepo.count();
+        Mockito.clearInvocations(emailSender);
+
+        Mockito.doThrow(new IllegalStateException("audit store unavailable")).when(activityLog)
+            .audit(Mockito.anyLong(), Mockito.anyLong(), Mockito.anyString(), any(), any(), any(), any(), any(), any());
+        try {
+            send(post("/api/partner/team/" + m.rowId() + "/suspend"), c.token()).andExpect(status().isInternalServerError());
+            send(delete("/api/partner/team/invitations/" + pending), c.token()).andExpect(status().isInternalServerError());
+            invite(c.token(), newcomer, "VIEWER", "COMPANY:" + c.id()).andExpect(status().isInternalServerError());
+        } finally {
+            Mockito.reset(activityLog);
+        }
+        assertEquals(PartnerMembershipStatus.ACTIVE, teamMemberRepo.findById(m.rowId()).orElseThrow().getStatus());
+        assertEquals("PENDING", invitationOf(c, pendingEmail).get("status").asText());
+        assertEquals(invitationsBefore, invitationRepo.count(), "no invitation without its audit row");
+        Mockito.verify(emailSender, Mockito.never()).send(any());
+        assertEquals(before, actions(c.id()));
+        assertFalse(titles(login(m.email())).contains("Team member suspended"), "no notification of a rolled-back change");
+    }
+
+    /**
+     * Item-3 hardening: outside the dev-only sender, no path logs a link — a failing provider whose exception message
+     * carries the link is logged by class only, and {@code AccountEmail} never prints its link.
+     */
+    @Test
+    void aFailingSendNeverLogsTheLinkAndAccountEmailRedactsIt(CapturedOutput output) throws Exception {
+        Company c = approvedCompany();
+        String email = partnerAccount();
+        List<String> links = new ArrayList<>();
+        Mockito.doAnswer(call -> {
+            com.example.planyourtrip.service.mail.AccountEmail sent = call.getArgument(0);
+            links.add(sent.actionUrl());
+            throw new IllegalStateException("provider rejected " + sent.actionUrl() + " / " + sent);
+        }).when(emailSender).send(any());
+        try {
+            invite(c.token(), email, "VIEWER", "COMPANY:" + c.id()).andExpect(status().isAccepted());
+        } finally {
+            Mockito.reset(emailSender);
+        }
+        String token = links.get(0).substring(links.get(0).indexOf("#token=") + 7);
+        assertFalse(output.getAll().contains(token), "the token reached a log");
+        assertEquals("FAILED", invitationOf(c, email).get("deliveryStatus").asText());
+
+        var mail = new com.example.planyourtrip.service.mail.AccountEmail("a@test.com",
+            com.example.planyourtrip.service.mail.AccountEmail.Kind.PARTNER_INVITATION, "https://p/accept-invitation#token=SECRET123");
+        assertFalse(mail.toString().contains("SECRET123"));
+        assertEquals("https://p/accept-invitation#token=SECRET123", mail.actionUrl());
+        // the development sender is never active in production, and the production sender prints nothing
+        assertTrue(java.util.Arrays.asList(com.example.planyourtrip.service.mail.DevelopmentLogEmailSender.class
+            .getAnnotation(org.springframework.context.annotation.Profile.class).value()).contains("!prod"));
+        assertTrue(java.util.Arrays.asList(com.example.planyourtrip.service.mail.UnconfiguredEmailSender.class
+            .getAnnotation(org.springframework.context.annotation.Profile.class).value()).contains("prod"));
+        IllegalStateException unconfigured = assertThrows(IllegalStateException.class,
+            () -> new com.example.planyourtrip.service.mail.UnconfiguredEmailSender().send(mail));
+        assertFalse(unconfigured.getMessage().contains("SECRET123"));
+        assertFalse(output.getAll().contains("SECRET123"));
     }
 
     /** Whatever ran before in this database: every revoked row keeps its own key, every live row 0 (RV-2). */

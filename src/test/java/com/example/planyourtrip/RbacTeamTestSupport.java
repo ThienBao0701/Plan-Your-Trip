@@ -72,6 +72,10 @@ abstract class RbacTeamTestSupport {
     @Autowired PartnerInvitationRepository invitationRepo;
     @Autowired TeamMemberSeeder seeder;
     @MockitoSpyBean EmailSender emailSender;
+    /** Spied so a test can make the strict audit write fail and prove the mutation rolls back with it (AU-1). */
+    @MockitoSpyBean com.example.planyourtrip.service.PartnerActivityLogService activityLog;
+    @Autowired com.example.planyourtrip.service.PartnerTeamService teamService;
+    @Autowired com.example.planyourtrip.service.PartnerInvitationService invitationService;
 
     static final String PASSWORD = "password123";
     static final String SETTINGS_ALL_OFF = """

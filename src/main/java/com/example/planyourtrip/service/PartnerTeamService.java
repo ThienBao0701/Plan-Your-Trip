@@ -181,6 +181,7 @@ public class PartnerTeamService {
     /** {@code PUT /api/partner/team/{memberId}/grants} (§15). */
     @Transactional
     public PartnerTeamMemberResponse replaceGrants(Long userId, Long memberId, PartnerTeamGrantsRequest req) {
+        requireAuditableReason(req.reason());
         PartnerTeamAuthority.Actor actor = authority.actor(access.requireTeamWorkspace(userId));
         authority.requireSomewhere(actor, TEAM_ROLE_ASSIGN);
         if (req.grants() == null || req.grants().isEmpty())
@@ -245,6 +246,7 @@ public class PartnerTeamService {
 
     private PartnerTeamMemberResponse changeStatus(Long userId, Long memberId, PartnerMembershipStatus status,
                                                    PartnerPermission permission, String reason) {
+        requireAuditableReason(reason);
         PartnerTeamAuthority.Actor actor = authority.actor(access.requireTeamWorkspace(userId));
         authority.requireSomewhere(actor, permission);
         PartnerProfile company = lockCompany(actor.companyId());
@@ -408,6 +410,18 @@ public class PartnerTeamService {
 
     private static ApiException notFound(Long memberId) {
         return new ApiException(HttpStatus.NOT_FOUND, "Team member not found: " + memberId);
+    }
+
+    /**
+     * RBAC R4 hardening — a reason is written verbatim to the strict audit trail, whose guard refuses
+     * credential-looking text and would fail the whole mutation (fail closed). Checked first, before the workspace
+     * is resolved or the company locked, so such input is a plain 400 and nothing starts. The value is never echoed
+     * or logged. Requests are already refused by {@code @NoCredentialText}; this covers every other caller.
+     */
+    static void requireAuditableReason(String reason) {
+        if (AdminActivityLogService.looksLikeCredential(reason)) {
+            throw invalid("reason", "must not contain passwords, secrets, keys, tokens or card or account numbers");
+        }
     }
 
     static ApiException invalid(String field, String message) {

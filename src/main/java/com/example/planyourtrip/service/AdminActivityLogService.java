@@ -60,6 +60,15 @@ public class AdminActivityLogService {
         "(?i)(password|passwd|secret|bearer\\s|eyJ[A-Za-z0-9_-]{10,}|api[_-]?key|private[_-]?key"
             + "|cvv|iban|swift|\\b\\d{13,19}\\b)");
 
+    /**
+     * RBAC R4 hardening — whether {@code value} would be refused by the audit guards ({@link #record} and
+     * {@link PartnerActivityLogService#audit}). Request validation uses it so that free text bound for the trail is
+     * refused up front with a 400, instead of failing the audit write mid-transaction; the guards stay in place.
+     */
+    public static boolean looksLikeCredential(String value) {
+        return value != null && FORBIDDEN.matcher(value).find();
+    }
+
     private final AdminActivityLogRepository logRepo;
     private final UserRepository userRepo;
 

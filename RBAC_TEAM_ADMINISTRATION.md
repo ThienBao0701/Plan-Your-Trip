@@ -15,9 +15,10 @@ It builds on R1–R3b. The design document is `frontend/docs/security/PLAN_YOUR_
 - `RBAC_OWNER_TEAM_SECURITY.md`
 - `RBAC_PARTNER_ENFORCEMENT.md`
 
-**Release dependency (IN-5).** Production still uses `UnconfiguredEmailSender`. Until a real email provider ships, every invitation create and resend there answers **503 `EMAIL_DELIVERY_UNAVAILABLE`**, and nothing is created.
+**Release prerequisites.** Both block an R4 release; `DEPLOYMENT.md` §22 lists them as a checklist.
 
-Verification so far was local only: H2, MockMvc, and the Flyway SQL Server parser for V8. V8 has not yet run against SQL Server. The environment-gated `SqlServerProdChainVerificationTest` gained the R4 checks, and must be run before release.
+1. **Email provider (IN-5).** Production still uses `UnconfiguredEmailSender`. Until a real email provider replaces it, every invitation create and resend there answers **503 `EMAIL_DELIVERY_UNAVAILABLE`**, and nothing is created. No credential or provider account is configured by R4.
+2. **V8 on SQL Server.** Verification so far was local only: H2, MockMvc, and the Flyway SQL Server parser for V8. V8 has **not** run against SQL Server. The environment-gated `SqlServerProdChainVerificationTest` carries the R4 checks (`rbacR4InvitationMigrationAppliedWithItsConstraints`) and must pass against a disposable SQL Server database before release (`DEPLOYMENT.md` §20).
 
 ## 1. Who may manage whom (§10.3)
 
@@ -57,7 +58,22 @@ All team decisions go through the `PartnerTeamAuthority` component. It uses the 
 | `POST /api/me/partner-invitations/accept` `{token}` | `/api/me/**`; checked in the service | 200, the caller's new access document (§25.2), `Cache-Control: no-store` |
 | `POST /api/me/partner-invitations/decline` `{token}` | Any authenticated holder of the link (AC-1) | 204 |
 
-The design table marks `POST /team/invitations` as COMPANY. Its normative step §13.1(1), "P08 for every grant scope", and §16 PA-3 let a property-scoped manager invite to their own property. The registry therefore records it like the promotion endpoint's body target: RESOURCE, authorized against the invited grants.
+**Design erratum E-R4-1: invitation creation is RESOURCE, not COMPANY.**
+
+The §25.3 table of the design marks `POST /api/partner/team/invitations` as kind COMPANY. Read with the rest of the design, that row is inconsistent:
+- §4.5 and §11.4 define a COMPANY endpoint as one that needs a COMPANY grant. Under that rule a property-scoped manager would always get 403.
+- But §13.1 step 1 ("require P08 for every grant scope"), §11.2 (an invitation's scope is the set of its grants), §11.4 (team permissions at PROPERTY scope cover invitations whose grants all lie inside that property) and §16 PA-3 (a property-scoped manager assigns that property) all require a property-scoped manager to be able to invite inside their property.
+
+The implementation follows the normative steps. The registry records the endpoint as **RESOURCE (INVITATION, body target)**, like `POST /promotions`: P08 must cover the scope of every invited grant, and P12 plus step-up are needed for OWNER.
+
+COMPANY semantics are not bypassed:
+- Every grant goes through §1's authority and I6 delegation, so a grant can never be wider than the inviter's own. A property grant never becomes company scope.
+- A company-scope grant requires P08 at company scope.
+- Legacy `POST /api/partner/team`, which always invites at company scope, stays COMPANY.
+
+`RbacTeamAdministrationTest.invitationsAreAuthorizedOverTheInvitedGrantsNeverWiderThanTheInviter` and `theRegistryRecordsInvitationsAsResourcesOverTheirGrants` pin this.
+
+The authoritative design file lives in the frontend repository (`frontend/docs/security/PLAN_YOUR_TRIP_RBAC_PERMISSION_MATRIX_V1.md`, §25.3 table). It should read **`RESOURCE (invitation; body target: every invited grant, §11.2)`** for this row. That one-line correction belongs to the frontend repository and is recorded here until it is applied there.
 
 ### Rules
 
@@ -99,10 +115,15 @@ The design table marks `POST /team/invitations` as COMPANY. Its normative step �
 
 **Decline** closes the invitation as `DECLINED`, audited as `TEAM_INVITATION_DECLINED`.
 
-**Token hygiene:**
-- The token never appears in a response, the database, the audit trail or a service log.
-- The development sender (`DevelopmentLogEmailSender`, never active under `prod`) prints account links by design, Phase A's agreed local mechanism; that now includes invitation links.
-- Audit text never contains the invited address. The strict writer's credential guard would otherwise refuse ordinary addresses, such as `secretary@…`.
+**Token logging contract:**
+- **Production.** No invitation token reaches any application, service, audit or error log, or any response.
+  - The database stores only the SHA-256.
+  - `PartnerInvitationService` logs invitation ids and error codes only. A failed send is logged by exception class, never by message, because a provider's message may quote the link.
+  - `AccountEmail.toString()` redacts the link.
+  - The production sender (`UnconfiguredEmailSender`) never receives a link: creation answers 503 first.
+- **Local development only.** `DevelopmentLogEmailSender` (`@Profile("!prod")`) is the documented local delivery mechanism of Phase A. It prints each account link (verification, password reset and, since R4, `/accept-invitation#token=…`) to the console so a developer can open it. This line is the only place a token is ever written to a log, and it can never be active under `prod`.
+- **Audit text.** Audit text never contains the invited address. The strict writer's credential guard would otherwise refuse ordinary addresses such as `secretary@…`.
+- **Tests.** `RbacTeamInvitationTest` asserts that tokens appear in no response, log or audit row, and that both senders keep their profiles.
 
 **PA-4.** When an admin moves a property to another company, the previous company's pending invitations with a grant on the property, or on one of its room types, are revoked with reason `PROPERTY_MOVED`. This happens in the same transaction and is audited in that company's trail.
 
@@ -127,6 +148,14 @@ This works identically on SQL Server and H2. A filtered index (`WHERE status <> 
 `PartnerTeamMemberRepository.findByPartnerProfileIdAndUserId` now returns the **live** row only. `findByPartnerProfileIdAndUserIdOrderByIdAsc` returns every row, history included.
 
 ## 4. Audit and notifications
+
+**Reasons (R4 hardening).** The optional `reason` of a grant change, suspension, removal or invitation revocation is written verbatim to the strict trail. The trail's guard refuses credential-like text (passwords, secrets, keys, tokens, card or account numbers) and fails closed.
+
+Such a reason is refused **before** anything starts:
+- `@NoCredentialText` on the request gives the structured **400 `VALIDATION_FAILED`** with `fieldErrors[{field: "reason"}]`.
+- The services repeat the check first, for any other caller.
+
+The rejected value is never echoed or logged. The check is conservative: a reason that merely mentions "password" is refused too, because telling harmless wording from a real secret is not reliable; the user rephrases. The guard itself is unchanged and stays the backstop. When an audit write fails for any reason, the mutation rolls back and no email or notification is sent (`anAuditWriteFailureRollsTheMutationBack`).
 
 **Audit (§22).** Every security mutation writes one strict partner audit row in the mutating transaction (`PartnerActivityLogService.audit`). The row:
 - fails closed: if it cannot be written, the change rolls back;

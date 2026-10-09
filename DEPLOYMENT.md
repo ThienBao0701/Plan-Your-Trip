@@ -182,3 +182,12 @@ NOT RUN in this environment (no Docker).**
 - [ ] Same-origin preserved (`API_BASE_URL=/api`) → no CORS surface.
 - [ ] Known gap (Phase A): sign-in has **no** brute-force rate limit or lockout — only one-time token issuance
       is throttled. Put a rate limit in front of `POST /api/auth/login` at the edge until the app has one.
+
+## 22. RBAC R4 release prerequisites
+R4 (partner team administration and invitations, `RBAC_TEAM_ADMINISTRATION.md`) must not be released until both hold:
+- [ ] **Email provider configured.** Production uses `UnconfiguredEmailSender`, so invitation create and resend answer
+  `503 EMAIL_DELIVERY_UNAVAILABLE` (nothing is created) until a real `EmailSender` implementation and its credentials
+  are deployed. No provider or credential is configured by the R4 code.
+- [ ] **V8 verified on SQL Server.** Run §20 against a **disposable** SQL Server database and confirm
+  `SqlServerProdChainVerificationTest` passes, including `rbacR4InvitationMigrationAppliedWithItsConstraints`. Until
+  then V8 is verified only statically (Flyway SQL Server parser) and on H2. Status: **NOT RUN**.

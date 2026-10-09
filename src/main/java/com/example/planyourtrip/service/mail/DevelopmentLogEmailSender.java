@@ -12,6 +12,10 @@ import org.springframework.stereotype.Component;
  * link (or the token after {@code #token=}) from the backend console. No email is delivered, and
  * nothing claims one was. The link is a one-time credential, which is why this bean can never be
  * active under the {@code prod} profile. No password is ever part of an {@link AccountEmail}.
+ *
+ * <p>RBAC R4: partner invitation links ({@code /accept-invitation#token=…}) are delivered the same way locally. This
+ * line is the <em>only</em> place an invitation token is ever written to a log, and only outside {@code prod}; the
+ * invitation service itself logs invitation ids, never links or tokens, and stores only the token's SHA-256.
  */
 @Component
 @Profile("!prod")
