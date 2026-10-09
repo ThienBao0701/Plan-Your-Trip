@@ -10909,6 +10909,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get partnerBookingFilterGuest => 'Tên hoặc email khách';
 
   @override
+  String get partnerBookingFilterGuestName => 'Tên khách';
+
+  @override
+  String get partnerBookingFilterGuestEmail => 'Email khách';
+
+  @override
   String get partnerBookingFilterCode => 'Mã đặt chỗ';
 
   @override
@@ -14742,4 +14748,182 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get partnerAcceptErrorStale =>
       'Lời mời này không còn hiệu lực. Hãy nhờ nhóm gửi lời mời mới.';
+
+  @override
+  String get adminSectionAccess => 'Truy cập';
+
+  @override
+  String get adminNavAccess => 'Quản trị viên';
+
+  @override
+  String get adminNoProfileTitle => 'Chưa có hồ sơ quản trị';
+
+  @override
+  String get adminNoProfileMessage =>
+      'Tài khoản của bạn là tài khoản quản trị nhưng chưa được gán hồ sơ quản trị nào, nên không thể dùng phần nào của bảng điều khiển. Hãy nhờ chủ sở hữu nền tảng gán hồ sơ cho bạn.';
+
+  @override
+  String get adminAccessLoadFailed =>
+      'Không thể tải quyền quản trị của bạn. Hãy kiểm tra kết nối và thử lại.';
+
+  @override
+  String get adminAccessSubtitle =>
+      'Hồ sơ quản trị quyết định mỗi quản trị viên được làm gì. Thay đổi có hiệu lực từ yêu cầu tiếp theo của họ; bạn không thể tự đổi hồ sơ của mình.';
+
+  @override
+  String get adminAccessRefresh => 'Tải lại danh sách quản trị viên';
+
+  @override
+  String get adminAccessEmptyTitle => 'Không có quản trị viên';
+
+  @override
+  String get adminAccessEmptyMessage =>
+      'Không tìm thấy tài khoản quản trị nào.';
+
+  @override
+  String get adminAccessEdit => 'Sửa hồ sơ';
+
+  @override
+  String get adminAccessSelfHint => 'Bạn không thể tự đổi hồ sơ của mình';
+
+  @override
+  String get adminAccessUnknownHint =>
+      'Quản trị viên này có một hồ sơ mà phiên bản bảng điều khiển này chưa biết. Hãy cập nhật bảng điều khiển trước khi đổi hồ sơ của họ.';
+
+  @override
+  String get adminAccessYou => 'Bạn';
+
+  @override
+  String get adminAccessDisabled => 'Đã vô hiệu hóa';
+
+  @override
+  String get adminAccessNoProfiles => 'Chưa có hồ sơ';
+
+  @override
+  String adminAccessEditTitle(String name) {
+    return 'Hồ sơ của $name';
+  }
+
+  @override
+  String get adminAccessEditHint =>
+      'Quản trị viên có quyền là hợp của các hồ sơ được chọn. Bỏ chọn tất cả để thu hồi mọi quyền.';
+
+  @override
+  String get adminAccessReason => 'Lý do (không bắt buộc)';
+
+  @override
+  String get adminAccessCancel => 'Hủy';
+
+  @override
+  String get adminAccessSave => 'Lưu hồ sơ';
+
+  @override
+  String get adminAccessSaved => 'Đã lưu hồ sơ quản trị.';
+
+  @override
+  String get adminAccessErrorLastOwner =>
+      'Phải còn ít nhất một chủ sở hữu nền tảng.';
+
+  @override
+  String get adminAccessErrorSelf =>
+      'Bạn không thể tự đổi hồ sơ quản trị của mình.';
+
+  @override
+  String get adminAccessErrorPermission =>
+      'Chỉ chủ sở hữu nền tảng mới được đổi hồ sơ quản trị.';
+
+  @override
+  String get adminAccessErrorStepUp =>
+      'Hãy xác nhận mật khẩu để đổi hồ sơ quản trị.';
+
+  @override
+  String get adminAccessErrorValidation =>
+      'Chỉ chọn các hồ sơ quản trị hợp lệ, và lý do không được chứa thông tin đăng nhập.';
+
+  @override
+  String get adminAccessErrorUncertain =>
+      'Không chắc thay đổi đã được lưu hay chưa. Danh sách đã được tải lại — hãy kiểm tra trước khi thử lại.';
+
+  @override
+  String get adminAccessErrorGone =>
+      'Quản trị viên này không còn tồn tại. Danh sách đã được tải lại.';
+
+  @override
+  String get adminAccessErrorNetwork =>
+      'Không thể kết nối máy chủ. Hãy thử lại.';
+
+  @override
+  String get adminProfilePlatformOwner => 'Chủ sở hữu nền tảng';
+
+  @override
+  String get adminProfilePartnerOperations => 'Vận hành đối tác';
+
+  @override
+  String get adminProfileContentCatalogue => 'Nội dung danh mục';
+
+  @override
+  String get adminProfileBookingSupport => 'Hỗ trợ đặt phòng';
+
+  @override
+  String get adminProfileFinanceOperations => 'Vận hành tài chính';
+
+  @override
+  String get adminProfileGrowthMarketing => 'Tăng trưởng & tiếp thị';
+
+  @override
+  String get adminProfileTrustSafety => 'Tin cậy & an toàn';
+
+  @override
+  String get adminProfileReviewModeration => 'Kiểm duyệt đánh giá';
+
+  @override
+  String get adminProfileAnalytics => 'Phân tích';
+
+  @override
+  String get adminProfileLocationCatalogue => 'Danh mục địa điểm hành chính';
+
+  @override
+  String get adminProfileTechSupport => 'Hỗ trợ kỹ thuật';
+
+  @override
+  String get adminProfilePlatformOwnerHint =>
+      'Mọi quyền quản trị, gồm quản lý quản trị viên, chuyển cơ sở lưu trú giữa các công ty và gửi thông báo hàng loạt.';
+
+  @override
+  String get adminProfilePartnerOperationsHint =>
+      'Xác minh và tạm ngưng đối tác, quản lý tồn phòng và giá thay đối tác.';
+
+  @override
+  String get adminProfileContentCatalogueHint =>
+      'Địa điểm, phòng, hình ảnh, danh mục, tiện nghi, kiểm duyệt và xuất bản.';
+
+  @override
+  String get adminProfileBookingSupportHint =>
+      'Đặt phòng, hội thoại, khách hàng, xem thanh toán và hóa đơn.';
+
+  @override
+  String get adminProfileFinanceOperationsHint =>
+      'Hoàn tiền, can thiệp thanh toán, hóa đơn, giá trị lưu trữ và tín dụng.';
+
+  @override
+  String get adminProfileGrowthMarketingHint =>
+      'Khuyến mãi, mã giảm giá, sản phẩm thẻ quà tặng, chương trình khách hàng, cá nhân hóa.';
+
+  @override
+  String get adminProfileTrustSafetyHint =>
+      'Nhật ký kiểm toán, tạm ngưng đối tác, gỡ tin đăng, hội thoại, kiểm duyệt đánh giá.';
+
+  @override
+  String get adminProfileReviewModerationHint => 'Hàng đợi đánh giá.';
+
+  @override
+  String get adminProfileAnalyticsHint =>
+      'Chỉ báo cáo tổng hợp — không có dữ liệu từng dòng hay dữ liệu cá nhân.';
+
+  @override
+  String get adminProfileLocationCatalogueHint => 'Cây đơn vị hành chính.';
+
+  @override
+  String get adminProfileTechSupportHint =>
+      'Nhật ký kiểm toán, xem đặt phòng và thanh toán với danh tính khách được che, tác vụ hệ thống.';
 }

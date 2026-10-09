@@ -5,6 +5,8 @@ import '../../app/surface_gate.dart';
 import '../../app/surface_session.dart';
 import '../../core/admin/admin_models.dart';
 import '../../core/admin/admin_state.dart';
+import 'admin_access_state.dart';
+import 'screens/admin_access_screen.dart';
 import '../../core/app_state.dart';
 import '../../design/app_breakpoints.dart';
 import '../../design/app_spacing.dart';
@@ -103,6 +105,13 @@ class _AdminAppShellState extends State<AdminAppShell> {
   /// from this flag.
   bool _mediaOpenedFromPlaceDetail = false;
 
+  /// RBAC R6 — administrators and their profiles (A02).
+  AdminAccessManagementState? _accessManagement;
+
+  /// The access document the route was last checked against; a new document
+  /// (after a session change) re-runs the check.
+  Object? _appliedAccess;
+
   bool _created = false;
 
   @override
@@ -140,6 +149,7 @@ class _AdminAppShellState extends State<AdminAppShell> {
     _categories?.dispose();
     _locations?.dispose();
     _placeDetail?.dispose();
+    _accessManagement?.dispose();
     super.dispose();
   }
 
@@ -162,6 +172,7 @@ class _AdminAppShellState extends State<AdminAppShell> {
     _amenities = AdminAmenitiesState(api: api);
     _categories = AdminCategoriesState(api: api);
     _locations = AdminLocationsState(api: api);
+    _accessManagement = AdminAccessManagementState(api: api);
 
     // One load for the landing section. Other sections load lazily when first
     // selected, so opening the console does not fan out six requests at once.
@@ -169,12 +180,40 @@ class _AdminAppShellState extends State<AdminAppShell> {
     // Deferred to after the frame: both `load()` and `setActiveRoute` call
     // notifyListeners, and doing that synchronously inside
     // didChangeDependencies would notify while the tree is still building.
-    final admin = AdminScope.maybeOf(context);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      _loadFor(_route);
-      admin?.setActiveRoute(_route);
-    });
+    //
+    // RBAC R6: nothing loads before the access document says what this
+    // administrator may see — the landing destination is chosen from it, and
+    // the document itself is requested from build (see there).
+  }
+
+  /// RBAC R6 — whether the access document grants [route]'s own read. Fails
+  /// closed: no document, no destination. UX only; the server authorizes.
+  static bool _permitted(AdminState? admin, String route) {
+    final destination = AdminNavigation.byRoute(route);
+    return admin != null &&
+        destination != null &&
+        admin.holds(destination.requiresPermission);
+  }
+
+  static String? _firstPermitted(AdminState? admin) {
+    for (final d in AdminNavigation.destinations) {
+      if (_permitted(admin, d.route)) return d.route;
+    }
+    return null;
+  }
+
+  /// Once the document is in: stay on the requested destination when it is
+  /// granted, otherwise land on the first granted one, then load it.
+  void _applyAccess(AdminState admin) {
+    if (admin.accessStatus != AdminAccessStatus.ready) return;
+    final target = _permitted(admin, _route) ? _route : _firstPermitted(admin);
+    if (target == null) return;
+    if (target != _route) {
+      setState(() => _route = target);
+      widget.onRouteChanged?.call(target);
+    }
+    _loadFor(target);
+    admin.setActiveRoute(target);
   }
 
   /// Loads a section the first time it is shown. Idle-guarded so re-selecting a
@@ -200,6 +239,10 @@ class _AdminAppShellState extends State<AdminAppShell> {
         // chosen — so what loads first is the place picker's options.
         if (_media?.placeSearchStatus == AdminLoadStatus.idle) {
           _media!.searchPlaces('');
+        }
+      case AdminRoutes.access:
+        if (_accessManagement?.status == AdminLoadStatus.idle) {
+          _accessManagement!.load();
         }
       case AdminRoutes.referenceData:
         // Only the tab that is actually shown. The screen loads the other one
@@ -292,6 +335,8 @@ class _AdminAppShellState extends State<AdminAppShell> {
     if (closeDrawer && Navigator.of(context).canPop()) {
       Navigator.of(context).pop();
     }
+    // The menu lists only granted destinations; anything else is ignored.
+    if (!_permitted(AdminScope.maybeOf(context), route)) return;
     // Leaving Partners drops any open detail, so returning to the
     // destination starts at the list rather than a stale partner.
     if (_route != route && _partnerDetail != null) {
@@ -344,6 +389,7 @@ class _AdminAppShellState extends State<AdminAppShell> {
           categories: _categories!,
           locations: _locations!,
         ),
+      AdminRoutes.access => AdminAccessScreen(state: _accessManagement!),
       AdminRoutes.media => AdminMediaScreen(
           state: _media!,
           onBackToPlace: _mediaOpenedFromPlaceDetail && _placeDetail != null
@@ -366,11 +412,63 @@ class _AdminAppShellState extends State<AdminAppShell> {
   String _titleFor(String route, AppLocalizations l10n) =>
       AdminNavigation.byRoute(route)?.label(l10n) ?? l10n.adminConsoleTitle;
 
+  /// The body while the access document is missing, loading or refused, or
+  /// while a route that is not granted is being replaced.
+  Widget _accessGate(AdminState? admin, AppLocalizations l10n) {
+    final status = admin?.accessStatus;
+    if (admin == null || status == AdminAccessStatus.noAccess) {
+      return Center(
+        key: const Key('admin-no-access'),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: OceanEmptyState(
+            title: l10n.adminNoProfileTitle,
+            message: l10n.adminNoProfileMessage,
+          ),
+        ),
+      );
+    }
+    if (status == AdminAccessStatus.error) {
+      return AdminStateView(
+        key: const Key('admin-access-error'),
+        status: AdminLoadStatus.error,
+        message: l10n.adminAccessLoadFailed,
+        onRetry: admin.loadAccess,
+      );
+    }
+    return const AdminStateView(status: AdminLoadStatus.loading);
+  }
+
+  Widget _gatedBody(AdminState? admin, AppLocalizations l10n) =>
+      admin?.accessStatus == AdminAccessStatus.ready &&
+              _permitted(admin, _route)
+          ? _bodyFor(_route)
+          : _accessGate(admin, l10n);
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final width = MediaQuery.sizeOf(context).width;
     final showSidebar = width >= AppBreakpoints.desktop;
+
+    final admin = AdminScope.maybeOf(context);
+    // Requested here rather than once in didChangeDependencies: the admin
+    // state can be replaced or reset (a new session) while this shell lives.
+    if (admin != null && admin.accessStatus == AdminAccessStatus.idle) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && admin.accessStatus == AdminAccessStatus.idle) {
+          admin.loadAccess();
+        }
+      });
+    }
+    if (admin != null &&
+        admin.accessStatus == AdminAccessStatus.ready &&
+        !identical(admin.access, _appliedAccess)) {
+      _appliedAccess = admin.access;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _applyAccess(admin);
+      });
+    }
 
     final content = Scaffold(
       backgroundColor: Colors.transparent,
@@ -414,10 +512,10 @@ class _AdminAppShellState extends State<AdminAppShell> {
                     ),
                   ),
                   const VerticalDivider(width: 1),
-                  Expanded(child: _bodyFor(_route)),
+                  Expanded(child: _gatedBody(admin, l10n)),
                 ],
               )
-            : _bodyFor(_route),
+            : _gatedBody(admin, l10n),
       ),
     );
 
@@ -469,7 +567,9 @@ class _AdminMenu extends StatelessWidget {
           ),
         ),
         const Divider(height: 1),
-        for (final section in AdminNavigation.populatedSections) ...[
+        for (final section in AdminNavigation.populatedSections.where((s) =>
+            AdminNavigation.inSection(s)
+                .any((d) => admin?.holds(d.requiresPermission) ?? false))) ...[
           Padding(
             padding: const EdgeInsets.fromLTRB(
                 AppSpacing.md, AppSpacing.sm, AppSpacing.md, AppSpacing.xxs),
@@ -481,8 +581,10 @@ class _AdminMenu extends StatelessWidget {
               ),
             ),
           ),
-          for (final d in AdminNavigation.inSection(section))
+          for (final d in AdminNavigation.inSection(section)
+              .where((d) => admin?.holds(d.requiresPermission) ?? false))
             ListTile(
+              key: Key('admin-nav-${d.route}'),
               leading: Icon(d.icon),
               title: Text(d.label(l10n)),
               selected: d.route == activeRoute,

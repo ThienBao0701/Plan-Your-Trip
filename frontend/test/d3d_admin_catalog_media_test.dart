@@ -18,6 +18,7 @@ import 'package:planyourtrip_frontend/features/admin/screens/admin_media_screen.
 import 'package:planyourtrip_frontend/features/admin/screens/admin_place_detail_screen.dart';
 import 'package:planyourtrip_frontend/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'support/admin_access_stub.dart';
 
 /// D3D — Catalog ↔ Media integration and its security boundary.
 ///
@@ -215,7 +216,7 @@ void main() {
       return route(req);
     });
     return (
-      api: ApiClient(client: mock, baseUrl: 'http://test/api'),
+      api: ApiClient(client: withAdminAccess(mock), baseUrl: 'http://test/api'),
       requests: requests,
       sent: sent,
       paths: paths

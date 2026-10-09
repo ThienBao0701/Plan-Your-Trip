@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/network/api_client.dart';
+import '../../../core/partner/partner_access_models.dart';
 import '../../../core/partner/partner_booking_models.dart';
 import '../../../core/partner/partner_state.dart';
 import '../../../design/app_breakpoints.dart';
@@ -340,6 +341,10 @@ class _BookingFiltersState extends State<_BookingFilters> {
 
   @override
   Widget build(BuildContext context) {
+    final searchesNames = widget.partner
+        .holdsAnywhere(PartnerPermissionKeys.bookingGuestIdentityView);
+    final searchesEmails = widget.partner
+        .holdsAnywhere(PartnerPermissionKeys.bookingGuestContactView);
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final bookings = widget.bookings;
@@ -407,25 +412,32 @@ class _BookingFiltersState extends State<_BookingFilters> {
             runSpacing: AppSpacing.sm,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              SizedBox(
-                width: 220,
-                child: TextField(
-                  controller: _guest,
-                  onSubmitted: (value) => bookings.applyQuery(
-                    widget.partner,
-                    value.trim().isEmpty
-                        ? query.copyWith(clearGuest: true)
-                        : query.copyWith(guest: value.trim()),
-                  ),
-                  decoration: InputDecoration(
-                    labelText: l10n.partnerBookingFilterGuest,
-                    isDense: true,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppRadii.sm),
+              if (searchesNames || searchesEmails)
+                SizedBox(
+                  width: 220,
+                  child: TextField(
+                    controller: _guest,
+                    onSubmitted: (value) => bookings.applyQuery(
+                      widget.partner,
+                      value.trim().isEmpty
+                          ? query.copyWith(clearGuest: true)
+                          : query.copyWith(guest: value.trim()),
+                    ),
+                    decoration: InputDecoration(
+                      // The server matches only what the caller may see:
+                      // names with P54, emails with P35.
+                      labelText: searchesNames && searchesEmails
+                          ? l10n.partnerBookingFilterGuest
+                          : searchesNames
+                              ? l10n.partnerBookingFilterGuestName
+                              : l10n.partnerBookingFilterGuestEmail,
+                      isDense: true,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppRadii.sm),
+                      ),
                     ),
                   ),
                 ),
-              ),
               SizedBox(
                 width: 220,
                 child: TextField(

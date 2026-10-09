@@ -20,6 +20,7 @@ import 'package:planyourtrip_frontend/features/admin/widgets/admin_widgets.dart'
 import 'package:planyourtrip_frontend/l10n/app_localizations.dart';
 import 'package:planyourtrip_frontend/l10n/app_localizations_en.dart';
 import 'package:planyourtrip_frontend/l10n/app_localizations_vi.dart';
+import 'support/admin_access_stub.dart';
 
 /// D10 — Admin Reference Data (amenities and categories).
 ///
@@ -301,7 +302,8 @@ void main() {
   }
 
   AppState adminApp(http.Client client, {AppRole role = AppRole.admin}) =>
-      AppState(api: ApiClient(client: client)..demoMode = false)
+      AppState(
+          api: ApiClient(client: withAdminAccess(client))..demoMode = false)
         ..demoMode = false
         ..email = 'admin@planyourtrip.com'
         ..role = role;
@@ -453,7 +455,8 @@ void main() {
 
     testWidgets('the menu lists Reference Data exactly once', (tester) async {
       await pumpConsole(tester);
-      expect(AdminNavigation.destinations, hasLength(10));
+      // RBAC R6 added the Administrators destination (11).
+      expect(AdminNavigation.destinations, hasLength(11));
       expect(
           AdminNavigation.destinations
               .where((d) => d.route == AdminRoutes.referenceData),

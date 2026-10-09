@@ -25,6 +25,14 @@ class PartnerPermissionKeys {
   static const String teamSuspend = 'partner.team.suspend';
   static const String teamRemove = 'partner.team.remove';
   static const String teamOwnerManage = 'partner.team.owner.manage';
+
+  /// P54 / P35 — the guest's name / contact. The booking list's guest search
+  /// matches only what these let the caller see; without either the server
+  /// refuses it, so the field is not offered.
+  static const String bookingGuestIdentityView =
+      'partner.booking.guest_identity.view';
+  static const String bookingGuestContactView =
+      'partner.booking.guest_contact.view';
 }
 
 /// A grant as the access document lists it (`Grant(role, scopeType, scopeId)`).

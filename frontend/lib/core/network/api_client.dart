@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import '../config/app_config.dart';
+import '../admin/admin_access_models.dart';
 import '../admin/admin_models.dart';
 import '../auth/auth_error.dart';
 import '../auth/auth_models.dart';
@@ -6485,6 +6486,53 @@ class ApiClient {
 
   /// `GET /api/admin/analytics/overview` -- platform-wide counts and revenue.
   /// Both bounds are optional; the backend applies its own default window.
+  // ── Admin access (RBAC R6, §25.4) ─────────────────────────────────────────
+
+  /// `GET /api/admin/me/access` — the caller's admin profiles and permission
+  /// keys (A01). A 403 means the account holds no admin profile at all.
+  Future<CollectionApiResult<AdminAccess>> getAdminAccess() =>
+      _partnerGetObject<AdminAccess?>(
+        _adminUri('/admin/me/access'),
+        AdminAccess.fromJson,
+      ).then((r) => !r.success
+          ? CollectionApiResult<AdminAccess>.failure(r.errorKind, r.message)
+          : r.data == null
+              ? const CollectionApiResult<AdminAccess>.failure(
+                  ApiErrorKind.malformed)
+              : CollectionApiResult<AdminAccess>.success(r.data!));
+
+  /// `GET /api/admin/access/admins` — every administrator and their profiles
+  /// (A02, `PLATFORM_OWNER` only).
+  Future<CollectionApiResult<List<AdminAccount>>> getAdminAccounts() =>
+      _partnerGetList(_adminUri('/admin/access/admins'), AdminAccount.fromJson);
+
+  /// `PUT /api/admin/access/admins/{userId}/profiles` — replaces the
+  /// administrator's profiles (A02 + fresh session). Refusals carry
+  /// `STEP_UP_REQUIRED`, `SELF_MODIFICATION_FORBIDDEN`,
+  /// `LAST_PLATFORM_OWNER_REQUIRED`, `PERMISSION_DENIED` or
+  /// `VALIDATION_FAILED`; a timeout is `uncertain`.
+  Future<ApiWriteResult<AdminAccount>> replaceAdminProfiles({
+    required int userId,
+    required List<AdminProfile> profiles,
+    String? reason,
+  }) =>
+      _partnerTeamCall<AdminAccount>(
+        () => _client.put(
+          _adminUri('/admin/access/admins/$userId/profiles'),
+          headers: _jsonHeaders,
+          body: jsonEncode({
+            'profiles': [
+              for (final p in profiles)
+                if (p != AdminProfile.unknown) p.wire,
+            ],
+            if (reason != null && reason.trim().isNotEmpty)
+              'reason': reason.trim(),
+          }),
+        ),
+        expected: const {200},
+        parse: AdminAccount.fromJson,
+      );
+
   Future<CollectionApiResult<AdminDashboardOverview>> getAdminOverview({
     DateTime? from,
     DateTime? to,
@@ -6524,6 +6572,8 @@ class ApiClient {
   /// `GET /api/admin/bookings` -- paginated. Filters are exactly the five the
   /// controller declares; sort must be one of
   /// `createdAt|checkInDate|checkOutDate|finalPrice|status|bookingCode`.
+  /// RBAC R6: a non-blank [guest] needs A05 `admin.customer.view`; without it
+  /// the server answers 403 `PERMISSION_DENIED` (no console screen sends it).
   Future<CollectionApiResult<AdminPage<AdminBookingRow>>> getAdminBookings({
     String? status,
     String? hotel,
@@ -7096,6 +7146,9 @@ class ApiClient {
   //   * mutating a partner's team   — those are partner-side operations;
   //   * assign-owner                — real, but the freeze places it in a
   //     future property/catalogue screen rather than partner management.
+  //     Since RBAC R6 it only submits an A16 dual-control request (202) that a
+  //     second platform owner approves (`/api/admin/dual-control/requests`);
+  //     the console has no screen for that queue yet.
   // Adding any of them here would be a speculative client for a contract the
   // backend does not offer.
 

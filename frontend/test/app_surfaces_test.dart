@@ -34,6 +34,7 @@ import 'package:planyourtrip_frontend/l10n/app_localizations.dart';
 import 'package:planyourtrip_frontend/l10n/app_localizations_en.dart';
 import 'package:planyourtrip_frontend/l10n/app_localizations_vi.dart';
 import 'package:planyourtrip_frontend/shared/widgets/glass_widgets.dart';
+import 'support/admin_access_stub.dart';
 
 /// App surfaces — User, Partner and Admin as three applications from one
 /// codebase, each on its own origin and admitting exactly one role family.
@@ -85,9 +86,9 @@ void main() {
         );
       });
 
-  AppState signedOut({String? loginRole}) =>
-      AppState(api: ApiClient(client: backend(loginRole: loginRole)))
-        ..demoMode = false;
+  AppState signedOut({String? loginRole}) => AppState(
+      api: ApiClient(client: withAdminAccess(backend(loginRole: loginRole))))
+    ..demoMode = false;
 
   AppState signedIn(AppRole role) => signedOut()
     ..email = 'someone@example.com'

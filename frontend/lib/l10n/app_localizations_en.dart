@@ -11078,6 +11078,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get partnerBookingFilterGuest => 'Guest name or email';
 
   @override
+  String get partnerBookingFilterGuestName => 'Guest name';
+
+  @override
+  String get partnerBookingFilterGuestEmail => 'Guest email';
+
+  @override
   String get partnerBookingFilterCode => 'Booking code';
 
   @override
@@ -14902,4 +14908,182 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get partnerAcceptErrorStale =>
       'This invitation is no longer valid. Ask the team for a new invitation.';
+
+  @override
+  String get adminSectionAccess => 'Access';
+
+  @override
+  String get adminNavAccess => 'Administrators';
+
+  @override
+  String get adminNoProfileTitle => 'No admin profile';
+
+  @override
+  String get adminNoProfileMessage =>
+      'Your account is an administrator account without an admin profile, so no part of the console is available. Ask a platform owner to assign you a profile.';
+
+  @override
+  String get adminAccessLoadFailed =>
+      'Could not load your admin access. Check your connection and try again.';
+
+  @override
+  String get adminAccessSubtitle =>
+      'Admin profiles decide what each administrator can do. Changes apply on their next request; you cannot change your own profiles.';
+
+  @override
+  String get adminAccessRefresh => 'Refresh administrators';
+
+  @override
+  String get adminAccessEmptyTitle => 'No administrators';
+
+  @override
+  String get adminAccessEmptyMessage => 'No administrator accounts were found.';
+
+  @override
+  String get adminAccessEdit => 'Edit profiles';
+
+  @override
+  String get adminAccessSelfHint => 'You cannot change your own profiles';
+
+  @override
+  String get adminAccessUnknownHint =>
+      'This administrator holds a profile this version of the console does not know. Update the console before changing their profiles.';
+
+  @override
+  String get adminAccessYou => 'You';
+
+  @override
+  String get adminAccessDisabled => 'Disabled';
+
+  @override
+  String get adminAccessNoProfiles => 'No profile';
+
+  @override
+  String adminAccessEditTitle(String name) {
+    return 'Profiles of $name';
+  }
+
+  @override
+  String get adminAccessEditHint =>
+      'The administrator holds the union of the selected profiles. Clear every box to remove all access.';
+
+  @override
+  String get adminAccessReason => 'Reason (optional)';
+
+  @override
+  String get adminAccessCancel => 'Cancel';
+
+  @override
+  String get adminAccessSave => 'Save profiles';
+
+  @override
+  String get adminAccessSaved => 'Admin profiles saved.';
+
+  @override
+  String get adminAccessErrorLastOwner =>
+      'At least one platform owner must remain.';
+
+  @override
+  String get adminAccessErrorSelf =>
+      'You cannot change your own admin profiles.';
+
+  @override
+  String get adminAccessErrorPermission =>
+      'Only a platform owner can change admin profiles.';
+
+  @override
+  String get adminAccessErrorStepUp =>
+      'Confirm your password to change admin profiles.';
+
+  @override
+  String get adminAccessErrorValidation =>
+      'Choose only known admin profiles, and keep the reason free of credentials.';
+
+  @override
+  String get adminAccessErrorUncertain =>
+      'The change may or may not have been saved. The list was reloaded — check it before trying again.';
+
+  @override
+  String get adminAccessErrorGone =>
+      'This administrator no longer exists. The list was reloaded.';
+
+  @override
+  String get adminAccessErrorNetwork =>
+      'Could not reach the server. Try again.';
+
+  @override
+  String get adminProfilePlatformOwner => 'Platform owner';
+
+  @override
+  String get adminProfilePartnerOperations => 'Partner operations';
+
+  @override
+  String get adminProfileContentCatalogue => 'Content catalogue';
+
+  @override
+  String get adminProfileBookingSupport => 'Booking support';
+
+  @override
+  String get adminProfileFinanceOperations => 'Finance operations';
+
+  @override
+  String get adminProfileGrowthMarketing => 'Growth marketing';
+
+  @override
+  String get adminProfileTrustSafety => 'Trust and safety';
+
+  @override
+  String get adminProfileReviewModeration => 'Review moderation';
+
+  @override
+  String get adminProfileAnalytics => 'Analytics';
+
+  @override
+  String get adminProfileLocationCatalogue => 'Location catalogue';
+
+  @override
+  String get adminProfileTechSupport => 'Tech support';
+
+  @override
+  String get adminProfilePlatformOwnerHint =>
+      'Every admin permission, including administrator access, moving properties between companies and broadcasts.';
+
+  @override
+  String get adminProfilePartnerOperationsHint =>
+      'Partner verification and suspension, inventory and rates on behalf of partners.';
+
+  @override
+  String get adminProfileContentCatalogueHint =>
+      'Places, rooms, media, categories, amenities, moderation and publication.';
+
+  @override
+  String get adminProfileBookingSupportHint =>
+      'Bookings, conversations, customers, and payment and invoice reads.';
+
+  @override
+  String get adminProfileFinanceOperationsHint =>
+      'Refunds, payment interventions, invoices, stored value and credits.';
+
+  @override
+  String get adminProfileGrowthMarketingHint =>
+      'Promotions, coupons, gift-card products, customer programmes, personalization.';
+
+  @override
+  String get adminProfileTrustSafetyHint =>
+      'Audit log, partner suspension, listing take-downs, conversations, review moderation.';
+
+  @override
+  String get adminProfileReviewModerationHint => 'The review queue.';
+
+  @override
+  String get adminProfileAnalyticsHint =>
+      'Aggregate reporting only — no row-level or personal data.';
+
+  @override
+  String get adminProfileLocationCatalogueHint =>
+      'The administrative-unit hierarchy.';
+
+  @override
+  String get adminProfileTechSupportHint =>
+      'Audit log, booking and payment reads with guest identity masked, system jobs.';
 }

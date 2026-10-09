@@ -1397,6 +1397,125 @@ void main() {
 
   // ── UI ────────────────────────────────────────────────────────────────
 
+  // RBAC — the guest search matches only the name (P54) and email (P35) the
+  // caller may see; without either the server refuses it with 403, so the
+  // field is not offered. UX only: the backend enforces the rule.
+  group('guest search follows guest visibility', () {
+    Map<String, dynamic> accessWith({
+      List<String> company = const [],
+      Map<String, List<String>> properties = const {},
+    }) =>
+        {
+          'workspace': {
+            'companyId': 7,
+            'businessName': 'Bay View Resorts',
+            'verificationStatus': 'APPROVED'
+          },
+          'membership': {
+            'id': 55,
+            'status': 'ACTIVE',
+            'primaryOwner': false,
+            'pendingOwnerConfirmation': false
+          },
+          'grants': [
+            {'role': 'VIEWER', 'scopeType': 'COMPANY', 'scopeId': 7},
+          ],
+          'permissions': {
+            'company': ['partner.workspace.access', ...company],
+            'properties': properties,
+            'units': <String, Object>{},
+          },
+          'context': {'properties': <Object>[], 'units': <Object>[]},
+          'stepUp': {'freshUntil': null},
+        };
+
+    /// Any guest search field, whatever its label.
+    Finder guestField() => find.byWidgetPredicate((w) =>
+        w is TextField &&
+        {
+          en.partnerBookingFilterGuest,
+          en.partnerBookingFilterGuestName,
+          en.partnerBookingFilterGuestEmail,
+        }.contains(w.decoration?.labelText));
+
+    // The label promises only what the server matches: a role without P35
+    // is never told it can search by email.
+    for (final (name, company, label) in [
+      ('VIEWER / REVENUE (no P54, no P35)', ['partner.booking.view'], null),
+      (
+        'FINANCE (P54 only)',
+        ['partner.booking.view', 'partner.booking.guest_identity.view'],
+        en.partnerBookingFilterGuestName
+      ),
+      (
+        'RESERVATIONS / MANAGER (P54 and P35)',
+        [
+          'partner.booking.view',
+          'partner.booking.guest_identity.view',
+          'partner.booking.guest_contact.view'
+        ],
+        en.partnerBookingFilterGuest
+      ),
+      (
+        'P35 only (no role has it; the label still follows the permission)',
+        ['partner.booking.view', 'partner.booking.guest_contact.view'],
+        en.partnerBookingFilterGuestEmail
+      ),
+    ]) {
+      testWidgets('$name: ${label ?? 'no guest search'}', (tester) async {
+        await pumpBookings(tester,
+            client: bookingsClient(overrides: {
+              '/partner/me/access':
+                  jsonResponse(accessWith(company: company), 200),
+            }));
+        if (label == null) {
+          expect(guestField(), findsNothing);
+        } else {
+          expect(find.widgetWithText(TextField, label), findsOneWidget);
+          expect(guestField(), findsOneWidget);
+        }
+        expect(find.text('PYT-20260829-000001'), findsWidgets,
+            reason: 'the list itself is unaffected');
+      });
+    }
+
+    testWidgets('FINANCE is never told it can search by email', (tester) async {
+      await pumpBookings(tester,
+          client: bookingsClient(overrides: {
+            '/partner/me/access': jsonResponse(
+                accessWith(company: const [
+                  'partner.booking.view',
+                  'partner.booking.guest_identity.view'
+                ]),
+                200),
+          }));
+      expect(find.text(en.partnerBookingFilterGuest), findsNothing);
+      expect(find.textContaining('email'), findsNothing);
+    });
+
+    testWidgets('P54 held at one property offers the search', (tester) async {
+      await pumpBookings(tester,
+          client: bookingsClient(overrides: {
+            '/partner/me/access': jsonResponse(
+                accessWith(company: const [
+                  'partner.booking.view'
+                ], properties: const {
+                  '101': ['partner.booking.guest_identity.view'],
+                }),
+                200),
+          }));
+      expect(guestField(), findsOneWidget);
+    });
+
+    testWidgets('no access document: no guest search (fails closed)',
+        (tester) async {
+      await pumpBookings(tester);
+      expect(guestField(), findsNothing);
+      expect(requestUris.where((u) => u.queryParameters.containsKey('guest')),
+          isEmpty);
+    });
+  });
+
   group('bookings UI', () {
     testWidgets('renders real booking data from the backend', (tester) async {
       await pumpBookings(tester);

@@ -19,6 +19,7 @@ import 'package:planyourtrip_frontend/features/admin/widgets/admin_widgets.dart'
 import 'package:planyourtrip_frontend/l10n/app_localizations.dart';
 import 'package:planyourtrip_frontend/l10n/app_localizations_en.dart';
 import 'package:planyourtrip_frontend/l10n/app_localizations_vi.dart';
+import 'support/admin_access_stub.dart';
 
 /// D11 — Admin locations, the third tab of the Reference Data destination.
 /// D13 — the parent picker, and the location hierarchy it mirrors.
@@ -341,7 +342,8 @@ void main() {
   }
 
   AppState adminApp(http.Client client, {AppRole role = AppRole.admin}) =>
-      AppState(api: ApiClient(client: client)..demoMode = false)
+      AppState(
+          api: ApiClient(client: withAdminAccess(client))..demoMode = false)
         ..demoMode = false
         ..email = 'admin@planyourtrip.com'
         ..role = role;
@@ -537,10 +539,11 @@ void main() {
       expect(find.byType(Tab), findsNWidgets(3));
     });
 
-    testWidgets('the navigation destination count is unchanged at 10',
+    testWidgets('the navigation destination count is unchanged at 11',
         (tester) async {
       await pumpConsole(tester);
-      expect(AdminNavigation.destinations, hasLength(10),
+      // 10 after D11; RBAC R6 added the Administrators destination.
+      expect(AdminNavigation.destinations, hasLength(11),
           reason: 'D11 adds a tab, not a destination');
       expect(
           AdminNavigation.destinations

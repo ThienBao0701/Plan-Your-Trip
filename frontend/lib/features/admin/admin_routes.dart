@@ -30,6 +30,7 @@ class AdminRoutes {
   static const String catalog = AdminRoutesRefs.catalog;
   static const String media = AdminRoutesRefs.media;
   static const String referenceData = AdminRoutesRefs.referenceData;
+  static const String access = AdminRoutesRefs.access;
 
   static bool isAdminRoute(String route) =>
       route == namespace || route.startsWith('$namespace/');

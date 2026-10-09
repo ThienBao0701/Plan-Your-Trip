@@ -17,6 +17,7 @@ import 'package:planyourtrip_frontend/features/admin/admin_navigation.dart';
 import 'package:planyourtrip_frontend/features/admin/admin_routes.dart';
 import 'package:planyourtrip_frontend/features/admin/widgets/admin_widgets.dart';
 import 'package:planyourtrip_frontend/l10n/app_localizations.dart';
+import 'support/admin_access_stub.dart';
 
 /// D1b — Admin CMS foundation.
 ///
@@ -206,7 +207,8 @@ void main() {
       });
 
   AppState adminApp(http.Client client, {AppRole role = AppRole.admin}) =>
-      AppState(api: ApiClient(client: client)..demoMode = false)
+      AppState(
+          api: ApiClient(client: withAdminAccess(client))..demoMode = false)
         ..demoMode = false
         ..email = 'admin@planyourtrip.com'
         ..role = role;
@@ -651,10 +653,11 @@ void main() {
         l10n.adminNavInvoices,
         l10n.adminNavReviews,
         l10n.adminNavActivityLog,
+        l10n.adminNavAccess,
       ]) {
         expect(find.text(label), findsWidgets);
       }
-      expect(AdminNavigation.destinations, hasLength(10));
+      expect(AdminNavigation.destinations, hasLength(11));
       // Nothing speculative: every destination resolves to a real route.
       for (final d in AdminNavigation.destinations) {
         expect(AdminRoutes.isAdminRoute(d.route), isTrue);

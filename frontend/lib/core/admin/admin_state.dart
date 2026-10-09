@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import '../app_role.dart';
 import '../app_state.dart';
 import '../network/api_client.dart';
+import 'admin_access_models.dart';
 
 /// Global context for the Admin CMS workspace.
 ///
@@ -25,10 +26,54 @@ import '../network/api_client.dart';
 /// `AppState` and resets whenever the identity, role or demo flag changes, so
 /// admin context can never outlive the account that established it. That is
 /// done from the outside, without editing `AppState`.
+/// RBAC R6 — where the caller's admin access document stands.
+enum AdminAccessStatus {
+  idle,
+  loading,
+  ready,
+
+  /// `GET /api/admin/me/access` answered 403: the account holds no admin
+  /// profile, so it may not use any part of the console.
+  noAccess,
+  error,
+}
+
 class AdminState extends ChangeNotifier {
   final ApiClient api;
 
   AdminState({required this.api});
+
+  AdminAccess? _access;
+  AdminAccessStatus _accessStatus = AdminAccessStatus.idle;
+
+  /// RBAC R6 — the caller's admin profiles and permission keys, in memory
+  /// only. Null until loaded.
+  AdminAccess? get access => _access;
+
+  AdminAccessStatus get accessStatus => _accessStatus;
+
+  /// Whether the access document grants [permissionKey]. Fails closed: false
+  /// while the document is missing, loading or failed. UX only — the server
+  /// authorizes every request.
+  bool holds(String permissionKey) => _access?.holds(permissionKey) ?? false;
+
+  /// Loads the access document; a no-op while a load is in flight.
+  Future<void> loadAccess() async {
+    if (_accessStatus == AdminAccessStatus.loading) return;
+    _accessStatus = AdminAccessStatus.loading;
+    notifyListeners();
+    final result = await api.getAdminAccess();
+    if (result.success && result.data != null) {
+      _access = result.data;
+      _accessStatus = AdminAccessStatus.ready;
+    } else {
+      _access = null;
+      _accessStatus = result.errorKind == ApiErrorKind.forbidden
+          ? AdminAccessStatus.noAccess
+          : AdminAccessStatus.error;
+    }
+    notifyListeners();
+  }
 
   String? _activeRoute;
   AppState? _boundApp;
@@ -87,6 +132,8 @@ class AdminState extends ChangeNotifier {
   /// call repeatedly.
   void reset() {
     _activeRoute = null;
+    _access = null;
+    _accessStatus = AdminAccessStatus.idle;
     notifyListeners();
   }
 

@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
 
+import '../../core/admin/admin_access_models.dart';
 import '../../l10n/app_localizations.dart';
 
 /// Sidebar grouping. The Admin CMS is information-dense, so destinations are
 /// grouped rather than presented as one flat list.
-enum AdminSection { overview, operations, catalog, finance, community, audit }
+enum AdminSection {
+  overview,
+  operations,
+  catalog,
+  finance,
+  community,
+  audit,
+  access
+}
 
 /// One destination in the Admin CMS shell.
 ///
@@ -22,11 +31,17 @@ class AdminDestination {
   /// the menu is built once and still follows a locale change.
   final String Function(AppLocalizations) label;
 
+  /// RBAC R6 — the admin permission key the destination's own read needs
+  /// (§9.2). The shell lists a destination only when the access document
+  /// grants it; the server still authorizes every request.
+  final String requiresPermission;
+
   const AdminDestination({
     required this.route,
     required this.section,
     required this.icon,
     required this.label,
+    required this.requiresPermission,
   });
 }
 
@@ -42,63 +57,81 @@ class AdminNavigation {
   static const List<AdminDestination> destinations = [
     AdminDestination(
       route: AdminRoutesRefs.dashboard,
+      requiresPermission: AdminPermissionKeys.analyticsView,
       section: AdminSection.overview,
       icon: Icons.dashboard_outlined,
       label: _dashboard,
     ),
     AdminDestination(
       route: AdminRoutesRefs.bookings,
+      requiresPermission: AdminPermissionKeys.bookingView,
       section: AdminSection.operations,
       icon: Icons.event_note_outlined,
       label: _bookings,
     ),
     AdminDestination(
       route: AdminRoutesRefs.partners,
+      requiresPermission: AdminPermissionKeys.partnerView,
       section: AdminSection.operations,
       icon: Icons.storefront_outlined,
       label: _partners,
     ),
     AdminDestination(
       route: AdminRoutesRefs.catalog,
+      requiresPermission: AdminPermissionKeys.placeView,
       section: AdminSection.catalog,
       icon: Icons.place_outlined,
       label: _catalog,
     ),
     AdminDestination(
       route: AdminRoutesRefs.media,
+      requiresPermission: AdminPermissionKeys.mediaManage,
       section: AdminSection.catalog,
       icon: Icons.photo_library_outlined,
       label: _media,
     ),
     AdminDestination(
       route: AdminRoutesRefs.referenceData,
+      requiresPermission: AdminPermissionKeys.consoleAccess,
       section: AdminSection.catalog,
       icon: Icons.category_outlined,
       label: _referenceData,
     ),
     AdminDestination(
       route: AdminRoutesRefs.payments,
+      requiresPermission: AdminPermissionKeys.paymentView,
       section: AdminSection.finance,
       icon: Icons.payments_outlined,
       label: _payments,
     ),
     AdminDestination(
       route: AdminRoutesRefs.invoices,
+      requiresPermission: AdminPermissionKeys.invoiceView,
       section: AdminSection.finance,
       icon: Icons.receipt_long_outlined,
       label: _invoices,
     ),
     AdminDestination(
       route: AdminRoutesRefs.reviews,
+      requiresPermission: AdminPermissionKeys.reviewView,
       section: AdminSection.community,
       icon: Icons.rate_review_outlined,
       label: _reviews,
     ),
     AdminDestination(
       route: AdminRoutesRefs.activityLog,
+      requiresPermission: AdminPermissionKeys.auditLogView,
       section: AdminSection.audit,
       icon: Icons.history_outlined,
       label: _activityLog,
+    ),
+    // RBAC R6 — administrators and their profiles (PLATFORM_OWNER only).
+    AdminDestination(
+      route: AdminRoutesRefs.access,
+      requiresPermission: AdminPermissionKeys.accessManage,
+      section: AdminSection.access,
+      icon: Icons.admin_panel_settings_outlined,
+      label: _access,
     ),
   ];
 
@@ -129,6 +162,7 @@ class AdminNavigation {
         AdminSection.finance => l10n.adminSectionFinance,
         AdminSection.community => l10n.adminSectionCommunity,
         AdminSection.audit => l10n.adminSectionAudit,
+        AdminSection.access => l10n.adminSectionAccess,
       };
 
   // Const-compatible label resolvers.
@@ -142,6 +176,7 @@ class AdminNavigation {
   static String _catalog(AppLocalizations l) => l.adminNavCatalog;
   static String _media(AppLocalizations l) => l.adminNavMedia;
   static String _referenceData(AppLocalizations l) => l.adminNavReferenceData;
+  static String _access(AppLocalizations l) => l.adminNavAccess;
 }
 
 /// Route strings, kept separate from `AdminRoutes` so `AdminNavigation` can be
@@ -176,4 +211,7 @@ class AdminRoutesRefs {
   /// other. Locations are deliberately absent — that contract is heavier and
   /// is its own phase.
   static const String referenceData = '/admin/reference-data';
+
+  /// RBAC R6. Administrators and their admin profiles (A02).
+  static const String access = '/admin/access';
 }

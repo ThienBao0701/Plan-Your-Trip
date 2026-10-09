@@ -18826,6 +18826,18 @@ abstract class AppLocalizations {
   /// **'Guest name or email'**
   String get partnerBookingFilterGuest;
 
+  /// No description provided for @partnerBookingFilterGuestName.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest name'**
+  String get partnerBookingFilterGuestName;
+
+  /// No description provided for @partnerBookingFilterGuestEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest email'**
+  String get partnerBookingFilterGuestEmail;
+
   /// No description provided for @partnerBookingFilterCode.
   ///
   /// In en, this message translates to:
@@ -25623,6 +25635,312 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This invitation is no longer valid. Ask the team for a new invitation.'**
   String get partnerAcceptErrorStale;
+
+  /// No description provided for @adminSectionAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Access'**
+  String get adminSectionAccess;
+
+  /// No description provided for @adminNavAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Administrators'**
+  String get adminNavAccess;
+
+  /// No description provided for @adminNoProfileTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No admin profile'**
+  String get adminNoProfileTitle;
+
+  /// No description provided for @adminNoProfileMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account is an administrator account without an admin profile, so no part of the console is available. Ask a platform owner to assign you a profile.'**
+  String get adminNoProfileMessage;
+
+  /// No description provided for @adminAccessLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load your admin access. Check your connection and try again.'**
+  String get adminAccessLoadFailed;
+
+  /// No description provided for @adminAccessSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Admin profiles decide what each administrator can do. Changes apply on their next request; you cannot change your own profiles.'**
+  String get adminAccessSubtitle;
+
+  /// No description provided for @adminAccessRefresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh administrators'**
+  String get adminAccessRefresh;
+
+  /// No description provided for @adminAccessEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No administrators'**
+  String get adminAccessEmptyTitle;
+
+  /// No description provided for @adminAccessEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No administrator accounts were found.'**
+  String get adminAccessEmptyMessage;
+
+  /// No description provided for @adminAccessEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit profiles'**
+  String get adminAccessEdit;
+
+  /// No description provided for @adminAccessSelfHint.
+  ///
+  /// In en, this message translates to:
+  /// **'You cannot change your own profiles'**
+  String get adminAccessSelfHint;
+
+  /// No description provided for @adminAccessUnknownHint.
+  ///
+  /// In en, this message translates to:
+  /// **'This administrator holds a profile this version of the console does not know. Update the console before changing their profiles.'**
+  String get adminAccessUnknownHint;
+
+  /// No description provided for @adminAccessYou.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get adminAccessYou;
+
+  /// No description provided for @adminAccessDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Disabled'**
+  String get adminAccessDisabled;
+
+  /// No description provided for @adminAccessNoProfiles.
+  ///
+  /// In en, this message translates to:
+  /// **'No profile'**
+  String get adminAccessNoProfiles;
+
+  /// No description provided for @adminAccessEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Profiles of {name}'**
+  String adminAccessEditTitle(String name);
+
+  /// No description provided for @adminAccessEditHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The administrator holds the union of the selected profiles. Clear every box to remove all access.'**
+  String get adminAccessEditHint;
+
+  /// No description provided for @adminAccessReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason (optional)'**
+  String get adminAccessReason;
+
+  /// No description provided for @adminAccessCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get adminAccessCancel;
+
+  /// No description provided for @adminAccessSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save profiles'**
+  String get adminAccessSave;
+
+  /// No description provided for @adminAccessSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Admin profiles saved.'**
+  String get adminAccessSaved;
+
+  /// No description provided for @adminAccessErrorLastOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'At least one platform owner must remain.'**
+  String get adminAccessErrorLastOwner;
+
+  /// No description provided for @adminAccessErrorSelf.
+  ///
+  /// In en, this message translates to:
+  /// **'You cannot change your own admin profiles.'**
+  String get adminAccessErrorSelf;
+
+  /// No description provided for @adminAccessErrorPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'Only a platform owner can change admin profiles.'**
+  String get adminAccessErrorPermission;
+
+  /// No description provided for @adminAccessErrorStepUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm your password to change admin profiles.'**
+  String get adminAccessErrorStepUp;
+
+  /// No description provided for @adminAccessErrorValidation.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose only known admin profiles, and keep the reason free of credentials.'**
+  String get adminAccessErrorValidation;
+
+  /// No description provided for @adminAccessErrorUncertain.
+  ///
+  /// In en, this message translates to:
+  /// **'The change may or may not have been saved. The list was reloaded — check it before trying again.'**
+  String get adminAccessErrorUncertain;
+
+  /// No description provided for @adminAccessErrorGone.
+  ///
+  /// In en, this message translates to:
+  /// **'This administrator no longer exists. The list was reloaded.'**
+  String get adminAccessErrorGone;
+
+  /// No description provided for @adminAccessErrorNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not reach the server. Try again.'**
+  String get adminAccessErrorNetwork;
+
+  /// No description provided for @adminProfilePlatformOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Platform owner'**
+  String get adminProfilePlatformOwner;
+
+  /// No description provided for @adminProfilePartnerOperations.
+  ///
+  /// In en, this message translates to:
+  /// **'Partner operations'**
+  String get adminProfilePartnerOperations;
+
+  /// No description provided for @adminProfileContentCatalogue.
+  ///
+  /// In en, this message translates to:
+  /// **'Content catalogue'**
+  String get adminProfileContentCatalogue;
+
+  /// No description provided for @adminProfileBookingSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking support'**
+  String get adminProfileBookingSupport;
+
+  /// No description provided for @adminProfileFinanceOperations.
+  ///
+  /// In en, this message translates to:
+  /// **'Finance operations'**
+  String get adminProfileFinanceOperations;
+
+  /// No description provided for @adminProfileGrowthMarketing.
+  ///
+  /// In en, this message translates to:
+  /// **'Growth marketing'**
+  String get adminProfileGrowthMarketing;
+
+  /// No description provided for @adminProfileTrustSafety.
+  ///
+  /// In en, this message translates to:
+  /// **'Trust and safety'**
+  String get adminProfileTrustSafety;
+
+  /// No description provided for @adminProfileReviewModeration.
+  ///
+  /// In en, this message translates to:
+  /// **'Review moderation'**
+  String get adminProfileReviewModeration;
+
+  /// No description provided for @adminProfileAnalytics.
+  ///
+  /// In en, this message translates to:
+  /// **'Analytics'**
+  String get adminProfileAnalytics;
+
+  /// No description provided for @adminProfileLocationCatalogue.
+  ///
+  /// In en, this message translates to:
+  /// **'Location catalogue'**
+  String get adminProfileLocationCatalogue;
+
+  /// No description provided for @adminProfileTechSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Tech support'**
+  String get adminProfileTechSupport;
+
+  /// No description provided for @adminProfilePlatformOwnerHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Every admin permission, including administrator access, moving properties between companies and broadcasts.'**
+  String get adminProfilePlatformOwnerHint;
+
+  /// No description provided for @adminProfilePartnerOperationsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Partner verification and suspension, inventory and rates on behalf of partners.'**
+  String get adminProfilePartnerOperationsHint;
+
+  /// No description provided for @adminProfileContentCatalogueHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Places, rooms, media, categories, amenities, moderation and publication.'**
+  String get adminProfileContentCatalogueHint;
+
+  /// No description provided for @adminProfileBookingSupportHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookings, conversations, customers, and payment and invoice reads.'**
+  String get adminProfileBookingSupportHint;
+
+  /// No description provided for @adminProfileFinanceOperationsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Refunds, payment interventions, invoices, stored value and credits.'**
+  String get adminProfileFinanceOperationsHint;
+
+  /// No description provided for @adminProfileGrowthMarketingHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Promotions, coupons, gift-card products, customer programmes, personalization.'**
+  String get adminProfileGrowthMarketingHint;
+
+  /// No description provided for @adminProfileTrustSafetyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Audit log, partner suspension, listing take-downs, conversations, review moderation.'**
+  String get adminProfileTrustSafetyHint;
+
+  /// No description provided for @adminProfileReviewModerationHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The review queue.'**
+  String get adminProfileReviewModerationHint;
+
+  /// No description provided for @adminProfileAnalyticsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Aggregate reporting only — no row-level or personal data.'**
+  String get adminProfileAnalyticsHint;
+
+  /// No description provided for @adminProfileLocationCatalogueHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The administrative-unit hierarchy.'**
+  String get adminProfileLocationCatalogueHint;
+
+  /// No description provided for @adminProfileTechSupportHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Audit log, booking and payment reads with guest identity masked, system jobs.'**
+  String get adminProfileTechSupportHint;
 }
 
 class _AppLocalizationsDelegate
