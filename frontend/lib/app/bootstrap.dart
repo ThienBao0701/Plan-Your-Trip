@@ -5,6 +5,7 @@ import '../core/admin/admin_state.dart';
 import '../core/app_state.dart';
 import '../core/partner/partner_state.dart';
 import 'app_surface.dart';
+import 'routing/auth_link_token.dart';
 import 'surface_app.dart';
 
 /// Entry for a dedicated `lib/main_<surface>.dart`.
@@ -29,6 +30,10 @@ Future<void> runSurfaceEntrypoint(AppSurface surface) async {
 /// [AdminState] only in the Admin console, so the traveller app does no partner
 /// or admin work at start-up.
 Future<void> bootstrapSurface(AppSurface surface) async {
+  // First, while the address bar still holds an emailed link exactly as opened
+  // (`/verify-email#token=…`, `/accept-invitation#token=…`): the framework's
+  // history setup drops the fragment before any screen can read it.
+  AuthLinkToken.captureLaunch();
   // Path URLs (`/bookings`, not `/#/bookings`): the origin's root is the
   // surface's root, and a location survives a refresh. A no-op off the web.
   usePathUrlStrategy();

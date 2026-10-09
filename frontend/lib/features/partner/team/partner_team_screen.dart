@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -808,7 +810,7 @@ class _InvitationsSection extends StatelessWidget {
   }
 }
 
-class _InvitationRow extends StatelessWidget {
+class _InvitationRow extends StatefulWidget {
   final PartnerTeamInvitation invitation;
   final PartnerAccess? access;
   final bool canManage;
@@ -827,7 +829,55 @@ class _InvitationRow extends StatelessWidget {
   });
 
   @override
+  State<_InvitationRow> createState() => _InvitationRowState();
+}
+
+/// Rebuilds once when the resend cooldown runs out, so Resend becomes
+/// available without a manual refresh (the server still decides).
+class _InvitationRowState extends State<_InvitationRow> {
+  Timer? _cooldownTimer;
+  bool _cooldownOver = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scheduleCooldownEnd();
+  }
+
+  @override
+  void didUpdateWidget(covariant _InvitationRow oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.invitation.resendAvailableAt !=
+        widget.invitation.resendAvailableAt) {
+      _scheduleCooldownEnd();
+    }
+  }
+
+  void _scheduleCooldownEnd() {
+    _cooldownTimer?.cancel();
+    _cooldownTimer = null;
+    _cooldownOver = false;
+    final availableAt = widget.invitation.resendAvailableAt;
+    if (availableAt == null || !widget.invitation.isPending) return;
+    final remaining = availableAt.difference(DateTime.now());
+    if (remaining <= Duration.zero) return;
+    _cooldownTimer = Timer(remaining, () {
+      if (mounted) setState(() => _cooldownOver = true);
+    });
+  }
+
+  @override
+  void dispose() {
+    _cooldownTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final invitation = widget.invitation;
+    final access = widget.access;
+    final canManage = widget.canManage;
+    final busy = widget.busy;
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final locale = Localizations.localeOf(context).toLanguageTag();
@@ -835,7 +885,8 @@ class _InvitationRow extends StatelessWidget {
     final pending = invitation.isPending;
     final now = DateTime.now();
     final availableAt = invitation.resendAvailableAt;
-    final coolingDown = availableAt != null && availableAt.isAfter(now);
+    final coolingDown =
+        !_cooldownOver && availableAt != null && availableAt.isAfter(now);
     final canResend = canManage &&
         pending &&
         !invitation.resendLimitReached &&
@@ -939,7 +990,7 @@ class _InvitationRow extends StatelessWidget {
               children: [
                 TextButton.icon(
                   key: Key('partner-team-resend-${invitation.id}'),
-                  onPressed: canResend ? onResend : null,
+                  onPressed: canResend ? widget.onResend : null,
                   icon: busy
                       ? const SizedBox(
                           width: 16,
@@ -950,7 +1001,7 @@ class _InvitationRow extends StatelessWidget {
                 ),
                 TextButton.icon(
                   key: Key('partner-team-revoke-${invitation.id}'),
-                  onPressed: busy ? null : onRevoke,
+                  onPressed: busy ? null : widget.onRevoke,
                   icon: const Icon(Icons.cancel_outlined,
                       color: AppColors.danger),
                   label: Text(l10n.partnerInviteRevoke,

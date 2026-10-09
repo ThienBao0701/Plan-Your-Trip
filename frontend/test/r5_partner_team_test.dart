@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
+import 'package:planyourtrip_frontend/app/routing/auth_link_token.dart';
 import 'package:planyourtrip_frontend/app/routing/invitation_link.dart';
 import 'package:planyourtrip_frontend/app/routing/partner_router.dart';
 import 'package:planyourtrip_frontend/core/app_role.dart';
@@ -32,6 +33,7 @@ void main() {
   setUp(() {
     SharedPreferences.setMockInitialValues({});
     PartnerInvitationLink.clear();
+    AuthLinkToken.clear('/');
   });
 
   final en = AppLocalizationsEn();
@@ -1009,6 +1011,28 @@ void main() {
       expect(find.text(en.partnerInviteResent), findsOneWidget);
     });
 
+    // Browser smoke test: Resend stayed disabled after the cooldown until a
+    // manual refresh.
+    testWidgets('resend becomes available when the cooldown ends',
+        (tester) async {
+      await pump(tester, const PartnerTeamScreen(),
+          client: backend(invitations: [
+            invitation(9, 'fresh@b.example',
+                lastSent: DateTime.now()
+                    .toUtc()
+                    .subtract(const Duration(seconds: 58))),
+          ]));
+      TextButton resend() => tester
+          .widget<TextButton>(find.byKey(const Key('partner-team-resend-9')));
+      expect(resend().onPressed, isNull);
+      final requests = log.length;
+      await tester.pump(const Duration(seconds: 3));
+      expect(resend().onPressed, isNotNull);
+      expect(find.byKey(const Key('partner-team-invitation-cooldown-9')),
+          findsNothing);
+      expect(log.length, requests, reason: 'no reload is needed');
+    });
+
     testWidgets('revoking confirms, sends the reason and refreshes',
         (tester) async {
       await pump(tester, const PartnerTeamScreen(), client: backend());
@@ -1178,6 +1202,38 @@ void main() {
           from: Uri.parse('https://partner.example/accept-invitation#other=1'));
       expect(PartnerInvitationLink.pending, isNull,
           reason: 'a fragment without a token is no token');
+    });
+
+    // Browser smoke test: on the web, Flutter's history setup rewrites the
+    // address bar to the bare path before the first screen builds, so a link
+    // read only from the live address lost its token. The bootstrap now keeps
+    // the address the app was opened at.
+    test('the link is still read after the address bar dropped its fragment',
+        () {
+      AuthLinkToken.captureLaunch(
+          from: Uri.base.replace(fragment: 'token=launch-tok'));
+      PartnerInvitationLink.capture();
+      expect(PartnerInvitationLink.pending, 'launch-tok');
+      expect(AuthLinkToken.read(), isNull,
+          reason: 'capturing it drops the launch address');
+    });
+
+    test('a launch fragment is never read at another location', () {
+      AuthLinkToken.captureLaunch(
+          from: Uri.base.replace(path: '/somewhere-else', fragment: 'token=x'));
+      PartnerInvitationLink.capture();
+      expect(PartnerInvitationLink.pending, isNull);
+    });
+
+    testWidgets('opened from the launch address, the screen offers to accept',
+        (tester) async {
+      AuthLinkToken.captureLaunch(
+          from: Uri.base.replace(fragment: 'token=launch-tok'));
+      await pump(tester, const AcceptInvitationScreen(),
+          client: backend(), scroll: false);
+      expect(find.byKey(const Key('partner-accept-submit')), findsOneWidget);
+      expect(find.byKey(const Key('partner-accept-no-link')), findsNothing);
+      expect(PartnerInvitationLink.pending, 'launch-tok');
     });
 
     test('the router serves the link signed out and signed in', () {
