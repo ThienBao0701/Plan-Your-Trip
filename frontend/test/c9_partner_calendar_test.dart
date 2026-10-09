@@ -357,6 +357,8 @@ void main() {
         partnerCalls,
         {
           'GET /api/partner/profile',
+          // R5: the workspace reads the caller's access document at start-up.
+          'GET /api/partner/me/access',
           'GET /api/partner/extranet/home',
           'GET /api/partner/hotels',
           'GET /api/partner/rooms',

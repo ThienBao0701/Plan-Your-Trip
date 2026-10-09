@@ -213,9 +213,10 @@ void main() {
   // ══════════════════════════════════════════════════════════════════════════
 
   group('surface routers', () {
-    test('the Partner workspace serves all thirteen destinations at the root',
+    test('the Partner workspace serves all fourteen destinations at the root',
         () {
-      expect(PartnerNavigation.destinations, hasLength(13));
+      // Thirteen backend menu keys plus R5's permission-gated `team`.
+      expect(PartnerNavigation.destinations, hasLength(14));
       for (final destination in PartnerNavigation.destinations) {
         final location = '/${destination.key}';
         expect(PartnerSurfaceRouter.locationOf(destination.route), location);

@@ -16,10 +16,11 @@ All routes are root-relative: the origin already says which application it is.
 | `/forgot-password` | request a reset link | same | same |
 | `/reset-password` | set a new password from a link | same | same |
 | `/account` | account details, security, business profile | account details, security | — |
-| destinations | the 13 workspace destinations | the 10 console destinations | the 4 tabs |
+| `/accept-invitation` | team invitation: sign-in guidance, then accept/decline ([PARTNER_TEAM.md](PARTNER_TEAM.md)) | — | — |
+| destinations | the 14 workspace destinations (`/team` only with `partner.team.view`) | the 10 console destinations | the 4 tabs |
 
-`/register`, `/verify-email`, `/forgot-password` and `/reset-password` are the only locations a signed-out
-visitor can open, because the emails carrying their tokens are opened without a session. `/account` needs a
+`/register`, `/verify-email`, `/forgot-password`, `/reset-password` and (R5) `/accept-invitation` are the only
+locations a signed-out visitor can open, because the emails carrying their tokens are opened without a session. `/account` needs a
 session and the surface's own role; a wrong role gets the access-denied screen as before.
 
 ## 2. Partner account lifecycle

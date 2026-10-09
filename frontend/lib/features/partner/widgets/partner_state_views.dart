@@ -104,11 +104,11 @@ class PartnerWorkspaceStatusView extends StatelessWidget {
             message: l10n.partnerStatusSuspendedMessage,
             actionLabel: l10n.partnerActionRefresh,
           ),
-        PartnerWorkspaceStatus.teamMemberUnsupported => _StatusSpec(
-            icon: Icons.groups_outlined,
-            title: l10n.partnerStatusTeamMemberTitle,
-            message: l10n.partnerStatusTeamMemberMessage,
-            actionLabel: l10n.partnerActionBack,
+        PartnerWorkspaceStatus.membershipSuspended => _StatusSpec(
+            icon: Icons.person_off_outlined,
+            title: l10n.partnerStatusMembershipSuspendedTitle,
+            message: l10n.partnerStatusMembershipSuspendedMessage,
+            actionLabel: l10n.partnerActionRefresh,
           ),
         PartnerWorkspaceStatus.unauthorized => _StatusSpec(
             icon: Icons.person_off_outlined,

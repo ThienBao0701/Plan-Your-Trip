@@ -35,8 +35,12 @@ import 'partner_models.dart';
 String? partnerTeamRoleWire(PartnerTeamRole role) => switch (role) {
       PartnerTeamRole.owner => 'OWNER',
       PartnerTeamRole.manager => 'MANAGER',
+      PartnerTeamRole.revenue => 'REVENUE',
+      PartnerTeamRole.reservations => 'RESERVATIONS',
       PartnerTeamRole.frontDesk => 'FRONT_DESK',
       PartnerTeamRole.finance => 'FINANCE',
+      PartnerTeamRole.content => 'CONTENT',
+      PartnerTeamRole.housekeeping => 'HOUSEKEEPING',
       PartnerTeamRole.viewer => 'VIEWER',
       PartnerTeamRole.unknown => null,
     };

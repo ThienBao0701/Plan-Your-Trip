@@ -34,7 +34,13 @@ class LoginScreen extends StatefulWidget {
   /// navigate.
   final bool embeddedInSurfaceGate;
 
-  const LoginScreen({super.key, this.embeddedInSurfaceGate = false});
+  /// RBAC R5 — optional guidance shown above the sign-in form, e.g. on the
+  /// invitation link's page ("join with a Partner account that uses the invited
+  /// address"). Presentation only.
+  final Widget? notice;
+
+  const LoginScreen(
+      {super.key, this.embeddedInSurfaceGate = false, this.notice});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -160,7 +166,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           children: [
                             Expanded(child: _HeroPanel(title: heroTitle)),
                             const SizedBox(width: AppSpacing.xl),
-                            Expanded(child: _buildLoginPanel(surface, l10n)),
+                            Expanded(
+                                child: _withNotice(
+                                    _buildLoginPanel(surface, l10n))),
                           ],
                         )
                       : Column(
@@ -168,7 +176,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           children: [
                             _HeroPanel(title: heroTitle),
                             const SizedBox(height: AppSpacing.lg),
-                            _buildLoginPanel(surface, l10n),
+                            _withNotice(_buildLoginPanel(surface, l10n)),
                           ],
                         ),
                 ),
@@ -177,6 +185,16 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _withNotice(Widget panel) {
+    final notice = widget.notice;
+    if (notice == null) return panel;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [notice, const SizedBox(height: AppSpacing.md), panel],
     );
   }
 

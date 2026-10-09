@@ -84,8 +84,8 @@ class _PartnerMessagesScreenState extends State<PartnerMessagesScreen> {
     final partner = PartnerScope.of(context);
     final messages = _messages;
 
-    // The workspace gate is authoritative — including `teamMemberUnsupported`,
-    // which is how a MANAGER/FRONT_DESK/FINANCE/VIEWER correctly lands here.
+    // The workspace gate is authoritative — including a suspended membership.
+    // A 404 from the module itself is shown as "not available to you".
     if (!partner.isReady || messages == null) {
       return PartnerWorkspaceStatusView(
         status: partner.status,
@@ -155,7 +155,7 @@ class _Body extends StatelessWidget {
       case PartnerMessagesStatus.notFound:
         return PartnerWorkspaceStatusView(
           key: const Key('partner-messages-notfound'),
-          status: PartnerWorkspaceStatus.teamMemberUnsupported,
+          status: PartnerWorkspaceStatus.forbidden,
           detail: messages.errorMessage,
         );
       case PartnerMessagesStatus.error:

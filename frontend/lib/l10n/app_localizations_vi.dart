@@ -8388,11 +8388,12 @@ class AppLocalizationsVi extends AppLocalizations {
       'Quản trị viên đã tạm ngưng tài khoản đối tác này. Hãy liên hệ bộ phận hỗ trợ để khôi phục quyền truy cập.';
 
   @override
-  String get partnerStatusTeamMemberTitle => 'Chưa hỗ trợ truy cập theo nhóm';
+  String get partnerStatusMembershipSuspendedTitle =>
+      'Quyền truy cập nhóm của bạn đang bị tạm ngưng';
 
   @override
-  String get partnerStatusTeamMemberMessage =>
-      'Bạn thuộc một nhóm đối tác nhưng không sở hữu hồ sơ đó. Hiện tại chỉ chủ sở hữu hồ sơ mới xem được tổng quan cổng đối tác.';
+  String get partnerStatusMembershipSuspendedMessage =>
+      'Chủ sở hữu hoặc quản lý của không gian làm việc này đã tạm ngưng tư cách thành viên của bạn. Bạn sẽ có lại quyền truy cập khi họ kích hoạt lại.';
 
   @override
   String get partnerStatusUnauthorizedTitle => 'Hãy đăng nhập lại';
@@ -14215,4 +14216,530 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get partnerBusinessValidationRequired => 'Trường này là bắt buộc.';
+
+  @override
+  String get partnerNavTeam => 'Nhóm';
+
+  @override
+  String get partnerTeamRoleRevenue => 'Doanh thu';
+
+  @override
+  String get partnerTeamRoleReservations => 'Đặt phòng';
+
+  @override
+  String get partnerTeamRoleContent => 'Nội dung';
+
+  @override
+  String get partnerTeamRoleHousekeeping => 'Buồng phòng';
+
+  @override
+  String get partnerTeamScopeField => 'Áp dụng cho';
+
+  @override
+  String get partnerTeamScopeCompany => 'Toàn công ty';
+
+  @override
+  String get partnerTeamScopeProperty => 'Cơ sở lưu trú';
+
+  @override
+  String get partnerTeamScopeUnit => 'Loại phòng';
+
+  @override
+  String partnerTeamScopePropertyNumber(int id) {
+    return 'Cơ sở #$id';
+  }
+
+  @override
+  String partnerTeamScopeUnitNumber(int id) {
+    return 'Loại phòng #$id';
+  }
+
+  @override
+  String get partnerTeamScopeChoose => 'Chọn';
+
+  @override
+  String get partnerTeamScopeChooseRole => 'Hãy chọn vai trò trước';
+
+  @override
+  String get partnerTeamScopeNoRooms => 'Cơ sở này chưa có loại phòng';
+
+  @override
+  String get partnerTeamScopeNoneForRole =>
+      'Bạn không thể cấp vai trò này ở phạm vi nào bạn quản lý.';
+
+  @override
+  String get partnerTeamStatusActive => 'Đang hoạt động';
+
+  @override
+  String get partnerTeamStatusSuspended => 'Đã tạm ngưng';
+
+  @override
+  String get partnerTeamStatusRevoked => 'Đã gỡ';
+
+  @override
+  String get partnerInvitationStatusPending => 'Đang chờ';
+
+  @override
+  String get partnerInvitationStatusAccepted => 'Đã chấp nhận';
+
+  @override
+  String get partnerInvitationStatusDeclined => 'Đã từ chối';
+
+  @override
+  String get partnerInvitationStatusRevoked => 'Đã thu hồi';
+
+  @override
+  String get partnerInvitationStatusExpired => 'Đã hết hạn';
+
+  @override
+  String get partnerInvitationDeliveryQueued => 'Chưa xác nhận gửi email';
+
+  @override
+  String get partnerInvitationDeliverySent => 'Đã gửi email';
+
+  @override
+  String get partnerInvitationDeliveryFailed => 'Gửi email thất bại';
+
+  @override
+  String get partnerTeamScreenTitle => 'Nhóm';
+
+  @override
+  String get partnerTeamScreenSubtitle =>
+      'Ai có thể làm việc trong không gian đối tác này, với vai trò nào và ở đâu. Thay đổi có hiệu lực ở yêu cầu tiếp theo của thành viên.';
+
+  @override
+  String partnerTeamCountMembers(int count) {
+    return 'Thành viên: $count';
+  }
+
+  @override
+  String partnerTeamCountSuspended(int count) {
+    return 'Tạm ngưng: $count';
+  }
+
+  @override
+  String partnerTeamCountPending(int count) {
+    return 'Lời mời đang chờ: $count';
+  }
+
+  @override
+  String get partnerTeamReadOnly =>
+      'Bạn có thể xem nhóm nhưng không thể thay đổi. Thay đổi nhóm cần quyền quản lý nhóm.';
+
+  @override
+  String get partnerTeamNoAccess =>
+      'Vai trò của bạn không bao gồm quyền xem nhóm.';
+
+  @override
+  String get partnerTeamAccessUnavailable =>
+      'Không tải được quyền truy cập của bạn nên các thao tác nhóm không khả dụng. Hãy làm mới để thử lại.';
+
+  @override
+  String get partnerTeamLoading => 'Đang tải nhóm';
+
+  @override
+  String get partnerTeamLoadFailed => 'Không tải được danh sách nhóm.';
+
+  @override
+  String get partnerTeamMembersHeading => 'Thành viên';
+
+  @override
+  String get partnerTeamMembersSubtitle =>
+      'Các thành viên đang hoạt động và tạm ngưng mà bạn được xem. Thành viên đã gỡ được lưu làm lịch sử và không hiển thị.';
+
+  @override
+  String get partnerTeamMembersEmpty =>
+      'Chưa có thành viên nào trong phạm vi bạn xem.';
+
+  @override
+  String get partnerTeamColumnMember => 'Thành viên';
+
+  @override
+  String get partnerTeamColumnAccess => 'Vai trò và phạm vi';
+
+  @override
+  String get partnerTeamColumnStatus => 'Trạng thái';
+
+  @override
+  String get partnerTeamYou => 'Bạn';
+
+  @override
+  String get partnerTeamPrimaryOwner => 'Chủ sở hữu chính';
+
+  @override
+  String get partnerTeamPrimaryOwnerProtected =>
+      'Chủ sở hữu chính — được bảo vệ, không thể thay đổi trong không gian làm việc';
+
+  @override
+  String get partnerTeamPendingOwner => 'Chờ xác nhận chủ sở hữu';
+
+  @override
+  String partnerTeamGrantLabel(String role, String scope) {
+    return '$role · $scope';
+  }
+
+  @override
+  String partnerTeamMemberActions(String name) {
+    return 'Thao tác cho $name';
+  }
+
+  @override
+  String get partnerTeamEditAccess => 'Sửa vai trò và phạm vi';
+
+  @override
+  String get partnerTeamSuspend => 'Tạm ngưng';
+
+  @override
+  String get partnerTeamReactivate => 'Kích hoạt lại';
+
+  @override
+  String get partnerTeamRemoveAction => 'Gỡ khỏi nhóm';
+
+  @override
+  String get partnerTeamLeave => 'Rời không gian làm việc này';
+
+  @override
+  String get partnerTeamCancel => 'Hủy';
+
+  @override
+  String get partnerTeamReasonLabel => 'Lý do (không bắt buộc)';
+
+  @override
+  String get partnerTeamOwnerStepUpHint =>
+      'Thay đổi liên quan đến chủ sở hữu sẽ yêu cầu bạn xác nhận mật khẩu.';
+
+  @override
+  String get partnerTeamSuspendTitle => 'Tạm ngưng thành viên này?';
+
+  @override
+  String partnerTeamSuspendBody(String name) {
+    return '$name sẽ mất quyền truy cập ở yêu cầu tiếp theo. Vai trò và phạm vi được giữ lại để kích hoạt sau.';
+  }
+
+  @override
+  String get partnerTeamReactivateTitle => 'Kích hoạt lại thành viên này?';
+
+  @override
+  String partnerTeamReactivateBody(String name) {
+    return '$name sẽ có lại vai trò và phạm vi trước đó.';
+  }
+
+  @override
+  String get partnerTeamRemoveTitle => 'Gỡ thành viên này?';
+
+  @override
+  String partnerTeamRemoveBody(String name) {
+    return '$name sẽ mất quyền truy cập. Tư cách thành viên được lưu làm lịch sử và không thể khôi phục; muốn làm việc lại, hãy gửi lời mời mới.';
+  }
+
+  @override
+  String get partnerTeamLeaveTitle => 'Rời không gian làm việc này?';
+
+  @override
+  String get partnerTeamLeaveBody =>
+      'Bạn sẽ mất quyền truy cập không gian đối tác này ngay lập tức. Muốn quay lại, chủ sở hữu hoặc quản lý phải mời bạn lần nữa.';
+
+  @override
+  String get partnerTeamSaved => 'Đã lưu vai trò và phạm vi.';
+
+  @override
+  String get partnerTeamSuspended => 'Đã tạm ngưng thành viên.';
+
+  @override
+  String get partnerTeamReactivated => 'Đã kích hoạt lại thành viên.';
+
+  @override
+  String get partnerTeamRemoved => 'Đã gỡ thành viên.';
+
+  @override
+  String get partnerTeamLeft => 'Bạn đã rời không gian làm việc.';
+
+  @override
+  String get partnerTeamConcurrentReloaded =>
+      'Thành viên này đã thay đổi kể từ khi bạn mở. Danh sách đã được làm mới — hãy xem lại và thử lại.';
+
+  @override
+  String get partnerTeamGrantAdd => 'Thêm vai trò hoặc phạm vi';
+
+  @override
+  String get partnerTeamGrantRemove => 'Bỏ quyền này';
+
+  @override
+  String get partnerInvitesHeading => 'Lời mời';
+
+  @override
+  String get partnerInvitesSubtitle =>
+      'Các lời mời bạn được xem. Chấp nhận một lời mời sẽ tạo tư cách thành viên mới với đúng các vai trò được mời.';
+
+  @override
+  String get partnerInvitesEmpty => 'Không có lời mời nào.';
+
+  @override
+  String get partnerInvitesUnavailable => 'Không tải được danh sách lời mời.';
+
+  @override
+  String get partnerInviteAction => 'Mời';
+
+  @override
+  String get partnerInviteTitle => 'Mời vào nhóm';
+
+  @override
+  String get partnerInviteBody =>
+      'Địa chỉ email sẽ nhận một liên kết để tham gia bằng tài khoản Đối tác dùng địa chỉ đó. Không ai tham gia cho đến khi họ chấp nhận, và không tài khoản nào được tạo hay thay đổi.';
+
+  @override
+  String get partnerInviteEmailLabel => 'Địa chỉ email';
+
+  @override
+  String get partnerInviteEmailRequired => 'Hãy nhập địa chỉ email.';
+
+  @override
+  String get partnerInviteEmailInvalid => 'Hãy nhập địa chỉ email hợp lệ.';
+
+  @override
+  String get partnerInviteGrantsLabel => 'Vai trò và phạm vi';
+
+  @override
+  String get partnerInviteReview => 'Bạn sắp cấp';
+
+  @override
+  String get partnerInviteLimits =>
+      'Lời mời có hiệu lực 7 ngày. Mỗi công ty có tối đa 20 lời mời đang chờ, mỗi địa chỉ được mời hoặc gửi lại mỗi phút một lần, và mỗi lời mời được gửi lại tối đa 5 lần.';
+
+  @override
+  String get partnerInviteSubmit => 'Gửi lời mời';
+
+  @override
+  String get partnerInviteRecorded =>
+      'Đã ghi nhận yêu cầu mời. Trạng thái gửi hiển thị trong danh sách.';
+
+  @override
+  String get partnerInviteResend => 'Gửi lại';
+
+  @override
+  String get partnerInviteResent =>
+      'Đã yêu cầu liên kết mới; liên kết trước không còn hiệu lực.';
+
+  @override
+  String get partnerInviteRevoke => 'Thu hồi';
+
+  @override
+  String get partnerInviteRevokeTitle => 'Thu hồi lời mời này?';
+
+  @override
+  String partnerInviteRevokeBody(String email) {
+    return 'Liên kết đã gửi tới $email sẽ không còn hiệu lực.';
+  }
+
+  @override
+  String get partnerInviteRevoked => 'Đã thu hồi lời mời.';
+
+  @override
+  String partnerInviteExpires(String date) {
+    return 'Hết hạn $date';
+  }
+
+  @override
+  String partnerInviteInvitedBy(String name) {
+    return 'Người mời: $name';
+  }
+
+  @override
+  String partnerInviteResends(int count, int max) {
+    return 'Đã gửi lại $count/$max';
+  }
+
+  @override
+  String partnerInviteResendAfter(String time) {
+    return 'Có thể gửi lại sau $time';
+  }
+
+  @override
+  String get partnerInviteResendLimit =>
+      'Đã đạt giới hạn gửi lại — hãy thu hồi và gửi lời mời mới.';
+
+  @override
+  String get partnerTeamErrorEmailUnavailable =>
+      'Hiện không gửi được email nên chưa có gì được gửi hay tạo. Hãy thử lại sau.';
+
+  @override
+  String get partnerTeamErrorRateLimited =>
+      'Quá nhiều lời mời: hãy chờ một phút giữa các lần gửi, giữ tối đa 20 lời mời đang chờ và gửi lại tối đa 5 lần.';
+
+  @override
+  String get partnerTeamErrorAlreadyMember =>
+      'Địa chỉ này đã thuộc về một thành viên trong nhóm.';
+
+  @override
+  String get partnerTeamErrorOwnerProtected =>
+      'Chỉ chủ sở hữu mới quản lý được chủ sở hữu, và không thể thay đổi chủ sở hữu chính trong không gian làm việc.';
+
+  @override
+  String get partnerTeamErrorNotDelegable =>
+      'Bạn không thể cấp hoặc quản lý vai trò hay phạm vi này.';
+
+  @override
+  String get partnerTeamErrorSelf =>
+      'Bạn không thể thay đổi tư cách thành viên của chính mình. Bạn có thể rời không gian làm việc.';
+
+  @override
+  String get partnerTeamErrorStepUp =>
+      'Hãy xác nhận mật khẩu để thực hiện thay đổi liên quan đến chủ sở hữu.';
+
+  @override
+  String get partnerTeamErrorLastOwner =>
+      'Công ty phải giữ ít nhất một chủ sở hữu đang hoạt động.';
+
+  @override
+  String get partnerTeamErrorConcurrent =>
+      'Đã có người thay đổi mục này. Hãy tải lại và thử lại.';
+
+  @override
+  String get partnerTeamErrorWorkspaceConflict =>
+      'Người này đã thuộc một không gian đối tác khác.';
+
+  @override
+  String get partnerTeamErrorInvitationNotPending =>
+      'Lời mời này không còn ở trạng thái chờ. Danh sách đã được làm mới.';
+
+  @override
+  String get partnerTeamErrorInvitationStale =>
+      'Một phạm vi của lời mời này không còn thuộc công ty. Hãy thu hồi và mời lại.';
+
+  @override
+  String get partnerTeamErrorScopeInvalid =>
+      'Không thể cấp vai trò đó ở phạm vi đó.';
+
+  @override
+  String get partnerTeamErrorPermission =>
+      'Vai trò của bạn không cho phép thao tác này.';
+
+  @override
+  String get partnerTeamErrorReason =>
+      'Lý do không được chứa mật khẩu, bí mật, khóa, mã truy cập hay số thẻ hoặc số tài khoản.';
+
+  @override
+  String get partnerTeamErrorEmail => 'Hãy nhập địa chỉ email hợp lệ.';
+
+  @override
+  String get partnerTeamErrorValidation =>
+      'Một số thông tin không hợp lệ. Hãy kiểm tra và thử lại.';
+
+  @override
+  String get partnerTeamErrorSession =>
+      'Phiên của bạn đã kết thúc. Hãy đăng nhập lại.';
+
+  @override
+  String get partnerTeamErrorGone =>
+      'Mục này không còn khả dụng. Danh sách đã được làm mới.';
+
+  @override
+  String get partnerTeamErrorUncertain =>
+      'Kết nối bị gián đoạn trước khi có phản hồi. Danh sách đã được làm mới — hãy kiểm tra thay đổi đã được thực hiện chưa.';
+
+  @override
+  String get partnerTeamErrorNetwork =>
+      'Không kết nối được máy chủ. Hãy kiểm tra kết nối và thử lại.';
+
+  @override
+  String get partnerTeamErrorServer => 'Máy chủ gặp lỗi. Hãy thử lại.';
+
+  @override
+  String get partnerEditGrantsTitle => 'Sửa vai trò và phạm vi';
+
+  @override
+  String get partnerEditGrantsBody =>
+      'Các quyền này thay thế quyền hiện tại của thành viên. Bạn chỉ có thể cấp vai trò và phạm vi mình quản lý.';
+
+  @override
+  String get partnerEditGrantsSubmit => 'Lưu';
+
+  @override
+  String get partnerStepUpTitle => 'Xác nhận mật khẩu';
+
+  @override
+  String get partnerStepUpBody =>
+      'Thay đổi liên quan đến chủ sở hữu cần lần đăng nhập gần đây. Hãy nhập mật khẩu để tiếp tục.';
+
+  @override
+  String get partnerStepUpPasswordLabel => 'Mật khẩu';
+
+  @override
+  String get partnerStepUpPasswordRequired => 'Hãy nhập mật khẩu.';
+
+  @override
+  String get partnerStepUpConfirm => 'Xác nhận';
+
+  @override
+  String get partnerAcceptTitle => 'Tham gia nhóm đối tác';
+
+  @override
+  String get partnerAcceptGuidance =>
+      'Bạn đã mở một lời mời tham gia nhóm. Hãy đăng nhập bằng tài khoản Đối tác dùng địa chỉ được mời. Không thể dùng tài khoản du khách — nếu địa chỉ được mời là tài khoản du khách của bạn, hãy nhờ người mời dùng địa chỉ khác (ví dụ email công việc).';
+
+  @override
+  String get partnerAcceptJoinNote =>
+      'Chấp nhận sẽ đưa bạn vào không gian đối tác đã mời với vai trò và phạm vi nhóm đã chọn. Việc này không tạo công ty riêng cho bạn.';
+
+  @override
+  String get partnerAcceptAction => 'Chấp nhận lời mời';
+
+  @override
+  String get partnerAcceptDecline => 'Từ chối';
+
+  @override
+  String get partnerAcceptDeclineTitle => 'Từ chối lời mời này?';
+
+  @override
+  String get partnerAcceptDeclineBody =>
+      'Liên kết sẽ không còn hiệu lực. Nhóm sẽ phải mời bạn lại.';
+
+  @override
+  String get partnerAcceptDeclined => 'Bạn đã từ chối lời mời.';
+
+  @override
+  String get partnerAcceptSuccess =>
+      'Bạn đã tham gia nhóm. Không gian làm việc sẽ mở với vai trò và phạm vi bạn được mời.';
+
+  @override
+  String get partnerAcceptOpenWorkspace => 'Mở không gian làm việc';
+
+  @override
+  String get partnerAcceptNoLink =>
+      'Chưa mở liên kết lời mời nào. Hãy mở liên kết trong email mời — liên kết chỉ dùng được một lần.';
+
+  @override
+  String get partnerAcceptMineHeading => 'Lời mời gửi tới bạn';
+
+  @override
+  String get partnerAcceptErrorInvalid =>
+      'Liên kết lời mời không hợp lệ hoặc đã được dùng. Hãy nhờ nhóm gửi lời mời mới.';
+
+  @override
+  String get partnerAcceptErrorExpired =>
+      'Lời mời đã hết hạn. Hãy nhờ nhóm gửi lời mời mới.';
+
+  @override
+  String get partnerAcceptErrorPartnerAccount =>
+      'Hãy tham gia bằng tài khoản Đối tác đã xác minh dùng địa chỉ được mời. Không thể dùng tài khoản du khách hoặc quản trị viên.';
+
+  @override
+  String get partnerAcceptErrorMismatch =>
+      'Lời mời này được gửi tới địa chỉ khác. Hãy đăng nhập bằng tài khoản Đối tác dùng địa chỉ được mời.';
+
+  @override
+  String get partnerAcceptErrorOwnCompany =>
+      'Tài khoản này đã có công ty riêng nên không thể tham gia không gian khác. Hãy dùng tài khoản Đối tác khác.';
+
+  @override
+  String get partnerAcceptErrorOtherWorkspace =>
+      'Tài khoản này đã thuộc một không gian đối tác. Hãy rời khỏi đó trước hoặc dùng tài khoản Đối tác khác.';
+
+  @override
+  String get partnerAcceptErrorUnavailable =>
+      'Công ty này hiện không thể nhận thành viên mới.';
+
+  @override
+  String get partnerAcceptErrorStale =>
+      'Lời mời này không còn hiệu lực. Hãy nhờ nhóm gửi lời mời mới.';
 }

@@ -61,6 +61,11 @@ class PartnerDestination {
   /// rather than a fabricated screen.
   final bool implemented;
 
+  /// RBAC R5 — a permission key the caller must hold at some scope for the
+  /// destination to be listed (RBAC V1.1 §23 F4), or null for the destinations
+  /// the server menu decides. UX shaping only.
+  final String? requiresPermission;
+
   const PartnerDestination({
     required this.key,
     required this.route,
@@ -69,6 +74,7 @@ class PartnerDestination {
     required this.group,
     this.badge = PartnerNavBadge.none,
     this.implemented = false,
+    this.requiresPermission,
   });
 
   String label(AppLocalizations l10n) => switch (key) {
@@ -84,6 +90,7 @@ class PartnerDestination {
         'finance' => l10n.partnerNavFinance,
         'reviews' => l10n.partnerNavReviews,
         'notifications' => l10n.partnerNavNotifications,
+        'team' => l10n.partnerNavTeam,
         'settings' => l10n.partnerNavSettings,
         _ => key,
       };
@@ -100,7 +107,8 @@ class PartnerDestination {
       key == 'settings' ? role.canEditSettings : true;
 }
 
-/// The thirteen destinations, in the backend's own order, grouped for display.
+/// The destinations — the backend menu's thirteen, in its own order, plus R5's
+/// client-side `team` — grouped for display.
 class PartnerNavigation {
   const PartnerNavigation._();
 
@@ -204,6 +212,18 @@ class PartnerNavigation {
       group: PartnerNavGroup.account,
       badge: PartnerNavBadge.unreadNotifications,
       implemented: true,
+    ),
+    // RBAC R5 — a client-side destination: the backend menu has no `team` item.
+    // It is shown only to a caller holding team view (P07) at some scope
+    // ([requiresPermission]), and the screen re-checks with the server.
+    PartnerDestination(
+      key: 'team',
+      route: '/partner/team',
+      icon: Icons.groups_outlined,
+      selectedIcon: Icons.groups_rounded,
+      group: PartnerNavGroup.account,
+      implemented: true,
+      requiresPermission: 'partner.team.view',
     ),
     PartnerDestination(
       key: 'settings',

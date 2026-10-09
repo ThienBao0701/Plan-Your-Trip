@@ -79,7 +79,7 @@ class _PartnerNotificationsScreenState
     final partner = PartnerScope.of(context);
     final notifications = _notifications;
 
-    // The workspace gate stays authoritative, including `teamMemberUnsupported`.
+    // The workspace gate stays authoritative, including a suspended membership.
     if (!partner.isReady || notifications == null) {
       return PartnerWorkspaceStatusView(
         status: partner.status,
@@ -149,7 +149,7 @@ class _Body extends StatelessWidget {
       case PartnerNotificationsStatus.notFound:
         return PartnerWorkspaceStatusView(
           key: const Key('partner-notifications-notfound'),
-          status: PartnerWorkspaceStatus.teamMemberUnsupported,
+          status: PartnerWorkspaceStatus.forbidden,
           detail: notifications.errorMessage,
         );
       case PartnerNotificationsStatus.error:

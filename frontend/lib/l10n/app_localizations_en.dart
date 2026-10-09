@@ -8553,11 +8553,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'An administrator suspended this partner account. Contact support to restore access.';
 
   @override
-  String get partnerStatusTeamMemberTitle => 'Team access not supported yet';
+  String get partnerStatusMembershipSuspendedTitle =>
+      'Your team access is suspended';
 
   @override
-  String get partnerStatusTeamMemberMessage =>
-      'You belong to a partner team but do not own its profile. The extranet overview is currently available to the profile owner only.';
+  String get partnerStatusMembershipSuspendedMessage =>
+      'An owner or manager of this workspace suspended your membership. Your access returns when they reactivate it.';
 
   @override
   String get partnerStatusUnauthorizedTitle => 'Sign in again';
@@ -14376,4 +14377,529 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get partnerBusinessValidationRequired => 'This field is required.';
+
+  @override
+  String get partnerNavTeam => 'Team';
+
+  @override
+  String get partnerTeamRoleRevenue => 'Revenue';
+
+  @override
+  String get partnerTeamRoleReservations => 'Reservations';
+
+  @override
+  String get partnerTeamRoleContent => 'Content';
+
+  @override
+  String get partnerTeamRoleHousekeeping => 'Housekeeping';
+
+  @override
+  String get partnerTeamScopeField => 'Applies to';
+
+  @override
+  String get partnerTeamScopeCompany => 'Whole company';
+
+  @override
+  String get partnerTeamScopeProperty => 'Property';
+
+  @override
+  String get partnerTeamScopeUnit => 'Room type';
+
+  @override
+  String partnerTeamScopePropertyNumber(int id) {
+    return 'Property #$id';
+  }
+
+  @override
+  String partnerTeamScopeUnitNumber(int id) {
+    return 'Room type #$id';
+  }
+
+  @override
+  String get partnerTeamScopeChoose => 'Choose';
+
+  @override
+  String get partnerTeamScopeChooseRole => 'Choose a role first';
+
+  @override
+  String get partnerTeamScopeNoRooms => 'No room types in this property';
+
+  @override
+  String get partnerTeamScopeNoneForRole =>
+      'You cannot grant this role at any scope you manage.';
+
+  @override
+  String get partnerTeamStatusActive => 'Active';
+
+  @override
+  String get partnerTeamStatusSuspended => 'Suspended';
+
+  @override
+  String get partnerTeamStatusRevoked => 'Removed';
+
+  @override
+  String get partnerInvitationStatusPending => 'Pending';
+
+  @override
+  String get partnerInvitationStatusAccepted => 'Accepted';
+
+  @override
+  String get partnerInvitationStatusDeclined => 'Declined';
+
+  @override
+  String get partnerInvitationStatusRevoked => 'Revoked';
+
+  @override
+  String get partnerInvitationStatusExpired => 'Expired';
+
+  @override
+  String get partnerInvitationDeliveryQueued => 'Email not confirmed yet';
+
+  @override
+  String get partnerInvitationDeliverySent => 'Email sent';
+
+  @override
+  String get partnerInvitationDeliveryFailed => 'Email not delivered';
+
+  @override
+  String get partnerTeamScreenTitle => 'Team';
+
+  @override
+  String get partnerTeamScreenSubtitle =>
+      'Who can work in this partner workspace, with which role and where. Changes take effect on the member\'s next request.';
+
+  @override
+  String partnerTeamCountMembers(int count) {
+    return 'Members: $count';
+  }
+
+  @override
+  String partnerTeamCountSuspended(int count) {
+    return 'Suspended: $count';
+  }
+
+  @override
+  String partnerTeamCountPending(int count) {
+    return 'Pending invitations: $count';
+  }
+
+  @override
+  String get partnerTeamReadOnly =>
+      'You can see the team but not change it. Team changes need a team-management permission.';
+
+  @override
+  String get partnerTeamNoAccess =>
+      'Your role does not include seeing the team.';
+
+  @override
+  String get partnerTeamAccessUnavailable =>
+      'Your access could not be loaded, so team actions are unavailable. Refresh to try again.';
+
+  @override
+  String get partnerTeamLoading => 'Loading the team';
+
+  @override
+  String get partnerTeamLoadFailed => 'The team could not be loaded.';
+
+  @override
+  String get partnerTeamMembersHeading => 'Members';
+
+  @override
+  String get partnerTeamMembersSubtitle =>
+      'Active and suspended members you can see. Removed members are kept as history and not listed.';
+
+  @override
+  String get partnerTeamMembersEmpty => 'No members in your view yet.';
+
+  @override
+  String get partnerTeamColumnMember => 'Member';
+
+  @override
+  String get partnerTeamColumnAccess => 'Role and scope';
+
+  @override
+  String get partnerTeamColumnStatus => 'Status';
+
+  @override
+  String get partnerTeamYou => 'You';
+
+  @override
+  String get partnerTeamPrimaryOwner => 'Primary owner';
+
+  @override
+  String get partnerTeamPrimaryOwnerProtected =>
+      'Primary owner — protected, cannot be changed from the workspace';
+
+  @override
+  String get partnerTeamPendingOwner => 'Owner confirmation pending';
+
+  @override
+  String partnerTeamGrantLabel(String role, String scope) {
+    return '$role · $scope';
+  }
+
+  @override
+  String partnerTeamMemberActions(String name) {
+    return 'Actions for $name';
+  }
+
+  @override
+  String get partnerTeamEditAccess => 'Edit role and scope';
+
+  @override
+  String get partnerTeamSuspend => 'Suspend';
+
+  @override
+  String get partnerTeamReactivate => 'Reactivate';
+
+  @override
+  String get partnerTeamRemoveAction => 'Remove from team';
+
+  @override
+  String get partnerTeamLeave => 'Leave this workspace';
+
+  @override
+  String get partnerTeamCancel => 'Cancel';
+
+  @override
+  String get partnerTeamReasonLabel => 'Reason (optional)';
+
+  @override
+  String get partnerTeamOwnerStepUpHint =>
+      'Changes involving an owner ask you to confirm your password.';
+
+  @override
+  String get partnerTeamSuspendTitle => 'Suspend this member?';
+
+  @override
+  String partnerTeamSuspendBody(String name) {
+    return '$name loses access on their next request. Their role and scope are kept for a later reactivation.';
+  }
+
+  @override
+  String get partnerTeamReactivateTitle => 'Reactivate this member?';
+
+  @override
+  String partnerTeamReactivateBody(String name) {
+    return '$name gets their previous role and scope back.';
+  }
+
+  @override
+  String get partnerTeamRemoveTitle => 'Remove this member?';
+
+  @override
+  String partnerTeamRemoveBody(String name) {
+    return '$name loses access. The membership is kept as history and cannot be restored; to work with them again, send a new invitation.';
+  }
+
+  @override
+  String get partnerTeamLeaveTitle => 'Leave this workspace?';
+
+  @override
+  String get partnerTeamLeaveBody =>
+      'You lose access to this partner workspace at once. To come back, an owner or manager has to invite you again.';
+
+  @override
+  String get partnerTeamSaved => 'Role and scope saved.';
+
+  @override
+  String get partnerTeamSuspended => 'Member suspended.';
+
+  @override
+  String get partnerTeamReactivated => 'Member reactivated.';
+
+  @override
+  String get partnerTeamRemoved => 'Member removed.';
+
+  @override
+  String get partnerTeamLeft => 'You left the workspace.';
+
+  @override
+  String get partnerTeamConcurrentReloaded =>
+      'This member changed since you opened it. The list was refreshed — review it and try again.';
+
+  @override
+  String get partnerTeamGrantAdd => 'Add another role or scope';
+
+  @override
+  String get partnerTeamGrantRemove => 'Remove this grant';
+
+  @override
+  String get partnerInvitesHeading => 'Invitations';
+
+  @override
+  String get partnerInvitesSubtitle =>
+      'Invitations you can see. Accepting one creates a new membership with exactly the invited roles.';
+
+  @override
+  String get partnerInvitesEmpty => 'No invitations.';
+
+  @override
+  String get partnerInvitesUnavailable => 'Invitations could not be loaded.';
+
+  @override
+  String get partnerInviteAction => 'Invite';
+
+  @override
+  String get partnerInviteTitle => 'Invite to the team';
+
+  @override
+  String get partnerInviteBody =>
+      'The address receives a link to join with a Partner account that uses it. Nobody joins until they accept, and no account is created or changed.';
+
+  @override
+  String get partnerInviteEmailLabel => 'Email address';
+
+  @override
+  String get partnerInviteEmailRequired => 'Enter an email address.';
+
+  @override
+  String get partnerInviteEmailInvalid => 'Enter a valid email address.';
+
+  @override
+  String get partnerInviteGrantsLabel => 'Role and scope';
+
+  @override
+  String get partnerInviteReview => 'You are about to grant';
+
+  @override
+  String get partnerInviteLimits =>
+      'Invitations last 7 days. A company can have up to 20 pending, an address can be invited or resent once a minute, and each invitation can be resent 5 times.';
+
+  @override
+  String get partnerInviteSubmit => 'Send invitation';
+
+  @override
+  String get partnerInviteRecorded =>
+      'Invitation request recorded. Its delivery status appears in the list.';
+
+  @override
+  String get partnerInviteResend => 'Resend';
+
+  @override
+  String get partnerInviteResent =>
+      'A new link was requested; the previous link no longer works.';
+
+  @override
+  String get partnerInviteRevoke => 'Revoke';
+
+  @override
+  String get partnerInviteRevokeTitle => 'Revoke this invitation?';
+
+  @override
+  String partnerInviteRevokeBody(String email) {
+    return 'The link sent to $email stops working.';
+  }
+
+  @override
+  String get partnerInviteRevoked => 'Invitation revoked.';
+
+  @override
+  String partnerInviteExpires(String date) {
+    return 'Expires $date';
+  }
+
+  @override
+  String partnerInviteInvitedBy(String name) {
+    return 'Invited by $name';
+  }
+
+  @override
+  String partnerInviteResends(int count, int max) {
+    return 'Resent $count/$max';
+  }
+
+  @override
+  String partnerInviteResendAfter(String time) {
+    return 'Can be resent after $time';
+  }
+
+  @override
+  String get partnerInviteResendLimit =>
+      'Resend limit reached — revoke it and send a new invitation.';
+
+  @override
+  String get partnerTeamErrorEmailUnavailable =>
+      'Email delivery is not available right now, so nothing was sent or created. Try again later.';
+
+  @override
+  String get partnerTeamErrorRateLimited =>
+      'Too many invitations for now: wait a minute between sends, keep at most 20 pending and resend at most 5 times.';
+
+  @override
+  String get partnerTeamErrorAlreadyMember =>
+      'This address already belongs to a team member.';
+
+  @override
+  String get partnerTeamErrorOwnerProtected =>
+      'Only an owner can manage owners, and the primary owner cannot be changed from the workspace.';
+
+  @override
+  String get partnerTeamErrorNotDelegable =>
+      'You cannot grant or manage this role or scope.';
+
+  @override
+  String get partnerTeamErrorSelf =>
+      'You cannot change your own membership. You can leave the workspace instead.';
+
+  @override
+  String get partnerTeamErrorStepUp =>
+      'Confirm your password to make changes involving an owner.';
+
+  @override
+  String get partnerTeamErrorLastOwner =>
+      'The company must keep at least one active owner.';
+
+  @override
+  String get partnerTeamErrorConcurrent =>
+      'Someone changed this in the meantime. Reload and try again.';
+
+  @override
+  String get partnerTeamErrorWorkspaceConflict =>
+      'This person already belongs to another partner workspace.';
+
+  @override
+  String get partnerTeamErrorInvitationNotPending =>
+      'This invitation is no longer pending. The list was refreshed.';
+
+  @override
+  String get partnerTeamErrorInvitationStale =>
+      'A scope of this invitation no longer belongs to the company. Revoke it and invite again.';
+
+  @override
+  String get partnerTeamErrorScopeInvalid =>
+      'That role cannot be granted at that scope.';
+
+  @override
+  String get partnerTeamErrorPermission => 'Your role does not allow this.';
+
+  @override
+  String get partnerTeamErrorReason =>
+      'The reason must not contain passwords, secrets, keys, tokens or card or account numbers.';
+
+  @override
+  String get partnerTeamErrorEmail => 'Enter a valid email address.';
+
+  @override
+  String get partnerTeamErrorValidation =>
+      'Some details are not valid. Check them and try again.';
+
+  @override
+  String get partnerTeamErrorSession =>
+      'Your session has ended. Sign in again.';
+
+  @override
+  String get partnerTeamErrorGone =>
+      'This is no longer available. The list was refreshed.';
+
+  @override
+  String get partnerTeamErrorUncertain =>
+      'The connection dropped before an answer arrived. The list was refreshed — check whether the change was made.';
+
+  @override
+  String get partnerTeamErrorNetwork =>
+      'Could not reach the server. Check the connection and try again.';
+
+  @override
+  String get partnerTeamErrorServer =>
+      'Something went wrong on the server. Try again.';
+
+  @override
+  String get partnerEditGrantsTitle => 'Edit role and scope';
+
+  @override
+  String get partnerEditGrantsBody =>
+      'These replace the member\'s current grants. You can only grant roles and scopes you manage.';
+
+  @override
+  String get partnerEditGrantsSubmit => 'Save';
+
+  @override
+  String get partnerStepUpTitle => 'Confirm your password';
+
+  @override
+  String get partnerStepUpBody =>
+      'Changes involving an owner need a recent sign-in. Enter your password to continue.';
+
+  @override
+  String get partnerStepUpPasswordLabel => 'Password';
+
+  @override
+  String get partnerStepUpPasswordRequired => 'Enter your password.';
+
+  @override
+  String get partnerStepUpConfirm => 'Confirm';
+
+  @override
+  String get partnerAcceptTitle => 'Join a partner team';
+
+  @override
+  String get partnerAcceptGuidance =>
+      'You opened a team invitation. Sign in with a Partner account that uses the invited address. A traveller account cannot be used — if the invited address is your traveller account, ask the person who invited you to use another (for example, work) address.';
+
+  @override
+  String get partnerAcceptJoinNote =>
+      'Accepting joins the invited partner workspace with the role and scope chosen by the team. It does not create a company of your own.';
+
+  @override
+  String get partnerAcceptAction => 'Accept invitation';
+
+  @override
+  String get partnerAcceptDecline => 'Decline';
+
+  @override
+  String get partnerAcceptDeclineTitle => 'Decline this invitation?';
+
+  @override
+  String get partnerAcceptDeclineBody =>
+      'The link stops working. The team would have to invite you again.';
+
+  @override
+  String get partnerAcceptDeclined => 'You declined the invitation.';
+
+  @override
+  String get partnerAcceptSuccess =>
+      'You joined the team. Your workspace opens with the role and scope you were invited with.';
+
+  @override
+  String get partnerAcceptOpenWorkspace => 'Open the workspace';
+
+  @override
+  String get partnerAcceptNoLink =>
+      'No invitation link is open. Open the link from the invitation email — it only works once.';
+
+  @override
+  String get partnerAcceptMineHeading => 'Invitations addressed to you';
+
+  @override
+  String get partnerAcceptErrorInvalid =>
+      'This invitation link is invalid or has already been used. Ask the team for a new invitation.';
+
+  @override
+  String get partnerAcceptErrorExpired =>
+      'This invitation has expired. Ask the team for a new invitation.';
+
+  @override
+  String get partnerAcceptErrorPartnerAccount =>
+      'Join with a verified Partner account that uses the invited address. A traveller or administrator account cannot be used.';
+
+  @override
+  String get partnerAcceptErrorMismatch =>
+      'This invitation was sent to a different address. Sign in with the Partner account that uses the invited address.';
+
+  @override
+  String get partnerAcceptErrorOwnCompany =>
+      'This account already has a company of its own, so it cannot join another workspace. Use a different Partner account.';
+
+  @override
+  String get partnerAcceptErrorOtherWorkspace =>
+      'This account already belongs to a partner workspace. Leave it first, or use a different Partner account.';
+
+  @override
+  String get partnerAcceptErrorUnavailable =>
+      'This company cannot accept new members right now.';
+
+  @override
+  String get partnerAcceptErrorStale =>
+      'This invitation is no longer valid. Ask the team for a new invitation.';
 }

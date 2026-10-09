@@ -4391,8 +4391,8 @@
   "partnerStatusRejectedMessage": "Đơn đăng ký đối tác của bạn đã bị từ chối nên không gian làm việc đang đóng.",
   "partnerStatusSuspendedTitle": "Tài khoản đối tác bị tạm ngưng",
   "partnerStatusSuspendedMessage": "Quản trị viên đã tạm ngưng tài khoản đối tác này. Hãy liên hệ bộ phận hỗ trợ để khôi phục quyền truy cập.",
-  "partnerStatusTeamMemberTitle": "Chưa hỗ trợ truy cập theo nhóm",
-  "partnerStatusTeamMemberMessage": "Bạn thuộc một nhóm đối tác nhưng không sở hữu hồ sơ đó. Hiện tại chỉ chủ sở hữu hồ sơ mới xem được tổng quan cổng đối tác.",
+  "partnerStatusMembershipSuspendedTitle": "Quyền truy cập nhóm của bạn đang bị tạm ngưng",
+  "partnerStatusMembershipSuspendedMessage": "Chủ sở hữu hoặc quản lý của không gian làm việc này đã tạm ngưng tư cách thành viên của bạn. Bạn sẽ có lại quyền truy cập khi họ kích hoạt lại.",
   "partnerStatusUnauthorizedTitle": "Hãy đăng nhập lại",
   "partnerStatusUnauthorizedMessage": "Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại để mở lại không gian làm việc.",
   "partnerStatusForbiddenTitle": "Truy cập bị từ chối",
@@ -7105,5 +7105,264 @@
   "partnerBusinessTypeTransport": "Vận chuyển",
   "partnerBusinessTypeOther": "Khác",
   "partnerBusinessTypeUnknown": "Loại hình chưa nhận diện",
-  "partnerBusinessValidationRequired": "Trường này là bắt buộc."
+  "partnerBusinessValidationRequired": "Trường này là bắt buộc.",
+  "partnerNavTeam": "Nhóm",
+  "partnerTeamRoleRevenue": "Doanh thu",
+  "partnerTeamRoleReservations": "Đặt phòng",
+  "partnerTeamRoleContent": "Nội dung",
+  "partnerTeamRoleHousekeeping": "Buồng phòng",
+  "partnerTeamScopeField": "Áp dụng cho",
+  "partnerTeamScopeCompany": "Toàn công ty",
+  "partnerTeamScopeProperty": "Cơ sở lưu trú",
+  "partnerTeamScopeUnit": "Loại phòng",
+  "partnerTeamScopePropertyNumber": "Cơ sở #{id}",
+  "@partnerTeamScopePropertyNumber": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
+  "partnerTeamScopeUnitNumber": "Loại phòng #{id}",
+  "@partnerTeamScopeUnitNumber": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
+  "partnerTeamScopeChoose": "Chọn",
+  "partnerTeamScopeChooseRole": "Hãy chọn vai trò trước",
+  "partnerTeamScopeNoRooms": "Cơ sở này chưa có loại phòng",
+  "partnerTeamScopeNoneForRole": "Bạn không thể cấp vai trò này ở phạm vi nào bạn quản lý.",
+  "partnerTeamStatusActive": "Đang hoạt động",
+  "partnerTeamStatusSuspended": "Đã tạm ngưng",
+  "partnerTeamStatusRevoked": "Đã gỡ",
+  "partnerInvitationStatusPending": "Đang chờ",
+  "partnerInvitationStatusAccepted": "Đã chấp nhận",
+  "partnerInvitationStatusDeclined": "Đã từ chối",
+  "partnerInvitationStatusRevoked": "Đã thu hồi",
+  "partnerInvitationStatusExpired": "Đã hết hạn",
+  "partnerInvitationDeliveryQueued": "Chưa xác nhận gửi email",
+  "partnerInvitationDeliverySent": "Đã gửi email",
+  "partnerInvitationDeliveryFailed": "Gửi email thất bại",
+  "partnerTeamScreenTitle": "Nhóm",
+  "partnerTeamScreenSubtitle": "Ai có thể làm việc trong không gian đối tác này, với vai trò nào và ở đâu. Thay đổi có hiệu lực ở yêu cầu tiếp theo của thành viên.",
+  "partnerTeamCountMembers": "Thành viên: {count}",
+  "@partnerTeamCountMembers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "partnerTeamCountSuspended": "Tạm ngưng: {count}",
+  "@partnerTeamCountSuspended": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "partnerTeamCountPending": "Lời mời đang chờ: {count}",
+  "@partnerTeamCountPending": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "partnerTeamReadOnly": "Bạn có thể xem nhóm nhưng không thể thay đổi. Thay đổi nhóm cần quyền quản lý nhóm.",
+  "partnerTeamNoAccess": "Vai trò của bạn không bao gồm quyền xem nhóm.",
+  "partnerTeamAccessUnavailable": "Không tải được quyền truy cập của bạn nên các thao tác nhóm không khả dụng. Hãy làm mới để thử lại.",
+  "partnerTeamLoading": "Đang tải nhóm",
+  "partnerTeamLoadFailed": "Không tải được danh sách nhóm.",
+  "partnerTeamMembersHeading": "Thành viên",
+  "partnerTeamMembersSubtitle": "Các thành viên đang hoạt động và tạm ngưng mà bạn được xem. Thành viên đã gỡ được lưu làm lịch sử và không hiển thị.",
+  "partnerTeamMembersEmpty": "Chưa có thành viên nào trong phạm vi bạn xem.",
+  "partnerTeamColumnMember": "Thành viên",
+  "partnerTeamColumnAccess": "Vai trò và phạm vi",
+  "partnerTeamColumnStatus": "Trạng thái",
+  "partnerTeamYou": "Bạn",
+  "partnerTeamPrimaryOwner": "Chủ sở hữu chính",
+  "partnerTeamPrimaryOwnerProtected": "Chủ sở hữu chính — được bảo vệ, không thể thay đổi trong không gian làm việc",
+  "partnerTeamPendingOwner": "Chờ xác nhận chủ sở hữu",
+  "partnerTeamGrantLabel": "{role} · {scope}",
+  "@partnerTeamGrantLabel": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      },
+      "scope": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerTeamMemberActions": "Thao tác cho {name}",
+  "@partnerTeamMemberActions": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerTeamEditAccess": "Sửa vai trò và phạm vi",
+  "partnerTeamSuspend": "Tạm ngưng",
+  "partnerTeamReactivate": "Kích hoạt lại",
+  "partnerTeamRemoveAction": "Gỡ khỏi nhóm",
+  "partnerTeamLeave": "Rời không gian làm việc này",
+  "partnerTeamCancel": "Hủy",
+  "partnerTeamReasonLabel": "Lý do (không bắt buộc)",
+  "partnerTeamOwnerStepUpHint": "Thay đổi liên quan đến chủ sở hữu sẽ yêu cầu bạn xác nhận mật khẩu.",
+  "partnerTeamSuspendTitle": "Tạm ngưng thành viên này?",
+  "partnerTeamSuspendBody": "{name} sẽ mất quyền truy cập ở yêu cầu tiếp theo. Vai trò và phạm vi được giữ lại để kích hoạt sau.",
+  "@partnerTeamSuspendBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerTeamReactivateTitle": "Kích hoạt lại thành viên này?",
+  "partnerTeamReactivateBody": "{name} sẽ có lại vai trò và phạm vi trước đó.",
+  "@partnerTeamReactivateBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerTeamRemoveTitle": "Gỡ thành viên này?",
+  "partnerTeamRemoveBody": "{name} sẽ mất quyền truy cập. Tư cách thành viên được lưu làm lịch sử và không thể khôi phục; muốn làm việc lại, hãy gửi lời mời mới.",
+  "@partnerTeamRemoveBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerTeamLeaveTitle": "Rời không gian làm việc này?",
+  "partnerTeamLeaveBody": "Bạn sẽ mất quyền truy cập không gian đối tác này ngay lập tức. Muốn quay lại, chủ sở hữu hoặc quản lý phải mời bạn lần nữa.",
+  "partnerTeamSaved": "Đã lưu vai trò và phạm vi.",
+  "partnerTeamSuspended": "Đã tạm ngưng thành viên.",
+  "partnerTeamReactivated": "Đã kích hoạt lại thành viên.",
+  "partnerTeamRemoved": "Đã gỡ thành viên.",
+  "partnerTeamLeft": "Bạn đã rời không gian làm việc.",
+  "partnerTeamConcurrentReloaded": "Thành viên này đã thay đổi kể từ khi bạn mở. Danh sách đã được làm mới — hãy xem lại và thử lại.",
+  "partnerTeamGrantAdd": "Thêm vai trò hoặc phạm vi",
+  "partnerTeamGrantRemove": "Bỏ quyền này",
+  "partnerInvitesHeading": "Lời mời",
+  "partnerInvitesSubtitle": "Các lời mời bạn được xem. Chấp nhận một lời mời sẽ tạo tư cách thành viên mới với đúng các vai trò được mời.",
+  "partnerInvitesEmpty": "Không có lời mời nào.",
+  "partnerInvitesUnavailable": "Không tải được danh sách lời mời.",
+  "partnerInviteAction": "Mời",
+  "partnerInviteTitle": "Mời vào nhóm",
+  "partnerInviteBody": "Địa chỉ email sẽ nhận một liên kết để tham gia bằng tài khoản Đối tác dùng địa chỉ đó. Không ai tham gia cho đến khi họ chấp nhận, và không tài khoản nào được tạo hay thay đổi.",
+  "partnerInviteEmailLabel": "Địa chỉ email",
+  "partnerInviteEmailRequired": "Hãy nhập địa chỉ email.",
+  "partnerInviteEmailInvalid": "Hãy nhập địa chỉ email hợp lệ.",
+  "partnerInviteGrantsLabel": "Vai trò và phạm vi",
+  "partnerInviteReview": "Bạn sắp cấp",
+  "partnerInviteLimits": "Lời mời có hiệu lực 7 ngày. Mỗi công ty có tối đa 20 lời mời đang chờ, mỗi địa chỉ được mời hoặc gửi lại mỗi phút một lần, và mỗi lời mời được gửi lại tối đa 5 lần.",
+  "partnerInviteSubmit": "Gửi lời mời",
+  "partnerInviteRecorded": "Đã ghi nhận yêu cầu mời. Trạng thái gửi hiển thị trong danh sách.",
+  "partnerInviteResend": "Gửi lại",
+  "partnerInviteResent": "Đã yêu cầu liên kết mới; liên kết trước không còn hiệu lực.",
+  "partnerInviteRevoke": "Thu hồi",
+  "partnerInviteRevokeTitle": "Thu hồi lời mời này?",
+  "partnerInviteRevokeBody": "Liên kết đã gửi tới {email} sẽ không còn hiệu lực.",
+  "@partnerInviteRevokeBody": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerInviteRevoked": "Đã thu hồi lời mời.",
+  "partnerInviteExpires": "Hết hạn {date}",
+  "@partnerInviteExpires": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerInviteInvitedBy": "Người mời: {name}",
+  "@partnerInviteInvitedBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerInviteResends": "Đã gửi lại {count}/{max}",
+  "@partnerInviteResends": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "partnerInviteResendAfter": "Có thể gửi lại sau {time}",
+  "@partnerInviteResendAfter": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerInviteResendLimit": "Đã đạt giới hạn gửi lại — hãy thu hồi và gửi lời mời mới.",
+  "partnerTeamErrorEmailUnavailable": "Hiện không gửi được email nên chưa có gì được gửi hay tạo. Hãy thử lại sau.",
+  "partnerTeamErrorRateLimited": "Quá nhiều lời mời: hãy chờ một phút giữa các lần gửi, giữ tối đa 20 lời mời đang chờ và gửi lại tối đa 5 lần.",
+  "partnerTeamErrorAlreadyMember": "Địa chỉ này đã thuộc về một thành viên trong nhóm.",
+  "partnerTeamErrorOwnerProtected": "Chỉ chủ sở hữu mới quản lý được chủ sở hữu, và không thể thay đổi chủ sở hữu chính trong không gian làm việc.",
+  "partnerTeamErrorNotDelegable": "Bạn không thể cấp hoặc quản lý vai trò hay phạm vi này.",
+  "partnerTeamErrorSelf": "Bạn không thể thay đổi tư cách thành viên của chính mình. Bạn có thể rời không gian làm việc.",
+  "partnerTeamErrorStepUp": "Hãy xác nhận mật khẩu để thực hiện thay đổi liên quan đến chủ sở hữu.",
+  "partnerTeamErrorLastOwner": "Công ty phải giữ ít nhất một chủ sở hữu đang hoạt động.",
+  "partnerTeamErrorConcurrent": "Đã có người thay đổi mục này. Hãy tải lại và thử lại.",
+  "partnerTeamErrorWorkspaceConflict": "Người này đã thuộc một không gian đối tác khác.",
+  "partnerTeamErrorInvitationNotPending": "Lời mời này không còn ở trạng thái chờ. Danh sách đã được làm mới.",
+  "partnerTeamErrorInvitationStale": "Một phạm vi của lời mời này không còn thuộc công ty. Hãy thu hồi và mời lại.",
+  "partnerTeamErrorScopeInvalid": "Không thể cấp vai trò đó ở phạm vi đó.",
+  "partnerTeamErrorPermission": "Vai trò của bạn không cho phép thao tác này.",
+  "partnerTeamErrorReason": "Lý do không được chứa mật khẩu, bí mật, khóa, mã truy cập hay số thẻ hoặc số tài khoản.",
+  "partnerTeamErrorEmail": "Hãy nhập địa chỉ email hợp lệ.",
+  "partnerTeamErrorValidation": "Một số thông tin không hợp lệ. Hãy kiểm tra và thử lại.",
+  "partnerTeamErrorSession": "Phiên của bạn đã kết thúc. Hãy đăng nhập lại.",
+  "partnerTeamErrorGone": "Mục này không còn khả dụng. Danh sách đã được làm mới.",
+  "partnerTeamErrorUncertain": "Kết nối bị gián đoạn trước khi có phản hồi. Danh sách đã được làm mới — hãy kiểm tra thay đổi đã được thực hiện chưa.",
+  "partnerTeamErrorNetwork": "Không kết nối được máy chủ. Hãy kiểm tra kết nối và thử lại.",
+  "partnerTeamErrorServer": "Máy chủ gặp lỗi. Hãy thử lại.",
+  "partnerEditGrantsTitle": "Sửa vai trò và phạm vi",
+  "partnerEditGrantsBody": "Các quyền này thay thế quyền hiện tại của thành viên. Bạn chỉ có thể cấp vai trò và phạm vi mình quản lý.",
+  "partnerEditGrantsSubmit": "Lưu",
+  "partnerStepUpTitle": "Xác nhận mật khẩu",
+  "partnerStepUpBody": "Thay đổi liên quan đến chủ sở hữu cần lần đăng nhập gần đây. Hãy nhập mật khẩu để tiếp tục.",
+  "partnerStepUpPasswordLabel": "Mật khẩu",
+  "partnerStepUpPasswordRequired": "Hãy nhập mật khẩu.",
+  "partnerStepUpConfirm": "Xác nhận",
+  "partnerAcceptTitle": "Tham gia nhóm đối tác",
+  "partnerAcceptGuidance": "Bạn đã mở một lời mời tham gia nhóm. Hãy đăng nhập bằng tài khoản Đối tác dùng địa chỉ được mời. Không thể dùng tài khoản du khách — nếu địa chỉ được mời là tài khoản du khách của bạn, hãy nhờ người mời dùng địa chỉ khác (ví dụ email công việc).",
+  "partnerAcceptJoinNote": "Chấp nhận sẽ đưa bạn vào không gian đối tác đã mời với vai trò và phạm vi nhóm đã chọn. Việc này không tạo công ty riêng cho bạn.",
+  "partnerAcceptAction": "Chấp nhận lời mời",
+  "partnerAcceptDecline": "Từ chối",
+  "partnerAcceptDeclineTitle": "Từ chối lời mời này?",
+  "partnerAcceptDeclineBody": "Liên kết sẽ không còn hiệu lực. Nhóm sẽ phải mời bạn lại.",
+  "partnerAcceptDeclined": "Bạn đã từ chối lời mời.",
+  "partnerAcceptSuccess": "Bạn đã tham gia nhóm. Không gian làm việc sẽ mở với vai trò và phạm vi bạn được mời.",
+  "partnerAcceptOpenWorkspace": "Mở không gian làm việc",
+  "partnerAcceptNoLink": "Chưa mở liên kết lời mời nào. Hãy mở liên kết trong email mời — liên kết chỉ dùng được một lần.",
+  "partnerAcceptMineHeading": "Lời mời gửi tới bạn",
+  "partnerAcceptErrorInvalid": "Liên kết lời mời không hợp lệ hoặc đã được dùng. Hãy nhờ nhóm gửi lời mời mới.",
+  "partnerAcceptErrorExpired": "Lời mời đã hết hạn. Hãy nhờ nhóm gửi lời mời mới.",
+  "partnerAcceptErrorPartnerAccount": "Hãy tham gia bằng tài khoản Đối tác đã xác minh dùng địa chỉ được mời. Không thể dùng tài khoản du khách hoặc quản trị viên.",
+  "partnerAcceptErrorMismatch": "Lời mời này được gửi tới địa chỉ khác. Hãy đăng nhập bằng tài khoản Đối tác dùng địa chỉ được mời.",
+  "partnerAcceptErrorOwnCompany": "Tài khoản này đã có công ty riêng nên không thể tham gia không gian khác. Hãy dùng tài khoản Đối tác khác.",
+  "partnerAcceptErrorOtherWorkspace": "Tài khoản này đã thuộc một không gian đối tác. Hãy rời khỏi đó trước hoặc dùng tài khoản Đối tác khác.",
+  "partnerAcceptErrorUnavailable": "Công ty này hiện không thể nhận thành viên mới.",
+  "partnerAcceptErrorStale": "Lời mời này không còn hiệu lực. Hãy nhờ nhóm gửi lời mời mới."
 }

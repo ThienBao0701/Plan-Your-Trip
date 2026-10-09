@@ -4391,8 +4391,8 @@
   "partnerStatusRejectedMessage": "Your partner application was rejected, so the workspace is closed.",
   "partnerStatusSuspendedTitle": "Partner account suspended",
   "partnerStatusSuspendedMessage": "An administrator suspended this partner account. Contact support to restore access.",
-  "partnerStatusTeamMemberTitle": "Team access not supported yet",
-  "partnerStatusTeamMemberMessage": "You belong to a partner team but do not own its profile. The extranet overview is currently available to the profile owner only.",
+  "partnerStatusMembershipSuspendedTitle": "Your team access is suspended",
+  "partnerStatusMembershipSuspendedMessage": "An owner or manager of this workspace suspended your membership. Your access returns when they reactivate it.",
   "partnerStatusUnauthorizedTitle": "Sign in again",
   "partnerStatusUnauthorizedMessage": "Your session expired. Sign in again to reopen the workspace.",
   "partnerStatusForbiddenTitle": "Access refused",
@@ -7105,5 +7105,264 @@
   "partnerBusinessTypeTransport": "Transport",
   "partnerBusinessTypeOther": "Other",
   "partnerBusinessTypeUnknown": "Unrecognised type",
-  "partnerBusinessValidationRequired": "This field is required."
+  "partnerBusinessValidationRequired": "This field is required.",
+  "partnerNavTeam": "Team",
+  "partnerTeamRoleRevenue": "Revenue",
+  "partnerTeamRoleReservations": "Reservations",
+  "partnerTeamRoleContent": "Content",
+  "partnerTeamRoleHousekeeping": "Housekeeping",
+  "partnerTeamScopeField": "Applies to",
+  "partnerTeamScopeCompany": "Whole company",
+  "partnerTeamScopeProperty": "Property",
+  "partnerTeamScopeUnit": "Room type",
+  "partnerTeamScopePropertyNumber": "Property #{id}",
+  "@partnerTeamScopePropertyNumber": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
+  "partnerTeamScopeUnitNumber": "Room type #{id}",
+  "@partnerTeamScopeUnitNumber": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
+  "partnerTeamScopeChoose": "Choose",
+  "partnerTeamScopeChooseRole": "Choose a role first",
+  "partnerTeamScopeNoRooms": "No room types in this property",
+  "partnerTeamScopeNoneForRole": "You cannot grant this role at any scope you manage.",
+  "partnerTeamStatusActive": "Active",
+  "partnerTeamStatusSuspended": "Suspended",
+  "partnerTeamStatusRevoked": "Removed",
+  "partnerInvitationStatusPending": "Pending",
+  "partnerInvitationStatusAccepted": "Accepted",
+  "partnerInvitationStatusDeclined": "Declined",
+  "partnerInvitationStatusRevoked": "Revoked",
+  "partnerInvitationStatusExpired": "Expired",
+  "partnerInvitationDeliveryQueued": "Email not confirmed yet",
+  "partnerInvitationDeliverySent": "Email sent",
+  "partnerInvitationDeliveryFailed": "Email not delivered",
+  "partnerTeamScreenTitle": "Team",
+  "partnerTeamScreenSubtitle": "Who can work in this partner workspace, with which role and where. Changes take effect on the member's next request.",
+  "partnerTeamCountMembers": "Members: {count}",
+  "@partnerTeamCountMembers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "partnerTeamCountSuspended": "Suspended: {count}",
+  "@partnerTeamCountSuspended": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "partnerTeamCountPending": "Pending invitations: {count}",
+  "@partnerTeamCountPending": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "partnerTeamReadOnly": "You can see the team but not change it. Team changes need a team-management permission.",
+  "partnerTeamNoAccess": "Your role does not include seeing the team.",
+  "partnerTeamAccessUnavailable": "Your access could not be loaded, so team actions are unavailable. Refresh to try again.",
+  "partnerTeamLoading": "Loading the team",
+  "partnerTeamLoadFailed": "The team could not be loaded.",
+  "partnerTeamMembersHeading": "Members",
+  "partnerTeamMembersSubtitle": "Active and suspended members you can see. Removed members are kept as history and not listed.",
+  "partnerTeamMembersEmpty": "No members in your view yet.",
+  "partnerTeamColumnMember": "Member",
+  "partnerTeamColumnAccess": "Role and scope",
+  "partnerTeamColumnStatus": "Status",
+  "partnerTeamYou": "You",
+  "partnerTeamPrimaryOwner": "Primary owner",
+  "partnerTeamPrimaryOwnerProtected": "Primary owner — protected, cannot be changed from the workspace",
+  "partnerTeamPendingOwner": "Owner confirmation pending",
+  "partnerTeamGrantLabel": "{role} · {scope}",
+  "@partnerTeamGrantLabel": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      },
+      "scope": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerTeamMemberActions": "Actions for {name}",
+  "@partnerTeamMemberActions": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerTeamEditAccess": "Edit role and scope",
+  "partnerTeamSuspend": "Suspend",
+  "partnerTeamReactivate": "Reactivate",
+  "partnerTeamRemoveAction": "Remove from team",
+  "partnerTeamLeave": "Leave this workspace",
+  "partnerTeamCancel": "Cancel",
+  "partnerTeamReasonLabel": "Reason (optional)",
+  "partnerTeamOwnerStepUpHint": "Changes involving an owner ask you to confirm your password.",
+  "partnerTeamSuspendTitle": "Suspend this member?",
+  "partnerTeamSuspendBody": "{name} loses access on their next request. Their role and scope are kept for a later reactivation.",
+  "@partnerTeamSuspendBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerTeamReactivateTitle": "Reactivate this member?",
+  "partnerTeamReactivateBody": "{name} gets their previous role and scope back.",
+  "@partnerTeamReactivateBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerTeamRemoveTitle": "Remove this member?",
+  "partnerTeamRemoveBody": "{name} loses access. The membership is kept as history and cannot be restored; to work with them again, send a new invitation.",
+  "@partnerTeamRemoveBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerTeamLeaveTitle": "Leave this workspace?",
+  "partnerTeamLeaveBody": "You lose access to this partner workspace at once. To come back, an owner or manager has to invite you again.",
+  "partnerTeamSaved": "Role and scope saved.",
+  "partnerTeamSuspended": "Member suspended.",
+  "partnerTeamReactivated": "Member reactivated.",
+  "partnerTeamRemoved": "Member removed.",
+  "partnerTeamLeft": "You left the workspace.",
+  "partnerTeamConcurrentReloaded": "This member changed since you opened it. The list was refreshed — review it and try again.",
+  "partnerTeamGrantAdd": "Add another role or scope",
+  "partnerTeamGrantRemove": "Remove this grant",
+  "partnerInvitesHeading": "Invitations",
+  "partnerInvitesSubtitle": "Invitations you can see. Accepting one creates a new membership with exactly the invited roles.",
+  "partnerInvitesEmpty": "No invitations.",
+  "partnerInvitesUnavailable": "Invitations could not be loaded.",
+  "partnerInviteAction": "Invite",
+  "partnerInviteTitle": "Invite to the team",
+  "partnerInviteBody": "The address receives a link to join with a Partner account that uses it. Nobody joins until they accept, and no account is created or changed.",
+  "partnerInviteEmailLabel": "Email address",
+  "partnerInviteEmailRequired": "Enter an email address.",
+  "partnerInviteEmailInvalid": "Enter a valid email address.",
+  "partnerInviteGrantsLabel": "Role and scope",
+  "partnerInviteReview": "You are about to grant",
+  "partnerInviteLimits": "Invitations last 7 days. A company can have up to 20 pending, an address can be invited or resent once a minute, and each invitation can be resent 5 times.",
+  "partnerInviteSubmit": "Send invitation",
+  "partnerInviteRecorded": "Invitation request recorded. Its delivery status appears in the list.",
+  "partnerInviteResend": "Resend",
+  "partnerInviteResent": "A new link was requested; the previous link no longer works.",
+  "partnerInviteRevoke": "Revoke",
+  "partnerInviteRevokeTitle": "Revoke this invitation?",
+  "partnerInviteRevokeBody": "The link sent to {email} stops working.",
+  "@partnerInviteRevokeBody": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerInviteRevoked": "Invitation revoked.",
+  "partnerInviteExpires": "Expires {date}",
+  "@partnerInviteExpires": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerInviteInvitedBy": "Invited by {name}",
+  "@partnerInviteInvitedBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerInviteResends": "Resent {count}/{max}",
+  "@partnerInviteResends": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "partnerInviteResendAfter": "Can be resent after {time}",
+  "@partnerInviteResendAfter": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "partnerInviteResendLimit": "Resend limit reached — revoke it and send a new invitation.",
+  "partnerTeamErrorEmailUnavailable": "Email delivery is not available right now, so nothing was sent or created. Try again later.",
+  "partnerTeamErrorRateLimited": "Too many invitations for now: wait a minute between sends, keep at most 20 pending and resend at most 5 times.",
+  "partnerTeamErrorAlreadyMember": "This address already belongs to a team member.",
+  "partnerTeamErrorOwnerProtected": "Only an owner can manage owners, and the primary owner cannot be changed from the workspace.",
+  "partnerTeamErrorNotDelegable": "You cannot grant or manage this role or scope.",
+  "partnerTeamErrorSelf": "You cannot change your own membership. You can leave the workspace instead.",
+  "partnerTeamErrorStepUp": "Confirm your password to make changes involving an owner.",
+  "partnerTeamErrorLastOwner": "The company must keep at least one active owner.",
+  "partnerTeamErrorConcurrent": "Someone changed this in the meantime. Reload and try again.",
+  "partnerTeamErrorWorkspaceConflict": "This person already belongs to another partner workspace.",
+  "partnerTeamErrorInvitationNotPending": "This invitation is no longer pending. The list was refreshed.",
+  "partnerTeamErrorInvitationStale": "A scope of this invitation no longer belongs to the company. Revoke it and invite again.",
+  "partnerTeamErrorScopeInvalid": "That role cannot be granted at that scope.",
+  "partnerTeamErrorPermission": "Your role does not allow this.",
+  "partnerTeamErrorReason": "The reason must not contain passwords, secrets, keys, tokens or card or account numbers.",
+  "partnerTeamErrorEmail": "Enter a valid email address.",
+  "partnerTeamErrorValidation": "Some details are not valid. Check them and try again.",
+  "partnerTeamErrorSession": "Your session has ended. Sign in again.",
+  "partnerTeamErrorGone": "This is no longer available. The list was refreshed.",
+  "partnerTeamErrorUncertain": "The connection dropped before an answer arrived. The list was refreshed — check whether the change was made.",
+  "partnerTeamErrorNetwork": "Could not reach the server. Check the connection and try again.",
+  "partnerTeamErrorServer": "Something went wrong on the server. Try again.",
+  "partnerEditGrantsTitle": "Edit role and scope",
+  "partnerEditGrantsBody": "These replace the member's current grants. You can only grant roles and scopes you manage.",
+  "partnerEditGrantsSubmit": "Save",
+  "partnerStepUpTitle": "Confirm your password",
+  "partnerStepUpBody": "Changes involving an owner need a recent sign-in. Enter your password to continue.",
+  "partnerStepUpPasswordLabel": "Password",
+  "partnerStepUpPasswordRequired": "Enter your password.",
+  "partnerStepUpConfirm": "Confirm",
+  "partnerAcceptTitle": "Join a partner team",
+  "partnerAcceptGuidance": "You opened a team invitation. Sign in with a Partner account that uses the invited address. A traveller account cannot be used — if the invited address is your traveller account, ask the person who invited you to use another (for example, work) address.",
+  "partnerAcceptJoinNote": "Accepting joins the invited partner workspace with the role and scope chosen by the team. It does not create a company of your own.",
+  "partnerAcceptAction": "Accept invitation",
+  "partnerAcceptDecline": "Decline",
+  "partnerAcceptDeclineTitle": "Decline this invitation?",
+  "partnerAcceptDeclineBody": "The link stops working. The team would have to invite you again.",
+  "partnerAcceptDeclined": "You declined the invitation.",
+  "partnerAcceptSuccess": "You joined the team. Your workspace opens with the role and scope you were invited with.",
+  "partnerAcceptOpenWorkspace": "Open the workspace",
+  "partnerAcceptNoLink": "No invitation link is open. Open the link from the invitation email — it only works once.",
+  "partnerAcceptMineHeading": "Invitations addressed to you",
+  "partnerAcceptErrorInvalid": "This invitation link is invalid or has already been used. Ask the team for a new invitation.",
+  "partnerAcceptErrorExpired": "This invitation has expired. Ask the team for a new invitation.",
+  "partnerAcceptErrorPartnerAccount": "Join with a verified Partner account that uses the invited address. A traveller or administrator account cannot be used.",
+  "partnerAcceptErrorMismatch": "This invitation was sent to a different address. Sign in with the Partner account that uses the invited address.",
+  "partnerAcceptErrorOwnCompany": "This account already has a company of its own, so it cannot join another workspace. Use a different Partner account.",
+  "partnerAcceptErrorOtherWorkspace": "This account already belongs to a partner workspace. Leave it first, or use a different Partner account.",
+  "partnerAcceptErrorUnavailable": "This company cannot accept new members right now.",
+  "partnerAcceptErrorStale": "This invitation is no longer valid. Ask the team for a new invitation."
 }

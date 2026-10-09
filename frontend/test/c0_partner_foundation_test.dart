@@ -583,27 +583,105 @@ void main() {
       expect(state.status, PartnerWorkspaceStatus.onboardingRequired);
     });
 
+    // RBAC R5 (§23 F10): since R3b the backend serves team members, so the
+    // former "team access not supported" dead end is retired. A member is
+    // resolved from the access document, never from the team list.
+    Map<String, dynamic> memberAccess(
+            {String status = 'ACTIVE', String company = 'APPROVED'}) =>
+        {
+          'workspace': {
+            'companyId': 7,
+            'businessName': 'Bay View Resorts',
+            'verificationStatus': company
+          },
+          'membership': {
+            'id': 55,
+            'status': status,
+            'primaryOwner': false,
+            'pendingOwnerConfirmation': false
+          },
+          'grants': [
+            {'role': 'MANAGER', 'scopeType': 'COMPANY', 'scopeId': 7},
+          ],
+          'permissions': {
+            'company': status == 'ACTIVE' && company == 'APPROVED'
+                ? [
+                    'partner.workspace.access',
+                    'partner.team.view',
+                    'partner.team.invite'
+                  ]
+                : <String>[],
+            'properties': <String, Object>{},
+            'units': <String, Object>{},
+          },
+          'context': {'properties': <Object>[], 'units': <Object>[]},
+          'stepUp': {'freshUntil': null},
+        };
+
     test(
-        'a team member without an owned profile is told the truth, '
-        'not asked to onboard', () async {
-      // Backend gap: PartnerExtranetService resolves owner-only, so a
-      // MANAGER/FRONT_DESK/FINANCE/VIEWER gets 404 from /extranet/home even
-      // though /partner/team serves them.
+        'a team member without an owned profile works in the invited workspace',
+        () async {
       final app = partnerApp(partnerClient(overrides: {
         '/partner/profile': jsonResponse(
             errorBody(404, 'Partner profile not found', '/p'), 404),
-        '/partner/team': jsonResponse(teamJson('MANAGER'), 200),
+        '/partner/me/access': jsonResponse(memberAccess(), 200),
       }));
       final state = PartnerState(api: app.api);
 
       await state.loadWorkspace(app);
 
-      expect(state.status, PartnerWorkspaceStatus.teamMemberUnsupported);
-      expect(
-        state.teamRole,
-        PartnerTeamRole.unknown,
-        reason: 'the team list does not identify the caller — fail closed',
-      );
+      expect(state.status, PartnerWorkspaceStatus.ready);
+      expect(state.teamRole, PartnerTeamRole.manager,
+          reason: 'the label comes from the access document grants');
+      expect(state.profile, isNull, reason: 'a member owns no profile');
+      expect(state.holdsAnywhere('partner.team.view'), isTrue);
+      expect(state.holdsAnywhere('partner.finance.payout.view'), isFalse);
+    });
+
+    test('a suspended membership is its own state, never the workspace',
+        () async {
+      final app = partnerApp(partnerClient(overrides: {
+        '/partner/profile': jsonResponse(
+            errorBody(404, 'Partner profile not found', '/p'), 404),
+        '/partner/me/access':
+            jsonResponse(memberAccess(status: 'SUSPENDED'), 200),
+      }));
+      final state = PartnerState(api: app.api);
+
+      await state.loadWorkspace(app);
+
+      expect(state.status, PartnerWorkspaceStatus.membershipSuspended);
+      expect(state.overview, isNull);
+    });
+
+    test('a member of a suspended company is told so', () async {
+      final app = partnerApp(partnerClient(overrides: {
+        '/partner/profile': jsonResponse(
+            errorBody(404, 'Partner profile not found', '/p'), 404),
+        '/partner/me/access':
+            jsonResponse(memberAccess(company: 'SUSPENDED'), 200),
+      }));
+      final state = PartnerState(api: app.api);
+
+      await state.loadWorkspace(app);
+
+      expect(state.status, PartnerWorkspaceStatus.suspended);
+    });
+
+    test('an unreadable access document fails closed, never as owner',
+        () async {
+      final app = partnerApp(partnerClient(overrides: {
+        '/partner/profile': jsonResponse(
+            errorBody(404, 'Partner profile not found', '/p'), 404),
+        '/partner/me/access': jsonResponse(errorBody(500, 'boom', '/a'), 500),
+      }));
+      final state = PartnerState(api: app.api);
+
+      await state.loadWorkspace(app);
+
+      expect(state.status, PartnerWorkspaceStatus.error);
+      expect(state.teamRole, PartnerTeamRole.unknown);
+      expect(state.access, isNull);
     });
 
     test('401 maps to unauthorized', () async {
@@ -713,10 +791,19 @@ void main() {
         'notifications',
         'settings',
       ];
-      final clientKeys =
-          PartnerNavigation.destinations.map((d) => d.key).toList();
+      // RBAC R5 adds exactly one client-side destination, `team`, gated on
+      // `partner.team.view`; every backend item stays verbatim and ungated.
+      final clientKeys = PartnerNavigation.destinations
+          .map((d) => d.key)
+          .where((key) => key != 'team')
+          .toList();
       expect(clientKeys.toSet(), backendKeys.toSet());
       expect(clientKeys.length, backendKeys.length);
+      expect(PartnerNavigation.destinations.length, backendKeys.length + 1);
+      for (final destination in PartnerNavigation.destinations) {
+        expect(destination.requiresPermission,
+            destination.key == 'team' ? 'partner.team.view' : isNull);
+      }
 
       for (final destination in PartnerNavigation.destinations) {
         expect(destination.route, '/partner/${destination.key}');
@@ -744,7 +831,8 @@ void main() {
       // the calendar destination C4 already held (leaving the ledger unchanged),
       // C10 concluded no new destination was warranted, C11 shipped finance and
       // analytics, C12 shipped reviews, D5 shipped messages (the guest↔host
-      // conversation module) and D6 shipped notifications, completing the set.
+      // conversation module) and D6 shipped notifications, completing the set;
+      // RBAC R5 added and shipped the client-side team destination.
       // This
       // list is a deliberate ledger — it
       // must be updated consciously each phase, so a destination flipped to
@@ -754,9 +842,20 @@ void main() {
           .map((d) => d.key)
           .toList();
       expect(implemented, [
-        'dashboard', 'hotels', 'rooms', 'calendar', 'pricing', 'bookings',
-        'messages', 'promotions', 'reviews', 'finance', 'analytics',
-        'notifications', 'settings',
+        'dashboard',
+        'hotels',
+        'rooms',
+        'calendar',
+        'pricing',
+        'bookings',
+        'messages',
+        'promotions',
+        'reviews',
+        'finance',
+        'analytics',
+        'notifications',
+        'team',
+        'settings',
       ]);
 
       // D6 shipped the last one, so nothing remains planned. The ledger stays

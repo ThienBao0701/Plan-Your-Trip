@@ -7,6 +7,7 @@ import 'package:http/testing.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:planyourtrip_frontend/app/app_surface.dart';
+import 'package:planyourtrip_frontend/app/routing/invitation_link.dart';
 import 'package:planyourtrip_frontend/app/routing/partner_router.dart';
 import 'package:planyourtrip_frontend/app/routing/surface_router.dart';
 import 'package:planyourtrip_frontend/app/surface_app.dart';
@@ -521,6 +522,8 @@ void main() {
         SurfaceRouter.verifyEmail,
         SurfaceRouter.forgotPassword,
         SurfaceRouter.resetPassword,
+        // R5: an emailed team invitation opens before signing in.
+        PartnerInvitationLink.location,
       });
       expect(router.publicScreenAt(SurfaceRouter.account), isNull,
           reason: 'the account area needs a session');

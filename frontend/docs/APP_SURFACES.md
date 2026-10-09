@@ -161,14 +161,15 @@ on (`/bookings`, not `/#/bookings`).
 | Surface | Locations |
 |---|---|
 | User | `/` Explore · `/trips` · `/planner` · `/profile` · `/forgot-password` · `/reset-password` |
-| Partner | `/` or `/dashboard` · `/hotels` · `/rooms` · `/calendar` · `/pricing` · `/bookings` · `/messages` · `/promotions` · `/reviews` · `/finance` · `/analytics` · `/notifications` · `/settings` · `/account` · `/register` · `/verify-email` · `/forgot-password` · `/reset-password` |
+| Partner | `/` or `/dashboard` · `/hotels` · `/rooms` · `/calendar` · `/pricing` · `/bookings` · `/messages` · `/promotions` · `/reviews` · `/finance` · `/analytics` · `/notifications` · `/team` · `/settings` · `/account` · `/register` · `/verify-email` · `/forgot-password` · `/reset-password` · `/accept-invitation` |
 | Admin | `/` or `/dashboard` · `/bookings` · `/partners` · `/catalog` · `/media` · `/reference-data` · `/payments` · `/invoices` · `/reviews` · `/activity-log` · `/account` · `/forgot-password` · `/reset-password` |
 
 **Account locations (Phase B).** `/register`, `/verify-email`, `/forgot-password` and `/reset-password` are
 served to a visitor with **no session** — the emails that carry their one-time tokens are opened signed out.
 `/account` needs a session that the surface admits. Only the Partner surface offers `/register`: Admin
 accounts are provisioned, and traveller sign-up stays inside the traveller sign-in flow. See
-`docs/PARTNER_ACCOUNT.md`.
+`docs/PARTNER_ACCOUNT.md`. The Partner surface's `/accept-invitation` (R5) opens signed out too and becomes the
+acceptance screen once signed in; see `docs/PARTNER_TEAM.md`.
 
 - Opening or refreshing a location opens that destination (after sign-in, if needed).
 - A path the surface does not serve — including a role-prefixed one such as `/partner/bookings` — opens the

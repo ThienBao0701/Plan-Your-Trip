@@ -129,9 +129,10 @@ void main() {
 
   group('C10 adds no surface of its own', () {
     test('no new partner destination was introduced', () {
-      // The backend menu has exactly thirteen keys; check-in/check-out are part
-      // of `bookings`, which C8 already implements.
-      expect(PartnerNavigation.destinations, hasLength(13));
+      // The backend menu has exactly thirteen keys (R5 adds the client-side,
+      // permission-gated `team`); check-in/check-out are part of `bookings`,
+      // which C8 already implements.
+      expect(PartnerNavigation.destinations, hasLength(14));
       final implemented = PartnerNavigation.destinations
           .where((d) => d.implemented)
           .map((d) => d.key)
@@ -153,6 +154,8 @@ void main() {
         'analytics',
         // D6 shipped notifications; still no separate check-in destination.
         'notifications',
+        // R5 shipped team management; still no separate check-in destination.
+        'team',
         'settings',
       ]);
       // There is deliberately no separate check-in destination.

@@ -14572,17 +14572,17 @@ abstract class AppLocalizations {
   /// **'An administrator suspended this partner account. Contact support to restore access.'**
   String get partnerStatusSuspendedMessage;
 
-  /// No description provided for @partnerStatusTeamMemberTitle.
+  /// No description provided for @partnerStatusMembershipSuspendedTitle.
   ///
   /// In en, this message translates to:
-  /// **'Team access not supported yet'**
-  String get partnerStatusTeamMemberTitle;
+  /// **'Your team access is suspended'**
+  String get partnerStatusMembershipSuspendedTitle;
 
-  /// No description provided for @partnerStatusTeamMemberMessage.
+  /// No description provided for @partnerStatusMembershipSuspendedMessage.
   ///
   /// In en, this message translates to:
-  /// **'You belong to a partner team but do not own its profile. The extranet overview is currently available to the profile owner only.'**
-  String get partnerStatusTeamMemberMessage;
+  /// **'An owner or manager of this workspace suspended your membership. Your access returns when they reactivate it.'**
+  String get partnerStatusMembershipSuspendedMessage;
 
   /// No description provided for @partnerStatusUnauthorizedTitle.
   ///
@@ -24735,6 +24735,894 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This field is required.'**
   String get partnerBusinessValidationRequired;
+
+  /// No description provided for @partnerNavTeam.
+  ///
+  /// In en, this message translates to:
+  /// **'Team'**
+  String get partnerNavTeam;
+
+  /// No description provided for @partnerTeamRoleRevenue.
+  ///
+  /// In en, this message translates to:
+  /// **'Revenue'**
+  String get partnerTeamRoleRevenue;
+
+  /// No description provided for @partnerTeamRoleReservations.
+  ///
+  /// In en, this message translates to:
+  /// **'Reservations'**
+  String get partnerTeamRoleReservations;
+
+  /// No description provided for @partnerTeamRoleContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Content'**
+  String get partnerTeamRoleContent;
+
+  /// No description provided for @partnerTeamRoleHousekeeping.
+  ///
+  /// In en, this message translates to:
+  /// **'Housekeeping'**
+  String get partnerTeamRoleHousekeeping;
+
+  /// No description provided for @partnerTeamScopeField.
+  ///
+  /// In en, this message translates to:
+  /// **'Applies to'**
+  String get partnerTeamScopeField;
+
+  /// No description provided for @partnerTeamScopeCompany.
+  ///
+  /// In en, this message translates to:
+  /// **'Whole company'**
+  String get partnerTeamScopeCompany;
+
+  /// No description provided for @partnerTeamScopeProperty.
+  ///
+  /// In en, this message translates to:
+  /// **'Property'**
+  String get partnerTeamScopeProperty;
+
+  /// No description provided for @partnerTeamScopeUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'Room type'**
+  String get partnerTeamScopeUnit;
+
+  /// No description provided for @partnerTeamScopePropertyNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Property #{id}'**
+  String partnerTeamScopePropertyNumber(int id);
+
+  /// No description provided for @partnerTeamScopeUnitNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Room type #{id}'**
+  String partnerTeamScopeUnitNumber(int id);
+
+  /// No description provided for @partnerTeamScopeChoose.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose'**
+  String get partnerTeamScopeChoose;
+
+  /// No description provided for @partnerTeamScopeChooseRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a role first'**
+  String get partnerTeamScopeChooseRole;
+
+  /// No description provided for @partnerTeamScopeNoRooms.
+  ///
+  /// In en, this message translates to:
+  /// **'No room types in this property'**
+  String get partnerTeamScopeNoRooms;
+
+  /// No description provided for @partnerTeamScopeNoneForRole.
+  ///
+  /// In en, this message translates to:
+  /// **'You cannot grant this role at any scope you manage.'**
+  String get partnerTeamScopeNoneForRole;
+
+  /// No description provided for @partnerTeamStatusActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get partnerTeamStatusActive;
+
+  /// No description provided for @partnerTeamStatusSuspended.
+  ///
+  /// In en, this message translates to:
+  /// **'Suspended'**
+  String get partnerTeamStatusSuspended;
+
+  /// No description provided for @partnerTeamStatusRevoked.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed'**
+  String get partnerTeamStatusRevoked;
+
+  /// No description provided for @partnerInvitationStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get partnerInvitationStatusPending;
+
+  /// No description provided for @partnerInvitationStatusAccepted.
+  ///
+  /// In en, this message translates to:
+  /// **'Accepted'**
+  String get partnerInvitationStatusAccepted;
+
+  /// No description provided for @partnerInvitationStatusDeclined.
+  ///
+  /// In en, this message translates to:
+  /// **'Declined'**
+  String get partnerInvitationStatusDeclined;
+
+  /// No description provided for @partnerInvitationStatusRevoked.
+  ///
+  /// In en, this message translates to:
+  /// **'Revoked'**
+  String get partnerInvitationStatusRevoked;
+
+  /// No description provided for @partnerInvitationStatusExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get partnerInvitationStatusExpired;
+
+  /// No description provided for @partnerInvitationDeliveryQueued.
+  ///
+  /// In en, this message translates to:
+  /// **'Email not confirmed yet'**
+  String get partnerInvitationDeliveryQueued;
+
+  /// No description provided for @partnerInvitationDeliverySent.
+  ///
+  /// In en, this message translates to:
+  /// **'Email sent'**
+  String get partnerInvitationDeliverySent;
+
+  /// No description provided for @partnerInvitationDeliveryFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Email not delivered'**
+  String get partnerInvitationDeliveryFailed;
+
+  /// No description provided for @partnerTeamScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Team'**
+  String get partnerTeamScreenTitle;
+
+  /// No description provided for @partnerTeamScreenSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Who can work in this partner workspace, with which role and where. Changes take effect on the member\'s next request.'**
+  String get partnerTeamScreenSubtitle;
+
+  /// No description provided for @partnerTeamCountMembers.
+  ///
+  /// In en, this message translates to:
+  /// **'Members: {count}'**
+  String partnerTeamCountMembers(int count);
+
+  /// No description provided for @partnerTeamCountSuspended.
+  ///
+  /// In en, this message translates to:
+  /// **'Suspended: {count}'**
+  String partnerTeamCountSuspended(int count);
+
+  /// No description provided for @partnerTeamCountPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending invitations: {count}'**
+  String partnerTeamCountPending(int count);
+
+  /// No description provided for @partnerTeamReadOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'You can see the team but not change it. Team changes need a team-management permission.'**
+  String get partnerTeamReadOnly;
+
+  /// No description provided for @partnerTeamNoAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Your role does not include seeing the team.'**
+  String get partnerTeamNoAccess;
+
+  /// No description provided for @partnerTeamAccessUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Your access could not be loaded, so team actions are unavailable. Refresh to try again.'**
+  String get partnerTeamAccessUnavailable;
+
+  /// No description provided for @partnerTeamLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading the team'**
+  String get partnerTeamLoading;
+
+  /// No description provided for @partnerTeamLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The team could not be loaded.'**
+  String get partnerTeamLoadFailed;
+
+  /// No description provided for @partnerTeamMembersHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Members'**
+  String get partnerTeamMembersHeading;
+
+  /// No description provided for @partnerTeamMembersSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Active and suspended members you can see. Removed members are kept as history and not listed.'**
+  String get partnerTeamMembersSubtitle;
+
+  /// No description provided for @partnerTeamMembersEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No members in your view yet.'**
+  String get partnerTeamMembersEmpty;
+
+  /// No description provided for @partnerTeamColumnMember.
+  ///
+  /// In en, this message translates to:
+  /// **'Member'**
+  String get partnerTeamColumnMember;
+
+  /// No description provided for @partnerTeamColumnAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Role and scope'**
+  String get partnerTeamColumnAccess;
+
+  /// No description provided for @partnerTeamColumnStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get partnerTeamColumnStatus;
+
+  /// No description provided for @partnerTeamYou.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get partnerTeamYou;
+
+  /// No description provided for @partnerTeamPrimaryOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Primary owner'**
+  String get partnerTeamPrimaryOwner;
+
+  /// No description provided for @partnerTeamPrimaryOwnerProtected.
+  ///
+  /// In en, this message translates to:
+  /// **'Primary owner — protected, cannot be changed from the workspace'**
+  String get partnerTeamPrimaryOwnerProtected;
+
+  /// No description provided for @partnerTeamPendingOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner confirmation pending'**
+  String get partnerTeamPendingOwner;
+
+  /// No description provided for @partnerTeamGrantLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{role} · {scope}'**
+  String partnerTeamGrantLabel(String role, String scope);
+
+  /// No description provided for @partnerTeamMemberActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Actions for {name}'**
+  String partnerTeamMemberActions(String name);
+
+  /// No description provided for @partnerTeamEditAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit role and scope'**
+  String get partnerTeamEditAccess;
+
+  /// No description provided for @partnerTeamSuspend.
+  ///
+  /// In en, this message translates to:
+  /// **'Suspend'**
+  String get partnerTeamSuspend;
+
+  /// No description provided for @partnerTeamReactivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Reactivate'**
+  String get partnerTeamReactivate;
+
+  /// No description provided for @partnerTeamRemoveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from team'**
+  String get partnerTeamRemoveAction;
+
+  /// No description provided for @partnerTeamLeave.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave this workspace'**
+  String get partnerTeamLeave;
+
+  /// No description provided for @partnerTeamCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get partnerTeamCancel;
+
+  /// No description provided for @partnerTeamReasonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason (optional)'**
+  String get partnerTeamReasonLabel;
+
+  /// No description provided for @partnerTeamOwnerStepUpHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes involving an owner ask you to confirm your password.'**
+  String get partnerTeamOwnerStepUpHint;
+
+  /// No description provided for @partnerTeamSuspendTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Suspend this member?'**
+  String get partnerTeamSuspendTitle;
+
+  /// No description provided for @partnerTeamSuspendBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} loses access on their next request. Their role and scope are kept for a later reactivation.'**
+  String partnerTeamSuspendBody(String name);
+
+  /// No description provided for @partnerTeamReactivateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reactivate this member?'**
+  String get partnerTeamReactivateTitle;
+
+  /// No description provided for @partnerTeamReactivateBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} gets their previous role and scope back.'**
+  String partnerTeamReactivateBody(String name);
+
+  /// No description provided for @partnerTeamRemoveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this member?'**
+  String get partnerTeamRemoveTitle;
+
+  /// No description provided for @partnerTeamRemoveBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} loses access. The membership is kept as history and cannot be restored; to work with them again, send a new invitation.'**
+  String partnerTeamRemoveBody(String name);
+
+  /// No description provided for @partnerTeamLeaveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave this workspace?'**
+  String get partnerTeamLeaveTitle;
+
+  /// No description provided for @partnerTeamLeaveBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You lose access to this partner workspace at once. To come back, an owner or manager has to invite you again.'**
+  String get partnerTeamLeaveBody;
+
+  /// No description provided for @partnerTeamSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Role and scope saved.'**
+  String get partnerTeamSaved;
+
+  /// No description provided for @partnerTeamSuspended.
+  ///
+  /// In en, this message translates to:
+  /// **'Member suspended.'**
+  String get partnerTeamSuspended;
+
+  /// No description provided for @partnerTeamReactivated.
+  ///
+  /// In en, this message translates to:
+  /// **'Member reactivated.'**
+  String get partnerTeamReactivated;
+
+  /// No description provided for @partnerTeamRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Member removed.'**
+  String get partnerTeamRemoved;
+
+  /// No description provided for @partnerTeamLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'You left the workspace.'**
+  String get partnerTeamLeft;
+
+  /// No description provided for @partnerTeamConcurrentReloaded.
+  ///
+  /// In en, this message translates to:
+  /// **'This member changed since you opened it. The list was refreshed — review it and try again.'**
+  String get partnerTeamConcurrentReloaded;
+
+  /// No description provided for @partnerTeamGrantAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add another role or scope'**
+  String get partnerTeamGrantAdd;
+
+  /// No description provided for @partnerTeamGrantRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this grant'**
+  String get partnerTeamGrantRemove;
+
+  /// No description provided for @partnerInvitesHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitations'**
+  String get partnerInvitesHeading;
+
+  /// No description provided for @partnerInvitesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitations you can see. Accepting one creates a new membership with exactly the invited roles.'**
+  String get partnerInvitesSubtitle;
+
+  /// No description provided for @partnerInvitesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No invitations.'**
+  String get partnerInvitesEmpty;
+
+  /// No description provided for @partnerInvitesUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitations could not be loaded.'**
+  String get partnerInvitesUnavailable;
+
+  /// No description provided for @partnerInviteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite'**
+  String get partnerInviteAction;
+
+  /// No description provided for @partnerInviteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite to the team'**
+  String get partnerInviteTitle;
+
+  /// No description provided for @partnerInviteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The address receives a link to join with a Partner account that uses it. Nobody joins until they accept, and no account is created or changed.'**
+  String get partnerInviteBody;
+
+  /// No description provided for @partnerInviteEmailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Email address'**
+  String get partnerInviteEmailLabel;
+
+  /// No description provided for @partnerInviteEmailRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an email address.'**
+  String get partnerInviteEmailRequired;
+
+  /// No description provided for @partnerInviteEmailInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email address.'**
+  String get partnerInviteEmailInvalid;
+
+  /// No description provided for @partnerInviteGrantsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Role and scope'**
+  String get partnerInviteGrantsLabel;
+
+  /// No description provided for @partnerInviteReview.
+  ///
+  /// In en, this message translates to:
+  /// **'You are about to grant'**
+  String get partnerInviteReview;
+
+  /// No description provided for @partnerInviteLimits.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitations last 7 days. A company can have up to 20 pending, an address can be invited or resent once a minute, and each invitation can be resent 5 times.'**
+  String get partnerInviteLimits;
+
+  /// No description provided for @partnerInviteSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Send invitation'**
+  String get partnerInviteSubmit;
+
+  /// No description provided for @partnerInviteRecorded.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation request recorded. Its delivery status appears in the list.'**
+  String get partnerInviteRecorded;
+
+  /// No description provided for @partnerInviteResend.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend'**
+  String get partnerInviteResend;
+
+  /// No description provided for @partnerInviteResent.
+  ///
+  /// In en, this message translates to:
+  /// **'A new link was requested; the previous link no longer works.'**
+  String get partnerInviteResent;
+
+  /// No description provided for @partnerInviteRevoke.
+  ///
+  /// In en, this message translates to:
+  /// **'Revoke'**
+  String get partnerInviteRevoke;
+
+  /// No description provided for @partnerInviteRevokeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Revoke this invitation?'**
+  String get partnerInviteRevokeTitle;
+
+  /// No description provided for @partnerInviteRevokeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The link sent to {email} stops working.'**
+  String partnerInviteRevokeBody(String email);
+
+  /// No description provided for @partnerInviteRevoked.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation revoked.'**
+  String get partnerInviteRevoked;
+
+  /// No description provided for @partnerInviteExpires.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires {date}'**
+  String partnerInviteExpires(String date);
+
+  /// No description provided for @partnerInviteInvitedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Invited by {name}'**
+  String partnerInviteInvitedBy(String name);
+
+  /// No description provided for @partnerInviteResends.
+  ///
+  /// In en, this message translates to:
+  /// **'Resent {count}/{max}'**
+  String partnerInviteResends(int count, int max);
+
+  /// No description provided for @partnerInviteResendAfter.
+  ///
+  /// In en, this message translates to:
+  /// **'Can be resent after {time}'**
+  String partnerInviteResendAfter(String time);
+
+  /// No description provided for @partnerInviteResendLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend limit reached — revoke it and send a new invitation.'**
+  String get partnerInviteResendLimit;
+
+  /// No description provided for @partnerTeamErrorEmailUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Email delivery is not available right now, so nothing was sent or created. Try again later.'**
+  String get partnerTeamErrorEmailUnavailable;
+
+  /// No description provided for @partnerTeamErrorRateLimited.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many invitations for now: wait a minute between sends, keep at most 20 pending and resend at most 5 times.'**
+  String get partnerTeamErrorRateLimited;
+
+  /// No description provided for @partnerTeamErrorAlreadyMember.
+  ///
+  /// In en, this message translates to:
+  /// **'This address already belongs to a team member.'**
+  String get partnerTeamErrorAlreadyMember;
+
+  /// No description provided for @partnerTeamErrorOwnerProtected.
+  ///
+  /// In en, this message translates to:
+  /// **'Only an owner can manage owners, and the primary owner cannot be changed from the workspace.'**
+  String get partnerTeamErrorOwnerProtected;
+
+  /// No description provided for @partnerTeamErrorNotDelegable.
+  ///
+  /// In en, this message translates to:
+  /// **'You cannot grant or manage this role or scope.'**
+  String get partnerTeamErrorNotDelegable;
+
+  /// No description provided for @partnerTeamErrorSelf.
+  ///
+  /// In en, this message translates to:
+  /// **'You cannot change your own membership. You can leave the workspace instead.'**
+  String get partnerTeamErrorSelf;
+
+  /// No description provided for @partnerTeamErrorStepUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm your password to make changes involving an owner.'**
+  String get partnerTeamErrorStepUp;
+
+  /// No description provided for @partnerTeamErrorLastOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'The company must keep at least one active owner.'**
+  String get partnerTeamErrorLastOwner;
+
+  /// No description provided for @partnerTeamErrorConcurrent.
+  ///
+  /// In en, this message translates to:
+  /// **'Someone changed this in the meantime. Reload and try again.'**
+  String get partnerTeamErrorConcurrent;
+
+  /// No description provided for @partnerTeamErrorWorkspaceConflict.
+  ///
+  /// In en, this message translates to:
+  /// **'This person already belongs to another partner workspace.'**
+  String get partnerTeamErrorWorkspaceConflict;
+
+  /// No description provided for @partnerTeamErrorInvitationNotPending.
+  ///
+  /// In en, this message translates to:
+  /// **'This invitation is no longer pending. The list was refreshed.'**
+  String get partnerTeamErrorInvitationNotPending;
+
+  /// No description provided for @partnerTeamErrorInvitationStale.
+  ///
+  /// In en, this message translates to:
+  /// **'A scope of this invitation no longer belongs to the company. Revoke it and invite again.'**
+  String get partnerTeamErrorInvitationStale;
+
+  /// No description provided for @partnerTeamErrorScopeInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'That role cannot be granted at that scope.'**
+  String get partnerTeamErrorScopeInvalid;
+
+  /// No description provided for @partnerTeamErrorPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'Your role does not allow this.'**
+  String get partnerTeamErrorPermission;
+
+  /// No description provided for @partnerTeamErrorReason.
+  ///
+  /// In en, this message translates to:
+  /// **'The reason must not contain passwords, secrets, keys, tokens or card or account numbers.'**
+  String get partnerTeamErrorReason;
+
+  /// No description provided for @partnerTeamErrorEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email address.'**
+  String get partnerTeamErrorEmail;
+
+  /// No description provided for @partnerTeamErrorValidation.
+  ///
+  /// In en, this message translates to:
+  /// **'Some details are not valid. Check them and try again.'**
+  String get partnerTeamErrorValidation;
+
+  /// No description provided for @partnerTeamErrorSession.
+  ///
+  /// In en, this message translates to:
+  /// **'Your session has ended. Sign in again.'**
+  String get partnerTeamErrorSession;
+
+  /// No description provided for @partnerTeamErrorGone.
+  ///
+  /// In en, this message translates to:
+  /// **'This is no longer available. The list was refreshed.'**
+  String get partnerTeamErrorGone;
+
+  /// No description provided for @partnerTeamErrorUncertain.
+  ///
+  /// In en, this message translates to:
+  /// **'The connection dropped before an answer arrived. The list was refreshed — check whether the change was made.'**
+  String get partnerTeamErrorUncertain;
+
+  /// No description provided for @partnerTeamErrorNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not reach the server. Check the connection and try again.'**
+  String get partnerTeamErrorNetwork;
+
+  /// No description provided for @partnerTeamErrorServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong on the server. Try again.'**
+  String get partnerTeamErrorServer;
+
+  /// No description provided for @partnerEditGrantsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit role and scope'**
+  String get partnerEditGrantsTitle;
+
+  /// No description provided for @partnerEditGrantsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'These replace the member\'s current grants. You can only grant roles and scopes you manage.'**
+  String get partnerEditGrantsBody;
+
+  /// No description provided for @partnerEditGrantsSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get partnerEditGrantsSubmit;
+
+  /// No description provided for @partnerStepUpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm your password'**
+  String get partnerStepUpTitle;
+
+  /// No description provided for @partnerStepUpBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes involving an owner need a recent sign-in. Enter your password to continue.'**
+  String get partnerStepUpBody;
+
+  /// No description provided for @partnerStepUpPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get partnerStepUpPasswordLabel;
+
+  /// No description provided for @partnerStepUpPasswordRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your password.'**
+  String get partnerStepUpPasswordRequired;
+
+  /// No description provided for @partnerStepUpConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get partnerStepUpConfirm;
+
+  /// No description provided for @partnerAcceptTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Join a partner team'**
+  String get partnerAcceptTitle;
+
+  /// No description provided for @partnerAcceptGuidance.
+  ///
+  /// In en, this message translates to:
+  /// **'You opened a team invitation. Sign in with a Partner account that uses the invited address. A traveller account cannot be used — if the invited address is your traveller account, ask the person who invited you to use another (for example, work) address.'**
+  String get partnerAcceptGuidance;
+
+  /// No description provided for @partnerAcceptJoinNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Accepting joins the invited partner workspace with the role and scope chosen by the team. It does not create a company of your own.'**
+  String get partnerAcceptJoinNote;
+
+  /// No description provided for @partnerAcceptAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept invitation'**
+  String get partnerAcceptAction;
+
+  /// No description provided for @partnerAcceptDecline.
+  ///
+  /// In en, this message translates to:
+  /// **'Decline'**
+  String get partnerAcceptDecline;
+
+  /// No description provided for @partnerAcceptDeclineTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Decline this invitation?'**
+  String get partnerAcceptDeclineTitle;
+
+  /// No description provided for @partnerAcceptDeclineBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The link stops working. The team would have to invite you again.'**
+  String get partnerAcceptDeclineBody;
+
+  /// No description provided for @partnerAcceptDeclined.
+  ///
+  /// In en, this message translates to:
+  /// **'You declined the invitation.'**
+  String get partnerAcceptDeclined;
+
+  /// No description provided for @partnerAcceptSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'You joined the team. Your workspace opens with the role and scope you were invited with.'**
+  String get partnerAcceptSuccess;
+
+  /// No description provided for @partnerAcceptOpenWorkspace.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the workspace'**
+  String get partnerAcceptOpenWorkspace;
+
+  /// No description provided for @partnerAcceptNoLink.
+  ///
+  /// In en, this message translates to:
+  /// **'No invitation link is open. Open the link from the invitation email — it only works once.'**
+  String get partnerAcceptNoLink;
+
+  /// No description provided for @partnerAcceptMineHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitations addressed to you'**
+  String get partnerAcceptMineHeading;
+
+  /// No description provided for @partnerAcceptErrorInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'This invitation link is invalid or has already been used. Ask the team for a new invitation.'**
+  String get partnerAcceptErrorInvalid;
+
+  /// No description provided for @partnerAcceptErrorExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'This invitation has expired. Ask the team for a new invitation.'**
+  String get partnerAcceptErrorExpired;
+
+  /// No description provided for @partnerAcceptErrorPartnerAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Join with a verified Partner account that uses the invited address. A traveller or administrator account cannot be used.'**
+  String get partnerAcceptErrorPartnerAccount;
+
+  /// No description provided for @partnerAcceptErrorMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'This invitation was sent to a different address. Sign in with the Partner account that uses the invited address.'**
+  String get partnerAcceptErrorMismatch;
+
+  /// No description provided for @partnerAcceptErrorOwnCompany.
+  ///
+  /// In en, this message translates to:
+  /// **'This account already has a company of its own, so it cannot join another workspace. Use a different Partner account.'**
+  String get partnerAcceptErrorOwnCompany;
+
+  /// No description provided for @partnerAcceptErrorOtherWorkspace.
+  ///
+  /// In en, this message translates to:
+  /// **'This account already belongs to a partner workspace. Leave it first, or use a different Partner account.'**
+  String get partnerAcceptErrorOtherWorkspace;
+
+  /// No description provided for @partnerAcceptErrorUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This company cannot accept new members right now.'**
+  String get partnerAcceptErrorUnavailable;
+
+  /// No description provided for @partnerAcceptErrorStale.
+  ///
+  /// In en, this message translates to:
+  /// **'This invitation is no longer valid. Ask the team for a new invitation.'**
+  String get partnerAcceptErrorStale;
 }
 
 class _AppLocalizationsDelegate

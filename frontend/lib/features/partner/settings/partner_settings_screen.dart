@@ -12,6 +12,7 @@ import '../../../shared/widgets/glass_widgets.dart';
 import '../policies/partner_policies_screen.dart';
 import '../properties/widgets/partner_property_widgets.dart';
 import '../widgets/partner_metric_widgets.dart';
+import '../team/partner_team_labels.dart';
 import '../widgets/partner_state_views.dart';
 import 'partner_account_state.dart';
 
@@ -22,7 +23,6 @@ import 'partner_account_state.dart';
 /// | Tab | Owner |
 /// |---|---|
 /// | Policies & workspace | **C6**, embedded verbatim |
-/// | Team | C12 |
 /// | Payout account | C12 |
 /// | Profile | C12, **read-only** |
 ///
@@ -31,7 +31,7 @@ import 'partner_account_state.dart';
 ///
 /// ## Role rules, taken from `PartnerSettingsService`
 ///
-///   * team add / update / remove → `requireOwner` → **OWNER only**;
+///   * the team moved to its own `team` destination in RBAC R5;
 ///   * payout write → `PAYOUT_WRITE_ROLES` → **OWNER or FINANCE**;
 ///   * settings write → OWNER or MANAGER, which remains C6's.
 ///
@@ -62,7 +62,7 @@ class _PartnerSettingsScreenState extends State<PartnerSettingsScreen>
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: 4, vsync: this);
+    _tabs = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -129,7 +129,6 @@ class _PartnerSettingsScreenState extends State<PartnerSettingsScreen>
                 indicatorColor: AppColors.ocean700,
                 tabs: [
                   Tab(text: l10n.partnerSettingsTabWorkspace),
-                  Tab(text: l10n.partnerSettingsTabTeam),
                   Tab(text: l10n.partnerSettingsTabPayout),
                   Tab(text: l10n.partnerSettingsTabProfile),
                 ],
@@ -143,397 +142,12 @@ class _PartnerSettingsScreenState extends State<PartnerSettingsScreen>
           builder: (context, _) => switch (_tabs.index) {
             // C6, embedded verbatim — its own state, its own editors.
             0 => const PartnerPoliciesScreen(),
-            1 => _TeamTab(partner: partner, account: account),
-            2 => _PayoutTab(partner: partner, account: account),
+            1 => _PayoutTab(partner: partner, account: account),
             _ => _ProfileTab(partner: partner),
           },
         ),
       ],
     );
-  }
-}
-
-class _TeamTab extends StatelessWidget {
-  final PartnerState partner;
-  final PartnerAccountState account;
-
-  const _TeamTab({required this.partner, required this.account});
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final canManage = account.canManageTeam(partner.teamRole);
-
-    final gate = _gate(context, account);
-    if (gate != null) return gate;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        OceanGlassCard(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                l10n.partnerTeamHeading,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.textPrimary,
-                    ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                l10n.partnerTeamSubtitle,
-                style: Theme.of(context)
-                    .textTheme
-                    .labelSmall
-                    ?.copyWith(color: AppColors.textTertiary),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              if (!canManage) ...[
-                PartnerMetricNotice(message: l10n.partnerTeamOwnerOnly),
-                const SizedBox(height: AppSpacing.md),
-              ],
-              if (account.team.isEmpty)
-                Text(
-                  l10n.partnerTeamEmpty,
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.copyWith(color: AppColors.textSecondary),
-                )
-              else
-                for (final member in account.team)
-                  _MemberRow(
-                    partner: partner,
-                    account: account,
-                    member: member,
-                    canManage: canManage,
-                  ),
-            ],
-          ),
-        ),
-        if (canManage) ...[
-          const SizedBox(height: AppSpacing.md),
-          _InviteCard(partner: partner, account: account),
-        ],
-      ],
-    );
-  }
-}
-
-class _MemberRow extends StatelessWidget {
-  final PartnerState partner;
-  final PartnerAccountState account;
-  final PartnerTeamMember member;
-  final bool canManage;
-
-  const _MemberRow({
-    required this.partner,
-    required this.account,
-    required this.member,
-    required this.canManage,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
-    final pending = account.pendingMemberId == member.id;
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.xs),
-      padding: const EdgeInsets.all(AppSpacing.sm),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceMuted,
-        borderRadius: BorderRadius.circular(AppRadii.sm),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      member.userName.isEmpty
-                          ? l10n.partnerPropertyNotSet
-                          : member.userName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    Text(
-                      member.userEmail,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.labelSmall
-                          ?.copyWith(color: AppColors.textSecondary),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: AppSpacing.xs),
-              OceanStatusPill(
-                label: partnerTeamRoleLabel(l10n, member.role),
-                color: AppColors.ocean600,
-                icon: Icons.badge_outlined,
-              ),
-              const SizedBox(width: AppSpacing.xxs),
-              OceanStatusPill(
-                label: member.active
-                    ? l10n.partnerTeamActive
-                    : l10n.partnerTeamInactive,
-                color:
-                    member.active ? AppColors.success : AppColors.textTertiary,
-                icon: member.active
-                    ? Icons.check_circle_outline_rounded
-                    : Icons.pause_circle_outline_rounded,
-              ),
-            ],
-          ),
-          if (canManage) ...[
-            const SizedBox(height: AppSpacing.xs),
-            if (pending)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: AppSpacing.xs),
-                child: SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-              )
-            else
-              Wrap(
-                spacing: AppSpacing.xs,
-                runSpacing: AppSpacing.xs,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 190,
-                    child: DropdownButtonFormField<PartnerTeamRole>(
-                      initialValue: partnerAssignableRoles.contains(member.role)
-                          ? member.role
-                          : null,
-                      isExpanded: true,
-                      decoration: InputDecoration(
-                        labelText: l10n.partnerTeamRoleField,
-                        isDense: true,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(AppRadii.sm),
-                        ),
-                      ),
-                      items: [
-                        for (final role in partnerAssignableRoles)
-                          DropdownMenuItem(
-                            value: role,
-                            child: Text(partnerTeamRoleLabel(l10n, role)),
-                          ),
-                      ],
-                      onChanged: (role) => role == null
-                          ? null
-                          : _run(
-                              context,
-                              () => account.updateMember(
-                                  partner: partner,
-                                  memberId: member.id,
-                                  role: role),
-                            ),
-                    ),
-                  ),
-                  OceanSecondaryButton(
-                    label: member.active
-                        ? l10n.partnerTeamDeactivate
-                        : l10n.partnerTeamActivate,
-                    icon: member.active
-                        ? Icons.pause_circle_outline_rounded
-                        : Icons.play_circle_outline_rounded,
-                    fullWidth: false,
-                    onPressed: () => _run(
-                      context,
-                      () => account.updateMember(
-                          partner: partner,
-                          memberId: member.id,
-                          active: !member.active),
-                    ),
-                  ),
-                  OceanSecondaryButton(
-                    label: l10n.partnerTeamRemove,
-                    icon: Icons.person_remove_outlined,
-                    fullWidth: false,
-                    onPressed: () => _confirmRemove(context),
-                  ),
-                ],
-              ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Future<void> _confirmRemove(BuildContext context) async {
-    final l10n = AppLocalizations.of(context)!;
-    // Removal is irreversible: there is no endpoint to restore a member.
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.partnerTeamRemove),
-        content: Text(l10n.partnerTeamRemoveConfirm(
-            member.userEmail.isEmpty ? member.userName : member.userEmail)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(l10n.partnerBookingActionCancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(l10n.partnerBookingActionConfirmCta),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true || !context.mounted) return;
-    await _run(
-      context,
-      () => account.removeMember(partner: partner, memberId: member.id),
-    );
-  }
-
-  Future<void> _run(
-    BuildContext context,
-    Future<PartnerAccountActionResult> Function() action,
-  ) async {
-    final l10n = AppLocalizations.of(context)!;
-    final messenger = ScaffoldMessenger.maybeOf(context);
-    final result = await action();
-    if (!context.mounted) return;
-    messenger?.showSnackBar(
-        SnackBar(content: Text(partnerAccountResultMessage(l10n, result))));
-  }
-}
-
-class _InviteCard extends StatefulWidget {
-  final PartnerState partner;
-  final PartnerAccountState account;
-
-  const _InviteCard({required this.partner, required this.account});
-
-  @override
-  State<_InviteCard> createState() => _InviteCardState();
-}
-
-class _InviteCardState extends State<_InviteCard> {
-  final TextEditingController _email = TextEditingController();
-  PartnerTeamRole _role = PartnerTeamRole.viewer;
-
-  @override
-  void dispose() {
-    _email.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-
-    return OceanGlassCard(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            l10n.partnerTeamInviteHeading,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.textPrimary,
-                ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            // The backend matches an existing user by email; it does not send
-            // an invitation email of its own.
-            l10n.partnerTeamInviteNote,
-            style: Theme.of(context)
-                .textTheme
-                .labelSmall
-                ?.copyWith(color: AppColors.textTertiary),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Wrap(
-            spacing: AppSpacing.sm,
-            runSpacing: AppSpacing.sm,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              SizedBox(
-                width: 260,
-                child: TextField(
-                  controller: _email,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    labelText: l10n.partnerTeamInviteEmail,
-                    isDense: true,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppRadii.sm),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 190,
-                child: DropdownButtonFormField<PartnerTeamRole>(
-                  initialValue: _role,
-                  isExpanded: true,
-                  decoration: InputDecoration(
-                    labelText: l10n.partnerTeamRoleField,
-                    isDense: true,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppRadii.sm),
-                    ),
-                  ),
-                  items: [
-                    for (final role in partnerAssignableRoles)
-                      DropdownMenuItem(
-                        value: role,
-                        child: Text(partnerTeamRoleLabel(l10n, role)),
-                      ),
-                  ],
-                  onChanged: (role) =>
-                      setState(() => _role = role ?? PartnerTeamRole.viewer),
-                ),
-              ),
-              OceanPrimaryButton(
-                label: l10n.partnerTeamInviteAction,
-                fullWidth: false,
-                onPressed: widget.account.pendingMemberId != null
-                    ? null
-                    : () => _invite(context),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _invite(BuildContext context) async {
-    final l10n = AppLocalizations.of(context)!;
-    final messenger = ScaffoldMessenger.maybeOf(context);
-    final result = await widget.account.addMember(
-      partner: widget.partner,
-      email: _email.text,
-      role: _role,
-    );
-    if (!context.mounted) return;
-    if (result == PartnerAccountActionResult.success) _email.clear();
-    messenger?.showSnackBar(
-        SnackBar(content: Text(partnerAccountResultMessage(l10n, result))));
   }
 }
 
@@ -947,16 +561,6 @@ class _AccountLoading extends StatelessWidget {
     );
   }
 }
-
-String partnerTeamRoleLabel(AppLocalizations l10n, PartnerTeamRole role) =>
-    switch (role) {
-      PartnerTeamRole.owner => l10n.partnerTeamRoleOwner,
-      PartnerTeamRole.manager => l10n.partnerTeamRoleManager,
-      PartnerTeamRole.frontDesk => l10n.partnerTeamRoleFrontDesk,
-      PartnerTeamRole.finance => l10n.partnerTeamRoleFinance,
-      PartnerTeamRole.viewer => l10n.partnerTeamRoleViewer,
-      PartnerTeamRole.unknown => l10n.partnerTeamRoleUnknown,
-    };
 
 String partnerPayoutMethodLabel(
   AppLocalizations l10n,

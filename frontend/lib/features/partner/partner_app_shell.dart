@@ -24,10 +24,12 @@ import 'finance/partner_finance_screen.dart';
 import 'calendar/partner_calendar_screen.dart';
 import 'reviews/partner_reviews_screen.dart';
 import 'settings/partner_settings_screen.dart';
+import 'team/partner_team_screen.dart';
 import 'promotions/partner_promotions_screen.dart';
 import 'rates/partner_rates_screen.dart';
 import 'rooms/partner_rooms_screen.dart';
 import 'widgets/partner_state_views.dart';
+import 'team/partner_team_labels.dart';
 
 /// The Partner Extranet shell: an operations workspace, not the traveller app.
 ///
@@ -103,6 +105,10 @@ class _PartnerAppShellState extends State<PartnerAppShell> {
       selectedRoute: _route,
       overview: partner.overview,
       teamRole: partner.teamRole,
+      isVisible: (destination) {
+        final permission = destination.requiresPermission;
+        return permission == null || partner.holdsAnywhere(permission);
+      },
       onSelect: (route) {
         if (!isDesktop) Navigator.of(context).maybePop();
         _select(route);
@@ -173,6 +179,7 @@ class _PartnerSidebar extends StatelessWidget {
   final String selectedRoute;
   final PartnerWorkspaceOverview? overview;
   final PartnerTeamRole teamRole;
+  final bool Function(PartnerDestination destination) isVisible;
   final ValueChanged<String> onSelect;
   final VoidCallback onSignOut;
 
@@ -180,6 +187,7 @@ class _PartnerSidebar extends StatelessWidget {
     required this.selectedRoute,
     required this.overview,
     required this.teamRole,
+    required this.isVisible,
     required this.onSelect,
     required this.onSignOut,
   });
@@ -245,7 +253,8 @@ class _PartnerSidebar extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.xxs),
                 Text(
-                  l10n.partnerTeamRoleLabel(_teamRoleLabel(l10n, teamRole)),
+                  l10n.partnerTeamRoleLabel(
+                      partnerTeamRoleLabel(l10n, teamRole)),
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: AppColors.textTertiary,
                   ),
@@ -275,7 +284,8 @@ class _PartnerSidebar extends StatelessWidget {
                       ),
                     ),
                   ),
-                  for (final destination in PartnerNavigation.ofGroup(group))
+                  for (final destination
+                      in PartnerNavigation.ofGroup(group).where(isVisible))
                     _PartnerNavTile(
                       destination: destination,
                       selected: destination.route == selectedRoute,
@@ -502,6 +512,7 @@ class _PartnerWorkArea extends StatelessWidget {
                     'analytics' => const PartnerAnalyticsScreen(),
                     'notifications' => const PartnerNotificationsScreen(),
                     'reviews' => const PartnerReviewsScreen(),
+                    'team' => const PartnerTeamScreen(),
                     'settings' => const PartnerSettingsScreen(),
                     _ => PartnerModuleScreen(destination: destination),
                   },
@@ -597,13 +608,3 @@ class _PartnerPageHeader extends StatelessWidget {
     );
   }
 }
-
-String _teamRoleLabel(AppLocalizations l10n, PartnerTeamRole role) =>
-    switch (role) {
-      PartnerTeamRole.owner => l10n.partnerTeamRoleOwner,
-      PartnerTeamRole.manager => l10n.partnerTeamRoleManager,
-      PartnerTeamRole.frontDesk => l10n.partnerTeamRoleFrontDesk,
-      PartnerTeamRole.finance => l10n.partnerTeamRoleFinance,
-      PartnerTeamRole.viewer => l10n.partnerTeamRoleViewer,
-      PartnerTeamRole.unknown => l10n.partnerTeamRoleUnknown,
-    };

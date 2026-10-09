@@ -13,6 +13,7 @@ library;
 
 import 'partner_dashboard_models.dart';
 import 'partner_property_models.dart';
+import 'partner_team_models.dart';
 
 /// `model/PartnerVerificationStatus.java`. The moderation lifecycle of a
 /// partner profile. Only `APPROVED` unlocks `/api/partner/extranet/**`.
@@ -51,11 +52,21 @@ enum PartnerVerificationStatus {
 ///
 /// [unknown] means "the client could not determine this team role" and must be
 /// treated as the least-privileged case (fail closed).
+///
+/// RBAC R5 — the nine V1.1 roles, in the backend enum's declaration order
+/// (`OWNER, MANAGER, REVENUE, RESERVATIONS, FRONT_DESK, FINANCE, CONTENT,
+/// HOUSEKEEPING, VIEWER`). Roles are labels and grant vocabulary only: what a
+/// caller may do comes from the access document's permissions
+/// (`partner_access_models.dart`), never from a role name.
 enum PartnerTeamRole {
   owner,
   manager,
+  revenue,
+  reservations,
   frontDesk,
   finance,
+  content,
+  housekeeping,
   viewer,
   unknown;
 
@@ -66,10 +77,18 @@ enum PartnerTeamRole {
         return PartnerTeamRole.owner;
       case 'MANAGER':
         return PartnerTeamRole.manager;
+      case 'REVENUE':
+        return PartnerTeamRole.revenue;
+      case 'RESERVATIONS':
+        return PartnerTeamRole.reservations;
       case 'FRONT_DESK':
         return PartnerTeamRole.frontDesk;
       case 'FINANCE':
         return PartnerTeamRole.finance;
+      case 'CONTENT':
+        return PartnerTeamRole.content;
+      case 'HOUSEKEEPING':
+        return PartnerTeamRole.housekeeping;
       case 'VIEWER':
         return PartnerTeamRole.viewer;
       default:
@@ -443,6 +462,11 @@ class PartnerProperty {
 }
 
 /// `dto/PartnerSettingsDto.PartnerTeamMemberResponse`.
+///
+/// RBAC R5 reads the R3a/R4 additions: [status], [grants], [primaryOwner],
+/// [pendingOwnerConfirmation], [isSelf] and [version] (sent back with a grant
+/// change). [role] is the highest grant and [active] is `status == ACTIVE`,
+/// both kept by the backend for older clients.
 class PartnerTeamMember {
   final int id;
   final int partnerProfileId;
@@ -451,6 +475,13 @@ class PartnerTeamMember {
   final String userEmail;
   final PartnerTeamRole role;
   final bool active;
+  final PartnerMembershipStatus status;
+  final List<PartnerTeamGrant> grants;
+  final bool primaryOwner;
+  final bool pendingOwnerConfirmation;
+  final bool isSelf;
+  final int? version;
+  final DateTime? joinedAt;
 
   const PartnerTeamMember({
     required this.id,
@@ -460,11 +491,20 @@ class PartnerTeamMember {
     required this.userEmail,
     required this.role,
     required this.active,
+    this.status = PartnerMembershipStatus.unknown,
+    this.grants = const [],
+    this.primaryOwner = false,
+    this.pendingOwnerConfirmation = false,
+    this.isSelf = false,
+    this.version,
+    this.joinedAt,
   });
 
   static PartnerTeamMember? fromJson(Map<String, dynamic> json) {
     final id = _asInt(json['id']);
     if (id == null) return null;
+    final active = json['active'] == true;
+    final status = PartnerMembershipStatus.parse(json['status']);
     return PartnerTeamMember(
       id: id,
       partnerProfileId: _asInt(json['partnerProfileId']) ?? 0,
@@ -472,9 +512,29 @@ class PartnerTeamMember {
       userName: _asString(json['userName']) ?? '',
       userEmail: _asString(json['userEmail']) ?? '',
       role: PartnerTeamRole.parse(json['role']),
-      active: json['active'] == true,
+      active: active,
+      // An older response without `status` still says whether it is active.
+      status: status != PartnerMembershipStatus.unknown
+          ? status
+          : (active
+              ? PartnerMembershipStatus.active
+              : PartnerMembershipStatus.suspended),
+      grants: parsePartnerTeamGrants(json['grants']),
+      primaryOwner: json['primaryOwner'] == true,
+      pendingOwnerConfirmation: json['pendingOwnerConfirmation'] == true,
+      isSelf: json['isSelf'] == true,
+      version: _asInt(json['version']),
+      joinedAt: _asDate(json['joinedAt']),
     );
   }
+
+  /// The roles this membership holds, from its grants (or its legacy role).
+  Set<PartnerTeamRole> get roles =>
+      grants.isEmpty ? {role} : grants.map((g) => g.role).toSet();
+
+  /// Holds or is about to hold OWNER: managing it needs an owner (§10.3, O-9).
+  bool get involvesOwner =>
+      pendingOwnerConfirmation || roles.contains(PartnerTeamRole.owner);
 }
 
 int? _asInt(Object? value) {

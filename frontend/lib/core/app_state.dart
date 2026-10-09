@@ -767,6 +767,29 @@ class AppState extends ChangeNotifier {
     return result;
   }
 
+  /// RBAC R5 — step-up (`POST /api/me/step-up`, RBAC V1.1 §25.6): re-enters the
+  /// password before an owner-level action and adopts the freshly issued token,
+  /// exactly as [changePassword] adopts its new one. The previous token stays
+  /// valid server-side; nothing about the password is stored or logged.
+  Future<AuthResult<AuthSessionRecord>> stepUp(String currentPassword) async {
+    final result = await api.stepUp(currentPassword);
+    final session = result.data;
+    if (!result.success || session == null) return result;
+
+    api.token = session.token;
+    final address = email;
+    if (address != null) {
+      await storage.save(
+        email: address,
+        token: session.token,
+        demo: demoMode,
+        role: role.wireValue,
+      );
+    }
+    notifyListeners();
+    return result;
+  }
+
   Future<void> logout() async {
     await storage.clear();
     api.token = null;

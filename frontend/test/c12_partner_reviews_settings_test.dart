@@ -10,6 +10,7 @@ import 'package:planyourtrip_frontend/core/network/api_client.dart';
 import 'package:planyourtrip_frontend/core/partner/partner_account_models.dart';
 import 'package:planyourtrip_frontend/core/partner/partner_models.dart';
 import 'package:planyourtrip_frontend/core/partner/partner_state.dart';
+import 'package:planyourtrip_frontend/core/partner/partner_team_models.dart';
 import 'package:planyourtrip_frontend/design/app_theme.dart';
 import 'package:planyourtrip_frontend/features/partner/partner_navigation.dart';
 import 'package:planyourtrip_frontend/features/partner/reviews/partner_reviews_screen.dart';
@@ -32,8 +33,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 ///    on the review's *author*, so `GET /api/reviews/{id}` is a 403.
 ///  * A review has **one** reply, replaced in place, with **no delete endpoint**.
 ///    Only an `APPROVED` review may be replied to — anything else is 422.
-///  * Team writes are **OWNER only**; payout writes are **OWNER or FINANCE**;
-///    C6's settings writes remain OWNER/MANAGER and are untouched.
+///  * Payout writes are **OWNER or FINANCE**; C6's settings writes remain
+///    OWNER/MANAGER and are untouched. RBAC R5 moved the team out of Settings
+///    into its own destination (`r5_partner_team_test.dart`).
 ///  * The payout API never returns a full account number — only `last4`.
 ///  * An approved business profile **cannot be edited**, so no editor is shown.
 void main() {
@@ -336,14 +338,15 @@ void main() {
 
   group('C12 duplicates nothing', () {
     test('reviews becomes the last implemented destination', () {
-      expect(PartnerNavigation.destinations, hasLength(13));
+      // RBAC R5 added one client-side destination, `team` (13 backend + 1).
+      expect(PartnerNavigation.destinations, hasLength(14));
       final planned = PartnerNavigation.destinations
           .where((d) => !d.implemented)
           .map((d) => d.key)
           .toSet();
       // D5 has since shipped Messages and D6 Notifications, so nothing remains
-      // planned. C12 still did not invent a destination for team, payout or
-      // profile — the count above holds that line.
+      // planned. C12 did not invent a destination for team, payout or profile;
+      // R5's `team` is the one deliberate addition the count above records.
       expect(planned, isEmpty);
     });
 
@@ -360,12 +363,7 @@ void main() {
       final touched = requestLog.where((r) => r.contains('/partner/')).toSet();
       expect(touched.any((r) => r.contains('/partner/settings')), isFalse);
       expect(touched.any((r) => r.contains('/policies')), isFalse);
-      expect(
-          touched,
-          containsAll(<String>[
-            'GET /api/partner/team',
-            'GET /api/partner/payout-account',
-          ]));
+      expect(touched, contains('GET /api/partner/payout-account'));
     });
   });
 
@@ -523,115 +521,27 @@ void main() {
 
   // ── Team ──────────────────────────────────────────────────────────────
 
-  group('team', () {
-    test('the role gate mirrors requireOwner exactly', () async {
+  group('team (moved to the R5 team destination)', () {
+    test('the settings module no longer reads or writes the team', () async {
       final loaded = await loadedAccount(c12Client());
-      expect(loaded.state.canManageTeam(PartnerTeamRole.owner), isTrue);
-      for (final role in [
-        PartnerTeamRole.manager,
-        PartnerTeamRole.frontDesk,
-        PartnerTeamRole.finance,
-        PartnerTeamRole.viewer,
-        PartnerTeamRole.unknown,
-      ]) {
-        expect(loaded.state.canManageTeam(role), isFalse, reason: '$role');
-      }
+      expect(loaded.state.status, PartnerAccountStatus.ready);
+      expect(requestLog.where((r) => r.contains('/partner/team')), isEmpty,
+          reason: 'team management lives in features/partner/team since R5');
     });
 
-    test('adding a member posts the email and the wire role', () async {
-      final loaded = await loadedAccount(c12Client());
-      final result = await loaded.state.addMember(
-        partner: loaded.partner,
-        email: '  desk@bayview.example ',
-        role: PartnerTeamRole.frontDesk,
-      );
-      expect(result, PartnerAccountActionResult.success);
-      expect(requestLog, contains('POST /api/partner/team'));
-      expect(writeBodies.first,
-          {'email': 'desk@bayview.example', 'role': 'FRONT_DESK'});
-    });
-
-    test('an unknown role can never be sent', () async {
-      final loaded = await loadedAccount(c12Client());
-      final before = requestLog.length;
-      final result = await loaded.state.addMember(
-        partner: loaded.partner,
-        email: 'x@y.z',
-        role: PartnerTeamRole.unknown,
-      );
-      expect(result, PartnerAccountActionResult.validation);
-      expect(requestLog.length, before);
-    });
-
-    test('a role change sends only the role, never active', () async {
-      final loaded = await loadedAccount(c12Client());
-      await loaded.state.updateMember(
-        partner: loaded.partner,
-        memberId: 1,
-        role: PartnerTeamRole.manager,
-      );
-      expect(requestLog, contains('PATCH /api/partner/team/1'));
-      expect(writeBodies.first, {'role': 'MANAGER'});
-    });
-
-    test('a deactivate sends only active, never a role', () async {
-      final loaded = await loadedAccount(c12Client());
-      await loaded.state.updateMember(
-        partner: loaded.partner,
-        memberId: 1,
-        active: false,
-      );
-      expect(writeBodies.first, {'active': false});
-    });
-
-    test('an update with nothing to change is refused locally', () async {
-      final loaded = await loadedAccount(c12Client());
-      final before = requestLog.length;
-      final result =
-          await loaded.state.updateMember(partner: loaded.partner, memberId: 1);
-      expect(result, PartnerAccountActionResult.validation);
-      expect(requestLog.length, before);
-    });
-
-    test('removal issues a DELETE and re-reads', () async {
-      final loaded = await loadedAccount(c12Client());
-      final result =
-          await loaded.state.removeMember(partner: loaded.partner, memberId: 1);
-      expect(result, PartnerAccountActionResult.success);
-      expect(requestLog, contains('DELETE /api/partner/team/1'));
-    });
-
-    test('a 403 on a team write is surfaced, not pre-empted', () async {
-      final loaded = await loadedAccount(c12Client(teamWriteStatus: 403));
-      final result =
-          await loaded.state.removeMember(partner: loaded.partner, memberId: 1);
-      expect(result, PartnerAccountActionResult.forbidden);
-    });
-
-    test('a 409 on add is a conflict', () async {
-      final loaded = await loadedAccount(c12Client(teamWriteStatus: 409));
-      final result = await loaded.state.addMember(
-        partner: loaded.partner,
-        email: 'x@y.z',
-        role: PartnerTeamRole.viewer,
-      );
-      expect(result, PartnerAccountActionResult.conflict);
-    });
-
-    test('only the five real roles are assignable', () {
-      expect(partnerAssignableRoles, hasLength(5));
-      expect(partnerAssignableRoles.contains(PartnerTeamRole.unknown), isFalse);
-      for (final role in partnerAssignableRoles) {
+    test('only the nine real roles can be sent, never an unknown one', () {
+      expect(PartnerTeamRoles.all, hasLength(9));
+      expect(PartnerTeamRoles.all.contains(PartnerTeamRole.unknown), isFalse);
+      for (final role in PartnerTeamRoles.all) {
         expect(partnerTeamRoleWire(role), isNotNull);
       }
       expect(partnerTeamRoleWire(PartnerTeamRole.unknown), isNull);
       // SUPER_PARTNER does not exist and is never created.
       expect(
-        partnerAssignableRoles
-            .map(partnerTeamRoleWire)
-            .contains('SUPER_PARTNER'),
-        isFalse,
-      );
+          PartnerTeamRoles.all
+              .map(partnerTeamRoleWire)
+              .contains('SUPER_PARTNER'),
+          isFalse);
     });
   });
 
@@ -671,8 +581,8 @@ void main() {
       final loaded = await loadedAccount(c12Client(payoutStatus: 500));
       expect(loaded.state.hasPayoutAccount, isFalse);
       expect(loaded.state.payoutErrorKind, ApiErrorKind.server);
-      // The team still loaded.
-      expect(loaded.state.team, isNotEmpty);
+      // The module still loaded: a payout failure is the payout tab's alone.
+      expect(loaded.state.status, PartnerAccountStatus.ready);
     });
 
     test('a too-short account number never reaches the network', () async {
@@ -772,20 +682,14 @@ void main() {
   });
 
   group('settings UI', () {
-    testWidgets('keeps C6 as the first tab and adds three', (tester) async {
+    testWidgets('keeps C6 as the first tab and adds payout and profile',
+        (tester) async {
       await pumpScreen(tester, const PartnerSettingsScreen());
       expect(find.text(en.partnerSettingsTabWorkspace), findsOneWidget);
-      expect(find.text(en.partnerSettingsTabTeam), findsOneWidget);
       expect(find.text(en.partnerSettingsTabPayout), findsOneWidget);
       expect(find.text(en.partnerSettingsTabProfile), findsOneWidget);
-    });
-
-    testWidgets('the team tab lists members', (tester) async {
-      await pumpScreen(tester, const PartnerSettingsScreen());
-      await tester.tap(find.text(en.partnerSettingsTabTeam));
-      await tester.pumpAndSettle();
-      expect(find.text('partner@planyourtrip.com'), findsWidgets);
-      expect(find.text(en.partnerTeamRoleOwner), findsWidgets);
+      // RBAC R5: the team has its own destination; Settings no longer duplicates it.
+      expect(find.text(en.partnerSettingsTabTeam), findsNothing);
     });
 
     testWidgets('the payout tab shows only the masked number', (tester) async {
@@ -851,14 +755,6 @@ void main() {
       });
     }
 
-    testWidgets('the team tab fits a narrow phone', (tester) async {
-      final errors = captureLayoutErrors(tester);
-      await pumpScreen(tester, const PartnerSettingsScreen(),
-          size: const Size(320, 5200));
-      await tester.tap(find.text(en.partnerSettingsTabTeam));
-      await tester.pumpAndSettle();
-      expect(errors, isEmpty);
-    });
   });
 
   group('localization', () {

@@ -39,19 +39,25 @@ class ApiFailure {
   /// The HTTP status, when there was a response at all.
   final int? status;
 
+  /// RBAC R5 — the sub-reason of [code] the backend sends with some conflicts,
+  /// e.g. `OWN_PROFILE_EXISTS` or `MEMBERSHIP_EXISTS` for `WORKSPACE_CONFLICT`.
+  final String? reason;
+
   const ApiFailure({
     required this.kind,
     this.code,
     this.serverMessage,
     this.fieldErrors = const [],
     this.status,
+    this.reason,
   });
 
   const ApiFailure.of(this.kind)
       : code = null,
         serverMessage = null,
         fieldErrors = const [],
-        status = null;
+        status = null,
+        reason = null;
 
   /// Reads a response body into a failure. [kind] comes from the status, so an
   /// unknown `code` still lands in the right category.
@@ -66,6 +72,7 @@ class ApiFailure {
         serverMessage: _stringOrNull(body?['message']),
         fieldErrors: _fieldErrors(body?['fieldErrors']),
         status: status,
+        reason: _stringOrNull(body?['reason']),
       );
 
   /// The first error reported for [field], or null.

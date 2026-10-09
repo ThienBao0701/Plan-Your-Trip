@@ -3,7 +3,9 @@ import 'package:flutter/widgets.dart';
 import '../app_role.dart';
 import '../app_state.dart';
 import '../network/api_client.dart';
+import 'partner_access_models.dart';
 import 'partner_models.dart';
+import 'partner_team_models.dart';
 
 /// Where the partner workspace stands right now. Exactly one of these is true
 /// at any moment, and the UI renders one view per value — no screen has to
@@ -46,15 +48,11 @@ enum PartnerWorkspaceStatus {
   /// An admin suspended the profile.
   suspended,
 
-  /// The caller belongs to a partner team but does not own the profile.
-  ///
-  /// This is a real backend limitation, not a client bug:
-  /// `PartnerExtranetService` resolves access owner-only
-  /// (`partnerProfileRepo.findByUserId`), while only `PartnerSettingsService`
-  /// is team-aware. A MANAGER/FRONT_DESK/FINANCE/VIEWER therefore gets 404 from
-  /// the extranet endpoints. We surface that honestly instead of telling them
-  /// to create a profile they must not create.
-  teamMemberUnsupported,
+  /// RBAC R5 — the caller is a team member whose membership is suspended: the
+  /// access document lists no permissions until an owner or manager reactivates
+  /// it. (Since R3b the backend serves team members, so the former
+  /// "team access not supported" state is retired, RBAC V1.1 §23 F10.)
+  membershipSuspended,
 
   /// The session is not (or no longer) authenticated — HTTP 401.
   unauthorized,
@@ -90,6 +88,7 @@ class PartnerState extends ChangeNotifier {
   List<PartnerProperty> _properties = const [];
   int? _selectedPropertyId;
   PartnerTeamRole _teamRole = PartnerTeamRole.unknown;
+  PartnerAccess? _access;
   String? _errorMessage;
   bool _propertiesUnavailable = false;
 
@@ -130,6 +129,30 @@ class PartnerState extends ChangeNotifier {
   /// [PartnerTeamRole.unknown], which every permission helper treats as the
   /// least-privileged case.
   PartnerTeamRole get teamRole => _teamRole;
+
+  /// RBAC R5 — the caller's effective access (`GET /api/partner/me/access`),
+  /// in memory only (§23 F2). Null when it could not be loaded, in which case
+  /// every capability derived from it is absent — fail closed, never "owner"
+  /// (F7).
+  PartnerAccess? get access => _access;
+
+  /// Whether the caller holds [permissionKey] at any scope (§23 F4/F5). UX
+  /// shaping only — the backend decides every request.
+  bool holdsAnywhere(String permissionKey) =>
+      _access?.holdsAnywhere(permissionKey) ?? false;
+
+  /// Reloads the access document — after a team change, a 403
+  /// `PERMISSION_DENIED`, or an explicit refresh (§23 F8). A failure keeps the
+  /// previous document rather than inventing access.
+  Future<void> refreshAccess() async {
+    final result = await api.getPartnerAccess();
+    if (!result.success) return;
+    _access = result.data;
+    if (_access != null && !_access!.primaryOwner) {
+      _teamRole = _access!.highestRole;
+    }
+    notifyListeners();
+  }
 
   /// Server-supplied message for the current failure, when one was safe to
   /// surface. Null otherwise.
@@ -233,6 +256,18 @@ class PartnerState extends ChangeNotifier {
     // the profile's own user), so this needs no extra request.
     _teamRole = PartnerTeamRole.owner;
 
+    // RBAC R5 — the access document shapes team affordances. Best-effort for
+    // the registrant, who holds every permission server-side anyway: if it
+    // cannot be read, those affordances stay hidden (fail closed, §23 F7).
+    final accessResult = await api.getPartnerAccess();
+    _access = accessResult.success ? accessResult.data : null;
+
+    await _loadOperationalData();
+  }
+
+  /// The overview (required) and the property list (best-effort), shared by the
+  /// registrant and by an active team member.
+  Future<void> _loadOperationalData() async {
     final overviewResult = await api.getPartnerWorkspaceOverview();
     if (!overviewResult.success) {
       _finishFailure(overviewResult.errorKind, overviewResult.message);
@@ -254,29 +289,44 @@ class PartnerState extends ChangeNotifier {
     _finish(PartnerWorkspaceStatus.ready);
   }
 
-  /// A 404 from `GET /api/partner/profile` is ambiguous: the caller either has
-  /// no partner relationship at all, or is a team member of someone else's org.
-  /// `GET /api/partner/team` is team-aware and tells them apart.
+  /// A 404 from `GET /api/partner/profile` means the caller registered no
+  /// company. RBAC R5: the access document (§25.2) says whether they are a team
+  /// member, of which workspace, in which state, and with which permissions —
+  /// a 404 there is a genuine newcomer.
   Future<void> _resolveWithoutOwnedProfile() async {
-    final teamResult = await api.getPartnerTeamMembers();
-    if (!teamResult.success) {
-      // 404 here means no membership either: a genuine newcomer.
-      if (teamResult.errorKind == ApiErrorKind.notFound) {
+    final accessResult = await api.getPartnerAccess();
+    if (!accessResult.success) {
+      if (accessResult.errorKind == ApiErrorKind.notFound) {
         _finish(PartnerWorkspaceStatus.onboardingRequired);
         return;
       }
-      _finishFailure(teamResult.errorKind, teamResult.message);
+      _finishFailure(accessResult.errorKind, accessResult.message);
       return;
     }
+    final access = accessResult.data!;
+    _access = access;
+    _teamRole = access.highestRole;
 
-    final members = teamResult.data ?? const <PartnerTeamMember>[];
-    if (members.isEmpty) {
-      _finish(PartnerWorkspaceStatus.onboardingRequired);
+    switch (access.verificationStatus) {
+      case PartnerVerificationStatus.approved:
+        break;
+      case PartnerVerificationStatus.suspended:
+        _finish(PartnerWorkspaceStatus.suspended);
+        return;
+      default:
+        // Not a company this member can work in yet; never treated as approved.
+        _finish(PartnerWorkspaceStatus.forbidden);
+        return;
+    }
+    if (access.membershipStatus == PartnerMembershipStatus.suspended) {
+      _finish(PartnerWorkspaceStatus.membershipSuspended);
       return;
     }
-    // The team list does not mark which row is the caller, so the team role
-    // cannot be narrowed here. It stays `unknown`, i.e. least-privileged.
-    _finish(PartnerWorkspaceStatus.teamMemberUnsupported);
+    if (access.membershipStatus != PartnerMembershipStatus.active) {
+      _finish(PartnerWorkspaceStatus.forbidden);
+      return;
+    }
+    await _loadOperationalData();
   }
 
   /// Selects the property whose data later modules will operate on. Ignores ids
@@ -333,6 +383,7 @@ class PartnerState extends ChangeNotifier {
     _properties = const [];
     _selectedPropertyId = null;
     _teamRole = PartnerTeamRole.unknown;
+    _access = null;
     _errorMessage = null;
     _propertiesUnavailable = false;
     notifyListeners();

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../core/network/api_client.dart';
-import '../../core/partner/partner_models.dart';
 import '../../core/partner/partner_state.dart';
 import '../../design/app_breakpoints.dart';
 import '../../design/app_colors.dart';
@@ -12,6 +11,7 @@ import 'dashboard/partner_dashboard_state.dart';
 import 'dashboard/widgets/partner_dashboard_sections.dart';
 import 'dashboard/widgets/partner_trend_chart.dart';
 import 'widgets/partner_state_views.dart';
+import 'team/partner_team_labels.dart';
 
 /// The Partner Dashboard — a desktop-first operations console rendered entirely
 /// from live `/api/partner/**` responses.
@@ -271,7 +271,7 @@ class _WorkspaceHeader extends StatelessWidget {
               _HeaderFact(
                 icon: Icons.badge_outlined,
                 text: l10n.partnerDashboardTeamRole(
-                    _teamRoleLabel(l10n, partner.teamRole)),
+                    partnerTeamRoleLabel(l10n, partner.teamRole)),
               ),
               if (selected != null)
                 _HeaderFact(
@@ -299,16 +299,6 @@ class _WorkspaceHeader extends StatelessWidget {
       ),
     );
   }
-
-  static String _teamRoleLabel(AppLocalizations l10n, PartnerTeamRole role) =>
-      switch (role) {
-        PartnerTeamRole.owner => l10n.partnerTeamRoleOwner,
-        PartnerTeamRole.manager => l10n.partnerTeamRoleManager,
-        PartnerTeamRole.frontDesk => l10n.partnerTeamRoleFrontDesk,
-        PartnerTeamRole.finance => l10n.partnerTeamRoleFinance,
-        PartnerTeamRole.viewer => l10n.partnerTeamRoleViewer,
-        PartnerTeamRole.unknown => l10n.partnerTeamRoleUnknown,
-      };
 }
 
 class _HeaderFact extends StatelessWidget {

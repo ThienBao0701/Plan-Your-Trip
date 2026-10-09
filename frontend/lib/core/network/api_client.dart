@@ -8,6 +8,7 @@ import '../auth/auth_models.dart';
 import 'api_failure.dart';
 import '../mock/app_models.dart';
 import '../mock/mock_data.dart';
+import '../partner/partner_access_models.dart';
 import '../partner/partner_account_models.dart';
 import '../partner/partner_analytics_models.dart';
 import '../partner/partner_booking_models.dart';
@@ -21,6 +22,7 @@ import '../partner/partner_property_form_models.dart';
 import '../partner/partner_property_models.dart';
 import '../partner/partner_rate_models.dart';
 import '../partner/partner_room_models.dart';
+import '../partner/partner_team_models.dart';
 
 /// Machine-readable outcome classification for the typed Saved Collections
 /// endpoints — deliberately distinct from the legacy `Map<String, dynamic>`
@@ -6034,105 +6036,250 @@ class ApiClient {
     }
   }
 
-  /// `POST /api/partner/team` — invite a member by email with a role.
-  /// **OWNER only** (`requireOwner`).
-  Future<CollectionApiResult<PartnerTeamMember>> addPartnerTeamMember({
-    required String email,
-    required PartnerTeamRole role,
-  }) =>
-      _partnerTeamWrite(
-        () => _client.post(
-          _partnerUri('/partner/team'),
-          headers: _jsonHeaders,
-          body: jsonEncode({
-            'email': email.trim(),
-            'role': partnerTeamRoleWire(role),
-          }),
-        ),
-        role,
-      );
+  // ── Partner team and invitations (RBAC R4 backend, R5 client) ──────────
+  //
+  // Every rule here is the server's: these calls only carry what the operator
+  // chose. Writes answer an [ApiWriteResult] whose [ApiFailure] keeps the
+  // backend's stable `code` (`OWNER_PROTECTED`, `ROLE_NOT_DELEGABLE`,
+  // `CONCURRENT_MODIFICATION`, `INVITATION_RATE_LIMITED`, …), its `reason` and
+  // its `fieldErrors`, so a screen branches on codes, never on prose. A timeout
+  // on a write is [ApiErrorKind.uncertain]: it may have committed.
+  //
+  // Invitation tokens: the management calls never see one (the backend never
+  // returns it). The only calls that carry one are [acceptPartnerInvitation] and
+  // [declinePartnerInvitation], in the request body — never in a URL — and
+  // nothing here logs a request body.
 
-  /// `PATCH /api/partner/team/{id}` — change a member's role, or activate and
-  /// deactivate them. **OWNER only.**
-  ///
-  /// Only the fields passed are sent, so a role change never silently toggles
-  /// `active` and vice versa.
-  Future<CollectionApiResult<PartnerTeamMember>> updatePartnerTeamMember({
-    required int memberId,
-    PartnerTeamRole? role,
-    bool? active,
-  }) =>
-      _partnerTeamWrite(
-        () => _client.patch(
-          _partnerUri('/partner/team/$memberId'),
-          headers: _jsonHeaders,
-          body: jsonEncode({
-            if (role != null) 'role': partnerTeamRoleWire(role),
-            if (active != null) 'active': active,
-          }),
-        ),
-        role,
-      );
-
-  /// `DELETE /api/partner/team/{id}` — remove a member. **OWNER only**, and
-  /// irreversible: there is no undo endpoint.
-  Future<CollectionApiVoidResult> removePartnerTeamMember(int memberId) async {
-    try {
-      final res = await _client
-          .delete(_partnerUri('/partner/team/$memberId'), headers: _jsonHeaders)
-          .timeout(_collectionsTimeout);
-      if (res.statusCode == 200 || res.statusCode == 204) {
-        return const CollectionApiVoidResult.success();
-      }
-      return CollectionApiVoidResult.failure(
-        _errorKindForStatus(res.statusCode),
-        _safeServerMessage(_decodeJsonMap(res).data),
-      );
-    } on TimeoutException {
-      // The removal may have committed, and it cannot be undone.
-      return const CollectionApiVoidResult.failure(ApiErrorKind.uncertain);
-    } on http.ClientException {
-      return const CollectionApiVoidResult.failure(ApiErrorKind.network);
-    } on FormatException {
-      return const CollectionApiVoidResult.failure(ApiErrorKind.malformed);
-    } catch (_) {
-      return const CollectionApiVoidResult.failure(ApiErrorKind.network);
+  /// `GET /api/partner/me/access` — the caller's workspace, membership, grants,
+  /// effective permissions and parent context (§25.2). Never cached.
+  Future<CollectionApiResult<PartnerAccess>> getPartnerAccess() async {
+    final result = await _partnerGetObject<PartnerAccess?>(
+      _partnerUri('/partner/me/access'),
+      PartnerAccess.fromJson,
+    );
+    if (!result.success) {
+      return CollectionApiResult.failure(result.errorKind, result.message);
     }
+    final access = result.data;
+    return access == null
+        ? const CollectionApiResult.failure(ApiErrorKind.malformed)
+        : CollectionApiResult.success(access);
   }
 
-  Future<CollectionApiResult<PartnerTeamMember>> _partnerTeamWrite(
-    Future<http.Response> Function() send,
-    PartnerTeamRole? role,
-  ) async {
-    if (role != null && partnerTeamRoleWire(role) == null) {
-      // An unrecognised role has no wire value and must never be sent.
-      return const CollectionApiResult.failure(ApiErrorKind.validation);
+  /// `GET /api/partner/team/invitations` — the invitations the caller's team
+  /// view covers (§25.3).
+  Future<CollectionApiResult<List<PartnerTeamInvitation>>>
+      getPartnerTeamInvitations() => _partnerGetList(
+          _partnerUri('/partner/team/invitations'),
+          PartnerTeamInvitation.fromJson);
+
+  /// `POST /api/partner/team/invitations` — 202 with one uniform body whatever
+  /// the address is: it confirms the request was recorded, not that an email
+  /// was delivered, and says nothing about the address's account.
+  Future<ApiWriteResult<void>> createPartnerTeamInvitation({
+    required String email,
+    required List<PartnerTeamGrant> grants,
+  }) {
+    final items = grants.map((g) => g.toJson()).toList();
+    if (items.isEmpty || items.contains(null)) {
+      return Future.value(ApiWriteResult.of(ApiErrorKind.validation));
     }
+    return _partnerTeamCall<void>(
+      () => _client.post(
+        _partnerUri('/partner/team/invitations'),
+        headers: _jsonHeaders,
+        body:
+            jsonEncode({'email': email.trim().toLowerCase(), 'grants': items}),
+      ),
+      expected: const {202},
+      parse: (_) => true,
+    );
+  }
+
+  /// `POST /api/partner/team/invitations/{id}/resend` — rotates the link's
+  /// token server-side; the previous link stops working. 202, uniform body.
+  Future<ApiWriteResult<void>> resendPartnerTeamInvitation(int invitationId) =>
+      _partnerTeamCall<void>(
+        () => _client.post(
+          _partnerUri('/partner/team/invitations/$invitationId/resend'),
+          headers: _jsonHeaders,
+        ),
+        expected: const {202},
+        parse: (_) => true,
+      );
+
+  /// `DELETE /api/partner/team/invitations/{id}` — revokes a pending invitation.
+  Future<ApiWriteResult<void>> revokePartnerTeamInvitation(int invitationId,
+          {String? reason}) =>
+      _partnerTeamCall<void>(
+        () => _client.delete(
+          _partnerUri('/partner/team/invitations/$invitationId'),
+          headers: _jsonHeaders,
+          body: _reasonBody(reason),
+        ),
+        expected: const {204, 200},
+        parse: (_) => true,
+      );
+
+  /// `PUT /api/partner/team/{id}/grants` — replaces every grant of a member.
+  /// [version] is the one the list returned: a stale one is 409
+  /// `CONCURRENT_MODIFICATION`, never silently overwritten.
+  Future<ApiWriteResult<PartnerTeamMember>> replacePartnerTeamGrants({
+    required int memberId,
+    required List<PartnerTeamGrant> grants,
+    required int version,
+    String? reason,
+  }) {
+    final items = grants.map((g) => g.toJson()).toList();
+    if (items.isEmpty || items.contains(null)) {
+      return Future.value(ApiWriteResult.of(ApiErrorKind.validation));
+    }
+    final trimmed = reason?.trim();
+    return _partnerTeamCall<PartnerTeamMember>(
+      () => _client.put(
+        _partnerUri('/partner/team/$memberId/grants'),
+        headers: _jsonHeaders,
+        body: jsonEncode({
+          'grants': items,
+          'version': version,
+          if (trimmed != null && trimmed.isNotEmpty) 'reason': trimmed,
+        }),
+      ),
+      expected: const {200},
+      parse: PartnerTeamMember.fromJson,
+    );
+  }
+
+  /// `POST /api/partner/team/{id}/suspend` — access ends on the next request;
+  /// grants are kept.
+  Future<ApiWriteResult<PartnerTeamMember>> suspendPartnerTeamMember(
+          int memberId,
+          {String? reason}) =>
+      _partnerTeamCall<PartnerTeamMember>(
+        () => _client.post(
+          _partnerUri('/partner/team/$memberId/suspend'),
+          headers: _jsonHeaders,
+          body: _reasonBody(reason),
+        ),
+        expected: const {200},
+        parse: PartnerTeamMember.fromJson,
+      );
+
+  /// `POST /api/partner/team/{id}/reactivate` — the same grants, re-checked.
+  Future<ApiWriteResult<PartnerTeamMember>> reactivatePartnerTeamMember(
+          int memberId) =>
+      _partnerTeamCall<PartnerTeamMember>(
+        () => _client.post(
+          _partnerUri('/partner/team/$memberId/reactivate'),
+          headers: _jsonHeaders,
+        ),
+        expected: const {200},
+        parse: PartnerTeamMember.fromJson,
+      );
+
+  /// `DELETE /api/partner/team/{id}` — a soft revoke: the membership becomes
+  /// history and can never be made active again; the person may be re-invited.
+  Future<ApiWriteResult<void>> removePartnerTeamMember(int memberId,
+          {String? reason}) =>
+      _partnerTeamCall<void>(
+        () => _client.delete(
+          _partnerUri('/partner/team/$memberId'),
+          headers: _jsonHeaders,
+          body: _reasonBody(reason),
+        ),
+        expected: const {204, 200},
+        parse: (_) => true,
+      );
+
+  /// `POST /api/partner/team/leave` — the caller leaves the workspace they
+  /// belong to. Refused for the primary owner and the last owner.
+  Future<ApiWriteResult<void>> leavePartnerTeam() => _partnerTeamCall<void>(
+        () => _client.post(_partnerUri('/partner/team/leave'),
+            headers: _jsonHeaders),
+        expected: const {204, 200},
+        parse: (_) => true,
+      );
+
+  /// `GET /api/me/partner-invitations` — pending invitations addressed to the
+  /// caller's own address (verified Partner accounts only). No token in it.
+  Future<CollectionApiResult<List<PartnerMyInvitation>>>
+      getMyPartnerInvitations() => _partnerGetList(
+          _partnerUri('/me/partner-invitations'), PartnerMyInvitation.fromJson);
+
+  /// `POST /api/me/partner-invitations/accept` — consumes the one-time token
+  /// from the emailed link and answers with the caller's new access document.
+  Future<ApiWriteResult<PartnerAccess>> acceptPartnerInvitation(String token) =>
+      _partnerTeamCall<PartnerAccess>(
+        () => _client.post(
+          _partnerUri('/me/partner-invitations/accept'),
+          headers: _jsonHeaders,
+          body: jsonEncode({'token': token.trim()}),
+        ),
+        expected: const {200},
+        parse: PartnerAccess.fromJson,
+      );
+
+  /// `POST /api/me/partner-invitations/decline` — anyone holding the link may
+  /// refuse it.
+  Future<ApiWriteResult<void>> declinePartnerInvitation(String token) =>
+      _partnerTeamCall<void>(
+        () => _client.post(
+          _partnerUri('/me/partner-invitations/decline'),
+          headers: _jsonHeaders,
+          body: jsonEncode({'token': token.trim()}),
+        ),
+        expected: const {204, 200},
+        parse: (_) => true,
+      );
+
+  /// `POST /api/me/step-up` — re-enters the password for owner-level actions
+  /// and returns a freshly issued token (§25.6). The previous token stays valid.
+  Future<AuthResult<AuthSessionRecord>> stepUp(String currentPassword) =>
+      _accountCall(
+        () => _client.post(
+          Uri.parse('$baseUrl/me/step-up'),
+          headers: _jsonHeaders,
+          body: jsonEncode({'currentPassword': currentPassword}),
+        ),
+        expected: const {200},
+        parse: AuthSessionRecord.fromJson,
+      );
+
+  String? _reasonBody(String? reason) {
+    final trimmed = reason?.trim();
+    return trimmed == null || trimmed.isEmpty
+        ? null
+        : jsonEncode({'reason': trimmed});
+  }
+
+  /// One request/decode path for every team and invitation write.
+  Future<ApiWriteResult<T>> _partnerTeamCall<T>(
+    Future<http.Response> Function() send, {
+    required Set<int> expected,
+    required Object? Function(Map<String, dynamic> body) parse,
+  }) async {
     try {
       final res = await send().timeout(_collectionsTimeout);
-      if (res.statusCode == 200 || res.statusCode == 201) {
-        final body = _decodeJsonMap(res).data;
-        if (body == null) {
-          return const CollectionApiResult.failure(ApiErrorKind.malformed);
-        }
-        final member = PartnerTeamMember.fromJson(body);
-        if (member == null) {
-          return const CollectionApiResult.failure(ApiErrorKind.malformed);
-        }
-        return CollectionApiResult.success(member);
+      final decoded = res.bodyBytes.isEmpty ? null : _decodeJsonMap(res).data;
+      if (expected.contains(res.statusCode)) {
+        final parsed = parse(decoded ?? const <String, dynamic>{});
+        if (parsed == null) return ApiWriteResult.of(ApiErrorKind.malformed);
+        // `void` results parse to `true`; typed ones to their record.
+        return ApiWriteResult<T>.success(parsed is T ? parsed as T : null);
       }
-      return CollectionApiResult.failure(
+      return ApiWriteResult.failed(ApiFailure.fromResponse(
+        res.statusCode,
+        decoded,
         _errorKindForStatus(res.statusCode),
-        _safeServerMessage(_decodeJsonMap(res).data),
-      );
+      ));
     } on TimeoutException {
-      return const CollectionApiResult.failure(ApiErrorKind.uncertain);
+      return ApiWriteResult.of(ApiErrorKind.uncertain);
     } on http.ClientException {
-      return const CollectionApiResult.failure(ApiErrorKind.network);
+      return ApiWriteResult.of(ApiErrorKind.network);
     } on FormatException {
-      return const CollectionApiResult.failure(ApiErrorKind.malformed);
+      return ApiWriteResult.of(ApiErrorKind.malformed);
     } catch (_) {
-      return const CollectionApiResult.failure(ApiErrorKind.network);
+      return ApiWriteResult.of(ApiErrorKind.network);
     }
   }
 
