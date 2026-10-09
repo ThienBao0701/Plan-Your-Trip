@@ -38,6 +38,13 @@ alter table users add terms_accepted_at datetimeoffset(6);
 
 alter table users add terms_version nvarchar(32);
 
+-- Batches (DB-07): Flyway's SQL Server parser splits a script only at GO lines, and SQL Server binds
+-- column names when it compiles a batch, so the backfill below must run in a later batch than the
+-- ALTERs that add its column (otherwise Msg 207). This separator is the only change made to V3, under
+-- an approved exception: no evidence shows the original V3 applied on any SQL Server, and the fixed V1-V8
+-- chain was verified on a disposable SQL Server 2022 database only (RBAC_MEMBERSHIP_FOUNDATION.md §7).
+go
+
 update users
    set email_verified_at = coalesce(created_at, sysdatetimeoffset())
  where email_verified_at is null;

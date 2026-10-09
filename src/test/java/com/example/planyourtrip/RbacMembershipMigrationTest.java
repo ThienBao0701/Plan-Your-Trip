@@ -51,11 +51,16 @@ class RbacMembershipMigrationTest {
     private static final String V7 = "/db/migration/V7__partner_membership_remediation.sql";
     private static final String V8 = "/db/migration/V8__partner_invitations.sql";
 
-    /** SHA-256 of V1–V3 with line endings normalised — applied migrations are never edited. */
+    /**
+     * SHA-256 of V1–V3 with line endings normalised — applied migrations are never edited. V3's value
+     * changed in DB-07 under an approved exception: the only SQL edit is a GO batch separator (plus its
+     * comment) so SQL Server can run it; no evidence shows the original V3 applied on any SQL Server, and the
+     * fixed chain was verified on a disposable SQL Server 2022 database only (RBAC_MEMBERSHIP_FOUNDATION.md §7).
+     */
     private static final Map<String, String> APPLIED = Map.of(
         "/db/migration/V1__initial_schema.sql", "0b57f807bd94dc4a1b6552fcb8517c56802e8ad3cf25ec42c449df6be81e5994",
         "/db/migration/V2__admin_activity_log.sql", "c3c408985bb2695554edd1f8b318ee3496b94056734448a6c7061d65301a3740",
-        "/db/migration/V3__account_lifecycle.sql", "b3a901e9df3bfe47b3b400948c297d18d0b22c9bf97975a361b6278dbdea6d18");
+        "/db/migration/V3__account_lifecycle.sql", "434028782c36c9891888bc9d7e7d4e829d5e163c99b91e06abf128c8626181aa");
 
     // ── Chain ────────────────────────────────────────────────────────────────
 

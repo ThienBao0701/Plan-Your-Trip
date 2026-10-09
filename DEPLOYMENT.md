@@ -73,8 +73,10 @@ read-only M-0 audit `db/audit/R2_M0_partner_membership_audit.sql` first; see `RB
 `RBAC_OWNER_TEAM_SECURITY.md`), `V8__partner_invitations` (RBAC R4 — M-3 invitation tables and the live-membership
 key that lets a removed member re-join through a new membership; see `RBAC_TEAM_ADMINISTRATION.md`). R4 invitations
 answer 503 in production until a real email provider replaces `UnconfiguredEmailSender`.
-Known blocker: V3 as committed fails on SQL Server (one batch adds and updates a column —
-`RBAC_MEMBERSHIP_FOUNDATION.md` §7).
+V3 SQL Server blocker: resolved in DB-07 (2026-10-09). V3 added a column and updated it in one batch (Msg 207);
+a single `GO` now separates them, under an approved exception (`RBAC_MEMBERSHIP_FOUNDATION.md` §7). The full
+V1–V8 chain was verified on a disposable SQL Server 2022 container only (details in §20); the Docker Compose
+stack, staging and production were not verified by DB-07.
 
 ## 9. Bootstrap behavior
 `ProductionBootstrap` (`@Profile("prod")`) idempotently seeds the default referral campaign and loyalty
@@ -166,8 +168,21 @@ JWT_SECRET='<32+>' VOUCHER_SIGNING_SECRET='<32+>' \
 ./mvnw -Dtest=SqlServerProdChainVerificationTest test
 ```
 (Requires temporarily publishing `db`'s 1433 to the host, or running the test from inside the network.)
-This proves Flyway apply + Hibernate `validate` + ProductionBootstrap against a real SQL Server. **Status:
-NOT RUN in this environment (no Docker).**
+This proves Flyway apply + Hibernate `validate` + ProductionBootstrap against a real SQL Server. The prod
+profile refuses to start on the committed development `JWT_SECRET` placeholder, so `JWT_SECRET` must be set.
+
+**Status: PASSED (DB-07, 2026-10-09)** on a disposable container, not the Compose `db`: Microsoft SQL Server
+2022 (RTM-CU26) 16.0.4265.3 Developer Edition on Linux, image `mcr.microsoft.com/mssql/server:2022-latest`, port
+published on `127.0.0.1` only, a fresh `PYT_DB05_VERIFY` database, a throwaway SA password and `JWT_SECRET`
+supplied through the environment only.
+- Run A (empty database): `SqlServerProdChainVerificationTest` 3/3 — Flyway "Successfully applied 8 migrations
+  … now at version v8", Hibernate `validate` and ProductionBootstrap passed, the R2–R4 constraint checks
+  (`rbacR2MembershipMigrationsAppliedWithTheirConstraints`, `rbacR4InvitationMigrationAppliedWithItsConstraints`)
+  passed; `flyway_schema_history` holds V1–V8, all `success = 1`.
+- Run B (same database again): 3/3 — "Successfully validated 8 migrations", "Schema [dbo] is up to date".
+- Before the fix, on another throwaway database of the same server: V1 and V2 applied, the original V3 failed with
+  `Msg 207 Invalid column name 'email_verified_at'` and left no column and no `auth_tokens` table.
+The container was removed afterwards. The Compose stack itself (`docker compose up`) was not exercised by DB-07.
 
 ## 21. Security checklist
 - [ ] `.env` is git-ignored and never committed; no real secrets in the repo.
@@ -188,6 +203,5 @@ R4 (partner team administration and invitations, `RBAC_TEAM_ADMINISTRATION.md`) 
 - [ ] **Email provider configured.** Production uses `UnconfiguredEmailSender`, so invitation create and resend answer
   `503 EMAIL_DELIVERY_UNAVAILABLE` (nothing is created) until a real `EmailSender` implementation and its credentials
   are deployed. No provider or credential is configured by the R4 code.
-- [ ] **V8 verified on SQL Server.** Run §20 against a **disposable** SQL Server database and confirm
-  `SqlServerProdChainVerificationTest` passes, including `rbacR4InvitationMigrationAppliedWithItsConstraints`. Until
-  then V8 is verified only statically (Flyway SQL Server parser) and on H2. Status: **NOT RUN**.
+- [x] **V8 verified on SQL Server.** §20 passed on a disposable SQL Server 2022 database (DB-07, 2026-10-09),
+  including `rbacR4InvitationMigrationAppliedWithItsConstraints`.

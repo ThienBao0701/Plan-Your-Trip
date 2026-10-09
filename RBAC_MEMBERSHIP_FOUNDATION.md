@@ -170,7 +170,7 @@ sqlcmd -S <server> -d <database> -I -i db/audit/R2_M0_partner_membership_audit.s
 | Behaviour, scopes, containment, invariants, compatibility | `RbacMembershipFoundationTest` (HTTP + services, H2) | in the suite |
 | Constraints enforced by the entity-built schema; M-0 audit portable | `RbacMembershipSchemaTest` (H2) | in the suite |
 | Migration texts, batches as Flyway splits them, entity = migration, additivity, V1–V3 unchanged | `RbacMembershipMigrationTest` (static, Flyway's SQL Server parser) | in the suite |
-| V4–V6 on SQL Server through Flyway + Hibernate `validate` | `SqlServerProdChainVerificationTest` (`DB05_SQLSERVER_VERIFY=true`), extended for V4–V6 | **not run** — needs a TCP-reachable SQL Server |
+| V1–V8 on SQL Server through Flyway + Hibernate `validate` | `SqlServerProdChainVerificationTest` (`DB05_SQLSERVER_VERIFY=true`), extended for V4–V8 | **passed** in DB-07 on SQL Server 2022 (`DEPLOYMENT.md` §20) |
 
 During R2 the migrations were also executed, outside the suite, on a disposable SQL Server 2019 LocalDB
 database: V1, V2, V3 (see §7), seeded legacy rows, the M-0 audit, then V4, V5 and V6 byte-for-byte, each in
@@ -184,12 +184,20 @@ LocalDB accepts only named-pipe connections and the JDBC driver needs TCP.
 
 ## 7. Known findings
 
-- **V3 does not run on SQL Server as committed.** Without `GO`, Flyway sends V3 as one batch; it adds
-  `users.email_verified_at` and updates it in the same batch, and SQL Server refuses the batch at compile time
-  (`Msg 207 Invalid column name 'email_verified_at'`, reproduced on SQL Server 2019 LocalDB). Because SQL
-  Server DDL is transactional, V3 cannot have been applied anywhere, so splitting it into batches would not
-  invalidate any recorded checksum — but V1–V3 are frozen, so the fix needs its own approved change. Until
-  then no production deployment can reach V4–V6.
+- **V3 did not run on SQL Server as committed — resolved in DB-07 (2026-10-09).** Without `GO`, Flyway sent V3
+  as one batch; it added `users.email_verified_at` and updated it in the same batch, and SQL Server refused the
+  batch at compile time (`Msg 207 Invalid column name 'email_verified_at'`). R2 documented this failure on SQL
+  Server 2019 LocalDB; DB-07 reproduced it with `sqlcmd` on a disposable SQL Server 2022 database, where the
+  failed batch left no `email_verified_at` column and no `auth_tokens` table.
+  The fix is one `go` line before the backfill; nothing else in V3 changed, and `RbacMembershipMigrationTest`
+  pins the new SHA-256.
+  Editing a frozen migration was allowed as an approved exception because no evidence shows the original V3
+  applied on any SQL Server: it fails before any of its statements runs, as the `sqlcmd` reproduction shows. No
+  Flyway run of the original V3 was observed, so the absence of a V3 `flyway_schema_history` row after such a run
+  is inferred from Flyway executing the migration in a transaction on SQL Server, not directly verified; the local
+  Docker Compose stacks on the development machine were built before V3 existed and their Flyway logs show schema
+  version 1 only; dev and test run H2 with Flyway disabled; and the owner confirmed no external SQL Server
+  environment. The full V1–V8 chain now passes `SqlServerProdChainVerificationTest` (`DEPLOYMENT.md` §20).
 - Design nit: §11.6 WS-1 reads "own profile or non-revoked memberships, never both", which the registrant's
   own OWNER row would violate; R2 reads it as memberships of *other* companies.
 
