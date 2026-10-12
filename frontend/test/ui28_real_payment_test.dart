@@ -251,51 +251,14 @@ void main() {
           PaymentActionOutcome.demoUnavailable);
       expect(await app.createRealPayment(55),
           PaymentActionOutcome.demoUnavailable);
-      expect(await app.settleRealPaymentSandbox(success: true),
-          PaymentActionOutcome.demoUnavailable);
       expect(calls, 0);
       expect(app.realPayment, isNull);
     });
   });
 
-  // ── Settlement flow ──────────────────────────────────────────────────────────
+  // ── Payment status flow ──────────────────────────────────────────────────────
 
-  group('Settlement', () {
-    test('mock-success settles PAID and confirms the booking side effects',
-        () async {
-      final app = routedApp(
-        onList: (_) async => jsonResponse([paymentJson()], 200),
-        onSuccess: (_) async => jsonResponse(paymentJson(status: 'PAID'), 200),
-      );
-      await app.loadPaymentForBooking(55);
-      // Pretend the history + detail were already cached.
-      app.realBookingsLoaded = true;
-      app.bookingDetailCache[55] = pendingBooking();
-
-      final outcome = await app.settleRealPaymentSandbox(success: true);
-      expect(outcome, PaymentActionOutcome.success);
-      expect(app.realPayment!.statusView, PaymentStatusView.paid);
-      // A PAID payment confirms the booking → caches invalidated for a re-fetch.
-      expect(app.realBookingsLoaded, isFalse);
-      expect(app.bookingDetailCache.containsKey(55), isFalse);
-    });
-
-    test('mock-fail settles FAILED and does NOT invalidate booking caches',
-        () async {
-      final app = routedApp(
-        onList: (_) async => jsonResponse([paymentJson()], 200),
-        onFail: (_) async => jsonResponse(
-            paymentJson(status: 'FAILED', failureReason: 'declined'), 200),
-      );
-      await app.loadPaymentForBooking(55);
-      app.realBookingsLoaded = true;
-      final outcome = await app.settleRealPaymentSandbox(success: false);
-      expect(outcome, PaymentActionOutcome.success);
-      expect(app.realPayment!.statusView, PaymentStatusView.failed);
-      expect(app.realPayment!.failureReason, 'declined');
-      expect(app.realBookingsLoaded, isTrue);
-    });
-
+  group('Payment status', () {
     test('refreshRealPayment re-fetches the current payment', () async {
       var gets = 0;
       final app = routedApp(
@@ -367,15 +330,18 @@ void main() {
           await app.createRealPayment(55), PaymentActionOutcome.unprocessable);
     });
 
-    test('settle 409 → conflict', () async {
+    test('provider unavailable is a dedicated payment outcome', () async {
       final app = routedApp(
-        onList: (_) async => jsonResponse([paymentJson()], 200),
-        onSuccess: (_) async => jsonResponse(
-            errorBody(409, 'conflict', '/api/payments/88/mock-success'), 409),
+        onCreate: (_) async => jsonResponse({
+          'status': 503,
+          'error': 'Service Unavailable',
+          'message': 'No live payment provider is currently configured',
+          'path': '/api/payments',
+          'code': 'PAYMENT_PROVIDER_UNAVAILABLE',
+        }, 503),
       );
-      await app.loadPaymentForBooking(55);
-      expect(await app.settleRealPaymentSandbox(success: true),
-          PaymentActionOutcome.conflict);
+      expect(await app.createRealPayment(55), PaymentActionOutcome.unavailable);
+      expect(app.realPayment, isNull);
     });
 
     test('create 500 → serverError', () async {
@@ -432,20 +398,27 @@ void main() {
         ),
         const Size(1200, 2200),
       );
-      expect(find.byKey(const Key('payment-sandbox-notice')), findsOneWidget);
       expect(find.byKey(const Key('payment-none')), findsOneWidget);
 
       await t.tap(find.byKey(const Key('payment-create')));
       await t.pumpAndSettle();
       expect(find.byKey(const Key('payment-status-card')), findsOneWidget);
-      expect(find.byKey(const Key('payment-complete')), findsOneWidget);
+      expect(find.byKey(const Key('payment-complete')), findsNothing);
+      expect(find.byKey(const Key('payment-fail')), findsNothing);
+      expect(find.byKey(const Key('payment-refresh')), findsOneWidget);
     });
 
-    testWidgets('completing a payment confirms it after the confirm dialog',
+    testWidgets('provider unavailable is explicit and offers no simulation',
         (t) async {
       final app = routedApp(
-        onList: (_) async => jsonResponse([paymentJson()], 200),
-        onSuccess: (_) async => jsonResponse(paymentJson(status: 'PAID'), 200),
+        onList: (_) async => jsonResponse(const [], 200),
+        onCreate: (_) async => jsonResponse({
+          'status': 503,
+          'error': 'Service Unavailable',
+          'message': 'No live payment provider is currently configured',
+          'path': '/api/payments',
+          'code': 'PAYMENT_PROVIDER_UNAVAILABLE',
+        }, 503),
       );
       await pumpSize(
         t,
@@ -459,17 +432,13 @@ void main() {
         ),
         const Size(1200, 2200),
       );
-      expect(find.byKey(const Key('payment-complete')), findsOneWidget);
-      await t.tap(find.byKey(const Key('payment-complete')));
+      await t.tap(find.byKey(const Key('payment-create')));
       await t.pumpAndSettle();
-      // Explicit confirmation is required (CLAUDE.md §11).
-      expect(find.byKey(const Key('payment-confirm-complete')), findsOneWidget);
-      await t.tap(find.byKey(const Key('payment-confirm-complete')));
-      await t.pumpAndSettle();
-      expect(app.realPayment!.statusView, PaymentStatusView.paid);
-      expect(find.byKey(const Key('payment-done')), findsOneWidget);
-      final l10n = AppLocalizationsEn();
-      expect(find.text(l10n.paymentSuccessHeadline), findsWidgets);
+      expect(find.byKey(const Key('payment-unavailable')), findsOneWidget);
+      expect(find.text(AppLocalizationsEn().paymentProviderUnavailableMessage),
+          findsOneWidget);
+      expect(find.byKey(const Key('payment-complete')), findsNothing);
+      expect(find.byKey(const Key('payment-fail')), findsNothing);
     });
 
     testWidgets('a list load error shows the retryable error state', (t) async {
@@ -540,23 +509,22 @@ void main() {
         vi.paymentTitle,
         en.paymentPayNowAction,
         vi.paymentPayNowAction,
-        en.paymentSandboxNotice,
-        vi.paymentSandboxNotice,
+        en.paymentProviderUnavailableTitle,
+        vi.paymentProviderUnavailableTitle,
+        en.paymentProviderUnavailableMessage,
+        vi.paymentProviderUnavailableMessage,
         en.paymentAmountToPayLabel,
         vi.paymentAmountToPayLabel,
         en.paymentCreateAction,
         vi.paymentCreateAction,
-        en.paymentCompleteSandboxAction,
-        vi.paymentCompleteSandboxAction,
-        en.paymentConfirmMessage,
-        vi.paymentConfirmMessage,
         en.paymentActionNotPayableMessage,
         vi.paymentActionNotPayableMessage,
       ];
       for (final s in values) {
         expect(s.trim(), isNotEmpty);
       }
-      expect(en.paymentSandboxNotice != vi.paymentSandboxNotice, isTrue);
+      expect(en.paymentProviderUnavailableMessage !=
+          vi.paymentProviderUnavailableMessage, isTrue);
     });
   });
 }

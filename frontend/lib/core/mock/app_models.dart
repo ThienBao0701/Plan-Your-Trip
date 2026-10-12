@@ -3498,8 +3498,7 @@ class RealPaymentRecord {
   }
 }
 
-/// Outcome of a real payment action (`POST /api/payments`, its reads, and the
-/// `mock-success` / `mock-fail` sandbox settlement endpoints). [demoUnavailable]
+/// Outcome of a real payment action (`POST /api/payments` and its reads). [demoUnavailable]
 /// is the Demo Mode guard (zero HTTP); [busy] is the single-flight guard;
 /// [sessionExpired] (401) never triggers auto-logout; [validation] 400,
 /// [forbidden] 403, [notFound] 404, [conflict] 409, [unprocessable] 422 (e.g.
@@ -3516,6 +3515,7 @@ enum PaymentActionOutcome {
   notFound,
   conflict,
   unprocessable,
+  unavailable,
   network,
   serverError,
 }

@@ -11296,11 +11296,17 @@ abstract class AppLocalizations {
   /// **'We couldn\'t load the payment. Please try again.'**
   String get paymentErrorMessage;
 
-  /// No description provided for @paymentSandboxNotice.
+  /// No description provided for @paymentProviderUnavailableTitle.
   ///
   /// In en, this message translates to:
-  /// **'No live payment gateway is connected. The payment is created for real on the backend and settled in a sandbox — no card is charged and no external checkout opens.'**
-  String get paymentSandboxNotice;
+  /// **'Payments aren\'t available yet'**
+  String get paymentProviderUnavailableTitle;
+
+  /// No description provided for @paymentProviderUnavailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No live payment provider is configured. Your booking has not been paid. Please try again later.'**
+  String get paymentProviderUnavailableMessage;
 
   /// No description provided for @paymentAmountToPayLabel.
   ///
@@ -11386,18 +11392,6 @@ abstract class AppLocalizations {
   /// **'This payment did not go through. You can start a new payment.'**
   String get paymentFailedBody;
 
-  /// No description provided for @paymentCompleteSandboxAction.
-  ///
-  /// In en, this message translates to:
-  /// **'Complete payment (sandbox)'**
-  String get paymentCompleteSandboxAction;
-
-  /// No description provided for @paymentFailSandboxAction.
-  ///
-  /// In en, this message translates to:
-  /// **'Simulate failed payment (sandbox)'**
-  String get paymentFailSandboxAction;
-
   /// No description provided for @paymentRefreshAction.
   ///
   /// In en, this message translates to:
@@ -11409,24 +11403,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Start a new payment'**
   String get paymentRetryNewAction;
-
-  /// No description provided for @paymentConfirmTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Complete this payment?'**
-  String get paymentConfirmTitle;
-
-  /// No description provided for @paymentConfirmMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'This settles the payment on the backend (sandbox) and confirms your booking. No card is charged.'**
-  String get paymentConfirmMessage;
-
-  /// No description provided for @paymentConfirmAction.
-  ///
-  /// In en, this message translates to:
-  /// **'Complete payment'**
-  String get paymentConfirmAction;
 
   /// No description provided for @paymentStatusUnknownLabel.
   ///

@@ -15,10 +15,8 @@ import '../expenses/expenses_screen.dart' show formatMoney;
 /// (`POST /api/payments`) for a PENDING booking and shows its real status
 /// (`GET /api/payments/{id}`, `.../bookings/{id}/payments`). This backend has NO
 /// live payment gateway — the settlement `checkoutUrl` is null, so nothing is
-/// redirected or launched. A payment is completed offline via the backend's own
-/// `mock-success` / `mock-fail` endpoints, surfaced here as explicitly-labelled
-/// SANDBOX actions (real endpoints, not fabricated results) behind an explicit
-/// confirmation (CLAUDE.md §11). A PAID payment confirms the booking server-side.
+/// redirected or launched. This screen never simulates payment completion; a
+/// booking can become paid only after a configured provider confirms it.
 class RealPaymentScreen extends StatefulWidget {
   final int bookingId;
   final String bookingCode;
@@ -56,19 +54,11 @@ class _RealPaymentScreenState extends State<RealPaymentScreen> {
     _afterAction(app, outcome);
   }
 
-  Future<void> _settle(AppState app, {required bool success}) async {
-    if (success) {
-      final confirmed = await _confirmComplete();
-      if (confirmed != true) return;
-    }
-    final outcome = await app.settleRealPaymentSandbox(success: success);
-    _afterAction(app, outcome);
-  }
-
   void _afterAction(AppState app, PaymentActionOutcome outcome) {
     if (!mounted) return;
     if (outcome == PaymentActionOutcome.success ||
-        outcome == PaymentActionOutcome.busy) {
+        outcome == PaymentActionOutcome.busy ||
+        outcome == PaymentActionOutcome.unavailable) {
       return;
     }
     if (outcome == PaymentActionOutcome.sessionExpired) {
@@ -80,29 +70,6 @@ class _RealPaymentScreenState extends State<RealPaymentScreen> {
       ..hideCurrentSnackBar()
       ..showSnackBar(
           SnackBar(content: Text(_messageForOutcome(l10n, outcome))));
-  }
-
-  Future<bool?> _confirmComplete() {
-    final l10n = AppLocalizations.of(context)!;
-    return showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.paymentConfirmTitle),
-        content: Text(l10n.paymentConfirmMessage),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(l10n.profileCancel),
-          ),
-          FilledButton.icon(
-            key: const Key('payment-confirm-complete'),
-            onPressed: () => Navigator.pop(ctx, true),
-            icon: const Icon(Icons.check_rounded),
-            label: Text(l10n.paymentConfirmAction),
-          ),
-        ],
-      ),
-    );
   }
 
   void _reauth() {
@@ -126,6 +93,7 @@ class _RealPaymentScreenState extends State<RealPaymentScreen> {
       PaymentActionOutcome.unprocessable => l10n.paymentActionNotPayableMessage,
       PaymentActionOutcome.conflict => l10n.paymentActionConflictMessage,
       PaymentActionOutcome.network => l10n.paymentActionNetworkMessage,
+      PaymentActionOutcome.unavailable => l10n.paymentProviderUnavailableMessage,
       _ => l10n.paymentActionServerErrorMessage,
     };
   }
@@ -183,6 +151,26 @@ class _RealPaymentScreenState extends State<RealPaymentScreen> {
         ),
       );
     }
+    if (payment == null && error == PaymentActionOutcome.unavailable) {
+      return _centered(
+        OceanGlassCard(
+          key: const Key('payment-unavailable'),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(Icons.payments_outlined),
+              const SizedBox(height: AppSpacing.sm),
+              Text(l10n.paymentProviderUnavailableTitle,
+                  style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: AppSpacing.xs),
+              Text(l10n.paymentProviderUnavailableMessage,
+                  style: Theme.of(context).textTheme.bodyMedium),
+            ],
+          ),
+        ),
+      );
+    }
     if (payment == null &&
         error != null &&
         error != PaymentActionOutcome.sessionExpired) {
@@ -209,8 +197,6 @@ class _RealPaymentScreenState extends State<RealPaymentScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _sandboxNotice(context, l10n),
-              const SizedBox(height: AppSpacing.md),
               _amountCard(context, l10n),
               const SizedBox(height: AppSpacing.md),
               if (payment == null)
@@ -237,26 +223,6 @@ class _RealPaymentScreenState extends State<RealPaymentScreen> {
             child: Center(child: child),
           ),
         ],
-      );
-
-  Widget _sandboxNotice(BuildContext context, AppLocalizations l10n) =>
-      OceanGlassSurface(
-        key: const Key('payment-sandbox-notice'),
-        blur: 0,
-        color: AppColors.paleCyan,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Icon(Icons.info_outline_rounded, color: AppColors.ocean),
-            const SizedBox(width: AppSpacing.sm),
-            Expanded(
-              child: Text(
-                l10n.paymentSandboxNotice,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ),
-          ],
-        ),
       );
 
   Widget _amountCard(BuildContext context, AppLocalizations l10n) {
@@ -382,20 +348,6 @@ class _RealPaymentScreenState extends State<RealPaymentScreen> {
     switch (view) {
       case PaymentStatusView.pending:
         return [
-          OceanPrimaryButton(
-            key: const Key('payment-complete'),
-            label: l10n.paymentCompleteSandboxAction,
-            icon: Icons.verified_rounded,
-            onPressed: submitting ? null : () => _settle(app, success: true),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          OceanSecondaryButton(
-            key: const Key('payment-fail'),
-            label: l10n.paymentFailSandboxAction,
-            icon: Icons.cancel_schedule_send_rounded,
-            onPressed: submitting ? null : () => _settle(app, success: false),
-          ),
-          const SizedBox(height: AppSpacing.sm),
           OceanSecondaryButton(
             key: const Key('payment-refresh'),
             label: l10n.paymentRefreshAction,

@@ -6646,8 +6646,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'We couldn\'t load the payment. Please try again.';
 
   @override
-  String get paymentSandboxNotice =>
-      'No live payment gateway is connected. The payment is created for real on the backend and settled in a sandbox — no card is charged and no external checkout opens.';
+  String get paymentProviderUnavailableTitle =>
+      'Payments aren\'t available yet';
+
+  @override
+  String get paymentProviderUnavailableMessage =>
+      'No live payment provider is configured. Your booking has not been paid. Please try again later.';
 
   @override
   String get paymentAmountToPayLabel => 'Amount to pay';
@@ -6696,26 +6700,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'This payment did not go through. You can start a new payment.';
 
   @override
-  String get paymentCompleteSandboxAction => 'Complete payment (sandbox)';
-
-  @override
-  String get paymentFailSandboxAction => 'Simulate failed payment (sandbox)';
-
-  @override
   String get paymentRefreshAction => 'Refresh status';
 
   @override
   String get paymentRetryNewAction => 'Start a new payment';
-
-  @override
-  String get paymentConfirmTitle => 'Complete this payment?';
-
-  @override
-  String get paymentConfirmMessage =>
-      'This settles the payment on the backend (sandbox) and confirms your booking. No card is charged.';
-
-  @override
-  String get paymentConfirmAction => 'Complete payment';
 
   @override
   String get paymentStatusUnknownLabel => 'Unknown';

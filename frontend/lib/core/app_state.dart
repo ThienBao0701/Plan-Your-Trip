@@ -1870,6 +1870,7 @@ class AppState extends ChangeNotifier {
         return SavedCollectionActionResult.network;
       case ApiErrorKind.server:
       case ApiErrorKind.malformed:
+      case ApiErrorKind.unavailable:
       case ApiErrorKind.validation:
       case ApiErrorKind.unprocessable:
       case ApiErrorKind.conflict:
@@ -2227,6 +2228,7 @@ class AppState extends ChangeNotifier {
       case ApiErrorKind.unprocessable:
       case ApiErrorKind.server:
       case ApiErrorKind.malformed:
+      case ApiErrorKind.unavailable:
       case ApiErrorKind.forbidden:
       case ApiErrorKind.uncertain:
       case null:
@@ -2486,6 +2488,7 @@ class AppState extends ChangeNotifier {
       ApiErrorKind.network => TripActionResult.network,
       ApiErrorKind.timeout => TripActionResult.timeout,
       ApiErrorKind.server => TripActionResult.serverError,
+      ApiErrorKind.unavailable => TripActionResult.serverError,
       ApiErrorKind.malformed => TripActionResult.malformed,
       ApiErrorKind.uncertain => TripActionResult.serverError,
       null => TripActionResult.serverError,
@@ -3424,6 +3427,7 @@ class AppState extends ChangeNotifier {
       ApiErrorKind.validation => PaymentActionOutcome.validation,
       ApiErrorKind.conflict => PaymentActionOutcome.conflict,
       ApiErrorKind.unprocessable => PaymentActionOutcome.unprocessable,
+      ApiErrorKind.unavailable => PaymentActionOutcome.unavailable,
       ApiErrorKind.network => PaymentActionOutcome.network,
       ApiErrorKind.timeout => PaymentActionOutcome.network,
       ApiErrorKind.server => PaymentActionOutcome.serverError,
@@ -3503,46 +3507,6 @@ class AppState extends ChangeNotifier {
     realPaymentError = outcome;
     notifyListeners();
     return outcome;
-  }
-
-  /// Settles the current PENDING payment via the backend's sandbox endpoints
-  /// ([success]=true → `mock-success` → PAID + booking CONFIRMED; false →
-  /// `mock-fail` → FAILED). These are REAL backend endpoints (the only offline
-  /// completion path). On a successful capture the real booking history/detail
-  /// caches are invalidated so the now-CONFIRMED booking is re-fetched.
-  Future<PaymentActionOutcome> settleRealPaymentSandbox({
-    required bool success,
-  }) async {
-    if (demoMode) return PaymentActionOutcome.demoUnavailable;
-    if (realPaymentSubmitting) return PaymentActionOutcome.busy;
-    final payment = realPayment;
-    if (payment == null) return PaymentActionOutcome.notFound;
-    realPaymentSubmitting = true;
-    realPaymentError = null;
-    notifyListeners();
-    final result = await api.settlePaymentSandbox(payment.id, success: success);
-    realPaymentSubmitting = false;
-    if (result.success && result.data != null) {
-      realPayment = result.data!;
-      realPaymentError = null;
-      if (result.data!.statusView == PaymentStatusView.paid) {
-        _invalidateRealBookingsAfterPayment(result.data!.bookingId);
-      }
-      notifyListeners();
-      return PaymentActionOutcome.success;
-    }
-    final outcome = _mapPaymentError(result.errorKind);
-    realPaymentError = outcome;
-    notifyListeners();
-    return outcome;
-  }
-
-  /// A PAID payment CONFIRMS the booking server-side, so the cached history list
-  /// and this booking's detail are now stale — drop them so the next open
-  /// re-fetches the real, updated status. No fabricated local status flip.
-  void _invalidateRealBookingsAfterPayment(int bookingId) {
-    realBookingsLoaded = false;
-    bookingDetailCache.remove(bookingId);
   }
 
   void clearRealPaymentError() {

@@ -38,6 +38,7 @@ enum ApiErrorKind {
   conflict,
   validation,
   unprocessable,
+  unavailable,
   server,
   malformed,
   // Write-only: the request may have reached and been committed by the server
@@ -1252,10 +1253,9 @@ class ApiClient {
   }
 
   // ── Payments (/api/payments, /api/bookings/{id}/payments, UI-28) ─────────────
-  // The backend has NO live payment gateway (checkoutUrl is null on the
-  // settlement flow — CLAUDE.md), so there is no redirect to launch. A payment is
-  // created PENDING and settled offline via the backend's own mock-success /
-  // mock-fail endpoints. All calls are authenticated, 8s timeout, no retry.
+  // This legacy payment API has no live checkout adapter. Production returns a
+  // typed provider-unavailable response; sandbox settlement is never called here.
+  // Calls are authenticated, use an 8s timeout, and are not retried.
 
   /// Creates a real payment for a booking (`POST /api/payments`, 201). The
   /// backend charges `booking.finalPrice`; [method] is the backend `PaymentMethod`
@@ -1279,9 +1279,12 @@ class ApiClient {
         }
         return CollectionApiResult.success(RealPaymentRecord.fromJson(body));
       }
+      final body = _decodeJsonMap(res).data;
+      final unavailable = res.statusCode == 503 &&
+          body?['code'] == 'PAYMENT_PROVIDER_UNAVAILABLE';
       return CollectionApiResult.failure(
-        _errorKindForStatus(res.statusCode),
-        _safeServerMessage(_decodeJsonMap(res).data),
+        unavailable ? ApiErrorKind.unavailable : _errorKindForStatus(res.statusCode),
+        _safeServerMessage(body),
       );
     } on TimeoutException {
       return const CollectionApiResult.failure(ApiErrorKind.timeout);
@@ -1337,42 +1340,6 @@ class ApiClient {
           .get(Uri.parse('$baseUrl/payments/$id'), headers: _jsonHeaders)
           .timeout(_collectionsTimeout);
       if (res.statusCode == 200) {
-        final body = _decodeJsonMap(res).data;
-        if (body == null) {
-          return const CollectionApiResult.failure(ApiErrorKind.malformed);
-        }
-        return CollectionApiResult.success(RealPaymentRecord.fromJson(body));
-      }
-      return CollectionApiResult.failure(
-        _errorKindForStatus(res.statusCode),
-        _safeServerMessage(_decodeJsonMap(res).data),
-      );
-    } on TimeoutException {
-      return const CollectionApiResult.failure(ApiErrorKind.timeout);
-    } on http.ClientException {
-      return const CollectionApiResult.failure(ApiErrorKind.network);
-    } on FormatException {
-      return const CollectionApiResult.failure(ApiErrorKind.malformed);
-    } catch (_) {
-      return const CollectionApiResult.failure(ApiErrorKind.network);
-    }
-  }
-
-  /// Settles a PENDING payment via the backend's own sandbox endpoint
-  /// ([success]=true → `mock-success` → PAID + booking CONFIRMED; false →
-  /// `mock-fail` → FAILED). These are REAL backend endpoints (the only offline
-  /// completion path, as no live gateway exists) — not a fabricated result.
-  Future<CollectionApiResult<RealPaymentRecord>> settlePaymentSandbox(
-    int id, {
-    required bool success,
-  }) async {
-    final suffix = success ? 'mock-success' : 'mock-fail';
-    try {
-      final res = await _client
-          .post(Uri.parse('$baseUrl/payments/$id/$suffix'),
-              headers: _jsonHeaders)
-          .timeout(_collectionsTimeout);
-      if (res.statusCode == 200 || res.statusCode == 201) {
         final body = _decodeJsonMap(res).data;
         if (body == null) {
           return const CollectionApiResult.failure(ApiErrorKind.malformed);

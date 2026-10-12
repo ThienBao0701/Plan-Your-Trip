@@ -6480,8 +6480,11 @@ class AppLocalizationsVi extends AppLocalizations {
       'Không thể tải thanh toán. Vui lòng thử lại.';
 
   @override
-  String get paymentSandboxNotice =>
-      'Chưa có cổng thanh toán trực tiếp nào được kết nối. Thanh toán được tạo thật trên máy chủ và xử lý trong môi trường thử nghiệm — không có thẻ nào bị trừ tiền và không có trang thanh toán bên ngoài nào mở ra.';
+  String get paymentProviderUnavailableTitle => 'Thanh toán hiện chưa khả dụng';
+
+  @override
+  String get paymentProviderUnavailableMessage =>
+      'Chưa có nhà cung cấp thanh toán trực tiếp nào được cấu hình. Đặt phòng của bạn chưa được thanh toán. Vui lòng thử lại sau.';
 
   @override
   String get paymentAmountToPayLabel => 'Số tiền cần thanh toán';
@@ -6530,27 +6533,10 @@ class AppLocalizationsVi extends AppLocalizations {
       'Khoản thanh toán này chưa thành công. Bạn có thể tạo một khoản thanh toán mới.';
 
   @override
-  String get paymentCompleteSandboxAction => 'Hoàn tất thanh toán (thử nghiệm)';
-
-  @override
-  String get paymentFailSandboxAction =>
-      'Mô phỏng thanh toán thất bại (thử nghiệm)';
-
-  @override
   String get paymentRefreshAction => 'Làm mới trạng thái';
 
   @override
   String get paymentRetryNewAction => 'Bắt đầu thanh toán mới';
-
-  @override
-  String get paymentConfirmTitle => 'Hoàn tất thanh toán này?';
-
-  @override
-  String get paymentConfirmMessage =>
-      'Thao tác này xử lý thanh toán trên máy chủ (thử nghiệm) và xác nhận đặt phòng của bạn. Không có thẻ nào bị trừ tiền.';
-
-  @override
-  String get paymentConfirmAction => 'Hoàn tất thanh toán';
 
   @override
   String get paymentStatusUnknownLabel => 'Không xác định';

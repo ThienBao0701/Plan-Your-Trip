@@ -96,6 +96,7 @@ String _byKind(AppLocalizations l10n, ApiErrorKind kind) => switch (kind) {
       ApiErrorKind.timeout =>
         l10n.partnerTeamErrorNetwork,
       ApiErrorKind.server ||
-      ApiErrorKind.malformed =>
+      ApiErrorKind.malformed ||
+      ApiErrorKind.unavailable =>
         l10n.partnerTeamErrorServer,
     };

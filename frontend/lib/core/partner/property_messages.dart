@@ -51,6 +51,7 @@ String propertyFailureMessage(AppLocalizations l10n, ApiFailure failure) {
     ApiErrorKind.timeout => l10n.partnerDashboardErrorTimeout,
     ApiErrorKind.network => l10n.partnerDashboardErrorNetwork,
     ApiErrorKind.server => l10n.partnerDashboardErrorServer,
+    ApiErrorKind.unavailable => l10n.partnerDashboardErrorServer,
     // The request may have been committed before the connection dropped;
     // never reported as either success or a clean failure.
     ApiErrorKind.uncertain => l10n.partnerPropertyActionUncertain,
