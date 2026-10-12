@@ -68,9 +68,9 @@ public class PaymentSettlementBridge {
         if (paymentRepo.existsByBookingIdAndStatus(bookingId, PaymentStatus.PAID)) return; // already paid
 
         Long ownerId = booking.getUser().getId();
-        PaymentResponse created = paymentService.createPayment(
+        PaymentResponse created = paymentService.createPaymentFromProvider(
             ownerId, new PaymentRequest(bookingId, methodFor(session.getProvider())));
-        paymentService.mockSuccess(ownerId, created.id(),
+        paymentService.settleSuccessFromProvider(ownerId, created.id(),
             new PaymentResultRequest(session.getProviderReference(), true, null));
         session.setPayment(paymentRepo.getReferenceById(created.id()));
     }
@@ -91,9 +91,9 @@ public class PaymentSettlementBridge {
         if (bs == BookingStatus.CANCELLED || bs == BookingStatus.CHECKED_OUT) return; // holds handled by booking lifecycle
 
         Long ownerId = booking.getUser().getId();
-        PaymentResponse created = paymentService.createPayment(
+        PaymentResponse created = paymentService.createPaymentFromProvider(
             ownerId, new PaymentRequest(bookingId, methodFor(session.getProvider())));
-        paymentService.mockFail(ownerId, created.id(),
+        paymentService.settleFailureFromProvider(ownerId, created.id(),
             new PaymentResultRequest(session.getProviderReference(), false, reason));
         session.setPayment(paymentRepo.getReferenceById(created.id()));
     }

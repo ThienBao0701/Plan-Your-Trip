@@ -1,6 +1,7 @@
 package com.example.planyourtrip.service;
 
 import com.example.planyourtrip.dto.PaymentSessionDto.*;
+import com.example.planyourtrip.config.PaymentProviderProperties;
 import com.example.planyourtrip.exception.ApiException;
 import com.example.planyourtrip.model.*;
 import com.example.planyourtrip.repository.BookingRepository;
@@ -71,6 +72,8 @@ public class PaymentGatewayService {
     private final NotificationService notificationService;
     private final PaymentSettlementBridge settlementBridge;
     private final AdminActivityLogService adminAudit;
+    private final PaymentProviderProperties providerProperties;
+    private final PaymentRuntimePolicy paymentRuntimePolicy;
     private final Map<PaymentProvider, PaymentGateway> gateways;
 
     public PaymentGatewayService(PaymentSessionRepository sessionRepo,
@@ -80,7 +83,9 @@ public class PaymentGatewayService {
                                  NotificationService notificationService,
                                  PaymentSettlementBridge settlementBridge,
                                  List<PaymentGateway> gatewayBeans,
-                                 AdminActivityLogService adminAudit) {
+                                 AdminActivityLogService adminAudit,
+                                 PaymentProviderProperties providerProperties,
+                                 PaymentRuntimePolicy paymentRuntimePolicy) {
         this.sessionRepo = sessionRepo;
         this.eventRepo = eventRepo;
         this.bookingRepo = bookingRepo;
@@ -88,6 +93,8 @@ public class PaymentGatewayService {
         this.notificationService = notificationService;
         this.settlementBridge = settlementBridge;
         this.adminAudit = adminAudit;
+        this.providerProperties = providerProperties;
+        this.paymentRuntimePolicy = paymentRuntimePolicy;
         Map<PaymentProvider, PaymentGateway> map = new HashMap<>();
         for (PaymentGateway gw : gatewayBeans) {
             map.put(gw.provider(), gw); // last-wins; in practice one bean per provider
@@ -110,6 +117,7 @@ public class PaymentGatewayService {
                 "Cannot open a payment session for a cancelled booking");
 
         PaymentGateway gateway = gatewayOrThrow(req.provider());
+        if (!paymentRuntimePolicy.simulationAllowed()) requireLiveProvider(req.provider(), gateway);
 
         PaymentSession session = new PaymentSession();
         session.setSessionId(generateUniqueSessionId());
@@ -131,7 +139,7 @@ public class PaymentGatewayService {
             PaymentSessionStatus.PENDING, "Session created; checkout URL generated",
             eventKey(saved, "created"));
 
-        return toResponse(saved, true);
+        return toResponse(saved);
     }
 
     // ═════════════════════════════════════════════════════════════════════
@@ -147,6 +155,7 @@ public class PaymentGatewayService {
      */
     @Transactional
     public SessionResponse processCallback(String sessionId, CallbackRequest req) {
+        paymentRuntimePolicy.requireSimulationAllowed();
         PaymentSession session = sessionRepo.findBySessionIdForUpdate(sessionId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Payment session not found: " + sessionId));
 
@@ -158,11 +167,11 @@ public class PaymentGatewayService {
 
         // Terminal session → idempotent no-op (no event, no notification).
         if (session.getStatus().isTerminal())
-            return toResponse(session, true);
+            return toResponse(session);
 
         return switch (v.outcome()) {
-            case AUTHORIZED -> toResponse(applyAuthorized(session, v.providerReference()), true);
-            case FAILED -> toResponse(applyFailed(session, v.providerReference()), true);
+            case AUTHORIZED -> toResponse(applyAuthorized(session, v.providerReference()));
+            case FAILED -> toResponse(applyFailed(session, v.providerReference()));
         };
     }
 
@@ -186,6 +195,7 @@ public class PaymentGatewayService {
     @Transactional
     public WebhookAck processWebhook(PaymentProvider provider, String rawBody, String signatureHeader) {
         PaymentGateway gateway = gatewayOrThrow(provider);
+        if (!paymentRuntimePolicy.simulationAllowed()) requireLiveProvider(provider, gateway);
 
         PaymentGateway.WebhookVerification v;
         try {
@@ -296,12 +306,13 @@ public class PaymentGatewayService {
 
         PaymentSession session = sessionRepo.findBySessionIdForUpdate(sessionId).orElseThrow();
         if (session.getStatus() == PaymentSessionStatus.CAPTURED)
-            return toResponse(session, true); // idempotent
+            return toResponse(session); // idempotent
         if (session.getStatus() != PaymentSessionStatus.AUTHORIZED)
             throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,
                 "Only an AUTHORIZED session can be captured. Current status: " + session.getStatus());
 
-        return toResponse(doCaptureTransition(session), true);
+        if (!paymentRuntimePolicy.simulationAllowed()) requireLiveProvider(session.getProvider(), gatewayOrThrow(session.getProvider()));
+        return toResponse(doCaptureTransition(session));
     }
 
     @Transactional
@@ -311,7 +322,7 @@ public class PaymentGatewayService {
 
         PaymentSession session = sessionRepo.findBySessionIdForUpdate(sessionId).orElseThrow();
         if (session.getStatus() == PaymentSessionStatus.CANCELLED)
-            return toResponse(session, true); // idempotent
+            return toResponse(session); // idempotent
         if (session.getStatus().isTerminal())
             throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,
                 "Cannot cancel a session in status " + session.getStatus());
@@ -329,7 +340,7 @@ public class PaymentGatewayService {
         // BRIDGE: a cancelled session releases any held loyalty/gift-card via the existing
         // PaymentService.mockFail hook chain (no-op when nothing was held).
         settlementBridge.settleFailure(saved, "Payment session cancelled");
-        return toResponse(saved, true);
+        return toResponse(saved);
     }
 
     /**
@@ -358,7 +369,7 @@ public class PaymentGatewayService {
         PaymentSession session = sessionRepo.findBySessionIdForUpdate(sessionId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Payment session not found: " + sessionId));
         if (session.getStatus() == PaymentSessionStatus.EXPIRED)
-            return toResponse(session, true); // idempotent
+            return toResponse(session); // idempotent
         if (session.getStatus().isTerminal())
             throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,
                 "Cannot expire a session in status " + session.getStatus());
@@ -380,7 +391,7 @@ public class PaymentGatewayService {
                 + (releasedHeldValue ? "; held loyalty/gift-card value was released" : ""),
             before.name(), expired.getStatus().name());
 
-        return toResponse(expired, true);
+        return toResponse(expired);
     }
 
     /** Time-based expiry sweep (admin-triggered; no scheduler in this phase). */
@@ -423,7 +434,7 @@ public class PaymentGatewayService {
     public SessionResponse getSession(Long userId, String sessionId) {
         PaymentSession session = sessionOrThrow(sessionId);
         checkOwnerOrAdmin(userId, session);
-        return toResponse(session, true);
+        return toResponse(session);
     }
 
     @Transactional(readOnly = true)
@@ -473,12 +484,12 @@ public class PaymentGatewayService {
         };
 
         return com.example.planyourtrip.dto.PageResponse.of(
-            sessionRepo.findAll(spec, pageable).map(x -> toResponse(x, true)));
+            sessionRepo.findAll(spec, pageable).map(this::toResponse));
     }
 
     @Transactional(readOnly = true)
     public SessionResponse adminGet(String sessionId) {
-        return toResponse(sessionOrThrow(sessionId), true);
+        return toResponse(sessionOrThrow(sessionId));
     }
 
     @Transactional(readOnly = true)
@@ -499,6 +510,13 @@ public class PaymentGatewayService {
                 "No payment gateway is registered for provider " + provider
                     + " (not implemented in this phase)");
         return gw;
+    }
+
+    private void requireLiveProvider(PaymentProvider provider, PaymentGateway gateway) {
+        if (gateway == null || !gateway.supportsLivePayments()
+                || !providerProperties.isLiveEnabled(provider)) {
+            throw paymentRuntimePolicy.providerUnavailable();
+        }
     }
 
     private void checkOwnerOrAdmin(Long userId, PaymentSession session) {
@@ -554,13 +572,12 @@ public class PaymentGatewayService {
         return sb.toString();
     }
 
-    private SessionResponse toResponse(PaymentSession s, boolean includeCallbackToken) {
+    private SessionResponse toResponse(PaymentSession s) {
         return new SessionResponse(
             s.getId(), s.getSessionId(), s.getProvider(),
             s.getBooking().getId(), s.getBooking().getBookingCode(),
             s.getAmount(), s.getCurrency(), s.getStatus(),
             s.getCheckoutUrl(), s.getProviderReference(),
-            includeCallbackToken ? s.getCallbackToken() : null,
             s.getExpiresAt(), s.getCreatedAt(), s.getUpdatedAt());
     }
 

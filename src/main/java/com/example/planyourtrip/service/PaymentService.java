@@ -25,6 +25,7 @@ public class PaymentService {
     private final InventoryReservationService inventoryReservationService;
     /** D1a — refunds move money and must leave an administrative trail. */
     private final AdminActivityLogService adminAudit;
+    private final PaymentRuntimePolicy paymentRuntimePolicy;
 
     public PaymentService(PaymentRepository paymentRepo,
                           BookingRepository bookingRepo,
@@ -33,7 +34,8 @@ public class PaymentService {
                           LoyaltyRedemptionService loyaltyRedemptionService,
                           GiftCardService giftCardService,
                           InventoryReservationService inventoryReservationService,
-                           AdminActivityLogService adminAudit) {
+                          AdminActivityLogService adminAudit,
+                          PaymentRuntimePolicy paymentRuntimePolicy) {
         this.paymentRepo = paymentRepo;
         this.bookingRepo = bookingRepo;
         this.userRepo    = userRepo;
@@ -42,10 +44,24 @@ public class PaymentService {
         this.giftCardService = giftCardService;
         this.inventoryReservationService = inventoryReservationService;
         this.adminAudit = adminAudit;
+        this.paymentRuntimePolicy = paymentRuntimePolicy;
     }
 
     @Transactional
     public PaymentResponse createPayment(Long userId, PaymentRequest req) {
+        // This legacy API only creates a pending row; it has no live checkout adapter.
+        // It is available only in explicitly enabled simulation mode.
+        if (!paymentRuntimePolicy.simulationAllowed()) throw paymentRuntimePolicy.providerUnavailable();
+        return createPaymentUnchecked(userId, req);
+    }
+
+    /** Internal provider bridge; the caller must have verified a provider settlement first. */
+    @Transactional
+    PaymentResponse createPaymentFromProvider(Long userId, PaymentRequest req) {
+        return createPaymentUnchecked(userId, req);
+    }
+
+    private PaymentResponse createPaymentUnchecked(Long userId, PaymentRequest req) {
         Booking booking = bookingRepo.findById(req.bookingId())
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND,
                 "Booking not found: " + req.bookingId()));
@@ -103,6 +119,16 @@ public class PaymentService {
 
     @Transactional
     public PaymentResponse mockSuccess(Long userId, Long paymentId, PaymentResultRequest req) {
+        paymentRuntimePolicy.requireSimulationAllowed();
+        return applySuccess(userId, paymentId, req);
+    }
+
+    @Transactional
+    PaymentResponse settleSuccessFromProvider(Long userId, Long paymentId, PaymentResultRequest req) {
+        return applySuccess(userId, paymentId, req);
+    }
+
+    private PaymentResponse applySuccess(Long userId, Long paymentId, PaymentResultRequest req) {
         Payment payment = paymentRepo.findById(paymentId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND,
                 "Payment not found: " + paymentId));
@@ -153,6 +179,16 @@ public class PaymentService {
 
     @Transactional
     public PaymentResponse mockFail(Long userId, Long paymentId, PaymentResultRequest req) {
+        paymentRuntimePolicy.requireSimulationAllowed();
+        return applyFailure(userId, paymentId, req);
+    }
+
+    @Transactional
+    PaymentResponse settleFailureFromProvider(Long userId, Long paymentId, PaymentResultRequest req) {
+        return applyFailure(userId, paymentId, req);
+    }
+
+    private PaymentResponse applyFailure(Long userId, Long paymentId, PaymentResultRequest req) {
         Payment payment = paymentRepo.findById(paymentId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND,
                 "Payment not found: " + paymentId));

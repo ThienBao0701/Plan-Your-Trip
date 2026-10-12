@@ -30,12 +30,7 @@ public class PaymentSessionDto {
         String providerReference
     ) {}
 
-    /**
-     * Full session view. {@code callbackToken} is echoed back to the authenticated owner/
-     * admin only — in this phase the caller acts as both merchant and (simulated) provider,
-     * so it needs the secret to drive the callback in tests/dev. A real integration would
-     * hand the token to the provider out-of-band and never return it to the customer.
-     */
+    /** Public session view. Callback credentials are never returned to API clients. */
     public record SessionResponse(
         Long id,
         String sessionId,
@@ -47,7 +42,6 @@ public class PaymentSessionDto {
         PaymentSessionStatus status,
         String checkoutUrl,
         String providerReference,
-        String callbackToken,
         Instant expiresAt,
         Instant createdAt,
         Instant updatedAt

@@ -46,6 +46,7 @@ class InventoryReservationTest {
     @Autowired HotelRoomRepository hotelRoomRepo;
     @Autowired RoomInventoryRepository inventoryRepo;
     @Autowired InventoryReservationRepository reservationRepo;
+    @Autowired PaymentSessionRepository sessionRepo;
 
     private static final LocalDate TODAY = LocalDate.now();
     private static final AtomicInteger DAY = new AtomicInteger(500);
@@ -485,7 +486,7 @@ class InventoryReservationTest {
 
     private void callback(JsonNode session, CallbackOutcome outcome) throws Exception {
         String sessionId = session.get("sessionId").asText();
-        String cbToken = session.get("callbackToken").asText();
+        String cbToken = sessionRepo.findBySessionId(sessionId).orElseThrow().getCallbackToken();
         mvc.perform(post("/api/payment-sessions/" + sessionId + "/callback")
                 .header("Authorization", "Bearer " + userToken)
                 .contentType(MediaType.APPLICATION_JSON)

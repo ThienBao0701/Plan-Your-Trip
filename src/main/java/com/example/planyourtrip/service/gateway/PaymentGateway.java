@@ -27,6 +27,11 @@ public interface PaymentGateway {
     /** The provider this gateway handles — the key used for selection. */
     PaymentProvider provider();
 
+    /** True only when this adapter performs a real provider checkout/capture flow. */
+    default boolean supportsLivePayments() {
+        return false;
+    }
+
     /** Build the provider-specific checkout URL a customer would be redirected to. */
     String createCheckoutUrl(PaymentSession session);
 

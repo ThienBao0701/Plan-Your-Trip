@@ -54,6 +54,7 @@ class PaymentProviderIntegrationTest {
     @Autowired PlaceRepository placeRepo;
     @Autowired HotelDetailRepository hotelDetailRepo;
     @Autowired HotelRoomRepository hotelRoomRepo;
+    @Autowired PaymentSessionRepository sessionRepo;
 
     private String userToken;
     private String adminToken;
@@ -292,7 +293,7 @@ class PaymentProviderIntegrationTest {
         Long bookingId = createBooking(76);
         JsonNode created = createSessionJson(bookingId, "MOCK");
         String sessionId = created.get("sessionId").asText();
-        String callbackToken = created.get("callbackToken").asText();
+        String callbackToken = sessionRepo.findBySessionId(sessionId).orElseThrow().getCallbackToken();
 
         // Authorize via the Phase-7.26 token-gated simulation callback.
         mvc.perform(post("/api/payment-sessions/" + sessionId + "/callback")
@@ -320,7 +321,7 @@ class PaymentProviderIntegrationTest {
         Long bookingId = createBooking(79);
         JsonNode created = createSessionJson(bookingId, "MOCK");
         String sessionId = created.get("sessionId").asText();
-        String callbackToken = created.get("callbackToken").asText();
+        String callbackToken = sessionRepo.findBySessionId(sessionId).orElseThrow().getCallbackToken();
 
         // Authorize (no settlement yet — authorize does not bridge).
         mvc.perform(post("/api/payment-sessions/" + sessionId + "/callback")

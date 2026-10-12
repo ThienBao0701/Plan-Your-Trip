@@ -72,6 +72,7 @@ class PaymentSessionTest {
     // D1d — the admin force-expire is audited; these read the trail back.
     @Autowired AdminActivityLogRepository auditRepo;
     @Autowired UserRepository userRepo;
+    @Autowired PaymentSessionRepository sessionRepo;
 
     private String adminToken;
     private String userToken;
@@ -112,9 +113,37 @@ class PaymentSessionTest {
         assertEquals("MOCK", res.get("provider").asText());
         assertEquals("PENDING", res.get("status").asText());
         assertEquals(bookingId, res.get("bookingId").asLong());
+        assertFalse(res.has("callbackToken"));
         assertTrue(res.get("checkoutUrl").asText().startsWith("https://mock-gateway"));
-        assertFalse(res.get("callbackToken").asText().isBlank());
         assertTrue(res.get("amount").asDouble() > 0);
+    }
+
+    @Test
+    void publicSessionResponsesNeverContainCallbackCredential() throws Exception {
+        Long bookingId = createBooking(userToken, 6);
+        JsonNode created = createSession(userToken, bookingId, "MOCK");
+        String sessionId = created.get("sessionId").asText();
+        String secret = sessionRepo.findBySessionId(sessionId).orElseThrow().getCallbackToken();
+        assertFalse(created.has("callbackToken"));
+
+        String read = mvc.perform(get("/api/payment-sessions/" + sessionId)
+                .header("Authorization", "Bearer " + userToken))
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        assertFalse(mapper.readTree(read).has("callbackToken"));
+
+        JsonNode authorized = callback(created, CallbackOutcome.AUTHORIZED, null);
+        assertFalse(authorized.has("callbackToken"));
+        String captured = mvc.perform(post("/api/payment-sessions/" + sessionId + "/capture")
+                .header("Authorization", "Bearer " + userToken))
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        assertFalse(mapper.readTree(captured).has("callbackToken"));
+        assertNotNull(secret, "the fixture credential remains available server-side");
+
+        JsonNode toCancel = createSession(userToken, createBooking(userToken, 8), "MOCK");
+        String cancel = mvc.perform(post("/api/payment-sessions/" + toCancel.get("sessionId").asText() + "/cancel")
+                .header("Authorization", "Bearer " + userToken))
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        assertFalse(mapper.readTree(cancel).has("callbackToken"));
     }
 
     @Test
@@ -421,7 +450,8 @@ class PaymentSessionTest {
         Long bookingId = createBooking(userToken, 84);
         JsonNode created = createSession(userToken, bookingId, "MOCK");
         String sessionId = created.get("sessionId").asText();
-        String callbackToken = created.get("callbackToken").asText();
+        String callbackToken = sessionRepo.findBySessionId(created.get("sessionId").asText())
+            .orElseThrow().getCallbackToken();
         String checkoutUrl = created.get("checkoutUrl").asText();
 
         mvc.perform(post("/api/admin/payment-sessions/" + sessionId + "/expire")
@@ -538,7 +568,7 @@ class PaymentSessionTest {
     private JsonNode callback(JsonNode createdSession, CallbackOutcome outcome, String providerReference)
             throws Exception {
         String sessionId = createdSession.get("sessionId").asText();
-        String token = createdSession.get("callbackToken").asText();
+        String token = sessionRepo.findBySessionId(sessionId).orElseThrow().getCallbackToken();
         String refJson = providerReference != null ? ",\"providerReference\":\"" + providerReference + "\"" : "";
         String body = mvc.perform(post("/api/payment-sessions/" + sessionId + "/callback")
                 .header("Authorization", "Bearer " + userToken)
@@ -546,7 +576,9 @@ class PaymentSessionTest {
                 .content("{\"callbackToken\":\"" + token + "\",\"outcome\":\"" + outcome.name() + "\"" + refJson + "}"))
             .andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
-        return mapper.readTree(body);
+        JsonNode response = mapper.readTree(body);
+        assertFalse(response.has("callbackToken"));
+        return response;
     }
 
     private String login(String email, String password) throws Exception {
