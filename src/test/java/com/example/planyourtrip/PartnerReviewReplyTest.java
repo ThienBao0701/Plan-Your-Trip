@@ -201,10 +201,10 @@ class PartnerReviewReplyTest {
     }
 
     @Test
-    void partnerReply_adminWithoutPartnerProfile_returns404() throws Exception {
+    void partnerReply_adminWithoutPartnerProfile_returns403() throws Exception {
         Long reviewId = approvedReview();
-        // Admin passes the /api/partner/** role gate but has no partner profile → 404 (no leak).
-        reply(adminToken, reviewId, "admin has no profile", status().isNotFound());
+        // Admins are rejected at the partner URL boundary before review scope resolution.
+        reply(adminToken, reviewId, "admin has no profile", status().isForbidden());
     }
 
     @Test

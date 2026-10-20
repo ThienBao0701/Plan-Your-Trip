@@ -195,14 +195,12 @@ class PartnerPropertyCrudTest {
 
     @Test
     void admin_cannotUsePartnerCreateEndpoint() throws Exception {
-        // SecurityConfig lets ADMIN through /api/partner/** at the URL level, and the service then
-        // resolves the caller's own partner profile — which an administrator does not have. The
-        // canonical answer is therefore 404, and no property is created for anyone.
+        // The partner URL boundary rejects ADMIN before resolving any workspace.
         mvc.perform(post("/api/partner/hotels")
                 .header("Authorization", "Bearer " + adminToken())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json(createBody(uniq("Admin Stay")))))
-            .andExpect(status().isNotFound());
+            .andExpect(status().isForbidden());
     }
 
     @Test

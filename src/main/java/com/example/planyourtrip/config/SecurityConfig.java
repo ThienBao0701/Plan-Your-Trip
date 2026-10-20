@@ -76,8 +76,10 @@ public class SecurityConfig {
                 // public visibility as the legacy GET /api/rooms/{roomId}/pricing endpoint.
                 a.requestMatchers(HttpMethod.POST, "/api/rooms/*/pricing/quote").permitAll();
                 a.requestMatchers("/api/admin/**").hasRole("ADMIN");
-                a.requestMatchers("/api/partner/profile/**").authenticated();
-                a.requestMatchers("/api/partner/**").hasAnyRole("PARTNER", "ADMIN");
+                // Profile routes include USER onboarding before approval, but platform admins
+                // must never enter the partner surface. Keep this narrower matcher first.
+                a.requestMatchers("/api/partner/profile/**").hasAnyRole("USER", "PARTNER");
+                a.requestMatchers("/api/partner/**").hasRole("PARTNER");
                 a.anyRequest().authenticated();
             })
             .headers(h -> h.frameOptions(f -> f.sameOrigin()))

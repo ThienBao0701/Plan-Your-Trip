@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -47,16 +48,15 @@ public class PartnerProfileService {
 
     @Transactional
     public PartnerProfileResponse createOrUpdateMyProfile(Long userId, PartnerProfileRequest req) {
+        User applicant = requireProfileApplicant(userId);
         PartnerProfile profile = partnerProfileRepo.findByUserId(userId).orElse(null);
 
         if (profile == null) {
             // RBAC V1.1 §11.6 WS-2 — one workspace per account: a member of another partner company
             // must leave it before registering a company of their own.
             membershipService.requireCanCreateCompany(userId);
-            User user = userRepo.findById(userId)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
             profile = new PartnerProfile();
-            profile.setUser(user);
+            profile.setUser(applicant);
             profile.setVerificationStatus(PartnerVerificationStatus.DRAFT);
         } else if (profile.getVerificationStatus() != PartnerVerificationStatus.DRAFT
                 && profile.getVerificationStatus() != PartnerVerificationStatus.REJECTED) {
@@ -78,11 +78,13 @@ public class PartnerProfileService {
 
     @Transactional(readOnly = true)
     public PartnerProfileResponse getMyProfile(Long userId) {
+        requireProfileApplicant(userId);
         return toResponse(myProfileOrThrow(userId));
     }
 
     @Transactional
     public PartnerSubmitResponse submitMyProfile(Long userId) {
+        requireProfileApplicant(userId);
         PartnerProfile profile = myProfileOrThrow(userId);
         if (profile.getVerificationStatus() != PartnerVerificationStatus.DRAFT
                 && profile.getVerificationStatus() != PartnerVerificationStatus.REJECTED) {
@@ -152,6 +154,10 @@ public class PartnerProfileService {
     @Transactional
     public PartnerProfileResponse adminApprove(Long adminUserId, Long id) {
         PartnerProfile profile = profileOrThrow(id);
+        if (Objects.equals(profile.getUser().getId(), adminUserId)) {
+            throw new ApiException(HttpStatus.FORBIDDEN, "SELF_APPROVAL_FORBIDDEN",
+                "Administrators cannot approve their own partner applications");
+        }
         if (profile.getVerificationStatus() != PartnerVerificationStatus.SUBMITTED)
             throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY, "Only submitted profiles can be approved");
 
@@ -183,6 +189,17 @@ public class PartnerProfileService {
             PartnerVerificationStatus.SUBMITTED.name(), PartnerVerificationStatus.APPROVED.name());
 
         return toResponse(profile);
+    }
+
+    /** Only traveller and partner accounts may use the partner onboarding self-service routes. */
+    private User requireProfileApplicant(Long userId) {
+        User user = userRepo.findById(userId)
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+        AccountRole role = AccountRole.parse(user.getRole()).orElse(null);
+        if (role != AccountRole.USER && role != AccountRole.PARTNER) {
+            throw new ApiException(HttpStatus.FORBIDDEN, "Access denied");
+        }
+        return user;
     }
 
     /**

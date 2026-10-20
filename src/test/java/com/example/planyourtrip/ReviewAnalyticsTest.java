@@ -204,9 +204,9 @@ class ReviewAnalyticsTest {
     }
 
     @Test
-    void partner_placeReviewAnalytics_adminWithoutPartnerProfile_returns404() throws Exception {
-        // Admin passes the /api/partner/** role gate but has no partner profile → uniform 404 (no leak).
-        placeAnalytics(adminToken, hotelPlaceId, null, null, status().isNotFound());
+    void partner_placeReviewAnalytics_adminWithoutPartnerProfile_returns403() throws Exception {
+        // Admins are rejected at the partner URL boundary before workspace resolution.
+        placeAnalytics(adminToken, hotelPlaceId, null, null, status().isForbidden());
     }
 
     @Test

@@ -104,10 +104,10 @@ class RbacKernelHttpTest {
         expect(get("/api/admin/partners"), adminToken(), HttpStatus.OK);
         expect(get("/api/admin/places"), adminToken(), HttpStatus.OK);
         expect(get("/api/admin/activity-logs"), adminToken(), HttpStatus.OK);
-        // an administrator still has no partner workspace of their own
+        // Partner operations require a PARTNER system identity, even if an Admin has a profile.
         mvc.perform(auth(get("/api/partner/hotels"), adminToken()))
-            .andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.message").value("Partner profile not found"));
+            .andExpect(status().isForbidden())
+            .andExpect(jsonPath("$.message").value("Access denied"));
     }
 
     @Test

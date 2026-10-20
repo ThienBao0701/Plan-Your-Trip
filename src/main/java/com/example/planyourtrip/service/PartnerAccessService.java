@@ -7,6 +7,8 @@ import com.example.planyourtrip.model.Place;
 import com.example.planyourtrip.model.PartnerTeamMember;
 import com.example.planyourtrip.model.PartnerTeamRole;
 import com.example.planyourtrip.model.PartnerVerificationStatus;
+import com.example.planyourtrip.model.AccountRole;
+import com.example.planyourtrip.repository.UserRepository;
 import com.example.planyourtrip.repository.PartnerProfileRepository;
 import com.example.planyourtrip.repository.PartnerTeamMemberRepository;
 import com.example.planyourtrip.repository.PlaceRepository;
@@ -51,6 +53,7 @@ public class PartnerAccessService {
 
     public static final String PARTNER_NOT_APPROVED = "PARTNER_NOT_APPROVED";
     public static final String PERMISSION_DENIED = "PERMISSION_DENIED";
+    public static final String PARTNER_ACCOUNT_REQUIRED = "PARTNER_ACCOUNT_REQUIRED";
 
     private static final Logger log = LoggerFactory.getLogger(PartnerAccessService.class);
 
@@ -63,17 +66,20 @@ public class PartnerAccessService {
     private final PartnerMembershipService memberships;
     private final PartnerResourceTargetResolver targets;
     private final PlaceRepository places;
+    private final UserRepository users;
 
     public PartnerAccessService(PartnerProfileRepository partnerProfiles,
                                 PartnerTeamMemberRepository teamMembers,
                                 PartnerMembershipService memberships,
                                 PartnerResourceTargetResolver targets,
-                                PlaceRepository places) {
+                                PlaceRepository places,
+                                UserRepository users) {
         this.partnerProfiles = partnerProfiles;
         this.teamMembers = teamMembers;
         this.memberships = memberships;
         this.targets = targets;
         this.places = places;
+        this.users = users;
     }
 
     // ── Workspace resolution ─────────────────────────────────────────────────
@@ -86,6 +92,7 @@ public class PartnerAccessService {
      */
     @Transactional(readOnly = true)
     public PartnerAccessContext requireWorkspace(Long userId) {
+        requirePartnerAccount(userId);
         Optional<PartnerProfile> own = partnerProfiles.findByUserId(userId);
         if (own.isPresent()) {
             requireApproved(own.get());
@@ -115,10 +122,26 @@ public class PartnerAccessService {
      * registrant-only self endpoints (business profile, §25.1 Profile rows).
      */
     public PartnerAccessContext requireRegistrantWorkspace(Long userId) {
+        requirePartnerAccount(userId);
         PartnerProfile profile = partnerProfiles.findByUserId(userId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, PROFILE_NOT_FOUND_MESSAGE));
         requireApproved(profile);
         return registrantContext(profile, userId);
+    }
+
+    /**
+     * A workspace is a PARTNER capability, not an account-profile capability. Keep this check
+     * inside the authorization kernel as well as at the URL boundary so internal callers cannot
+     * turn an ADMIN-owned legacy profile or membership into partner access.
+     */
+    private void requirePartnerAccount(Long userId) {
+        boolean isPartner = users.findById(userId)
+            .flatMap(user -> AccountRole.parse(user.getRole()))
+            .filter(role -> role == AccountRole.PARTNER)
+            .isPresent();
+        if (!isPartner) {
+            throw new ApiException(HttpStatus.FORBIDDEN, PARTNER_ACCOUNT_REQUIRED, "Partner account required");
+        }
     }
 
     // ── Scope helpers (B5: filter in the query) ──────────────────────────────

@@ -556,7 +556,7 @@ class RbacPartnerEnforcementTest {
         mvc.perform(get("/api/partner/me/access")).andExpect(status().isUnauthorized());
         mvc.perform(get("/api/partner/hotels").header("Authorization", "Bearer not-a-token")).andExpect(status().isUnauthorized());
         send(get("/api/partner/hotels"), f.guestToken()).andExpect(status().isForbidden());        // USER on /api/partner
-        send(get("/api/partner/me/access"), adminToken()).andExpect(status().isNotFound());      // admins have no workspace
+        send(get("/api/partner/me/access"), adminToken()).andExpect(status().isForbidden());
         denied(patch("/api/partner/hotels/" + f.p1() + "/activate"), f.m("viewerCompany").token());  // views it: 403
         denied(patch("/api/partner/hotels/" + f.p1() + "/activate"), f.m("financeCompany").token());       // views it: 403
         notFound(patch("/api/partner/hotels/" + f.p1() + "/activate"), f.m("housekeepingUnit").token());  // cannot see it: 404
@@ -640,8 +640,7 @@ class RbacPartnerEnforcementTest {
         // partner and admin authority never cross (§3)
         send(get("/api/admin/partners"), self.token()).andExpect(status().isForbidden());
         send(get("/api/admin/partners"), f.a().ownerToken()).andExpect(status().isForbidden());
-        send(get("/api/partner/hotels"), adminToken()).andExpect(status().isNotFound())     // no workspace
-            .andExpect(jsonPath("$.message").value("Partner profile not found"));
+        send(get("/api/partner/hotels"), adminToken()).andExpect(status().isForbidden());
         PartnerAccessContext ctx = partnerAccess.requireWorkspace(self.userId());
         assertTrue(PartnerAuthorization.effectivePermissions(ctx).company().stream()
             .noneMatch(p -> p == PartnerPermission.TEAM_OWNER_MANAGE || p == PartnerPermission.OWNERSHIP_TRANSFER
