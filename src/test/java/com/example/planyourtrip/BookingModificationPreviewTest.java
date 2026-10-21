@@ -3,6 +3,7 @@ package com.example.planyourtrip;
 import com.example.planyourtrip.repository.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * WOULD do — new price, old→new totals + difference (additional payment / refundable amount),
  * overlap-adjusted inventory availability, layered coupon/loyalty/travel-credit/gift-card previews —
  * and, critically, that it mutates NOTHING (no booking / inventory / payment / reservation / ledger /
- * notification change; the booking's own fields are untouched). Also proves ownership (403),
+ * notification change; the booking's own fields are untouched). Also proves owner-only access (404 for foreign bookings),
  * non-PENDING rejection (422), the room-change-not-supported invariant, and the overlap-adjustment
  * that makes a one-night-shift overlapping stay show AVAILABLE.
  *
@@ -334,11 +335,11 @@ class BookingModificationPreviewTest {
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
-    // 9. Ownership → 403 (matches modify())
+    // 9. Foreign booking is masked as missing.
     // ═══════════════════════════════════════════════════════════════════════════
 
     @Test
-    void anotherUsersBooking_returns403() throws Exception {
+    void anotherUsersBooking_matchesMissingBookingAfterNormalizingPathAndTimestamp() throws Exception {
         Long roomId = provisionBookableRoom();
         Long planId = createPlanReturnId(roomId, plan("Own", "PV-OWN-" + uniq(), 1_000_000, 20));
         String owner = registerAndLogin("pv-owner-" + uniq() + "@test.com");
@@ -347,7 +348,23 @@ class BookingModificationPreviewTest {
         String other = registerAndLogin("pv-other-" + uniq() + "@test.com");
         Map<String, Object> req = new LinkedHashMap<>();
         req.put("checkOut", today(6).toString());
-        preview(other, bookingId, req, status().isForbidden());
+        assertFalse(bookingRepo.existsById(Long.MAX_VALUE));
+        ObjectNode foreign = (ObjectNode) preview(other, bookingId, req, status().isNotFound());
+        ObjectNode missing = (ObjectNode) preview(other, Long.MAX_VALUE, req, status().isNotFound());
+        assertEquals("/api/me/bookings/" + bookingId + "/modify/preview", foreign.path("path").asText());
+        assertEquals("/api/me/bookings/" + Long.MAX_VALUE + "/modify/preview", missing.path("path").asText());
+        assertTrue(foreign.hasNonNull("timestamp"));
+        assertTrue(missing.hasNonNull("timestamp"));
+        foreign.remove(java.util.List.of("path", "timestamp"));
+        missing.remove(java.util.List.of("path", "timestamp"));
+        ObjectNode expected = mapper.createObjectNode()
+            .put("status", 404).put("error", "Not Found").put("message", "Booking not found");
+        assertEquals(expected, foreign);
+        assertEquals(foreign, missing);
+        // Inspect text fields, not the numeric HTTP status (which could coincide with a fixture ID).
+        foreign.elements().forEachRemaining(value -> {
+            if (value.isTextual()) assertFalse(value.asText().contains(bookingId.toString()));
+        });
     }
 
     @Test

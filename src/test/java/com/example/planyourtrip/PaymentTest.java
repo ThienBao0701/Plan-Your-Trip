@@ -1,6 +1,8 @@
 package com.example.planyourtrip;
 
 import com.example.planyourtrip.repository.*;
+import com.example.planyourtrip.model.BookingStatus;
+import com.example.planyourtrip.model.PaymentStatus;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,6 +30,8 @@ class PaymentTest {
     @Autowired HotelRoomRepository hotelRoomRepo;
     @Autowired BookingRepository bookingRepo;
     @Autowired PaymentRepository paymentRepo;
+    @Autowired AdminActivityLogRepository auditRepo;
+    @Autowired NotificationRepository notificationRepo;
 
     private String adminToken;
     private String userToken;
@@ -78,7 +82,7 @@ class PaymentTest {
     }
 
     @Test
-    void payment_create_rejectsOtherUserBooking_returns403() throws Exception {
+    void payment_create_rejectsOtherUserBooking_returns404() throws Exception {
         Long bookingId = createBooking(userToken, stdTwinRoomId, TODAY.plusDays(47), TODAY.plusDays(49), 1);
 
         // Partner tries to pay for user's booking
@@ -86,7 +90,7 @@ class PaymentTest {
                 .header("Authorization", "Bearer " + partnerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"bookingId\":" + bookingId + ",\"paymentMethod\":\"MOCK\"}"))
-            .andExpect(status().isForbidden());
+            .andExpect(status().isNotFound());
     }
 
     @Test
@@ -239,15 +243,20 @@ class PaymentTest {
     }
 
     @Test
-    void payment_mockSuccess_adminCanConfirm() throws Exception {
+    void payment_mockSuccessAdminCannotSettleAnotherUsersPayment() throws Exception {
         Long bookingId = createBooking(userToken, stdTwinRoomId, TODAY.plusDays(66), TODAY.plusDays(68), 1);
         Long payId     = createPayment(userToken, bookingId);
+        long auditsBefore = auditRepo.count();
+        long notificationsBefore = notificationRepo.count();
 
-        // Admin triggers success
         mvc.perform(post("/api/payments/" + payId + "/mock-success")
                 .header("Authorization", "Bearer " + adminToken))
-            .andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString();
+            .andExpect(status().isNotFound());
+        assertEquals(PaymentStatus.PENDING, paymentRepo.findById(payId).orElseThrow().getStatus());
+        assertEquals(BookingStatus.PENDING, bookingRepo.findById(bookingId).orElseThrow().getStatus());
+        assertEquals(auditsBefore, auditRepo.count(), "rejected settlement must not create an audit event");
+        assertEquals(notificationsBefore, notificationRepo.count(),
+            "rejected settlement must not notify about payment or booking success");
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -268,14 +277,21 @@ class PaymentTest {
     }
 
     @Test
-    void payment_userCannotGetOtherPayment_returns403() throws Exception {
+    void payment_userCannotDistinguishForeignFromMissingPayment() throws Exception {
         Long bookingId = createBooking(userToken, stdTwinRoomId, TODAY.plusDays(70), TODAY.plusDays(72), 1);
         Long payId     = createPayment(userToken, bookingId);
 
         // Partner tries to get user's payment
-        mvc.perform(get("/api/payments/" + payId)
+        String foreignBody = mvc.perform(get("/api/payments/" + payId)
                 .header("Authorization", "Bearer " + partnerToken))
-            .andExpect(status().isForbidden());
+            .andExpect(status().isNotFound())
+            .andReturn().getResponse().getContentAsString();
+        String missingBody = mvc.perform(get("/api/payments/99999999")
+                .header("Authorization", "Bearer " + partnerToken))
+            .andExpect(status().isNotFound())
+            .andReturn().getResponse().getContentAsString();
+        assertEquals(mapper.readTree(missingBody).get("message").asText(),
+            mapper.readTree(foreignBody).get("message").asText());
     }
 
     @Test
@@ -286,11 +302,14 @@ class PaymentTest {
     }
 
     @Test
-    void payment_adminCanGetAnyPayment_returns200() throws Exception {
+    void paymentAdminReadsUseThePermissionGatedAdminRoute() throws Exception {
         Long bookingId = createBooking(userToken, stdTwinRoomId, TODAY.plusDays(72), TODAY.plusDays(74), 1);
         Long payId     = createPayment(userToken, bookingId);
 
         mvc.perform(get("/api/payments/" + payId)
+                .header("Authorization", "Bearer " + adminToken))
+            .andExpect(status().isNotFound());
+        mvc.perform(get("/api/admin/payments/" + payId)
                 .header("Authorization", "Bearer " + adminToken))
             .andExpect(status().isOk());
     }
@@ -316,12 +335,12 @@ class PaymentTest {
     }
 
     @Test
-    void payment_listByBooking_otherUser_returns403() throws Exception {
+    void payment_listByBooking_otherUser_returns404() throws Exception {
         Long bookingId = createBooking(userToken, stdTwinRoomId, TODAY.plusDays(76), TODAY.plusDays(78), 1);
 
         mvc.perform(get("/api/bookings/" + bookingId + "/payments")
                 .header("Authorization", "Bearer " + partnerToken))
-            .andExpect(status().isForbidden());
+            .andExpect(status().isNotFound());
     }
 
     // ═══════════════════════════════════════════════════════════════════════════

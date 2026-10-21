@@ -78,9 +78,9 @@ public class ReviewService {
                                   Integer ratingLocation, Integer ratingValue, Integer ratingFacilities,
                                   String title, String content) {
         Booking booking = bookingRepo.findById(bookingId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found: " + bookingId));
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found"));
         if (!booking.getUser().getId().equals(userId))
-            throw new ApiException(HttpStatus.FORBIDDEN, "Access denied: booking belongs to another user");
+            throw new ApiException(HttpStatus.NOT_FOUND, "Booking not found");
         if (booking.getStatus() != BookingStatus.COMPLETED)
             throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY, "Only completed bookings can be reviewed");
         if (reviewRepo.existsByBookingId(booking.getId()))
@@ -126,8 +126,14 @@ public class ReviewService {
     @Transactional(readOnly = true)
     public ReviewResponse getReview(Long userId, Long reviewId) {
         Review review = reviewOrThrow(reviewId);
-        checkOwnerOrAdmin(userId, review.getUser().getId());
+        requireOwner(userId, review, "Review not found");
         return toResponse(review);
+    }
+
+    /** Admin read surface; the /api/admin endpoint registry enforces REVIEW_VIEW before this call. */
+    @Transactional(readOnly = true)
+    public ReviewResponse adminGetReview(Long reviewId) {
+        return toResponse(reviewOrThrow(reviewId));
     }
 
     @Transactional(readOnly = true)
@@ -184,12 +190,12 @@ public class ReviewService {
      * {@link MediaAssetService#create} verbatim (same validation: url required,
      * mediaType required, cover-only-IMAGE). {@code ownerType}/{@code ownerId} are
      * FORCED to REVIEW / the path reviewId — never taken from the client.
-     * Wrong owner → 403, matching the existing review ownership convention.
+     * A missing review and a review owned by someone else share the same 404 response.
      */
     @Transactional
     public MediaAssetResponse addReviewMedia(Long userId, Long reviewId, ReviewMediaRequest req) {
         Review review = reviewOrThrow(reviewId);
-        requireOwner(userId, review);
+        requireOwner(userId, review, "Review not found");
         MediaAssetRequest full = new MediaAssetRequest(
             MediaOwnerType.REVIEW, reviewId,
             req.url(), req.thumbnailUrl(), req.mediaType(),
@@ -201,20 +207,20 @@ public class ReviewService {
      * Soft-delete (deactivate) one media asset attached to a review the caller owns.
      * Reuses {@link MediaAssetService#deactivate} — the same soft-delete the admin
      * media surface uses. The media must belong to THIS review (ownerType=REVIEW,
-     * ownerId=reviewId) else 404; wrong review owner → 403.
+     * ownerId=reviewId) else 404; a foreign review is masked as missing.
      */
     @Transactional
     public MediaAssetResponse deleteReviewMedia(Long userId, Long reviewId, Long mediaId) {
         Review review = reviewOrThrow(reviewId);
-        requireOwner(userId, review);
+        requireOwner(userId, review, "Review not found");
         if (!mediaAssetRepo.existsByOwnerTypeAndOwnerIdAndId(MediaOwnerType.REVIEW, reviewId, mediaId))
             throw new ApiException(HttpStatus.NOT_FOUND, "Media asset not found: " + mediaId);
         return mediaAssetService.deactivate(mediaId);
     }
 
-    private void requireOwner(Long userId, Review review) {
+    private void requireOwner(Long userId, Review review, String notFoundMessage) {
         if (!review.getUser().getId().equals(userId))
-            throw new ApiException(HttpStatus.FORBIDDEN, "Access denied: review belongs to another user");
+            throw new ApiException(HttpStatus.NOT_FOUND, notFoundMessage);
     }
 
     @Transactional
@@ -331,15 +337,7 @@ public class ReviewService {
 
     private Review reviewOrThrow(Long reviewId) {
         return reviewRepo.findById(reviewId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Review not found: " + reviewId));
-    }
-
-    private void checkOwnerOrAdmin(Long userId, Long ownerId) {
-        if (ownerId.equals(userId)) return;
-        User requestingUser = userRepo.findById(userId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
-        if (!"ADMIN".equals(requestingUser.getRole()))
-            throw new ApiException(HttpStatus.FORBIDDEN, "Access denied");
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Review not found"));
     }
 
     private ReviewResponse toResponse(Review r) {

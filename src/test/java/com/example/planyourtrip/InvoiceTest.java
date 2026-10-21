@@ -3,15 +3,20 @@ package com.example.planyourtrip;
 import com.example.planyourtrip.repository.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,6 +37,8 @@ class InvoiceTest {
     @Autowired PlaceRepository placeRepo;
     @Autowired HotelDetailRepository hotelDetailRepo;
     @Autowired HotelRoomRepository hotelRoomRepo;
+    @Autowired PaymentRepository paymentRepo;
+    @Autowired JdbcTemplate jdbc;
 
     private String adminToken;
     private String userToken;
@@ -40,6 +47,8 @@ class InvoiceTest {
 
     private static final LocalDate TODAY = LocalDate.now();
     private static final AtomicInteger dayCursor = new AtomicInteger(40);
+    // Privacy fixtures stay separate from the legacy 40+ day windows and inside the 90-day seed.
+    private static final AtomicInteger privacyDayCursor = new AtomicInteger(10);
 
     @BeforeEach
     void setup() throws Exception {
@@ -84,6 +93,47 @@ class InvoiceTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(String.format("{\"bookingId\":%d,\"paymentId\":%d}", bookingId, paymentId)))
             .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    void invoice_create_foreignAndMissingPaymentsShareGeneric404WithoutSideEffects() throws Exception {
+        Long bookingId = createPrivacyBooking(userToken);
+        mockSuccess(createPayment(bookingId));
+        String other = registerUser("invoice-payment-owner");
+        Long foreignBookingId = createPrivacyBooking(other);
+        Long foreignPaymentId = createPayment(other, foreignBookingId);
+        mockSuccess(other, foreignPaymentId);
+        assertFalse(paymentRepo.existsById(Long.MAX_VALUE));
+        var before = invoiceSideEffectSnapshot();
+
+        ObjectNode foreign = invoiceCreationError(bookingId, foreignPaymentId, 404);
+        assertEquals(before, invoiceSideEffectSnapshot(), "foreign payment rejection must not mutate state");
+        ObjectNode missing = invoiceCreationError(bookingId, Long.MAX_VALUE, 404);
+        assertEquals(before, invoiceSideEffectSnapshot(), "missing payment rejection must not mutate state");
+        ObjectNode expected = mapper.createObjectNode()
+            .put("status", 404).put("error", "Not Found").put("message", "Payment not found");
+        assertEquals(expected, foreign);
+        assertEquals(foreign, missing);
+        foreign.elements().forEachRemaining(value -> {
+            if (value.isTextual()) assertFalse(value.asText().contains(foreignPaymentId.toString()));
+        });
+    }
+
+    @Test
+    void invoice_create_ownedPaymentForAnotherBookingRetainsAssociationValidation() throws Exception {
+        Long bookingId = createPrivacyBooking(userToken);
+        mockSuccess(createPayment(bookingId));
+        Long otherBookingId = createPrivacyBooking(userToken);
+        Long accessiblePaymentId = createPayment(otherBookingId);
+        mockSuccess(accessiblePaymentId);
+        // This is an accessible payment, so the existing association error remains useful.
+        mvc.perform(get("/api/payments/" + accessiblePaymentId)
+                .header("Authorization", "Bearer " + userToken))
+            .andExpect(status().isOk());
+        var before = invoiceSideEffectSnapshot();
+        ObjectNode error = invoiceCreationError(bookingId, accessiblePaymentId, 400);
+        assertEquals("Payment does not belong to this booking", error.path("message").asText());
+        assertEquals(before, invoiceSideEffectSnapshot());
     }
 
     @Test
@@ -143,15 +193,22 @@ class InvoiceTest {
     }
 
     @Test
-    void invoice_getOtherUser_returns403() throws Exception {
+    void invoice_getOtherUserMatchesMissingInvoice404() throws Exception {
         Long bookingId = createBooking();
         Long paymentId = createPayment(bookingId);
         mockSuccess(paymentId);
         Long invoiceId = createInvoice(bookingId, paymentId).get("id").asLong();
 
-        mvc.perform(get("/api/invoices/" + invoiceId)
+        String foreign = mvc.perform(get("/api/invoices/" + invoiceId)
                 .header("Authorization", "Bearer " + partnerToken))
-            .andExpect(status().isForbidden());
+            .andExpect(status().isNotFound())
+            .andReturn().getResponse().getContentAsString();
+        String missing = mvc.perform(get("/api/invoices/9999998")
+                .header("Authorization", "Bearer " + partnerToken))
+            .andExpect(status().isNotFound())
+            .andReturn().getResponse().getContentAsString();
+        assertEquals(mapper.readTree(missing).get("message").asText(),
+            mapper.readTree(foreign).get("message").asText());
     }
 
     @Test
@@ -371,11 +428,18 @@ class InvoiceTest {
     }
 
     private Long createBooking() throws Exception {
-        LocalDate ci = TODAY.plusDays(dayCursor.getAndAdd(3));
+        return createBooking(userToken, TODAY.plusDays(dayCursor.getAndAdd(3)));
+    }
+
+    private Long createPrivacyBooking(String token) throws Exception {
+        return createBooking(token, TODAY.plusDays(privacyDayCursor.getAndAdd(3)));
+    }
+
+    private Long createBooking(String token, LocalDate ci) throws Exception {
         LocalDate co = ci.plusDays(2);
 
         String body = mvc.perform(post("/api/bookings")
-                .header("Authorization", "Bearer " + userToken)
+                .header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(String.format(
                     "{\"roomId\":%d,\"checkIn\":\"%s\",\"checkOut\":\"%s\",\"adults\":2,\"children\":0,\"numberOfRooms\":1}",
@@ -386,8 +450,12 @@ class InvoiceTest {
     }
 
     private Long createPayment(Long bookingId) throws Exception {
+        return createPayment(userToken, bookingId);
+    }
+
+    private Long createPayment(String token, Long bookingId) throws Exception {
         String body = mvc.perform(post("/api/payments")
-                .header("Authorization", "Bearer " + userToken)
+                .header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"bookingId\":" + bookingId + ",\"paymentMethod\":\"MOCK\"}"))
             .andExpect(status().isCreated())
@@ -396,9 +464,54 @@ class InvoiceTest {
     }
 
     private void mockSuccess(Long paymentId) throws Exception {
+        mockSuccess(userToken, paymentId);
+    }
+
+    private void mockSuccess(String token, Long paymentId) throws Exception {
         mvc.perform(post("/api/payments/" + paymentId + "/mock-success")
-                .header("Authorization", "Bearer " + userToken))
+                .header("Authorization", "Bearer " + token))
             .andExpect(status().isOk());
+    }
+
+    private String registerUser(String prefix) throws Exception {
+        String body = mvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(Map.of(
+                    "fullName", "Invoice Privacy Tester",
+                    "email", prefix + "-" + privacyDayCursor.get() + "@test.com",
+                    "password", "password123"))))
+            .andExpect(status().isCreated())
+            .andReturn().getResponse().getContentAsString();
+        return mapper.readTree(body).get("token").asText();
+    }
+
+    private ObjectNode invoiceCreationError(Long bookingId, Long paymentId, int expectedStatus) throws Exception {
+        String body = mvc.perform(post("/api/invoices")
+                .header("Authorization", "Bearer " + userToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(Map.of("bookingId", bookingId, "paymentId", paymentId))))
+            .andExpect(status().is(expectedStatus))
+            .andReturn().getResponse().getContentAsString();
+        ObjectNode error = (ObjectNode) mapper.readTree(body);
+        assertEquals("/api/invoices", error.path("path").asText());
+        assertTrue(error.hasNonNull("timestamp"));
+        error.remove(List.of("path", "timestamp"));
+        return error;
+    }
+
+    private Map<String, List<Map<String, String>>> invoiceSideEffectSnapshot() {
+        Map<String, List<Map<String, String>>> snapshot = new LinkedHashMap<>();
+        for (String table : List.of("invoices", "bookings", "payments", "admin_activity_logs", "notifications")) {
+            snapshot.put(table, jdbc.query("SELECT * FROM " + table + " ORDER BY id", (rs, rowNum) -> {
+                Map<String, String> row = new LinkedHashMap<>();
+                // Compare column values, including CLOB contents, rather than JDBC object identities.
+                for (int column = 1; column <= rs.getMetaData().getColumnCount(); column++) {
+                    row.put(rs.getMetaData().getColumnLabel(column), rs.getString(column));
+                }
+                return row;
+            }));
+        }
+        return snapshot;
     }
 
     private JsonNode createInvoice(Long bookingId, Long paymentId) throws Exception {

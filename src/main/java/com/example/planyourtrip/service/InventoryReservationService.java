@@ -8,7 +8,6 @@ import com.example.planyourtrip.model.InventoryReservationStatus;
 import com.example.planyourtrip.repository.BookingRepository;
 import com.example.planyourtrip.repository.InventoryReservationRepository;
 import com.example.planyourtrip.repository.RoomInventoryRepository;
-import com.example.planyourtrip.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -74,18 +73,15 @@ public class InventoryReservationService {
     private final InventoryReservationRepository reservationRepo;
     private final RoomInventoryRepository inventoryRepo;
     private final BookingRepository bookingRepo;
-    private final UserRepository userRepo;
     private final AdminActivityLogService adminAudit;
 
     public InventoryReservationService(InventoryReservationRepository reservationRepo,
                                        RoomInventoryRepository inventoryRepo,
                                        BookingRepository bookingRepo,
-                                       UserRepository userRepo,
                                        AdminActivityLogService adminAudit) {
         this.reservationRepo = reservationRepo;
         this.inventoryRepo = inventoryRepo;
         this.bookingRepo = bookingRepo;
-        this.userRepo = userRepo;
         this.adminAudit = adminAudit;
     }
 
@@ -277,19 +273,15 @@ public class InventoryReservationService {
     // READS
     // ═════════════════════════════════════════════════════════════════════
 
-    /** Customer reservation-status endpoint — owner-scoped (admin also allowed). */
+    /** Customer reservation-status endpoint — owner-scoped; Admin reads use the permission-gated Admin API. */
     @Transactional(readOnly = true)
     public ReservationResponse getForBooking(Long userId, Long bookingId) {
+        String notFound = "Inventory reservation not found";
         InventoryReservation reservation = reservationRepo.findByBookingId(bookingId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND,
-                "No inventory reservation exists for booking " + bookingId));
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, notFound));
         Long ownerId = reservation.getBooking().getUser().getId();
-        if (!ownerId.equals(userId)) {
-            var requester = userRepo.findById(userId)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
-            if (!"ADMIN".equals(requester.getRole()))
-                throw new ApiException(HttpStatus.FORBIDDEN, "Access denied");
-        }
+        if (!ownerId.equals(userId))
+            throw new ApiException(HttpStatus.NOT_FOUND, notFound);
         return toResponse(reservation);
     }
 

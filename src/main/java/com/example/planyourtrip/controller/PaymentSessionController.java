@@ -39,13 +39,13 @@ public class PaymentSessionController {
     }
 
     @GetMapping("/{sessionId}")
-    @Operation(summary = "Get a payment session by its public sessionId (owner or admin)")
+    @Operation(summary = "Get own payment session by its public sessionId")
     public SessionResponse get(@AuthUser Long uid, @PathVariable String sessionId) {
         return service.getSession(uid, sessionId);
     }
 
     @GetMapping("/{sessionId}/events")
-    @Operation(summary = "List the immutable lifecycle events for a session (owner or admin)")
+    @Operation(summary = "List own payment-session lifecycle events")
     public List<SessionEventResponse> events(@AuthUser Long uid, @PathVariable String sessionId) {
         return service.getSessionEvents(uid, sessionId);
     }
@@ -57,13 +57,13 @@ public class PaymentSessionController {
     }
 
     @PostMapping("/{sessionId}/capture")
-    @Operation(summary = "Capture an AUTHORIZED session (owner or admin; idempotent)")
+    @Operation(summary = "Capture an AUTHORIZED own session (idempotent)")
     public SessionResponse capture(@AuthUser Long uid, @PathVariable String sessionId) {
         return service.capture(uid, sessionId);
     }
 
     @PostMapping("/{sessionId}/cancel")
-    @Operation(summary = "Cancel a non-terminal session (owner or admin; idempotent)")
+    @Operation(summary = "Cancel a non-terminal own session (idempotent)")
     public SessionResponse cancel(@AuthUser Long uid, @PathVariable String sessionId) {
         return service.cancel(uid, sessionId);
     }

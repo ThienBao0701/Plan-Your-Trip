@@ -37,7 +37,7 @@ public class ReviewController {
     }
 
     @GetMapping("/api/reviews/{id}")
-    @Operation(summary = "Get review by ID (owner or admin)")
+    @Operation(summary = "Get own review by ID")
     public ReviewResponse getById(@AuthUser Long uid, @PathVariable Long id) {
         return service.getReview(uid, id);
     }

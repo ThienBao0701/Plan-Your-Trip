@@ -223,11 +223,11 @@ class BookingModificationTest {
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
-    // 6. Another user's booking → 403 (matches cancel())
+    // 6. Another user's booking is masked as missing.
     // ═══════════════════════════════════════════════════════════════════════════
 
     @Test
-    void modifyAnotherUsersBooking_returns403() throws Exception {
+    void modifyAnotherUsersBooking_returns404() throws Exception {
         Long roomId = provisionBookableRoom();
         Long planId = createPlanReturnId(roomId, plan("Own", "OWN-1", 1_000_000, 20));
         String owner = registerAndLogin("mod-owner-" + uniq() + "@test.com");
@@ -236,7 +236,7 @@ class BookingModificationTest {
         String other = registerAndLogin("mod-other-" + uniq() + "@test.com");
         Map<String, Object> req = new LinkedHashMap<>();
         req.put("checkOut", today(20).toString());
-        modify(other, bookingId, req, status().isForbidden());
+        modify(other, bookingId, req, status().isNotFound());
     }
 
     // ═══════════════════════════════════════════════════════════════════════════

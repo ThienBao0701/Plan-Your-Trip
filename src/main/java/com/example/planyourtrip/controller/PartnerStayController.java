@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Phase 7.42 — Consolidated READ-ONLY Partner Guest Stay Detail.
  *
- * <p>One authenticated (PARTNER/ADMIN via the existing {@code /api/partner/**} rule), ownership-scoped,
+ * <p>One authenticated (PARTNER via the existing {@code /api/partner/**} rule), ownership-scoped,
  * strictly READ-ONLY endpoint that returns the whole guest-stay screen for a booking in a single call —
  * a superset of {@code GET /api/partner/bookings/{id}} for the stay use-case. An unknown booking AND a
  * booking outside the caller's properties both return a uniform 404 (no cross-partner leak). It mutates

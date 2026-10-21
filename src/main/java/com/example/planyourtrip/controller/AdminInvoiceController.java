@@ -35,8 +35,8 @@ public class AdminInvoiceController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get invoice by ID")
-    public InvoiceResponse getById(@AuthUser Long uid, @PathVariable Long id) {
-        return service.getInvoice(uid, id);
+    public InvoiceResponse getById(@PathVariable Long id) {
+        return service.adminGetInvoice(id);
     }
 
     @PatchMapping("/{id}/status")

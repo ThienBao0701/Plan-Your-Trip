@@ -28,7 +28,7 @@ public class InventoryReservationController {
     }
 
     @GetMapping
-    @Operation(summary = "Get the inventory-reservation status for a booking (owner or admin)")
+    @Operation(summary = "Get the inventory-reservation status for own booking")
     public ReservationResponse get(@AuthUser Long uid, @PathVariable Long bookingId) {
         return service.getForBooking(uid, bookingId);
     }

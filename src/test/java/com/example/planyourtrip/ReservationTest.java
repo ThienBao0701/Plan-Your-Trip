@@ -379,14 +379,14 @@ class ReservationTest {
     }
 
     @Test
-    void reservation_timeline_otherUser_returns403() throws Exception {
+    void reservation_timeline_otherUser_returns404() throws Exception {
         Long bookingId = createBooking(TODAY.plusDays(62), TODAY.plusDays(64));
 
         // partner cannot view user's timeline
         String partnerToken = login("partner@planyourtrip.com", "partner123456");
         mvc.perform(get("/api/bookings/" + bookingId + "/timeline")
                 .header("Authorization", "Bearer " + partnerToken))
-            .andExpect(status().isForbidden());
+            .andExpect(status().isNotFound());
     }
 
     // ═══════════════════════════════════════════════════════════════════════════

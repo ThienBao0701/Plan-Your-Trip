@@ -7,7 +7,6 @@ import com.example.planyourtrip.model.*;
 import com.example.planyourtrip.repository.BookingRepository;
 import com.example.planyourtrip.repository.PaymentSessionEventRepository;
 import com.example.planyourtrip.repository.PaymentSessionRepository;
-import com.example.planyourtrip.repository.UserRepository;
 import com.example.planyourtrip.service.gateway.PaymentGateway;
 import com.example.planyourtrip.service.gateway.PaymentGateway.CallbackVerification;
 import com.example.planyourtrip.service.gateway.PaymentGateway.GatewayCallback;
@@ -68,7 +67,6 @@ public class PaymentGatewayService {
     private final PaymentSessionRepository sessionRepo;
     private final PaymentSessionEventRepository eventRepo;
     private final BookingRepository bookingRepo;
-    private final UserRepository userRepo;
     private final NotificationService notificationService;
     private final PaymentSettlementBridge settlementBridge;
     private final AdminActivityLogService adminAudit;
@@ -79,7 +77,6 @@ public class PaymentGatewayService {
     public PaymentGatewayService(PaymentSessionRepository sessionRepo,
                                  PaymentSessionEventRepository eventRepo,
                                  BookingRepository bookingRepo,
-                                 UserRepository userRepo,
                                  NotificationService notificationService,
                                  PaymentSettlementBridge settlementBridge,
                                  List<PaymentGateway> gatewayBeans,
@@ -89,7 +86,6 @@ public class PaymentGatewayService {
         this.sessionRepo = sessionRepo;
         this.eventRepo = eventRepo;
         this.bookingRepo = bookingRepo;
-        this.userRepo = userRepo;
         this.notificationService = notificationService;
         this.settlementBridge = settlementBridge;
         this.adminAudit = adminAudit;
@@ -109,9 +105,9 @@ public class PaymentGatewayService {
     @Transactional
     public SessionResponse createSession(Long userId, CreateSessionRequest req) {
         Booking booking = bookingRepo.findById(req.bookingId())
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found: " + req.bookingId()));
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found"));
         if (!booking.getUser().getId().equals(userId))
-            throw new ApiException(HttpStatus.FORBIDDEN, "Access denied: booking belongs to another user");
+            throw new ApiException(HttpStatus.NOT_FOUND, "Booking not found");
         if (booking.getStatus() == BookingStatus.CANCELLED)
             throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,
                 "Cannot open a payment session for a cancelled booking");
@@ -302,7 +298,7 @@ public class PaymentGatewayService {
     @Transactional
     public SessionResponse capture(Long userId, String sessionId) {
         PaymentSession pre = sessionOrThrow(sessionId);
-        checkOwnerOrAdmin(userId, pre);
+        requireOwner(userId, pre, "Payment session not found");
 
         PaymentSession session = sessionRepo.findBySessionIdForUpdate(sessionId).orElseThrow();
         if (session.getStatus() == PaymentSessionStatus.CAPTURED)
@@ -318,7 +314,7 @@ public class PaymentGatewayService {
     @Transactional
     public SessionResponse cancel(Long userId, String sessionId) {
         PaymentSession pre = sessionOrThrow(sessionId);
-        checkOwnerOrAdmin(userId, pre);
+        requireOwner(userId, pre, "Payment session not found");
 
         PaymentSession session = sessionRepo.findBySessionIdForUpdate(sessionId).orElseThrow();
         if (session.getStatus() == PaymentSessionStatus.CANCELLED)
@@ -433,14 +429,14 @@ public class PaymentGatewayService {
     @Transactional(readOnly = true)
     public SessionResponse getSession(Long userId, String sessionId) {
         PaymentSession session = sessionOrThrow(sessionId);
-        checkOwnerOrAdmin(userId, session);
+        requireOwner(userId, session, "Payment session not found");
         return toResponse(session);
     }
 
     @Transactional(readOnly = true)
     public List<SessionEventResponse> getSessionEvents(Long userId, String sessionId) {
         PaymentSession session = sessionOrThrow(sessionId);
-        checkOwnerOrAdmin(userId, session);
+        requireOwner(userId, session, "Payment session not found");
         return eventRepo.findByPaymentSessionIdOrderByCreatedAtAscIdAsc(session.getId())
             .stream().map(this::toEventResponse).toList();
     }
@@ -519,18 +515,15 @@ public class PaymentGatewayService {
         }
     }
 
-    private void checkOwnerOrAdmin(Long userId, PaymentSession session) {
+    private void requireOwner(Long userId, PaymentSession session, String notFoundMessage) {
         Long ownerId = session.getBooking().getUser().getId();
-        if (ownerId.equals(userId)) return;
-        User requester = userRepo.findById(userId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
-        if (!"ADMIN".equals(requester.getRole()))
-            throw new ApiException(HttpStatus.FORBIDDEN, "Access denied");
+        if (!ownerId.equals(userId))
+            throw new ApiException(HttpStatus.NOT_FOUND, notFoundMessage);
     }
 
     private PaymentSession sessionOrThrow(String sessionId) {
         return sessionRepo.findBySessionId(sessionId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Payment session not found: " + sessionId));
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Payment session not found"));
     }
 
     private void insertEvent(PaymentSession session, PaymentSessionEventType type,

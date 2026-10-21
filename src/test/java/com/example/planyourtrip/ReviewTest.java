@@ -96,14 +96,14 @@ class ReviewTest {
     }
 
     @Test
-    void review_create_rejectsOtherUserBooking_returns403() throws Exception {
+    void review_create_rejectsOtherUserBooking_returns404() throws Exception {
         Long bookingId = createCompletedBooking();
 
         mvc.perform(post("/api/reviews")
                 .header("Authorization", "Bearer " + partnerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(reviewJson(bookingId, 5, null, null, null, null, null, null, null)))
-            .andExpect(status().isForbidden());
+            .andExpect(status().isNotFound());
     }
 
     @Test
@@ -184,6 +184,16 @@ class ReviewTest {
     }
 
     @Test
+    void adminReadsReviewsThroughThePermissionGatedRoute() throws Exception {
+        Long bookingId = createCompletedBooking();
+        Long reviewId = createReview(bookingId, 5, null, null, null, null, null, null, null).get("id").asLong();
+        mvc.perform(get("/api/admin/reviews/" + reviewId)
+                .header("Authorization", "Bearer " + adminToken))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(reviewId));
+    }
+
+    @Test
     void admin_listReviews_forbiddenForUser_returns403() throws Exception {
         mvc.perform(get("/api/admin/reviews")
                 .header("Authorization", "Bearer " + userToken))
@@ -206,13 +216,20 @@ class ReviewTest {
     }
 
     @Test
-    void review_getOtherUser_returns403() throws Exception {
+    void review_getOtherUserMatchesMissingReview404() throws Exception {
         Long bookingId = createCompletedBooking();
         Long reviewId = createReview(bookingId, 5, null, null, null, null, null, null, null).get("id").asLong();
 
-        mvc.perform(get("/api/reviews/" + reviewId)
+        String foreignBody = mvc.perform(get("/api/reviews/" + reviewId)
                 .header("Authorization", "Bearer " + partnerToken))
-            .andExpect(status().isForbidden());
+            .andExpect(status().isNotFound())
+            .andReturn().getResponse().getContentAsString();
+        String missingBody = mvc.perform(get("/api/reviews/99999999")
+                .header("Authorization", "Bearer " + partnerToken))
+            .andExpect(status().isNotFound())
+            .andReturn().getResponse().getContentAsString();
+        assertEquals(mapper.readTree(missingBody).get("message").asText(),
+            mapper.readTree(foreignBody).get("message").asText());
     }
 
     // ═══════════════════════════════════════════════════════════════════════════

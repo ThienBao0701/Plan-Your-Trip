@@ -28,7 +28,7 @@ public class PaymentController {
     }
 
     @GetMapping("/api/payments/{id}")
-    @Operation(summary = "Get payment by ID (owner or admin)")
+    @Operation(summary = "Get own payment by ID")
     public PaymentResponse getById(@AuthUser Long uid, @PathVariable Long id) {
         return service.getPayment(uid, id);
     }
@@ -41,7 +41,7 @@ public class PaymentController {
     }
 
     @PostMapping("/api/payments/{id}/mock-success")
-    @Operation(summary = "Simulate successful payment (owner or admin)")
+    @Operation(summary = "Simulate successful payment (owner only; sandbox policy applies)")
     public PaymentResponse mockSuccess(@AuthUser Long uid,
                                         @PathVariable Long id,
                                         @RequestBody(required = false) PaymentResultRequest req) {
@@ -49,7 +49,7 @@ public class PaymentController {
     }
 
     @PostMapping("/api/payments/{id}/mock-fail")
-    @Operation(summary = "Simulate failed payment (owner or admin)")
+    @Operation(summary = "Simulate failed payment (owner only; sandbox policy applies)")
     public PaymentResponse mockFail(@AuthUser Long uid,
                                      @PathVariable Long id,
                                      @RequestBody(required = false) PaymentResultRequest req) {

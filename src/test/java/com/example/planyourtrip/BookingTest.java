@@ -230,11 +230,14 @@ class BookingTest {
     }
 
     @Test
-    void booking_getById_admin_returns200() throws Exception {
+    void adminUsesPermissionGatedBookingReadRoute() throws Exception {
         Long id = createBooking(userToken, stdTwinRoomId, TODAY.plusDays(15), TODAY.plusDays(17), 1);
 
-        // Admin can view any booking via the user endpoint
-        String body = mvc.perform(get("/api/bookings/" + id)
+        mvc.perform(get("/api/bookings/" + id)
+                .header("Authorization", "Bearer " + adminToken))
+            .andExpect(status().isNotFound());
+
+        String body = mvc.perform(get("/api/admin/bookings/" + id)
                 .header("Authorization", "Bearer " + adminToken))
             .andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
@@ -247,6 +250,21 @@ class BookingTest {
         mvc.perform(get("/api/bookings/9999999")
                 .header("Authorization", "Bearer " + adminToken))
             .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void foreignBookingAndMissingBookingShareTheSameTimelineNotFound() throws Exception {
+        Long id = createBooking(userToken, stdTwinRoomId, TODAY.plusDays(18), TODAY.plusDays(20), 1);
+        String foreign = mvc.perform(get("/api/bookings/" + id + "/timeline")
+                .header("Authorization", "Bearer " + adminToken))
+            .andExpect(status().isNotFound())
+            .andReturn().getResponse().getContentAsString();
+        String missing = mvc.perform(get("/api/bookings/9999998/timeline")
+                .header("Authorization", "Bearer " + adminToken))
+            .andExpect(status().isNotFound())
+            .andReturn().getResponse().getContentAsString();
+        assertEquals(mapper.readTree(missing).get("message").asText(),
+            mapper.readTree(foreign).get("message").asText());
     }
 
     @Test

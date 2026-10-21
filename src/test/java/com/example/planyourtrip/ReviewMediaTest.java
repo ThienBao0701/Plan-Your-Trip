@@ -151,25 +151,25 @@ class ReviewMediaTest {
     // ═══════════════════════════════════════════════════════════════════════════
 
     @Test
-    void otherUser_cannotUploadToSomeoneElsesReview_returns403() throws Exception {
+    void otherUser_cannotUploadToSomeoneElsesReview_returns404() throws Exception {
         Long reviewId = createReviewId(5);
 
         mvc.perform(post("/api/me/reviews/" + reviewId + "/media")
                 .header("Authorization", "Bearer " + partnerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"url\":\"https://example.com/x.jpg\",\"mediaType\":\"IMAGE\"}"))
-            .andExpect(status().isForbidden());
+            .andExpect(status().isNotFound());
     }
 
     @Test
-    void otherUser_cannotDeleteSomeoneElsesReviewMedia_returns403() throws Exception {
+    void otherUser_cannotDeleteSomeoneElsesReviewMedia_returns404() throws Exception {
         Long reviewId = createReviewId(5);
         Long mediaId = addReviewMedia(reviewId, userToken,
             "{\"url\":\"https://example.com/mine.jpg\",\"mediaType\":\"IMAGE\"}").get("id").asLong();
 
         mvc.perform(delete("/api/me/reviews/" + reviewId + "/media/" + mediaId)
                 .header("Authorization", "Bearer " + partnerToken))
-            .andExpect(status().isForbidden());
+            .andExpect(status().isNotFound());
     }
 
     @Test

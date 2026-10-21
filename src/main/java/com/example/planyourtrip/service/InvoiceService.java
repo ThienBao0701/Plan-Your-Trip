@@ -43,10 +43,13 @@ public class InvoiceService {
         Booking booking = bookingRepo.findById(req.bookingId())
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found: " + req.bookingId()));
         if (!booking.getUser().getId().equals(userId))
-            throw new ApiException(HttpStatus.FORBIDDEN, "Access denied: booking belongs to another user");
+            throw new ApiException(HttpStatus.NOT_FOUND, "Booking not found: " + req.bookingId());
 
         Payment payment = paymentRepo.findById(req.paymentId())
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Payment not found: " + req.paymentId()));
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Payment not found"));
+        // Mask inaccessible payments before exposing association or payment-state details.
+        if (!payment.getBooking().getUser().getId().equals(userId))
+            throw new ApiException(HttpStatus.NOT_FOUND, "Payment not found");
         if (!payment.getBooking().getId().equals(booking.getId()))
             throw new ApiException(HttpStatus.BAD_REQUEST, "Payment does not belong to this booking");
         if (payment.getStatus() != PaymentStatus.PAID)
@@ -99,16 +102,22 @@ public class InvoiceService {
     @Transactional(readOnly = true)
     public InvoiceResponse getInvoice(Long userId, Long invoiceId) {
         Invoice invoice = invoiceRepo.findById(invoiceId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Invoice not found: " + invoiceId));
-        checkOwnerOrAdmin(userId, invoice.getUser().getId());
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Invoice not found"));
+        requireOwner(userId, invoice.getUser().getId(), "Invoice not found");
         return toResponse(invoice);
+    }
+
+    /** Admin read surface; the /api/admin endpoint registry enforces INVOICE_VIEW before this call. */
+    @Transactional(readOnly = true)
+    public InvoiceResponse adminGetInvoice(Long invoiceId) {
+        return toResponse(invoiceOrThrow(invoiceId));
     }
 
     @Transactional(readOnly = true)
     public InvoiceResponse getInvoiceByBooking(Long userId, Long bookingId) {
         Invoice invoice = invoiceRepo.findByBookingId(bookingId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "No invoice found for booking: " + bookingId));
-        checkOwnerOrAdmin(userId, invoice.getUser().getId());
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Invoice not found for booking"));
+        requireOwner(userId, invoice.getUser().getId(), "Invoice not found for booking");
         return toResponse(invoice);
     }
 
@@ -178,12 +187,9 @@ public class InvoiceService {
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Invoice not found: " + invoiceId));
     }
 
-    private void checkOwnerOrAdmin(Long userId, Long ownerId) {
-        if (ownerId.equals(userId)) return;
-        User requestingUser = userRepo.findById(userId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
-        if (!"ADMIN".equals(requestingUser.getRole()))
-            throw new ApiException(HttpStatus.FORBIDDEN, "Access denied");
+    private void requireOwner(Long userId, Long ownerId, String notFoundMessage) {
+        if (!ownerId.equals(userId))
+            throw new ApiException(HttpStatus.NOT_FOUND, notFoundMessage);
     }
 
     private String generateNumber(Long id) {

@@ -341,7 +341,7 @@ class InventoryReservationTest {
     // ═══════════════════════════════════════════════════════════════════════════
 
     @Test
-    void customerCanReadOwnReservationStatusOthersForbidden() throws Exception {
+    void customerCanReadOwnReservationStatusForeignAndMissingAreBothNotFound() throws Exception {
         LocalDate ci = nextWindow();
         seedNight(ci, 2, 2);
         Long bookingId = createBooking(userToken, ci, 1);
@@ -353,16 +353,26 @@ class InventoryReservationTest {
         assertEquals("HELD", mapper.readTree(body).get("status").asText());
         assertEquals(bookingId.longValue(), mapper.readTree(body).get("bookingId").asLong());
 
-        // A different customer cannot see this booking's hold.
+        // A different customer gets the same 404 as a booking with no reservation.
         String otherToken = registerUser("res-other").get("token").asText();
-        mvc.perform(get("/api/bookings/" + bookingId + "/inventory-reservation")
+        String foreignBody = mvc.perform(get("/api/bookings/" + bookingId + "/inventory-reservation")
                 .header("Authorization", "Bearer " + otherToken))
-            .andExpect(status().isForbidden());
+            .andExpect(status().isNotFound())
+            .andReturn().getResponse().getContentAsString();
+        String missingBody = mvc.perform(get("/api/bookings/99999999/inventory-reservation")
+                .header("Authorization", "Bearer " + otherToken))
+            .andExpect(status().isNotFound())
+            .andReturn().getResponse().getContentAsString();
+        assertEquals(mapper.readTree(missingBody).get("message").asText(),
+            mapper.readTree(foreignBody).get("message").asText());
 
-        // Admin can.
-        mvc.perform(get("/api/bookings/" + bookingId + "/inventory-reservation")
+        // Admin inspection uses the permission-gated Admin route.
+        mvc.perform(get("/api/admin/inventory-reservations/booking/" + bookingId)
                 .header("Authorization", "Bearer " + adminToken))
             .andExpect(status().isOk());
+        mvc.perform(get("/api/bookings/" + bookingId + "/inventory-reservation")
+                .header("Authorization", "Bearer " + adminToken))
+            .andExpect(status().isNotFound());
     }
 
     @Test

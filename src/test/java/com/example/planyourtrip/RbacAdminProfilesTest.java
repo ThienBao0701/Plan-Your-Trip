@@ -164,6 +164,23 @@ class RbacAdminProfilesTest {
         send(get("/api/admin/bookings"), token, 403);
     }
 
+    @Test
+    void userFacingBookingLookupCannotBypassAdminProfiles() throws Exception {
+        Booking booking = bookings.findAll().stream().findFirst().orElseThrow();
+        String noProfile = adminWith();
+        String limited = adminWith(AdminProfile.ANALYTICS);
+        String permitted = adminWith(AdminProfile.BOOKING_SUPPORT);
+        String customerPath = "/api/bookings/" + booking.getId();
+        String adminPath = "/api/admin/bookings/" + booking.getId();
+
+        send(get(customerPath), noProfile, 404);
+        send(get(adminPath), noProfile, 403);
+        send(get(customerPath), limited, 404);
+        send(get(adminPath), limited, 403);
+        send(get(customerPath), permitted, 404);
+        send(get(adminPath), permitted, 200);
+    }
+
     // ── A15 / A46 value-dependent mapping (§9.2, §25.5) ─────────────────────
 
     @Test

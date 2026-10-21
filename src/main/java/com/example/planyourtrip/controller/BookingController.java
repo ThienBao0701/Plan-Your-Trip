@@ -37,13 +37,13 @@ public class BookingController {
     }
 
     @GetMapping("/api/bookings/{id}")
-    @Operation(summary = "Get booking by ID (owner or admin only)")
+    @Operation(summary = "Get own booking by ID")
     public BookingResponse getById(@AuthUser Long uid, @PathVariable Long id) {
         return service.getById(uid, id);
     }
 
     @GetMapping("/api/bookings/{id}/timeline")
-    @Operation(summary = "Get booking timeline (owner or admin)")
+    @Operation(summary = "Get own booking timeline")
     public BookingTimelineResponse getTimeline(@AuthUser Long uid, @PathVariable Long id) {
         return service.getTimeline(uid, id);
     }
@@ -72,8 +72,7 @@ public class BookingController {
         return service.getActiveBookings(uid);
     }
 
-    // Phase 7.38 — Customer Booking Digital Voucher (read-only). Owner-scoped and, unlike
-    // getById/cancel/modify (403 for another user's booking, ADMIN allowed), this surface returns
+    // Phase 7.38 — Customer Booking Digital Voucher (read-only). Owner-scoped.
     // 404 for ANY booking that is not the caller's own — a deliberate "don't leak existence" privacy
     // choice for the customer voucher (mirroring the coupon / gift-card / wallet read surfaces). See
     // BookingService.getVoucher.

@@ -129,19 +129,19 @@ class ReviewBookingRouteTest {
     // ═══════════════════════════════════════════════════════════════════════════
 
     @Test
-    void bookingRoute_otherUser_partner_cannotReview_returns403() throws Exception {
+    void bookingRoute_otherUser_partner_cannotReview_returns404() throws Exception {
         Long bookingId = createCompletedBooking();
         // Partner is not the booking's customer (and also happens to be the hotel owner) → rejected.
         postBookingReview(bookingId, partnerToken, 5, null, null, null, null, null, null, null)
-            .andExpect(status().isForbidden());
+            .andExpect(status().isNotFound());
     }
 
     @Test
-    void bookingRoute_admin_cannotReview_returns403() throws Exception {
+    void bookingRoute_admin_cannotReview_returns404() throws Exception {
         Long bookingId = createCompletedBooking();
         // Admin is not the booking's customer → ownership check rejects before any admin bypass.
         postBookingReview(bookingId, adminToken, 5, null, null, null, null, null, null, null)
-            .andExpect(status().isForbidden());
+            .andExpect(status().isNotFound());
     }
 
     @Test

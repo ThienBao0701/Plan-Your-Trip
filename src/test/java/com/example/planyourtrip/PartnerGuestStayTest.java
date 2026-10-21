@@ -156,13 +156,13 @@ class PartnerGuestStayTest {
     }
 
     @Test
-    void adminToken_canReadAnyStay() throws Exception {
+    void adminToken_cannotEnterPartnerStayRoute() throws Exception {
         OwnedHotelRoom r = setupOwnedHotelRoom("AdminRead");
         String guestToken = registerGuest();
         Long bookingId = createAndConfirmBooking(guestToken, r.roomId(), today.plusDays(1), today.plusDays(3));
 
-        // ADMIN passes the /api/partner/** role gate, but has no approved partner profile ⇒ service 404.
-        getStay(adminToken(), bookingId).andExpect(status().isNotFound());
+        // Platform Admins use /api/admin/**; the partner surface is restricted to PARTNER principals.
+        getStay(adminToken(), bookingId).andExpect(status().isForbidden());
     }
 
     // ═══════════════════════════════════════════════════════════════════════════

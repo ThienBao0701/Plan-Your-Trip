@@ -37,7 +37,7 @@ public class AdminReviewController {
     @GetMapping("/{id}")
     @Operation(summary = "Get review by ID")
     public ReviewResponse getById(@AuthUser Long uid, @PathVariable Long id) {
-        return service.getReview(uid, id);
+        return service.adminGetReview(id);
     }
 
     @PatchMapping("/{id}/moderate")

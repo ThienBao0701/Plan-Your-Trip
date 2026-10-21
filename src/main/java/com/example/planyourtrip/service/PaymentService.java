@@ -18,7 +18,6 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepo;
     private final BookingRepository bookingRepo;
-    private final UserRepository userRepo;
     private final NotificationService notificationService;
     private final LoyaltyRedemptionService loyaltyRedemptionService;
     private final GiftCardService giftCardService;
@@ -29,7 +28,6 @@ public class PaymentService {
 
     public PaymentService(PaymentRepository paymentRepo,
                           BookingRepository bookingRepo,
-                          UserRepository userRepo,
                           NotificationService notificationService,
                           LoyaltyRedemptionService loyaltyRedemptionService,
                           GiftCardService giftCardService,
@@ -38,7 +36,6 @@ public class PaymentService {
                           PaymentRuntimePolicy paymentRuntimePolicy) {
         this.paymentRepo = paymentRepo;
         this.bookingRepo = bookingRepo;
-        this.userRepo    = userRepo;
         this.notificationService = notificationService;
         this.loyaltyRedemptionService = loyaltyRedemptionService;
         this.giftCardService = giftCardService;
@@ -64,11 +61,10 @@ public class PaymentService {
     private PaymentResponse createPaymentUnchecked(Long userId, PaymentRequest req) {
         Booking booking = bookingRepo.findById(req.bookingId())
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND,
-                "Booking not found: " + req.bookingId()));
+                "Booking not found"));
 
         if (!booking.getUser().getId().equals(userId))
-            throw new ApiException(HttpStatus.FORBIDDEN,
-                "Access denied: booking belongs to another user");
+            throw new ApiException(HttpStatus.NOT_FOUND, "Booking not found");
 
         BookingStatus status = booking.getStatus();
         if (status == BookingStatus.CANCELLED)
@@ -101,18 +97,17 @@ public class PaymentService {
     public PaymentResponse getPayment(Long userId, Long paymentId) {
         Payment payment = paymentRepo.findById(paymentId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND,
-                "Payment not found: " + paymentId));
-        checkOwnerOrAdmin(userId, payment);
+                "Payment not found"));
+        requireOwner(userId, payment, "Payment not found");
         return toResponse(payment);
     }
 
     @Transactional(readOnly = true)
     public List<PaymentResponse> getPaymentsByBooking(Long userId, Long bookingId) {
         Booking booking = bookingRepo.findById(bookingId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND,
-                "Booking not found: " + bookingId));
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found"));
         if (!booking.getUser().getId().equals(userId))
-            throw new ApiException(HttpStatus.FORBIDDEN, "Access denied");
+            throw new ApiException(HttpStatus.NOT_FOUND, "Booking not found");
         return paymentRepo.findByBookingIdOrderByCreatedAtDesc(bookingId)
             .stream().map(this::toResponse).toList();
     }
@@ -131,8 +126,8 @@ public class PaymentService {
     private PaymentResponse applySuccess(Long userId, Long paymentId, PaymentResultRequest req) {
         Payment payment = paymentRepo.findById(paymentId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND,
-                "Payment not found: " + paymentId));
-        checkOwnerOrAdmin(userId, payment);
+                "Payment not found"));
+        requireOwner(userId, payment, "Payment not found");
 
         if (payment.getStatus() != PaymentStatus.PENDING)
             throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,
@@ -191,8 +186,8 @@ public class PaymentService {
     private PaymentResponse applyFailure(Long userId, Long paymentId, PaymentResultRequest req) {
         Payment payment = paymentRepo.findById(paymentId)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND,
-                "Payment not found: " + paymentId));
-        checkOwnerOrAdmin(userId, payment);
+                "Payment not found"));
+        requireOwner(userId, payment, "Payment not found");
 
         if (payment.getStatus() != PaymentStatus.PENDING)
             throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,
@@ -293,13 +288,10 @@ public class PaymentService {
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    private void checkOwnerOrAdmin(Long userId, Payment payment) {
+    private void requireOwner(Long userId, Payment payment, String notFoundMessage) {
         Long ownerId = payment.getBooking().getUser().getId();
-        if (ownerId.equals(userId)) return;
-        User requestingUser = userRepo.findById(userId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
-        if (!"ADMIN".equals(requestingUser.getRole()))
-            throw new ApiException(HttpStatus.FORBIDDEN, "Access denied");
+        if (!ownerId.equals(userId))
+            throw new ApiException(HttpStatus.NOT_FOUND, notFoundMessage);
     }
 
     private PaymentProvider providerFor(PaymentMethod method) {

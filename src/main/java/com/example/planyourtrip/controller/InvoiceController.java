@@ -27,13 +27,13 @@ public class InvoiceController {
     }
 
     @GetMapping("/api/invoices/{id}")
-    @Operation(summary = "Get invoice by ID (owner or admin)")
+    @Operation(summary = "Get own invoice by ID")
     public InvoiceResponse getById(@AuthUser Long uid, @PathVariable Long id) {
         return service.getInvoice(uid, id);
     }
 
     @GetMapping("/api/bookings/{bookingId}/invoice")
-    @Operation(summary = "Get invoice for a booking (owner or admin)")
+    @Operation(summary = "Get own invoice for a booking")
     public InvoiceResponse getByBooking(@AuthUser Long uid, @PathVariable Long bookingId) {
         return service.getInvoiceByBooking(uid, bookingId);
     }

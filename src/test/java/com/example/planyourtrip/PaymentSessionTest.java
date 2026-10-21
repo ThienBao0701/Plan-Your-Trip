@@ -4,6 +4,7 @@ import com.example.planyourtrip.model.AdminActivityLog;
 import com.example.planyourtrip.model.CallbackOutcome;
 import com.example.planyourtrip.model.PaymentProvider;
 import com.example.planyourtrip.model.PaymentSession;
+import com.example.planyourtrip.model.PaymentSessionStatus;
 import com.example.planyourtrip.repository.*;
 import com.example.planyourtrip.service.gateway.PaymentGateway;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -73,6 +74,8 @@ class PaymentSessionTest {
     @Autowired AdminActivityLogRepository auditRepo;
     @Autowired UserRepository userRepo;
     @Autowired PaymentSessionRepository sessionRepo;
+    @Autowired PaymentSessionEventRepository eventRepo;
+    @Autowired NotificationRepository notificationRepo;
 
     private String adminToken;
     private String userToken;
@@ -147,13 +150,13 @@ class PaymentSessionTest {
     }
 
     @Test
-    void session_create_rejectsOtherUsersBooking_returns403() throws Exception {
+    void session_create_rejectsOtherUsersBookingWithoutExistenceLeak() throws Exception {
         Long bookingId = createBooking(userToken, 5);
         mvc.perform(post("/api/payment-sessions")
                 .header("Authorization", "Bearer " + partnerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"bookingId\":" + bookingId + ",\"provider\":\"MOCK\"}"))
-            .andExpect(status().isForbidden());
+            .andExpect(status().isNotFound());
     }
 
     @Test
@@ -193,6 +196,45 @@ class PaymentSessionTest {
 
         assertEquals(bookingId, fetched.get("bookingId").asLong());
         assertFalse(fetched.get("bookingCode").asText().isBlank());
+    }
+
+    @Test
+    void adminSessionInspectionUsesThePermissionGatedRouteAndCannotCancelAsOwner() throws Exception {
+        Long bookingId = createBooking(userToken, 10);
+        JsonNode created = createSession(userToken, bookingId, "MOCK");
+        String sessionId = created.get("sessionId").asText();
+
+        String foreign = mvc.perform(get("/api/payment-sessions/" + sessionId)
+                .header("Authorization", "Bearer " + adminToken))
+            .andExpect(status().isNotFound())
+            .andReturn().getResponse().getContentAsString();
+        String missing = mvc.perform(get("/api/payment-sessions/PS-not-present")
+                .header("Authorization", "Bearer " + adminToken))
+            .andExpect(status().isNotFound())
+            .andReturn().getResponse().getContentAsString();
+        assertEquals(mapper.readTree(missing).get("message").asText(),
+            mapper.readTree(foreign).get("message").asText());
+
+        mvc.perform(get("/api/admin/payment-sessions/" + sessionId)
+                .header("Authorization", "Bearer " + adminToken))
+            .andExpect(status().isOk());
+        mvc.perform(get("/api/admin/payment-sessions/" + sessionId + "/events")
+                .header("Authorization", "Bearer " + adminToken))
+            .andExpect(status().isOk());
+        long eventsBeforeDeniedCancel = eventRepo.findByPaymentSessionIdOrderByCreatedAtAscIdAsc(
+            sessionRepo.findBySessionId(sessionId).orElseThrow().getId()).size();
+        long auditsBeforeDeniedCancel = auditRepo.count();
+        long notificationsBeforeDeniedCancel = notificationRepo.count();
+        mvc.perform(post("/api/payment-sessions/" + sessionId + "/cancel")
+                .header("Authorization", "Bearer " + adminToken))
+            .andExpect(status().isNotFound());
+        assertEquals(PaymentSessionStatus.PENDING,
+            sessionRepo.findBySessionId(sessionId).orElseThrow().getStatus());
+        assertEquals(eventsBeforeDeniedCancel, eventRepo.findByPaymentSessionIdOrderByCreatedAtAscIdAsc(
+            sessionRepo.findBySessionId(sessionId).orElseThrow().getId()).size());
+        assertEquals(auditsBeforeDeniedCancel, auditRepo.count(), "rejected cancel must not emit an audit event");
+        assertEquals(notificationsBeforeDeniedCancel, notificationRepo.count(),
+            "rejected cancel must not emit a notification");
     }
 
     // ═══════════════════════════════════════════════════════════════════════════

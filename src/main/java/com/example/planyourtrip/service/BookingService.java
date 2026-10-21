@@ -300,11 +300,9 @@ public class BookingService {
     @Transactional(readOnly = true)
     public BookingResponse getById(Long userId, Long bookingId) {
         Booking booking = bookingRepo.findById(bookingId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found: " + bookingId));
-        User requestingUser = userRepo.findById(userId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
-        if (!booking.getUser().getId().equals(userId) && !"ADMIN".equals(requestingUser.getRole()))
-            throw new ApiException(HttpStatus.FORBIDDEN, "Access denied");
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found"));
+        if (!booking.getUser().getId().equals(userId))
+            throw new ApiException(HttpStatus.NOT_FOUND, "Booking not found");
         return toResponse(booking);
     }
 
@@ -336,11 +334,9 @@ public class BookingService {
     @Transactional(readOnly = true)
     public BookingTimelineResponse getTimeline(Long userId, Long bookingId) {
         Booking b = bookingRepo.findById(bookingId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found: " + bookingId));
-        User requestingUser = userRepo.findById(userId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
-        if (!b.getUser().getId().equals(userId) && !"ADMIN".equals(requestingUser.getRole()))
-            throw new ApiException(HttpStatus.FORBIDDEN, "Access denied");
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found"));
+        if (!b.getUser().getId().equals(userId))
+            throw new ApiException(HttpStatus.NOT_FOUND, "Booking not found");
         return buildTimeline(b);
     }
 
@@ -352,9 +348,8 @@ public class BookingService {
      * pure read + DTO mapping, no price recomputation, no mutation of anything (no Booking/Payment
      * write, no inventory/reservation change, no ledger/notification/audit row, no lock).
      *
-     * <p><b>Ownership — deliberate 404 (not 403) for a non-owner.</b> Unlike {@link #getById} /
-     * {@link #cancel} / {@link #modify}, which return 403 "Access denied" for another user's booking
-     * (and let ADMIN read), this voucher surface returns 404 for ANY booking that is not the caller's
+     * <p><b>Ownership — deliberate 404 (not 403) for a non-owner.</b> This voucher surface returns
+     * 404 for ANY booking that is not the caller's
      * own — the same "don't leak existence" privacy pattern the coupon / gift-card / wallet read
      * surfaces use. This is the one intentional convention divergence in this phase: the voucher is a
      * customer self-service artifact, so it never confirms the existence of a booking the caller does
@@ -367,11 +362,11 @@ public class BookingService {
     @Transactional(readOnly = true)
     public BookingVoucherResponse getVoucher(Long userId, Long bookingId) {
         Booking b = bookingRepo.findById(bookingId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found: " + bookingId));
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found"));
         // Owner-scoped 404 (see javadoc): a booking that is not the caller's is indistinguishable from
         // one that does not exist. No ADMIN bypass on this customer surface.
         if (!b.getUser().getId().equals(userId))
-            throw new ApiException(HttpStatus.NOT_FOUND, "Booking not found: " + bookingId);
+            throw new ApiException(HttpStatus.NOT_FOUND, "Booking not found");
         return toVoucher(b);
     }
 
@@ -492,9 +487,9 @@ public class BookingService {
     @Transactional
     public BookingResponse cancel(Long userId, Long bookingId, String cancelReason) {
         Booking booking = bookingRepo.findById(bookingId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found: " + bookingId));
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found"));
         if (!booking.getUser().getId().equals(userId))
-            throw new ApiException(HttpStatus.FORBIDDEN, "Access denied");
+            throw new ApiException(HttpStatus.NOT_FOUND, "Booking not found");
 
         BookingStatus current = booking.getStatus();
         if (current == BookingStatus.CANCELLED)
@@ -579,11 +574,10 @@ public class BookingService {
     @Transactional
     public BookingResponse modify(Long userId, Long bookingId, BookingModificationRequest req) {
         Booking booking = bookingRepo.findById(bookingId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found: " + bookingId));
-        // Ownership convention MATCHES cancel(): another user's booking → 403 (consistency within
-        // this controller wins).
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found"));
+        // Preserve the same owner-only privacy contract as cancellation.
         if (!booking.getUser().getId().equals(userId))
-            throw new ApiException(HttpStatus.FORBIDDEN, "Access denied");
+            throw new ApiException(HttpStatus.NOT_FOUND, "Booking not found");
 
         if (booking.getStatus() != BookingStatus.PENDING)
             throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,

@@ -52,7 +52,7 @@ import java.util.Optional;
  * and never writes a notification or ledger entry. {@code @Transactional(readOnly = true)}.
  *
  * <p><b>Validation mirrors modify() precisely</b> so a successful preview predicts a successful
- * modify: owner-only (403), PENDING-only (422), no-applied-benefit (422), and the same hard 400s for
+ * modify: owner-only (404 for foreign bookings), PENDING-only (422), no-applied-benefit (422), and the same hard 400s for
  * past check-in / non-positive stay / adults &lt; 1 / capacity exceeded. Soft conditions
  * (unavailable inventory, an ineligible previewed benefit, an inactive hold) are surfaced in
  * {@code eligibilityFailures} rather than thrown, since a preview is informational.
@@ -98,11 +98,11 @@ public class BookingModificationPreviewService {
     public BookingModificationPreviewResponse preview(Long userId, Long bookingId,
                                                       BookingModificationPreviewRequest req) {
         Booking booking = bookingRepo.findById(bookingId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found: " + bookingId));
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found"));
 
-        // Ownership convention MATCHES modify()/cancel(): another user's booking → 403.
+        // Match modify()/cancel(): a foreign booking is indistinguishable from a missing booking.
         if (!booking.getUser().getId().equals(userId))
-            throw new ApiException(HttpStatus.FORBIDDEN, "Access denied");
+            throw new ApiException(HttpStatus.NOT_FOUND, "Booking not found");
 
         // PENDING-only boundary (mirrors modify()). The spec lists CANCELLED/COMPLETED/EXPIRED/
         // REFUNDED explicitly; we reject ANY non-PENDING status (which subsumes those plus
